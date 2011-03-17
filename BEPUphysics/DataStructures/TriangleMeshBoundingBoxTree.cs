@@ -682,6 +682,7 @@ namespace BEPUphysics.DataStructures
 
         }
 
+        //Epsilons in comparers help handle precision errors. 
         XAxisComparer xAxisComparer;
         class XAxisComparer : IComparer<int>
         {
@@ -697,9 +698,9 @@ namespace BEPUphysics.DataStructures
                 tree.triangleMeshData.GetBoundingBox(b, out bBoundingBox);
                 float x1 = (aBoundingBox.Max.X + aBoundingBox.Min.X) * .5f;
                 float x2 = (bBoundingBox.Max.X + bBoundingBox.Min.X) * .5f;
-                if (x1 > x2)
+                if (x1 > x2 + Toolbox.BigEpsilon)
                     return 1;
-                if (x2 > x1)
+                if (x2 > x1 + Toolbox.BigEpsilon)
                     return -1;
                 return 0;
 
@@ -721,9 +722,9 @@ namespace BEPUphysics.DataStructures
                 tree.triangleMeshData.GetBoundingBox(b, out bBoundingBox);
                 float y1 = (aBoundingBox.Max.Y + aBoundingBox.Min.Y) * .5f;
                 float y2 = (bBoundingBox.Max.Y + bBoundingBox.Min.Y) * .5f;
-                if (y1 > y2)
+                if (y1 > y2 + Toolbox.BigEpsilon)
                     return 1;
-                if (y2 > y1)
+                if (y2 > y1 + Toolbox.BigEpsilon)
                     return -1;
                 return 0;
 
@@ -744,9 +745,9 @@ namespace BEPUphysics.DataStructures
                 tree.triangleMeshData.GetBoundingBox(b, out bBoundingBox);
                 float z1 = (aBoundingBox.Max.Z + aBoundingBox.Min.Z) * .5f;
                 float z2 = (bBoundingBox.Max.Z + bBoundingBox.Min.Z) * .5f;
-                if (z1 > z2)
+                if (z1 > z2 + Toolbox.BigEpsilon)
                     return 1;
-                if (z2 > z1)
+                if (z2 > z1 + Toolbox.BigEpsilon)
                     return -1;
                 return 0;
 

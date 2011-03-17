@@ -338,7 +338,12 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             Vector3.Subtract(ref ray.Position, ref transform.Position, out localRay.Position);
             Vector3.Transform(ref localRay.Position, ref conjugate, out localRay.Position);
 
-            return Toolbox.FindRayTriangleIntersection(ref localRay, maximumLength, sidedness, ref vA, ref vB, ref vC, out hit);
+            bool toReturn = Toolbox.FindRayTriangleIntersection(ref localRay, maximumLength, sidedness, ref vA, ref vB, ref vC, out hit);
+            //Move the hit back into world space.
+            Vector3.Multiply(ref ray.Direction, hit.T, out hit.Location);
+            Vector3.Add(ref ray.Position, ref hit.Location, out hit.Location);
+            Vector3.Transform(ref hit.Normal, ref transform.Orientation, out hit.Normal);
+            return toReturn;
         }
 
         /// <summary>

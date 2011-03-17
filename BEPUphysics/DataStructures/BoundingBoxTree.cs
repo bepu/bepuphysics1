@@ -496,6 +496,8 @@ namespace BEPUphysics.DataStructures
         }
 
         static XAxisComparer xAxisComparer = new XAxisComparer();
+
+        //Epsilons in comparers help handle precision errors. 
         class XAxisComparer : IComparer<T>
         {
             public int Compare(T a, T b)
@@ -503,9 +505,9 @@ namespace BEPUphysics.DataStructures
 
                 float x1 = (a.BoundingBox.Max.X + a.BoundingBox.Min.X) * .5f;
                 float x2 = (b.BoundingBox.Max.X + b.BoundingBox.Min.X) * .5f;
-                if (x1 > x2)
+                if (x1 > x2 + Toolbox.BigEpsilon)
                     return 1;
-                if (x2 > x1)
+                if (x2 > x1 + Toolbox.BigEpsilon)
                     return -1;
                 return 0;
 
@@ -520,9 +522,9 @@ namespace BEPUphysics.DataStructures
 
                 float y1 = (a.BoundingBox.Max.Y + a.BoundingBox.Min.Y) * .5f;
                 float y2 = (b.BoundingBox.Max.Y + b.BoundingBox.Min.Y) * .5f;
-                if (y1 > y2)
+                if (y1 > y2 + Toolbox.BigEpsilon)
                     return 1;
-                if (y2 > y1)
+                if (y2 > y1 + Toolbox.BigEpsilon)
                     return -1;
                 return 0;
 
@@ -536,9 +538,9 @@ namespace BEPUphysics.DataStructures
 
                 float z1 = (a.BoundingBox.Max.Z + a.BoundingBox.Min.Z) * .5f;
                 float z2 = (b.BoundingBox.Max.Z + b.BoundingBox.Min.Z) * .5f;
-                if (z1 > z2)
+                if (z1 > z2 + Toolbox.BigEpsilon)
                     return 1;
-                if (z2 > z1)
+                if (z2 > z1 + Toolbox.BigEpsilon)
                     return -1;
                 return 0;
 
