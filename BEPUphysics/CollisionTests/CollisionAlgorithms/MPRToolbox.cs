@@ -656,7 +656,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
         /// </summary>
         /// <param name="shapeA">First shape to check.</param>
         /// <param name="shapeB">Second shape to check.</param>
-        /// <param name="v0">Normal to warmstart the penetration depth calculation.</param>
+        /// <param name="v0">Position to warmstart the penetration depth calculation.</param>
         /// <param name="localTransformB">Transform of shapeB in the local space of A.</param>
         /// <param name="normal">Direction along which to find the penetration depth.</param>
         /// <returns>Length of the interpenetrating area along the given normal.</returns>

@@ -19,7 +19,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         ///<param name="radius">Radius of the cylinder.</param>
         public CylinderShape(float height, float radius)
         {
-            Height = height;
+            this.halfHeight = height * .5f;
             Radius = radius;
         }
 

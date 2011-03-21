@@ -39,6 +39,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             {
                 Vector3.Subtract(ref this.vertices.Elements[i], ref center, out this.vertices.Elements[i]);
             }
+            OnShapeChanged();
         }
 
         ///<summary>
@@ -60,6 +61,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             {
                 Vector3.Subtract(ref this.vertices.Elements[i], ref center, out this.vertices.Elements[i]);
             }
+            OnShapeChanged();
         }
 
 

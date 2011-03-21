@@ -2,21 +2,24 @@
 using BEPUphysics;
 using BEPUphysics.Entities;
 using Microsoft.Xna.Framework;
-using BEPUphysics.Updateables;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.MathExtensions;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
+using BEPUphysics.Entities.Prefabs;
+using BEPUphysics.UpdateableSystems;
+using BEPUphysics.CollisionShapes.ConvexShapes;
+using BEPUphysics.CollisionTests.CollisionAlgorithms.GJK;
 
 namespace BEPUphysicsDemos
 {
     public class CharacterController : Updateable, IEndOfTimeStepUpdateable
     {
         /// <summary>
-        /// Entity whose shape will be used in a convex cast that finds supporting entities for the character or any entities blocking a step-up.
+        /// Shape that will be used in a convex cast that finds supporting entities for the character or any entities blocking a step-up.
         /// When the character is supported and looking for something to step on, this shape will be cast downward.
         /// To verify that it is valid, it will then be cast upward from the character's head.
         /// </summary>
-        private Cylinder castingShape;
+        private CylinderShape castingShape;
 
         /// <summary>
         /// A box positioned relative to the character's body used to identify collision pairs with nearby objects that could be possibly stood upon.
@@ -139,19 +142,18 @@ namespace BEPUphysicsDemos
         /// <param name="characterWidth">The diameter of the character.</param>
         /// <param name="mass">Total mass of the character.</param>
         /// <param name="maximumStepHeight">Height that the character can climb up.</param>
-        /// <param name="supportMargin">The distance above the ground that the bottom of the character's body floats.</param>
-        /// <param name="collisionMargin">Mass of the character.</param>
-        public CharacterController(Vector3 position, float characterHeight, float characterWidth, float mass, float maximumStepHeight, float supportMargin, float collisionMargin)
+        public CharacterController(Vector3 position, float characterHeight, float characterWidth, float mass, float maximumStepHeight)
         {
             //Create the physical body of the character. 
             //The character's cylinder height and radius must be shrunk down marginally
             //to take into account the collision margin and support margin while still fitting in the defined character height/width.
             var bodyPosition = new Vector3(position.X, position.Y + supportMargin / 2, position.Z);
+            float collisionMargin = .04f;
             Body = new Cylinder(bodyPosition,
                                 characterHeight - 2 * collisionMargin - supportMargin,
                                 characterWidth / 2 - collisionMargin,
                                 mass);
-            Body.CollisionMargin = collisionMargin;
+            Body.CollisionInformation.Shape.CollisionMargin = collisionMargin;
 
             feetCollisionPairCollectorPositionOffset = new Vector3(0, -Body.Height / 2 - supportMargin - collisionMargin, 0);
             feetCollisionPairCollector = new Box(bodyPosition + feetCollisionPairCollectorPositionOffset, characterWidth, maximumStepHeight * 2, characterWidth, 1);
@@ -167,11 +169,11 @@ namespace BEPUphysicsDemos
             CollisionRules.AddRule(headCollisionPairCollector, Body, CollisionRule.NoBroadPhase); //Prevents the creation of any collision pairs between the body and the collector.
             headBlockageFinderOffset = new Vector3(0, headCollisionPairCollectorPositionOffset.Y - maximumStepHeight / 2 - collisionMargin, 0);
 
-            castingShape = new Cylinder(Vector3.Zero, 0, Body.Radius + collisionMargin);
+            castingShape = new CylinderShape(0, Body.Radius + collisionMargin);
             castingShape.CollisionMargin = 0;
 
             this.maximumStepHeight = maximumStepHeight;
-            this.supportMargin = supportMargin;
+            this.supportMargin = .01f;
 
             Body.LocalInertiaTensorInverse = new Matrix3X3();
             feetCollisionPairCollector.LocalInertiaTensorInverse = new Matrix3X3();
@@ -262,46 +264,50 @@ namespace BEPUphysicsDemos
             Entity hitEntity = null, stepHitEntity = null;
             float distance = float.MaxValue, stepDistance = float.MaxValue;
 
-
-            for (int i = 0; i < feetCollisionPairCollector.CollisionInformation.Pairs.Count; i++)
+            foreach (Entity candidate in feetCollisionPairCollector.CollisionInformation.OverlappedEntities)
             {
-                var pair = feetCollisionPairCollector.CollisionInformation.Pairs[i];
+
+                //for (int i = 0; i < feetCollisionPairCollector.CollisionInformation.Pairs.Count; i++)
+                //{
+                //var pair = feetCollisionPairCollector.CollisionInformation.Pairs[i];
+
                 //Determine which member of the collision pair is the possible support.
                 //The comparisons are all kept on a "parent" as opposed to "collider" level so that interaction with compound shapes is simpler.
-                Entity candidate = pair.ColliderA == feetCollisionPairCollector ? pair.ColliderB : pair.ColliderA;
+                //Entity candidate = pair.ColliderA == feetCollisionPairCollector ? pair.ColliderB : pair.ColliderA;
                 //Ensure that the candidate is a valid supporting entity.
                 if (candidate.CollisionInformation.CollisionRules.Personal > CollisionRule.Normal)
                     continue; //It is invalid!
 
-                float tempToi;
-                Vector3 tempHitLocation, tempHitNormal;
-
                 //Fire a convex cast at the candidate and determine some details! 
-                Vector3 Position = candidate.Position;
-                Quaternion orientation = candidate.Orientation;
-                if (Toolbox.AreSweptObjectsColliding(castingShape, candidate,
-                                                     ref startingLocation, ref Position, ref Toolbox.IdentityOrientation, ref orientation,
-                                                     0, candidate.CollisionMargin, ref sweep, ref Toolbox.ZeroVector, //Could use frame velocity as a candidate sweep, but not really important.
-                                                     out tempHitLocation, out tempHitNormal, out tempToi))
+                ConvexShape targetShape = candidate.CollisionInformation.Shape as ConvexShape;
+                if (targetShape != null)
                 {
-                    //tempHitNormal *= -1;
-                    tempToi *= maximumDistance;
-                    if (tempToi < stepDistance)
+                    RigidTransform sweepTransform = new RigidTransform(startingLocation);
+                    RigidTransform targetTransform = new RigidTransform(candidate.Position, candidate.Orientation);
+                    RayHit rayHit;
+                    if (GJKToolbox.ConvexCast(castingShape, targetShape, ref sweep,
+                                              ref sweepTransform, ref targetTransform,
+                                              out rayHit))
                     {
-                        stepDistance = tempToi;
-                        stepHitLocation = tempHitLocation;
-                        stepHitNormal = tempHitNormal;
-                        stepHitEntity = candidate;
-                    }
-                    if (tempToi < distance &&
-                        //If the hit is within a small margin range at the base of the character...
-                        tempToi >= maximumStepHeight - Body.CollisionMargin - supportMargin && tempToi <= maximumStepHeight)
-                    {
-                        //Then this could be one of the non-step supports.
-                        distance = tempToi;
-                        hitLocation = tempHitLocation;
-                        hitNormal = tempHitNormal;
-                        hitEntity = candidate;
+                        //tempHitNormal *= -1;
+                        rayHit.T *= maximumDistance;
+                        if (rayHit.T < stepDistance)
+                        {
+                            stepDistance = rayHit.T;
+                            stepHitLocation = rayHit.Location;
+                            stepHitNormal = rayHit.Normal;
+                            stepHitEntity = candidate;
+                        }
+                        if (rayHit.T < distance &&
+                            //If the hit is within a small margin range at the base of the character...
+                            rayHit.T >= maximumStepHeight - Body.CollisionInformation.Shape.CollisionMargin - supportMargin && rayHit.T <= maximumStepHeight)
+                        {
+                            //Then this could be one of the non-step supports.
+                            distance = rayHit.T;
+                            hitLocation = rayHit.Location;
+                            hitNormal = rayHit.Normal;
+                            hitEntity = candidate;
+                        }
                     }
                 }
             }
@@ -367,31 +373,35 @@ namespace BEPUphysicsDemos
         private bool IsStepSafe(float hitDistance)
         {
             float stepHeight = maximumStepHeight - hitDistance;
-            var sweep = new Vector3(0, stepHeight + Body.CollisionMargin, 0);
+            var sweep = new Vector3(0, stepHeight + Body.CollisionInformation.Shape.CollisionMargin, 0);
             Vector3 startingLocation = headBlockageFinderOffset + Body.Position;
 
-            foreach (CollisionPair pair in headCollisionPairCollector.CollisionPairs)
+            foreach (Entity candidate in headCollisionPairCollector.CollisionInformation.OverlappedEntities)
             {
-                //Determine which member of the collision pair is the possible blockage.
-                //The comparisons are all kept on a "parent" as opposed to "collider" level so that interaction with compound shapes is simpler.
+                //foreach (CollisionPair pair in headCollisionPairCollector.CollisionPairs)
+                //{
+                //    //Determine which member of the collision pair is the possible blockage.
+                //    //The comparisons are all kept on a "parent" as opposed to "collider" level so that interaction with compound shapes is simpler.
 
-                Entity candidate = pair.ParentA == headCollisionPairCollector ? pair.ParentB : pair.ParentA;
+                //    Entity candidate = pair.ParentA == headCollisionPairCollector ? pair.ParentB : pair.ParentA;
                 //Ensure that the candidate is a valid blocking entity.
-                if (candidate.CollisionRules.Personal > CollisionRule.Normal)
+                if (candidate.CollisionInformation.CollisionRules.Personal > CollisionRule.Normal)
                     continue; //It is invalid!
 
-                float toi;
-                Vector3 tempHitLocation, tempHitNormal;
 
-                //Fire a convex cast at the candidate and determine some details! 
-                Vector3 Position = candidate.Position;
-                Quaternion orientation = candidate.Orientation;
-                if (Toolbox.AreSweptObjectsColliding(castingShape, candidate,
-                                                     ref startingLocation, ref Position, ref Toolbox.IdentityOrientation, ref orientation,
-                                                     0, candidate.CollisionMargin, ref sweep, ref Toolbox.ZeroVector, //Could use frame velocity as a candidate sweep, but not really important.
-                                                     out tempHitLocation, out tempHitNormal, out toi))
+                //Fire a convex cast at the candidate and determine some details!  
+                ConvexShape targetShape = candidate.CollisionInformation.Shape as ConvexShape;
+                if (targetShape != null)
                 {
-                    return false;
+                    RigidTransform sweepTransform = new RigidTransform(startingLocation);
+                    RigidTransform targetTransform = new RigidTransform(candidate.Position, candidate.Orientation);
+                    RayHit rayHit;
+                    if (GJKToolbox.ConvexCast(castingShape, targetShape, ref sweep,
+                                              ref sweepTransform, ref targetTransform,
+                                              out rayHit))
+                    {
+                        return false;
+                    }
                 }
             }
             return true;

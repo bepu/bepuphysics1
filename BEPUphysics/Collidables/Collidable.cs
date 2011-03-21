@@ -53,7 +53,9 @@ namespace BEPUphysics.Collidables
         public bool IgnoreShapeChanges { get; set; }
 
         Action<CollisionShape> shapeChangedDelegate;
-        protected abstract void OnShapeChanged(CollisionShape collisionShape);
+        protected virtual void OnShapeChanged(CollisionShape collisionShape)
+        {
+        }
 
 
         internal List<CollidablePairHandler> pairs = new List<CollidablePairHandler>();

@@ -2,6 +2,8 @@
 using BEPUphysics.CollisionTests.CollisionAlgorithms.GJK;
 using Microsoft.Xna.Framework;
 using BEPUphysics.CollisionShapes.ConvexShapes;
+using BEPUphysics.MathExtensions;
+using BEPUphysics.Settings;
 
 namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 {
@@ -31,7 +33,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
         ///<param name="contact">Contact between the shapes, if any.</param>
         ///<returns>Whether or not the shapes are colliding.</returns>
         public bool GenerateContactCandidate(out ContactData contact)
-        {            
+        {
             switch (state)
             {
                 case CollisionState.Plane:
@@ -54,6 +56,8 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
         private bool DoPlaneTest(out ContactData contact)
         {
+
+
             //Find closest point between object and plane.
             Vector3 reverseNormal;
             Vector3 ab, ac;
@@ -111,6 +115,8 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 return DoExternalSeparated(out contact);
             }
 
+
+
             float dotE;
             Vector3.Dot(ref extremePoint, ref reverseNormal, out dotE);
             float t = (dotA - dotE) / reverseNormal.LengthSquared();
@@ -135,19 +141,32 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 //Due to the previous tests, we know it isn't penetrating, and it is right above the face.
                 //All that's left is to create the contact.
 
+
                 contact = new ContactData();
                 //Displacement is from A to B.  point = A + t * AB, where t = marginA / margin.
-                Vector3.Multiply(ref offset, -convex.collisionMargin / marginSum, out contact.Position); //t * AB
+                if (marginSum > Toolbox.Epsilon) //This can be zero! It would cause a NaN is unprotected.
+                    Vector3.Multiply(ref offset, -convex.collisionMargin / marginSum, out contact.Position); //t * AB
+                else contact.Position = new Vector3();
                 Vector3.Add(ref extremePoint, ref contact.Position, out contact.Position); //A + t * AB.
 
                 float normalLength = reverseNormal.Length();
                 Vector3.Divide(ref reverseNormal, normalLength, out contact.Normal);
                 float distance = normalLength * t;
 
+
+
                 contact.PenetrationDepth = marginSum - distance;
 
                 if (contact.PenetrationDepth > marginSum)
                 {
+                    //Check to see if the inner sphere is touching the plane.
+                    //This overrides other depth tests.
+                    ContactData temp;
+                    if (TryInnerSphereContact(out temp))
+                    {
+                        contact = temp;
+                        return true;
+                    }
                     //The convex object is stuck deep in the plane!
                     //The most problematic case for this is when
                     //an object is right on top of a cliff.
@@ -206,6 +225,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
         private bool DoExternalSeparated(out ContactData contact)
         {
+
             if (GJKToolbox.AreShapesIntersecting(convex, triangle, ref Toolbox.RigidIdentity, ref Toolbox.RigidIdentity, ref localSeparatingAxis))
             {
                 state = CollisionState.ExternalNear;
@@ -218,6 +238,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
         private bool DoExternalNear(out ContactData contact)
         {
+
             Vector3 closestA, closestB;
 
 
@@ -266,7 +287,9 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
 
                 //Displacement is from A to B.  point = A + t * AB, where t = marginA / margin.
-                Vector3.Multiply(ref displacement, convex.collisionMargin / margin, out contact.Position); //t * AB
+                if (margin > Toolbox.Epsilon) //This can be zero! It would cause a NaN is unprotected.
+                    Vector3.Multiply(ref displacement, convex.collisionMargin / margin, out contact.Position); //t * AB
+                else contact.Position = new Vector3();
                 Vector3.Add(ref closestA, ref contact.Position, out contact.Position); //A + t * AB.
 
 
@@ -291,6 +314,9 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
         private bool DoDeepContact(out ContactData contact)
         {
+            if (TryInnerSphereContact(out contact))
+                return true;
+
             if (MPRToolbox.AreObjectsColliding(convex, triangle, ref Toolbox.RigidIdentity, ref Toolbox.RigidIdentity, out contact))
             {
                 //Determine if the normal points in the appropriate direction given the sidedness of the triangle.
@@ -317,6 +343,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             return false;
         }
 
+
         void TryToEscape()
         {
             if (++escapeAttempts == EscapeAttemptPeriod)
@@ -333,6 +360,37 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 escapeAttempts = 0;
                 state = CollisionState.Plane;
             }
+        }
+
+
+        private bool TryInnerSphereContact(out ContactData contact)
+        {
+            Vector3 closestPoint;
+            if (Toolbox.GetClosestPointOnTriangleToPoint(ref triangle.vA, ref triangle.vB, ref triangle.vC, ref Toolbox.ZeroVector, out closestPoint))
+            {
+                state = CollisionState.Plane;
+            }
+            float length = closestPoint.LengthSquared();
+            float minimumRadius = convex.minimumRadius * (MotionSettings.CoreShapeScaling + .01f);
+            if (length < minimumRadius * minimumRadius)
+            {
+                length = (float)Math.Sqrt(length);
+                contact.Position = closestPoint;
+                if (length > Toolbox.Epsilon) //Watch out for NaN's!
+                    Vector3.Divide(ref closestPoint, length, out contact.Normal);
+                else
+                {
+                    //This isn't fast, but this is an extremely rare event.
+                    contact.Normal = triangle.GetNormal(Toolbox.RigidIdentity);
+                }
+
+                //The penetration depth could also be approximated rather than computed.  This is basically an approximation anyway.
+                contact.PenetrationDepth = MPRToolbox.FindPenetrationDepth(triangle, convex, ref contact.Position, ref Toolbox.RigidIdentity, ref contact.Normal);
+                contact.Id = -1;
+                return true;
+            }
+            contact = new ContactData();
+            return false;
         }
 
         ///<summary>

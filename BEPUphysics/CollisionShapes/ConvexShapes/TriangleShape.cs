@@ -56,6 +56,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             this.vA = vA - center;
             this.vB = vB - center;
             this.vC = vC - center;
+            OnShapeChanged();
         }
 
         ///<summary>
@@ -72,6 +73,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             this.vA = vA - center;
             this.vB = vB - center;
             this.vC = vC - center;
+            OnShapeChanged();
         }
 
         ///<summary>

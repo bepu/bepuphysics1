@@ -128,6 +128,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             Recenter(out center);
 
             shapes.Changed += ShapesChanged;
+            OnShapeChanged();
         }
 
         ///<summary>
@@ -148,6 +149,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             Recenter(out v);
 
             shapes.Changed += ShapesChanged;
+            OnShapeChanged();
         }
 
         ///<summary>
@@ -168,6 +170,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             Recenter(out center);
 
             shapes.Changed += ShapesChanged;
+            OnShapeChanged();
         }
 
         void ShapesChanged(ObservableList<ConvexShapeEntry> list)

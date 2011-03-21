@@ -11,6 +11,9 @@ using BEPUphysics.MathExtensions;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.DataStructures;
 using Microsoft.Xna.Framework.Graphics;
+using BEPUphysics.Collidables.MobileCollidables;
+using BEPUphysics.CollisionShapes;
+using BEPUphysics.Settings;
 
 namespace BEPUphysicsDemos.Demos
 {
@@ -31,32 +34,79 @@ namespace BEPUphysicsDemos.Demos
 
             Vector3[] vertices;
             int[] indices;
-            TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("playground"), out vertices, out indices);
-            //InstancedMesh mesh = new InstancedMesh(new InstancedMeshShape(vertices, indices), new AffineTransform(new Vector3(0, -15, 0)));
-            var mesh = new StaticMesh(vertices, indices, new AffineTransform(Matrix3X3.CreateFromAxisAngle(Vector3.Up, MathHelper.Pi), new Vector3(0, -10, 0)));
-            mesh.Sidedness = TriangleSidedness.DoubleSided;
-            Space.Add(mesh);
-            game.ModelDrawer.Add(mesh.Mesh);
+            TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("barrelandplatform"), out vertices, out indices);
 
-            Triangle t = new Triangle(new Vector3(0, -10, 0), new Vector3(10, -10, 0), new Vector3(0, -10, 10));
-            t.Sidedness = TriangleSidedness.Clockwise;
-            Space.Add(t);
-            t.Position -= new Vector3(10, 0, 0);
-            //Space.ForceUpdater.Gravity = new Vector3();
+            float radius = 1;
+            var scaleTransform = Matrix.CreateScale(2 * radius);
 
-            game.Camera.Position = new Vector3(0, 0, 0);
+            List<DynamicCompoundEntry> triangles = new List<DynamicCompoundEntry>(indices.Length / 3);
 
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < indices.Length; i += 3)
             {
-                Entity toAdd = new Box(new Vector3((float)random.NextDouble() * 10, (float)random.NextDouble() * 10, (float)random.NextDouble() * 10), 1, 1, 1, 1);
-                containedEntities.Add(toAdd);
-                Space.Add(toAdd);
+                // [Recentered Triangle]
+                Vector3 centre;
+                TriangleShape tri = new TriangleShape(
+                    Vector3.Transform(vertices[indices[i]], scaleTransform),
+                    Vector3.Transform(vertices[indices[i + 1]], scaleTransform),
+                    Vector3.Transform(vertices[indices[i + 2]], scaleTransform),
+                    out centre
+                    );
+
+                //Depending on the winding of the model, using clockwise or counterclockwise will permit
+                //objects to move freely from the inside to the outside, or from the outside inside.
+                //Doublesided stops both ways.  (It's the default too, so setting this isn't really necessary)
+                tri.Sidedness = TriangleSidedness.DoubleSided;
+                //By now, if we checked the triangle shape's vertices, they would be in the triangle's local space.
+                //If we added centre to the vertices, they would be in the original world space locations.
+                //Knowing that, we can pass the centre to the DynamicCompoundEntry's position and they will be in the correct location.
+                triangles.Add(
+                    new DynamicCompoundEntry(
+                        tri,
+                        centre,
+                        .5f
+                    )
+                );
             }
 
-            boxA = new Box(new Vector3(0, 50, 0), 1, 1, 1, 1);
-            boxA.PositionUpdateMode = PositionUpdateMode.Continuous;
-            Space.Add(boxA);
 
+            var body = new CompoundBody(triangles);
+
+            Space.Add(body);
+
+            Space.Add(new Box(new Vector3(0, -50, 0), 100, 1, 100));
+
+
+            game.Camera.Position = new Vector3(0, 0, 10);
+            
+            //Vector3[] vertices;
+            //int[] indices;
+            //TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("playground"), out vertices, out indices);
+            ////InstancedMesh mesh = new InstancedMesh(new InstancedMeshShape(vertices, indices), new AffineTransform(new Vector3(0, -15, 0)));
+            //var mesh = new StaticMesh(vertices, indices, new AffineTransform(Matrix3X3.CreateFromAxisAngle(Vector3.Up, MathHelper.Pi), new Vector3(0, -10, 0)));
+            //mesh.Sidedness = TriangleSidedness.DoubleSided;
+            //Space.Add(mesh);
+            //game.ModelDrawer.Add(mesh.Mesh);
+
+            //Triangle t = new Triangle(new Vector3(0, -10, 0), new Vector3(10, -10, 0), new Vector3(0, -10, 10));
+            //t.Sidedness = TriangleSidedness.Clockwise;
+            //Space.Add(t);
+            //t.Position -= new Vector3(10, 0, 0);
+            ////Space.ForceUpdater.Gravity = new Vector3();
+
+            //game.Camera.Position = new Vector3(0, 0, 0);
+
+            //for (int i = 0; i < 100; i++)
+            //{
+            //    Entity toAdd = new Box(new Vector3((float)random.NextDouble() * 10, (float)random.NextDouble() * 10, (float)random.NextDouble() * 10), 1, 1, 1, 1);
+            //    containedEntities.Add(toAdd);
+            //    Space.Add(toAdd);
+            //}
+
+            //boxA = new Box(new Vector3(0, 50, 0), 1, 1, 1, 1);
+            //boxA.PositionUpdateMode = PositionUpdateMode.Continuous;
+            //Space.Add(boxA);
+
+            Space.NarrowPhase.AllowMultithreading = false;
         }
 
         Box boxA, boxB;
@@ -70,20 +120,6 @@ namespace BEPUphysicsDemos.Demos
         public override void Update(float dt)
         {
             KeyboardState state = Keyboard.GetState();
-
-            for (int i = 0; i < 5 && containedEntities.Count > 0; i++)
-            {
-                int index = random.Next(0, containedEntities.Count);
-                Space.Remove(containedEntities[index]);
-                containedEntities.RemoveAt(index);
-            }
-
-            for (int i = 0; i < 5; i++)
-            {
-                Entity toAdd = new Box(new Vector3((float)random.NextDouble() * 10, (float)random.NextDouble() * 10, (float)random.NextDouble() * 10), 1, 1, 1, 1);
-                containedEntities.Add(toAdd);
-                Space.Add(toAdd);
-            }
 
 
 

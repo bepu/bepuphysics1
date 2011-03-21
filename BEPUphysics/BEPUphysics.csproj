@@ -46,6 +46,12 @@
     <DocumentationFile>bin\x86\Release\BEPUphysics.XML</DocumentationFile>
     <DebugSymbols>false</DebugSymbols>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>strongNameKey.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Xna.Framework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86">
       <Private>False</Private>
@@ -405,6 +411,7 @@
     <Compile Include="Vehicle\WheelSlidingFriction.cs" />
     <Compile Include="Vehicle\WheelSuspension.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <None Include="strongNameKey.snk" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

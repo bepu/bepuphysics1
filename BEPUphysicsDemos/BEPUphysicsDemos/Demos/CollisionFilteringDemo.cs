@@ -25,7 +25,8 @@ namespace BEPUphysicsDemos.Demos
             var firstStackGroup = new CollisionGroup();
             var secondStackGroup = new CollisionGroup();
             //Adding this rule to the space's collision group rules will prevent entities belong to these two groups from generating collision pairs with each other.
-            CollisionRules.CollisionGroupRules.Add(new CollisionGroupPair(firstStackGroup, secondStackGroup), CollisionRule.NoBroadPhase);
+            groupPair = new CollisionGroupPair(firstStackGroup, secondStackGroup);
+            CollisionRules.CollisionGroupRules.Add(groupPair, CollisionRule.NoBroadPhase);
 
             for (int k = 0; k < 10; k++)
             {
@@ -54,6 +55,15 @@ namespace BEPUphysicsDemos.Demos
         public override string Name
         {
             get { return "Collision Filtering"; }
+        }
+
+        CollisionGroupPair groupPair;
+        public override void CleanUp()
+        {
+            base.CleanUp();
+            //The CollisionGroupRules are static, so this dictionary would fill up
+            //if we kept changing the simulation without cleaning it out.
+            CollisionRules.CollisionGroupRules.Remove(groupPair);
         }
     }
 }

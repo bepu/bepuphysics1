@@ -6,6 +6,8 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using BEPUphysics.MathExtensions;
 using BEPUphysics.CollisionShapes.ConvexShapes;
+using System.Diagnostics;
+using BEPUphysics.Settings;
 
 namespace BEPUphysicsDemos.Demos
 {
@@ -25,6 +27,7 @@ namespace BEPUphysicsDemos.Demos
             Vector3[] staticTriangleVertices;
             int[] staticTriangleIndices;
 
+
             var playgroundModel = game.Content.Load<Model>("playground");
             //This load method wraps the TriangleMesh.GetVerticesAndIndicesFromModel method 
             //to output vertices of type StaticTriangleGroupVertex instead of TriangleMeshVertex or simply Vector3.
@@ -39,8 +42,8 @@ namespace BEPUphysicsDemos.Demos
             int numColumns = 8;
             int numRows = 8;
             int numHigh = 1;
-            float separation = 10;
-            Entity toAdd;
+            float separation = 8;
+            Box toAdd;
             for (int i = 0; i < numRows; i++)
                 for (int j = 0; j < numColumns; j++)
                     for (int k = 0; k < numHigh; k++)
@@ -48,14 +51,14 @@ namespace BEPUphysicsDemos.Demos
                         toAdd = new Box(
                             new Vector3(
                             separation * i - numRows * separation / 2,
-                            20f + k * separation,
+                            30f + k * separation,
                             separation * j - numColumns * separation / 2),
-                            2f, 2f, 2f, 15);
+                            2, 2, 2, 15);
                         Space.Add(toAdd);
                     }
-
             game.ModelDrawer.Add(staticMesh.Mesh);
             game.Camera.Position = new Vector3(0, 10, 40);
+
         }
 
         /// <summary>
@@ -65,5 +68,7 @@ namespace BEPUphysicsDemos.Demos
         {
             get { return "Static Mesh"; }
         }
+
+   
     }
 }

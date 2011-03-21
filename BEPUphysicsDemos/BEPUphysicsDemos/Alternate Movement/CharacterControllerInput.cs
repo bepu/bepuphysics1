@@ -43,7 +43,7 @@ namespace BEPUphysicsDemos
         /// <param name="CameraToUse">Camera to attach to the character.</param>
         public CharacterControllerInput(Space owningSpace, Camera CameraToUse)
         {
-            CharacterController = new CharacterController(Vector3.Zero, 3, 1, 20f, 1.4f, .01f, .04f);
+            CharacterController = new CharacterController(Vector3.Zero, 2, .4f, 30f, 1.1f);
 
             Space = owningSpace;
             Space.Add(CharacterController);

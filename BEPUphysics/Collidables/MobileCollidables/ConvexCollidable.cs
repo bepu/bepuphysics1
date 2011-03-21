@@ -15,12 +15,6 @@ namespace BEPUphysics.Collidables.MobileCollidables
 
         }
 
-        protected ConvexCollidable(ConvexShape shape, float minimumRadius, float maximumRadius)
-            : base(shape, minimumRadius, maximumRadius)
-        {
-
-        }
-
         ///<summary>
         /// Gets the shape of the collidable.
         ///</summary>
@@ -61,20 +55,6 @@ namespace BEPUphysics.Collidables.MobileCollidables
         ///<param name="shape">Shape to use in the collidable.</param>
         public ConvexCollidable(T shape)
             : base(shape)
-        {
-
-        }
-
-        ///<summary>
-        /// Constructs a new convex collidable.
-        ///</summary>
-        ///<param name="shape">Shape to use for the collidable.</param>
-        ///<param name="minimumRadius">Precomputed minimum radius of the collidable.
-        /// If the other constructor is used, these are calculated automatically; sometimes re-using known values can help construction speeds.</param>
-        ///<param name="maximumRadius">Precomputed maximum radius of the collidable.
-        /// If the other constructor is used, these are calculated automatically; sometimes re-using known values can help construction speeds.</param>
-        public ConvexCollidable(T shape, float minimumRadius, float maximumRadius)
-            : base(shape, minimumRadius, maximumRadius)
         {
 
         }

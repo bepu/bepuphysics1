@@ -17,7 +17,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         ///<param name="radius">Radius to expand the line segment width.</param>
         public CapsuleShape(float length, float radius)
         {
-            Length = length;
+            halfLength = length * .5f;
             Radius = radius;
         }
 

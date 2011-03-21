@@ -30,6 +30,14 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             }
         }
 
+        protected internal float minimumRadius;
+        /// <summary>
+        /// Gets or sets the minimum radius of the collidable's shape.  This is initialized to a value that is
+        /// guaranteed to be equal to or smaller than the actual minimum radius.  When setting this property,
+        /// ensure that the inner sphere formed by the new minimum radius is fully contained within the shape.
+        /// </summary>
+        public float MinimumRadius { get { return minimumRadius; } set { minimumRadius = value; } }
+
         ///<summary>
         /// Gets the extreme point of the shape in local space in a given direction.
         ///</summary>
@@ -89,6 +97,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
                 Vector3.Add(ref extremePoint, ref direction, out extremePoint);
             }
         }
+
 
 
         /// <summary>
@@ -214,6 +223,11 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             return InertiaHelper.ComputeVolumeDistribution(this, out volume);
         }
 
+        protected override void OnShapeChanged()
+        {
+            base.OnShapeChanged();
+            minimumRadius = ComputeMinimumRadius();
+        }
 
         /// <summary>
         /// Computes the volume distribution of the shape.

@@ -52,7 +52,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         ///<param name="transform">Transform to use.</param>
         public TransformableShape(ConvexShape shape, Matrix3X3 transform)
         {
-            Shape = shape;
+            this.shape = shape;
             Transform = transform;
 
         }
@@ -168,5 +168,6 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         {
             return new ConvexCollidable<TransformableShape>(this);
         }
+
     }
 }

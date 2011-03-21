@@ -45,7 +45,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         ///<param name="radius">Radius of the cone base.</param>
         public ConeShape(float height, float radius)
         {
-            Height = height;
+            this.height = height;
             Radius = radius;
         }
 

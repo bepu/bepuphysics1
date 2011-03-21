@@ -270,7 +270,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                 Vector3.Multiply(ref velocity, dt, out velocity);
                 float velocitySquared = velocity.LengthSquared();
 
-                var minimumRadiusA = convexA.minimumRadius * MotionSettings.CoreShapeScaling;
+                var minimumRadiusA = convexA.Shape.minimumRadius * MotionSettings.CoreShapeScaling;
                 timeOfImpact = 1;
                 if (minimumRadiusA * minimumRadiusA < velocitySquared)
                 {
@@ -282,7 +282,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                     }
                 }
 
-                var minimumRadiusB = convexB.minimumRadius * MotionSettings.CoreShapeScaling;
+                var minimumRadiusB = convexB.Shape.minimumRadius * MotionSettings.CoreShapeScaling;
                 if (minimumRadiusB * minimumRadiusB < velocitySquared)
                 {
                     //Spherecast B against A.

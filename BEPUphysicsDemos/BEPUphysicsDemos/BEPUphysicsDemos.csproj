@@ -59,6 +59,7 @@
     <PlatformTarget>x86</PlatformTarget>
     <XnaCompressContent>true</XnaCompressContent>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <DebugSymbols>false</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Xna.Framework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
@@ -81,8 +82,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Alternate Movement\CharacterController.cs" />
-    <None Include="Alternate Movement\CharacterControllerInput.cs" />
+    <Compile Include="Alternate Movement\CharacterController.cs" />
+    <Compile Include="Alternate Movement\CharacterControllerInput.cs" />
     <Compile Include="Alternate Movement\SimpleCharacterController.cs" />
     <Compile Include="Alternate Movement\SimpleCharacterControllerInput.cs" />
     <Compile Include="Alternate Movement\TankInput.cs" />

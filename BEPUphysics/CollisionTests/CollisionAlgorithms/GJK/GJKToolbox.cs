@@ -311,11 +311,13 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms.GJK
 
             RaySimplex simplex = new RaySimplex();
 
+ 
             float vw, vdir;
             int count = 0;
-            //This epsilon has a significant impact on performance and accuracy.  Changing it to use BigEpsilon instead increases speed by around 30-40% usually, but jigging is more evident.
-            while (v.LengthSquared() >= Toolbox.Epsilon * simplex.GetErrorTolerance(ref Toolbox.ZeroVector)) //TODO: Should the error tolerance be based on the evolving hit location?
+            do
             {
+                
+
                 if (++count > MaximumGJKIterations)
                 {
                     //It's taken too long to find a hit.  Numerical problems are probable; quit.
@@ -353,7 +355,11 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms.GJK
 
                 shiftedSimplex.GetPointClosestToOrigin(ref simplex, out v);
 
-            }
+                //Could measure the progress of the ray.  If it's too little, could early out.
+                //Not used by default since it's biased towards precision over performance.
+
+            } while (v.LengthSquared() >= Toolbox.Epsilon * simplex.GetErrorTolerance(ref Toolbox.ZeroVector));
+            //This epsilon has a significant impact on performance and accuracy.  Changing it to use BigEpsilon instead increases speed by around 30-40% usually, but jigging is more evident.
             //Transform the hit data into world space.
             Vector3.Transform(ref hit.Normal, ref transformA.Orientation, out hit.Normal);
             Vector3.Multiply(ref velocityWorld, hit.T, out hit.Location);

@@ -40,10 +40,10 @@ namespace BEPUphysicsDemos
             set
             {
                 pitch = value;
-                if (pitch > MathHelper.PiOver2)
-                    pitch = MathHelper.PiOver2;
-                else if (pitch < -MathHelper.PiOver2)
-                    pitch = -MathHelper.PiOver2;
+                if (pitch > MathHelper.PiOver2 * .99f)
+                    pitch = MathHelper.PiOver2 * .99f;
+                else if (pitch < -MathHelper.PiOver2 * .99f)
+                    pitch = -MathHelper.PiOver2 * .99f;
             }
         }
 

@@ -152,7 +152,10 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 //Generate a contact.
                 contact = new ContactData();
                 //Displacement is from A to B.  point = A + t * AB, where t = marginA / margin.
-                Vector3.Multiply(ref displacement, informationA.Shape.collisionMargin / margin, out contact.Position); //t * AB
+                if (margin > Toolbox.Epsilon) //Avoid a NaN!
+                    Vector3.Multiply(ref displacement, informationA.Shape.collisionMargin / margin, out contact.Position); //t * AB
+                else
+                    contact.Position = new Vector3();
                     
                 Vector3.Add(ref closestA, ref contact.Position, out contact.Position); //A + t * AB.
 

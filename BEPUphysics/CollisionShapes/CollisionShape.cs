@@ -14,7 +14,7 @@ namespace BEPUphysics.CollisionShapes
         ///</summary>
         public event Action<CollisionShape> ShapeChanged;
 
-        protected void OnShapeChanged()
+        protected virtual void OnShapeChanged()
         {
             if (ShapeChanged != null)
                 ShapeChanged(this);

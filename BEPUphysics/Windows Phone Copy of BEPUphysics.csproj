@@ -48,6 +48,12 @@
     <DocumentationFile>bin\Windows Phone\Release\BEPUphysics.XML</DocumentationFile>
     <LangVersion>3</LangVersion>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>strongNameKey.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Folder Include="BroadPhases\Hierarchies\" />
   </ItemGroup>
@@ -374,6 +380,7 @@
     <None Include="Properties\WMAppManifest.xml">
       <XnaPlatformSpecific>true</XnaPlatformSpecific>
     </None>
+    <None Include="strongNameKey.snk" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup />

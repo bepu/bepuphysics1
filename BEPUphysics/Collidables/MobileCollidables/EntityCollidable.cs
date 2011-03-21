@@ -23,28 +23,8 @@ namespace BEPUphysics.Collidables.MobileCollidables
             base.Shape = shape;
         }
 
-        protected EntityCollidable(EntityShape shape, float minimumRadius, float maximumRadius)
-            : this()
-        {
-            IgnoreShapeChanges = true;
-            base.Shape = shape;
-            IgnoreShapeChanges = false;
-            this.maximumRadius = maximumRadius;
-            this.minimumRadius = minimumRadius;
-        }
 
 
-        internal float maximumRadius;
-        ///<summary>
-        /// Gets or sets the maximum radius of the collidable's shape.
-        ///</summary>
-        public float MaximumRadius { get { return maximumRadius; } set { maximumRadius = value; } }
-
-        internal float minimumRadius;
-        /// <summary>
-        /// Gets or sets the minimum radius of the collidable's shape.
-        /// </summary>
-        public float MinimumRadius { get { return minimumRadius; } set { minimumRadius = value; } }
 
 
         /// <summary>
@@ -79,15 +59,7 @@ namespace BEPUphysics.Collidables.MobileCollidables
             }
         }
 
-        protected override void OnShapeChanged(CollisionShape collisionShape)
-        {
-            if (!IgnoreShapeChanges && collisionShape != null)
-            {
-                maximumRadius = Shape.ComputeMaximumRadius();
-                minimumRadius = Shape.ComputeMinimumRadius();
-            }
-        }
-
+   
         protected virtual void OnEntityChanged()
         {
         }

@@ -1,4 +1,6 @@
 ﻿using BEPUphysics.PositionUpdating;
+using System;
+using Microsoft.Xna.Framework;
 
 namespace BEPUphysics.Settings
 {
@@ -20,12 +22,22 @@ namespace BEPUphysics.Settings
         public static bool ConserveAngularMomentum;
         ///<summary>
         /// The scaling to apply to the core shapes used for continuous collision detection tests.
-        /// Values should be between 0 and 1.  The smaller the value, the smaller the shapes used
-        /// to perform CCD are, and more collisions are missed.  It is not recommended to set this value
-        /// to 1, however; not all collisions need to be caught.  In fact, catching too many may result in jerky
-        /// motion.
+        /// Values should be between 0 and 0.99f.  The smaller the value, the smaller the shapes used
+        /// to perform CCD are, and more collisions are missed.
         ///</summary>
-        public static float CoreShapeScaling = .8f;
+        public static float CoreShapeScaling
+        {
+            get
+            {
+                return coreShapeScaling;
+            }
+            set
+            {
+                //The reason why it doesn't allow up to 1.0 is there exist systems that require a small margin between the full minimum radius and the core shape.
+                coreShapeScaling = MathHelper.Clamp(value, 0, .99f);
+            }
+        }
+        static float coreShapeScaling = .8f;
         /// <summary>
         /// The default position updating mode used by position updateables.
         /// </summary>

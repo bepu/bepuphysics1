@@ -10,9 +10,9 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
     ///</summary>
     public class BoxShape : ConvexShape
     {
+        internal float halfWidth;
         internal float halfHeight;
         internal float halfLength;
-        internal float halfWidth;
 
 
         ///<summary>
@@ -23,9 +23,10 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         ///<param name="length">Length of the box.</param>
         public BoxShape(float width, float height, float length)
         {
-            Width = width;
-            Height = height;
-            Length = length;
+            halfWidth = width * .5f;
+            halfHeight = height * .5f;
+            halfLength = length * .5f;
+            OnShapeChanged();
         }
 
         /// <summary>
