@@ -105,13 +105,13 @@ namespace BEPUphysicsDemos.Demos
             var lowerPosition = upperArm.Position + new Vector3(-.65f, 1.6f, 0);
 
             CollisionRules clawPart1ARules = new CollisionRules();
-            var bodies = new List<DynamicCompoundChildData>()
+            var bodies = new List<CompoundChildData>()
             {
-                new DynamicCompoundChildData(new CompoundChildData(new CompoundShapeEntry(new BoxShape(1, .25f, .25f), lowerPosition), clawPart1ARules), 3),
-                new DynamicCompoundChildData(new CompoundChildData(new CompoundShapeEntry(new ConeShape(1, .125f), lowerPosition + new Vector3(-.375f, .4f, 0)), new Material(2,2,0)), 3)
+                new CompoundChildData(new CompoundShapeEntry(new BoxShape(1, .25f, .25f), lowerPosition, 3), clawPart1ARules),
+                new CompoundChildData(new CompoundShapeEntry(new ConeShape(1, .125f), lowerPosition + new Vector3(-.375f, .4f, 0), 3), new Material(2,2,0))
             };
 
-            var claw = new CompoundBody(bodies);
+            var claw = new CompoundBody(bodies, 6);
             Space.Add(claw);
 
             clawHingeA = new RevoluteJoint(upperArm, claw, upperArm.Position + new Vector3(0, 1.5f, 0), Vector3.Forward);
@@ -129,12 +129,12 @@ namespace BEPUphysicsDemos.Demos
             lowerPosition = upperArm.Position + new Vector3(.65f, 1.6f, 0);
 
             CollisionRules clawPart1BRules = new CollisionRules();
-            bodies = new List<DynamicCompoundChildData>()
+            bodies = new List<CompoundChildData>()
             {
-                new DynamicCompoundChildData(new CompoundChildData(new CompoundShapeEntry(new BoxShape(1, .25f, .25f), lowerPosition), clawPart1BRules), 3),
-                new DynamicCompoundChildData(new CompoundChildData(new CompoundShapeEntry(new ConeShape(1, .125f), lowerPosition + new Vector3(.375f, .4f, 0)), new Material(2,2,0)), 3)
+                new CompoundChildData(new CompoundShapeEntry(new BoxShape(1, .25f, .25f), lowerPosition, 3), clawPart1BRules),
+                new CompoundChildData(new CompoundShapeEntry(new ConeShape(1, .125f), lowerPosition + new Vector3(.375f, .4f, 0), 3), new Material(2,2,0))
             };
-            claw = new CompoundBody(bodies);
+            claw = new CompoundBody(bodies, 6);
             Space.Add(claw);
 
             clawHingeB = new RevoluteJoint(upperArm, claw, upperArm.Position + new Vector3(0, 1.5f, 0), Vector3.Forward);

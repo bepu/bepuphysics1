@@ -59,6 +59,7 @@ namespace BEPUphysicsDemos.Demos
             detector.Space.Add(movedBox);
             detector.CollisionInformation.Events.InitialCollisionDetected += InitialCollisionDetected;
             detector.CollisionInformation.Events.CollisionEnded += CollisionEnded;
+
         }
 
 
@@ -81,6 +82,7 @@ namespace BEPUphysicsDemos.Demos
                 movedBox.Orientation = Quaternion.Identity;
                 movedBox.LinearVelocity = Vector3.Zero;
                 movedBox.AngularVelocity = Vector3.Zero;
+
             }
         }
 

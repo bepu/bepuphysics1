@@ -35,10 +35,10 @@ namespace BEPUphysics.Collidables
             protected set
             {
                 if (shape != null)
-                    shape.ShapeChanged += shapeChangedDelegate;
+                    shape.ShapeChanged -= shapeChangedDelegate;
                 shape = value;
                 if (shape != null)
-                    shape.ShapeChanged -= shapeChangedDelegate;
+                    shape.ShapeChanged += shapeChangedDelegate;
                 OnShapeChanged(shape);
 
                 //TODO: Watch out for unwanted references in the delegate lists.

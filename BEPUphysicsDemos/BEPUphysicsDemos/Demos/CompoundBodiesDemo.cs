@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using BEPUphysics.CollisionShapes;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace BEPUphysicsDemos.Demos
 {
@@ -20,31 +21,31 @@ namespace BEPUphysicsDemos.Demos
         {
 
             //Build the first body
-            var bodies = new List<DynamicCompoundEntry>() 
+            var bodies = new List<CompoundShapeEntry>() 
             {
-                new DynamicCompoundEntry(new SphereShape(.5f), new Vector3(0, 1, 0), 15),
-                new DynamicCompoundEntry(new ConeShape(2, .5f), new Vector3(1, 1, 0), 15),
-                new DynamicCompoundEntry(new SphereShape(.5f), new Vector3(-1, 1, 0), 15)
+                new CompoundShapeEntry(new SphereShape(.5f), new Vector3(0, 1, 0), 1),
+                new CompoundShapeEntry(new ConeShape(2, .5f), new Vector3(1, 1, 0), 1),
+                new CompoundShapeEntry(new SphereShape(.5f), new Vector3(-1, 1, 0), 1)
             };
-            var cb1 = new CompoundBody(bodies);
+            var cb1 = new CompoundBody(bodies, 45);
 
 
 
             //Build the second body
-            bodies = new List<DynamicCompoundEntry>() 
+            bodies = new List<CompoundShapeEntry>() 
             {
-                new DynamicCompoundEntry(new BoxShape(1,1,1), new Vector3(0, 3, 0), 2),
-                new DynamicCompoundEntry(new BoxShape(1,1,1), new Vector3(1, 3.5f, 0), 2),
+                new CompoundShapeEntry(new BoxShape(1,1,1), new Vector3(0, 3, 0), 1),
+                new CompoundShapeEntry(new BoxShape(1,1,1), new Vector3(1, 3.5f, 0), 1),
             };
-            var cb2 = new CompoundBody(bodies);
+            var cb2 = new CompoundBody(bodies, 4);
 
-            bodies = new List<DynamicCompoundEntry>();
+            bodies = new List<CompoundShapeEntry>();
             //Build the third Braum's-fry style body
             for (int k = 0; k < 7; k++)
             {
-                bodies.Add(new DynamicCompoundEntry(new BoxShape(1, 1, 1), new Vector3(-4 + k * .7f, 2 + .7f * k, 2 + k * .2f), 1));
+                bodies.Add(new CompoundShapeEntry(new BoxShape(1, 1, 1), new Vector3(-4 + k * .7f, 2 + .7f * k, 2 + k * .2f), 1));
             }
-            var cb3 = new CompoundBody(bodies);
+            var cb3 = new CompoundBody(bodies, 7);
 
             //Add them all to the space
             Space.Add(cb3);
@@ -64,6 +65,13 @@ namespace BEPUphysicsDemos.Demos
         public override string Name
         {
             get { return "Compound Bodies"; }
+        }
+
+        public override void Update(float dt)
+        {
+            if (Game.KeyboardInput.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.P))
+                Debug.WriteLine("Break.");
+            base.Update(dt);
         }
     }
 }

@@ -47,8 +47,6 @@ namespace BEPUphysics.Collidables.MobileCollidables
                 children.Elements[i].CollisionInformation.Entity = entity;
                 if (children.Elements[i].Material == null)
                     children.Elements[i].Material = entity.material;
-                if (children.Elements[i].CollisionInformation.collisionRules.group == null)
-                    children.Elements[i].CollisionInformation.collisionRules.group = entity.CollisionInformation.collisionRules.group;
             }
             base.OnEntityChanged();
         }
@@ -56,7 +54,7 @@ namespace BEPUphysics.Collidables.MobileCollidables
 
 
 
-        private static CompoundChild GetChild(CompoundChildData data)
+        private CompoundChild GetChild(CompoundChildData data, int index)
         {
             var instance = data.Entry.Shape.GetMobileInstance();
             if (data.Events != null)
@@ -65,50 +63,54 @@ namespace BEPUphysics.Collidables.MobileCollidables
                 instance.collisionRules = data.CollisionRules;
             if (data.Material == null)
                 data.Material = new Material();
-            return new CompoundChild(instance, data.Entry.LocalTransform, data.Material);
+            return new CompoundChild(Shape, instance, data.Material, index);
+        }
+
+        private CompoundChild GetChild(CompoundShapeEntry entry, int index)
+        {
+            var instance = entry.Shape.GetMobileInstance();
+            return new CompoundChild(Shape, instance, index);
         }
 
         ///<summary>
-        /// Constructs a compound collidable.
+        /// Constructs a compound collidable using additional information about the shapes in the compound.
         ///</summary>
         ///<param name="children">Data representing the children of the compound collidable.</param>
-        ///<param name="center">Center of the compound collidable.</param>
-        public CompoundCollidable(IList<CompoundChildData> children, Vector3 center)
+        public CompoundCollidable(IList<CompoundChildData> children)
         {
             var shapeList = new RawList<CompoundShapeEntry>();
             for (int i = 0; i < children.Count; i++)
             {
-                CompoundChild child = GetChild(children[i]);
-                child.localTransform.Position -= center; //Recenter.
-                var shapeEntry = new CompoundShapeEntry(child.CollisionInformation.Shape, child.LocalTransform);
-                shapeList.Add(shapeEntry);
+                CompoundChild child = GetChild(children[i], i);
+                shapeList.Add(children[i].Entry);
                 this.children.Add(child);
             }
-            shape = new CompoundShape(shapeList);
+            base.Shape = new CompoundShape(shapeList);
             hierarchy = new CompoundHierarchy(this);
             Children = new ReadOnlyCollection<CompoundChild>(this.children);
-            Shape.ShapeChanged += OnShapeChanged;
+ 
         }
 
         ///<summary>
-        /// Constructs a compound collidable.
+        /// Constructs a compound collidable using additional information about the shapes in the compound.
         ///</summary>
-        ///<param name="children">Children of the compound collidable.</param>
-        ///<param name="center">Center of the compound collidable.</param>
-        public CompoundCollidable(IList<CompoundChild> children, Vector3 center)
+        ///<param name="children">Data representing the children of the compound collidable.</param>
+        ///<param name="center">Location computed to be the center of the compound object.</param>
+        public CompoundCollidable(IList<CompoundChildData> children, out Vector3 center)
         {
             var shapeList = new RawList<CompoundShapeEntry>();
             for (int i = 0; i < children.Count; i++)
             {
-                children[i].localTransform.Position -= center; //Recenter.
-                var shapeEntry = new CompoundShapeEntry(children[i].CollisionInformation.Shape, children[i].LocalTransform);
-                shapeList.Add(shapeEntry);
-                this.children.Add(children[i]);
+                CompoundChild child = GetChild(children[i], i);
+                shapeList.Add(children[i].Entry);
+                this.children.Add(child);
             }
-            shape = new CompoundShape(shapeList);
+            base.Shape = new CompoundShape(shapeList, out center);
             hierarchy = new CompoundHierarchy(this);
             Children = new ReadOnlyCollection<CompoundChild>(this.children);
+
         }
+
 
         ///<summary>
         /// Constructs a new CompoundCollidable.
@@ -117,35 +119,19 @@ namespace BEPUphysics.Collidables.MobileCollidables
         public CompoundCollidable(CompoundShape compoundShape)
             : base(compoundShape)
         {
-            Children = new ReadOnlyCollection<CompoundChild>(children);
-            Initialize();
-
-            
-        }
-
-        protected override void OnShapeChanged(CollisionShape collisionShape)
-        {
-            //TODO: Some oddities when changing compound bodies after being constructed.
-            //The center computation performed with two of the above constructors
-            //is not performed with Initialize, since it would require a modification
-            //of the shape...
-            //Additionally, it kills off any event/material/collision rules stuff previously in the shape.
-            Initialize();
-        }
-
-
-
-        void Initialize()
-        {
-            children.Clear();
-            RawList<CompoundShapeEntry> list = Shape.Shapes.list;
-            for (int i = 0; i < list.count; i++)
+            for (int i = 0; i < compoundShape.shapes.count; i++)
             {
-                var child = new CompoundChild(list.Elements[i].Shape.GetMobileInstance(), list.Elements[i].LocalTransform);
-                children.Add(child);
+                CompoundChild child = GetChild(compoundShape.shapes.Elements[i], i);
+                this.children.Add(child);
             }
             hierarchy = new CompoundHierarchy(this);
+            Children = new ReadOnlyCollection<CompoundChild>(this.children);
+ 
         }
+
+
+
+
 
 
         internal CompoundHierarchy hierarchy;
@@ -169,10 +155,11 @@ namespace BEPUphysics.Collidables.MobileCollidables
         public override void UpdateWorldTransform(ref Vector3 position, ref Quaternion orientation)
         {
             base.UpdateWorldTransform(ref position, ref orientation);
+            var shapeList = Shape.shapes;
             for (int i = 0; i < children.count; i++)
             {
                 RigidTransform transform;
-                RigidTransform.Transform(ref children.Elements[i].localTransform, ref worldTransform, out transform);
+                RigidTransform.Transform(ref shapeList.Elements[children.Elements[i].shapeIndex].LocalTransform, ref worldTransform, out transform);
                 children.Elements[i].CollisionInformation.UpdateWorldTransform(ref transform.Position, ref transform.Orientation);
             }
         }
@@ -341,41 +328,15 @@ namespace BEPUphysics.Collidables.MobileCollidables
         }
     }
 
-    ///<summary>
-    /// Child data for a new dynamic child.
-    /// This data is not itself a child yet; another system
-    /// will use it as input to construct the children.
-    ///</summary>
-    public struct DynamicCompoundChildData
-    {
-        ///<summary>
-        /// Base data for the child.
-        ///</summary>
-        public CompoundChildData ChildData;
-        ///<summary>
-        /// Mass of the child.
-        ///</summary>
-        public float Mass;
-
-        ///<summary>
-        /// Constructs data for a new dynamic child.
-        ///</summary>
-        ///<param name="data">Base data to use to construct the new child.</param>
-        ///<param name="mass">Mass to use to construct the new child.</param>
-        public DynamicCompoundChildData(CompoundChildData data, float mass)
-        {
-            ChildData = data;
-            Mass = mass;
-        }
-
-
-    }
 
     ///<summary>
     /// A collidable child of a compound.
     ///</summary>
     public class CompoundChild : IBoundingBoxOwner
     {
+        CompoundShape shape;
+        internal int shapeIndex;
+
         private EntityCollidable collisionInformation;
         ///<summary>
         /// Gets the Collidable associated with the child.
@@ -393,41 +354,31 @@ namespace BEPUphysics.Collidables.MobileCollidables
         ///</summary>
         public Material Material { get; set; }
 
-        internal RigidTransform localTransform;
-        //This can't be changed because it is a property of the shape, stored here for convenience.
-        ///<summary>
-        /// Gets the local transform of the child.
-        ///</summary>
-        public RigidTransform LocalTransform
+        /// <summary>
+        /// Gets the index of the shape associated with this child in the CompoundShape's shapes list.
+        /// </summary>
+        public CompoundShapeEntry Entry
         {
             get
             {
-                return localTransform;
+                return shape.shapes.Elements[shapeIndex];
             }
+
         }
 
-        ///<summary>
-        /// Constructs a new compound child.
-        ///</summary>
-        ///<param name="collisionInformation">Collidable to use for the child.</param>
-        ///<param name="localTransform">Local transform to use to position the child.</param>
-        ///<param name="material">Material of the child.</param>
-        public CompoundChild(EntityCollidable collisionInformation, RigidTransform localTransform, Material material)
+        internal CompoundChild(CompoundShape shape, EntityCollidable collisionInformation, Material material, int index)
         {
+            this.shape = shape;
             this.collisionInformation = collisionInformation;
-            this.localTransform = localTransform;
             Material = material;
+            this.shapeIndex = index;
         }
 
-        ///<summary>
-        /// Constructs a new compound child.
-        ///</summary>
-        ///<param name="collisionInformation">Collidable to use for the child.</param>
-        ///<param name="localTransform">Local transform to use to position the child.</param>\
-        public CompoundChild(EntityCollidable collisionInformation, RigidTransform localTransform)
+        internal CompoundChild(CompoundShape shape, EntityCollidable collisionInformation, int index)
         {
+            this.shape = shape;
             this.collisionInformation = collisionInformation;
-            this.localTransform = localTransform;
+            this.shapeIndex = index;
         }
 
         /// <summary>

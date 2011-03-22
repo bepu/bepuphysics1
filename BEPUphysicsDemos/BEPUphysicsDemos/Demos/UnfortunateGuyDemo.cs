@@ -31,16 +31,16 @@ namespace BEPUphysicsDemos.Demos
             //focuses on a single arm, showing some extra details and limits.
 
             //Make the torso.
-            var bodies = new List<DynamicCompoundEntry>()
+            var bodies = new List<CompoundShapeEntry>()
             {
-                new DynamicCompoundEntry(new BoxShape(2, 1.5f, 1), new Vector3(-1, 3, 0), 50),
-                new DynamicCompoundEntry(new SphereShape(.45f), new Vector3(.4f, 3, 0), 1),
-                new DynamicCompoundEntry(new SphereShape(.25f), new Vector3(-1.9f, 3.5f, 0), 1),
-                new DynamicCompoundEntry(new SphereShape(.25f), new Vector3(-1.9f, 2.5f, 0), 1),
-                new DynamicCompoundEntry(new SphereShape(.25f), new Vector3(-.3f, 2.3f, 0), 1)
+                new CompoundShapeEntry(new BoxShape(2, 1.5f, 1), new Vector3(-1, 3, 0), 50),
+                new CompoundShapeEntry(new SphereShape(.45f), new Vector3(.4f, 3, 0), 1),
+                new CompoundShapeEntry(new SphereShape(.25f), new Vector3(-1.9f, 3.5f, 0), 1),
+                new CompoundShapeEntry(new SphereShape(.25f), new Vector3(-1.9f, 2.5f, 0), 1),
+                new CompoundShapeEntry(new SphereShape(.25f), new Vector3(-.3f, 2.3f, 0), 1)
             };
 
-            var torso = new CompoundBody(bodies);
+            var torso = new CompoundBody(bodies, 54);
             Space.Add(torso);
 
             //Make the upper arm.

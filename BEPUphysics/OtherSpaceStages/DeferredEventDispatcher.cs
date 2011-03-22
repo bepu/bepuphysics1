@@ -76,9 +76,17 @@ namespace BEPUphysics.OtherSpaceStages
 
         protected override void UpdateStage()
         {
-            foreach (IDeferredEventCreator creator in activeEventCreators)
+            for (int i = activeEventCreators.Count - 1; i >= 0; i--)
             {
-                creator.DispatchEvents();
+                activeEventCreators[i].DispatchEvents();
+                // Since it can attempt to remove or add any number of creators during the handler, all we can do is make sure 
+                // that our current index is still valid.  We may re-dispatch some event creators, but assuming they follow the
+                // proper pattern for deferred event creators, it will be okay.  The first execution cleans out all of the 
+                // deferred events that have been queued up.  The second execution will try, but the queues will be empty.
+                // This is a fairly acceptable result for a rare case.
+                if (i > activeEventCreators.Count)
+                    i = activeEventCreators.Count;
+
             }
         }
 

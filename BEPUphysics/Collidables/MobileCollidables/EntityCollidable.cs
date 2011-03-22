@@ -59,7 +59,7 @@ namespace BEPUphysics.Collidables.MobileCollidables
             }
         }
 
-   
+
         protected virtual void OnEntityChanged()
         {
         }
@@ -140,7 +140,9 @@ namespace BEPUphysics.Collidables.MobileCollidables
         protected override void CollisionRulesUpdated()
         {
             //Try to activate the entity since our collision rules just changed; broadphase might need to update some stuff.
-            entity.IsActive = true;
+            //Beware, though; if this collidable is still being constructed, then the entity won't be available.
+            if (entity != null)
+                entity.IsActive = true;
         }
 
 

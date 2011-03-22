@@ -37,9 +37,9 @@ namespace BEPUphysicsDemos.Demos
             TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("barrelandplatform"), out vertices, out indices);
 
             float radius = 1;
-            var scaleTransform = Matrix.CreateScale(2 * radius);
+            var scaleTransform = Matrix.CreateScale(10 * radius);
 
-            List<DynamicCompoundEntry> triangles = new List<DynamicCompoundEntry>(indices.Length / 3);
+            List<CompoundShapeEntry> triangles = new List<CompoundShapeEntry>(indices.Length / 3);
 
             for (int i = 0; i < indices.Length; i += 3)
             {
@@ -60,16 +60,16 @@ namespace BEPUphysicsDemos.Demos
                 //If we added centre to the vertices, they would be in the original world space locations.
                 //Knowing that, we can pass the centre to the DynamicCompoundEntry's position and they will be in the correct location.
                 triangles.Add(
-                    new DynamicCompoundEntry(
+                    new CompoundShapeEntry(
                         tri,
                         centre,
-                        .5f
+                        1
                     )
                 );
             }
 
 
-            var body = new CompoundBody(triangles);
+            var body = new CompoundBody(triangles, 400);
 
             Space.Add(body);
 

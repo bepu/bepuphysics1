@@ -86,12 +86,12 @@ namespace BEPUphysicsDemos
         /// <param name="wheelTexture">Texture to use for the wheels.</param>
         public VehicleInput(Vector3 position, Space owningSpace, Camera cameraToUse, ModelDrawer drawer, Model wheelModel, Texture2D wheelTexture)
         {
-            var bodies = new List<DynamicCompoundEntry>()
+            var bodies = new List<CompoundShapeEntry>()
             {
-                new DynamicCompoundEntry(new BoxShape(2.5f, .75f, 4.5f), new Vector3(0, 0, 0), 60),
-                new DynamicCompoundEntry(new BoxShape(2.5f, .3f, 2f), new Vector3(0, .75f / 2 + .3f / 2, .5f), 1)
+                new CompoundShapeEntry(new BoxShape(2.5f, .75f, 4.5f), new Vector3(0, 0, 0), 60),
+                new CompoundShapeEntry(new BoxShape(2.5f, .3f, 2f), new Vector3(0, .75f / 2 + .3f / 2, .5f), 1)
             };
-            var body = new CompoundBody(bodies);
+            var body = new CompoundBody(bodies, 61);
             body.CollisionInformation.LocalPosition = new Vector3(0, .5f, 0);
             body.Position = (position); //At first, just keep it out of the way.
             Vehicle = new Vehicle(body);

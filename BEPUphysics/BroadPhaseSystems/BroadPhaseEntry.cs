@@ -13,7 +13,7 @@ namespace BEPUphysics.BroadPhaseSystems
         internal int hashCode;
         protected BroadPhaseEntry()
         {
-            collisionRules = new CollisionRules();
+            CollisionRules = new CollisionRules();
             collisionRulesUpdatedDelegate = CollisionRulesUpdated;
 
             hashCode = (int)(base.GetHashCode() * 0xd8163841);

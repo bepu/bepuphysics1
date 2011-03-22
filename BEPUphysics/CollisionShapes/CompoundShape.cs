@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework;
 using BEPUphysics.DataStructures;
 using BEPUphysics.MathExtensions;
 using BEPUphysics.ResourceManagement;
+using System.Collections.ObjectModel;
 
 namespace BEPUphysics.CollisionShapes
 {
@@ -22,9 +23,68 @@ namespace BEPUphysics.CollisionShapes
         /// Shape used by the compound.
         /// </summary>
         public EntityShape Shape;
+        /// <summary>
+        /// Weight of the entry.  This defines how much the entry contributes to its owner
+        /// for the purposes of center of rotation computation.
+        /// </summary>
+        public float Weight;
 
         ///<summary>
-        /// Constructs a new compound shape entry.
+        /// Constructs a new compound shape entry using the volume of the shape as a weight.
+        ///</summary>
+        ///<param name="shape">Shape to use.</param>
+        ///<param name="localTransform">Local transform of the shape.</param>
+        ///<param name="weight">Weight of the entry.  This defines how much the entry contributes to its owner
+        /// for the purposes of center of rotation computation.</param>
+        public CompoundShapeEntry(EntityShape shape, RigidTransform localTransform, float weight)
+        {
+            LocalTransform = localTransform;
+            Shape = shape;
+            Weight = weight;
+        }
+
+        ///<summary>
+        /// Constructs a new compound shape entry using the volume of the shape as a weight.
+        ///</summary>
+        ///<param name="shape">Shape to use.</param>
+        ///<param name="position">Local position of the shape.</param>
+        ///<param name="weight">Weight of the entry.  This defines how much the entry contributes to its owner
+        /// for the purposes of center of mass and inertia computation.</param>
+        public CompoundShapeEntry(EntityShape shape, Vector3 position, float weight)
+        {
+            LocalTransform = new RigidTransform(position);
+            Shape = shape;
+            Weight = weight;
+        }
+
+        ///<summary>
+        /// Constructs a new compound shape entry using the volume of the shape as a weight.
+        ///</summary>
+        ///<param name="shape">Shape to use.</param>
+        ///<param name="orientation">Local orientation of the shape.</param>
+        ///<param name="weight">Weight of the entry.  This defines how much the entry contributes to its owner
+        /// for the purposes of center of rotation computation.</param>
+        public CompoundShapeEntry(EntityShape shape, Quaternion orientation, float weight)
+        {
+            LocalTransform = new RigidTransform(orientation);
+            Shape = shape;
+            Weight = weight;
+        }
+        ///<summary>
+        /// Constructs a new compound shape entry using the volume of the shape as a weight.
+        ///</summary>
+        ///<param name="shape">Shape to use.</param>
+        ///<param name="weight">Weight of the entry.  This defines how much the entry contributes to its owner
+        /// for the purposes of center of rotation computation.</param>
+        public CompoundShapeEntry(EntityShape shape, float weight)
+        {
+            LocalTransform = RigidTransform.Identity;
+            Shape = shape;
+            Weight = weight;
+        }
+
+        ///<summary>
+        /// Constructs a new compound shape entry using the volume of the shape as a weight.
         ///</summary>
         ///<param name="shape">Shape to use.</param>
         ///<param name="localTransform">Local transform of the shape.</param>
@@ -32,10 +92,11 @@ namespace BEPUphysics.CollisionShapes
         {
             LocalTransform = localTransform;
             Shape = shape;
+            Weight = shape.ComputeVolume();
         }
 
         ///<summary>
-        /// Constructs a new compound shape entry.
+        /// Constructs a new compound shape entry using the volume of the shape as a weight.
         ///</summary>
         ///<param name="shape">Shape to use.</param>
         ///<param name="position">Local position of the shape.</param>
@@ -43,10 +104,11 @@ namespace BEPUphysics.CollisionShapes
         {
             LocalTransform = new RigidTransform(position);
             Shape = shape;
+            Weight = shape.ComputeVolume();
         }
 
         ///<summary>
-        /// Constructs a new compound shape entry.
+        /// Constructs a new compound shape entry using the volume of the shape as a weight.
         ///</summary>
         ///<param name="shape">Shape to use.</param>
         ///<param name="orientation">Local orientation of the shape.</param>
@@ -54,87 +116,19 @@ namespace BEPUphysics.CollisionShapes
         {
             LocalTransform = new RigidTransform(orientation);
             Shape = shape;
+            Weight = shape.ComputeVolume();
         }
         ///<summary>
-        /// Constructs a new compound shape entry.
+        /// Constructs a new compound shape entry using the volume of the shape as a weight.
         ///</summary>
         ///<param name="shape">Shape to use.</param>
         public CompoundShapeEntry(EntityShape shape)
         {
             LocalTransform = RigidTransform.Identity;
             Shape = shape;
+            Weight = shape.ComputeVolume();
         }
     }
-
-    ///<summary>
-    /// Contains a shape, its local transform, and mass.
-    /// Used to create a compound shape.
-    ///</summary>
-    public struct DynamicCompoundEntry
-    {
-        ///<summary>
-        /// The shape and local transform information of the entry.
-        ///</summary>
-        public CompoundShapeEntry Entry;
-        ///<summary>
-        /// Mass of the entry, used to compute the center of mass and other physical properties.
-        ///</summary>
-        public float Mass;
-        ///<summary>
-        /// Constructs a new dynamic compound entry.
-        ///</summary>
-        ///<param name="entry">Entry to use.</param>
-        ///<param name="mass">Mass of the entry.</param>
-        public DynamicCompoundEntry(CompoundShapeEntry entry, float mass)
-        {
-            Entry = entry;
-            Mass = mass;
-        }
-        ///<summary>
-        /// Constructs a new dynamic compound entry.
-        ///</summary>
-        ///<param name="shape">Shape of the entry to use.</param>
-        ///<param name="transform">Local transform of the entry.</param>
-        ///<param name="mass">Mass of the entry.</param>
-        public DynamicCompoundEntry(EntityShape shape, RigidTransform transform, float mass)
-        {
-            Entry = new CompoundShapeEntry(shape, transform);
-            Mass = mass;
-        }
-        ///<summary>
-        /// Constructs a new dynamic compound entry.
-        ///</summary>
-        ///<param name="shape">Shape of the entry to use.</param>
-        ///<param name="position">Local position of the entry.</param>
-        ///<param name="mass">Mass of the entry.</param>
-        public DynamicCompoundEntry(EntityShape shape, Vector3 position, float mass)
-        {
-            Entry = new CompoundShapeEntry(shape, new RigidTransform(position));
-            Mass = mass;
-        }
-        ///<summary>
-        /// Constructs a new dynamic compound entry.
-        ///</summary>
-        ///<param name="shape">Shape of the entry to use.</param>
-        ///<param name="orientation">Local orientation of the entry.</param>
-        ///<param name="mass">Mass of the entry.</param>
-        public DynamicCompoundEntry(EntityShape shape, Quaternion orientation, float mass)
-        {
-            Entry = new CompoundShapeEntry(shape, new RigidTransform(orientation));
-            Mass = mass;
-        }
-        ///<summary>
-        /// Constructs a new dynamic compound entry.
-        ///</summary>
-        ///<param name="shape">Shape of the entry to use.</param>
-        ///<param name="mass">Mass of the entry.</param>
-        public DynamicCompoundEntry(EntityShape shape, float mass)
-        {
-            Entry = new CompoundShapeEntry(shape);
-            Mass = mass;
-        }
-    }
-
 
 
 
@@ -144,29 +138,40 @@ namespace BEPUphysics.CollisionShapes
     ///</summary>
     public class CompoundShape : EntityShape
     {
-        ObservableList<CompoundShapeEntry> shapes = new ObservableList<CompoundShapeEntry>();
+        internal RawList<CompoundShapeEntry> shapes;
         ///<summary>
         /// Gets the list of shapes in the compound shape.
         ///</summary>
         ///<exception cref="Exception">Thrown if the set shapes list has 0 shapes in it.</exception>
-        public ObservableList<CompoundShapeEntry> Shapes
+        public ReadOnlyCollection<CompoundShapeEntry> Shapes
         {
-            get
+            get;
+            private set;
+        }
+
+
+
+        ///<summary>
+        /// Constructs a compound shape.
+        ///</summary>
+        ///<param name="shapes">Shape entries used to create the compound.</param>
+        /// <param name="center">Computed center of the compound shape, using the entry weights.</param>
+        public CompoundShape(IList<CompoundShapeEntry> shapes, out Vector3 center)
+        {
+            center = ComputeCenter(shapes);
+            if (shapes.Count > 0)
             {
-                return shapes;
+                this.shapes = new RawList<CompoundShapeEntry>(shapes);
+                for (int i = 0; i < this.shapes.count; i++)
+                {
+                    this.shapes.Elements[i].LocalTransform.Position -= center;
+                }
             }
-            set
+            else
             {
-                if (value.Count > 0)
-                {
-                    shapes = value;
-                    OnShapeChanged();
-                }
-                else
-                {
-                    throw new Exception("Compound shape must have at least 1 subshape.");
-                }
+                throw new Exception("Compound shape must have at least 1 subshape.");
             }
+            Shapes = new ReadOnlyCollection<CompoundShapeEntry>(this.shapes);
         }
 
         ///<summary>
@@ -174,29 +179,21 @@ namespace BEPUphysics.CollisionShapes
         ///</summary>
         ///<param name="shapes">Shape entries used to create the compound.</param>
         public CompoundShape(IList<CompoundShapeEntry> shapes)
-            :this(shapes, Vector3.Zero)
         {
-        }
-        ///<summary>
-        /// Constructs a compound shape.
-        ///</summary>
-        ///<param name="shapes">Shape entries used to create the compound.</param>
-        /// <param name="center">Center to use when creating the compound.</param>
-        public CompoundShape(IList<CompoundShapeEntry> shapes, Vector3 center)
-        {
+            Vector3 center = ComputeCenter(shapes);
             if (shapes.Count > 0)
             {
-                for (int i = 0; i < shapes.Count; i++)
+                this.shapes = new RawList<CompoundShapeEntry>(shapes);
+                for (int i = 0; i < this.shapes.count; i++)
                 {
-                    var shape = shapes[i];
-                    shape.LocalTransform.Position -= center;
-                    this.shapes.Add(shape);
+                    this.shapes.Elements[i].LocalTransform.Position -= center;
                 }
             }
             else
             {
                 throw new Exception("Compound shape must have at least 1 subshape.");
             }
+            Shapes = new ReadOnlyCollection<CompoundShapeEntry>(this.shapes);
         }
 
         #region EntityShape members and support
@@ -210,9 +207,9 @@ namespace BEPUphysics.CollisionShapes
         public override float ComputeMinimumRadius()
         {
             float minRadius = 0;
-            for (int i = 0; i < shapes.list.count; i++)
+            for (int i = 0; i < shapes.count; i++)
             {
-                float radius = shapes.list.Elements[i].Shape.ComputeMinimumRadius();
+                float radius = shapes.Elements[i].Shape.ComputeMinimumRadius();
                 if (radius < minRadius)
                     minRadius = radius;
             }
@@ -228,9 +225,9 @@ namespace BEPUphysics.CollisionShapes
         public override float ComputeMaximumRadius()
         {
             float maxRadius = 0;
-            for (int i = 0; i < shapes.list.count; i++)
+            for (int i = 0; i < shapes.count; i++)
             {
-                float radius = shapes.list.Elements[i].LocalTransform.Position.Length() + shapes.list.Elements[i].Shape.ComputeMaximumRadius();
+                float radius = shapes.Elements[i].LocalTransform.Position.Length() + shapes.Elements[i].Shape.ComputeMaximumRadius();
                 if (radius > maxRadius)
                     maxRadius = radius;
             }
@@ -239,53 +236,27 @@ namespace BEPUphysics.CollisionShapes
 
         /// <summary>
         /// Computes the center of the shape.  This can be considered its 
-        /// center of mass.  This calculation is often associated with the 
-        /// volume calculation, which is given by this method as well.
+        /// center of mass, based on the weightings of entries in the shape.
+        /// For properly calibrated compound shapes, this will return a zero vector,
+        /// since the shape recenters itself on construction.
         /// </summary>
-        /// <param name="volume">Volume of the shape.</param>
         /// <returns>Center of the shape.</returns>
-        public override Vector3 ComputeCenter(out float volume)
+        public override Vector3 ComputeCenter()
         {
-            volume = 0;
+            float totalWeight = 0;
             var center = new Vector3();
-            for (int i = 0; i < shapes.list.count; i++)
+            for (int i = 0; i < shapes.count; i++)
             {
-                float volumeContribution = shapes.list.Elements[i].Shape.ComputeVolume();
-                volume += volumeContribution;
+                totalWeight += shapes.Elements[i].Weight;
                 Vector3 centerContribution;
-                //TODO: This does not factor in the computed center of the subshape.  If inertia tensor is ACTUALLY local, that's fine. 
-                //It's a bit weird if the inertia tensor is computed as local, but isn't ACTUALLY local.
-                Vector3.Multiply(ref shapes.list.Elements[i].LocalTransform.Position, volumeContribution, out centerContribution);
+                Vector3.Multiply(ref shapes.Elements[i].LocalTransform.Position, shapes.Elements[i].Weight, out centerContribution);
                 Vector3.Add(ref center, ref centerContribution, out center);
 
             }
-            Vector3.Multiply(ref center, 1 / volume, out center);
+            Vector3.Multiply(ref center, 1 / totalWeight, out center);
             return center;
         }
 
-        ///<summary>
-        /// Computes the center, volume, and volume-based weights of the entries of the compound shape.
-        ///</summary>
-        ///<param name="volume">Total volume of the compound shape.</param>
-        ///<param name="outputWeights">Volume-based weights of each entry in the compound shape.</param>
-        ///<returns></returns>
-        public Vector3 ComputeCenter(out float volume, IList<float> outputWeights)
-        {
-            volume = 0;
-            var center = new Vector3();
-            for (int i = 0; i < shapes.list.count; i++)
-            {
-                float volumeContribution = shapes.list.Elements[i].Shape.ComputeVolume();
-                outputWeights.Add(volumeContribution);
-                volume += volumeContribution;
-                Vector3 centerContribution;
-                Vector3.Multiply(ref shapes.list.Elements[i].LocalTransform.Position, volumeContribution, out centerContribution);
-                Vector3.Add(ref center, ref centerContribution, out center);
-
-            }
-            Vector3.Multiply(ref center, 1 / volume, out center);
-            return center;
-        }
 
         ///<summary>
         /// Computes the center of a compound using its child data.
@@ -317,14 +288,14 @@ namespace BEPUphysics.CollisionShapes
         public static Vector3 ComputeCenter(IList<CompoundShapeEntry> childData)
         {
             var center = new Vector3();
-            float volume = 0;
+            float totalWeight = 0;
             for (int i = 0; i < childData.Count; i++)
             {
-                float volumeContribution = childData[i].Shape.ComputeVolume();
-                volume += volumeContribution;
-                center += childData[i].LocalTransform.Position * volumeContribution;
+                float weight = childData[i].Weight;
+                totalWeight += weight;
+                center += childData[i].LocalTransform.Position * weight;
             }
-            Vector3.Divide(ref center, volume, out center);
+            Vector3.Divide(ref center, totalWeight, out center);
             return center;
 
         }
@@ -336,9 +307,9 @@ namespace BEPUphysics.CollisionShapes
         public override float ComputeVolume()
         {
             float volume = 0;
-            for (int i = 0; i < shapes.list.count; i++)
+            for (int i = 0; i < shapes.count; i++)
             {
-                volume += shapes.list.Elements[i].Shape.ComputeVolume();
+                volume += shapes.Elements[i].Shape.ComputeVolume();
             }
             return volume;
         }
@@ -352,27 +323,22 @@ namespace BEPUphysics.CollisionShapes
         /// <returns>Volume distribution of the shape.</returns>
         public override Matrix3X3 ComputeVolumeDistribution(out float volume)
         {
-            var weights = Resources.GetFloatList();
-            Vector3 center = ComputeCenter(out volume, weights);
-            Matrix3X3 volumeDistribution = ComputeVolumeDistribution(center, weights, volume);
-            Resources.GiveBack(weights);
-            Matrix3X3.Multiply(ref volumeDistribution, 1 / volume, out volumeDistribution);
-            return volumeDistribution;
+            volume = ComputeVolume();
+            return ComputeVolumeDistribution();
         }
 
         /// <summary>
-        /// Computes the volume distribution, center, volume-based weights, and total weight (volume) of the shape.
+        /// Computes the volume distribution of the shape.
         /// </summary>
-        /// <param name="center">Center of the compound.</param>
-        /// <param name="weights">Per-shape volume-based weights of the compound.</param>
-        /// <param name="totalWeight">Total volume of the shape.</param>
         /// <returns>Volume distribution of the shape.</returns>
-        public Matrix3X3 ComputeVolumeDistribution(Vector3 center, List<float> weights, float totalWeight)
+        public override Matrix3X3 ComputeVolumeDistribution()
         {
             var volumeDistribution = new Matrix3X3();
-            for (int i = 0; i < shapes.list.count; i++)
+            float totalWeight = 0;
+            for (int i = 0; i < shapes.count; i++)
             {
-                Matrix3X3 contribution = GetContribution(shapes.list.Elements[i].Shape, ref shapes.list.Elements[i].LocalTransform, ref center, weights[i]);
+                totalWeight += shapes.Elements[i].Weight;
+                Matrix3X3 contribution = GetContribution(shapes.Elements[i].Shape, ref shapes.Elements[i].LocalTransform, ref Toolbox.ZeroVector, shapes.Elements[i].Weight);
                 Matrix3X3.Add(ref contribution, ref volumeDistribution, out volumeDistribution);
 
             }
@@ -380,45 +346,30 @@ namespace BEPUphysics.CollisionShapes
             return volumeDistribution;
         }
 
-
         /// <summary>
         /// Computes the volume distribution and center of the shape.
         /// </summary>
         /// <param name="entries">Mass-weighted entries of the compound.</param>
         /// <param name="center">Center of the compound.</param>
         /// <returns>Volume distribution of the shape.</returns>
-        public static Matrix3X3 ComputeVolumeDistribution(IList<DynamicCompoundEntry> entries, out Vector3 center)
+        public static Matrix3X3 ComputeVolumeDistribution(IList<CompoundShapeEntry> entries, out Vector3 center)
         {
             center = new Vector3();
             float totalWeight = 0;
             for (int i = 0; i < entries.Count; i++)
             {
-                center += entries[i].Entry.LocalTransform.Position * entries[i].Mass;
-                totalWeight += entries[i].Mass;
+                center += entries[i].LocalTransform.Position * entries[i].Weight;
+                totalWeight += entries[i].Weight;
             }
             center /= totalWeight;
             var volumeDistribution = new Matrix3X3();
             for (int i = 0; i < entries.Count; i++)
             {
-                RigidTransform transform = entries[i].Entry.LocalTransform;
-                Matrix3X3 contribution = GetContribution(entries[i].Entry.Shape, ref transform, ref center, entries[i].Mass);
+                RigidTransform transform = entries[i].LocalTransform;
+                Matrix3X3 contribution = GetContribution(entries[i].Shape, ref transform, ref center, entries[i].Weight);
                 Matrix3X3.Add(ref volumeDistribution, ref contribution, out volumeDistribution);
             }
             return volumeDistribution;
-        }
-
-        ///<summary>
-        /// Gets the volume distribution and weight contributed by a single shape.
-        ///</summary>
-        ///<param name="shape">Shape to use to compute a contribution.</param>
-        ///<param name="transform">Transform of the shape.</param>
-        ///<param name="center">Center to use when computing the distribution.</param>
-        ///<param name="weight">Weight associated with the contribution.</param>
-        ///<returns>Volume distribution of the contribution.</returns>
-        public static Matrix3X3 GetContribution(EntityShape shape, ref RigidTransform transform, ref Vector3 center, out float weight)
-        {
-            Matrix3X3 baseContribution = shape.ComputeVolumeDistribution(out weight);
-            return TransformContribution(ref transform, ref center, ref baseContribution, weight);
         }
 
         ///<summary>
@@ -488,26 +439,14 @@ namespace BEPUphysics.CollisionShapes
 
 
         /// <summary>
-        /// Computes the volume distribution of the shape.
-        /// The volume distribution can be used to compute inertia tensors when
-        /// paired with mass and other tuning factors.
+        /// Computes the center of the shape and its volume.
         /// </summary>
-        /// <returns>Volume distribution of the shape.</returns>
-        public override Matrix3X3 ComputeVolumeDistribution()
+        /// <param name="volume">Volume of the compound.</param>
+        /// <returns>Volume of the compound.</returns>
+        public override Vector3 ComputeCenter(out float volume)
         {
-            float volume;
-            return ComputeVolumeDistribution(out volume);
-        }
-
-        /// <summary>
-        /// Computes the center of the shape.  This can be considered its 
-        /// center of mass.
-        /// </summary>
-        /// <returns>Center of the shape.</returns>
-        public override Vector3 ComputeCenter()
-        {
-            float volume;
-            return ComputeCenter(out volume);
+            volume = ComputeVolume();
+            return ComputeCenter();
         }
 
         /// <summary>

@@ -23,18 +23,18 @@ namespace BEPUphysicsDemos.Demos
             : base(game)
         {
             //Build the ship
-            var shipFuselage = new DynamicCompoundEntry(new CylinderShape(3, .7f), new Vector3(0, 5, 0), 4);
-            var shipNose = new DynamicCompoundEntry(new ConeShape(2, .7f), new Vector3(0, 7f, 0), 2);
-            var shipWing = new DynamicCompoundEntry(new BoxShape(5f, 2, .2f), new Vector3(0, 5, 0), 3);
-            var shipThrusters = new DynamicCompoundEntry(new ConeShape(1, .5f), new Vector3(0, 3.25f, 0), 1);
+            var shipFuselage = new CompoundShapeEntry(new CylinderShape(3, .7f), new Vector3(0, 5, 0), 4);
+            var shipNose = new CompoundShapeEntry(new ConeShape(2, .7f), new Vector3(0, 7f, 0), 2);
+            var shipWing = new CompoundShapeEntry(new BoxShape(5f, 2, .2f), new Vector3(0, 5, 0), 3);
+            var shipThrusters = new CompoundShapeEntry(new ConeShape(1, .5f), new Vector3(0, 3.25f, 0), 1);
 
-            var bodies = new List<DynamicCompoundEntry>();
+            var bodies = new List<CompoundShapeEntry>();
             bodies.Add(shipFuselage);
             bodies.Add(shipNose);
             bodies.Add(shipWing);
             bodies.Add(shipThrusters);
 
-            var ship = new CompoundBody(bodies);
+            var ship = new CompoundBody(bodies, 10);
 
             //Setup the launch pad and ramp
             Entity toAdd = new Box(new Vector3(10, 4, 0), 26, 1f, 6);
@@ -52,7 +52,7 @@ namespace BEPUphysicsDemos.Demos
             Space.Add(toAdd);
 
             //Blast-off!
-            ship.AngularDamping = .95f; //Helps keep the rocket on track for a little while longer :D
+            ship.AngularDamping = .4f; //Helps keep the rocket on track for a little while longer :D
             var thruster = new Thruster(ship, new Vector3(0, -2, 0), new Vector3(0, 300, 0), 0);
             Space.Add(thruster);
             ship.Orientation = Quaternion.CreateFromAxisAngle(Vector3.Right, (float)Math.PI / 2) * Quaternion.CreateFromAxisAngle(Vector3.Forward, (float)Math.PI / 2);

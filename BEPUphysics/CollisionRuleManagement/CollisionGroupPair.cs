@@ -29,10 +29,10 @@ namespace BEPUphysics.CollisionRuleManagement
         {
             if (groupA == null)
                 throw new ArgumentNullException("groupA",
-                                                "The first collision group in the pair is null.  If this is a reference to an entity's collision group, remember that collision groups are not automatically assigned until an entity has been added to a space; consider manually setting the entity's CollisionGroup beforehand or wait until after the entity belongs to the space.");
+                                                "The first collision group in the pair is null.  If this pair was being created for CollisionRule calculation purposes, simply consider the rule to be CollisionRule.Defer.");
             if (groupB == null)
                 throw new ArgumentNullException("groupB",
-                                                "The second collision group in the pair is null.  If this is a reference to an entity's collision group, remember that collision groups are not automatically assigned until an entity has been added to a space; consider manually setting the entity's CollisionGroup beforehand or wait until after the entity belongs to the space.");
+                                                "The second collision group in the pair is null.  If this pair was being created for CollisionRule calculation purposes, simply consider the rule to be CollisionRule.Defer.");
             A = groupA;
             B = groupB;
             const ulong prime = 0xd8163841;

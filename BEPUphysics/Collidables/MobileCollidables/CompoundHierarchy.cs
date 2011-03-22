@@ -45,7 +45,7 @@ namespace BEPUphysics.Collidables.MobileCollidables
             //Otherwise, the tree would try to create a hierarchy based on a bunch of zeroed out bounding boxes!
             for (int i = 0; i < children.Length; i++)
             {
-                children[i].CollisionInformation.worldTransform = children[i].localTransform;
+                children[i].CollisionInformation.worldTransform = owner.Shape.shapes.Elements[i].LocalTransform;
                 children[i].CollisionInformation.UpdateBoundingBoxInternal(0);
             }
             tree = new BoundingBoxTree<CompoundChild>(children);
