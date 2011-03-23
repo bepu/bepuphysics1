@@ -14,6 +14,7 @@ using Microsoft.Xna.Framework.Graphics;
 using BEPUphysics.Collidables.MobileCollidables;
 using BEPUphysics.CollisionShapes;
 using BEPUphysics.Settings;
+using BEPUphysics.NarrowPhaseSystems.Pairs;
 
 namespace BEPUphysicsDemos.Demos
 {
@@ -69,7 +70,7 @@ namespace BEPUphysicsDemos.Demos
             }
 
 
-            var body = new CompoundBody(triangles, 400);
+            body = new CompoundBody(triangles, 400);
 
             Space.Add(body);
 
@@ -109,6 +110,7 @@ namespace BEPUphysicsDemos.Demos
             Space.NarrowPhase.AllowMultithreading = false;
         }
 
+        CompoundBody body;
         Box boxA, boxB;
 
         double time;
@@ -121,7 +123,17 @@ namespace BEPUphysicsDemos.Demos
         {
             KeyboardState state = Keyboard.GetState();
 
-
+            if (state.IsKeyDown(Keys.O))
+            {
+                foreach (CompoundConvexPairHandler pair in body.CollisionInformation.Pairs)
+                {
+                    foreach (ContactInformation contactInfo in pair.Contacts)
+                    {
+                        if (contactInfo.Contact.PenetrationDepth > 1)
+                            Debug.WriteLine("Breka.");
+                    }
+                }
+            }
 
             if (state.IsKeyDown(Keys.P))
             {

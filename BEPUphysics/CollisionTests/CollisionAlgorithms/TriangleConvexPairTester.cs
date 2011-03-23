@@ -95,6 +95,10 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                         contact = new ContactData();
                         return false;
                     }
+
+                    //The reverse normal is pointing towards the convex.
+                    //It needs to point away from the convex so that the direction
+                    //will get the proper extreme point.
                     Vector3.Negate(ref reverseNormal, out reverseNormal);
                     dotA = -dotA;
                     break;
@@ -123,13 +127,10 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
 
 
-            Vector3 pointOnPlane;
-            Vector3.Multiply(ref reverseNormal, t, out pointOnPlane);
-            Vector3.Subtract(ref extremePoint, ref pointOnPlane, out pointOnPlane);
+            Vector3 offset;
+            Vector3.Multiply(ref reverseNormal, t, out offset);
 
             //Compare the distance from the plane to the convex object.
-            Vector3 offset;
-            Vector3.Subtract(ref pointOnPlane, ref extremePoint, out offset);
             float distanceSquared = offset.LengthSquared();
 
             float marginSum = triangle.collisionMargin + convex.collisionMargin;
@@ -138,14 +139,13 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             if (t <= 0 || distanceSquared < marginSum * marginSum)
             {
                 //The convex object is in the margin of the plane.
-                //Due to the previous tests, we know it isn't penetrating, and it is right above the face.
                 //All that's left is to create the contact.
 
 
                 contact = new ContactData();
                 //Displacement is from A to B.  point = A + t * AB, where t = marginA / margin.
                 if (marginSum > Toolbox.Epsilon) //This can be zero! It would cause a NaN is unprotected.
-                    Vector3.Multiply(ref offset, -convex.collisionMargin / marginSum, out contact.Position); //t * AB
+                    Vector3.Multiply(ref offset, convex.collisionMargin / marginSum, out contact.Position); //t * AB
                 else contact.Position = new Vector3();
                 Vector3.Add(ref extremePoint, ref contact.Position, out contact.Position); //A + t * AB.
 
@@ -161,10 +161,11 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 {
                     //Check to see if the inner sphere is touching the plane.
                     //This overrides other depth tests.
-                    ContactData temp;
-                    if (TryInnerSphereContact(out temp))
+
+                    ContactData alternateContact;
+                    if (TryInnerSphereContact(out alternateContact))
                     {
-                        contact = temp;
+                        contact = alternateContact;
                         return true;
                     }
                     //The convex object is stuck deep in the plane!
@@ -176,7 +177,6 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
                     //Verify that the depth is correct by trying another approach.
                     CollisionState previousState = state;
-                    ContactData alternateContact;
                     state = CollisionState.ExternalNear;
                     if (DoExternalNear(out alternateContact))
                     {
@@ -197,8 +197,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                         //just return to plane testing.  If the point turns up outside the face region
                         //next time, the system will adapt.
                         state = previousState;
-                        //isFaceContact = false;
-                        //return false;
+                        return false;
                     }
                 }
                 return true;
