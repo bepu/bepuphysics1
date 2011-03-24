@@ -43,7 +43,7 @@ namespace BEPUphysicsDemos.Demos
             int numRows = 8;
             int numHigh = 1;
             float separation = 8;
-            Box toAdd;
+            Entity toAdd;
             for (int i = 0; i < numRows; i++)
                 for (int j = 0; j < numColumns; j++)
                     for (int k = 0; k < numHigh; k++)
@@ -59,6 +59,7 @@ namespace BEPUphysicsDemos.Demos
             game.ModelDrawer.Add(staticMesh.Mesh);
             game.Camera.Position = new Vector3(0, 10, 40);
 
+
         }
 
         /// <summary>
@@ -68,6 +69,7 @@ namespace BEPUphysicsDemos.Demos
         {
             get { return "Static Mesh"; }
         }
+
 
    
     }

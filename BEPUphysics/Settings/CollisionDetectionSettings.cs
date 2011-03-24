@@ -1,4 +1,5 @@
-﻿namespace BEPUphysics.Settings
+﻿using System;
+namespace BEPUphysics.Settings
 {
     ///<summary>
     /// Settings class containing global information about collision detection.
@@ -21,6 +22,24 @@
         /// the system will not use one of them.  This avoids redundant constraints.
         /// </summary>
         public static float ContactMinimumSeparationDistanceSquared = .01f;
+
+        internal static float nonconvexNormalDotMinimum = .99f;
+        /// <summary>
+        /// In regular convex manifolds, two contacts are considered redundant if their positions are too close together.  
+        /// In nonconvex manifolds, the normal must also be tested, since a contact in the same location could have a different normal.
+        /// This property is the minimum angle in radians between normals below which contacts are considered redundant.
+        /// </summary>
+        public static float NonconvexNormalAngleDifferenceMinimum
+        {
+            get
+            {
+                return (float)Math.Acos(nonconvexNormalDotMinimum);
+            }
+            set
+            {
+                nonconvexNormalDotMinimum = (float)Math.Cos(value);
+            }
+        }
 
         /// <summary>
         /// The default amount of allowed penetration into the margin before position correcting impulses will be applied.

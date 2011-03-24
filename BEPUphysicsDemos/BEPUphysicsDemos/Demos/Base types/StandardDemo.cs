@@ -11,6 +11,7 @@ using Microsoft.Xna.Framework.Input;
 using BEPUphysics.CollisionRuleManagement;
 using System;
 using System.Diagnostics;
+using BEPUphysics.Settings;
 
 namespace BEPUphysicsDemos.Demos
 {
@@ -41,7 +42,6 @@ namespace BEPUphysicsDemos.Demos
             var wheelTexture = game.Content.Load<Texture2D>("wheel");
             whitePixel = game.Content.Load<Texture2D>("whitePixel");
             vehicle = new VehicleInput(new Vector3(10000, 0, 0), Space, game.Camera, game.ModelDrawer, wheelModel, wheelTexture);
-
             Space.ForceUpdater.Gravity = new Vector3(0, -9.81f, 0f); //If left unset, the default value is (0,0,0).
 
             //Create the tossable ball.

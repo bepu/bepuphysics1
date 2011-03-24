@@ -32,7 +32,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 //In collision!
 
                 if (radiusSum > Toolbox.Epsilon) //This would be weird, but it is still possible to cause a NaN.
-                    Vector3.Multiply(ref centerDifference, b.collisionMargin / radiusSum, out  contact.Position);
+                    Vector3.Multiply(ref centerDifference, a.collisionMargin / radiusSum, out  contact.Position);
                 else contact.Position = new Vector3();
                 Vector3.Add(ref contact.Position, ref positionA, out contact.Position);
 

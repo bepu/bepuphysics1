@@ -8,7 +8,6 @@ using BEPUphysics.Settings;
 using BEPUphysics.ResourceManagement;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.MathExtensions;
-using Microsoft.Xna.Framework.Input;
 
 namespace BEPUphysics.CollisionTests.Manifolds
 {
@@ -100,10 +99,6 @@ namespace BEPUphysics.CollisionTests.Manifolds
             ContactData contact;
             if (pairTester.GenerateContactCandidate(out contact))
             {
-                if (contact.PenetrationDepth > 1 && Keyboard.GetState().IsKeyDown(Keys.O))
-                {
-                    Console.WriteLine("break.");
-                }
                 //Put the contact into world space.
                 Matrix3X3.Transform(ref contact.Position, ref orientation, out contact.Position);
                 Vector3.Add(ref contact.Position, ref convex.worldTransform.Position, out contact.Position);

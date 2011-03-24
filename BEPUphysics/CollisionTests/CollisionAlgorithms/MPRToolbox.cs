@@ -373,9 +373,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                             float v1Weight = v0ov2v3volume * inverseTotalVolume;
                             float v2Weight = v0v1ov3volume * inverseTotalVolume;
                             float v3Weight = 1 - v0Weight - v1Weight - v2Weight;
-                            Vector3 contactLocationA = v0Weight * v0A + v1Weight * v1A + v2Weight * v2A + v3Weight * v3A;
-                            Vector3 contactLocationB = v0Weight * v0B + v1Weight * v1B + v2Weight * v2B + v3Weight * v3B;
-                            contact.Position = (contactLocationA + contactLocationB) / 2;
+                            contact.Position = v0Weight * v0A + v1Weight * v1A + v2Weight * v2A + v3Weight * v3A;
                             //Find depth by passing in normal to special normal-warmstarted depth finder.
                             contact.PenetrationDepth = FindPenetrationDepth(shapeA, shapeB, ref v0, ref localTransformB, ref contact.Normal);
 

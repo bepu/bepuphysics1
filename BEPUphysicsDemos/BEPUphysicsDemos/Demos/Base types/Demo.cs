@@ -72,7 +72,7 @@ namespace BEPUphysicsDemos.Demos
             long startTime = Stopwatch.GetTimestamp();
 
             //Update the simulation.
-            Space.Update(); //pass in dt to the update to update an appropriate number of times.
+            Space.Update(); //pass in dt to the function to use internal timestepping, if desired.
 
             long endTime = Stopwatch.GetTimestamp();
             accumulatedPhysicsTime += (endTime - startTime) / (double)Stopwatch.Frequency;

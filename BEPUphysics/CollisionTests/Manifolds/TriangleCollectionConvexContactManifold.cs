@@ -106,8 +106,6 @@ namespace BEPUphysics.CollisionTests.Manifolds
                 {
                     if (UseImprovedBoundaryHandling)
                     {
-                        //if (Keyboard.GetState().IsKeyDown(Keys.O))
-                        //    Debug.WriteLine("break.");
                         if (AnalyzeCandidate(ref indices, pairTester, ref contact))
                         {
                             AddLocalContact(ref contact, ref orientation);
@@ -579,7 +577,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     //This is a nonconvex manifold.  There will be times where a an object will be shoved into a corner such that
                     //a single position will have two reasonable normals.  If the normals aren't mostly aligned, they should NOT be considered equivalent.
                     Vector3.Dot(ref contacts.Elements[i].Normal, ref contactCandidate.Normal, out distanceSquared);
-                    if (Math.Abs(distanceSquared) >= .9)
+                    if (Math.Abs(distanceSquared) >= CollisionDetectionSettings.nonconvexNormalDotMinimum)
                     {
                         //Update the existing 'redundant' contact with the new information.
                         //This works out because the new contact is the deepest contact according to the previous collision detection iteration.
@@ -602,7 +600,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     //This is a nonconvex manifold.  There will be times where a an object will be shoved into a corner such that
                     //a single position will have two reasonable normals.  If the normals aren't mostly aligned, they should NOT be considered equivalent.
                     Vector3.Dot(ref candidatesToAdd.Elements[i].Normal, ref contactCandidate.Normal, out distanceSquared);
-                    if (Math.Abs(distanceSquared) >= .9)
+                    if (Math.Abs(distanceSquared) >= CollisionDetectionSettings.nonconvexNormalDotMinimum)
                         return false;
                 }
             }
