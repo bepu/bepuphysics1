@@ -149,9 +149,9 @@ namespace BEPUphysics.Entities.Prefabs
         /// <param name="v1">Position of the first vertex.</param>
         /// <param name="v2">Position of the second vertex.</param>
         /// <param name="v3">Position of the third vertex.</param>
-        /// <param name="m">Mass of the object.</param>
-        public Triangle(Vector3 pos, Vector3 v1, Vector3 v2, Vector3 v3, float m)
-            : this(v1, v2, v3, m)
+        /// <param name="mass">Mass of the object.</param>
+        public Triangle(Vector3 pos, Vector3 v1, Vector3 v2, Vector3 v3, float mass)
+            : this(v1, v2, v3, mass)
         {
             Position = pos;
         }
@@ -176,9 +176,9 @@ namespace BEPUphysics.Entities.Prefabs
         /// <param name="v1">Position of the first vertex.</param>
         /// <param name="v2">Position of the second vertex.</param>
         /// <param name="v3">Position of the third vertex.</param>
-        /// <param name="m">Mass of the object.</param>
-        public Triangle(MotionState motionState, Vector3 v1, Vector3 v2, Vector3 v3, float m)
-            : this(v1, v2, v3, m)
+        /// <param name="mass">Mass of the object.</param>
+        public Triangle(MotionState motionState, Vector3 v1, Vector3 v2, Vector3 v3, float mass)
+            : this(v1, v2, v3, mass)
         {
             MotionState = motionState;
         }

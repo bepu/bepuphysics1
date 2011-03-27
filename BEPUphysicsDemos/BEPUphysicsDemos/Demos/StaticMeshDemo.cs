@@ -53,7 +53,7 @@ namespace BEPUphysicsDemos.Demos
                             separation * i - numRows * separation / 2,
                             30f + k * separation,
                             separation * j - numColumns * separation / 2),
-                            2, 2, 2, 15);
+                            .2f, .2f, .2f, 15);
                         Space.Add(toAdd);
                     }
             game.ModelDrawer.Add(staticMesh.Mesh);

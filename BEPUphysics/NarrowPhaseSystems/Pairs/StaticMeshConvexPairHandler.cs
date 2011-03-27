@@ -275,8 +275,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                         Vector3.Subtract(ref triangle.vC, ref convex.worldTransform.Position, out triangle.vC);
 
                         RayHit rayHit;
-                        if (GJKToolbox.SphereCast(new Ray(Toolbox.ZeroVector, velocity), minimumRadius, triangle, ref Toolbox.RigidIdentity, 1, out rayHit) &&
-                            rayHit.T < timeOfImpact && 
+                        if (GJKToolbox.CCDSphereCast(new Ray(Toolbox.ZeroVector, velocity), minimumRadius, triangle, ref Toolbox.RigidIdentity, timeOfImpact, out rayHit) &&
                             rayHit.T > Toolbox.BigEpsilon)
                         {
                             if (mesh.sidedness != TriangleSidedness.DoubleSided)

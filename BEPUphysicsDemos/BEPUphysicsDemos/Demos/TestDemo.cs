@@ -15,6 +15,9 @@ using BEPUphysics.Collidables.MobileCollidables;
 using BEPUphysics.CollisionShapes;
 using BEPUphysics.Settings;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
+using BEPUphysics.CollisionRuleManagement;
+using BEPUphysics.BroadPhaseSystems;
+using BEPUphysics.Constraints;
 
 namespace BEPUphysicsDemos.Demos
 {
@@ -32,82 +35,29 @@ namespace BEPUphysicsDemos.Demos
             : base(game)
         {
 
-
-            Vector3[] vertices;
-            int[] indices;
-            TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("barrelandplatform"), out vertices, out indices);
-
-            float radius = 1;
-            var scaleTransform = Matrix.CreateScale(10 * radius);
-
-            List<CompoundShapeEntry> triangles = new List<CompoundShapeEntry>(indices.Length / 3);
-
-            for (int i = 0; i < indices.Length; i += 3)
+            Random random = new Random();
+            MotionSettings.DefaultPositionUpdateMode = PositionUpdateMode.Continuous;
+            //CollisionRules.CollisionGroupRules.Add(new CollisionGroupPair(CollisionRules.DefaultDynamicCollisionGroup, CollisionRules.DefaultDynamicCollisionGroup), CollisionRule.NoBroadPhase);
+            for (int i = 0; i < 1000; i++)
             {
-                // [Recentered Triangle]
-                Vector3 centre;
-                TriangleShape tri = new TriangleShape(
-                    Vector3.Transform(vertices[indices[i]], scaleTransform),
-                    Vector3.Transform(vertices[indices[i + 1]], scaleTransform),
-                    Vector3.Transform(vertices[indices[i + 2]], scaleTransform),
-                    out centre
-                    );
-
-                //Depending on the winding of the model, using clockwise or counterclockwise will permit
-                //objects to move freely from the inside to the outside, or from the outside inside.
-                //Doublesided stops both ways.  (It's the default too, so setting this isn't really necessary)
-                tri.Sidedness = TriangleSidedness.DoubleSided;
-                //By now, if we checked the triangle shape's vertices, they would be in the triangle's local space.
-                //If we added centre to the vertices, they would be in the original world space locations.
-                //Knowing that, we can pass the centre to the DynamicCompoundEntry's position and they will be in the correct location.
-                triangles.Add(
-                    new CompoundShapeEntry(
-                        tri,
-                        centre,
-                        1
-                    )
-                );
+                Space.Add(new Sphere(new Vector3((i % 2) * .5f, 10 + i * 4, (i % 3) * .33f), .5f, 1));
+                //Space.Add(new Sphere(new Vector3(-20 + (float)random.NextDouble() * 40, 10 + i * 4, -20 + (float)random.NextDouble() * 40), .5f, 1));
             }
 
+            Space.ForceUpdater.Gravity = new Vector3(0, -18, 0);
+            Space.Add(new Box(new Vector3(0, 0, 0), 10, 0, 10));
+            //Space.Solver.IterationLimit = 10;
+            //SolverSettings.DefaultMinimumIterations = 5;
+            //Space.PositionUpdater.AllowMultithreading = false;
+            //Space.NarrowPhase.AllowMultithreading = false;
 
-            body = new CompoundBody(triangles, 400);
 
-            Space.Add(body);
-
-            Space.Add(new Box(new Vector3(0, -50, 0), 100, 1, 100));
-
-
-            game.Camera.Position = new Vector3(0, 0, 10);
+            Space.Add(new Box(new Vector3(5000, -20, 0), 10000 - 10, 40, 10000));
+            Space.Add(new Box(new Vector3(-5000, -20, 0), 10000 - 10, 40, 10000));
+            Space.Add(new Box(new Vector3(0, -20, 5000), 10, 40, 10000 - 10));
+            Space.Add(new Box(new Vector3(0, -20, -5000), 10, 40, 10000 - 10));
             
-            //Vector3[] vertices;
-            //int[] indices;
-            //TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("playground"), out vertices, out indices);
-            ////InstancedMesh mesh = new InstancedMesh(new InstancedMeshShape(vertices, indices), new AffineTransform(new Vector3(0, -15, 0)));
-            //var mesh = new StaticMesh(vertices, indices, new AffineTransform(Matrix3X3.CreateFromAxisAngle(Vector3.Up, MathHelper.Pi), new Vector3(0, -10, 0)));
-            //mesh.Sidedness = TriangleSidedness.DoubleSided;
-            //Space.Add(mesh);
-            //game.ModelDrawer.Add(mesh.Mesh);
 
-            //Triangle t = new Triangle(new Vector3(0, -10, 0), new Vector3(10, -10, 0), new Vector3(0, -10, 10));
-            //t.Sidedness = TriangleSidedness.Clockwise;
-            //Space.Add(t);
-            //t.Position -= new Vector3(10, 0, 0);
-            ////Space.ForceUpdater.Gravity = new Vector3();
-
-            //game.Camera.Position = new Vector3(0, 0, 0);
-
-            //for (int i = 0; i < 100; i++)
-            //{
-            //    Entity toAdd = new Box(new Vector3((float)random.NextDouble() * 10, (float)random.NextDouble() * 10, (float)random.NextDouble() * 10), 1, 1, 1, 1);
-            //    containedEntities.Add(toAdd);
-            //    Space.Add(toAdd);
-            //}
-
-            //boxA = new Box(new Vector3(0, 50, 0), 1, 1, 1, 1);
-            //boxA.PositionUpdateMode = PositionUpdateMode.Continuous;
-            //Space.Add(boxA);
-
-            Space.NarrowPhase.AllowMultithreading = false;
         }
 
         CompoundBody body;
@@ -123,21 +73,12 @@ namespace BEPUphysicsDemos.Demos
         {
             KeyboardState state = Keyboard.GetState();
 
-            if (state.IsKeyDown(Keys.O))
-            {
-                foreach (CompoundConvexPairHandler pair in body.CollisionInformation.Pairs)
-                {
-                    foreach (ContactInformation contactInfo in pair.Contacts)
-                    {
-                        if (contactInfo.Contact.PenetrationDepth > 1)
-                            Debug.WriteLine("Breka.");
-                    }
-                }
-            }
-
             if (state.IsKeyDown(Keys.P))
             {
                 Debug.WriteLine("Break.");
+                var overlaps = new List<BroadPhaseEntry>();
+                Space.BroadPhase.QueryAccelerator.GetEntries(new BoundingBox(new Vector3(-10000000, -10000000, -10000000), new Vector3(10000000, -50, 10000000)), overlaps);
+                Debug.WriteLine("Count: " + overlaps.Count);
             }
 
             base.Update(dt);
@@ -158,6 +99,11 @@ namespace BEPUphysicsDemos.Demos
             get { return "Test"; }
         }
 
+        public override void CleanUp()
+        {
+            //CollisionRules.CollisionGroupRules.Remove(new CollisionGroupPair(CollisionRules.DefaultDynamicCollisionGroup, CollisionRules.DefaultDynamicCollisionGroup));
+            base.CleanUp();
+        }
         //float minX = -1;
         //float minY = -10;
         //float minZ = -1;

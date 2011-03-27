@@ -55,9 +55,9 @@ namespace BEPUphysics.Entities.Prefabs
         /// </summary>
         /// <param name="position">Position to place the convex hull.</param>
         /// <param name="points">List of points in the object.</param>
-        /// <param name="m">Mass of the object.</param>
-        public ConvexHull(Vector3 position, IList<Vector3> points, float m)
-            : this(points, m)
+        /// <param name="mass">Mass of the object.</param>
+        public ConvexHull(Vector3 position, IList<Vector3> points, float mass)
+            : this(points, mass)
         {
             Position = position;
         }
@@ -79,9 +79,9 @@ namespace BEPUphysics.Entities.Prefabs
         /// </summary>
         /// <param name="motionState">Motion state specifying the entity's initial state.</param>
         /// <param name="points">List of points in the object.</param>
-        /// <param name="m">Mass of the object.</param>
-        public ConvexHull(MotionState motionState, IList<Vector3> points, float m)
-            : this(points, m)
+        /// <param name="mass">Mass of the object.</param>
+        public ConvexHull(MotionState motionState, IList<Vector3> points, float mass)
+            : this(points, mass)
         {
             MotionState = motionState;
         }

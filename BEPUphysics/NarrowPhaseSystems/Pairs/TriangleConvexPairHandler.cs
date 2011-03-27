@@ -280,7 +280,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                 {
                     //Spherecast A against B.
                     RayHit rayHit;
-                    if (GJKToolbox.SphereCast(new Ray(convex.worldTransform.Position, -velocity), minimumRadiusA, triangle.Shape, ref triangle.worldTransform, 1, out rayHit))
+                    if (GJKToolbox.CCDSphereCast(new Ray(convex.worldTransform.Position, -velocity), minimumRadiusA, triangle.Shape, ref triangle.worldTransform, timeOfImpact, out rayHit))
                     {
                         if (triangle.Shape.sidedness != TriangleSidedness.DoubleSided)
                         {                

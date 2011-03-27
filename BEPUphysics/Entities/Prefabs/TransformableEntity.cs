@@ -56,27 +56,27 @@ namespace BEPUphysics.Entities.Prefabs
         /// <summary>
         /// Constructs a dynamic transformable entity.
         /// </summary>
-        /// <param name="pos">Position of the entity.</param>
+        /// <param name="position">Position of the entity.</param>
         /// <param name="shape">Shape to transform.</param>
         /// <param name="transform">Transform to apply to the shape.</param>
-        /// <param name="m">Mass of the object.</param>
-        public TransformableEntity(Vector3 pos, ConvexShape shape, Matrix3X3 transform, float m)
-            : this(shape, transform, m)
+        /// <param name="mass">Mass of the object.</param>
+        public TransformableEntity(Vector3 position, ConvexShape shape, Matrix3X3 transform, float mass)
+            : this(shape, transform, mass)
         {
-            Position = pos;
+            Position = position;
         }
 
 
         /// <summary>
         /// Constructs a kinematic transformable entity.
         /// </summary>
-        /// <param name="pos">Position of the entity.</param>
+        /// <param name="position">Position of the entity.</param>
         /// <param name="shape">Shape to transform.</param>
         /// <param name="transform">Transform to apply to the shape.</param>
-        public TransformableEntity(Vector3 pos, ConvexShape shape, Matrix3X3 transform)
+        public TransformableEntity(Vector3 position, ConvexShape shape, Matrix3X3 transform)
             : this(shape, transform)
         {
-            Position = pos;
+            Position = position;
         }
 
 
@@ -86,9 +86,9 @@ namespace BEPUphysics.Entities.Prefabs
         /// <param name="motionState">Initial motion state of the entity.</param>
         /// <param name="shape">Shape to transform.</param>
         /// <param name="transform">Transform to apply to the shape.</param>
-        /// <param name="m">Mass of the object.</param>
-        public TransformableEntity(MotionState motionState, ConvexShape shape, Matrix3X3 transform, float m)
-            : this(shape, transform, m)
+        /// <param name="mass">Mass of the object.</param>
+        public TransformableEntity(MotionState motionState, ConvexShape shape, Matrix3X3 transform, float mass)
+            : this(shape, transform, mass)
         {
             MotionState = motionState;
         }

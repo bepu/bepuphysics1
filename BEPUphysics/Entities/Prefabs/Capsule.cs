@@ -104,37 +104,37 @@ namespace BEPUphysics.Entities.Prefabs
         /// <summary>
         /// Constructs a physically simulated capsule.
         /// </summary>
-        /// <param name="pos">Position of the capsule.</param>
-        /// <param name="len">Length of the capsule.</param>
-        /// <param name="rad">Radius of the capsule.</param>
-        /// <param name="m">Mass of the object.</param>
-        public Capsule(Vector3 pos, float len, float rad, float m)
-            : this(len, rad, m)
+        /// <param name="position">Position of the capsule.</param>
+        /// <param name="length">Length of the capsule.</param>
+        /// <param name="radius">Radius of the capsule.</param>
+        /// <param name="mass">Mass of the object.</param>
+        public Capsule(Vector3 position, float length, float radius, float mass)
+            : this(length, radius, mass)
         {
-            Position = pos;
+            Position = position;
         }
 
         /// <summary>
         /// Constructs a nondynamic capsule.
         /// </summary>
-        /// <param name="pos">Position of the capsule.</param>
-        /// <param name="len">Length of the capsule.</param>
-        /// <param name="rad">Radius of the capsule.</param>
-        public Capsule(Vector3 pos, float len, float rad)
-            : this(len, rad)
+        /// <param name="position">Position of the capsule.</param>
+        /// <param name="length">Length of the capsule.</param>
+        /// <param name="radius">Radius of the capsule.</param>
+        public Capsule(Vector3 position, float length, float radius)
+            : this(length, radius)
         {
-            Position = pos;
+            Position = position;
         }
 
         /// <summary>
         /// Constructs a dynamic capsule.
         /// </summary>
         /// <param name="motionState">Motion state specifying the entity's initial state.</param>
-        /// <param name="len">Length of the capsule.</param>
-        /// <param name="rad">Radius of the capsule.</param>
-        /// <param name="m">Mass of the object.</param>
-        public Capsule(MotionState motionState, float len, float rad, float m)
-            : this(len, rad, m)
+        /// <param name="length">Length of the capsule.</param>
+        /// <param name="radius">Radius of the capsule.</param>
+        /// <param name="mass">Mass of the object.</param>
+        public Capsule(MotionState motionState, float length, float radius, float mass)
+            : this(length, radius, mass)
         {
             MotionState = motionState;
         }
@@ -143,10 +143,10 @@ namespace BEPUphysics.Entities.Prefabs
         /// Constructs a nondynamic capsule.
         /// </summary>
         /// <param name="motionState">Motion state specifying the entity's initial state.</param>
-        /// <param name="len">Length of the capsule.</param>
-        /// <param name="rad">Radius of the capsule.</param>
-        public Capsule(MotionState motionState, float len, float rad)
-            : this(len, rad)
+        /// <param name="length">Length of the capsule.</param>
+        /// <param name="radius">Radius of the capsule.</param>
+        public Capsule(MotionState motionState, float length, float radius)
+            : this(length, radius)
         {
             MotionState = motionState;
         }

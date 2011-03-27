@@ -43,6 +43,7 @@ namespace BEPUphysicsDemos.Demos
             whitePixel = game.Content.Load<Texture2D>("whitePixel");
             vehicle = new VehicleInput(new Vector3(10000, 0, 0), Space, game.Camera, game.ModelDrawer, wheelModel, wheelTexture);
             Space.ForceUpdater.Gravity = new Vector3(0, -9.81f, 0f); //If left unset, the default value is (0,0,0).
+            MotionSettings.DefaultPositionUpdateMode = BEPUphysics.PositionUpdating.PositionUpdateMode.Continuous;
 
             //Create the tossable ball.
             kapow = new Sphere(new Vector3(11000, 0, 0), .6f, 20);
@@ -58,11 +59,11 @@ namespace BEPUphysicsDemos.Demos
             //  BEPUphysics uses an iterative system to solve constraints.  You can tell it to do more or less iterations.
             //  Less iterations is faster; more iterations makes the result more accurate.
             //
-            //  The amount of iterations needed for a simulation varies.  The "Wall" and "Pyramid" simulations (#1 and #16) are each fairly
+            //  The amount of iterations needed for a simulation varies.  The "Wall" and "Pyramid" simulations are each fairly
             //  solver intensive, but as few as 4 iterations can be used with acceptable results.
-            //  The "Jenga" (#19) simulation usually needs a few more iterations for stability; 7-9 is a good minimum.
+            //  The "Jenga" simulation usually needs a few more iterations for stability; 7-9 is a good minimum.
             //
-            //  The Dogbot demo (#9) shows how accuracy can smoothly increase with more iterations.
+            //  The Dogbot demo shows how accuracy can smoothly increase with more iterations.
             //  With very few iterations (1-3), it has slightly jaggier movement, as if the parts used to construct it were a little cheap.
             //  As you give it a few more iterations, the motors and constraints get more and more robust.
             //  

@@ -36,26 +36,26 @@ namespace BEPUphysics.Entities.Prefabs
         /// <summary>
         /// Constructs a dynamic minkowski sum.
         /// </summary>
-        /// <param name="pos">Position of the resulting shape.</param>
+        /// <param name="position">Position of the resulting shape.</param>
         /// <param name="a">First entity in the sum.</param>
         /// <param name="b">Second entity in the sum.</param>
-        /// <param name="m">Mass of the object.</param>
-        public MinkowskiSum(Vector3 pos, OrientedConvexShapeEntry a, OrientedConvexShapeEntry b, float m)
-            : this(a, b, m)
+        /// <param name="mass">Mass of the object.</param>
+        public MinkowskiSum(Vector3 position, OrientedConvexShapeEntry a, OrientedConvexShapeEntry b, float mass)
+            : this(a, b, mass)
         {
-            Position = pos;
+            Position = position;
         }
 
         /// <summary>
         /// Constructs a nondynamic minkowski sum of two entities.
         /// </summary>
-        /// <param name="pos">Position of the resulting shape.</param>
+        /// <param name="position">Position of the resulting shape.</param>
         /// <param name="a">First entity in the sum.</param>
         /// <param name="b">Second entity in the sum.</param>
-        public MinkowskiSum(Vector3 pos, OrientedConvexShapeEntry a, OrientedConvexShapeEntry b)
+        public MinkowskiSum(Vector3 position, OrientedConvexShapeEntry a, OrientedConvexShapeEntry b)
             : this(a, b)
         {
-            Position = pos;
+            Position = position;
         }
 
         /// <summary>
@@ -64,9 +64,9 @@ namespace BEPUphysics.Entities.Prefabs
         /// <param name="motionState">Motion state specifying the entity's initial state.</param>
         /// <param name="a">First entity in the sum.</param>
         /// <param name="b">Second entity in the sum.</param>
-        /// <param name="m">Mass of the object.</param>
-        public MinkowskiSum(MotionState motionState, OrientedConvexShapeEntry a, OrientedConvexShapeEntry b, float m)
-            : this(a, b, m)
+        /// <param name="mass">Mass of the object.</param>
+        public MinkowskiSum(MotionState motionState, OrientedConvexShapeEntry a, OrientedConvexShapeEntry b, float mass)
+            : this(a, b, mass)
         {
             MotionState = motionState;
         }
@@ -88,9 +88,9 @@ namespace BEPUphysics.Entities.Prefabs
         /// </summary>
         /// <param name="motionState">Motion state specifying the entity's initial state.</param>
         /// <param name="shapes">List of shapes to make the sum frmo.</param>
-        /// <param name="m">Mass of the object.</param>
-        public MinkowskiSum(MotionState motionState, IList<OrientedConvexShapeEntry> shapes, float m)
-            : base(new ConvexCollidable<MinkowskiSumShape>(new MinkowskiSumShape(shapes)), m)
+        /// <param name="mass">Mass of the object.</param>
+        public MinkowskiSum(MotionState motionState, IList<OrientedConvexShapeEntry> shapes, float mass)
+            : base(new ConvexCollidable<MinkowskiSumShape>(new MinkowskiSumShape(shapes)), mass)
         {
             MotionState = motionState;
         }

@@ -234,5 +234,10 @@ namespace BEPUphysics.Collidables
         void ISpaceObject.OnRemovalFromSpace(ISpace oldSpace)
         {
         }
+
+        /// <summary>
+        /// Gets or sets the user data associated with this object.
+        /// </summary>
+        public object Tag { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using BEPUphysics.CollisionShapes.ConvexShapes;
 using Microsoft.Xna.Framework;
+using System;
 
 namespace BEPUphysics.Collidables.MobileCollidables
 {
@@ -95,8 +96,19 @@ namespace BEPUphysics.Collidables.MobileCollidables
                     boundingBox.Max.Z += entity.linearVelocity.Z * dt;
                 else
                     boundingBox.Min.Z += entity.linearVelocity.Z * dt;
+
+                float angularExpansion = Math.Max(entity.angularVelocity.Length() * dt, Shape.maximumRadius);
+                boundingBox.Min.X -= angularExpansion;
+                boundingBox.Min.Y -= angularExpansion;
+                boundingBox.Min.Z -= angularExpansion;
+
+                boundingBox.Min.X += angularExpansion;
+                boundingBox.Min.Y += angularExpansion;
+                boundingBox.Min.Z += angularExpansion;
+
             }
         }
+
 
     }
 }

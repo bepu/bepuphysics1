@@ -160,6 +160,10 @@ namespace BEPUphysics.SolverSystems
         {
         }
 
+        /// <summary>
+        /// Gets or sets the user data associated with this object.
+        /// </summary>
+        public object Tag { get; set; }
 
 
         //Connected members are handled slightly differently from involved entities.

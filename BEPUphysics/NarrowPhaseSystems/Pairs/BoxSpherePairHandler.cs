@@ -123,7 +123,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             //TODO: These cleanup systems are convoluted, fragile, and duplicated all over the place.  Clean up the clean ups.
             previouslyColliding = false;
 
-            if(colliding)
+            if (colliding)
                 OnContactRemoved(contact);
             //If there are still any constraints, remove solver updateables.
             if (contactConstraint.solver != null)
@@ -272,6 +272,39 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                     )
                 )
             {
+                //timeOfImpact = 1;
+                //float radius = sphere.Shape.collisionMargin - .001f;
+                //while (radius > Toolbox.Epsilon)
+                //{
+                //    float planeY = box.worldTransform.Position.Y + box.Shape.halfHeight + radius;
+                //    //if (sphere.worldTransform.Position.Y - planeY < Toolbox.Epsilon)
+                //    //{
+                //    //    timeOfImpact = 1;
+                //    //    return;
+                //    //}
+
+                //    if (sphere.entity.linearVelocity.Y >= 0)
+                //    {
+                //        timeOfImpact = 1;
+                //        return;
+                //    }
+                //    float t = (sphere.worldTransform.Position.Y - planeY) / (-sphere.entity.linearVelocity.Y * dt);
+                //    if (t <= 1 && t > 0)
+                //    {
+                //        timeOfImpact = t;
+                //        return;
+                //    }
+                //    if (t > 1)
+                //    {
+                //        timeOfImpact = 1;
+                //        return;
+                //    }
+                //    radius /= 2;
+                //}
+                //if (timeOfImpact <= 0)
+                //    timeOfImpact = 1;
+                //return;
+
                 //Only perform the test if the minimum radii are small enough relative to the size of the velocity.
                 Vector3 velocity;
                 if (box.entity.PositionUpdateMode == PositionUpdateMode.Discrete)
@@ -289,22 +322,17 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                 {
                     //Spherecast A against B.
                     RayHit rayHit;
-                    if (GJKToolbox.SphereCast(new Ray(box.worldTransform.Position, -velocity), minimumRadiusA, sphere.Shape, ref sphere.worldTransform, 1, out rayHit))
-                    {
+                    if (GJKToolbox.CCDSphereCast(new Ray(box.worldTransform.Position, -velocity), minimumRadiusA, sphere.Shape, ref sphere.worldTransform, timeOfImpact, out rayHit))
                         timeOfImpact = rayHit.T;
-                    }
                 }
 
                 var minimumRadiusB = sphere.Shape.minimumRadius * MotionSettings.CoreShapeScaling;
                 if (minimumRadiusB * minimumRadiusB < velocitySquared)
                 {
-                    //Spherecast B against A.
                     RayHit rayHit;
-                    if (GJKToolbox.SphereCast(new Ray(sphere.worldTransform.Position, velocity), minimumRadiusB, box.Shape, ref box.worldTransform, 1, out rayHit) &&
-                        rayHit.T < timeOfImpact)
-                    {
+                    if (GJKToolbox.CCDSphereCast(new Ray(sphere.worldTransform.Position, velocity), minimumRadiusB, box.Shape, ref box.worldTransform, timeOfImpact, out rayHit))
                         timeOfImpact = rayHit.T;
-                    }
+
                 }
 
                 //If it's intersecting, throw our hands into the air and give up.
@@ -316,6 +344,24 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                 if (timeOfImpact == 0)
                     timeOfImpact = 1;
             }
+
+        }
+
+        bool TryToi(float minimumRadiusSphere, Vector3 velocity, out float toi)
+        {
+            //Spherecast B against A.
+            RayHit rayHit;
+            if (GJKToolbox.SphereCast(new Ray(sphere.worldTransform.Position, velocity), minimumRadiusSphere, box.Shape, ref box.worldTransform, 1, out rayHit) &&
+                rayHit.T < timeOfImpact)
+            {
+                toi = rayHit.T;
+                return true;
+            }
+            minimumRadiusSphere /= 2;
+            toi = 1;
+            if (minimumRadiusSphere < Toolbox.Epsilon)
+                return false;
+            return TryToi(minimumRadiusSphere / 2, velocity, out toi);
 
         }
 

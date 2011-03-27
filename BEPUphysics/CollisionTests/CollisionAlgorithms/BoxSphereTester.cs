@@ -57,19 +57,15 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             {
                 //Inside of the box.
                 Vector3 penetrationDepths;
-                penetrationDepths.X = localClosestPoint.X > 0 ? localClosestPoint.X - box.halfWidth : box.halfWidth - localClosestPoint.X;
-                penetrationDepths.Y = localClosestPoint.Y > 0 ? localClosestPoint.Y - box.halfHeight : box.halfHeight - localClosestPoint.Y;
-                penetrationDepths.Z = localClosestPoint.Z > 0 ? localClosestPoint.Z - box.halfLength : box.halfLength - localClosestPoint.Z;
-                Vector3 abs;
-                abs.X = Math.Abs(penetrationDepths.X);
-                abs.Y = Math.Abs(penetrationDepths.Y);
-                abs.Z = Math.Abs(penetrationDepths.Z);
-                if (abs.X < abs.Y && abs.X < abs.Z)
+                penetrationDepths.X = localClosestPoint.X < 0 ? localClosestPoint.X + box.halfWidth : box.halfWidth - localClosestPoint.X;
+                penetrationDepths.Y = localClosestPoint.Y < 0 ? localClosestPoint.Y + box.halfHeight : box.halfHeight - localClosestPoint.Y;
+                penetrationDepths.Z = localClosestPoint.Z < 0 ? localClosestPoint.Z + box.halfLength : box.halfLength - localClosestPoint.Z;
+                if (penetrationDepths.X < penetrationDepths.Y && penetrationDepths.X < penetrationDepths.Z)
                 {
                     contact.Normal = localClosestPoint.X > 0 ? Toolbox.RightVector : Toolbox.LeftVector; 
                     contact.PenetrationDepth = penetrationDepths.X;
                 }
-                else if (abs.Y < abs.Z)
+                else if (penetrationDepths.Y < penetrationDepths.Z)
                 {
                     contact.Normal = localClosestPoint.Y > 0 ? Toolbox.UpVector : Toolbox.DownVector; 
                     contact.PenetrationDepth = penetrationDepths.Y;

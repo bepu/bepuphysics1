@@ -1,6 +1,7 @@
 ﻿using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.MathExtensions;
 using Microsoft.Xna.Framework;
+using BEPUphysics.Settings;
 
 namespace BEPUphysics.CollisionTests.CollisionAlgorithms.GJK
 {
@@ -419,16 +420,15 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms.GJK
                 if (vw > 0)
                 {
                     Vector3.Dot(ref v, ref ray.Direction, out vdir);
+                    hit.T = hit.T - vw / vdir;
                     if (vdir >= 0)
                     {
-                        hit = new RayHit();
+                        //We would have to back up!
                         return false;
                     }
-                    hit.T = hit.T - vw / vdir;
                     if (hit.T > maximumLength)
                     {
                         //If we've gone beyond where the ray can reach, there's obviously no hit.
-                        hit = new RayHit();
                         return false;
                     }
                     //Shift the ray up.
@@ -449,6 +449,43 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms.GJK
             Vector3.Add(ref hit.Location, ref shapeTransform.Position, out hit.Location);
 
             return true;
+        }
+
+        ///<summary>
+        /// Casts a fat (sphere expanded) ray against the shape.  If the raycast appears to be stuck in the shape, the cast will be attempted
+        /// with a smaller ray (scaled by the MotionSettings.CoreShapeScaling each time).
+        ///</summary>
+        ///<param name="ray">Ray to test against the shape.</param>
+        ///<param name="radius">Radius of the ray.</param>
+        ///<param name="target">Shape to test against.</param>
+        ///<param name="shapeTransform">Transform to apply to the shape for the test.</param>
+        ///<param name="maximumLength">Maximum length of the ray in units of the ray direction's length.</param>
+        ///<param name="hit">Hit data of the sphere cast, if any.</param>
+        ///<returns>Whether or not the sphere cast hit the shape.</returns>
+        public static bool CCDSphereCast(Ray ray, float radius, ConvexShape target, ref RigidTransform shapeTransform, float maximumLength,
+                                   out RayHit hit)
+        {
+            int iterations = 0;
+            while (true)
+            {
+                if (GJKToolbox.SphereCast(ray, radius, target, ref shapeTransform, maximumLength, out hit) &&
+                    hit.T > 0)
+                {
+                    //The ray cast isn't embedded in the shape, and it's less than maximum length away!
+                    return true;
+                }
+                if (hit.T > maximumLength || hit.T < 0)
+                    return false; //Failure showed it was too far, or behind.
+
+                radius *= MotionSettings.CoreShapeScaling;
+                iterations++;
+                if (iterations > 3) //Limit could be configurable.
+                {
+                    //It's iterated too much, let's just do a last ditch attempt using a raycast and hope that can help.
+                    return GJKToolbox.RayCast(ray, target, ref shapeTransform, maximumLength, out hit) && hit.T > 0;
+                        
+                }
+            }
         }
     }
 

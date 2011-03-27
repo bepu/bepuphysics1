@@ -38,6 +38,13 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         /// </summary>
         public float MinimumRadius { get { return minimumRadius; } set { minimumRadius = value; } }
 
+        protected internal float maximumRadius;
+        /// <summary>
+        /// Gets the maximum radius of the collidable's shape.  This is initialized to a value that is
+        /// guaranteed to be equal to or larger than the actual maximum radius.
+        /// </summary>
+        public float MaximumRadius { get { return maximumRadius; } }
+
         ///<summary>
         /// Gets the extreme point of the shape in local space in a given direction.
         ///</summary>
@@ -227,6 +234,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         {
             base.OnShapeChanged();
             minimumRadius = ComputeMinimumRadius();
+            maximumRadius = ComputeMaximumRadius();
         }
 
         /// <summary>

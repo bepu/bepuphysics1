@@ -17,6 +17,10 @@
         /// <summary>
         /// Called before an object is removed from its space.
         /// </summary>
-        void OnRemovalFromSpace(ISpace oldSpace); 
+        void OnRemovalFromSpace(ISpace oldSpace);
+        /// <summary>
+        /// Gets or sets the user data associated with this object.
+        /// </summary>
+        object Tag { get; set; }
     }
 }

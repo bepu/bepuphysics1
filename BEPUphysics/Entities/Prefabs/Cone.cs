@@ -56,37 +56,37 @@ namespace BEPUphysics.Entities.Prefabs
         /// <summary>
         /// Constructs a physically simulated cone.
         /// </summary>
-        /// <param name="pos">Position of the cone.</param>
-        /// <param name="high">Height of the cone.</param>
-        /// <param name="rad">Radius of the cone.</param>
-        /// <param name="m">Mass of the object.</param>
-        public Cone(Vector3 pos, float high, float rad, float m)
-            : this(high, rad, m)
+        /// <param name="position">Position of the cone.</param>
+        /// <param name="height">Height of the cone.</param>
+        /// <param name="radius">Radius of the cone.</param>
+        /// <param name="mass">Mass of the object.</param>
+        public Cone(Vector3 position, float height, float radius, float mass)
+            : this(height, radius, mass)
         {
-            Position = pos;
+            Position = position;
         }
 
         /// <summary>
         /// Constructs a nondynamic cone.
         /// </summary>
-        /// <param name="pos">Position of the cone.</param>
-        /// <param name="high">Height of the cone.</param>
-        /// <param name="rad">Radius of the cone.</param>
-        public Cone(Vector3 pos, float high, float rad)
-            : this(high, rad)
+        /// <param name="position">Position of the cone.</param>
+        /// <param name="height">Height of the cone.</param>
+        /// <param name="radius">Radius of the cone.</param>
+        public Cone(Vector3 position, float height, float radius)
+            : this(height, radius)
         {
-            Position = pos;
+            Position = position;
         }
 
         /// <summary>
         /// Constructs a physically simulated cone.
         /// </summary>
         /// <param name="motionState">Motion state specifying the entity's initial state.</param>
-        /// <param name="high">Height of the cone.</param>
-        /// <param name="rad">Radius of the cone.</param>
-        /// <param name="m">Mass of the object.</param>
-        public Cone(MotionState motionState, float high, float rad, float m)
-            : this(high, rad, m)
+        /// <param name="height">Height of the cone.</param>
+        /// <param name="radius">Radius of the cone.</param>
+        /// <param name="mass">Mass of the object.</param>
+        public Cone(MotionState motionState, float height, float radius, float mass)
+            : this(height, radius, mass)
         {
             MotionState = motionState;
         }
@@ -95,10 +95,10 @@ namespace BEPUphysics.Entities.Prefabs
         /// Constructs a nondynamic cone.
         /// </summary>
         /// <param name="motionState">Motion state specifying the entity's initial state.</param>
-        /// <param name="high">Height of the cone.</param>
-        /// <param name="rad">Radius of the cone.</param>
-        public Cone(MotionState motionState, float high, float rad)
-            : this(high, rad)
+        /// <param name="height">Height of the cone.</param>
+        /// <param name="radius">Radius of the cone.</param>
+        public Cone(MotionState motionState, float height, float radius)
+            : this(height, radius)
         {
             MotionState = motionState;
         }

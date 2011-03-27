@@ -222,6 +222,9 @@ namespace BEPUphysics.Collidables
         {
         }
 
-
+        /// <summary>
+        /// Gets or sets the user data associated with this object.
+        /// </summary>
+        public object Tag { get; set; }
     }
 }

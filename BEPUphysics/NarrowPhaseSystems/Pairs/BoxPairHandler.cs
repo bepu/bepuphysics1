@@ -285,10 +285,8 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                 {
                     //Spherecast A against B.
                     RayHit rayHit;
-                    if (GJKToolbox.SphereCast(new Ray(boxA.worldTransform.Position, -velocity), minimumRadiusA, boxB.Shape, ref boxB.worldTransform, 1, out rayHit))
-                    {
+                    if (GJKToolbox.CCDSphereCast(new Ray(boxA.worldTransform.Position, -velocity), minimumRadiusA, boxB.Shape, ref boxB.worldTransform, timeOfImpact, out rayHit))
                         timeOfImpact = rayHit.T;
-                    }
                 }
 
                 var minimumRadiusB = boxB.Shape.minimumRadius * MotionSettings.CoreShapeScaling;
@@ -296,11 +294,8 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                 {
                     //Spherecast B against A.
                     RayHit rayHit;
-                    if (GJKToolbox.SphereCast(new Ray(boxB.worldTransform.Position, velocity), minimumRadiusB, boxA.Shape, ref boxA.worldTransform, 1, out rayHit) &&
-                        rayHit.T < timeOfImpact)
-                    {
+                    if (GJKToolbox.CCDSphereCast(new Ray(boxB.worldTransform.Position, velocity), minimumRadiusB, boxA.Shape, ref boxA.worldTransform, timeOfImpact, out rayHit))
                         timeOfImpact = rayHit.T;
-                    }
                 }
 
                 //If it's intersecting, throw our hands into the air and give up.

@@ -40,34 +40,34 @@ namespace BEPUphysics.Entities.Prefabs
         /// <summary>
         /// Constructs a physically simulated sphere.
         /// </summary>
-        /// <param name="pos">Position of the sphere.</param>
-        /// <param name="rad">Radius of the sphere.</param>
-        /// <param name="m">Mass of the object.</param>
-        public Sphere(Vector3 pos, float rad, float m)
-            : this(rad, m)
+        /// <param name="position">Position of the sphere.</param>
+        /// <param name="radius">Radius of the sphere.</param>
+        /// <param name="mass">Mass of the object.</param>
+        public Sphere(Vector3 position, float radius, float mass)
+            : this(radius, mass)
         {
-            Position = pos;
+            Position = position;
         }
 
         /// <summary>
         /// Constructs a nondynamic sphere.
         /// </summary>
-        /// <param name="pos">Position of the sphere.</param>
-        /// <param name="rad">Radius of the sphere.</param>
-        public Sphere(Vector3 pos, float rad)
-            : this(rad)
+        /// <param name="position">Position of the sphere.</param>
+        /// <param name="radius">Radius of the sphere.</param>
+        public Sphere(Vector3 position, float radius)
+            : this(radius)
         {
-            Position = pos;
+            Position = position;
         }
 
         /// <summary>
         /// Constructs a physically simulated sphere.
         /// </summary>
         /// <param name="motionState">Motion state specifying the entity's initial state.</param>
-        /// <param name="rad">Radius of the sphere.</param>
-        /// <param name="m">Mass of the object.</param>
-        public Sphere(MotionState motionState, float rad, float m)
-            : this(rad, m)
+        /// <param name="radius">Radius of the sphere.</param>
+        /// <param name="mass">Mass of the object.</param>
+        public Sphere(MotionState motionState, float radius, float mass)
+            : this(radius, mass)
         {
             MotionState = motionState;
         }
@@ -76,9 +76,9 @@ namespace BEPUphysics.Entities.Prefabs
         /// Constructs a nondynamic sphere.
         /// </summary>
         /// <param name="motionState">Motion state specifying the entity's initial state.</param>
-        /// <param name="rad">Radius of the sphere.</param>
-        public Sphere(MotionState motionState, float rad)
-            : this(rad)
+        /// <param name="radius">Radius of the sphere.</param>
+        public Sphere(MotionState motionState, float radius)
+            : this(radius)
         {
             MotionState = motionState;
         }

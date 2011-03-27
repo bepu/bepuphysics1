@@ -41,8 +41,8 @@ namespace BEPUphysics.Entities.Prefabs
         }
 
 
-        private Cylinder(float high, float rad, float m)
-            : base(new ConvexCollidable<CylinderShape>(new CylinderShape(high, rad)), m)
+        private Cylinder(float high, float rad, float mass)
+            : base(new ConvexCollidable<CylinderShape>(new CylinderShape(high, rad)), mass)
         {
         }
 
@@ -54,37 +54,37 @@ namespace BEPUphysics.Entities.Prefabs
         /// <summary>
         /// Constructs a physically simulated cylinder.
         /// </summary>
-        /// <param name="pos">Position of the cylinder.</param>
-        /// <param name="high">Height of the cylinder.</param>
-        /// <param name="rad">Radius of the cylinder.</param>
-        /// <param name="m">Mass of the object.</param>
-        public Cylinder(Vector3 pos, float high, float rad, float m)
-            : this(high, rad, m)
+        /// <param name="position">Position of the cylinder.</param>
+        /// <param name="height">Height of the cylinder.</param>
+        /// <param name="radius">Radius of the cylinder.</param>
+        /// <param name="mass">Mass of the object.</param>
+        public Cylinder(Vector3 position, float height, float radius, float mass)
+            : this(height, radius, mass)
         {
-            Position = pos;
+            Position = position;
         }
 
         /// <summary>
         /// Constructs a nondynamic cylinder.
         /// </summary>
-        /// <param name="pos">Position of the cylinder.</param>
-        /// <param name="high">Height of the cylinder.</param>
-        /// <param name="rad">Radius of the cylinder.</param>
-        public Cylinder(Vector3 pos, float high, float rad)
-            : this(high, rad)
+        /// <param name="position">Position of the cylinder.</param>
+        /// <param name="height">Height of the cylinder.</param>
+        /// <param name="radius">Radius of the cylinder.</param>
+        public Cylinder(Vector3 position, float height, float radius)
+            : this(height, radius)
         {
-            Position = pos;
+            Position = position;
         }
 
         /// <summary>
         /// Constructs a physically simulated cylinder.
         /// </summary>
         /// <param name="motionState">Motion state specifying the entity's initial state.</param>
-        /// <param name="high">Height of the cylinder.</param>
-        /// <param name="rad">Radius of the cylinder.</param>
-        /// <param name="m">Mass of the object.</param>
-        public Cylinder(MotionState motionState, float high, float rad, float m)
-            : this(high, rad, m)
+        /// <param name="height">Height of the cylinder.</param>
+        /// <param name="radius">Radius of the cylinder.</param>
+        /// <param name="mass">Mass of the object.</param>
+        public Cylinder(MotionState motionState, float height, float radius, float mass)
+            : this(height, radius, mass)
         {
             MotionState = motionState;
         }
@@ -93,10 +93,10 @@ namespace BEPUphysics.Entities.Prefabs
         /// Constructs a nondynamic cylinder.
         /// </summary>
         /// <param name="motionState">Motion state specifying the entity's initial state.</param>
-        /// <param name="high">Height of the cylinder.</param>
-        /// <param name="rad">Radius of the cylinder.</param>
-        public Cylinder(MotionState motionState, float high, float rad)
-            : this(high, rad)
+        /// <param name="height">Height of the cylinder.</param>
+        /// <param name="radius">Radius of the cylinder.</param>
+        public Cylinder(MotionState motionState, float height, float radius)
+            : this(height, radius)
         {
             MotionState = motionState;
         }
