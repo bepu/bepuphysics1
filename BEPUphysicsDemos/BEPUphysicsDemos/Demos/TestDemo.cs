@@ -39,7 +39,11 @@ namespace BEPUphysicsDemos.Demos
             MotionSettings.DefaultPositionUpdateMode = PositionUpdateMode.Continuous;
             MotionSettings.UseExtraExpansionForContinuousBoundingBoxes = true;
             //CollisionRules.CollisionGroupRules.Add(new CollisionGroupPair(CollisionRules.DefaultDynamicCollisionGroup, CollisionRules.DefaultDynamicCollisionGroup), CollisionRule.NoBroadPhase);
+#if XBOX360
+            for (int i = 0; i < 300; i++)
+#else
             for (int i = 0; i < 1000; i++)
+#endif
             {
                 Space.Add(new Sphere(new Vector3((i % 2) * .5f, 10 + i * 4, (i % 3) * .33f), .5f, 1) { Material = new BEPUphysics.Materials.Material(1, 1, .2f) });
                 //Space.Add(new Sphere(new Vector3(-20 + (float)random.NextDouble() * 40, 10 + i * 4, -20 + (float)random.NextDouble() * 40), .5f, 1));

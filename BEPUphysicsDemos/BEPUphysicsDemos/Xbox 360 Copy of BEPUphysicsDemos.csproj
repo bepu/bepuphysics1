@@ -59,8 +59,8 @@
   </PropertyGroup>
   <ItemGroup />
   <ItemGroup>
-    <None Include="Alternate Movement\CharacterController.cs" />
-    <None Include="Alternate Movement\CharacterControllerInput.cs" />
+    <Compile Include="Alternate Movement\CharacterController.cs" />
+    <Compile Include="Alternate Movement\CharacterControllerInput.cs" />
     <Compile Include="Alternate Movement\SimpleCharacterController.cs" />
     <Compile Include="Alternate Movement\SimpleCharacterControllerInput.cs" />
     <Compile Include="Alternate Movement\TankInput.cs" />
