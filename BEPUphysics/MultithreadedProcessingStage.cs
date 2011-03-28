@@ -33,6 +33,14 @@ namespace BEPUphysics
         /// </summary>
         public event Action Finishing;
 
+        protected bool ShouldUseMultithreading
+        {
+            get
+            {
+                return AllowMultithreading && ThreadManager != null && ThreadManager.ThreadCount > 1;
+            }
+        }
+
         ///<summary>
         /// Runs the processing stage.
         ///</summary>
@@ -42,7 +50,7 @@ namespace BEPUphysics
                 return;
             if (Starting != null)
                 Starting();
-            if (AllowMultithreading && ThreadManager != null && ThreadManager.ThreadCount > 1)
+            if (ShouldUseMultithreading)
             {
                 UpdateMultithreaded();
             }

@@ -27,12 +27,14 @@ namespace BEPUphysics.CollisionTests.Manifolds
             }
         }
 
-        protected override int FindOverlappingTriangles(float dt)
+        protected internal override int FindOverlappingTriangles(float dt)
         {
             BoundingBox boundingBox;
             convex.Shape.GetLocalBoundingBox(ref convex.worldTransform, ref mesh.worldTransform, out boundingBox); 
             Vector3 transformedVelocity;
-            Matrix3X3.TransformTranspose(ref convex.entity.linearVelocity, ref mesh.worldTransform.LinearTransform, out transformedVelocity);
+            Matrix3X3 inverse;
+            Matrix3X3.Invert(ref mesh.worldTransform.LinearTransform, out inverse);
+            Matrix3X3.Transform(ref convex.entity.linearVelocity, ref inverse, out transformedVelocity);
             Vector3.Multiply(ref transformedVelocity, dt, out transformedVelocity);
 
             if (transformedVelocity.X > 0)
@@ -70,7 +72,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
             indices.C = data.indices[triangleIndex + 2];
         }
 
-        protected override void CleanUpOverlappingTriangles()
+        protected internal override void CleanUpOverlappingTriangles()
         {
             overlappedTriangles.Clear();
         }

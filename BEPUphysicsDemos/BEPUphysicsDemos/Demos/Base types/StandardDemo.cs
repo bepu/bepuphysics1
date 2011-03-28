@@ -43,7 +43,6 @@ namespace BEPUphysicsDemos.Demos
             whitePixel = game.Content.Load<Texture2D>("whitePixel");
             vehicle = new VehicleInput(new Vector3(10000, 0, 0), Space, game.Camera, game.ModelDrawer, wheelModel, wheelTexture);
             Space.ForceUpdater.Gravity = new Vector3(0, -9.81f, 0f); //If left unset, the default value is (0,0,0).
-            MotionSettings.DefaultPositionUpdateMode = BEPUphysics.PositionUpdating.PositionUpdateMode.Continuous;
 
             //Create the tossable ball.
             kapow = new Sphere(new Vector3(11000, 0, 0), .6f, 20);

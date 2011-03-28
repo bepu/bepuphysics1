@@ -169,6 +169,8 @@ namespace BEPUphysics.NarrowPhaseSystems
             }
         }
 
+
+
         //Only used in the multithreaded case where there are a lot of narrow phase objects.
         ConcurrentDeque<INarrowPhasePair> overlapsToRemove = new ConcurrentDeque<INarrowPhasePair>();
         Action<int> multithreadedRemovalLoopDelegate;
@@ -184,6 +186,7 @@ namespace BEPUphysics.NarrowPhaseSystems
             else
                 narrowPhaseObject.NeedsUpdate = true;
         }
+
 
         protected override void UpdateMultithreaded()
         {
@@ -234,6 +237,8 @@ namespace BEPUphysics.NarrowPhaseSystems
             AddNewNarrowPhaseObjects();
 
         }
+
+
 
         void RemoveStaleOverlaps()
         {
@@ -346,5 +351,74 @@ namespace BEPUphysics.NarrowPhaseSystems
                     solver.Remove(change.Item);
             }
         }
+
+
+
+
+        //The following are methods which can be used to split the narrow phase pair creation
+        //from the pair update.  This can be helpful for some update orders where they cannot
+        //be done simultaneously.  For performance, these would also need to implement 
+        //multithreaded options.
+        //void TryToAddOverlap(int i)
+        //{
+        //    BroadPhaseOverlap overlap = broadPhaseOverlaps.Elements[i];
+        //    if (overlap.collisionRule < CollisionRule.NoNarrowPhasePair)
+        //    {
+        //        INarrowPhasePair narrowPhaseObject;
+        //        //see if the overlap is already present in the narrow phase.
+        //        if (!overlapMapping.TryGetValue(overlap, out narrowPhaseObject))
+        //        {
+        //            //Create/enqueue based on collision table
+        //            narrowPhaseObject = NarrowPhaseHelper.GetPair(ref overlap);
+        //            if (narrowPhaseObject != null)
+        //            {
+        //                narrowPhaseObject.NarrowPhase = this;
+        //                //Add the new object to the 'todo' list.
+        //                //Technically, this doesn't need to be thread-safe when this is called from the sequential context.
+        //                //It's just bunched together for maintainability despite the slightly performance hit.
+        //                newNarrowPhasePairs.Enqueue(narrowPhaseObject);
+        //            }
+        //        }
+        //        if (narrowPhaseObject != null)
+        //        {
+        //            narrowPhaseObject.NeedsUpdate = false;  //This is hacky.
+        //        }
+        //    }
+        //}
+
+        //public void UpdatePairList()
+        //{
+        //    for (int i = 0; i < broadPhaseOverlaps.count; i++)
+        //        TryToAddOverlap(i);
+
+        //    if (narrowPhasePairs.Count < MultithreadedRemovalCutoff)
+        //    {
+        //        RemoveStaleOverlaps();
+        //    }
+        //    else
+        //    {
+        //        ThreadManager.ForLoop(0, narrowPhasePairs.Count, multithreadedRemovalLoopDelegate);
+        //        INarrowPhasePair overlapToRemove;
+        //        while (overlapsToRemove.TryUnsafeDequeueFirst(out overlapToRemove))
+        //        {
+        //            narrowPhasePairs[narrowPhasePairs.IndexOf(overlapToRemove)] = narrowPhasePairs[narrowPhasePairs.Count - 1];
+        //            narrowPhasePairs.RemoveAt(narrowPhasePairs.Count - 1);
+        //            OnRemovePair(overlapToRemove);
+        //        }
+        //    }
+
+
+        //    AddNewNarrowPhaseObjects();
+        //}
+
+        //public void UpdatePairs()
+        //{
+        //    for (int i = 0; i < narrowPhasePairs.Count; i++)
+        //    {
+        //        if (narrowPhasePairs[i].BroadPhaseOverlap.collisionRule < CollisionRule.NoNarrowPhaseUpdate &&
+        //            (narrowPhasePairs[i].BroadPhaseOverlap.entryA.IsActive || narrowPhasePairs[i].BroadPhaseOverlap.entryB.IsActive))
+        //            narrowPhasePairs[i].UpdateCollision(TimeStepSettings.TimeStepDuration);
+        //    }
+        //}
     }
 }

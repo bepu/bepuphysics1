@@ -1,6 +1,8 @@
 ﻿using BEPUphysics.CollisionShapes.ConvexShapes;
 using Microsoft.Xna.Framework;
 using System;
+using BEPUphysics.PositionUpdating;
+using BEPUphysics.Settings;
 
 namespace BEPUphysics.Collidables.MobileCollidables
 {
@@ -82,29 +84,59 @@ namespace BEPUphysics.Collidables.MobileCollidables
             //Expand bounding box with velocity.
             if (dt > 0)
             {
+                bool useExtraExpansion = MotionSettings.UseExtraExpansionForContinuousBoundingBoxes && entity.PositionUpdateMode == PositionUpdateMode.Continuous;
+                float velocityScaling = useExtraExpansion ? 2 : 1;
                 if (entity.linearVelocity.X > 0)
-                    boundingBox.Max.X += entity.linearVelocity.X * dt;
+                    boundingBox.Max.X += entity.linearVelocity.X * dt * velocityScaling;
                 else
-                    boundingBox.Min.X += entity.linearVelocity.X * dt;
+                    boundingBox.Min.X += entity.linearVelocity.X * dt * velocityScaling;
 
                 if (entity.linearVelocity.Y > 0)
-                    boundingBox.Max.Y += entity.linearVelocity.Y * dt;
+                    boundingBox.Max.Y += entity.linearVelocity.Y * dt * velocityScaling;
                 else
-                    boundingBox.Min.Y += entity.linearVelocity.Y * dt;
+                    boundingBox.Min.Y += entity.linearVelocity.Y * dt * velocityScaling;
 
                 if (entity.linearVelocity.Z > 0)
-                    boundingBox.Max.Z += entity.linearVelocity.Z * dt;
+                    boundingBox.Max.Z += entity.linearVelocity.Z * dt * velocityScaling;
                 else
-                    boundingBox.Min.Z += entity.linearVelocity.Z * dt;
+                    boundingBox.Min.Z += entity.linearVelocity.Z * dt * velocityScaling;
 
-                float angularExpansion = Math.Max(entity.angularVelocity.Length() * dt, Shape.maximumRadius);
-                boundingBox.Min.X -= angularExpansion;
-                boundingBox.Min.Y -= angularExpansion;
-                boundingBox.Min.Z -= angularExpansion;
 
-                boundingBox.Min.X += angularExpansion;
-                boundingBox.Min.Y += angularExpansion;
-                boundingBox.Min.Z += angularExpansion;
+
+                
+                if (useExtraExpansion)
+                {
+                    float expansion = 0;
+                    //It's possible that an object could have a small bounding box since its own
+                    //velocity is low, but then a collision with a high velocity object sends
+                    //it way out of its bounding box.  By taking into account high velocity objects
+                    //in danger of hitting us and expanding our own bounding box by their speed,
+                    //we stand a much better chance of not missing secondary collisions.
+                    foreach (var e in OverlappedEntities)
+                    {
+
+                        float velocity = e.linearVelocity.LengthSquared();
+                        if (velocity > expansion)
+                            expansion = velocity;
+                    }
+                    expansion = (float)Math.Sqrt(expansion) * dt;
+
+
+                    boundingBox.Min.X -= expansion;
+                    boundingBox.Min.Y -= expansion;
+                    boundingBox.Min.Z -= expansion;
+
+                    boundingBox.Max.X += expansion;
+                    boundingBox.Max.Y += expansion;
+                    boundingBox.Max.Z += expansion;
+                    
+                }
+
+                //Could use this to incorporate angular motion.  Since the bounding box is an approximation to begin with,
+                //this isn't too important.  If an updating system is used where the bounding box MUST fully contain the frame's motion
+                //then the commented area should be used.
+                //Math.Min(entity.angularVelocity.Length() * dt, Shape.maximumRadius) * velocityScaling;
+                //TODO: consider using minimum radius 
 
             }
         }

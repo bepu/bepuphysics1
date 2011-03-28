@@ -54,9 +54,9 @@ namespace BEPUphysics.CollisionTests.Manifolds
 
 
         protected abstract bool UseImprovedBoundaryHandling { get; }
-        protected abstract int FindOverlappingTriangles(float dt);
+        protected internal abstract int FindOverlappingTriangles(float dt);
         protected abstract void ConfigureTriangle(int i, out TriangleIndices indices);
-        protected abstract void CleanUpOverlappingTriangles();
+        protected internal abstract void CleanUpOverlappingTriangles();
 
         ///<summary>
         /// Updates the manifold.

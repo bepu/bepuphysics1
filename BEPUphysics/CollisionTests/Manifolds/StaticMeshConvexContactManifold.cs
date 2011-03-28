@@ -25,7 +25,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
             }
         }
 
-        protected override int FindOverlappingTriangles(float dt)
+        protected internal override int FindOverlappingTriangles(float dt)
         {
             mesh.Mesh.Tree.GetOverlaps(convex.boundingBox, overlappedTriangles);
             return overlappedTriangles.count;
@@ -43,7 +43,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
             indices.C = mesh.Mesh.Data.indices[triangleIndex + 2];
         }
 
-        protected override void CleanUpOverlappingTriangles()
+        protected internal override void CleanUpOverlappingTriangles()
         {
             overlappedTriangles.Clear();
         }

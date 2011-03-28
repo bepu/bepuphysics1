@@ -39,6 +39,7 @@ namespace BEPUphysicsDemos
             SolverSettings.DefaultMinimumIterations = 1;
             space.Solver.IterationLimit = 10;
             GeneralConvexPairTester.UseSimplexCaching = false;
+            MotionSettings.UseExtraExpansionForContinuousBoundingBoxes = false;
         }
 
         /// <summary>
@@ -109,6 +110,7 @@ namespace BEPUphysicsDemos
         public static void ApplyHighStabilitySettings(Space space)
         {
             MotionSettings.DefaultPositionUpdateMode = PositionUpdateMode.Continuous;
+            MotionSettings.UseExtraExpansionForContinuousBoundingBoxes = true;
             SolverSettings.DefaultMinimumIterations = 5;
             space.Solver.IterationLimit = 50;
 

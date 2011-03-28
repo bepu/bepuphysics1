@@ -35,9 +35,9 @@ namespace BEPUphysicsDemos.Demos
             var staticMesh = new StaticMesh(staticTriangleVertices, staticTriangleIndices, new AffineTransform(Matrix3X3.CreateFromAxisAngle(Vector3.Up, MathHelper.Pi), new Vector3(0, -10, 0)));
             staticMesh.Sidedness = TriangleSidedness.Counterclockwise;
 
+
             Space.Add(staticMesh);
-            //Modify the group's world matrix to rotate it around (or transform it in general).
-            //staticMesh.WorldTransform = new AffineTransform(Matrix3X3.CreateFromAxisAngle(Vector3.Up, MathHelper.Pi), new Vector3(0, -10, 0));
+
             //Dump some boxes on top of it for fun.
             int numColumns = 8;
             int numRows = 8;
@@ -53,7 +53,7 @@ namespace BEPUphysicsDemos.Demos
                             separation * i - numRows * separation / 2,
                             30f + k * separation,
                             separation * j - numColumns * separation / 2),
-                            .2f, .2f, .2f, 15);
+                            2, 2, 2, 15);
                         Space.Add(toAdd);
                     }
             game.ModelDrawer.Add(staticMesh.Mesh);

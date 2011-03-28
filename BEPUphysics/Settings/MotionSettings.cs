@@ -42,5 +42,14 @@ namespace BEPUphysics.Settings
         /// The default position updating mode used by position updateables.
         /// </summary>
         public static PositionUpdateMode DefaultPositionUpdateMode = PositionUpdateMode.Discrete;
+        /// <summary>
+        /// It is possible for an object in danger of being hit by a moving object to have a bounding box which
+        /// does not contain the resulting motion, and CCD will fail to detect a secondary collision.
+        /// Setting this to true will take into account nearby objects' velocities and use them to enlarge the 
+        /// bounding box so that secondary collisions are not missed.
+        /// The larger size of bounding boxes can cause an increase in collision pairs during stressful situations,
+        /// which can harm performance.
+        /// </summary>
+        public static bool UseExtraExpansionForContinuousBoundingBoxes;
     }
 }
