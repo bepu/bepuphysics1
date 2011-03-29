@@ -44,7 +44,12 @@ namespace BEPUphysics.CollisionTests
             }
             //If the normals oppose each other, this can happen.  It doesn't need to be normalized, but having SOME normal is necessary.
             if (normal.LengthSquared() < Toolbox.Epsilon)
-                normal = contacts.Elements[0].Normal;
+                if (contacts.count > 0)
+                    normal = contacts.Elements[0].Normal;
+                else if (contactCandidates.count > 0)
+                    normal = contactCandidates.Elements[0].Normal; //This method is only called when there's too many contacts, so if contacts is empty, the candidates must NOT be empty.
+                else //This method should not have been called at all if it gets here.
+                    throw new ArgumentException("Cannot reduce an empty contact set.");
 
 
             //Find the contact (candidate) that is furthest away from the deepest contact (candidate).
@@ -90,8 +95,8 @@ namespace BEPUphysics.CollisionTests
                     toAdd.Add(ref contactCandidates.Elements[0]);
                     return;
                 }
-                throw new InvalidOperationException("Cannot reduce an empty contact set.");
-                
+                throw new ArgumentException("Cannot reduce an empty contact set.");
+
             }
             Vector3 furthestPosition;
             if (furthestIndex < contacts.count)

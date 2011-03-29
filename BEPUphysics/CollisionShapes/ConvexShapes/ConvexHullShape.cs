@@ -31,14 +31,13 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         {
             if (vertices.Count == 0)
                 throw new ArgumentException("Vertices list used to create a ConvexHullShape cannot be empty.");
-            this.vertices = new RawList<Vector3>(vertices);
+
+            var surfaceVertices = Resources.GetVectorList();
+            Vector3 center = ComputeCenter(vertices, surfaceVertices);
+            this.vertices = new RawList<Vector3>(surfaceVertices);
+            Resources.GiveBack(surfaceVertices);
             Vertices = new ReadOnlyCollection<Vector3>(this.vertices);
-            //Ensure that the convex hull is centered on its local origin.
-            Vector3 center = ComputeCenter();
-            for (int i = 0; i < this.vertices.count; i++)
-            {
-                Vector3.Subtract(ref this.vertices.Elements[i], ref center, out this.vertices.Elements[i]);
-            }
+
             OnShapeChanged();
         }
 
@@ -53,14 +52,36 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         {
             if (vertices.Count == 0)
                 throw new ArgumentException("Vertices list used to create a ConvexHullShape cannot be empty.");
-            this.vertices = new RawList<Vector3>(vertices);
+
+            var surfaceVertices = Resources.GetVectorList();
+            center = ComputeCenter(vertices, surfaceVertices);
+            this.vertices = new RawList<Vector3>(surfaceVertices);
+            Resources.GiveBack(surfaceVertices);
             Vertices = new ReadOnlyCollection<Vector3>(this.vertices);
+
+            OnShapeChanged();
+        }
+
+        ///<summary>
+        /// Constructs a new convex hull shape.
+        /// The point set will be recentered on the local origin.
+        ///</summary>
+        ///<param name="vertices">Point set to use to construct the convex hull.</param>
+        /// <param name="center">Computed center of the convex hull shape prior to recentering.</param>
+        /// <param name="outputHullTriangleIndices">Triangle indices computed on the surface of the point set.</param>
+        /// <param name="outputUniqueSurfaceVertices">Unique vertices on the surface of the convex hull.</param>
+        ///<exception cref="ArgumentException">Thrown when the point set is empty.</exception>
+        public ConvexHullShape(IList<Vector3> vertices, out Vector3 center, IList<int> outputHullTriangleIndices, IList<Vector3> outputUniqueSurfaceVertices)
+        {
+            if (vertices.Count == 0)
+                throw new ArgumentException("Vertices list used to create a ConvexHullShape cannot be empty.");
+            
+
             //Ensure that the convex hull is centered on its local origin.
-            center = ComputeCenter();
-            for (int i = 0; i < this.vertices.count; i++)
-            {
-                Vector3.Subtract(ref this.vertices.Elements[i], ref center, out this.vertices.Elements[i]);
-            }
+            center = ComputeCenter(vertices, outputHullTriangleIndices, outputUniqueSurfaceVertices);
+            this.vertices = new RawList<Vector3>(outputUniqueSurfaceVertices);
+            Vertices = new ReadOnlyCollection<Vector3>(this.vertices);
+
             OnShapeChanged();
         }
 
@@ -175,24 +196,6 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         }
 
         #region Shape Information
-        ///<summary>
-        /// Computes the triangles on the surface of the convex hull.
-        ///</summary>
-        ///<param name="pointSet">Points in the convex hull.</param>
-        ///<param name="outputTriangleList">Triangle list of the surface.</param>
-        public static void GetSurfaceTriangles(IList<Vector3> pointSet, IList<Vector3> outputTriangleList)
-        {
-            List<int> indices = Resources.GetIntList();
-            List<Vector3> hullVerts = Resources.GetVectorList();
-            Toolbox.GetConvexHull(pointSet, indices, hullVerts);
-            //Get the list of triangles of the surface
-            for (int k = 0; k < indices.Count; k++)
-            {
-                outputTriangleList.Add(pointSet[indices[k]]);
-            }
-            Resources.GiveBack(indices);
-            Resources.GiveBack(hullVerts);
-        }
 
         /// <summary>
         /// Computes the center of the shape.  This can be considered its 
@@ -233,9 +236,9 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         ///<param name="volume">Volume of the hull.</param>
         ///<param name="outputLocalSurfaceTriangles">Surface triangles of the hull.</param>
         ///<returns>Center of the hull.</returns>
-        public Vector3 ComputeCenter(out float volume, IList<Vector3> outputLocalSurfaceTriangles)
+        public Vector3 ComputeCenter(out float volume, IList<int> outputSurfaceTriangles, IList<Vector3> outputLocalSurfaceVertices)
         {
-            return ComputeCenter(vertices, out volume, outputLocalSurfaceTriangles);
+            return ComputeCenter(vertices, out volume, outputSurfaceTriangles, outputLocalSurfaceVertices);
         }
 
         ///<summary>
@@ -257,9 +260,40 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         ///<returns>Center of the convex hull.</returns>
         public static Vector3 ComputeCenter(IList<Vector3> vertices, out float volume)
         {
-            var localSurfaceTriangles = Resources.GetVectorList();
-            Vector3 toReturn = ComputeCenter(vertices, out volume, localSurfaceTriangles);
-            Resources.GiveBack(localSurfaceTriangles);
+            var localSurfaceVertices = Resources.GetVectorList();
+            var surfaceTriangles = Resources.GetIntList();
+            Vector3 toReturn = ComputeCenter(vertices, out volume, surfaceTriangles, localSurfaceVertices);
+            Resources.GiveBack(localSurfaceVertices);
+            Resources.GiveBack(surfaceTriangles);
+            return toReturn;
+        }
+
+        ///<summary>
+        /// Computes the center and surface triangles of a convex hull defined by a point set.
+        ///</summary>
+        ///<param name="vertices">Point set defining the convex hull.</param>
+        ///<param name="outputLocalSurfaceVertices">Local positions of vertices on the convex hull.</param>
+        ///<returns>Center of the convex hull.</returns>
+        public static Vector3 ComputeCenter(IList<Vector3> vertices, IList<Vector3> outputLocalSurfaceVertices)
+        {
+            float volume;
+            var indices = Resources.GetIntList();
+            Vector3 toReturn = ComputeCenter(vertices, out volume, indices, outputLocalSurfaceVertices);
+            Resources.GiveBack(indices);
+            return toReturn;
+        }
+
+            ///<summary>
+        /// Computes the center and surface triangles of a convex hull defined by a point set.
+        ///</summary>
+        ///<param name="vertices">Point set defining the convex hull.</param>
+        ///<param name="outputSurfaceTriangles">Indices of surface triangles of the convex hull.</param>
+        ///<param name="outputLocalSurfaceVertices">Local positions of vertices on the convex hull.</param>
+        ///<returns>Center of the convex hull.</returns>
+        public static Vector3 ComputeCenter(IList<Vector3> vertices, IList<int> outputSurfaceTriangles, IList<Vector3> outputLocalSurfaceVertices)
+        {
+            float volume;
+            Vector3 toReturn = ComputeCenter(vertices, out volume, outputSurfaceTriangles, outputLocalSurfaceVertices);
             return toReturn;
         }
 
@@ -268,9 +302,10 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         ///</summary>
         ///<param name="vertices">Point set defining the convex hull.</param>
         ///<param name="volume">Volume of the convex hull.</param>
-        ///<param name="outputLocalSurfaceTriangles">Surface triangles of the convex hull.</param>
+        ///<param name="outputSurfaceTriangles">Indices of surface triangles of the convex hull.</param>
+        ///<param name="outputLocalSurfaceVertices">Local positions of vertices on the convex hull.</param>
         ///<returns>Center of the convex hull.</returns>
-        public static Vector3 ComputeCenter(IList<Vector3> vertices, out float volume, IList<Vector3> outputLocalSurfaceTriangles)
+        public static Vector3 ComputeCenter(IList<Vector3> vertices, out float volume, IList<int> outputSurfaceTriangles, IList<Vector3> outputLocalSurfaceVertices)
         {
             Vector3 centroid = Toolbox.ZeroVector;
             for (int k = 0; k < vertices.Count; k++)
@@ -279,16 +314,19 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             }
             centroid /= vertices.Count;
 
-            GetSurfaceTriangles(vertices, outputLocalSurfaceTriangles);
+            Toolbox.GetConvexHull(vertices, outputSurfaceTriangles, outputLocalSurfaceVertices);
 
             volume = 0;
             List<float> volumes = Resources.GetFloatList();
             List<Vector3> centroids = Resources.GetVectorList();
-            for (int k = 0; k < outputLocalSurfaceTriangles.Count; k += 3)
+            for (int k = 0; k < outputSurfaceTriangles.Count; k += 3)
             {
-                volumes.Add(Vector3.Dot(Vector3.Cross(outputLocalSurfaceTriangles[k + 1] - outputLocalSurfaceTriangles[k], outputLocalSurfaceTriangles[k + 2] - outputLocalSurfaceTriangles[k]), centroid - outputLocalSurfaceTriangles[k]));
+                volumes.Add(Vector3.Dot(
+                    Vector3.Cross(vertices[outputSurfaceTriangles[k + 1]] - vertices[outputSurfaceTriangles[k]],
+                                  vertices[outputSurfaceTriangles[k + 2]] - vertices[outputSurfaceTriangles[k]]),
+                    centroid - vertices[outputSurfaceTriangles[k]]));
                 volume += volumes[k / 3];
-                centroids.Add((outputLocalSurfaceTriangles[k] + outputLocalSurfaceTriangles[k + 1] + outputLocalSurfaceTriangles[k + 2] + centroid) / 4);
+                centroids.Add((vertices[outputSurfaceTriangles[k]] + vertices[outputSurfaceTriangles[k + 1]] + vertices[outputSurfaceTriangles[k + 2]] + centroid) / 4);
             }
             Vector3 center = Toolbox.ZeroVector;
             for (int k = 0; k < centroids.Count; k++)
@@ -296,9 +334,9 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
                 center += centroids[k] * (volumes[k] / volume);
             }
             volume /= 6;
-            for (int k = 0; k < outputLocalSurfaceTriangles.Count; k++)
+            for (int k = 0; k < outputLocalSurfaceVertices.Count; k++)
             {
-                outputLocalSurfaceTriangles[k] -= center;
+                outputLocalSurfaceVertices[k] -= center;
             }
             Resources.GiveBack(centroids);
             Resources.GiveBack(volumes);
@@ -314,10 +352,12 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         /// <returns>Volume distribution of the shape.</returns>
         public override Matrix3X3 ComputeVolumeDistribution(out float volume)
         {
-            var surfaceTriangles = Resources.GetVectorList();
-            ComputeCenter(out volume, surfaceTriangles);
+            var surfaceTriangles = Resources.GetIntList();
+            var surfaceVertices = Resources.GetVectorList();
+            ComputeCenter(out volume, surfaceTriangles, surfaceVertices);
             Matrix3X3 toReturn = ComputeVolumeDistribution(volume, surfaceTriangles);
             Resources.GiveBack(surfaceTriangles);
+            Resources.GiveBack(surfaceVertices);
             return toReturn;
         }
 
@@ -327,7 +367,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         ///<param name="volume">Volume of the convex hull.</param>
         ///<param name="localSurfaceTriangles">Surface triangles of the convex hull.</param>
         ///<returns>Volume distribution of the convex hull.</returns>
-        public Matrix3X3 ComputeVolumeDistribution(float volume, IList<Vector3> localSurfaceTriangles)
+        public Matrix3X3 ComputeVolumeDistribution(float volume, IList<int> localSurfaceTriangles)
         {
             //TODO: This method has a lot of overlap with the volume calculation.  Conceptually very similar.
 
@@ -345,9 +385,9 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             float offFactor = -density / 120;
             for (int i = 0; i < localSurfaceTriangles.Count; i += 3)
             {
-                v2 = localSurfaceTriangles[i];
-                v3 = localSurfaceTriangles[i + 1];
-                v4 = localSurfaceTriangles[i + 2];
+                v2 = vertices[localSurfaceTriangles[i]];
+                v3 = vertices[localSurfaceTriangles[i + 1]];
+                v4 = vertices[localSurfaceTriangles[i + 2]];
                 float determinant = Math.Abs(v2.X * (v3.Y * v4.Z - v3.Z * v4.Y) -
                                              v3.X * (v2.Y * v4.Z - v2.Z * v4.Y) +
                                              v4.X * (v2.Y * v3.Z - v2.Z * v3.Y)); //Determinant is 6 * volume.

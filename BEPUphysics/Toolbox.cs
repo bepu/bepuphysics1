@@ -9,7 +9,7 @@ using BEPUphysics.MathExtensions;
 namespace BEPUphysics
 {
     //TODO: It would be nice to split and improve this monolith into individually superior, organized components.
-    
+
 
     /// <summary>
     /// Helper class with many algorithms for intersection testing and 3D math.
@@ -1899,12 +1899,12 @@ namespace BEPUphysics
         }
 
         /// <summary>
-        /// Trims out all points within the given list which are not on the outer convex hull of the group.
+        /// Identifies the indices of points in a set which are on the outer convex hull of the set.
         /// </summary>
         /// <param name="points">List of points in the set.</param>
-        /// <param name="indices">List of indices composing the triangulated surface of the convex hull.</param>
-        /// <param name="hullVertices">List of points on the convex hull.</param>
-        public static void GetConvexHull(IList<Vector3> points, IList<int> indices, IList<Vector3> hullVertices)
+        /// <param name="indices">List of indices composing the triangulated surface of the convex hull.
+        /// Each group of 3 indices represents a triangle on the surface of the hull.</param>
+        public static void GetConvexHull(IList<Vector3> points, IList<int> indices)
         {
             //Points is what will be used as a vertex buffer.
             List<int> outsidePoints = Resources.GetIntList();
@@ -2077,14 +2077,52 @@ namespace BEPUphysics
                 }
             }
             //"Hullify" the points.
-            for (int k = 0; k < indices.Count; k++)
-            {
-                if (!hullVertices.Contains(points[indices[k]]))
-                    hullVertices.Add(points[indices[k]]);
-            }
+
             Resources.GiveBack(outsidePoints);
             Resources.GiveBack(edges);
             Resources.GiveBack(toRemove);
+        }
+
+        /// <summary>
+        /// Identifies the points on the surface of hull.
+        /// </summary>
+        /// <param name="points">List of points in the set.</param>
+        /// <param name="outputSurfacePoints">Unique points on the surface of the convex hull.</param>
+        public static void GetConvexHull(IList<Vector3> points, IList<Vector3> outputSurfacePoints)
+        {
+            var indices = Resources.GetIntList();
+            GetConvexHull(points, indices, outputSurfacePoints);
+            Resources.GiveBack(indices);
+        }
+
+        /// <summary>
+        /// Identifies the points on the surface of hull.
+        /// </summary>
+        /// <param name="points">List of points in the set.</param>
+        /// <param name="indices">List of indices composing the triangulated surface of the convex hull.
+        /// Each group of 3 indices represents a triangle on the surface of the hull.</param>
+        /// <param name="outputSurfacePoints">Unique points on the surface of the convex hull.</param>
+        public static void GetConvexHull(IList<Vector3> points, IList<int> outputIndices, IList<Vector3> outputSurfacePoints)
+        {
+            //TODO: This isn't incredibly fast, but neither is the original GetConvexHull method.
+            //This whole system could use some optimization.
+            GetConvexHull(points, outputIndices);
+
+            var alreadyContainedIndices = Resources.GetIntList();
+
+            for (int i = outputIndices.Count - 1; i >= 0; i--)
+            {
+                int index = outputIndices[i];
+                if (!alreadyContainedIndices.Contains(index))
+                {
+                    outputSurfacePoints.Add(points[index]);
+                    alreadyContainedIndices.Add(index);
+                }
+            }
+
+            Resources.GiveBack(alreadyContainedIndices);
+
+
         }
         #endregion
 
