@@ -81,7 +81,7 @@ namespace BEPUphysics.UpdateableSystems
         /// </summary>
         /// <param name="triangleMesh">Arbitrary closed triangle mesh representing the volume.</param>
         /// <param name="queryAccelerator">System used to find nearby objects.</param>
-        public DetectorVolume(TriangleMeshBoundingBoxTreeData triangleMesh, IQueryAccelerator queryAccelerator)
+        public DetectorVolume(MeshBoundingBoxTreeData triangleMesh, IQueryAccelerator queryAccelerator)
         {
             TriangleMesh = new TriangleMesh(triangleMesh);
             readOnlyNearbyEntities = new ReadOnlyDictionary<Entity, ContainmentState>(nearbyEntities);

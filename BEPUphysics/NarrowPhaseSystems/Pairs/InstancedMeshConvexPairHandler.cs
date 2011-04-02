@@ -270,7 +270,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                     //Spherecast against all triangles to find the earliest time.
                     for (int i = 0; i < contactManifold.overlappedTriangles.count; i++)
                     {
-                        TriangleMeshBoundingBoxTreeData data = instancedMesh.Shape.TriangleMesh.Data;
+                        MeshBoundingBoxTreeData data = instancedMesh.Shape.TriangleMesh.Data;
                         int triangleIndex = contactManifold.overlappedTriangles.Elements[i];
                         data.GetTriangle(triangleIndex, out triangle.vA, out triangle.vB, out triangle.vC);
                         AffineTransform.Transform(ref triangle.vA, ref instancedMesh.worldTransform, out triangle.vA);

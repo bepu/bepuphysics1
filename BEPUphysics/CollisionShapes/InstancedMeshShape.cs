@@ -37,7 +37,7 @@ namespace BEPUphysics.CollisionShapes
         ///<param name="indices">Indices of the mesh.</param>
         public InstancedMeshShape(Vector3[] vertices, int[] indices)
         {
-            TriangleMesh = new TriangleMesh(new StaticTriangleMeshData(vertices, indices));
+            TriangleMesh = new TriangleMesh(new StaticMeshData(vertices, indices));
         }
 
 

@@ -5,7 +5,7 @@ namespace BEPUphysics.DataStructures
     ///<summary>
     /// Superclass of the data used to create triangle mesh bounding box trees.
     ///</summary>
-    public abstract class TriangleMeshBoundingBoxTreeData
+    public abstract class MeshBoundingBoxTreeData
     {
         internal int[] indices;
         ///<summary>

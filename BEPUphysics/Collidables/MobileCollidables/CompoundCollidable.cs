@@ -187,7 +187,7 @@ namespace BEPUphysics.Collidables.MobileCollidables
         {
             rayHit = new RayHit();
             var hitElements = Resources.GetCompoundChildList();
-            if (hierarchy.Tree.RayCast(ray, maximumLength, hitElements))
+            if (hierarchy.Tree.GetOverlaps(ray, maximumLength, hitElements))
             {
                 rayHit.T = float.MaxValue;
                 for (int i = 0; i < hitElements.count; i++)

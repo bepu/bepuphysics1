@@ -27,7 +27,7 @@ namespace BEPUphysicsDemos.Demos
             Vector3[] modelVertices;
             int[] modelIndices;
             TriangleMesh.GetVerticesAndIndicesFromModel(tubeModel, out modelVertices, out modelIndices);
-            var detectorVolume = new DetectorVolume(new StaticTriangleMeshData(modelVertices, modelIndices), Space.BroadPhase.QueryAccelerator);
+            var detectorVolume = new DetectorVolume(new StaticMeshData(modelVertices, modelIndices), Space.BroadPhase.QueryAccelerator);
             Space.Add(detectorVolume);
 
             game.ModelDrawer.Add(detectorVolume.TriangleMesh);

@@ -11,11 +11,11 @@ namespace BEPUphysics.CollisionShapes
     ///</summary>
     public class StaticMeshShape : CollisionShape
     {
-        TransformableTriangleMeshData triangleMeshData;
+        TransformableMeshData triangleMeshData;
         ///<summary>
         /// Gets the triangle mesh data composing the StaticMeshShape.
         ///</summary>
-        public TransformableTriangleMeshData TriangleMeshData
+        public TransformableMeshData TriangleMeshData
         {
             get
             {
@@ -36,7 +36,7 @@ namespace BEPUphysics.CollisionShapes
         ///<param name="worldTransform">World transform to use in the local space data.</param>
         public StaticMeshShape(Vector3[] vertices, int[] indices, AffineTransform worldTransform)
         {
-            triangleMeshData = new TransformableTriangleMeshData(vertices, indices, worldTransform);
+            triangleMeshData = new TransformableMeshData(vertices, indices, worldTransform);
         }
 
 
@@ -48,7 +48,7 @@ namespace BEPUphysics.CollisionShapes
         ///<param name="indices">Indices of the mesh.</param>
         public StaticMeshShape(Vector3[] vertices, int[] indices)
         {
-            triangleMeshData = new TransformableTriangleMeshData(vertices, indices);
+            triangleMeshData = new TransformableMeshData(vertices, indices);
         }
 
 

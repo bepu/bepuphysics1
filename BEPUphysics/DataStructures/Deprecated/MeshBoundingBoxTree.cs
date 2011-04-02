@@ -5,13 +5,25 @@ using Microsoft.Xna.Framework;
 
 namespace BEPUphysics.DataStructures
 {
+    //////////////////////////
+    //  This is an old version of the MeshBoundingBoxTree.
+    //  It uses a top-down construction approach and a contiguous array
+    //  to store the nodes.
+    //  It can occasionally outperform the newer incrementally constructed tree,
+    //  but the construction time is more than 10 times slower.
+    //
+    //  If there's a very tight performance or memory requirement, trying this tree
+    //  out might be worth it.  However, the mesh itself determines which tree works
+    //  better.  For some, the incremental tree will be better in every way.
+    //////////////////////////
+
     ///<summary>
     ///  Binary tree of triangles surrounded by axis aligned bounding boxes, supporting various speedy queries.
     ///</summary>
-    public class TriangleMeshBoundingBoxTree
+    public class MeshBoundingBoxTree
     {
         internal Node[] nodeArray;
-        internal TriangleMeshBoundingBoxTreeData triangleMeshData;
+        internal MeshBoundingBoxTreeData triangleMeshData;
 
         ///<summary>
         /// Gets the bounding box of the root of the tree.
@@ -29,7 +41,7 @@ namespace BEPUphysics.DataStructures
         ///<summary>
         /// Gets the triangle mesh data used to build the tree.
         ///</summary>
-        public TriangleMeshBoundingBoxTreeData TriangleMeshData
+        public MeshBoundingBoxTreeData TriangleMeshData
         {
             get
             {
@@ -41,7 +53,7 @@ namespace BEPUphysics.DataStructures
         /// Constructs a new triangle mesh tree.
         ///</summary>
         ///<param name="triangleMeshData">Data to use to construct the tree.</param>
-        public TriangleMeshBoundingBoxTree(TriangleMeshBoundingBoxTreeData triangleMeshData)
+        public MeshBoundingBoxTree(MeshBoundingBoxTreeData triangleMeshData)
         {
             xAxisComparer = new XAxisComparer(this);
             yAxisComparer = new YAxisComparer(this);
@@ -53,7 +65,7 @@ namespace BEPUphysics.DataStructures
         ///</summary>
         ///<param name="triangleMeshData">Data to use to construct the tree.</param>
         ///<param name="margin">Margin to expand the bounding box of elements by.</param>
-        public TriangleMeshBoundingBoxTree(TriangleMeshBoundingBoxTreeData triangleMeshData, float margin)
+        public MeshBoundingBoxTree(MeshBoundingBoxTreeData triangleMeshData, float margin)
         {
             xAxisComparer = new XAxisComparer(this);
             yAxisComparer = new YAxisComparer(this);
@@ -91,7 +103,7 @@ namespace BEPUphysics.DataStructures
         /// refit function if the topology of the mesh is unchanged.
         ///</summary>
         ///<param name="triangleMeshData">Data used to construct the tree.</param>
-        public void Reconstruct(TriangleMeshBoundingBoxTreeData triangleMeshData)
+        public void Reconstruct(MeshBoundingBoxTreeData triangleMeshData)
         {
             Reconstruct(triangleMeshData, 0);
         }
@@ -103,7 +115,7 @@ namespace BEPUphysics.DataStructures
         ///</summary>
         ///<param name="triangleMeshData">Data used to construct the tree.</param>
         /// <param name="margin">Margin to expand the bounding box of elements by.</param>
-        public void Reconstruct(TriangleMeshBoundingBoxTreeData triangleMeshData, float margin)
+        public void Reconstruct(MeshBoundingBoxTreeData triangleMeshData, float margin)
         {
             if (triangleMeshData.vertices.Length == 0)
                 throw new InvalidOperationException("Triangle mesh data contains no vertices.  Ensure the mesh data was loaded properly.");
@@ -246,6 +258,40 @@ namespace BEPUphysics.DataStructures
                 int childB = child + 1;
                 Refit(childB, margin);
                 BoundingBox.CreateMerged(ref nodeArray[child].BoundingBox, ref nodeArray[childB].BoundingBox, out nodeArray[currentNode].BoundingBox);
+            }
+        }
+
+        void Analyze(out List<int> depths, out int minDepth, out int maxDepth, out int nodeCount)
+        {
+            depths = new List<int>();
+            nodeCount = 0;
+            AnalyzeRecursive(0, 0, depths, ref nodeCount);
+
+            minDepth = int.MaxValue;
+            maxDepth = 0;
+            for (int i = 0; i < depths.Count; i++)
+            {
+                if (depths[i] > maxDepth)
+                    maxDepth = depths[i];
+                if (depths[i] < minDepth)
+                    minDepth = depths[i];
+            }
+        }
+
+        void AnalyzeRecursive(int index, int depth, List<int> depths, ref int nodeCount)
+        {
+            nodeCount++;
+            if (nodeArray[index].Value == -1)
+            {
+                //It's overlapping, so investigate and see if my children are overlapping too.
+                index = index + index + 1;
+                AnalyzeRecursive(index, depth + 1, depths, ref nodeCount);
+                AnalyzeRecursive(index + 1, depth + 1, depths, ref nodeCount);
+            }
+            else
+            {
+                //I'm a leaf node! and overlapping!
+                depths.Add(depth);
             }
         }
 
@@ -567,7 +613,7 @@ namespace BEPUphysics.DataStructures
         ///<param name="opposingTree">The tree to test against.</param>
         ///<param name="collidingElements">Overlapping elements in the trees.</param>
         ///<returns>Whether or not any elements were contained.</returns>
-        public bool GetOverlaps(TriangleMeshBoundingBoxTree opposingTree, IList<TreeOverlapPair<int, int>> collidingElements)
+        public bool GetOverlaps(MeshBoundingBoxTree opposingTree, IList<TreeOverlapPair<int, int>> collidingElements)
         {
             bool isOverlapping;
             opposingTree.nodeArray[0].BoundingBox.Intersects(ref nodeArray[0].BoundingBox, out isOverlapping);
@@ -583,7 +629,7 @@ namespace BEPUphysics.DataStructures
         ///<param name="opposingTree">The tree to test against.</param>
         ///<param name="collidingElements">Overlapping elements in the trees.</param>
         ///<returns>Whether or not any elements were contained.</returns>
-        public bool GetOverlapsWithoutRootTest(TriangleMeshBoundingBoxTree opposingTree, IList<TreeOverlapPair<int, int>> collidingElements)
+        public bool GetOverlapsWithoutRootTest(MeshBoundingBoxTree opposingTree, IList<TreeOverlapPair<int, int>> collidingElements)
         {
             //We assume here that the opposing tree and current tree's roots overlap.
             //Also that both trees have been initialized.
@@ -686,8 +732,8 @@ namespace BEPUphysics.DataStructures
         XAxisComparer xAxisComparer;
         class XAxisComparer : IComparer<int>
         {
-            TriangleMeshBoundingBoxTree tree;
-            public XAxisComparer(TriangleMeshBoundingBoxTree tree)
+            MeshBoundingBoxTree tree;
+            public XAxisComparer(MeshBoundingBoxTree tree)
             {
                 this.tree = tree;
             }
@@ -710,8 +756,8 @@ namespace BEPUphysics.DataStructures
         YAxisComparer yAxisComparer;
         class YAxisComparer : IComparer<int>
         {
-            TriangleMeshBoundingBoxTree tree;
-            public YAxisComparer(TriangleMeshBoundingBoxTree tree)
+            MeshBoundingBoxTree tree;
+            public YAxisComparer(MeshBoundingBoxTree tree)
             {
                 this.tree = tree;
             }
@@ -733,8 +779,8 @@ namespace BEPUphysics.DataStructures
         ZAxisComparer zAxisComparer;
         class ZAxisComparer : IComparer<int>
         {
-            TriangleMeshBoundingBoxTree tree;
-            public ZAxisComparer(TriangleMeshBoundingBoxTree tree)
+            MeshBoundingBoxTree tree;
+            public ZAxisComparer(MeshBoundingBoxTree tree)
             {
                 this.tree = tree;
             }

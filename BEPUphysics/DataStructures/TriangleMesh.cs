@@ -12,11 +12,11 @@ namespace BEPUphysics.DataStructures
     ///</summary>
     public class TriangleMesh
     {
-        private TriangleMeshBoundingBoxTreeData data;
+        private MeshBoundingBoxTreeData data;
         ///<summary>
         /// Gets or sets the bounding box data used in the mesh.
         ///</summary>
-        public TriangleMeshBoundingBoxTreeData Data
+        public MeshBoundingBoxTreeData Data
         {
             get
             {
@@ -25,15 +25,15 @@ namespace BEPUphysics.DataStructures
             set
             {
                 data = value;
-                tree.Reconstruct(data);
+                tree.Data = data;
             }
         }
 
-        private TriangleMeshBoundingBoxTree tree;
+        private MeshBoundingBoxTree tree;
         ///<summary>
         /// Gets the bounding box tree that accelerates queries to this triangle mesh.
         ///</summary>
-        public TriangleMeshBoundingBoxTree Tree
+        public MeshBoundingBoxTree Tree
         {
             get
             {
@@ -45,21 +45,10 @@ namespace BEPUphysics.DataStructures
         /// Constructs a new triangle mesh.
         ///</summary>
         ///<param name="data">Data to use to construct the mesh.</param>
-        public TriangleMesh(TriangleMeshBoundingBoxTreeData data)
+        public TriangleMesh(MeshBoundingBoxTreeData data)
         {
             this.data = data;
-            tree = new TriangleMeshBoundingBoxTree(data);
-        }
-
-        ///<summary>
-        /// Constructs a new triangle mesh.
-        ///</summary>
-        ///<param name="data">Data to use to construct the mesh.</param>
-        ///<param name="margin">Margin to expand the bounding boxes of the triangles by.</param>
-        public TriangleMesh(TriangleMeshBoundingBoxTreeData data, float margin)
-        {
-            this.data = data;
-            tree = new TriangleMeshBoundingBoxTree(data, margin);
+            tree = new MeshBoundingBoxTree(data);
         }
 
         ///<summary>
@@ -186,7 +175,7 @@ namespace BEPUphysics.DataStructures
         public bool RayCast(Ray ray, float maximumLength, TriangleSidedness sidedness, IList<RayHit> hits)
         {
             var hitElements = Resources.GetIntList();
-            tree.RayCast(ray, hitElements);
+            tree.GetOverlaps(ray, hitElements);
             for (int i = 0; i < hitElements.Count; i++)
             {
                 Vector3 v1, v2, v3;

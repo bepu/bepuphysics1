@@ -5,14 +5,14 @@ namespace BEPUphysics.DataStructures
     ///<summary>
     /// Collection of triangle mesh data that directly returns vertices from its vertex buffer instead of transforming them first.
     ///</summary>
-    public class StaticTriangleMeshData : TriangleMeshBoundingBoxTreeData
+    public class StaticMeshData : MeshBoundingBoxTreeData
     {
         ///<summary>
         /// Constructs the triangle mesh data.
         ///</summary>
         ///<param name="vertices">Vertices to use in the data.</param>
         ///<param name="indices">Indices to use in the data.</param>
-        public StaticTriangleMeshData(Vector3[] vertices, int[] indices)
+        public StaticMeshData(Vector3[] vertices, int[] indices)
         {
             Vertices = vertices;
             Indices = indices;

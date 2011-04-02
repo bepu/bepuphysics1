@@ -2588,9 +2588,7 @@ namespace BEPUphysics
             Matrix3X3 tempRotMat;
             Matrix3X3.CreateFromQuaternion(ref normalizedOrientation, out tempRotMat);
             Matrix3X3 tempInertiaTensorInverse;
-            Matrix3X3 transposed;
-            Matrix3X3.Transpose(ref tempRotMat, out transposed);
-            Matrix3X3.Multiply(ref transposed, ref localInertiaTensorInverse, out tempInertiaTensorInverse);
+            Matrix3X3.MultiplyTransposed(ref tempRotMat, ref localInertiaTensorInverse, out tempInertiaTensorInverse);
             Matrix3X3.Multiply(ref tempInertiaTensorInverse, ref tempRotMat, out tempInertiaTensorInverse);
             Vector3 halfspin;
             Matrix3X3.Transform(ref angularMomentum, ref tempInertiaTensorInverse, out halfspin);

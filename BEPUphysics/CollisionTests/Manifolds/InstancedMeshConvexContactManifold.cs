@@ -58,7 +58,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
 
         protected override void ConfigureTriangle(int i, out TriangleIndices indices)
         {
-            TriangleMeshBoundingBoxTreeData data = mesh.Shape.TriangleMesh.Data;
+            MeshBoundingBoxTreeData data = mesh.Shape.TriangleMesh.Data;
             int triangleIndex = overlappedTriangles.Elements[i];
             data.GetTriangle(triangleIndex, out localTriangleShape.vA, out localTriangleShape.vB, out localTriangleShape.vC);
             AffineTransform.Transform(ref localTriangleShape.vA, ref mesh.worldTransform, out localTriangleShape.vA);

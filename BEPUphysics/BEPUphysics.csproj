@@ -32,7 +32,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <DebugType>none</DebugType>
+    <DebugType>full</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\x86\Release</OutputPath>
     <DefineConstants>WINDOWS;ALLOWUNSAFE</DefineConstants>
@@ -44,7 +44,7 @@
     <XnaCompressContent>true</XnaCompressContent>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DocumentationFile>bin\x86\Release\BEPUphysics.XML</DocumentationFile>
-    <DebugSymbols>false</DebugSymbols>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
@@ -99,6 +99,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BroadPhaseSystems\Hierarchies\DynamicHierarchyNode.cs" />
+    <None Include="DataStructures\Deprecated\MeshBoundingBoxTree.cs" />
+    <Compile Include="DataStructures\BoundingBoxTree.cs" />
+    <Compile Include="DataStructures\MeshBoundingBoxTree.cs" />
+    <Compile Include="DataStructures\MeshBoundingBoxTreeData.cs" />
+    <Compile Include="DataStructures\StaticMeshData.cs" />
+    <Compile Include="DataStructures\TransformableMeshData.cs" />
+    <Compile Include="DataStructures\TreeOverlapPair.cs" />
     <Compile Include="DeactivationManagement\DeactivationManager.cs" />
     <Compile Include="BroadPhaseSystems\BroadPhase.cs" />
     <Compile Include="BroadPhaseSystems\BroadPhaseEntry.cs" />
@@ -284,13 +291,10 @@
     <Compile Include="CollisionTests\Manifolds\GeneralConvexContactManifold.cs" />
     <Compile Include="CollisionTests\ContactRefresher.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\GeneralConvexPairTester.cs" />
-    <Compile Include="DataStructures\BoundingBoxTree.cs" />
+    <None Include="DataStructures\Deprecated\BoundingBoxTree.cs" />
     <Compile Include="DataStructures\RawValueList.cs" />
     <Compile Include="DataStructures\RawList.cs" />
-    <Compile Include="DataStructures\TriangleMeshBoundingBoxTree.cs" />
-    <Compile Include="DataStructures\TransformableTriangleMeshData.cs" />
     <Compile Include="BroadPhaseSystems\IBoundingBoxOwner.cs" />
-    <Compile Include="DataStructures\TriangleMeshBoundingBoxTreeData.cs" />
     <Compile Include="DataStructures\ObservableDictionary.cs" />
     <Compile Include="DataStructures\HashSet.cs" />
     <Compile Include="DataStructures\PriorityQueue.cs" />
@@ -298,7 +302,6 @@
     <Compile Include="DataStructures\ReadOnlyEnumerable.cs" />
     <Compile Include="DataStructures\TinyList.cs" />
     <Compile Include="DataStructures\TinyStructList.cs" />
-    <Compile Include="DataStructures\StaticTriangleMeshData.cs" />
     <Compile Include="UpdateableSystems\DetectorVolume.cs" />
     <Compile Include="Entities\Entity.cs" />
     <Compile Include="Entities\EntityBase.cs" />

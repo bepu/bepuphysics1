@@ -169,6 +169,10 @@
     <Compile Include="Constraints\TwoEntity\Motors\MotorSettings.cs" />
     <Compile Include="Constraints\TwoEntity\Motors\RevoluteMotor.cs" />
     <Compile Include="Constraints\TwoEntity\Motors\TwistMotor.cs" />
+    <Compile Include="DataStructures\BoundingBoxTree.cs" />
+    <Compile Include="DataStructures\Deprecated\BoundingBoxTree.cs" />
+    <Compile Include="DataStructures\MeshBoundingBoxTree.cs" />
+    <Compile Include="DataStructures\TreeOverlapPair.cs" />
     <Compile Include="DeactivationManagement\DeactivationManager.cs" />
     <Compile Include="DeactivationManagement\ISimulationIslandConnection.cs" />
     <Compile Include="DeactivationManagement\ISimulationIslandMember.cs" />
@@ -270,12 +274,11 @@
     <Compile Include="CollisionTests\ContactSupplementData.cs" />
     <Compile Include="CollisionTests\ContactRefresher.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\GeneralConvexPairTester.cs" />
-    <Compile Include="DataStructures\BoundingBoxTree.cs" />
     <Compile Include="DataStructures\RawValueList.cs" />
     <Compile Include="DataStructures\RawList.cs" />
-    <Compile Include="DataStructures\TriangleMeshBoundingBoxTree.cs" />
-    <Compile Include="DataStructures\TransformableTriangleMeshData.cs" />
-    <Compile Include="DataStructures\TriangleMeshBoundingBoxTreeData.cs" />
+    <Compile Include="DataStructures\Deprecated\MeshBoundingBoxTree.cs" />
+    <Compile Include="DataStructures\TransformableMeshData.cs" />
+    <Compile Include="DataStructures\MeshBoundingBoxTreeData.cs" />
     <Compile Include="DataStructures\ObservableDictionary.cs" />
     <Compile Include="DataStructures\HashSet.cs" />
     <Compile Include="DataStructures\PriorityQueue.cs" />
@@ -283,7 +286,7 @@
     <Compile Include="DataStructures\ReadOnlyEnumerable.cs" />
     <Compile Include="DataStructures\TinyList.cs" />
     <Compile Include="DataStructures\TinyStructList.cs" />
-    <Compile Include="DataStructures\StaticTriangleMeshData.cs" />
+    <Compile Include="DataStructures\StaticMeshData.cs" />
     <Compile Include="Entities\Entity.cs" />
     <Compile Include="Entities\EntityBase.cs" />
     <Compile Include="Entities\MorphableEntity.cs" />

@@ -40,11 +40,11 @@ namespace BEPUphysics.Collidables
         {
             get
             {
-                return (mesh.Data as TransformableTriangleMeshData).worldTransform;
+                return (mesh.Data as TransformableMeshData).worldTransform;
             }
             set
             {
-                (mesh.Data as TransformableTriangleMeshData).WorldTransform = value;
+                (mesh.Data as TransformableMeshData).WorldTransform = value;
                 mesh.Tree.Refit();
                 boundingBox = mesh.Tree.BoundingBox;
             }

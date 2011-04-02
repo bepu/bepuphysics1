@@ -6,14 +6,14 @@ namespace BEPUphysics.DataStructures
     ///<summary>
     /// Collection of mesh data which transforms its vertices before returning them.
     ///</summary>
-    public class TransformableTriangleMeshData : TriangleMeshBoundingBoxTreeData
+    public class TransformableMeshData : MeshBoundingBoxTreeData
     {
         ///<summary>
         /// Constructs the mesh data.
         ///</summary>
         ///<param name="vertices">Vertices to use in the mesh data.</param>
         ///<param name="indices">Indices to use in the mesh data.</param>
-        public TransformableTriangleMeshData(Vector3[] vertices, int[] indices)
+        public TransformableMeshData(Vector3[] vertices, int[] indices)
         {
             Vertices = vertices;
             Indices = indices;
@@ -25,7 +25,7 @@ namespace BEPUphysics.DataStructures
         ///<param name="vertices">Vertice sto use in the mesh data.</param>
         ///<param name="indices">Indices to use in the mesh data.</param>
         ///<param name="worldTransform">Transform to apply to vertices before returning their positions.</param>
-        public TransformableTriangleMeshData(Vector3[] vertices, int[] indices, AffineTransform worldTransform)
+        public TransformableMeshData(Vector3[] vertices, int[] indices, AffineTransform worldTransform)
         {
             this.worldTransform = worldTransform;
             Vertices = vertices;
