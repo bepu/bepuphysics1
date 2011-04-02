@@ -18,7 +18,6 @@ using BEPUphysics.NarrowPhaseSystems.Pairs;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.Constraints;
-using System.Windows.Forms;
 
 namespace BEPUphysicsDemos.Demos
 {
@@ -36,53 +35,15 @@ namespace BEPUphysicsDemos.Demos
             : base(game)
         {
 
-            Vector3[] vertices;
-            int[] indices;
+            //Vector3[] vertices;
+            //int[] indices;
 
-            TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("barrelandplatform"), out vertices, out indices);
-            StaticMeshData data = new StaticMeshData(vertices, indices);
-
-
-            float radius = .5f;
-            var scaleTransform = Matrix.CreateScale(20 * radius);
-
-            List<CompoundShapeEntry> triangles = new List<CompoundShapeEntry>(indices.Length / 3);
-
-            for (int i = 0; i < indices.Length; i += 3)
-            {
-                // [Recentered Triangle]
-                Vector3 centre;
-                TriangleShape tri = new TriangleShape(
-                    Vector3.Transform(vertices[indices[i]], scaleTransform),
-                    Vector3.Transform(vertices[indices[i + 1]], scaleTransform),
-                    Vector3.Transform(vertices[indices[i + 2]], scaleTransform),
-                    out centre
-                    );
-
-                //Depending on the winding of the model, using clockwise or counterclockwise will permit
-                //objects to move freely from the inside to the outside, or from the outside inside.
-                //Doublesided stops both ways.  (It's the default too, so setting this isn't really necessary)
-                tri.Sidedness = TriangleSidedness.DoubleSided;
-                //By now, if we checked the triangle shape's vertices, they would be in the triangle's local space.
-                //If we added centre to the vertices, they would be in the original world space locations.
-                //Knowing that, we can pass the centre to the DynamicCompoundEntry's position and they will be in the correct location.
-                triangles.Add(
-                    new CompoundShapeEntry(
-                        tri,
-                        centre,
-                        1f
-                    )
-                );
-            }
-
-            var body = new CompoundBody(triangles, 100);
-
-            Space.Add(body);
-
-            Space.Add(new Box(new Vector3(0, -25, 0), 100, 1, 100));
+            //TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("playground"), out vertices, out indices);
+            //StaticMeshData data = new StaticMeshData(vertices, indices);
 
 
-            //MeshBoundingBoxTree incrementalTree = new MeshBoundingBoxTree(data);
+            ////MeshBoundingBoxTree incrementalTree = new MeshBoundingBoxTree(data);
+            ////var topDownTree = new TopDownMeshBoundingBoxTree(data);
 
 
             ////List<int> depths;
@@ -95,34 +56,35 @@ namespace BEPUphysicsDemos.Demos
 
 
 
-            //var offset = incrementalTree.BoundingBox.Max - incrementalTree.BoundingBox.Min;
-            //var origin = incrementalTree.BoundingBox.Min;
+            ////var offset = incrementalTree.BoundingBox.Max - incrementalTree.BoundingBox.Min;
+            ////var origin = incrementalTree.BoundingBox.Min;
 
 
 
             //List<int> overlaps = new List<int>(10000);
             //List<int> overlaps2 = new List<int>(10000);
-            //int numRuns = 1000000;
-            //Vector3 boundingBoxOffset = new Vector3(1f, 1f, 1f);
+            //int numRuns = 10;
+            //Vector3 boundingBoxOffset = new Vector3(.01f, .01f, .01f);
 
             //Random random = new Random(1);
             //double start = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
-            ////for (int i = 0; i < numRuns / 100; i++)
-            ////{
+            //for (int i = 0; i < numRuns; i++)
+            //{
 
-            ////    overlaps.Clear();
-            ////    Vector3 center = origin + new Vector3((float)random.NextDouble() * offset.X, (float)random.NextDouble() * offset.Y, (float)random.NextDouble() * offset.Z);
-            ////    Vector3 direction = new Vector3(-.5f + (float)random.NextDouble(), -.5f + (float)random.NextDouble(), -.5f + (float)random.NextDouble());
-            ////    //BoundingBox overlap = new BoundingBox(center - boundingBoxOffset, center + boundingBoxOffset);
-            ////    Ray ray = new Ray(center, direction);
+            //    //overlaps.Clear();
+            //    //Vector3 center = origin + new Vector3((float)random.NextDouble() * offset.X, (float)random.NextDouble() * offset.Y, (float)random.NextDouble() * offset.Z);
+            //    //Vector3 direction = new Vector3(-.5f + (float)random.NextDouble(), -.5f + (float)random.NextDouble(), -.5f + (float)random.NextDouble());
+            //    //BoundingBox overlap = new BoundingBox(center - boundingBoxOffset, center + boundingBoxOffset);
+            //    //Ray ray = new Ray(center, direction);
 
-            ////    for (int j = 0; j < 100; j++)
-            ////    {
-            ////        topDownTree.RayCast(ray, overlaps);
-            ////    }
+            //    //for (int j = 0; j < 100; j++)
+            //    //{
+            //    //    topDownTree.GetOverlaps(overlap, overlaps);
+            //    //}
 
+            //    var topDownTree = new TopDownMeshBoundingBoxTree(data);
 
-            ////}
+            //}
 
             //double end = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
 
@@ -131,27 +93,27 @@ namespace BEPUphysicsDemos.Demos
 
             //random = new Random(1);
             //start = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
-            //for (int i = 0; i < numRuns / 100; i++)
+            //for (int i = 0; i < numRuns; i++)
             //{
-            //    overlaps2.Clear();
-            //    Vector3 center = origin + new Vector3((float)random.NextDouble() * offset.X, (float)random.NextDouble() * offset.Y, (float)random.NextDouble() * offset.Z);
-            //    Vector3 direction = new Vector3(-.5f + (float)random.NextDouble(), -.5f + (float)random.NextDouble(), -.5f + (float)random.NextDouble());
+            //    //overlaps2.Clear();
+            //    //Vector3 center = origin + new Vector3((float)random.NextDouble() * offset.X, (float)random.NextDouble() * offset.Y, (float)random.NextDouble() * offset.Z);
+            //    //Vector3 direction = new Vector3(-.5f + (float)random.NextDouble(), -.5f + (float)random.NextDouble(), -.5f + (float)random.NextDouble());
             //    //BoundingBox overlap = new BoundingBox(center - boundingBoxOffset, center + boundingBoxOffset);
-            //    Ray ray = new Ray(center, direction);
+            //    //Ray ray = new Ray(center, direction);
 
-            //    for (int j = 0; j < 100; j++)
-            //    {
-            //        incrementalTree.GetOverlaps(ray, overlaps2);
-            //    }
+            //    //for (int j = 0; j < 100; j++)
+            //    //{
+            //    //    incrementalTree.GetOverlaps(overlap, overlaps2);
+            //    //}
 
+            //    MeshBoundingBoxTree incrementalTree = new MeshBoundingBoxTree(data);
             //}
 
             //end = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
 
             //time2 = (end - start) / numRuns;
 
-            ////Console.WriteLine("timeper: " + time1);
-            //Clipboard.SetData(DataFormats.StringFormat, "Top down: " + time1 + ", Incremental: " + time2);
+            //Console.WriteLine("timeper: " + time1);
 
 
         }
@@ -183,8 +145,8 @@ namespace BEPUphysicsDemos.Demos
 
         public override void DrawUI()
         {
-            Game.DataTextDrawer.Draw(time1 * 1000000000, new Vector2(0, 100));
-            Game.DataTextDrawer.Draw(time2 * 1000000000, new Vector2(0, 130));
+            Game.DataTextDrawer.Draw(time1 * 1000000000, new Vector2(50, 100));
+            Game.DataTextDrawer.Draw(time2 * 1000000000, new Vector2(50, 130));
             base.DrawUI();
         }
 

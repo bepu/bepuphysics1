@@ -54,9 +54,7 @@
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>strongNameKey.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
-  <ItemGroup>
-    <Folder Include="BroadPhases\Hierarchies\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="CollisionTests\CollisionAlgorithms\GJK\SimplexBackup.cs" />
     <Compile Include="BroadPhaseSystems\BroadPhase.cs" />
@@ -69,7 +67,9 @@
     <Compile Include="BroadPhaseSystems\IBroadPhaseEntryOwner.cs" />
     <Compile Include="BroadPhaseSystems\IQueryAccelerator.cs" />
     <Compile Include="Collidables\MobileCollidables\MobileCollidable.cs" />
+    <Compile Include="Collidables\MobileCollidables\MobileMeshCollidable.cs" />
     <Compile Include="CollisionShapes\ConvexShapes\InertiaHelper.cs" />
+    <Compile Include="CollisionShapes\MobileMeshShape.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\GJK\GJKToolbox.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\GJK\OldGJKVerifier.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\GJK\RaySimplex.cs" />
@@ -94,8 +94,8 @@
     <Compile Include="Constraints\TwoEntity\Joints\SwivelHingeAngularJoint.cs" />
     <Compile Include="Constraints\TwoEntity\Joints\TwistJoint.cs" />
     <Compile Include="DataStructures\BoundingBoxTree.cs" />
-    <Compile Include="DataStructures\Deprecated\BoundingBoxTree.cs" />
-    <Compile Include="DataStructures\Deprecated\MeshBoundingBoxTree.cs" />
+    <None Include="DataStructures\Deprecated\BoundingBoxTree.cs" />
+    <None Include="DataStructures\Deprecated\MeshBoundingBoxTree.cs" />
     <Compile Include="DataStructures\MeshBoundingBoxTree.cs" />
     <Compile Include="DataStructures\MeshBoundingBoxTreeData.cs" />
     <Compile Include="DataStructures\StaticMeshData.cs" />

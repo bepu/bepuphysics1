@@ -1204,6 +1204,9 @@ namespace BEPUphysics.Entities
 
         /// <summary>
         /// Gets or sets the user data associated with the entity.
+        /// This is separate from the entity's collidable's tag.
+        /// If a tag needs to be accessed from within the collision
+        /// detection pipeline, consider using the entity.CollisionInformation.Tag.
         /// </summary>
         public object Tag { get; set; }
 

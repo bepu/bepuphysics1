@@ -49,9 +49,7 @@
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>strongNameKey.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
-  <ItemGroup>
-    <Folder Include="BroadPhases\Hierarchies\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Compile Include="BroadPhaseSystems\BroadPhase.cs" />
     <Compile Include="BroadPhaseSystems\BroadPhaseEntry.cs" />
@@ -75,6 +73,7 @@
     <Compile Include="Collidables\MobileCollidables\ConvexCollidable.cs" />
     <Compile Include="Collidables\MobileCollidables\EntityCollidable.cs" />
     <Compile Include="Collidables\MobileCollidables\MobileCollidable.cs" />
+    <Compile Include="Collidables\MobileCollidables\MobileMeshCollidable.cs" />
     <Compile Include="Collidables\MobileCollidables\TriangleCollidable.cs" />
     <Compile Include="Collidables\StaticMesh.cs" />
     <Compile Include="Collidables\Terrain.cs" />
@@ -91,6 +90,7 @@
     <Compile Include="CollisionShapes\EntityShape.cs" />
     <Compile Include="CollisionShapes\InstancedMeshShape.cs" />
     <None Include="CollisionShapes\OldCAStuff.cs" />
+    <Compile Include="CollisionShapes\MobileMeshShape.cs" />
     <Compile Include="CollisionShapes\ShapeDistributionInformation.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\BoxBoxCollider.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\BoxBoxColliderOld.cs" />
@@ -170,7 +170,7 @@
     <Compile Include="Constraints\TwoEntity\Motors\RevoluteMotor.cs" />
     <Compile Include="Constraints\TwoEntity\Motors\TwistMotor.cs" />
     <Compile Include="DataStructures\BoundingBoxTree.cs" />
-    <Compile Include="DataStructures\Deprecated\BoundingBoxTree.cs" />
+    <None Include="DataStructures\Deprecated\BoundingBoxTree.cs" />
     <Compile Include="DataStructures\MeshBoundingBoxTree.cs" />
     <Compile Include="DataStructures\TreeOverlapPair.cs" />
     <Compile Include="DeactivationManagement\DeactivationManager.cs" />
@@ -276,7 +276,7 @@
     <Compile Include="CollisionTests\CollisionAlgorithms\GeneralConvexPairTester.cs" />
     <Compile Include="DataStructures\RawValueList.cs" />
     <Compile Include="DataStructures\RawList.cs" />
-    <Compile Include="DataStructures\Deprecated\MeshBoundingBoxTree.cs" />
+    <None Include="DataStructures\Deprecated\MeshBoundingBoxTree.cs" />
     <Compile Include="DataStructures\TransformableMeshData.cs" />
     <Compile Include="DataStructures\MeshBoundingBoxTreeData.cs" />
     <Compile Include="DataStructures\ObservableDictionary.cs" />

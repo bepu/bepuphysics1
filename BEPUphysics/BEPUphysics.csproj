@@ -99,7 +99,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BroadPhaseSystems\Hierarchies\DynamicHierarchyNode.cs" />
-    <None Include="DataStructures\Deprecated\MeshBoundingBoxTree.cs" />
+    <Compile Include="DataStructures\Deprecated\MeshBoundingBoxTree.cs" />
+    <Compile Include="Collidables\MobileCollidables\MobileMeshCollidable.cs" />
+    <Compile Include="CollisionShapes\MobileMeshShape.cs" />
     <Compile Include="DataStructures\BoundingBoxTree.cs" />
     <Compile Include="DataStructures\MeshBoundingBoxTree.cs" />
     <Compile Include="DataStructures\MeshBoundingBoxTreeData.cs" />

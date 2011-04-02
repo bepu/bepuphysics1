@@ -33,8 +33,8 @@ namespace BEPUphysics.MathExtensions
         ///<param name="translation">Translation to use in the transform.</param>
         public AffineTransform(Quaternion orientation, Vector3 translation)
         {
-            Translation = translation;
             Matrix3X3.CreateFromQuaternion(ref orientation, out LinearTransform);
+            Translation = translation;
         }
 
         ///<summary>
@@ -46,11 +46,11 @@ namespace BEPUphysics.MathExtensions
         public AffineTransform(Vector3 scaling, Quaternion orientation, Vector3 translation)
         {
             //Create an SRT transform.
-            Translation = translation;
             Matrix3X3.CreateScale(ref scaling, out LinearTransform);
             Matrix3X3 rotation;
             Matrix3X3.CreateFromQuaternion(ref orientation, out rotation);
             Matrix3X3.Multiply(ref LinearTransform, ref rotation, out LinearTransform);
+            Translation = translation;
         }
 
         ///<summary>
@@ -60,8 +60,8 @@ namespace BEPUphysics.MathExtensions
         ///<param name="translation">Translation component of the transform.</param>
         public AffineTransform(Matrix3X3 linearTransform, Vector3 translation)
         {
-            Translation = translation;
             LinearTransform = linearTransform;
+            Translation = translation;
 
         }
 
