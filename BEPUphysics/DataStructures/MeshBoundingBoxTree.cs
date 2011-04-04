@@ -63,6 +63,7 @@ namespace BEPUphysics.DataStructures
         /// </summary>
         public void Reconstruct()
         {
+            root = null;
             for (int i = 0; i < data.indices.Length; i += 3)
             {
                 //Use a permuted version of the triangles instead of the actual triangle list.

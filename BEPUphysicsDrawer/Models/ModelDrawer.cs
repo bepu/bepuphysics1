@@ -67,6 +67,7 @@ namespace BEPUphysicsDrawer.Models
             shapeMeshGetters.Add(typeof(WrappedShape), DisplayWrappedBody.GetShapeMeshData);
             shapeMeshGetters.Add(typeof(TransformableShape), DisplayTransformable.GetShapeMeshData);
             shapeMeshGetters.Add(typeof(CompoundShape), DisplayCompoundBody.GetShapeMeshData);
+            shapeMeshGetters.Add(typeof(MobileMeshShape), DisplayMobileMesh.GetShapeMeshData);
 
         }
 

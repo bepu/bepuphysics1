@@ -75,7 +75,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         {
             if (vertices.Count == 0)
                 throw new ArgumentException("Vertices list used to create a ConvexHullShape cannot be empty.");
-            
+
 
             //Ensure that the convex hull is centered on its local origin.
             center = ComputeCenter(vertices, outputHullTriangleIndices, outputUniqueSurfaceVertices);
@@ -283,7 +283,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             return toReturn;
         }
 
-            ///<summary>
+        ///<summary>
         /// Computes the center and surface triangles of a convex hull defined by a point set.
         ///</summary>
         ///<param name="vertices">Point set defining the convex hull.</param>
@@ -369,7 +369,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         ///<returns>Volume distribution of the convex hull.</returns>
         public Matrix3X3 ComputeVolumeDistribution(float volume, IList<int> localSurfaceTriangles)
         {
-            //TODO: This method has a lot of overlap with the volume calculation.  Conceptually very similar.
+            //TODO: This method has a lot of overlap with the volume calculation.  Conceptually very similar, could bundle tighter.
 
             //Source: Explicit Exact Formulas for the 3-D Tetrahedron Inertia Tensor in Terms of its Vertex Coordinates
             //http://www.scipub.org/fulltext/jms2/jms2118-11.pdf
@@ -481,7 +481,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             dCBD /= nCBD.Length();
             dACD /= nACD.Length();
             dADB /= nADB.Length();
-            
+
             return collisionMargin + Math.Min(dABC, Math.Min(dCBD, Math.Min(dACD, dADB)));
         }
 

@@ -35,12 +35,37 @@ namespace BEPUphysicsDemos.Demos
             : base(game)
         {
 
-            //Vector3[] vertices;
-            //int[] indices;
+            Vector3[] vertices;
+            int[] indices;
 
-            //TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("playground"), out vertices, out indices);
-            //StaticMeshData data = new StaticMeshData(vertices, indices);
+            TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("cube"), out vertices, out indices);
 
+            ShapeDistributionInformation info;
+            AffineTransform transform = new AffineTransform(new Vector3(1, 1, 1), Quaternion.Identity, new Vector3(0, 0, 0));
+            var shape = new MobileMeshShape(vertices, indices, transform, MobileMeshSolidity.DoubleSided, out info);
+
+            Matrix3X3 inertia;
+            float mass = 100;
+            //inertia = new Matrix3X3();
+            //inertia.M11 = mass;
+            //inertia.M22 = mass;
+            //inertia.M33 = mass;
+            Matrix3X3.Multiply(ref info.VolumeDistribution, mass * InertiaHelper.InertiaTensorScale, out inertia);
+            for (int i = 0; i < 1; i++)
+            {
+                var entityMesh = new Entity<MobileMeshCollidable>(new MobileMeshCollidable(shape), mass, inertia, info.Volume);
+                entityMesh.CollisionInformation.ImproveBoundaryBehavior = false;
+                entityMesh.Position = new Vector3(0, 5, 0);
+                Space.Add(entityMesh);
+                entityMesh.IsAlwaysActive = true;
+            }
+
+            Space.Add(new Box(new Vector3(0, -10, 0), 100, 1, 100));
+            game.Camera.Position = new Vector3(0, -7, 15);
+            game.Camera.Yaw = 0;
+            game.Camera.Pitch = 0;
+
+            //Space.ForceUpdater.Gravity = new Vector3();
 
             ////MeshBoundingBoxTree incrementalTree = new MeshBoundingBoxTree(data);
             ////var topDownTree = new TopDownMeshBoundingBoxTree(data);

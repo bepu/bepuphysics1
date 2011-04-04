@@ -52,6 +52,14 @@ namespace BEPUphysics.CollisionTests.Manifolds
             candidatesToAdd = new RawValueList<ContactData>(1);
         }
 
+        protected virtual RigidTransform MeshTransform
+        {
+            get
+            {
+                return RigidTransform.Identity;
+            }
+        }
+
 
         protected abstract bool UseImprovedBoundaryHandling { get; }
         protected internal abstract int FindOverlappingTriangles(float dt);
@@ -65,7 +73,8 @@ namespace BEPUphysics.CollisionTests.Manifolds
         public override void Update(float dt)
         {
             //First, refresh all existing contacts.  This is an incremental manifold.
-            ContactRefresher.ContactRefresh(contacts, supplementData, ref convex.worldTransform, ref Toolbox.RigidIdentity, contactIndicesToRemove);
+            var transform = MeshTransform;
+            ContactRefresher.ContactRefresh(contacts, supplementData, ref convex.worldTransform, ref transform, contactIndicesToRemove);
             RemoveQueuedContacts();
 
             CleanUpOverlappingTriangles();

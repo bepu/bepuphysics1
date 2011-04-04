@@ -108,6 +108,7 @@
     <Compile Include="CollisionTests\Manifolds\ContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\GeneralConvexContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\InstancedMeshConvexContactManifold.cs" />
+    <Compile Include="CollisionTests\Manifolds\MobileMeshConvexContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\StaticMeshConvexContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\TerrainConvexContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\TriangleCollectionConvexContactManifold.cs" />
@@ -210,6 +211,7 @@
     <Compile Include="NarrowPhaseSystems\Factories\CompoundTerrainPairFactory.cs" />
     <Compile Include="NarrowPhaseSystems\Factories\CompoundInstancedMeshPairFactory.cs" />
     <Compile Include="NarrowPhaseSystems\Factories\InstancedMeshConvexPairFactory.cs" />
+    <Compile Include="NarrowPhaseSystems\Factories\MobileMeshConvexPairFactory.cs" />
     <Compile Include="NarrowPhaseSystems\Factories\NarrowPhasePairFactory.cs" />
     <Compile Include="NarrowPhaseSystems\Factories\TerrainConvexPairFactory.cs" />
     <Compile Include="NarrowPhaseSystems\Factories\StaticMeshConvexPairFactory.cs" />
@@ -228,6 +230,7 @@
     <Compile Include="NarrowPhaseSystems\Pairs\ContactCollection.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\ContactInformation.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\InstancedMeshConvexPairHandler.cs" />
+    <Compile Include="NarrowPhaseSystems\Pairs\MobileMeshConvexPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\TerrainConvexPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\StaticMeshConvexPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\TriangleConvexPairHandler.cs" />

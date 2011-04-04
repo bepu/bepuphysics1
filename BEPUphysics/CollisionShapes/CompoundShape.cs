@@ -198,42 +198,6 @@ namespace BEPUphysics.CollisionShapes
 
         #region EntityShape members and support
 
-        ///<summary>
-        /// Computes the minimum radius of the shape.
-        /// This is often smaller than the actual minimum radius;
-        /// it is simply an approximation that avoids overestimating.
-        ///</summary>
-        ///<returns>Minimum radius of the shape.</returns>
-        public override float ComputeMinimumRadius()
-        {
-            float minRadius = 0;
-            for (int i = 0; i < shapes.count; i++)
-            {
-                float radius = shapes.Elements[i].Shape.ComputeMinimumRadius();
-                if (radius < minRadius)
-                    minRadius = radius;
-            }
-            return minRadius;
-        }
-
-        /// <summary>
-        /// Computes the maximum radius of the shape.
-        /// This is often larger than the actual maximum radius;
-        /// it is simply an approximation that avoids underestimating.
-        /// </summary>
-        /// <returns>Maximum radius of the shape.</returns>
-        public override float ComputeMaximumRadius()
-        {
-            float maxRadius = 0;
-            for (int i = 0; i < shapes.count; i++)
-            {
-                float radius = shapes.Elements[i].LocalTransform.Position.Length() + shapes.Elements[i].Shape.ComputeMaximumRadius();
-                if (radius > maxRadius)
-                    maxRadius = radius;
-            }
-            return maxRadius;
-        }
-
         /// <summary>
         /// Computes the center of the shape.  This can be considered its 
         /// center of mass, based on the weightings of entries in the shape.

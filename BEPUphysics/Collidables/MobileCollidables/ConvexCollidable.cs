@@ -32,7 +32,6 @@ namespace BEPUphysics.Collidables.MobileCollidables
 
 
 
-
     }
 
     ///<summary>
@@ -83,6 +82,8 @@ namespace BEPUphysics.Collidables.MobileCollidables
 
             ExpandBoundingBox(ref boundingBox, dt);
         }
+
+
 
 
 

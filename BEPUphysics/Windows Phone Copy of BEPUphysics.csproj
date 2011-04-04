@@ -80,6 +80,7 @@
     <Compile Include="CollisionTests\Manifolds\ContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\GeneralConvexContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\InstancedMeshConvexContactManifold.cs" />
+    <Compile Include="CollisionTests\Manifolds\MobileMeshConvexContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\StaticMeshConvexContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\TerrainConvexContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\TriangleCollectionConvexContactManifold.cs" />
@@ -118,6 +119,8 @@
     <Compile Include="ISpace.cs" />
     <Compile Include="ISpaceObject.cs" />
     <Compile Include="MultithreadedProcessingStage.cs" />
+    <Compile Include="NarrowPhaseSystems\Factories\MobileMeshConvexPairFactory.cs" />
+    <Compile Include="NarrowPhaseSystems\Pairs\MobileMeshConvexPairHandler.cs" />
     <Compile Include="OtherSpaceStages\BoundingBoxUpdater.cs" />
     <Compile Include="OtherSpaceStages\DeferredEventDispatcher.cs" />
     <Compile Include="OtherSpaceStages\ForceUpdater.cs" />

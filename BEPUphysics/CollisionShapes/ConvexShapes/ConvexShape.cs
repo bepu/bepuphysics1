@@ -321,5 +321,21 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             boundingBox.Min.Y = transform.Translation.Y + down.Y;
             boundingBox.Min.Z = transform.Translation.Z + forward.Z;
         }
+
+
+        ///<summary>
+        /// Computes the minimum radius of the shape.
+        /// This is often smaller than the actual minimum radius;
+        /// it is simply an approximation that avoids overestimating.
+        ///</summary>
+        ///<returns>Minimum radius of the shape.</returns>
+        public abstract float ComputeMinimumRadius();
+        /// <summary>
+        /// Computes the maximum radius of the shape.
+        /// This is often larger than the actual maximum radius;
+        /// it is simply an approximation that avoids underestimating.
+        /// </summary>
+        /// <returns>Maximum radius of the shape.</returns>
+        public abstract float ComputeMaximumRadius();
     }
 }

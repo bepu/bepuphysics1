@@ -109,9 +109,18 @@ namespace BEPUphysics.NarrowPhaseSystems
             collisionManagers.Add(new TypePair(typeof(CompoundCollidable), typeof(Terrain)), new CompoundTerrainPairFactory());
             collisionManagers.Add(new TypePair(typeof(CompoundCollidable), typeof(InstancedMesh)), new CompoundInstancedMeshPairFactory());
 
-            //How about new convex shapes and triangle mesh stuff?  Would need to define the rule...
-            //Need some system that works on sets of types to really make this work out.
-            //Would analyze specific dictionary first, followed by the larger scope (convex-convex, triangle-convex, etc.)
+            var mobileMeshConvexFactory = new MobileMeshConvexPairFactory();
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<BoxShape>), typeof(MobileMeshCollidable)), mobileMeshConvexFactory);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<SphereShape>), typeof(MobileMeshCollidable)), mobileMeshConvexFactory);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<CapsuleShape>), typeof(MobileMeshCollidable)), mobileMeshConvexFactory);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<TriangleShape>), typeof(MobileMeshCollidable)), mobileMeshConvexFactory);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<CylinderShape>), typeof(MobileMeshCollidable)), mobileMeshConvexFactory);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<ConeShape>), typeof(MobileMeshCollidable)), mobileMeshConvexFactory);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<TransformableShape>), typeof(MobileMeshCollidable)), mobileMeshConvexFactory);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<MinkowskiSumShape>), typeof(MobileMeshCollidable)), mobileMeshConvexFactory);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<WrappedShape>), typeof(MobileMeshCollidable)), mobileMeshConvexFactory);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<ConvexHullShape>), typeof(MobileMeshCollidable)), mobileMeshConvexFactory);
+
 
         }
 

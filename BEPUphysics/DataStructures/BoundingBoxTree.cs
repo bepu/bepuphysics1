@@ -45,6 +45,7 @@ namespace BEPUphysics.DataStructures
         /// </summary>
         public void Reconstruct(IList<T> elements)
         {
+            root = null;
             int count = elements.Count;
             for (int i = 0; i < count; i++)
             {

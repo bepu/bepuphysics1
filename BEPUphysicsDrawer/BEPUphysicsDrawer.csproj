@@ -95,6 +95,7 @@
     <Compile Include="Models\Display types\DisplayTerrain.cs" />
     <Compile Include="Models\Display types\DisplayTriangleMesh.cs" />
     <Compile Include="Models\Display types\Entity types\DisplayEntity.cs" />
+    <Compile Include="Models\Display types\Entity types\DisplayMobileMesh.cs" />
     <Compile Include="Models\Display types\Entity types\DisplayTransformable.cs" />
     <Compile Include="Models\Display types\Entity types\DisplayBox.cs" />
     <Compile Include="Models\Display types\Entity types\DisplayCapsule.cs" />
