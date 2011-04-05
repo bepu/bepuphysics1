@@ -57,7 +57,6 @@ namespace BEPUphysics.CollisionShapes
             this.solidity = solidity;
             var data = new TransformableMeshData(vertices, indices, localTransform);
             ComputeShapeInformation(data, out distributionInfo);
-            data.worldTransform.Translation -= distributionInfo.Center;
 
             for (int i = 0; i < surfaceVertices.count; i++)
             {
@@ -218,6 +217,26 @@ namespace BEPUphysics.CollisionShapes
 
                 //The following inertia tensor calculation assumes a closed mesh.
 
+                shapeInformation.Volume = 0;
+                for (int i = 0; i < data.indices.Length; i += 3)
+                {
+                    Vector3 v2, v3, v4;
+                    data.GetTriangle(i, out v2, out v3, out v4);
+
+                    //Determinant is 6 * volume.  It's signed, though; this is because the mesh isn't necessarily convex nor centered on the origin.
+                    float tetrahedronVolume = v2.X * (v3.Y * v4.Z - v3.Z * v4.Y) -
+                                              v3.X * (v2.Y * v4.Z - v2.Z * v4.Y) +
+                                              v4.X * (v2.Y * v3.Z - v2.Z * v3.Y);
+
+                    shapeInformation.Volume += tetrahedronVolume;
+                    shapeInformation.Center += tetrahedronVolume * (v2 + v3 + v4);
+                }
+                shapeInformation.Center /= shapeInformation.Volume * 4;
+                shapeInformation.Volume /= 6;
+                shapeInformation.Volume = Math.Abs(shapeInformation.Volume);
+
+                data.worldTransform.Translation -= shapeInformation.Center;
+
                 //Source: Explicit Exact Formulas for the 3-D Tetrahedron Inertia Tensor in Terms of its Vertex Coordinates
                 //http://www.scipub.org/fulltext/jms2/jms2118-11.pdf
                 //x1, x2, x3, x4 are origin, triangle1, triangle2, triangle3
@@ -226,23 +245,19 @@ namespace BEPUphysics.CollisionShapes
                 // [ -b'  b  -a' ]
                 // [ -c' -a'  c  ]
                 float a = 0, b = 0, c = 0, ao = 0, bo = 0, co = 0;
-
-
-
-                shapeInformation.Volume = 0;
+                
+                float totalWeight = 0;
                 for (int i = 0; i < data.indices.Length; i += 3)
                 {
                     Vector3 v2, v3, v4;
                     data.GetTriangle(i, out v2, out v3, out v4);
 
                     //Determinant is 6 * volume.  It's signed, though; this is because the mesh isn't necessarily convex nor centered on the origin.
-                    //float tetrahedronVolume = Vector3.Dot(v2, Vector3.Cross(v3, v4));
                     float tetrahedronVolume = v2.X * (v3.Y * v4.Z - v3.Z * v4.Y) -
                                               v3.X * (v2.Y * v4.Z - v2.Z * v4.Y) +
                                               v4.X * (v2.Y * v3.Z - v2.Z * v3.Y);
-
-                    shapeInformation.Volume += tetrahedronVolume;
-                    shapeInformation.Center += tetrahedronVolume * (v2 + v3 + v4);
+     
+                    totalWeight += tetrahedronVolume;
 
                     a += tetrahedronVolume * (v2.Y * v2.Y + v2.Y * v3.Y + v3.Y * v3.Y + v2.Y * v4.Y + v3.Y * v4.Y + v4.Y * v4.Y +
                                               v2.Z * v2.Z + v2.Z * v3.Z + v3.Z * v3.Z + v2.Z * v4.Z + v3.Z * v4.Z + v4.Z * v4.Z);
@@ -254,11 +269,9 @@ namespace BEPUphysics.CollisionShapes
                     bo += tetrahedronVolume * (2 * v2.X * v2.Z + v3.X * v2.Z + v4.X * v2.Z + v2.X * v3.Z + 2 * v3.X * v3.Z + v4.X * v3.Z + v2.X * v4.Z + v3.X * v4.Z + 2 * v4.X * v4.Z);
                     co += tetrahedronVolume * (2 * v2.X * v2.Y + v3.X * v2.Y + v4.X * v2.Y + v2.X * v3.Y + 2 * v3.X * v3.Y + v4.X * v3.Y + v2.X * v4.Y + v3.X * v4.Y + 2 * v4.X * v4.Y);
                 }
-                shapeInformation.Center /= shapeInformation.Volume * 4;
-                shapeInformation.Volume /= 6;
-                float density = 1 / shapeInformation.Volume;
-                float diagonalFactor = density / 60;
-                float offFactor = -density / 120;
+                float density = 1 / totalWeight;
+                float diagonalFactor = density / 10;
+                float offFactor = -density / 20;
                 a *= diagonalFactor;
                 b *= diagonalFactor;
                 c *= diagonalFactor;
@@ -270,13 +283,11 @@ namespace BEPUphysics.CollisionShapes
                                                                     co, ao, c);
 
 
-                shapeInformation.Volume = Math.Abs(shapeInformation.Volume);
             }
             else
             {
                 shapeInformation.Center = new Vector3();
                 float totalWeight = 0;
-                shapeInformation.VolumeDistribution = new Matrix3X3();
                 for (int i = 0; i < data.indices.Length; i += 3)
                 { //Configure the inertia tensor to be local.
                     Vector3 vA, vB, vC;
@@ -292,40 +303,64 @@ namespace BEPUphysics.CollisionShapes
 
                     shapeInformation.Center += weight * (vA + vB + vC) / 3;
 
+
+                }
+                shapeInformation.Center /= totalWeight;
+                shapeInformation.Volume = 0;
+
+
+                data.worldTransform.Translation -= shapeInformation.Center;
+
+                shapeInformation.VolumeDistribution = new Matrix3X3();
+                for (int i = 0; i < data.indices.Length; i += 3)
+                { //Configure the inertia tensor to be local.
+                    Vector3 vA, vB, vC;
+                    data.GetTriangle(i, out vA, out vB, out vC);
+                    Vector3 vAvB;
+                    Vector3 vAvC;
+                    Vector3.Subtract(ref vB, ref vA, out vAvB);
+                    Vector3.Subtract(ref vC, ref vA, out vAvC);
+                    Vector3 cross;
+                    Vector3.Cross(ref vAvB, ref vAvC, out cross);
+                    float weight = cross.Length();
+                    totalWeight += weight;
+
                     Matrix3X3 innerProduct;
                     Matrix3X3.CreateScale(vA.LengthSquared(), out innerProduct);
                     Matrix3X3 outerProduct;
                     Matrix3X3.CreateOuterProduct(ref vA, ref vA, out outerProduct);
                     Matrix3X3 contribution;
                     Matrix3X3.Subtract(ref innerProduct, ref outerProduct, out contribution);
+                    Matrix3X3.Multiply(ref contribution, weight, out contribution);
                     Matrix3X3.Add(ref shapeInformation.VolumeDistribution, ref contribution, out shapeInformation.VolumeDistribution);
 
                     Matrix3X3.CreateScale(vB.LengthSquared(), out innerProduct);
                     Matrix3X3.CreateOuterProduct(ref vB, ref vB, out outerProduct);
-                    Matrix3X3.Subtract(ref innerProduct, ref outerProduct, out contribution);
+                    Matrix3X3.Subtract(ref innerProduct, ref outerProduct, out outerProduct);
+                    Matrix3X3.Multiply(ref contribution, weight, out contribution);
                     Matrix3X3.Add(ref shapeInformation.VolumeDistribution, ref contribution, out shapeInformation.VolumeDistribution);
 
                     Matrix3X3.CreateScale(vC.LengthSquared(), out innerProduct);
                     Matrix3X3.CreateOuterProduct(ref vC, ref vC, out outerProduct);
                     Matrix3X3.Subtract(ref innerProduct, ref outerProduct, out contribution);
+                    Matrix3X3.Multiply(ref contribution, weight, out contribution);
                     Matrix3X3.Add(ref shapeInformation.VolumeDistribution, ref contribution, out shapeInformation.VolumeDistribution);
+
                 }
-                shapeInformation.Center /= totalWeight;
-                shapeInformation.Volume = 0;
                 Matrix3X3.Multiply(ref shapeInformation.VolumeDistribution, 1 / (6 * totalWeight), out shapeInformation.VolumeDistribution);
             }
 
-            //Configure the inertia tensor to be local.
-            Vector3 finalOffset = shapeInformation.Center;
-            Matrix3X3 finalInnerProduct;
-            Matrix3X3.CreateScale(finalOffset.LengthSquared(), out finalInnerProduct);
-            Matrix3X3 finalOuterProduct;
-            Matrix3X3.CreateOuterProduct(ref finalOffset, ref finalOffset, out finalOuterProduct);
+            ////Configure the inertia tensor to be local.
+            //Vector3 finalOffset = shapeInformation.Center;
+            //Matrix3X3 finalInnerProduct;
+            //Matrix3X3.CreateScale(finalOffset.LengthSquared(), out finalInnerProduct);
+            //Matrix3X3 finalOuterProduct;
+            //Matrix3X3.CreateOuterProduct(ref finalOffset, ref finalOffset, out finalOuterProduct);
 
-            Matrix3X3 finalContribution;
-            Matrix3X3.Subtract(ref finalInnerProduct, ref finalOuterProduct, out finalContribution);
+            //Matrix3X3 finalContribution;
+            //Matrix3X3.Subtract(ref finalInnerProduct, ref finalOuterProduct, out finalContribution);
 
-            Matrix3X3.Subtract(ref shapeInformation.VolumeDistribution, ref finalContribution, out shapeInformation.VolumeDistribution);
+            //Matrix3X3.Subtract(ref shapeInformation.VolumeDistribution, ref finalContribution, out shapeInformation.VolumeDistribution);
         }
 
         ///// <summary>

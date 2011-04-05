@@ -38,11 +38,11 @@ namespace BEPUphysicsDemos.Demos
             Vector3[] vertices;
             int[] indices;
 
-            TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("cube"), out vertices, out indices);
+            TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("tube"), out vertices, out indices);
 
             ShapeDistributionInformation info;
-            AffineTransform transform = new AffineTransform(new Vector3(1, 1, 1), Quaternion.Identity, new Vector3(0, 0, 0));
-            var shape = new MobileMeshShape(vertices, indices, transform, MobileMeshSolidity.DoubleSided, out info);
+            AffineTransform transform = new AffineTransform(new Vector3(1,1, 1), Quaternion.Identity, new Vector3(0, 0, 0));
+            var shape = new MobileMeshShape(vertices, indices, transform, MobileMeshSolidity.Solid, out info);
 
             Matrix3X3 inertia;
             float mass = 100;
@@ -55,7 +55,7 @@ namespace BEPUphysicsDemos.Demos
             {
                 var entityMesh = new Entity<MobileMeshCollidable>(new MobileMeshCollidable(shape), mass, inertia, info.Volume);
                 entityMesh.CollisionInformation.ImproveBoundaryBehavior = false;
-                entityMesh.Position = new Vector3(0, 5, 0);
+                entityMesh.Position = new Vector3(0, 35, 0);
                 Space.Add(entityMesh);
                 entityMesh.IsAlwaysActive = true;
             }
@@ -64,6 +64,8 @@ namespace BEPUphysicsDemos.Demos
             game.Camera.Position = new Vector3(0, -7, 15);
             game.Camera.Yaw = 0;
             game.Camera.Pitch = 0;
+
+            Space.NarrowPhase.AllowMultithreading = false;
 
             //Space.ForceUpdater.Gravity = new Vector3();
 

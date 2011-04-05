@@ -8,6 +8,7 @@ using BEPUphysics.Settings;
 using BEPUphysics.ResourceManagement;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.MathExtensions;
+using System.Diagnostics;
 
 namespace BEPUphysics.CollisionTests.Manifolds
 {
@@ -240,7 +241,9 @@ namespace BEPUphysics.CollisionTests.Manifolds
             Matrix3X3.Transform(ref contact.Normal, ref orientation, out contact.Normal);
             //Check to see if the contact is unique before proceeding.
             if (IsContactUnique(ref contact))
+            {
                 candidatesToAdd.Add(ref contact);
+            }
         }
 
 
@@ -561,8 +564,8 @@ namespace BEPUphysics.CollisionTests.Manifolds
             supplement.BasePenetrationDepth = contactCandidate.PenetrationDepth;
             //The closest point method computes the local space versions before transforming to world... consider cutting out the middle man
             RigidTransform.TransformByInverse(ref contactCandidate.Position, ref convex.worldTransform, out supplement.LocalOffsetA);
-            supplement.LocalOffsetB = contactCandidate.Position;
-            //RigidTransform.TransformByInverse(ref contactCandidate.Position, ref mesh.worldTransform, out supplement.LocalOffsetB);
+            RigidTransform transform = MeshTransform;
+            RigidTransform.TransformByInverse(ref contactCandidate.Position, ref transform, out supplement.LocalOffsetB);
             supplementData.Add(ref supplement);
             base.Add(ref contactCandidate);
         }
@@ -578,6 +581,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
         {
 
             float distanceSquared;
+            RigidTransform meshTransform = MeshTransform;
             for (int i = 0; i < contacts.count; i++)
             {
                 Vector3.DistanceSquared(ref contacts.Elements[i].Position, ref contactCandidate.Position, out distanceSquared);
@@ -595,8 +599,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                         contacts.Elements[i].PenetrationDepth = contactCandidate.PenetrationDepth;
                         supplementData.Elements[i].BasePenetrationDepth = contactCandidate.PenetrationDepth;
                         RigidTransform.TransformByInverse(ref contactCandidate.Position, ref convex.worldTransform, out supplementData.Elements[i].LocalOffsetA);
-                        supplementData.Elements[i].LocalOffsetB = contactCandidate.Position;
-                        //RigidTransform.TransformByInverse(ref contactCandidate.Position, ref mesh.worldTransform, out supplementData.Elements[i].LocalOffsetB);
+                        RigidTransform.TransformByInverse(ref contactCandidate.Position, ref meshTransform, out supplementData.Elements[i].LocalOffsetB);
                         return false;
                     }
                 }

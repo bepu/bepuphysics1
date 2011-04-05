@@ -121,6 +121,9 @@ namespace BEPUphysics.NarrowPhaseSystems
             collisionManagers.Add(new TypePair(typeof(ConvexCollidable<WrappedShape>), typeof(MobileMeshCollidable)), mobileMeshConvexFactory);
             collisionManagers.Add(new TypePair(typeof(ConvexCollidable<ConvexHullShape>), typeof(MobileMeshCollidable)), mobileMeshConvexFactory);
 
+                            var mobileMeshCompoundFactory = new CompoundMobileMeshPairFactory();
+            collisionManagers.Add(new TypePair(typeof(CompoundCollidable), typeof(MobileMeshCollidable)), mobileMeshCompoundFactory);
+
 
         }
 
