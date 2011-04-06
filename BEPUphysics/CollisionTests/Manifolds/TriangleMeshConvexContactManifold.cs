@@ -17,7 +17,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
     ///</summary>
     public abstract class TriangleMeshConvexContactManifold : ContactManifold
     {
-        RawValueList<ContactSupplementData> supplementData = new RawValueList<ContactSupplementData>(4);
+        protected RawValueList<ContactSupplementData> supplementData = new RawValueList<ContactSupplementData>(4);
         Dictionary<TriangleIndices, TriangleConvexPairTester> activePairTesters = new Dictionary<TriangleIndices, TriangleConvexPairTester>(4);
         RawValueList<ContactData> candidatesToAdd;
         RawValueList<ContactData> reducedCandidates = new RawValueList<ContactData>();
@@ -205,6 +205,10 @@ namespace BEPUphysics.CollisionTests.Manifolds
                 activePairTesters.Remove(toRemove[i]);
             }
 
+
+            //Some child types will want to do some extra post processing on the manifold.        
+            ProcessCandidates(candidatesToAdd);
+
             //Check if adding the new contacts would overflow the manifold.
             if (contacts.count + candidatesToAdd.count > 4)
             {
@@ -225,7 +229,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     Add(ref candidatesToAdd.Elements[i]);
                 }
             }
-
+            
 
 
 
@@ -634,6 +638,11 @@ namespace BEPUphysics.CollisionTests.Manifolds
             //}
             return true;
 
+        }
+
+        protected virtual void ProcessCandidates(RawValueList<ContactData> candidates)
+        {
+            
         }
 
 

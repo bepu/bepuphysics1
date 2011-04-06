@@ -76,37 +76,33 @@ namespace BEPUphysics.CollisionShapes
         /// </summary>
         internal TriangleSidedness solidSidedness;
 
-        internal bool IsPointInsideMesh(ref Vector3 point, ref RigidTransform transform)
+        internal bool IsRayOriginInMesh(ref Ray ray, out RayHit hit)
         {
-            Ray ray = new Ray();
-            //Pick a ray direction that goes to a random location on the mesh.  
-            //A vertex would work, but targeting the middle of a triangle avoids some edge cases.
-            Vector3 vA, vB, vC;
-            triangleMesh.Data.GetTriangle(((triangleMesh.Data.indices.Length / 3) / 2) * 3, out vA, out vB, out vC);
-            Vector3.Add(ref vA, ref vB, out ray.Direction);
-            Vector3.Add(ref vC, ref ray.Direction, out ray.Direction);
-            Vector3.Divide(ref ray.Direction, 3, out ray.Direction);
-
             var overlapList = Resources.GetIntList();
             if (triangleMesh.Tree.GetOverlaps(ray, overlapList))
             {
                 var hits = Resources.GetRayHitList();
+                hit = new RayHit();
+                hit.T = float.MaxValue;
                 for (int i = 0; i < overlapList.Count; i++)
                 {
+                    Vector3 vA, vB, vC;
                     triangleMesh.Data.GetTriangle(overlapList[i], out vA, out vB, out vC);
-                    RayHit hit;
-                    if (Toolbox.FindRayTriangleIntersection(ref ray, float.MaxValue, TriangleSidedness.DoubleSided, ref vA, ref vB, ref vC, out hit))
+                    RayHit tempHit;
+                    if (Toolbox.FindRayTriangleIntersection(ref ray, float.MaxValue, TriangleSidedness.DoubleSided, ref vA, ref vB, ref vC, out tempHit) &&
+                        IsHitUnique(hits, ref tempHit) && //Adds if unique.
+                        tempHit.T < hit.T)
                     {
-                        //Adds if unique.
-                        IsHitUnique(hits, ref hit);
+                        hit = tempHit;
                     }
                 }
                 int hitCount = hits.count;
                 Resources.GiveBack(hits);
                 Resources.GiveBack(overlapList);
-                return hits.count % 2 != 0; //true -> outside, false -> inside
+                return hitCount % 2 != 0; //true -> outside, false -> inside
             }
             Resources.GiveBack(overlapList);
+            hit = new RayHit();
             return false;
         }
 
@@ -245,7 +241,7 @@ namespace BEPUphysics.CollisionShapes
                 // [ -b'  b  -a' ]
                 // [ -c' -a'  c  ]
                 float a = 0, b = 0, c = 0, ao = 0, bo = 0, co = 0;
-                
+
                 float totalWeight = 0;
                 for (int i = 0; i < data.indices.Length; i += 3)
                 {
@@ -256,7 +252,7 @@ namespace BEPUphysics.CollisionShapes
                     float tetrahedronVolume = v2.X * (v3.Y * v4.Z - v3.Z * v4.Y) -
                                               v3.X * (v2.Y * v4.Z - v2.Z * v4.Y) +
                                               v4.X * (v2.Y * v3.Z - v2.Z * v3.Y);
-     
+
                     totalWeight += tetrahedronVolume;
 
                     a += tetrahedronVolume * (v2.Y * v2.Y + v2.Y * v3.Y + v3.Y * v3.Y + v2.Y * v4.Y + v3.Y * v4.Y + v4.Y * v4.Y +

@@ -38,14 +38,19 @@ namespace BEPUphysicsDemos.Demos
             Vector3[] vertices;
             int[] indices;
 
-            TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("tube"), out vertices, out indices);
+            TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("hollowsphere"), out vertices, out indices);
 
             ShapeDistributionInformation info;
-            AffineTransform transform = new AffineTransform(new Vector3(1,1, 1), Quaternion.Identity, new Vector3(0, 0, 0));
+            //AffineTransform transform = new AffineTransform(new Vector3(2, 1, 2), Quaternion.CreateFromAxisAngle(new Vector3(1, 0, 0), MathHelper.Pi), new Vector3(0, 0, 0));
+            AffineTransform transform = new AffineTransform(new Vector3(.05f, .05f, .05f), Quaternion.Identity, new Vector3(0, 10, 0));
             var shape = new MobileMeshShape(vertices, indices, transform, MobileMeshSolidity.Solid, out info);
 
+            Space.Remove(kapow);
+            kapow = new Sphere(new Vector3(10000, 0, 0), .1f, 1);
+            Space.Add(kapow);
+
             Matrix3X3 inertia;
-            float mass = 100;
+            float mass = 10000;
             //inertia = new Matrix3X3();
             //inertia.M11 = mass;
             //inertia.M22 = mass;
@@ -55,9 +60,20 @@ namespace BEPUphysicsDemos.Demos
             {
                 var entityMesh = new Entity<MobileMeshCollidable>(new MobileMeshCollidable(shape), mass, inertia, info.Volume);
                 entityMesh.CollisionInformation.ImproveBoundaryBehavior = false;
-                entityMesh.Position = new Vector3(0, 35, 0);
+                entityMesh.Position = new Vector3(0, 20, 0);
+                entityMesh.AngularVelocity = new Vector3(.8f, 0, 0);
+                //entityMesh.Material.KineticFriction = 0;
+                //entityMesh.Material.StaticFriction = 0;
                 Space.Add(entityMesh);
                 entityMesh.IsAlwaysActive = true;
+            }
+
+            for (int j = 0; j <30; j++)
+            {
+                var toAdd = new Box(new Vector3(0, 20, 0), 3, 3, 3, 1);
+                //toAdd.Material.KineticFriction = 0;
+                //toAdd.Material.StaticFriction = 0;
+                Space.Add(toAdd);
             }
 
             Space.Add(new Box(new Vector3(0, -10, 0), 100, 1, 100));
@@ -66,6 +82,7 @@ namespace BEPUphysicsDemos.Demos
             game.Camera.Pitch = 0;
 
             Space.NarrowPhase.AllowMultithreading = false;
+            Space.Solver.AllowMultithreading = false;
 
             //Space.ForceUpdater.Gravity = new Vector3();
 

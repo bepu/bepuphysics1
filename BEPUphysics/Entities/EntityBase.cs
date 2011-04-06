@@ -605,9 +605,26 @@ namespace BEPUphysics.Entities
                         }
                     }
 
+                    //This prevents the entity from going to sleep when interacting with an active kinematic.
+                    //It's not very elegant or fast, though.
+                    //TODO: Work out a better way that is still thread safe.
+                    for (int i = 0; i < connections.Count; i++)
+                    {
+                        for (int j = 0; j < connections[i].ConnectedMembers.Count; j++)
+                        {
+                            if (connections[i].ConnectedMembers[j].IsActive && !connections[i].ConnectedMembers[j].IsDynamic)
+                            {
+                                isDeactivationCandidate = false; 
+                                velocityTimeBelowLimit = 0;
+                            }
+                        }
+                    }
+
                 }
                 else
                     isDeactivationCandidate = false;
+
+
             }
             else
             {

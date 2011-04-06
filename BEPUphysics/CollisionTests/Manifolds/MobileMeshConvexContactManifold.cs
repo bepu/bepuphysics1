@@ -38,7 +38,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
         {
             BoundingBox boundingBox;
             AffineTransform transform = new AffineTransform(mesh.worldTransform.Orientation, mesh.worldTransform.Position);
-            convex.Shape.GetLocalBoundingBox(ref convex.worldTransform, ref transform, out boundingBox); 
+            convex.Shape.GetLocalBoundingBox(ref convex.worldTransform, ref transform, out boundingBox);
             Vector3 transformedVelocity;
             //Compute the relative velocity with respect to the mesh.  The mesh's bounding tree is NOT expanded with velocity,
             //so whatever motion there is between the two objects needs to be included in the convex's bounding box.
@@ -110,6 +110,82 @@ namespace BEPUphysics.CollisionTests.Manifolds
             get { return mesh.improveBoundaryBehavior; }
         }
 
+        Vector3 lastValidLocalConvexPosition;
+        protected override void ProcessCandidates(RawValueList<ContactData> candidates)
+        {
+            if (Mesh.Shape.solidity == MobileMeshSolidity.Solid)
+            {
+                if (candidates.count == 0)
+                {
+
+                    //If there are NO contacts in the mesh and it's supposed to be a solid,
+                    //then we must check the convex for containment within the shell.
+                    //We already know that it's not on the shell, meaning that the shape is either
+                    //far enough away outside the shell that there's no contact (and we're done), 
+                    //or it's far enough inside the shell that the triangles cannot create contacts.
+
+                    //To find out which it is, raycast against the shell along the last known previous
+                    //local relative penetrating displacement.
+                    Ray ray;
+                    RigidTransform.TransformByInverse(ref convex.entity.position, ref mesh.worldTransform, out ray.Position);
+                    Vector3.Subtract(ref lastValidLocalConvexPosition, ref ray.Position, out ray.Direction);
+                    ray.Direction.Normalize();
+                    RayHit hit;
+                    if (mesh.Shape.IsRayOriginInMesh(ref ray, out hit))
+                    {
+                        ContactData newContact = new ContactData();
+                        newContact.Id = 2; //Give it a special id so that we know that it came from the inside.
+                        Matrix3X3 orientation;
+                        Matrix3X3.CreateFromQuaternion(ref mesh.worldTransform.Orientation, out orientation);
+                        Matrix3X3.Transform(ref ray.Position, ref orientation, out newContact.Position);
+                        Vector3.Add(ref newContact.Position, ref mesh.worldTransform.Position, out newContact.Position);
+
+                        //Vector3.Negate(ref ray.Direction, out newContact.Normal);
+                        newContact.Normal = hit.Normal;
+                        newContact.Normal.Normalize();
+                        float factor;
+                        Vector3.Dot(ref ray.Direction, ref newContact.Normal, out factor);
+                        newContact.PenetrationDepth = Math.Abs(factor) * hit.T + convex.Shape.minimumRadius;
+                        Matrix3X3.Transform(ref newContact.Normal, ref orientation, out newContact.Normal);
+                        //Do not yet create a new contact.  Check to see if an 'inner contact' with id == 2 already exists.
+                        bool addContact = true;
+                        for (int i = 0; i < contacts.count; i++)
+                        {
+                            if (contacts.Elements[i].Id == 2)
+                            {
+                                contacts.Elements[i].Position = newContact.Position;
+                                contacts.Elements[i].Normal = newContact.Normal;
+                                contacts.Elements[i].PenetrationDepth = newContact.PenetrationDepth;
+                                supplementData.Elements[i].BasePenetrationDepth = newContact.PenetrationDepth;
+                                supplementData.Elements[i].LocalOffsetA = new Vector3();
+                                supplementData.Elements[i].LocalOffsetB = ray.Position; //convex local position in mesh.
+                                addContact = false;
+                                break;
+                            }
+                        }
+                        if (addContact)
+                            Add(ref newContact);
+                    }
+                    else
+                    {
+                        //We're not touching the mesh.
+                        lastValidLocalConvexPosition = ray.Position;
+                    }
+                }
+                else
+                {
+                    //There exist candidates that interact with the surface, so get rid of any contacts created from the inside.
+                    for (int i = contacts.count - 1; i >= 0; i--)
+                    {
+                        if (contacts.Elements[i].Id == 2) //It was created inside!
+                            Remove(i);
+                    }
+
+                    //We're still in a outside location, despite colliding.
+                    RigidTransform.TransformByInverse(ref convex.entity.position, ref mesh.worldTransform, out lastValidLocalConvexPosition);
+                }
+            }
+        }
 
         ///<summary>
         /// Cleans up the manifold.

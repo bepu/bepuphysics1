@@ -127,7 +127,7 @@ namespace BEPUphysics.Constraints.Collision
         {
             //Compute relative velocity and convert to impulse
             float lambda = RelativeVelocity * velocityToImpulse;
-   
+
 
             //Clamp accumulated impulse
             float previousAccumulatedImpulse = accumulatedImpulse;
@@ -184,12 +184,12 @@ namespace BEPUphysics.Constraints.Collision
 
             Vector3 velocityA = new Vector3(), velocityB = new Vector3();
             Vector3 ra = penetrationConstraint.ra, rb = penetrationConstraint.rb;
-            if (entityAIsDynamic)
+            if (entityA != null)
             {
                 Vector3.Cross(ref entityA.angularVelocity, ref ra, out velocityA);
                 Vector3.Add(ref velocityA, ref entityA.linearVelocity, out velocityA);
             }
-            if (entityBIsDynamic)
+            if (entityB != null)
             {
                 Vector3.Cross(ref entityB.angularVelocity, ref rb, out velocityB);
                 Vector3.Add(ref velocityB, ref entityB.linearVelocity, out velocityB);
@@ -242,20 +242,14 @@ namespace BEPUphysics.Constraints.Collision
 
 
             //angular A = Ra x N
-            if (entityAIsDynamic)
-            {
-                angularAX = (ra.Y * linearAZ) - (ra.Z * linearAY);
-                angularAY = (ra.Z * linearAX) - (ra.X * linearAZ);
-                angularAZ = (ra.X * linearAY) - (ra.Y * linearAX);
-            }
+            angularAX = (ra.Y * linearAZ) - (ra.Z * linearAY);
+            angularAY = (ra.Z * linearAX) - (ra.X * linearAZ);
+            angularAZ = (ra.X * linearAY) - (ra.Y * linearAX);
 
             //Angular B = N x Rb
-            if (entityBIsDynamic)
-            {
-                angularBX = (linearAY * rb.Z) - (linearAZ * rb.Y);
-                angularBY = (linearAZ * rb.X) - (linearAX * rb.Z);
-                angularBZ = (linearAX * rb.Y) - (linearAY * rb.X);
-            }
+            angularBX = (linearAY * rb.Z) - (linearAZ * rb.Y);
+            angularBY = (linearAZ * rb.X) - (linearAX * rb.Z);
+            angularBZ = (linearAX * rb.Y) - (linearAY * rb.X);
 
             //Compute inverse effective mass matrix
             float entryA, entryB;
