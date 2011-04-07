@@ -98,7 +98,7 @@ namespace BEPUphysics.Collidables.MobileCollidables
                 //if it is inside or outside.
                 if (Shape.TriangleMesh.RayCast(localRay, float.MaxValue, hits))
                 {
-                    if (hits.count % 2 == 0 || Shape.solidity == MobileMeshSolidity.Solid)
+                    if (hits.count % 2 == 0 || Shape.solidity != MobileMeshSolidity.Solid)
                     {
                         //Even number of hits; the ray started on the outside.
                         //Find the earliest hit.
