@@ -250,72 +250,108 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         ///<param name="dt">Timestep duration.</param>
         public override void UpdateTimeOfImpact(Collidable requester, float dt)
         {
-            timeOfImpact = 1;
-            ////TODO: This conditional early outing stuff could be pulled up into a common system, along with most of the pair handler.
-            //if (convex.IsActive && convex.entity.PositionUpdateMode == PositionUpdateMode.Continuous)
-            //{
-            //    //TODO: This system could be made more robust by using a similar region-based rejection of edges.
-            //    //CCD events are awfully rare under normal circumstances, so this isn't usually an issue.
+            //TODO: This conditional early outing stuff could be pulled up into a common system, along with most of the pair handler.
+            var overlap = BroadPhaseOverlap;
+            if (
+                    (overlap.entryA.IsActive || overlap.entryB.IsActive) && //At least one has to be active.
+                    (
+                        (
+                            convex.entity.PositionUpdateMode == PositionUpdateMode.Continuous &&   //If both are continuous, only do the process for A.
+                            mobileMesh.entity.PositionUpdateMode == PositionUpdateMode.Continuous &&
+                            overlap.entryA == requester
+                        ) ||
+                        (
+                            convex.entity.PositionUpdateMode == PositionUpdateMode.Continuous ^   //If only one is continuous, then we must do it.
+                            mobileMesh.entity.PositionUpdateMode == PositionUpdateMode.Continuous
+                        )
+                    )
+                )
+            {
+                //TODO: This system could be made more robust by using a similar region-based rejection of edges.
+                //CCD events are awfully rare under normal circumstances, so this isn't usually an issue.
 
-            //    //Only perform the test if the minimum radii are small enough relative to the size of the velocity.
-            //    Vector3 velocity;
-            //    Vector3.Multiply(ref convex.entity.linearVelocity, dt, out velocity);
-            //    float velocitySquared = velocity.LengthSquared();
+                //Only perform the test if the minimum radii are small enough relative to the size of the velocity.
+                Vector3 velocity;
+                Vector3.Subtract(ref convex.entity.linearVelocity, ref mobileMesh.entity.linearVelocity, out velocity);
+                Vector3.Multiply(ref velocity, dt, out velocity);
+                float velocitySquared = velocity.LengthSquared();
 
-            //    var minimumRadius = convex.Shape.minimumRadius * MotionSettings.CoreShapeScaling;
-            //    timeOfImpact = 1;
-            //    if (minimumRadius * minimumRadius < velocitySquared)
-            //    {
-            //        var triangle = Resources.GetTriangle();
-            //        triangle.collisionMargin = 0;
-            //        //Spherecast against all triangles to find the earliest time.
-            //        for (int i = 0; i < contactManifold.overlappedTriangles.count; i++)
-            //        {
-            //            MeshBoundingBoxTreeData data = mobileMesh.Shape.TriangleMesh.Data;
-            //            int triangleIndex = contactManifold.overlappedTriangles.Elements[i];
-            //            data.GetTriangle(triangleIndex, out triangle.vA, out triangle.vB, out triangle.vC);
-            //            AffineTransform.Transform(ref triangle.vA, ref mobileMesh.worldTransform, out triangle.vA);
-            //            AffineTransform.Transform(ref triangle.vB, ref mobileMesh.worldTransform, out triangle.vB);
-            //            AffineTransform.Transform(ref triangle.vC, ref mobileMesh.worldTransform, out triangle.vC);
-            //            //Put the triangle into 'localish' space of the convex.
-            //            Vector3.Subtract(ref triangle.vA, ref convex.worldTransform.Position, out triangle.vA);
-            //            Vector3.Subtract(ref triangle.vB, ref convex.worldTransform.Position, out triangle.vB);
-            //            Vector3.Subtract(ref triangle.vC, ref convex.worldTransform.Position, out triangle.vC);
+                var minimumRadius = convex.Shape.minimumRadius * MotionSettings.CoreShapeScaling;
+                timeOfImpact = 1;
+                if (minimumRadius * minimumRadius < velocitySquared)
+                {
+                    TriangleSidedness sidedness;
+                    switch (mobileMesh.Shape.solidity)
+                    {
+                        case CollisionShapes.MobileMeshSolidity.Clockwise:
+                            sidedness = TriangleSidedness.Clockwise;
+                            break;
+                        case CollisionShapes.MobileMeshSolidity.Counterclockwise:
+                            sidedness = TriangleSidedness.Counterclockwise;
+                            break;
+                        case CollisionShapes.MobileMeshSolidity.DoubleSided:
+                            sidedness = TriangleSidedness.DoubleSided;
+                            break;
+                        case CollisionShapes.MobileMeshSolidity.Solid:
+                        default:
+                            sidedness = mobileMesh.Shape.solidSidedness;
+                            break;
+                    }
+                    Matrix3X3 orientation;
+                    Matrix3X3.CreateFromQuaternion(ref mobileMesh.worldTransform.Orientation, out orientation);
+                    var triangle = Resources.GetTriangle();
+                    triangle.collisionMargin = 0;
+                    //Spherecast against all triangles to find the earliest time.
+                    for (int i = 0; i < contactManifold.overlappedTriangles.count; i++)
+                    {
+                        MeshBoundingBoxTreeData data = mobileMesh.Shape.TriangleMesh.Data;
+                        int triangleIndex = contactManifold.overlappedTriangles.Elements[i];
+                        data.GetTriangle(triangleIndex, out triangle.vA, out triangle.vB, out triangle.vC);
+                        Matrix3X3.Transform(ref triangle.vA, ref orientation, out triangle.vA);
+                        Matrix3X3.Transform(ref triangle.vB, ref orientation, out triangle.vB);
+                        Matrix3X3.Transform(ref triangle.vC, ref orientation, out triangle.vC);
+                        Vector3.Add(ref triangle.vA, ref mobileMesh.worldTransform.Position, out triangle.vA);
+                        Vector3.Add(ref triangle.vB, ref mobileMesh.worldTransform.Position, out triangle.vB);
+                        Vector3.Add(ref triangle.vC, ref mobileMesh.worldTransform.Position, out triangle.vC);
+                        //Put the triangle into 'localish' space of the convex.
+                        Vector3.Subtract(ref triangle.vA, ref convex.worldTransform.Position, out triangle.vA);
+                        Vector3.Subtract(ref triangle.vB, ref convex.worldTransform.Position, out triangle.vB);
+                        Vector3.Subtract(ref triangle.vC, ref convex.worldTransform.Position, out triangle.vC);
 
-            //            RayHit rayHit;
-            //            if (GJKToolbox.CCDSphereCast(new Ray(Toolbox.ZeroVector, velocity), minimumRadius, triangle, ref Toolbox.RigidIdentity, timeOfImpact, out rayHit) &&
-            //                rayHit.T > Toolbox.BigEpsilon)
-            //            {
+                        RayHit rayHit;
+                        if (GJKToolbox.CCDSphereCast(new Ray(Toolbox.ZeroVector, velocity), minimumRadius, triangle, ref Toolbox.RigidIdentity, timeOfImpact, out rayHit) &&
+                            rayHit.T > Toolbox.BigEpsilon)
+                        {
 
-            //                if (mobileMesh.sidedness != TriangleSidedness.DoubleSided)
-            //                {
-            //                    Vector3 AB, AC;
-            //                    Vector3.Subtract(ref triangle.vB, ref triangle.vA, out AB);
-            //                    Vector3.Subtract(ref triangle.vC, ref triangle.vA, out AC);
-            //                    Vector3 normal;
-            //                    Vector3.Cross(ref AB, ref AC, out normal);
-            //                    float dot;
-            //                    Vector3.Dot(ref normal, ref rayHit.Normal, out dot);
-            //                    //Only perform sweep if the object is in danger of hitting the object.
-            //                    //Triangles can be one sided, so check the impact normal against the triangle normal.
-            //                    if (mobileMesh.sidedness == TriangleSidedness.Counterclockwise && dot < 0 ||
-            //                        mobileMesh.sidedness == TriangleSidedness.Clockwise && dot > 0)
-            //                    {
-            //                        timeOfImpact = rayHit.T;
-            //                    }
-            //                }
-            //                else
-            //                {
-            //                    timeOfImpact = rayHit.T;
-            //                }
-            //            }
-            //        }
-            //        Resources.GiveBack(triangle);
-            //    }
+                            if (sidedness != TriangleSidedness.DoubleSided)
+                            {
+                                Vector3 AB, AC;
+                                Vector3.Subtract(ref triangle.vB, ref triangle.vA, out AB);
+                                Vector3.Subtract(ref triangle.vC, ref triangle.vA, out AC);
+                                Vector3 normal;
+                                Vector3.Cross(ref AB, ref AC, out normal);
+                                float dot;
+                                Vector3.Dot(ref normal, ref rayHit.Normal, out dot);
+                                //Only perform sweep if the object is in danger of hitting the object.
+                                //Triangles can be one sided, so check the impact normal against the triangle normal.
+                                if (sidedness == TriangleSidedness.Counterclockwise && dot < 0 ||
+                                    sidedness == TriangleSidedness.Clockwise && dot > 0)
+                                {
+                                    timeOfImpact = rayHit.T;
+                                }
+                            }
+                            else
+                            {
+                                timeOfImpact = rayHit.T;
+                            }
+                        }
+                    }
+                    Resources.GiveBack(triangle);
+                }
 
 
 
-            //}
+            }
 
         }
 

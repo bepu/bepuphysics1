@@ -6,7 +6,6 @@ using BEPUphysics.DataStructures;
 using BEPUphysics.MathExtensions;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.CollisionShapes;
-using System.Diagnostics;
 
 namespace BEPUphysics.CollisionTests.Manifolds
 {
@@ -111,136 +110,86 @@ namespace BEPUphysics.CollisionTests.Manifolds
             get { return mesh.improveBoundaryBehavior; }
         }
 
-        enum ContainmentState
-        {
-            Inside,
-            Outside,
-            Shell
-        }
 
-        ContainmentState previousContainmentState = ContainmentState.Outside;
-        Vector3 penetrationAxis = Vector3.Up;
-        Vector3 lastValidLocalConvexPosition;
+        Vector3 lastValidConvexPosition;
         protected override void ProcessCandidates(RawValueList<ContactData> candidates)
         {
             if (Mesh.Shape.solidity == MobileMeshSolidity.Solid)
             {
-                if (candidates.count == 0)
+
+                //If there's no new contacts on the mesh and it's supposed to be a solid,
+                //then we must check the convex for containment within the shell.
+                //We already know that it's not on the shell, meaning that the shape is either
+                //far enough away outside the shell that there's no contact (and we're done), 
+                //or it's far enough inside the shell that the triangles cannot create contacts.
+
+                //To find out which it is, raycast against the shell.
+
+                Matrix3X3 orientation;
+                Matrix3X3.CreateFromQuaternion(ref mesh.worldTransform.Orientation, out orientation);
+
+                Ray ray;
+                Vector3.Subtract(ref convex.worldTransform.Position, ref mesh.worldTransform.Position, out ray.Position);
+                Matrix3X3.TransformTranspose(ref ray.Position, ref orientation, out ray.Position);
+
+                //Cast from the current position back to the previous position.
+                Vector3.Subtract(ref lastValidConvexPosition, ref ray.Position, out ray.Direction);
+                float rayDirectionLength = ray.Direction.LengthSquared();
+                if (rayDirectionLength < Toolbox.Epsilon)
                 {
-
-                    //If there's no new contacts on the mesh and it's supposed to be a solid,
-                    //then we must check the convex for containment within the shell.
-                    //We already know that it's not on the shell, meaning that the shape is either
-                    //far enough away outside the shell that there's no contact (and we're done), 
-                    //or it's far enough inside the shell that the triangles cannot create contacts.
-
-                    //To find out which it is, raycast against the shell.
-
-                    //So which direction should be used for the raycast?
-
-                    Matrix3X3 orientation;
-                    Matrix3X3.CreateFromQuaternion(ref mesh.worldTransform.Orientation, out orientation);
-
-                    Ray ray;
-                    Vector3.Subtract(ref convex.worldTransform.Position, ref mesh.worldTransform.Position, out ray.Position);
-                    Matrix3X3.TransformTranspose(ref ray.Position, ref orientation, out ray.Position);
-                    switch (previousContainmentState)
+                    //The object may not have moved enough to normalize properly.  If so, choose something arbitrary.
+                    //Try the direction from the center of the object to the convex's position.
+                    ray.Direction = ray.Position;
+                    rayDirectionLength = ray.Direction.LengthSquared();
+                    if (rayDirectionLength < Toolbox.Epsilon)
                     {
-                        case ContainmentState.Shell:
-                            //Use the existing axis computed by the shell.
-                            //The shell only found a world space axis, so we need to transform it now.
-                            Matrix3X3.TransformTranspose(ref penetrationAxis, ref orientation, out penetrationAxis);
-                            //The penetration axis gotten from a contact faces towards the inside of the mesh, so it needs to be reversed.
-                            Vector3.Negate(ref penetrationAxis, out ray.Direction);
-                            break;
-                        case ContainmentState.Outside:
-                            //Use the direction pointing from the current position back to the previous position.
-                            Vector3.Subtract(ref lastValidLocalConvexPosition, ref ray.Position, out ray.Direction);
-                            //Keep the value around for next frame if we're still inside.
-                            ray.Direction.Normalize();
-                            penetrationAxis = ray.Direction;
-                            break;
-                        default:
-                        case ContainmentState.Inside:
-                            //Continue using the same direction.
-                            ray.Direction = penetrationAxis;
-                            break;
+                        //This is unlikely; just pick something completely arbitrary then.
+                        ray.Direction = Vector3.Up;
                     }
+                }
 
-                    RayHit hit;
-                    if (mesh.Shape.IsRayOriginInMesh(ref ray, out hit))
+
+                RayHit hit;
+                if (mesh.Shape.IsRayOriginInMesh(ref ray, out hit))
+                {
+                    ContactData newContact = new ContactData();
+                    newContact.Id = 2; //Give it a special id so that we know that it came from the inside.
+                    Matrix3X3.Transform(ref ray.Position, ref orientation, out newContact.Position);
+                    Vector3.Add(ref newContact.Position, ref mesh.worldTransform.Position, out newContact.Position);
+
+                    newContact.Normal = hit.Normal;
+                    newContact.Normal.Normalize();
+
+                    float factor;
+                    Vector3.Dot(ref ray.Direction, ref newContact.Normal, out factor);
+                    newContact.PenetrationDepth = Math.Abs(factor / (float)Math.Sqrt(rayDirectionLength)) * hit.T + convex.Shape.minimumRadius;
+                    Matrix3X3.Transform(ref newContact.Normal, ref orientation, out newContact.Normal);
+
+                    //Do not yet create a new contact.  Check to see if an 'inner contact' with id == 2 already exists.
+                    bool addContact = true;
+                    for (int i = 0; i < contacts.count; i++)
                     {
-                        ContactData newContact = new ContactData();
-                        newContact.Id = 2; //Give it a special id so that we know that it came from the inside.
-                        Matrix3X3.Transform(ref ray.Position, ref orientation, out newContact.Position);
-                        Vector3.Add(ref newContact.Position, ref mesh.worldTransform.Position, out newContact.Position);
-
-                        //Vector3.Negate(ref ray.Direction, out newContact.Normal);
-                        newContact.Normal = hit.Normal;
-                        newContact.Normal.Normalize();
-
-                        float factor;
-                        Vector3.Dot(ref ray.Direction, ref newContact.Normal, out factor);
-                        newContact.PenetrationDepth = Math.Abs(factor) * hit.T + convex.Shape.minimumRadius;
-                        Matrix3X3.Transform(ref newContact.Normal, ref orientation, out newContact.Normal);
-                        //Do not yet create a new contact.  Check to see if an 'inner contact' with id == 2 already exists.
-                        bool addContact = true;
-                        for (int i = 0; i < contacts.count; i++)
+                        if (contacts.Elements[i].Id == 2)
                         {
-                            if (contacts.Elements[i].Id == 2)
-                            {
-                                contacts.Elements[i].Position = newContact.Position;
-                                contacts.Elements[i].Normal = newContact.Normal;
-                                contacts.Elements[i].PenetrationDepth = newContact.PenetrationDepth;
-                                supplementData.Elements[i].BasePenetrationDepth = newContact.PenetrationDepth;
-                                supplementData.Elements[i].LocalOffsetA = new Vector3();
-                                supplementData.Elements[i].LocalOffsetB = ray.Position; //convex local position in mesh.
-                                addContact = false;
-                                break;
-                            }
+                            contacts.Elements[i].Position = newContact.Position;
+                            contacts.Elements[i].Normal = newContact.Normal;
+                            contacts.Elements[i].PenetrationDepth = newContact.PenetrationDepth;
+                            supplementData.Elements[i].BasePenetrationDepth = newContact.PenetrationDepth;
+                            supplementData.Elements[i].LocalOffsetA = new Vector3();
+                            supplementData.Elements[i].LocalOffsetB = ray.Position; //convex local position in mesh.
+                            addContact = false;
+                            break;
                         }
-                        if (addContact)
-                            Add(ref newContact);
-
-                        previousContainmentState = ContainmentState.Inside;
                     }
-                    else
-                    {
-                        //We're not touching the mesh.
-                        lastValidLocalConvexPosition = ray.Position;
+                    if (addContact)
+                        Add(ref newContact);
 
-                        previousContainmentState = ContainmentState.Outside;
-                    }
                 }
                 else
                 {
-                    //There exist candidates that interact with the surface, so get rid of any contact created from the inside.
-                    for (int i = contacts.count - 1; i >= 0; i--)
-                    {
-                        if (contacts.Elements[i].Id == 2) //It was created inside!
-                        {
-                            Remove(i);
-                            break;
-                        }
-                    }
+                    //We're not touching the mesh.
+                    lastValidConvexPosition = ray.Position;
 
-                    int deepest = 0;
-                    float maxDepth = -1;
-                    for (int i = 0; i < candidates.count; i++)
-                    {
-                        if (candidates.Elements[i].PenetrationDepth > maxDepth)
-                        {
-                            deepest = i;
-                            maxDepth = candidates.Elements[i].PenetrationDepth;
-                        }
-
-                    }
-                    //The contact normals are a good estimate of the minimum separating axis.
-                    //It's not being put into local space since the transition from shell->inside will take care of that.
-                    penetrationAxis = candidates.Elements[deepest].Normal;
-                    previousContainmentState = ContainmentState.Shell;
-
-                   // RigidTransform.TransformByInverse(ref convex.entity.position, ref mesh.worldTransform, out lastValidLocalConvexPosition);
                 }
             }
         }

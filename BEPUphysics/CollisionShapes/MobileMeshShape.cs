@@ -79,6 +79,7 @@ namespace BEPUphysics.CollisionShapes
         internal bool IsRayOriginInMesh(ref Ray ray, out RayHit hit)
         {
             var overlapList = Resources.GetIntList();
+            float tolerance = ray.Direction.LengthSquared() * .0001f;
             if (triangleMesh.Tree.GetOverlaps(ray, overlapList))
             {
                 var hits = Resources.GetRayHitList();
@@ -90,7 +91,7 @@ namespace BEPUphysics.CollisionShapes
                     triangleMesh.Data.GetTriangle(overlapList[i], out vA, out vB, out vC);
                     RayHit tempHit;
                     if (Toolbox.FindRayTriangleIntersection(ref ray, float.MaxValue, TriangleSidedness.DoubleSided, ref vA, ref vB, ref vC, out tempHit) &&
-                        IsHitUnique(hits, ref tempHit) && //Adds if unique.
+                        IsHitUnique(hits, tolerance, ref tempHit) && //Adds if unique.
                         tempHit.T < hit.T)
                     {
                         hit = tempHit;
@@ -99,18 +100,18 @@ namespace BEPUphysics.CollisionShapes
                 int hitCount = hits.count;
                 Resources.GiveBack(hits);
                 Resources.GiveBack(overlapList);
-                return hitCount % 2 != 0; //true -> outside, false -> inside
+                return hitCount % 2 != 0;
             }
             Resources.GiveBack(overlapList);
             hit = new RayHit();
             return false;
         }
 
-        internal bool IsHitUnique(RawList<RayHit> hits, ref RayHit hit)
+        internal bool IsHitUnique(RawList<RayHit> hits, float tolerance, ref RayHit hit)
         {
             for (int i = 0; i < hits.Count; i++)
             {
-                if (Math.Abs(hits.Elements[i].T - hit.T) < Toolbox.Epsilon)
+                if (Math.Abs(hits.Elements[i].T - hit.T) < tolerance)
                     return false;
             }
             hits.Add(hit);
@@ -137,6 +138,8 @@ namespace BEPUphysics.CollisionShapes
             triangleMesh.Data.GetTriangle(((triangleMesh.Data.indices.Length / 3) / 2) * 3, out vA, out vB, out vC);
             ray.Direction = (vA + vB + vC) / 3;
 
+            float tolerance = ray.Direction.LengthSquared() * .0001f;
+
             var hitList = Resources.GetIntList();
             if (triangleMesh.Tree.GetOverlaps(ray, hitList))
             {
@@ -151,7 +154,7 @@ namespace BEPUphysics.CollisionShapes
                     triangleMesh.Data.GetTriangle(hitList[i], out vA, out vB, out vC);
                     RayHit hit;
                     if (Toolbox.FindRayTriangleIntersection(ref ray, float.MaxValue, TriangleSidedness.DoubleSided, ref vA, ref vB, ref vC, out hit) &&
-                        IsHitUnique(hits, ref hit))
+                        IsHitUnique(hits, tolerance, ref hit))
                     {
                         if (hit.T < minimumT)
                         {

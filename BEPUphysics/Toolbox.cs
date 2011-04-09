@@ -156,7 +156,7 @@ namespace BEPUphysics
             float u = (ACdotAC * ABdotAP - ABdotAC * ACdotAP) * denom;
             float v = (ABdotAB * ACdotAP - ABdotAC * ABdotAP) * denom;
 
-            return (u >= 0) && (v >= 0) && (u + v <= 1);
+            return (u >= -Toolbox.BigEpsilon) && (v >= -Toolbox.BigEpsilon) && (u + v <= 1 + Toolbox.BigEpsilon);
 
         }
 
