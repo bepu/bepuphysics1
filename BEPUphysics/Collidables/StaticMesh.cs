@@ -63,7 +63,6 @@ namespace BEPUphysics.Collidables
             collisionRules.group = CollisionRules.DefaultKinematicCollisionGroup;
             events = new ContactEventManager<StaticMesh>(this);
 
-
             material = new Material();
             materialChangedDelegate = OnMaterialChanged;
             material.MaterialChanged += materialChangedDelegate;
@@ -146,6 +145,10 @@ namespace BEPUphysics.Collidables
             {
                 return events;
             }
+        }
+        protected internal override IContactEventTriggerer EventTriggerer
+        {
+            get { return events; }
         }
 
         internal Material material;

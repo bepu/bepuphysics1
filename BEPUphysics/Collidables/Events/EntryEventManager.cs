@@ -10,7 +10,7 @@ namespace BEPUphysics.Collidables.Events
     /// Event manager for BroadPhaseEntries (all types that live in the broad phase).
     ///</summary>
     ///<typeparam name="T">Some BroadPhaseEntry subclass.</typeparam>
-    public class EntryEventManager<T> : IDeferredEventCreator where T : BroadPhaseEntry
+    public class EntryEventManager<T> : IDeferredEventCreator, IEntryEventTriggerer where T : BroadPhaseEntry
     {
         protected internal T owner;
         ///<summary>
@@ -180,7 +180,7 @@ namespace BEPUphysics.Collidables.Events
         }
 
 
-        protected internal void OnPairCreated(BroadPhaseEntry other, INarrowPhasePair collisionPair)
+        public void OnPairCreated(BroadPhaseEntry other, INarrowPhasePair collisionPair)
         {
             if (InternalPairCreated != null)
                 eventStoragePairCreated.Enqueue(new EventStoragePairCreated(other, collisionPair));
@@ -188,7 +188,7 @@ namespace BEPUphysics.Collidables.Events
                 CreatingPair(owner, other, collisionPair);
         }
 
-        protected internal void OnPairRemoved(BroadPhaseEntry other)
+        public void OnPairRemoved(BroadPhaseEntry other)
         {
             if (InternalPairRemoved != null)
             {
@@ -200,7 +200,7 @@ namespace BEPUphysics.Collidables.Events
             }
         }
 
-        protected internal void OnPairUpdated(BroadPhaseEntry other, INarrowPhasePair collisionPair)
+        public void OnPairUpdated(BroadPhaseEntry other, INarrowPhasePair collisionPair)
         {
             if (InternalPairUpdated != null)
                 eventStoragePairUpdated.Enqueue(new EventStoragePairUpdated(other, collisionPair));

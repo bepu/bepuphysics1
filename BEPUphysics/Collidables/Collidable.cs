@@ -5,6 +5,7 @@ using BEPUphysics.CollisionShapes;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
 using BEPUphysics.CollisionRuleManagement;
 using System;
+using BEPUphysics.Collidables.Events;
 
 namespace BEPUphysics.Collidables
 {
@@ -44,6 +45,8 @@ namespace BEPUphysics.Collidables
                 //TODO: Watch out for unwanted references in the delegate lists.
             }
         }
+
+        protected internal abstract IContactEventTriggerer EventTriggerer { get; }
 
 
 
@@ -88,5 +91,5 @@ namespace BEPUphysics.Collidables
 
     }
 
-    
+
 }

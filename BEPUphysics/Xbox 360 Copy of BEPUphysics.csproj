@@ -67,6 +67,8 @@
     <Compile Include="Collidables\Events\CollisionEventTypes.cs" />
     <Compile Include="Collidables\Events\ContactEventManager.cs" />
     <Compile Include="Collidables\Events\EntryEventManager.cs" />
+    <Compile Include="Collidables\Events\IContactEventTriggerer.cs" />
+    <Compile Include="Collidables\Events\IEntryEventTriggerer.cs" />
     <Compile Include="Collidables\InstancedMesh.cs" />
     <Compile Include="Collidables\MobileCollidables\CompoundCollidable.cs" />
     <Compile Include="Collidables\MobileCollidables\CompoundHierarchy.cs" />
@@ -233,6 +235,7 @@
     <Compile Include="NarrowPhaseSystems\Pairs\ContactInformation.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\InstancedMeshConvexPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\MobileMeshConvexPairHandler.cs" />
+    <Compile Include="NarrowPhaseSystems\Pairs\MobileMeshMeshPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\TerrainConvexPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\StaticMeshConvexPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\TriangleConvexPairHandler.cs" />

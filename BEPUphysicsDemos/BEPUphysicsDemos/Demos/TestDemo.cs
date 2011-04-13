@@ -18,6 +18,7 @@ using BEPUphysics.NarrowPhaseSystems.Pairs;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.Constraints;
+using BEPUphysics.CollisionTests.CollisionAlgorithms.GJK;
 
 namespace BEPUphysicsDemos.Demos
 {
@@ -37,6 +38,8 @@ namespace BEPUphysicsDemos.Demos
 
             Vector3[] vertices;
             int[] indices;
+
+
 
             TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("hollowsphere"), out vertices, out indices);
 

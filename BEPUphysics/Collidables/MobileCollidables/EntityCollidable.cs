@@ -17,7 +17,7 @@ namespace BEPUphysics.Collidables.MobileCollidables
         protected EntityCollidable()
         {
             //This constructor is used when the subclass is going to set the shape after doing some extra initialization.
-            events = new ContactEventManager<EntityCollidable>(this);
+            Events = new ContactEventManager<EntityCollidable>(this);
         }
 
         protected EntityCollidable(EntityShape shape)
@@ -226,6 +226,10 @@ namespace BEPUphysics.Collidables.MobileCollidables
             {
                 events = value;
             }
+        }
+        protected internal override IContactEventTriggerer EventTriggerer
+        {
+            get { return events; }
         }
 
 

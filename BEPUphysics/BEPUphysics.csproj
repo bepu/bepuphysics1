@@ -100,6 +100,8 @@
   <ItemGroup>
     <Compile Include="BroadPhaseSystems\Hierarchies\DynamicHierarchyNode.cs" />
     <None Include="DataStructures\Deprecated\MeshBoundingBoxTree.cs" />
+    <Compile Include="Collidables\Events\IContactEventTriggerer.cs" />
+    <Compile Include="Collidables\Events\IEntryEventTriggerer.cs" />
     <Compile Include="Collidables\MobileCollidables\MobileMeshCollidable.cs" />
     <Compile Include="CollisionShapes\MobileMeshShape.cs" />
     <Compile Include="CollisionTests\Manifolds\MobileMeshConvexContactManifold.cs" />
@@ -227,6 +229,7 @@
     <Compile Include="NarrowPhaseSystems\Pairs\CompoundMobileMeshPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\ContactCollection.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\ContactInformation.cs" />
+    <Compile Include="NarrowPhaseSystems\Pairs\MobileMeshMeshPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\MobileMeshConvexPairHandler.cs" />
     <Compile Include="PositionUpdating\ContinuousPositionUpdater.cs" />
     <Compile Include="PositionUpdating\DiscretePositionUpdater.cs" />

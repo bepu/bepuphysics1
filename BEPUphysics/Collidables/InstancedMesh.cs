@@ -125,6 +125,10 @@ namespace BEPUphysics.Collidables
                 return events;
             }
         }
+        protected internal override IContactEventTriggerer EventTriggerer
+        {
+            get { return events; }
+        }
 
         internal Material material;
         //NOT thread safe due to material change pair update.

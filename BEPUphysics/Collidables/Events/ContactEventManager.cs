@@ -9,7 +9,7 @@ namespace BEPUphysics.Collidables.Events
     /// Event manager for collidables (things which can create contact points).
     ///</summary>
     ///<typeparam name="T">Some Collidable subclass.</typeparam>
-    public class ContactEventManager<T> : EntryEventManager<T> where T : Collidable
+    public class ContactEventManager<T> : EntryEventManager<T>, IContactEventTriggerer where T : Collidable
     {
         ///<summary>
         /// Constructs a new event manager.
@@ -205,7 +205,7 @@ namespace BEPUphysics.Collidables.Events
             base.DispatchEvents();
         }
 
-        protected internal void OnCollisionEnded(Collidable other, CollidablePairHandler collisionPair)
+        public void OnCollisionEnded(Collidable other, CollidablePairHandler collisionPair)
         {
             if (InternalCollisionEnded != null)
                 eventStorageCollisionEnded.Enqueue(new EventStorageCollisionEnded(other, collisionPair));
@@ -213,7 +213,7 @@ namespace BEPUphysics.Collidables.Events
                 CollisionEnding(owner, other, collisionPair);
         }
 
-        protected internal void OnPairTouching(Collidable other, CollidablePairHandler collisionPair)
+        public void OnPairTouching(Collidable other, CollidablePairHandler collisionPair)
         {
             if (InternalPairTouched != null)
                 eventStoragePairTouched.Enqueue(new EventStoragePairTouched(other, collisionPair));
@@ -221,7 +221,7 @@ namespace BEPUphysics.Collidables.Events
                 PairTouching(owner, other, collisionPair);
         }
 
-        protected internal void OnContactCreated(Collidable other, CollidablePairHandler collisionPair, Contact contact)
+        public void OnContactCreated(Collidable other, CollidablePairHandler collisionPair, Contact contact)
         {
             if (InternalContactCreated != null)
             {
@@ -236,7 +236,7 @@ namespace BEPUphysics.Collidables.Events
                 CreatingContact(owner, other, collisionPair, contact);
         }
 
-        protected internal void OnContactRemoved(Collidable other, CollidablePairHandler collisionPair, Contact contact)
+        public void OnContactRemoved(Collidable other, CollidablePairHandler collisionPair, Contact contact)
         {
             if (InternalContactRemoved != null)
             {
@@ -251,7 +251,7 @@ namespace BEPUphysics.Collidables.Events
                 RemovingContact(owner, other, collisionPair, contact);
         }
 
-        protected internal void OnInitialCollisionDetected(Collidable other, CollidablePairHandler collisionPair)
+        public void OnInitialCollisionDetected(Collidable other, CollidablePairHandler collisionPair)
         {
             if (InternalInitialCollisionDetected != null)
                 eventStorageInitialCollisionDetected.Enqueue(new EventStorageInitialCollisionDetected(other, collisionPair));

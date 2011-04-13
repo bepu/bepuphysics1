@@ -17,7 +17,7 @@ using BEPUphysics.CollisionShapes.ConvexShapes;
 namespace BEPUphysics.NarrowPhaseSystems.Pairs
 {
     ///<summary>
-    /// Handles a instanced mesh-convex collision pair.
+    /// Handles a mobile mesh-convex collision pair.
     ///</summary>
     public class MobileMeshConvexPairHandler : CollidablePairHandler
     {

@@ -66,6 +66,8 @@
     <Compile Include="BroadPhaseSystems\IBoundingBoxOwner.cs" />
     <Compile Include="BroadPhaseSystems\IBroadPhaseEntryOwner.cs" />
     <Compile Include="BroadPhaseSystems\IQueryAccelerator.cs" />
+    <Compile Include="Collidables\Events\IContactEventTriggerer.cs" />
+    <Compile Include="Collidables\Events\IEntryEventTriggerer.cs" />
     <Compile Include="Collidables\MobileCollidables\MobileCollidable.cs" />
     <Compile Include="Collidables\MobileCollidables\MobileMeshCollidable.cs" />
     <Compile Include="CollisionShapes\ConvexShapes\InertiaHelper.cs" />
@@ -123,6 +125,7 @@
     <Compile Include="NarrowPhaseSystems\Factories\MobileMeshConvexPairFactory.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\CompoundMobileMeshPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\MobileMeshConvexPairHandler.cs" />
+    <Compile Include="NarrowPhaseSystems\Pairs\MobileMeshMeshPairHandler.cs" />
     <Compile Include="OtherSpaceStages\BoundingBoxUpdater.cs" />
     <Compile Include="OtherSpaceStages\DeferredEventDispatcher.cs" />
     <Compile Include="OtherSpaceStages\ForceUpdater.cs" />
