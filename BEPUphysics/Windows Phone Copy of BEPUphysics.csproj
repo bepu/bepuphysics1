@@ -126,6 +126,7 @@
     <Compile Include="NarrowPhaseSystems\Pairs\CompoundMobileMeshPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\MobileMeshConvexPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\MobileMeshMeshPairHandler.cs" />
+    <Compile Include="NarrowPhaseSystems\Pairs\Type1PairHandler.cs" />
     <Compile Include="OtherSpaceStages\BoundingBoxUpdater.cs" />
     <Compile Include="OtherSpaceStages\DeferredEventDispatcher.cs" />
     <Compile Include="OtherSpaceStages\ForceUpdater.cs" />

@@ -229,6 +229,7 @@
     <Compile Include="NarrowPhaseSystems\Pairs\CompoundMobileMeshPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\ContactCollection.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\ContactInformation.cs" />
+    <Compile Include="NarrowPhaseSystems\Pairs\Type1PairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\MobileMeshMeshPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\MobileMeshConvexPairHandler.cs" />
     <Compile Include="PositionUpdating\ContinuousPositionUpdater.cs" />

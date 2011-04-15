@@ -2,6 +2,12 @@
 using BEPUphysics.Collidables;
 using BEPUphysics.NarrowPhaseSystems.Factories;
 using BEPUphysics.CollisionRuleManagement;
+using BEPUphysics.Entities;
+using BEPUphysics.Constraints.Collision;
+using BEPUphysics.CollisionTests.Manifolds;
+using BEPUphysics.CollisionTests;
+using System;
+using BEPUphysics.Constraints.SolverGroups;
 
 namespace BEPUphysics.NarrowPhaseSystems.Pairs
 {
@@ -10,6 +16,17 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
     ///</summary>
     public abstract class CollidablePairHandler : INarrowPhasePair
     {
+        protected abstract Collidable CollidableA { get; }
+        protected abstract Collidable CollidableB { get; }
+        //Entities could be null!
+        protected abstract Entity EntityA { get; }
+        protected abstract Entity EntityB { get; }
+
+        public abstract int ContactCount { get; }
+
+        protected int previousContactCount;
+
+
         protected CollidablePairHandler()
         {
             Contacts = new ContactCollection(this);
@@ -20,6 +37,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         ///</summary>
         ///<param name="dt">Timestep duration.</param>
         public abstract void UpdateCollision(float dt);
+
 
         protected internal float timeOfImpact = 1;
         ///<summary>
@@ -141,24 +159,97 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         ///</summary>
         ///<param name="entryA">First entry in the pair.</param>
         ///<param name="entryB">Second entry in the pair.</param>
-        public abstract void Initialize(BroadPhaseEntry entryA, BroadPhaseEntry entryB);
+        public virtual void Initialize(BroadPhaseEntry entryA, BroadPhaseEntry entryB)
+        {
+            //Child initialization is responsible for setting up the entries.
+            //Child initialization is responsible for setting up the manifold.
+            //Child initialization is responsible for setting up the constraint.
+
+
+            UpdateMaterialProperties();
+
+            if (!suppressEvents)
+            {
+                CollidableA.EventTriggerer.OnPairCreated(CollidableB, this);
+                CollidableB.EventTriggerer.OnPairCreated(CollidableA, this);
+            }
+        }
 
         ///<summary>
         /// Called when the pair handler is added to the narrow phase.
         ///</summary>
-        public abstract void OnAddedToNarrowPhase();
+        public virtual void OnAddedToNarrowPhase()
+        {
+            CollidableA.pairs.Add(this);
+            CollidableB.pairs.Add(this);
+        }
+
+        protected virtual void OnContactAdded(Contact contact)
+        {
+            //Children manage the addition of the contact to the constraint, if any.
+            if (!suppressEvents)
+            {
+                CollidableA.EventTriggerer.OnContactCreated(CollidableB, this, contact);
+                CollidableB.EventTriggerer.OnContactCreated(CollidableA, this, contact);
+            }
+            if (Parent != null)
+                Parent.OnContactAdded(contact);
+
+        }
+
+        protected virtual void OnContactRemoved(Contact contact)
+        {
+            //Children manage the removal of the contact from the constraint, if any.
+            if (!suppressEvents)
+            {
+                CollidableA.EventTriggerer.OnContactRemoved(CollidableB, this, contact);
+                CollidableB.EventTriggerer.OnContactRemoved(CollidableA, this, contact);
+            }
+            if (Parent != null)
+                Parent.OnContactRemoved(contact);
+
+        }
 
         ///<summary>
         /// Cleans up the pair handler.
         ///</summary>
         public virtual void CleanUp()
         {
+
+            //Child types remove contacts from the pair handler and call OnContactRemoved.
+            //Child types manage the removal of the constraint from the space, if necessary.
+
+
+            previousContactCount = 0;
+            //If the contact manifold had any contacts in it on cleanup, then we still need to fire the 'ending' event.
+            if (ContactCount > 0 && !suppressEvents)
+            {
+                CollidableA.EventTriggerer.OnCollisionEnded(CollidableB, this);
+                CollidableB.EventTriggerer.OnCollisionEnded(CollidableA, this);
+            }
+
+            //Remove this pair from each collidable.  This can be done safely because the CleanUp is called sequentially.
+            CollidableA.pairs.Remove(this);
+            CollidableB.pairs.Remove(this);
+
+            //Notify the colliders that the pair went away.
+            if (!suppressEvents)
+            {
+                CollidableA.EventTriggerer.OnPairRemoved(CollidableB);
+                CollidableB.EventTriggerer.OnPairRemoved(CollidableA);
+            }
+
+
             broadPhaseOverlap = new BroadPhaseOverlap();
             (this as INarrowPhasePair).NeedsUpdate = false;
             (this as INarrowPhasePair).NarrowPhase = null;
             suppressEvents = false;
             timeOfImpact = 1;
             Parent = null;
+
+
+            //Child cleanup is responsible for cleaning up direct references to the involved collidables.
+            //Child cleanup is responsible for cleaning up contact manifolds.
         }
 
         ///<summary>
@@ -169,7 +260,6 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
 
         internal abstract void GetContactInformation(int index, out ContactInformation info);
 
-        internal abstract int ContactCount { get; }
 
         ///<summary>
         /// Gets a list of the contacts in the pair and their associated constraint information.

@@ -156,13 +156,13 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                 OtherMesh.EventTriggerer.OnCollisionEnded(mobileMesh, this);
             }
 
-            mobileMesh.pairs.Remove(this);
-            OtherMesh.pairs.Remove(this);
+            CollidableA.pairs.Remove(this);
+            CollidableB.pairs.Remove(this);
 
             if (!suppressEvents)
             {
-                mobileMesh.events.OnPairRemoved(OtherMesh);
-                OtherMesh.EventTriggerer.OnPairRemoved(mobileMesh);
+                CollidableA.EventTriggerer.OnPairRemoved(OtherMesh);
+                CollidableB.EventTriggerer.OnPairRemoved(mobileMesh);
             }
 
             mobileMesh = null;

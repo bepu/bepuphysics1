@@ -244,6 +244,7 @@
     <Compile Include="NarrowPhaseSystems\Pairs\IPairHandlerParent.cs" />
     <Compile Include="DataStructures\ObservableList.cs" />
     <Compile Include="DataStructures\TriangleMesh.cs" />
+    <Compile Include="NarrowPhaseSystems\Pairs\Type1PairHandler.cs" />
     <Compile Include="OtherSpaceStages\BoundingBoxUpdater.cs" />
     <Compile Include="OtherSpaceStages\DeferredEventDispatcher.cs" />
     <Compile Include="OtherSpaceStages\ForceUpdater.cs" />
