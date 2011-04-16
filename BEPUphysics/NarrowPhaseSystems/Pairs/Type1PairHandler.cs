@@ -25,16 +25,14 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         protected abstract ContactManifold ContactManifold { get; }
         protected abstract ContactManifoldConstraint ContactConstraint { get; }
 
-        Action<Contact> contactAddedDelegate;
-        Action<Contact> contactRemovedDelegate;
-
         ///<summary>
         /// Constructs a pair handler.
         ///</summary>
-        public Type1PairHandler()
+        protected Type1PairHandler()
         {
-            contactAddedDelegate = OnContactAdded;
-            contactRemovedDelegate = OnContactRemoved;
+            //Child type constructors construct manifold first.
+            ContactManifold.ContactAdded += OnContactAdded;
+            ContactManifold.ContactRemoved += OnContactRemoved;
         }
 
         protected override void OnContactAdded(Contact contact)
@@ -62,6 +60,8 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
 
             ContactManifold.Initialize(CollidableA, CollidableB);
             ContactConstraint.Initialize(EntityA, EntityB, this);
+
+            base.Initialize(entryA, entryB);
 
         }
 
@@ -111,7 +111,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             //Child cleanup is responsible for cleaning up direct references to the involved collidables.
         }
 
-        protected abstract void UpdateContacts(float dt);
+
 
         ///<summary>
         /// Updates the pair handler.
@@ -126,10 +126,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                 CollidableB.EventTriggerer.OnPairUpdated(CollidableA, this);
             }
 
-
-            UpdateContacts(dt);
-
-
+            ContactManifold.Update(dt);
 
             if (ContactManifold.contacts.count > 0)
             {

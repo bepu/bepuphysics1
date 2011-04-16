@@ -220,9 +220,8 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             //Child types manage the removal of the constraint from the space, if necessary.
 
 
-            previousContactCount = 0;
             //If the contact manifold had any contacts in it on cleanup, then we still need to fire the 'ending' event.
-            if (ContactCount > 0 && !suppressEvents)
+            if (previousContactCount > 0 && !suppressEvents)
             {
                 CollidableA.EventTriggerer.OnCollisionEnded(CollidableB, this);
                 CollidableB.EventTriggerer.OnCollisionEnded(CollidableA, this);
@@ -247,6 +246,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             timeOfImpact = 1;
             Parent = null;
 
+            previousContactCount = 0;
 
             //Child cleanup is responsible for cleaning up direct references to the involved collidables.
             //Child cleanup is responsible for cleaning up contact manifolds.

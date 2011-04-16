@@ -43,7 +43,9 @@ namespace BEPUphysicsDemos.Demos
             whitePixel = game.Content.Load<Texture2D>("whitePixel");
             vehicle = new VehicleInput(new Vector3(10000, 0, 0), Space, game.Camera, game.ModelDrawer, wheelModel, wheelTexture);
             Space.ForceUpdater.Gravity = new Vector3(0, -9.81f, 0f); //If left unset, the default value is (0,0,0).
-
+            Space.NarrowPhase.AllowMultithreading = false;
+            Space.Solver.AllowMultithreading = false;
+            Space.BroadPhase.AllowMultithreading = false;
 
             //Create the tossable ball.
             kapow = new Sphere(new Vector3(11000, 0, 0), .6f, 20);
@@ -223,6 +225,8 @@ namespace BEPUphysicsDemos.Demos
 
             #endregion
 
+            if (Game.KeyboardInput.IsKeyDown(Keys.P))
+                Debug.WriteLine("Break.");
             base.Update(dt); //Base.update updates the space, which needs to be done before the character or vehicle are updated.
 
             character.Update(Space.TimeStepSettings.TimeStepDuration, Game.PreviousKeyboardInput, Game.KeyboardInput, Game.PreviousGamePadInput, Game.GamePadInput);

@@ -13,18 +13,20 @@ namespace BEPUphysics.CollisionTests.Manifolds
     {
 
         protected RawList<int> contactIndicesToRemove;
-        protected internal RawList<Contact> contacts = new RawList<Contact>(4);
+        protected internal RawList<Contact> contacts;
 
         ///<summary>
         /// Gets the contacts in the manifold.
         ///</summary>
-        public ReadOnlyCollection<Contact> Contacts { get; private set; }
+        public ReadOnlyList<Contact> Contacts
+        {
+            get
+            {
+                return new ReadOnlyList<Contact>(contacts);
+            }
+        }
         protected ResourcePool<Contact> unusedContacts;
 
-        protected ContactManifold()
-        {
-            Contacts = new ReadOnlyCollection<Contact>(contacts);
-        }
 
         protected void RemoveQueuedContacts()
         {
@@ -87,14 +89,8 @@ namespace BEPUphysics.CollisionTests.Manifolds
         ///</summary>
         public virtual void CleanUp()
         {
-            ContactRemoved = null;
-            ContactAdded = null;
         }
 
-        //public void Update()
-        //{
-        //    Update(0);
-        //}
         ///<summary>
         /// Updates the manifold.
         ///</summary>

@@ -79,10 +79,12 @@
     <Compile Include="CollisionTests\CollisionAlgorithms\GJK\Simplex.cs" />
     <Compile Include="CollisionTests\ContactData.cs" />
     <Compile Include="CollisionTests\Manifolds\BoxContactManifold.cs" />
+    <Compile Include="CollisionTests\Manifolds\BoxSphereContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\ContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\GeneralConvexContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\InstancedMeshConvexContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\MobileMeshConvexContactManifold.cs" />
+    <Compile Include="CollisionTests\Manifolds\SphereContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\StaticMeshConvexContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\TerrainConvexContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\TriangleConvexContactManifold.cs" />
@@ -101,6 +103,7 @@
     <None Include="DataStructures\Deprecated\MeshBoundingBoxTree.cs" />
     <Compile Include="DataStructures\MeshBoundingBoxTree.cs" />
     <Compile Include="DataStructures\MeshBoundingBoxTreeData.cs" />
+    <Compile Include="DataStructures\ReadOnlyList.cs" />
     <Compile Include="DataStructures\StaticMeshData.cs" />
     <Compile Include="DataStructures\TransformableMeshData.cs" />
     <Compile Include="DataStructures\TreeOverlapPair.cs" />
@@ -123,7 +126,10 @@
     <Compile Include="MultithreadedProcessingStage.cs" />
     <Compile Include="NarrowPhaseSystems\Factories\CompoundMobileMeshPairFactory.cs" />
     <Compile Include="NarrowPhaseSystems\Factories\MobileMeshConvexPairFactory.cs" />
+    <Compile Include="NarrowPhaseSystems\Pairs\CompoundGroupPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\CompoundMobileMeshPairHandler.cs" />
+    <Compile Include="NarrowPhaseSystems\Pairs\ConvexPairHandler.cs" />
+    <Compile Include="NarrowPhaseSystems\Pairs\GroupPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\MobileMeshConvexPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\MobileMeshMeshPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\Type1PairHandler.cs" />

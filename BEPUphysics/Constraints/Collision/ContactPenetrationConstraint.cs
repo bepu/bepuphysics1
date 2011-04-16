@@ -22,12 +22,12 @@ namespace BEPUphysics.Constraints.Collision
         internal float angularAX, angularAY, angularAZ;
         internal float angularBX, angularBY, angularBZ;
 
-        //Inverse effective mass matrix
 
         private float bias;
         private float linearAX, linearAY, linearAZ;
         private Entity entityA, entityB;
         private bool entityADynamic, entityBDynamic;
+        //Inverse effective mass matrix
         internal float velocityToImpulse;
         private ContactManifoldConstraint contactManifoldConstraint;
 
