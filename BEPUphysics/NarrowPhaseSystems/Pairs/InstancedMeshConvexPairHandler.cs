@@ -19,7 +19,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
     ///<summary>
     /// Handles a instanced mesh-convex collision pair.
     ///</summary>
-    public class InstancedMeshConvexPairHandler : CollidablePairHandler
+    public class InstancedMeshConvexPairHandler : Type1PairHandler
     {
         InstancedMesh instancedMesh;
         ConvexCollidable convex;
@@ -27,45 +27,29 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         InstancedMeshConvexContactManifold contactManifold = new InstancedMeshConvexContactManifold();
         NonConvexContactManifoldConstraint contactConstraint = new NonConvexContactManifoldConstraint();
 
-        Action<Contact> contactAddedDelegate;
-        Action<Contact> contactRemovedDelegate;
-
-        ///<summary>
-        /// Constructs a pair handler.
-        ///</summary>
-        public InstancedMeshConvexPairHandler()
+        protected override Collidable CollidableA
         {
-            contactAddedDelegate = OnContactAdded;
-            contactRemovedDelegate = OnContactRemoved;
+            get { return convex; }
         }
-
-        void OnContactAdded(Contact contact)
+        protected override Collidable CollidableB
         {
-            contactConstraint.AddContact(contact);
-
-
-            if (!suppressEvents)
-            {
-                instancedMesh.events.OnContactCreated(convex, this, contact);
-                convex.events.OnContactCreated(instancedMesh, this, contact);
-            }
-            if (Parent != null)
-                Parent.OnContactAdded(contact);
-
+            get { return instancedMesh; }
         }
-
-        void OnContactRemoved(Contact contact)
+        protected override Entities.Entity EntityA
         {
-            contactConstraint.RemoveContact(contact);
-
-            if (!suppressEvents)
-            {
-                instancedMesh.events.OnContactRemoved(convex, this, contact);
-                convex.events.OnContactRemoved(instancedMesh, this, contact);
-            }
-            if (Parent != null)
-                Parent.OnContactRemoved(contact);
-
+            get { return convex.entity; }
+        }
+        protected override Entities.Entity EntityB
+        {
+            get { return null; }
+        }
+        protected override ContactManifoldConstraint ContactConstraint
+        {
+            get { return contactConstraint; }
+        }
+        protected override ContactManifold ContactManifold
+        {
+            get { return contactManifold; }
         }
 
         ///<summary>
@@ -88,160 +72,23 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                     throw new Exception("Inappropriate types used to initialize pair.");
             }
 
-            if (!suppressEvents)
-            {
-                instancedMesh.events.OnPairCreated(convex, this);
-                convex.events.OnPairCreated(instancedMesh, this);
-            }
-
-            contactManifold.Initialize(instancedMesh, convex);
-            contactManifold.ContactAdded += contactAddedDelegate;
-            contactManifold.ContactRemoved += contactRemovedDelegate;
-
-
-            contactConstraint.Initialize(convex.entity, null, this);
-            UpdateMaterialProperties();
+            base.Initialize(entryA, entryB);
 
         }
 
-        ///<summary>
-        /// Forces an update of the pair's material properties.
-        ///</summary>
-        public override void UpdateMaterialProperties()
-        {
-            contactConstraint.UpdateMaterialProperties(
-              convex.entity == null ? null : convex.entity.material,
-              instancedMesh.material);
-        }
-
-        ///<summary>
-        /// Called when the pair handler is added to the narrow phase.
-        ///</summary>
-        public override void OnAddedToNarrowPhase()
-        {
-            instancedMesh.pairs.Add(this);
-            convex.pairs.Add(this);
-        }
 
         ///<summary>
         /// Cleans up the pair handler.
         ///</summary>
         public override void CleanUp()
         {
-            //TODO: These cleanup systems are convoluted, fragile, and duplicated all over the place.  Clean up the clean ups.
-            previousContactCount = 0;
-
-            for (int i = contactManifold.contacts.count - 1; i >= 0; i--)
-            {
-                OnContactRemoved(contactManifold.contacts[i]);
-            }
-
-            //If the constraint is still in the solver, then request to have it removed.
-            if (contactConstraint.solver != null)
-            {
-                contactConstraint.pair = null; //Setting the pair to null tells the constraint that it's going to be orphaned.  It will be cleaned up on removal.
-                if (Parent != null)
-                    Parent.RemoveSolverUpdateable(contactConstraint);
-                else if (NarrowPhase != null)
-                    NarrowPhase.EnqueueRemovedSolverUpdateable(contactConstraint);
-            }
-            else
-                contactConstraint.CleanUpReferences();//The constraint isn't in the solver, so we can safely clean it up directly.
-
-            contactConstraint.CleanUp();
-
-            if (contactManifold.contacts.count > 0 && !suppressEvents)
-            {
-                instancedMesh.events.OnCollisionEnded(convex, this);
-                convex.events.OnCollisionEnded(instancedMesh, this);
-            }
-
-            instancedMesh.pairs.Remove(this);
-            convex.pairs.Remove(this);
-
-            if (!suppressEvents)
-            {
-                instancedMesh.events.OnPairRemoved(convex);
-                convex.events.OnPairRemoved(instancedMesh);
-            }
-
+            base.CleanUp();
             instancedMesh = null;
             convex = null;
 
-
-            contactManifold.CleanUp();
-
-
-            base.CleanUp();
-
-
         }
 
-        int previousContactCount;
-
-        ///<summary>
-        /// Updates the pair handler.
-        ///</summary>
-        ///<param name="dt">Timestep duration.</param>
-        public override void UpdateCollision(float dt)
-        {
-
-            if (!suppressEvents)
-            {
-                instancedMesh.events.OnPairUpdated(convex, this);
-                convex.events.OnPairUpdated(instancedMesh, this);
-            }
-
-
-            contactManifold.Update(dt);
-
-
-
-            if (contactManifold.contacts.count > 0)
-            {
-                if (!suppressEvents)
-                {
-                    instancedMesh.events.OnPairTouching(convex, this);
-                    convex.events.OnPairTouching(instancedMesh, this);
-                }
-
-                if (previousContactCount == 0)
-                {
-                    //New collision.
-
-                    //Add a solver item.
-                    if (Parent != null)
-                        Parent.AddSolverUpdateable(contactConstraint);
-                    else if (NarrowPhase != null)
-                        NarrowPhase.EnqueueGeneratedSolverUpdateable(contactConstraint);
-
-                    //And notify the pair members.
-                    if (!suppressEvents)
-                    {
-                        instancedMesh.events.OnInitialCollisionDetected(convex, this);
-                        convex.events.OnInitialCollisionDetected(instancedMesh, this);
-                    }
-                }
-            }
-            else if (previousContactCount > 0)
-            {
-                //Just exited collision.
-
-                //Remove the solver item.
-                if (Parent != null)
-                    Parent.RemoveSolverUpdateable(contactConstraint);
-                else if (NarrowPhase != null)
-                    NarrowPhase.EnqueueRemovedSolverUpdateable(contactConstraint);
-
-                if (!suppressEvents)
-                {
-                    instancedMesh.events.OnCollisionEnded(convex, this);
-                    convex.events.OnCollisionEnded(instancedMesh, this);
-                }
-            }
-            previousContactCount = contactManifold.contacts.count;
-        }
-
+        
 
         ///<summary>
         /// Updates the time of impact for the pair.
@@ -340,11 +187,6 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             Vector3.Subtract(ref info.Contact.Position, ref convex.entity.position, out velocity);
             Vector3.Cross(ref convex.entity.angularVelocity, ref velocity, out velocity);
             Vector3.Add(ref velocity, ref convex.entity.linearVelocity, out info.RelativeVelocity);
-        }
-
-        internal override int ContactCount
-        {
-            get { return contactManifold.contacts.count; }
         }
 
     }

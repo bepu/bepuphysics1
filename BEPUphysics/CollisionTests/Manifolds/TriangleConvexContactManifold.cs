@@ -62,6 +62,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
         ///</summary>
         public TriangleConvexContactManifold()
         {
+            contacts = new RawList<Contact>(4);
             unusedContacts = new UnsafeResourcePool<Contact>(4);
             contactIndicesToRemove = new RawList<int>(4);
             pairTester = new TriangleConvexPairTester();

@@ -40,7 +40,6 @@ namespace BEPUphysicsDemos.Demos
             int[] indices;
 
 
-
             TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("hollowsphere"), out vertices, out indices);
 
             MotionSettings.DefaultPositionUpdateMode = PositionUpdateMode.Continuous;

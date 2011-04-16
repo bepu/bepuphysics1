@@ -16,7 +16,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
     ///<summary>
     /// Handles a triangle-convex collision pair.
     ///</summary>
-    public class TriangleConvexPairHandler : CollidablePairHandler
+    public class TriangleConvexPairHandler : ConvexPairHandler
     {
         ConvexCollidable<TriangleShape> triangle;
         ConvexCollidable convex;
@@ -24,46 +24,33 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         TriangleConvexContactManifold contactManifold = new TriangleConvexContactManifold();
         ConvexContactManifoldConstraint contactConstraint = new ConvexContactManifoldConstraint();
 
-        Action<Contact> contactAddedDelegate;
-        Action<Contact> contactRemovedDelegate;
-
-        ///<summary>
-        /// Constructs a new pair handler.
-        ///</summary>
-        public TriangleConvexPairHandler()
+        protected override Collidable CollidableA
         {
-            contactAddedDelegate = OnContactAdded;
-            contactRemovedDelegate = OnContactRemoved;
+            get { return convex; }
+        }
+        protected override Collidable CollidableB
+        {
+            get { return triangle; }
         }
 
-        void OnContactAdded(Contact contact)
+        protected override Entities.Entity EntityA
         {
-            contactConstraint.AddContact(contact);
-
-
-            if (!suppressEvents)
-            {
-                triangle.events.OnContactCreated(convex, this, contact);
-                convex.events.OnContactCreated(triangle, this, contact);
-            }
-            if (Parent != null)
-                Parent.OnContactAdded(contact);
-
+            get { return convex.entity; }
+        }
+        protected override Entities.Entity EntityB
+        {
+            get { return triangle.entity; }
+        }
+        protected override ContactManifoldConstraint ContactConstraint
+        {
+            get { return contactConstraint; }
+        }
+        protected override ContactManifold ContactManifold
+        {
+            get { return contactManifold; }
         }
 
-        void OnContactRemoved(Contact contact)
-        {
-            contactConstraint.RemoveContact(contact);
 
-            if (!suppressEvents)
-            {
-                triangle.events.OnContactRemoved(convex, this, contact);
-                convex.events.OnContactRemoved(triangle, this, contact);
-            }
-            if (Parent != null)
-                Parent.OnContactRemoved(contact);
-
-        }
 
         ///<summary>
         /// Initializes the pair handler.
@@ -85,38 +72,9 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                     throw new Exception("Inappropriate types used to initialize pair.");
             }
 
-            if (!suppressEvents)
-            {
-                triangle.events.OnPairCreated(convex, this);
-                convex.events.OnPairCreated(triangle, this);
-            }
 
-            contactManifold.Initialize(convex, triangle);
-            contactManifold.ContactAdded += contactAddedDelegate;
-            contactManifold.ContactRemoved += contactRemovedDelegate;
+            base.Initialize(entryA, entryB);
 
-            contactConstraint.Initialize(convex.entity, triangle.entity, this);
-            UpdateMaterialProperties();
-
-        }
-
-        ///<summary>
-        /// Forces an update of the pair's material properties.
-        ///</summary>
-        public override void UpdateMaterialProperties()
-        {
-            contactConstraint.UpdateMaterialProperties(
-                 convex.entity == null ? null : convex.entity.material,
-                 triangle.entity == null ? null : triangle.entity.material);
-        }
-
-        ///<summary>
-        /// Called when the pair handler is added to the narrow phase.
-        ///</summary>
-        public override void OnAddedToNarrowPhase()
-        {
-            triangle.pairs.Add(this);
-            convex.pairs.Add(this);
         }
 
         ///<summary>
@@ -124,119 +82,14 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         ///</summary>
         public override void CleanUp()
         {
-            //TODO: These cleanup systems are convoluted, fragile, and duplicated all over the place.  Clean up the clean ups.
-            previousContactCount = 0;
-
-            for (int i = contactManifold.contacts.count - 1; i >= 0; i--)
-            {
-                OnContactRemoved(contactManifold.contacts[i]);
-            }
-
-            //If the constraint is still in the solver, then request to have it removed.
-            if (contactConstraint.solver != null)
-            {
-                contactConstraint.pair = null; //Setting the pair to null tells the constraint that it's going to be orphaned.  It will be cleaned up on removal.
-                if (Parent != null)
-                    Parent.RemoveSolverUpdateable(contactConstraint);
-                else if (NarrowPhase != null)
-                    NarrowPhase.EnqueueRemovedSolverUpdateable(contactConstraint);
-            }
-            else
-                contactConstraint.CleanUpReferences();//The constraint isn't in the solver, so we can safely clean it up directly.
-
-            contactConstraint.CleanUp();
-
-            if (contactManifold.contacts.count > 0 && !suppressEvents)
-            {
-                triangle.events.OnCollisionEnded(convex, this);
-                convex.events.OnCollisionEnded(triangle, this);
-            }
-
-            triangle.pairs.Remove(this);
-            convex.pairs.Remove(this);
-
-            if (!suppressEvents)
-            {
-                triangle.events.OnPairRemoved(convex);
-                convex.events.OnPairRemoved(triangle);
-            }
+            base.CleanUp();
 
             triangle = null;
             convex = null;
 
-
-            contactManifold.CleanUp();
-
-
-            base.CleanUp();
-
-
         }
 
-        int previousContactCount;
 
-        ///<summary>
-        /// Updates the pair handler.
-        ///</summary>
-        ///<param name="dt">Timestep duration.</param>
-        public override void UpdateCollision(float dt)
-        {
-
-            if (!suppressEvents)
-            {
-                triangle.events.OnPairUpdated(convex, this);
-                convex.events.OnPairUpdated(triangle, this);
-            }
-
-
-            contactManifold.Update(dt);
-
-
-
-            if (contactManifold.contacts.count > 0)
-            {
-                if (!suppressEvents)
-                {
-                    triangle.events.OnPairTouching(convex, this);
-                    convex.events.OnPairTouching(triangle, this);
-                }
-
-                if (previousContactCount == 0)
-                {
-                    //New collision.
-
-                    //Add a solver item.
-                    if (Parent != null)
-                        Parent.AddSolverUpdateable(contactConstraint);
-                    else if (NarrowPhase != null)
-                        NarrowPhase.EnqueueGeneratedSolverUpdateable(contactConstraint);
-
-                    //And notify the pair members.
-                    if (!suppressEvents)
-                    {
-                        triangle.events.OnInitialCollisionDetected(convex, this);
-                        convex.events.OnInitialCollisionDetected(triangle, this);
-                    }
-                }
-            }
-            else if (previousContactCount > 0)
-            {
-                //Just exited collision.
-
-                //Remove the solver item.
-                if (Parent != null)
-                    Parent.RemoveSolverUpdateable(contactConstraint);
-                else if (NarrowPhase != null)
-                    NarrowPhase.EnqueueRemovedSolverUpdateable(contactConstraint);
-
-                if (!suppressEvents)
-                {
-                    triangle.events.OnCollisionEnded(convex, this);
-                    convex.events.OnCollisionEnded(triangle, this);
-                }
-            }
-            previousContactCount = contactManifold.contacts.count;
-        }
 
 
         ///<summary>
@@ -345,42 +198,6 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         }
 
 
-        internal override int ContactCount
-        {
-            get { return contactManifold.contacts.count; }
-        }
-
-        internal override void GetContactInformation(int index, out ContactInformation info)
-        {
-            info.Contact = contactManifold.contacts.Elements[index];
-            //Find the contact's normal force.
-            float totalNormalImpulse = 0;
-            info.NormalForce = 0;
-            for (int i = 0; i < contactConstraint.penetrationConstraints.count; i++)
-            {
-                totalNormalImpulse += contactConstraint.penetrationConstraints.Elements[i].accumulatedImpulse;
-                if (contactConstraint.penetrationConstraints.Elements[i].contact == info.Contact)
-                {
-                    info.NormalForce = contactConstraint.penetrationConstraints.Elements[i].accumulatedImpulse;
-                }
-            }
-            //Compute friction force.  Since we are using central friction, this is 'faked.'
-            float radius;
-            Vector3.Distance(ref contactConstraint.slidingFriction.manifoldCenter, ref info.Contact.Position, out radius);
-            info.FrictionForce = (info.NormalForce / totalNormalImpulse) * (contactConstraint.slidingFriction.accumulatedImpulse.Length() + contactConstraint.twistFriction.accumulatedImpulse * radius);
-
-            //Compute relative velocity
-            Vector3 velocity;
-            Vector3.Subtract(ref info.Contact.Position, ref triangle.entity.position, out velocity);
-            Vector3.Cross(ref triangle.entity.angularVelocity, ref velocity, out velocity);
-            Vector3.Add(ref velocity, ref triangle.entity.linearVelocity, out info.RelativeVelocity);
-
-            Vector3.Subtract(ref info.Contact.Position, ref convex.entity.position, out velocity);
-            Vector3.Cross(ref convex.entity.angularVelocity, ref velocity, out velocity);
-            Vector3.Add(ref velocity, ref convex.entity.linearVelocity, out velocity);
-
-            Vector3.Subtract(ref info.RelativeVelocity, ref velocity, out info.RelativeVelocity);
-        }
     }
 
 }

@@ -48,6 +48,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
         ///</summary>
         protected TriangleMeshConvexContactManifold()
         {
+            contacts = new RawList<Contact>(4);
             unusedContacts = new UnsafeResourcePool<Contact>(4);
             contactIndicesToRemove = new RawList<int>(4);
             candidatesToAdd = new RawValueList<ContactData>(1);

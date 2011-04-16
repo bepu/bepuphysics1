@@ -72,7 +72,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         {
             ContactConstraint.UpdateMaterialProperties(
               EntityA == null ? null : EntityA.material,
-              EntityB.material == null ? null : EntityB.material);
+              EntityB == null ? null : EntityB.material);
         }
 
 

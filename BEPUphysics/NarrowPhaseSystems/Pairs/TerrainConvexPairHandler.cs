@@ -16,7 +16,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
     ///<summary>
     /// Handles a terrain-convex collision pair.
     ///</summary>
-    public class TerrainConvexPairHandler : CollidablePairHandler
+    public class TerrainConvexPairHandler : Type1PairHandler
     {
         Terrain terrain;
         ConvexCollidable convex;
@@ -24,45 +24,29 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         TerrainConvexContactManifold contactManifold = new TerrainConvexContactManifold();
         NonConvexContactManifoldConstraint contactConstraint = new NonConvexContactManifoldConstraint();
 
-        Action<Contact> contactAddedDelegate;
-        Action<Contact> contactRemovedDelegate;
-
-        ///<summary>
-        /// Constructs a new pair handler.
-        ///</summary>
-        public TerrainConvexPairHandler()
+        protected override Collidable CollidableA
         {
-            contactAddedDelegate = OnContactAdded;
-            contactRemovedDelegate = OnContactRemoved;
+            get { return convex; }
         }
-
-        void OnContactAdded(Contact contact)
+        protected override Collidable CollidableB
         {
-            contactConstraint.AddContact(contact);
-
-
-            if (!suppressEvents)
-            {
-                terrain.events.OnContactCreated(convex, this, contact);
-                convex.events.OnContactCreated(terrain, this, contact);
-            }
-            if (Parent != null)
-                Parent.OnContactAdded(contact);
-
+            get { return terrain; }
         }
-
-        void OnContactRemoved(Contact contact)
+        protected override Entities.Entity EntityA
         {
-            contactConstraint.RemoveContact(contact);
-
-            if (!suppressEvents)
-            {
-                terrain.events.OnContactRemoved(convex, this, contact);
-                convex.events.OnContactRemoved(terrain, this, contact);
-            }
-            if (Parent != null)
-                Parent.OnContactRemoved(contact);
-
+            get { return convex.entity; }
+        }
+        protected override Entities.Entity EntityB
+        {
+            get { return null; }
+        }
+        protected override ContactManifoldConstraint ContactConstraint
+        {
+            get { return contactConstraint; }
+        }
+        protected override ContactManifold ContactManifold
+        {
+            get { return contactManifold; }
         }
 
         ///<summary>
@@ -85,157 +69,21 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                     throw new Exception("Inappropriate types used to initialize pair.");
             }
 
-            if (!suppressEvents)
-            {
-                terrain.events.OnPairCreated(convex, this);
-                convex.events.OnPairCreated(terrain, this);
-            }
-
-            contactManifold.Initialize(terrain, convex);
-            contactManifold.ContactAdded += contactAddedDelegate;
-            contactManifold.ContactRemoved += contactRemovedDelegate;
-
-            contactConstraint.Initialize(convex.entity, null, this);
-            UpdateMaterialProperties();
+            base.Initialize(entryA, entryB);
 
         }
 
-        ///<summary>
-        /// Forces an update of the pair's material properties.
-        ///</summary>
-        public override void UpdateMaterialProperties()
-        {
-            contactConstraint.UpdateMaterialProperties(
-               convex.entity == null ? null : convex.entity.material,
-               terrain.material);
-        }
-
-        ///<summary>
-        /// Called when the pair handler is added to the narrow phase.
-        ///</summary>
-        public override void OnAddedToNarrowPhase()
-        {
-            terrain.pairs.Add(this);
-            convex.pairs.Add(this);
-        }
 
         ///<summary>
         /// Cleans up the pair handler.
         ///</summary>
         public override void CleanUp()
         {
-            //TODO: These cleanup systems are convoluted, fragile, and duplicated all over the place.  Clean up the clean ups.
-            previousContactCount = 0;
-
-            for (int i = contactManifold.contacts.count - 1; i >= 0; i--)
-            {
-                OnContactRemoved(contactManifold.contacts[i]);
-            }
-
-            //If the constraint is still in the solver, then request to have it removed.
-            if (contactConstraint.solver != null)
-            {
-                contactConstraint.pair = null; //Setting the pair to null tells the constraint that it's going to be orphaned.  It will be cleaned up on removal.
-                if (Parent != null)
-                    Parent.RemoveSolverUpdateable(contactConstraint);
-                else if (NarrowPhase != null)
-                    NarrowPhase.EnqueueRemovedSolverUpdateable(contactConstraint);
-            }
-            else
-                contactConstraint.CleanUpReferences();//The constraint isn't in the solver, so we can safely clean it up directly.
-
-            contactConstraint.CleanUp();
-
-            if (contactManifold.contacts.count > 0 && !suppressEvents)
-            {
-                terrain.events.OnCollisionEnded(convex, this);
-                convex.events.OnCollisionEnded(terrain, this);
-            }
-
-            terrain.pairs.Remove(this);
-            convex.pairs.Remove(this);
-
-            if (!suppressEvents)
-            {
-                terrain.events.OnPairRemoved(convex);
-                convex.events.OnPairRemoved(terrain);
-            }
+            base.CleanUp();
 
             terrain = null;
             convex = null;
 
-
-            contactManifold.CleanUp();
-
-
-            base.CleanUp();
-
-
-        }
-
-        int previousContactCount;
-
-        ///<summary>
-        /// Updates the pair handler.
-        ///</summary>
-        ///<param name="dt">Timestep duration.</param>
-        public override void UpdateCollision(float dt)
-        {
-
-            if (!suppressEvents)
-            {
-                terrain.events.OnPairUpdated(convex, this);
-                convex.events.OnPairUpdated(terrain, this);
-            }
-
-
-            contactManifold.Update(dt);
-
-
-
-            if (contactManifold.contacts.count > 0)
-            {
-                if (!suppressEvents)
-                {
-                    terrain.events.OnPairTouching(convex, this);
-                    convex.events.OnPairTouching(terrain, this);
-                }
-
-                if (previousContactCount == 0)
-                {
-                    //New collision.
-
-                    //Add a solver item.
-                    if (Parent != null)
-                        Parent.AddSolverUpdateable(contactConstraint);
-                    else if (NarrowPhase != null)
-                        NarrowPhase.EnqueueGeneratedSolverUpdateable(contactConstraint);
-
-                    //And notify the pair members.
-                    if (!suppressEvents)
-                    {
-                        terrain.events.OnInitialCollisionDetected(convex, this);
-                        convex.events.OnInitialCollisionDetected(terrain, this);
-                    }
-                }
-            }
-            else if (previousContactCount > 0)
-            {
-                //Just exited collision.
-
-                //Remove the solver item.
-                if (Parent != null)
-                    Parent.RemoveSolverUpdateable(contactConstraint);
-                else if (NarrowPhase != null)
-                    NarrowPhase.EnqueueRemovedSolverUpdateable(contactConstraint);
-
-                if (!suppressEvents)
-                {
-                    terrain.events.OnCollisionEnded(convex, this);
-                    convex.events.OnCollisionEnded(terrain, this);
-                }
-            }
-            previousContactCount = contactManifold.contacts.count;
         }
 
 
@@ -309,10 +157,6 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
 
         }
 
-        internal override int ContactCount
-        {
-            get { return contactManifold.contacts.count; }
-        }
 
         internal override void GetContactInformation(int index, out ContactInformation info)
         {

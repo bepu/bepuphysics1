@@ -20,7 +20,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         ContactManifoldConstraintGroup manifoldConstraintGroup;
 
         protected CompoundCollidable compoundInfo;
-        
+
         Dictionary<CollidablePair, CollidablePairHandler> subPairs = new Dictionary<CollidablePair, CollidablePairHandler>();
         HashSet<CollidablePair> containedPairs = new HashSet<CollidablePair>();
         RawList<CollidablePair> pairsToRemove = new RawList<CollidablePair>();
@@ -93,7 +93,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         ///</summary>
         public override void CleanUp()
         {
-            
+
             //The pair handler cleanup will get rid of contacts.
             foreach (CollidablePairHandler pairHandler in subPairs.Values)
             {
@@ -101,7 +101,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             }
             subPairs.Clear();
             //don't need to remove constraints directly from our group, since cleaning up our children should get rid of them.
-           
+
 
             base.CleanUp();
 
@@ -120,8 +120,11 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                 if (!subPairs.ContainsKey(pair))
                 {
                     CollidablePairHandler newPair = NarrowPhaseHelper.GetPairHandler(ref pair, rule);
-                    newPair.Parent = this;
-                    subPairs.Add(pair, newPair);
+                    if (newPair != null)
+                    {
+                        newPair.Parent = this;
+                        subPairs.Add(pair, newPair);
+                    }
                 }
                 containedPairs.Add(pair);
             }
@@ -173,11 +176,11 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         public override void UpdateTimeOfImpact(Collidable requester, float dt)
         {
             timeOfImpact = 1;
-            foreach(CollidablePairHandler pair in subPairs.Values)
+            foreach (CollidablePairHandler pair in subPairs.Values)
             {
                 //The system uses the identity of the requester to determine if it needs to do handle the TOI calculation.
                 //Use the child pair's own entries as a proxy.
-                if(BroadPhaseOverlap.entryA == requester)
+                if (BroadPhaseOverlap.entryA == requester)
                     pair.UpdateTimeOfImpact(pair.BroadPhaseOverlap.entryA as Collidable, dt);
                 else
                     pair.UpdateTimeOfImpact(pair.BroadPhaseOverlap.entryB as Collidable, dt);
