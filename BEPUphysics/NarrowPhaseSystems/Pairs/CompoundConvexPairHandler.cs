@@ -17,25 +17,9 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
     ///</summary>
     public class CompoundConvexPairHandler : CompoundGroupPairHandler
     {
-        ContactManifoldConstraintGroup manifoldConstraintGroup;
-        
         ConvexCollidable convexInfo;
 
-
-
-        Dictionary<CollidablePair, CollidablePairHandler> subPairs = new Dictionary<CollidablePair, CollidablePairHandler>();
-        HashSet<CollidablePair> containedPairs = new HashSet<CollidablePair>();
-        RawList<CollidablePair> pairsToRemove = new RawList<CollidablePair>();
-
-        ///<summary>
-        /// Gets a list of the pairs associated with children.
-        ///</summary>
-        public ReadOnlyDictionary<CollidablePair, CollidablePairHandler> ChildPairs
-        {
-            get;
-            private set;
-        }
-
+        
         protected override Collidable CollidableB
         {
             get { return convexInfo; }
@@ -46,14 +30,6 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             get { return convexInfo.entity; }
         }
 
-
-        ///<summary>
-        /// Constructs a new compound-convex pair handler.
-        ///</summary>
-        public CompoundConvexPairHandler()
-        {
-            ChildPairs = new ReadOnlyDictionary<CollidablePair, CollidablePairHandler>(subPairs);
-        }
 
 
         ///<summary>

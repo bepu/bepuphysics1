@@ -250,7 +250,7 @@
     <Compile Include="NarrowPhaseSystems\Factories\BoxPairFactory.cs" />
     <Compile Include="NarrowPhaseSystems\Factories\BoxSpherePairFactory.cs" />
     <Compile Include="NarrowPhaseSystems\Factories\CompoundConvexPairFactory.cs" />
-    <None Include="NarrowPhaseSystems\Factories\CompoundPairFactory.cs" />
+    <Compile Include="NarrowPhaseSystems\Factories\CompoundPairFactory.cs" />
     <None Include="NarrowPhaseSystems\Factories\CompoundStaticMeshPairFactory.cs" />
     <None Include="NarrowPhaseSystems\Factories\CompoundTerrainPairFactory.cs" />
     <None Include="NarrowPhaseSystems\Factories\CompoundInstancedMeshPairFactory.cs" />
@@ -264,7 +264,7 @@
     <Compile Include="NarrowPhaseSystems\Pairs\CompoundConvexPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\BoxPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\BoxSpherePairHandler.cs" />
-    <None Include="NarrowPhaseSystems\Pairs\CompoundPairHandler.cs" />
+    <Compile Include="NarrowPhaseSystems\Pairs\CompoundPairHandler.cs" />
     <None Include="NarrowPhaseSystems\Pairs\CompoundStaticMeshPairHandler.cs" />
     <None Include="NarrowPhaseSystems\Pairs\CompoundTerrainPairHandler.cs" />
     <None Include="NarrowPhaseSystems\Pairs\CompoundInstancedMeshPairHandler.cs" />
