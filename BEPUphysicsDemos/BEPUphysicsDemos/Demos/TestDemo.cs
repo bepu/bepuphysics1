@@ -19,6 +19,7 @@ using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.Constraints;
 using BEPUphysics.CollisionTests.CollisionAlgorithms.GJK;
+using BEPUphysics.Constraints.SolverGroups;
 
 namespace BEPUphysicsDemos.Demos
 {
@@ -27,6 +28,23 @@ namespace BEPUphysicsDemos.Demos
     /// </summary>
     public class TestDemo : StandardDemo
     {
+        void ConstructStuff()
+        {
+            CompoundBody body = new CompoundBody(
+            new List<CompoundShapeEntry>
+            {
+                new CompoundShapeEntry(new BoxShape(1,1,1), new Vector3(0,.5f,0)),
+                new CompoundShapeEntry(new BoxShape(2,1,2), new Vector3(0,-.5f,0))
+            }, 10);
+            Cylinder wheel = new Cylinder(new Vector3(0, .5f, 0), .1f, 1, 1);
+            CollisionRules.AddRule(body, wheel, CollisionRule.NoBroadPhase);
+            var joint = new RevoluteJoint(body, wheel, new Vector3(0, 1, 0), Vector3.Up);
+            joint.Motor.IsActive = true;
+            joint.Motor.Settings.VelocityMotor.GoalVelocity = 1;
+            Space.Add(body);
+            Space.Add(wheel);
+            Space.Add(joint);
+        }
 
         /// <summary>
         /// Constructs a new demo.
@@ -35,7 +53,6 @@ namespace BEPUphysicsDemos.Demos
         public TestDemo(DemosGame game)
             : base(game)
         {
-
             Vector3[] vertices;
             int[] indices;
 
@@ -74,7 +91,7 @@ namespace BEPUphysicsDemos.Demos
                 //entityMesh.IsAlwaysActive = true;
             }
 
-            for (int j = 0; j <1; j++)
+            for (int j = 0; j < 1; j++)
             {
                 var toAdd = new Box(new Vector3(0, 25 + j * 0, 0), 2, 2, 2, 1);
                 //toAdd.Material.KineticFriction = 0;

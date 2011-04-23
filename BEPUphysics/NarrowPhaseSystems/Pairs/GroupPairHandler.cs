@@ -18,7 +18,10 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
     public abstract class GroupPairHandler : CollidablePairHandler, IPairHandlerParent
     {
         ContactManifoldConstraintGroup manifoldConstraintGroup;
-
+        
+        Dictionary<CollidablePair, CollidablePairHandler> subPairs = new Dictionary<CollidablePair, CollidablePairHandler>();
+        HashSet<CollidablePair> containedPairs = new HashSet<CollidablePair>();
+        RawList<CollidablePair> pairsToRemove = new RawList<CollidablePair>();
 
 
         ///<summary>
@@ -31,14 +34,29 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         }
 
 
+
         ///<summary>
         /// Constructs a new compound-convex pair handler.
         ///</summary>
         public GroupPairHandler()
         {
             manifoldConstraintGroup = new ContactManifoldConstraintGroup();
+            ChildPairs = new ReadOnlyDictionary<CollidablePair, CollidablePairHandler>(subPairs);
         }
 
+
+
+
+        ///<summary>
+        /// Forces an update of the pair's material properties.
+        ///</summary>
+        public override void UpdateMaterialProperties()
+        {
+            foreach (CollidablePairHandler pairHandler in subPairs.Values)
+            {
+                pairHandler.UpdateMaterialProperties();
+            }
+        }
 
         ///<summary>
         /// Initializes the pair handler.
@@ -55,53 +73,83 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             base.Initialize(entryA, entryB);
         }
 
-
-        //No cleanup method is necessary.  Cleaning up child pairs will clean up the constraint.
-        //If there's a manifold, we don't know about it up here either, so the child type will have to deal with it anyway.
-        //Problem: reference cleanup..
-
-
-        void IPairHandlerParent.AddSolverUpdateable(EntitySolverUpdateable addedItem)
+        ///<summary>
+        /// Cleans up the pair handler.
+        ///</summary>
+        public override void CleanUp()
         {
 
-            manifoldConstraintGroup.Add(addedItem);
-            //If this is the first child solver item to be added, we need to add ourselves to our parent too.
-            if (manifoldConstraintGroup.SolverUpdateables.Count == 1)
+            //The pair handler cleanup will get rid of contacts.
+            foreach (CollidablePairHandler pairHandler in subPairs.Values)
             {
-                if (Parent == null)
-                {
-                    NarrowPhase.EnqueueGeneratedSolverUpdateable(manifoldConstraintGroup);
-                }
-                else
-                {
-                    Parent.AddSolverUpdateable(manifoldConstraintGroup);
-                }
+                pairHandler.CleanUp();
             }
+            subPairs.Clear();
+            //don't need to remove constraints directly from our group, since cleaning up our children should get rid of them.
 
+
+            base.CleanUp();
+
+            //Child type needs to null out the references.
         }
 
-        void IPairHandlerParent.RemoveSolverUpdateable(EntitySolverUpdateable removedItem)
+
+
+        protected void TryToAdd(Collidable a, Collidable b)
+        {
+            CollisionRule rule;
+            if ((rule = CollisionRules.collisionRuleCalculator(a.collisionRules, b.collisionRules)) < CollisionRule.NoNarrowPhasePair)
+            {
+                var pair = new CollidablePair(a, b);
+                if (!subPairs.ContainsKey(pair))
+                {
+                    CollidablePairHandler newPair = NarrowPhaseHelper.GetPairHandler(ref pair, rule);
+                    if (newPair != null)
+                    {
+                        newPair.Parent = this;
+                        subPairs.Add(pair, newPair);
+                    }
+                }
+                containedPairs.Add(pair);
+            }
+        }
+
+        protected abstract void UpdateContainedPairs();
+
+
+        ///<summary>
+        /// Updates the pair handler's contacts.
+        ///</summary>
+        ///<param name="dt">Timestep duration.</param>
+        protected virtual void UpdateContacts(float dt)
         {
 
-            manifoldConstraintGroup.Remove(removedItem);
-
-            //If this is the last child solver item, we need to remove ourselves from our parent too.
-            if (manifoldConstraintGroup.SolverUpdateables.Count == 0)
+            UpdateContainedPairs();
+            //Eliminate old pairs.
+            foreach (CollidablePair pair in subPairs.Keys)
             {
-                if (Parent == null)
-                {
-                    NarrowPhase.EnqueueRemovedSolverUpdateable(manifoldConstraintGroup);
-                }
-                else
-                {
-                    Parent.RemoveSolverUpdateable(manifoldConstraintGroup);
-                }
+                if (!containedPairs.Contains(pair))
+                    pairsToRemove.Add(pair);
+            }
+            for (int i = 0; i < pairsToRemove.count; i++)
+            {
+                CollidablePairHandler toReturn = subPairs[pairsToRemove.Elements[i]];
+                subPairs.Remove(pairsToRemove.Elements[i]);
+                toReturn.CleanUp();
+                (toReturn as INarrowPhasePair).Factory.GiveBack(toReturn);
+
+            }
+            containedPairs.Clear();
+            pairsToRemove.Clear();
+
+            foreach (CollidablePairHandler pair in subPairs.Values)
+            {
+                if (pair.BroadPhaseOverlap.collisionRule < CollisionRule.NoNarrowPhaseUpdate) //Don't test if the collision rules say don't.
+                    pair.UpdateCollision(dt);
             }
 
 
         }
-
-        protected abstract void UpdateContacts(float dt);
 
 
         ///<summary>
@@ -149,9 +197,84 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
 
         }
 
+        ///<summary>
+        /// Updates the time of impact for the pair.
+        ///</summary>
+        ///<param name="requester">Collidable requesting the update.</param>
+        ///<param name="dt">Timestep duration.</param>
+        public override void UpdateTimeOfImpact(Collidable requester, float dt)
+        {
+            timeOfImpact = 1;
+            foreach (CollidablePairHandler pair in subPairs.Values)
+            {
+                //The system uses the identity of the requester to determine if it needs to do handle the TOI calculation.
+                //Use the child pair's own entries as a proxy.
+                if (BroadPhaseOverlap.entryA == requester)
+                    pair.UpdateTimeOfImpact(pair.BroadPhaseOverlap.entryA as Collidable, dt);
+                else
+                    pair.UpdateTimeOfImpact(pair.BroadPhaseOverlap.entryB as Collidable, dt);
+                if (pair.timeOfImpact < timeOfImpact)
+                    timeOfImpact = pair.timeOfImpact;
+            }
+        }
 
 
+        internal override void GetContactInformation(int index, out ContactInformation info)
+        {
+            foreach (CollidablePairHandler pair in subPairs.Values)
+            {
+                int count = pair.Contacts.Count;
+                if (index - count < 0)
+                {
+                    pair.GetContactInformation(index, out info);
+                    return;
+                }
+                index -= count;
+            }
+            throw new IndexOutOfRangeException("Contact index is not present in the pair.");
 
+        }
+
+
+        void IPairHandlerParent.AddSolverUpdateable(EntitySolverUpdateable addedItem)
+        {
+
+            manifoldConstraintGroup.Add(addedItem);
+            //If this is the first child solver item to be added, we need to add ourselves to our parent too.
+            if (manifoldConstraintGroup.SolverUpdateables.Count == 1)
+            {
+                if (Parent == null)
+                {
+                    NarrowPhase.EnqueueGeneratedSolverUpdateable(manifoldConstraintGroup);
+                }
+                else
+                {
+                    Parent.AddSolverUpdateable(manifoldConstraintGroup);
+                }
+            }
+
+        }
+
+        void IPairHandlerParent.RemoveSolverUpdateable(EntitySolverUpdateable removedItem)
+        {
+
+            manifoldConstraintGroup.Remove(removedItem);
+
+            //If this is the last child solver item, we need to remove ourselves from our parent too.
+            if (manifoldConstraintGroup.SolverUpdateables.Count == 0)
+            {
+                if (Parent == null)
+                {
+                    NarrowPhase.EnqueueRemovedSolverUpdateable(manifoldConstraintGroup);
+                }
+                else
+                {
+                    Parent.RemoveSolverUpdateable(manifoldConstraintGroup);
+                }
+            }
+
+
+        }
 
 
         void IPairHandlerParent.OnContactAdded(Contact contact)
@@ -174,6 +297,5 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         {
             get { return contactCount; }
         }
-
     }
 }

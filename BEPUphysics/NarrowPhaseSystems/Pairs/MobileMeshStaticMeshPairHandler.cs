@@ -13,24 +13,22 @@ using BEPUphysics.CollisionTests;
 namespace BEPUphysics.NarrowPhaseSystems.Pairs
 {
     ///<summary>
-    /// Handles a compound and convex collision pair.
+    /// Handles a mobile mesh-static mesh collision pair.
     ///</summary>
-    public class CompoundConvexPairHandler : CompoundGroupPairHandler
+    public class MobileMeshStaticMeshPairHandler : MobileMeshMeshPairHandler
     {
-        ConvexCollidable convexInfo;
 
-        
+
+        StaticMesh staticMesh;
+
         protected override Collidable CollidableB
         {
-            get { return convexInfo; }
+            get { return staticMesh; }
         }
-
         protected override Entities.Entity EntityB
         {
-            get { return convexInfo.entity; }
+            get { return null; }
         }
-
-
 
         ///<summary>
         /// Initializes the pair handler.
@@ -39,15 +37,16 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         ///<param name="entryB">Second entry in the pair.</param>
         public override void Initialize(BroadPhaseEntry entryA, BroadPhaseEntry entryB)
         {
-            convexInfo = entryA as ConvexCollidable;
-            if (convexInfo == null)
+            staticMesh = entryA as StaticMesh;
+            if (staticMesh == null)
             {
-                convexInfo = entryB as ConvexCollidable; 
-                if (convexInfo == null)
+                staticMesh = entryB as StaticMesh;
+                if (staticMesh == null)
                 {
                     throw new Exception("Inappropriate types used to initialize pair.");
                 }
             }
+
 
             base.Initialize(entryA, entryB);
         }
@@ -58,23 +57,26 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         ///</summary>
         public override void CleanUp()
         {
+
             base.CleanUp();
-            convexInfo = null;
+            staticMesh = null;
+
+
         }
+
 
 
 
         protected override void UpdateContainedPairs()
         {
-            var overlappedElements = Resources.GetCompoundChildList();
-            mesh.hierarchy.Tree.GetOverlaps(CollidableB.boundingBox, overlappedElements);
-            for (int i = 0; i < overlappedElements.count; i++)
+            var overlappedElements = Resources.GetIntList();
+            staticMesh.Mesh.Tree.GetOverlaps(staticMesh.boundingBox, overlappedElements);
+            for (int i = 0; i < overlappedElements.Count; i++)
             {
-                TryToAdd(overlappedElements.Elements[i].CollisionInformation, CollidableB);
+                TryToAdd(overlappedElements[i], staticMesh);
             }
 
             Resources.GiveBack(overlappedElements);
-
 
         }
 

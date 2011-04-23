@@ -104,7 +104,10 @@
     <Compile Include="Collidables\Events\IEntryEventTriggerer.cs" />
     <Compile Include="Collidables\MobileCollidables\MobileMeshCollidable.cs" />
     <Compile Include="CollisionShapes\MobileMeshShape.cs" />
+    <Compile Include="CollisionTests\CollisionAlgorithms\TriangleMeshConvexPairTester.cs" />
     <Compile Include="CollisionTests\Manifolds\BoxSphereContactManifold.cs" />
+    <Compile Include="CollisionTests\Manifolds\MobileMeshMeshContactManifold.cs" />
+    <Compile Include="CollisionTests\Manifolds\MobileMeshStaticMeshContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\SphereContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\MobileMeshConvexContactManifold.cs" />
     <Compile Include="DataStructures\BoundingBoxTree.cs" />
@@ -234,9 +237,10 @@
     <Compile Include="NarrowPhaseSystems\Pairs\ContactInformation.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\ConvexPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\CompoundGroupPairHandler.cs" />
+    <Compile Include="NarrowPhaseSystems\Pairs\MobileMeshStaticMeshPairHandler.cs" />
+    <Compile Include="NarrowPhaseSystems\Pairs\MobileMeshMeshPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\GroupPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\Type1PairHandler.cs" />
-    <None Include="NarrowPhaseSystems\Pairs\MobileMeshMeshPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\MobileMeshConvexPairHandler.cs" />
     <Compile Include="PositionUpdating\ContinuousPositionUpdater.cs" />
     <Compile Include="PositionUpdating\DiscretePositionUpdater.cs" />

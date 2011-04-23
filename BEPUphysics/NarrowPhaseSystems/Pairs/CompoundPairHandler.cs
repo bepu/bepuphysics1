@@ -62,7 +62,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         RawList<TreeOverlapPair<CompoundChild, CompoundChild>> overlappedElements = new RawList<TreeOverlapPair<CompoundChild, CompoundChild>>();
         protected override void UpdateContainedPairs()
         {
-            compoundInfo.hierarchy.Tree.GetOverlaps(compoundInfoB.hierarchy.Tree, overlappedElements);
+            mesh.hierarchy.Tree.GetOverlaps(compoundInfoB.hierarchy.Tree, overlappedElements);
             for (int i = 0; i < overlappedElements.count; i++)
             {
                 TryToAdd(overlappedElements.Elements[i].OverlapA.CollisionInformation, overlappedElements.Elements[i].OverlapB.CollisionInformation);
