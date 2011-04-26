@@ -102,16 +102,18 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         {
             //TODO: This conditional early outing stuff could be pulled up into a common system, along with most of the pair handler.
             var overlap = BroadPhaseOverlap;
+            var convexMode = convex.entity == null ? PositionUpdateMode.Discrete : convex.entity.PositionUpdateMode;
+            bool convexIsActive = convex.entity == null ? false : convex.entity.isActive;
             if (
-                    (overlap.entryA.IsActive || overlap.entryB.IsActive) && //At least one has to be active.
+                    (mobileMesh.IsActive || convex.entity == null ? false : convex.entity.isActive) && //At least one has to be active.
                     (
                         (
-                            convex.entity.PositionUpdateMode == PositionUpdateMode.Continuous &&   //If both are continuous, only do the process for A.
+                            convexMode == PositionUpdateMode.Continuous &&   //If both are continuous, only do the process for A.
                             mobileMesh.entity.PositionUpdateMode == PositionUpdateMode.Continuous &&
                             overlap.entryA == requester
                         ) ||
                         (
-                            convex.entity.PositionUpdateMode == PositionUpdateMode.Continuous ^   //If only one is continuous, then we must do it.
+                            convexMode == PositionUpdateMode.Continuous ^   //If only one is continuous, then we must do it.
                             mobileMesh.entity.PositionUpdateMode == PositionUpdateMode.Continuous
                         )
                     )
@@ -122,7 +124,10 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
 
                 //Only perform the test if the minimum radii are small enough relative to the size of the velocity.
                 Vector3 velocity;
-                Vector3.Subtract(ref convex.entity.linearVelocity, ref mobileMesh.entity.linearVelocity, out velocity);
+                if (convex.entity != null)
+                    Vector3.Subtract(ref convex.entity.linearVelocity, ref mobileMesh.entity.linearVelocity, out velocity);
+                else
+                    Vector3.Negate(ref mobileMesh.entity.linearVelocity, out velocity);
                 Vector3.Multiply(ref velocity, dt, out velocity);
                 float velocitySquared = velocity.LengthSquared();
 
@@ -224,9 +229,24 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
 
             //Compute relative velocity
             Vector3 velocity;
-            Vector3.Subtract(ref info.Contact.Position, ref convex.entity.position, out velocity);
-            Vector3.Cross(ref convex.entity.angularVelocity, ref velocity, out velocity);
-            Vector3.Add(ref velocity, ref convex.entity.linearVelocity, out info.RelativeVelocity);
+            if (convex.entity == null)
+            {
+                Vector3.Subtract(ref info.Contact.Position, ref mobileMesh.entity.position, out velocity);
+                Vector3.Cross(ref mobileMesh.entity.angularVelocity, ref velocity, out velocity);
+                Vector3.Add(ref velocity, ref mobileMesh.entity.linearVelocity, out info.RelativeVelocity);
+                Vector3.Negate(ref info.RelativeVelocity, out info.RelativeVelocity);
+            }
+            else
+            {
+                Vector3.Subtract(ref info.Contact.Position, ref convex.entity.position, out velocity);
+                Vector3.Cross(ref convex.entity.angularVelocity, ref velocity, out velocity);
+                Vector3.Add(ref velocity, ref convex.entity.linearVelocity, out info.RelativeVelocity);
+
+                Vector3.Subtract(ref info.Contact.Position, ref mobileMesh.entity.position, out velocity);
+                Vector3.Cross(ref mobileMesh.entity.angularVelocity, ref velocity, out velocity);
+                Vector3.Add(ref velocity, ref mobileMesh.entity.linearVelocity, out velocity);
+                Vector3.Subtract(ref info.RelativeVelocity, ref velocity, out info.RelativeVelocity);
+            }
         }
 
      

@@ -221,6 +221,7 @@
     <Compile Include="NarrowPhaseSystems\Factories\CompoundInstancedMeshPairFactory.cs" />
     <Compile Include="NarrowPhaseSystems\Factories\InstancedMeshConvexPairFactory.cs" />
     <Compile Include="NarrowPhaseSystems\Factories\MobileMeshConvexPairFactory.cs" />
+    <Compile Include="NarrowPhaseSystems\Factories\MobileMeshStaticMeshPairFactory.cs" />
     <Compile Include="NarrowPhaseSystems\Factories\NarrowPhasePairFactory.cs" />
     <Compile Include="NarrowPhaseSystems\Factories\TerrainConvexPairFactory.cs" />
     <Compile Include="NarrowPhaseSystems\Factories\StaticMeshConvexPairFactory.cs" />

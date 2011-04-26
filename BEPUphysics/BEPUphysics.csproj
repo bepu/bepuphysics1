@@ -231,6 +231,7 @@
     <Compile Include="Entities\Prefabs\Triangle.cs" />
     <Compile Include="Entities\Prefabs\WrappedBody.cs" />
     <Compile Include="NarrowPhaseSystems\Factories\CompoundMobileMeshPairFactory.cs" />
+    <Compile Include="NarrowPhaseSystems\Factories\MobileMeshStaticMeshPairFactory.cs" />
     <Compile Include="NarrowPhaseSystems\Factories\MobileMeshConvexPairFactory.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\CompoundMobileMeshPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\ContactCollection.cs" />

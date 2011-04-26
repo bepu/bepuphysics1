@@ -68,9 +68,11 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
 
 
         protected override void UpdateContainedPairs()
-        {
+        {           
+            //Could go other way; get triangles in mesh that overlap the compound.
+            //Could be faster sometimes depending on the way it's set up.
             var overlappedElements = Resources.GetCompoundChildList();
-            terrain.Shape.GetOverlaps(compoundInfo.boundingBox, overlappedElements);
+            compoundInfo.hierarchy.Tree.GetOverlaps(terrain.boundingBox, overlappedElements);
             for (int i = 0; i < overlappedElements.count; i++)
             {
                 TryToAdd(overlappedElements.Elements[i].CollisionInformation, terrain);

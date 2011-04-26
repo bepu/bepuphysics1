@@ -42,7 +42,10 @@ namespace BEPUphysics.CollisionTests.Manifolds
             Vector3 transformedVelocity;
             //Compute the relative velocity with respect to the mesh.  The mesh's bounding tree is NOT expanded with velocity,
             //so whatever motion there is between the two objects needs to be included in the convex's bounding box.
-            Vector3.Subtract(ref convex.entity.linearVelocity, ref mesh.entity.linearVelocity, out transformedVelocity);
+            if (convex.entity != null)
+                Vector3.Subtract(ref convex.entity.linearVelocity, ref mesh.entity.linearVelocity, out transformedVelocity);
+            else
+                Vector3.Negate(ref mesh.entity.linearVelocity, out transformedVelocity);
             //The linear transform is known to be orientation only, so using the transpose is allowed.
             Matrix3X3.TransformTranspose(ref transformedVelocity, ref transform.LinearTransform, out transformedVelocity);
             Vector3.Multiply(ref transformedVelocity, dt, out transformedVelocity);

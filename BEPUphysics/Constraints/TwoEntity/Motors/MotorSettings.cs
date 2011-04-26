@@ -55,6 +55,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
             set
             {
                 maximumForce = value >= 0 ? value : 0;
+                WakeUpEntities();
             }
         }
 
@@ -67,7 +68,24 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
         public MotorMode Mode
         {
             get { return mode; }
-            set { mode = value; }
+            set
+            {
+                mode = value;
+                WakeUpEntities();
+            }
+        }
+
+        internal void WakeUpEntities()
+        {
+            for (int i = 0; i < motor.involvedEntities.count; i++)
+            {
+                if (motor.involvedEntities[i].isDynamic)
+                {
+                    if (!motor.involvedEntities[i].isActive)
+                        motor.involvedEntities[i].IsActive = true;
+                    break;
+                }
+            }
         }
     }
 
@@ -210,6 +228,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
             set
             {
                 baseCorrectiveSpeed = value < 0 ? 0 : value;
+                motorSettings.WakeUpEntities();
             }
         }
 
@@ -230,6 +249,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
                 {
                     maxCorrectiveVelocitySquared = maxCorrectiveVelocity * maxCorrectiveVelocity;
                 }
+                motorSettings.WakeUpEntities();
             }
         }
 
@@ -268,13 +288,12 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
             get { return goal; }
             set
             {
-                if (motorSettings.motor.involvedEntities.Count > 0 &&
-                    !motorSettings.motor.involvedEntities[0].IsActive &&
-                    goal != value)
-                    motorSettings.motor.involvedEntities[0].IsActive = true;
                 goal = value;
+                motorSettings.WakeUpEntities();
             }
         }
+
+
     }
 
     /// <summary>
@@ -298,11 +317,8 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
             get { return goal; }
             set
             {
-                if (motorSettings.motor.involvedEntities.Count > 0 &&
-                    !motorSettings.motor.involvedEntities[0].IsActive &&
-                    goal != value)
-                    motorSettings.motor.involvedEntities[0].IsActive = true;
                 goal = value;
+                motorSettings.WakeUpEntities();
             }
         }
     }
@@ -328,11 +344,8 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
             get { return goal; }
             set
             {
-                if (motorSettings.motor.involvedEntities.Count > 0 &&
-                    !motorSettings.motor.involvedEntities[0].IsActive &&
-                    goal != value)
-                    motorSettings.motor.involvedEntities[0].IsActive = true;
                 goal = value;
+                motorSettings.WakeUpEntities();
             }
         }
     }
@@ -371,6 +384,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
             set
             {
                 softness = value < 0 ? 0 : value;
+                motorSettings.WakeUpEntities();
             }
         }
     }
@@ -396,11 +410,8 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
             get { return goalVelocity; }
             set
             {
-                if (motorSettings.motor.involvedEntities.Count > 0 &&
-                    !motorSettings.motor.involvedEntities[0].IsActive &&
-                    goalVelocity != value)
-                    motorSettings.motor.involvedEntities[0].IsActive = true;
                 goalVelocity = value;
+                motorSettings.WakeUpEntities();
             }
         }
     }
@@ -426,11 +437,8 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
             get { return goalVelocity; }
             set
             {
-                if (motorSettings.motor.involvedEntities.Count > 0 &&
-                    !motorSettings.motor.involvedEntities[0].IsActive &&
-                    goalVelocity != value)
-                    motorSettings.motor.involvedEntities[0].IsActive = true;
                 goalVelocity = value;
+                motorSettings.WakeUpEntities();
             }
         }
     }

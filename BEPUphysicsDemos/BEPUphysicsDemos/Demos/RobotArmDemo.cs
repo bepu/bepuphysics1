@@ -52,10 +52,6 @@ namespace BEPUphysicsDemos.Demos
             Space.Add(ground);
 
             var armBase = new Cylinder(new Vector3(0, 2, 0), 2.5f, 1, 40);
-            //If the object is sleeping when servos are activated, the servo
-            //won't appear to work.  You can either wake up the object or 
-            //just make it always active.
-            armBase.IsAlwaysActive = true;
             Space.Add(armBase);
 
             //The arm base can rotate around the Y axis.

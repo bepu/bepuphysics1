@@ -9,6 +9,7 @@ using BEPUphysics.DataStructures;
 using BEPUphysics.ResourceManagement;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.CollisionTests;
+using Microsoft.Xna.Framework;
 
 namespace BEPUphysics.NarrowPhaseSystems.Pairs
 {
@@ -17,7 +18,6 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
     ///</summary>
     public class MobileMeshStaticMeshPairHandler : MobileMeshMeshPairHandler
     {
-
 
         StaticMesh staticMesh;
 
@@ -70,7 +70,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         protected override void UpdateContainedPairs()
         {
             var overlappedElements = Resources.GetIntList();
-            staticMesh.Mesh.Tree.GetOverlaps(staticMesh.boundingBox, overlappedElements);
+            staticMesh.Mesh.Tree.GetOverlaps(mesh.boundingBox, overlappedElements);
             for (int i = 0; i < overlappedElements.Count; i++)
             {
                 TryToAdd(overlappedElements[i], staticMesh);
@@ -78,6 +78,11 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
 
             Resources.GiveBack(overlappedElements);
 
+        }
+
+        protected override void GetTriangleVertices(int i, out Vector3 vA, out Vector3 vB, out Vector3 vC)
+        {
+            staticMesh.Shape.TriangleMeshData.GetTriangle(i, out vA, out vB, out vC);
         }
 
 

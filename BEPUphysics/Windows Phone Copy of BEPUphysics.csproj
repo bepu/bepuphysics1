@@ -129,6 +129,7 @@
     <Compile Include="MultithreadedProcessingStage.cs" />
     <Compile Include="NarrowPhaseSystems\Factories\CompoundMobileMeshPairFactory.cs" />
     <Compile Include="NarrowPhaseSystems\Factories\MobileMeshConvexPairFactory.cs" />
+    <Compile Include="NarrowPhaseSystems\Factories\MobileMeshStaticMeshPairFactory.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\CompoundGroupPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\CompoundMobileMeshPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\ConvexPairHandler.cs" />

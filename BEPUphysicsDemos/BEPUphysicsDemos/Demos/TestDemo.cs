@@ -57,15 +57,21 @@ namespace BEPUphysicsDemos.Demos
             int[] indices;
 
 
-            TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("hollowsphere"), out vertices, out indices);
+            TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("cube"), out vertices, out indices);
+            AffineTransform transform = new AffineTransform(new Vector3(100, 1, 100), Quaternion.Identity, new Vector3(0, 0, 0));
+            StaticMesh staticMesh = new StaticMesh(vertices, indices, transform);
+            Space.Add(staticMesh);
+            game.ModelDrawer.Add(staticMesh.Mesh);
 
+            TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("hollowsphere"), out vertices, out indices);
             MotionSettings.DefaultPositionUpdateMode = PositionUpdateMode.Continuous;
             ShapeDistributionInformation info;
             //AffineTransform transform = new AffineTransform(new Vector3(2, 1, 2), Quaternion.CreateFromAxisAngle(new Vector3(1, 0, 0), MathHelper.Pi), new Vector3(0, 0, 0));
-            AffineTransform transform = new AffineTransform(new Vector3(.03f, .03f, .03f), Quaternion.Identity, new Vector3(0, 10, 0));
+            transform = new AffineTransform(new Vector3(.03f, .03f, .03f), Quaternion.Identity, new Vector3(0, 0, 0));
             var shape = new MobileMeshShape(vertices, indices, transform, MobileMeshSolidity.Solid, out info);
             //CollisionResponseSettings.PenetrationRecoveryStiffness = 1f;
             //CollisionResponseSettings.MaximumPositionCorrectionSpeed = float.MaxValue;
+
 
             Space.Remove(kapow);
             kapow = new Sphere(new Vector3(10000, 0, 0), .5f, 1);
@@ -81,7 +87,7 @@ namespace BEPUphysicsDemos.Demos
             {
                 var entityMesh = new Entity<MobileMeshCollidable>(new MobileMeshCollidable(shape), mass, inertia, info.Volume);
                 entityMesh.CollisionInformation.ImproveBoundaryBehavior = true;
-                entityMesh.Position = new Vector3(0, 20, 0);
+                entityMesh.Position = new Vector3(0, 40, 0);
                 //entityMesh.AngularVelocity = new Vector3(1, 1, 1);
                 //entityMesh.LinearVelocity = new Vector3(1, 0, 0);
                 //entityMesh.Material.KineticFriction = 0;
@@ -89,15 +95,16 @@ namespace BEPUphysicsDemos.Demos
                 //entityMesh.LocalInertiaTensorInverse = new Matrix3X3();
                 Space.Add(entityMesh);
                 //entityMesh.IsAlwaysActive = true;
+                meshCollidable = entityMesh.CollisionInformation;
             }
 
-            for (int j = 0; j < 1; j++)
-            {
-                var toAdd = new Box(new Vector3(0, 25 + j * 0, 0), 2, 2, 2, 1);
-                //toAdd.Material.KineticFriction = 0;
-                //toAdd.Material.StaticFriction = 0;
-                Space.Add(toAdd);
-            }
+            //for (int j = 0; j < 1; j++)
+            //{
+            //    var toAdd = new Box(new Vector3(0, 25 + j * 0, 0), 2, 2, 2, 1);
+            //    //toAdd.Material.KineticFriction = 0;
+            //    //toAdd.Material.StaticFriction = 0;
+            //    Space.Add(toAdd);
+            //}
 
             Space.Add(new Box(new Vector3(0, -10, 0), 100, 1, 100));
             game.Camera.Position = new Vector3(0, 20, 45);
@@ -193,19 +200,21 @@ namespace BEPUphysicsDemos.Demos
         bool contained = true;
         Random random = new Random();
 
+        MobileMeshCollidable meshCollidable;
+
         List<Entity> containedEntities = new List<Entity>();
 
         public override void Update(float dt)
         {
             KeyboardState state = Keyboard.GetState();
 
-            if (state.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.P))
-            {
-                Debug.WriteLine("Break.");
-                var overlaps = new List<BroadPhaseEntry>();
-                Space.BroadPhase.QueryAccelerator.GetEntries(new BoundingBox(new Vector3(-10000000, -10000000, -10000000), new Vector3(10000000, -50, 10000000)), overlaps);
-                Debug.WriteLine("Count: " + overlaps.Count);
-            }
+            //if (state.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.P))
+            //{
+            //    Debug.WriteLine("Break.");
+            //    var overlaps = new List<BroadPhaseEntry>();
+            //    Space.BroadPhase.QueryAccelerator.GetEntries(new BoundingBox(new Vector3(-10000000, -10000000, -10000000), new Vector3(10000000, -50, 10000000)), overlaps);
+            //    Debug.WriteLine("Count: " + overlaps.Count);
+            //}
 
             base.Update(dt);
         }

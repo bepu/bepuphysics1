@@ -67,7 +67,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         protected override void UpdateContainedPairs()
         {
             var overlappedElements = Resources.GetCompoundChildList();
-            mesh.hierarchy.Tree.GetOverlaps(CollidableB.boundingBox, overlappedElements);
+            compoundInfo.hierarchy.Tree.GetOverlaps(convexInfo.boundingBox, overlappedElements);
             for (int i = 0; i < overlappedElements.count; i++)
             {
                 TryToAdd(overlappedElements.Elements[i].CollisionInformation, CollidableB);
