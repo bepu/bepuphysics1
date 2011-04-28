@@ -103,6 +103,7 @@
     <Compile Include="CollisionTests\CollisionAlgorithms\GJK\RaySimplex.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\GJK\SimpleSimplex.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\GJK\Simplex.cs" />
+    <Compile Include="CollisionTests\CollisionAlgorithms\MPRTesting.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\TriangleConvexPairTester.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\SphereTester.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\TriangleMeshConvexPairTester.cs" />
@@ -301,7 +302,6 @@
     <Compile Include="DataStructures\MeshBoundingBoxTreeData.cs" />
     <Compile Include="DataStructures\ObservableDictionary.cs" />
     <Compile Include="DataStructures\HashSet.cs" />
-    <Compile Include="DataStructures\PriorityQueue.cs" />
     <Compile Include="DataStructures\ReadOnlyDictionary.cs" />
     <Compile Include="DataStructures\ReadOnlyEnumerable.cs" />
     <Compile Include="DataStructures\TinyList.cs" />

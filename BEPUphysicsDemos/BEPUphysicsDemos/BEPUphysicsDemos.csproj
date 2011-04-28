@@ -123,6 +123,7 @@
     <Compile Include="Demos\SleepModeDemo.cs" />
     <Compile Include="Demos\SpaceshipDemo.cs" />
     <Compile Include="Demos\TerrainDemo.cs" />
+    <Compile Include="Demos\TestDemo2.cs" />
     <Compile Include="Demos\TornadoDemo.cs" />
     <Compile Include="Demos\UnfortunateGuyDemo.cs" />
     <Compile Include="Demos\DiscreteVsContinuousDemo.cs" />

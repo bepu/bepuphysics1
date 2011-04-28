@@ -57,18 +57,18 @@ namespace BEPUphysicsDemos.Demos
             int[] indices;
 
 
-            TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("cube"), out vertices, out indices);
-            AffineTransform transform = new AffineTransform(new Vector3(100, 1, 100), Quaternion.Identity, new Vector3(0, 0, 0));
+            TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("playground"), out vertices, out indices);
+            AffineTransform transform = new AffineTransform(new Vector3(1, 1, 1), Quaternion.Identity, new Vector3(0, -30, 0));
             StaticMesh staticMesh = new StaticMesh(vertices, indices, transform);
-            Space.Add(staticMesh);
-            game.ModelDrawer.Add(staticMesh.Mesh);
+            //Space.Add(staticMesh);
+            //game.ModelDrawer.Add(staticMesh.Mesh);
 
-            TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("hollowsphere"), out vertices, out indices);
+            TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("cube"), out vertices, out indices);
             MotionSettings.DefaultPositionUpdateMode = PositionUpdateMode.Continuous;
             ShapeDistributionInformation info;
-            //AffineTransform transform = new AffineTransform(new Vector3(2, 1, 2), Quaternion.CreateFromAxisAngle(new Vector3(1, 0, 0), MathHelper.Pi), new Vector3(0, 0, 0));
-            transform = new AffineTransform(new Vector3(.03f, .03f, .03f), Quaternion.Identity, new Vector3(0, 0, 0));
-            var shape = new MobileMeshShape(vertices, indices, transform, MobileMeshSolidity.Solid, out info);
+            transform = new AffineTransform(new Vector3(1, 1, 1), Quaternion.CreateFromAxisAngle(new Vector3(1, 0, 0), MathHelper.Pi), new Vector3(0, 0, 0));
+            //transform = new AffineTransform(new Vector3(.03f, .03f, .03f), Quaternion.Identity, new Vector3(0, 0, 0));
+            var shape = new MobileMeshShape(vertices, indices, transform, MobileMeshSolidity.DoubleSided, out info);
             //CollisionResponseSettings.PenetrationRecoveryStiffness = 1f;
             //CollisionResponseSettings.MaximumPositionCorrectionSpeed = float.MaxValue;
 
@@ -106,7 +106,7 @@ namespace BEPUphysicsDemos.Demos
             //    Space.Add(toAdd);
             //}
 
-            Space.Add(new Box(new Vector3(0, -10, 0), 100, 1, 100));
+            Space.Add(new Box(new Vector3(0, -10, 0), 100, 100, 100));
             game.Camera.Position = new Vector3(0, 20, 45);
             game.Camera.Yaw = 0;
             game.Camera.Pitch = 0;
