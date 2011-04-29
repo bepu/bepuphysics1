@@ -52,5 +52,10 @@ namespace BEPUphysics.ResourceManagement
                 InstanceInitializer(toReturn);
             return toReturn;
         }
+
+        /// <summary>
+        /// Removes all elements from the pool.
+        /// </summary>
+        public abstract void Clear();
     }
 }

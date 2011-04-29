@@ -99,5 +99,13 @@ namespace BEPUphysics.ResourceManagement
                 return CreateNewResource();
             }
         }
+
+        /// <summary>
+        /// Clears out the resource pool.
+        /// </summary>
+        public override void Clear()
+        {
+            stack.Clear();
+        }
     }
 }

@@ -98,5 +98,17 @@ namespace BEPUphysics.ResourceManagement
             }
             return CreateNewResource();
         }
+
+        /// <summary>
+        /// Clears out the resource pool.
+        /// </summary>
+        public override void Clear()
+        {
+            while (stack.Count > 0)
+            {
+                T item;
+                stack.TryDequeueFirst(out item);
+            }
+        }
     }
 }

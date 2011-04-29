@@ -1,5 +1,6 @@
 ﻿using BEPUphysics.Collidables.MobileCollidables;
 using BEPUphysics.MathExtensions;
+using BEPUphysics.CollisionShapes;
 
 namespace BEPUphysics.Entities
 {
@@ -62,6 +63,47 @@ namespace BEPUphysics.Entities
         public MorphableEntity(EntityCollidable collisionInformation, float mass, Matrix3X3 inertiaTensor, float volume)
         {
             Initialize(collisionInformation, mass, inertiaTensor, volume);
+        }
+
+        ///<summary>
+        /// Constructs a new morphable entity.
+        ///</summary>
+        ///<param name="shape">Shape to use with the entity.</param>
+        public MorphableEntity(EntityShape shape)
+        {
+            Initialize(shape.GetMobileInstance());
+        }
+
+        ///<summary>
+        /// Constructs a new morphable entity.
+        ///</summary>
+        ///<param name="shape">Shape to use with the entity.</param>
+        ///<param name="mass">Mass of the entity.</param>
+        public MorphableEntity(EntityShape shape, float mass)
+        {
+            Initialize(shape.GetMobileInstance(), mass);
+        }
+
+        ///<summary>
+        /// Constructs a new morphable entity.
+        ///</summary>
+        ///<param name="shape">Shape to use with the entity.</param>
+        ///<param name="mass">Mass of the entity.</param>
+        /// <param name="inertiaTensor">Inertia tensor of the entity.</param>
+        public MorphableEntity(EntityShape shape, float mass, Matrix3X3 inertiaTensor)
+        {
+            Initialize(shape.GetMobileInstance(), mass, inertiaTensor);
+        }
+        ///<summary>
+        /// Constructs a new morphable entity.
+        ///</summary>
+        ///<param name="shape">Shape to use with the entity.</param>
+        ///<param name="mass">Mass of the entity.</param>
+        /// <param name="inertiaTensor">Inertia tensor of the entity.</param>
+        /// <param name="volume">Volume of the entity.</param>
+        public MorphableEntity(EntityShape shape, float mass, Matrix3X3 inertiaTensor, float volume)
+        {
+            Initialize(shape.GetMobileInstance(), mass, inertiaTensor, volume);
         }
 
         /// <summary>

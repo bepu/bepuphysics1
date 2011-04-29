@@ -1,11 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
+using System;
 
 namespace BEPUphysics.EntityStateManagement
 {
     ///<summary>
     /// State describing the position, orientation, and velocity of an entity.
     ///</summary>
-    public struct MotionState
+    public struct MotionState : IEquatable<MotionState>
     {
         ///<summary>
         /// Position of an entity.
@@ -48,5 +49,14 @@ namespace BEPUphysics.EntityStateManagement
         /// Angular velocity of an entity.
         ///</summary>
         public Vector3 AngularVelocity;
+
+
+        public bool Equals(MotionState other)
+        {
+            return other.AngularVelocity == AngularVelocity &&
+                   other.LinearVelocity == LinearVelocity &&
+                   other.Position == Position &&
+                   other.Orientation == Orientation;
+        }
     }
 }
