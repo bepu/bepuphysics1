@@ -177,6 +177,7 @@ namespace BEPUphysicsDrawer.Models
         public void Remove(object objectToRemove)
         {
             Remove(displayObjects[objectToRemove]);
+            displayObjects.Remove(objectToRemove);   
         }
 
         /// <summary>

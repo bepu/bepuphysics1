@@ -77,7 +77,7 @@ namespace BEPUphysicsDrawer.Models
                 indices[i] += baseVertexBufferIndex;
             }
             BatchInformation.VertexCount = vertices.Count;
-            BatchInformation.IndexCount = vertices.Count;
+            BatchInformation.IndexCount = indices.Count;
         }
 
         /// <summary>

@@ -54,12 +54,14 @@
     <Compile Include="BroadPhaseSystems\BroadPhase.cs" />
     <Compile Include="BroadPhaseSystems\BroadPhaseEntry.cs" />
     <Compile Include="BroadPhaseSystems\BroadPhaseOverlap.cs" />
+    <Compile Include="BroadPhaseSystems\BruteForce.cs" />
     <Compile Include="BroadPhaseSystems\Hierarchies\DynamicHierarchy.cs" />
     <Compile Include="BroadPhaseSystems\Hierarchies\DynamicHierarchyNode.cs" />
     <Compile Include="BroadPhaseSystems\Hierarchies\DynamicHierarchyQueryAccelerator.cs" />
     <Compile Include="BroadPhaseSystems\IBoundingBoxOwner.cs" />
     <Compile Include="BroadPhaseSystems\IBroadPhaseEntryOwner.cs" />
     <Compile Include="BroadPhaseSystems\IQueryAccelerator.cs" />
+    <Compile Include="BroadPhaseSystems\SweepAndPrune.cs" />
     <Compile Include="Collidables\Collidable.cs" />
     <Compile Include="Collidables\CollidableCollection.cs" />
     <Compile Include="Collidables\CollidablePair.cs" />

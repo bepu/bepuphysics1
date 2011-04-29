@@ -23,7 +23,6 @@ namespace BEPUphysicsDrawer.Models
         private readonly EffectParameter viewParameter;
         private readonly EffectParameter worldTransformsParameter;
         internal VertexDeclaration instancingVertexDeclaration;
-        internal VertexDeclaration vertexDeclaration;
 
         public InstancedModelDrawer(Game game)
             : base(game)
