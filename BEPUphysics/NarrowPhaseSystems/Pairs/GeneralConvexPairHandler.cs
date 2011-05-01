@@ -15,13 +15,12 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
     ///<summary>
     /// Handles a convex-convex collision pair.
     ///</summary>
-    public class GeneralConvexPairHandler : ConvexPairHandler
+    public class GeneralConvexPairHandler : ConvexConstraintPairHandler
     {
         ConvexCollidable convexA;
         ConvexCollidable convexB;
 
         GeneralConvexContactManifold contactManifold = new GeneralConvexContactManifold();
-        ConvexContactManifoldConstraint contactConstraint = new ConvexContactManifoldConstraint();
 
 
         protected override Collidable CollidableA
@@ -31,13 +30,6 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         protected override Collidable CollidableB
         {
             get { return convexB; }
-        }
-        protected override ContactManifoldConstraint ContactConstraint
-        {
-            get
-            {
-                return contactConstraint;
-            }
         }
         protected override ContactManifold ContactManifold
         {

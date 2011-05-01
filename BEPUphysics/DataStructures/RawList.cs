@@ -204,11 +204,17 @@ namespace BEPUphysics.DataStructures
         {
             get
             {
-                return Elements[index];
+                if (index < count && index >= 0)
+                    return Elements[index];
+                else
+                    throw new IndexOutOfRangeException("Index is outside of the list's bounds.");
             }
             set
             {
-                Elements[index] = value;
+                if (index < count && index >= 0)
+                    Elements[index] = value;
+                else
+                    throw new IndexOutOfRangeException("Index is outside of the list's bounds.");
             }
         }
 

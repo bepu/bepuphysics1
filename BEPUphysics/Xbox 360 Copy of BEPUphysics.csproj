@@ -244,6 +244,7 @@
     <Compile Include="NarrowPhaseSystems\Pairs\CompoundInstancedMeshPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\ContactCollection.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\ContactInformation.cs" />
+    <Compile Include="NarrowPhaseSystems\Pairs\ConvexConstraintPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\ConvexPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\GroupPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\InstancedMeshConvexPairHandler.cs" />

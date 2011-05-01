@@ -25,8 +25,8 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
         Vector3 localSeparatingAxis;
         CachedSimplex cachedSimplex;
 
-        protected internal ConvexCollidable informationA;
-        protected internal ConvexCollidable informationB;
+        protected internal ConvexCollidable collidableA;
+        protected internal ConvexCollidable collidableB;
 
         ///<summary>
         /// Gets the first collidable in the pair.
@@ -35,7 +35,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
         {
             get
             {
-                return informationA;
+                return collidableA;
             }
         }
         ///<summary>
@@ -45,7 +45,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
         {
             get
             {
-                return informationB;
+                return collidableB;
             }
         }
 
@@ -83,7 +83,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             switch (state)
             {
                 case CollisionState.Separated:
-                    if (GJKToolbox.AreShapesIntersecting(informationA.Shape, informationB.Shape, ref informationA.worldTransform, ref informationB.worldTransform, ref localSeparatingAxis))
+                    if (GJKToolbox.AreShapesIntersecting(collidableA.Shape, collidableB.Shape, ref collidableA.worldTransform, ref collidableB.worldTransform, ref localSeparatingAxis))
                     {
                         state = CollisionState.ShallowContact;
                         return DoShallowContact(out contact);
@@ -127,13 +127,13 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
             bool intersecting;
             if (UseSimplexCaching)
-                intersecting = GJKToolbox.GetClosestPoints(informationA.Shape, informationB.Shape, ref informationA.worldTransform, ref informationB.worldTransform, ref cachedSimplex, out closestA, out closestB);
+                intersecting = GJKToolbox.GetClosestPoints(collidableA.Shape, collidableB.Shape, ref collidableA.worldTransform, ref collidableB.worldTransform, ref cachedSimplex, out closestA, out closestB);
             else
             {
                 //The initialization of the pair creates a pretty decent simplex to start from.
                 //Just don't try to update it.
                 CachedSimplex preInitializedSimplex = cachedSimplex;
-                intersecting = GJKToolbox.GetClosestPoints(informationA.Shape, informationB.Shape, ref informationA.worldTransform, ref informationB.worldTransform, ref preInitializedSimplex, out closestA, out closestB);
+                intersecting = GJKToolbox.GetClosestPoints(collidableA.Shape, collidableB.Shape, ref collidableA.worldTransform, ref collidableB.worldTransform, ref preInitializedSimplex, out closestA, out closestB);
             }
             if (intersecting)
             //if (OldGJKVerifier.GetClosestPointsBetweenObjects(informationA.Shape, informationB.Shape, ref informationA.worldTransform, ref informationB.worldTransform, 0, 0, out closestA, out closestB))
@@ -144,7 +144,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             Vector3 displacement;
             Vector3.Subtract(ref closestB, ref closestA, out displacement);
             float distanceSquared = displacement.LengthSquared();
-            float margin = informationA.Shape.collisionMargin + informationB.Shape.collisionMargin;
+            float margin = collidableA.Shape.collisionMargin + collidableB.Shape.collisionMargin;
 
 
             if (distanceSquared < margin * margin)
@@ -153,7 +153,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 contact = new ContactData();
                 //Displacement is from A to B.  point = A + t * AB, where t = marginA / margin.
                 if (margin > Toolbox.Epsilon) //Avoid a NaN!
-                    Vector3.Multiply(ref displacement, informationA.Shape.collisionMargin / margin, out contact.Position); //t * AB
+                    Vector3.Multiply(ref displacement, collidableA.Shape.collisionMargin / margin, out contact.Position); //t * AB
                 else
                     contact.Position = new Vector3();
                     
@@ -175,9 +175,9 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
         private bool DoDeepContact(out ContactData contact)
         {
-            if (MPRToolbox.AreObjectsColliding(informationA.Shape, informationB.Shape, ref informationA.worldTransform, ref informationB.worldTransform, out contact))
+            if (MPRToolbox.AreObjectsColliding(collidableA.Shape, collidableB.Shape, ref collidableA.worldTransform, ref collidableB.worldTransform, out contact))
             {
-                if (contact.PenetrationDepth < informationA.Shape.collisionMargin + informationB.Shape.collisionMargin)
+                if (contact.PenetrationDepth < collidableA.Shape.collisionMargin + collidableB.Shape.collisionMargin)
                     state = CollisionState.ShallowContact; //If it's emerged from the deep contact, we can go back to using the preferred GJK method.
                 return true;
             }
@@ -194,8 +194,8 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
         ///<param name="shapeB">Second shape in the pair.</param>
         public void Initialize(Collidable shapeA, Collidable shapeB)
         {
-            informationA = shapeA as ConvexCollidable;
-            informationB = shapeB as ConvexCollidable;
+            collidableA = shapeA as ConvexCollidable;
+            collidableB = shapeB as ConvexCollidable;
             cachedSimplex = new CachedSimplex {State = SimplexState.Point};// new CachedSimplex(informationA.Shape, informationB.Shape, ref informationA.worldTransform, ref informationB.worldTransform);
         }
 
@@ -205,8 +205,10 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
         public void CleanUp()
         {
             state = CollisionState.Separated;
-            informationA = null;
-            informationB = null;
+            cachedSimplex = new CachedSimplex();
+            localSeparatingAxis = new Vector3();
+            collidableA = null;
+            collidableB = null;
         }
 
 

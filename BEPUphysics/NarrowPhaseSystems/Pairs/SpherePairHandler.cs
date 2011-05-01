@@ -91,7 +91,33 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
 
         }
 
+        internal override void GetContactInformation(int index, out ContactInformation info)
+        {
+            info.Contact = ContactManifold.contacts.Elements[index];
+            //Find the contact's force.
+            info.FrictionForce = 0;
+            info.NormalForce = 0;
+            for (int i = 0; i < contactConstraint.frictionConstraints.count; i++)
+            {
+                if (contactConstraint.frictionConstraints.Elements[i].PenetrationConstraint.contact == info.Contact)
+                {
+                    info.FrictionForce = contactConstraint.frictionConstraints.Elements[i].accumulatedImpulse;
+                    info.NormalForce = contactConstraint.frictionConstraints.Elements[i].PenetrationConstraint.accumulatedImpulse;
+                    break;
+                }
+            }
+            //Compute relative velocity
+            Vector3 velocity;
+            Vector3.Subtract(ref info.Contact.Position, ref EntityA.position, out velocity);
+            Vector3.Cross(ref EntityA.angularVelocity, ref velocity, out velocity);
+            Vector3.Add(ref velocity, ref EntityA.linearVelocity, out info.RelativeVelocity);
 
+            Vector3.Subtract(ref info.Contact.Position, ref EntityB.position, out velocity);
+            Vector3.Cross(ref EntityB.angularVelocity, ref velocity, out velocity);
+            Vector3.Add(ref velocity, ref EntityB.linearVelocity, out velocity);
+
+            Vector3.Subtract(ref info.RelativeVelocity, ref velocity, out info.RelativeVelocity);
+        }
 
     }
 

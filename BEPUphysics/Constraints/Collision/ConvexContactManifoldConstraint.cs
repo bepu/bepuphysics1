@@ -2,6 +2,9 @@
 using System.Collections.ObjectModel;
 using BEPUphysics.ResourceManagement;
 using BEPUphysics.DataStructures;
+using System.Diagnostics;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace BEPUphysics.Constraints.Collision
 {
@@ -49,7 +52,7 @@ namespace BEPUphysics.Constraints.Collision
         ///</summary>
         public ReadOnlyCollection<ContactPenetrationConstraint> ContactPenetrationConstraints { get; private set; }
 
-        ResourcePool<ContactPenetrationConstraint> penetrationConstraintPool = new UnsafeResourcePool<ContactPenetrationConstraint>(4);
+        Stack<ContactPenetrationConstraint> penetrationConstraintPool = new Stack<ContactPenetrationConstraint>(4);
 
 
         ///<summary>
@@ -63,23 +66,23 @@ namespace BEPUphysics.Constraints.Collision
 
             penetrationConstraints = new RawList<ContactPenetrationConstraint>(4);
             ContactPenetrationConstraints = new ReadOnlyCollection<ContactPenetrationConstraint>(penetrationConstraints);
-  
+
 
             //Order matters in this adding process.  Sliding friction computes some information used by the twist friction, and both use penetration impulses.
             for (int i = 0; i < 4; i++)
             {
                 var penetrationConstraint = new ContactPenetrationConstraint();
                 Add(penetrationConstraint);
-                penetrationConstraintPool.GiveBack(penetrationConstraint);
+                penetrationConstraint.Tag = i;
+                penetrationConstraintPool.Push(penetrationConstraint);
             }
             slidingFriction = new SlidingFrictionTwoAxis();
-            Add(slidingFriction); 
+            Add(slidingFriction);
             twistFriction = new TwistFrictionConstraint();
             Add(twistFriction);
-            
-            
-        }
 
+
+        }
 
         ///<summary>
         /// Cleans up the constraint.
@@ -92,7 +95,7 @@ namespace BEPUphysics.Constraints.Collision
                 var penetrationConstraint = penetrationConstraints.Elements[i];
                 penetrationConstraint.CleanUp();
                 penetrationConstraints.RemoveAt(i);
-                penetrationConstraintPool.GiveBack(penetrationConstraint);
+                penetrationConstraintPool.Push(penetrationConstraint);
             }
             if (twistFriction.isActive)
             {
@@ -110,7 +113,7 @@ namespace BEPUphysics.Constraints.Collision
         ///<param name="contact">Contact to add.</param>
         public override void AddContact(Contact contact)
         {
-            var penetrationConstraint = penetrationConstraintPool.Take();
+            var penetrationConstraint = penetrationConstraintPool.Pop();
             penetrationConstraint.Setup(this, contact);
             penetrationConstraints.Add(penetrationConstraint);
             if (penetrationConstraints.count == 1)
@@ -134,7 +137,7 @@ namespace BEPUphysics.Constraints.Collision
                 {
                     penetrationConstraint.CleanUp();
                     penetrationConstraints.RemoveAt(i);
-                    penetrationConstraintPool.GiveBack(penetrationConstraint);
+                    penetrationConstraintPool.Push(penetrationConstraint);
                     break;
                 }
             }
@@ -147,8 +150,60 @@ namespace BEPUphysics.Constraints.Collision
         }
 
 
+        //NOTE: Even though the order of addition to the solver group ensures penetration constraints come first, the
+        //order of penetration constraints themselves matters in terms of determinism!
+        //Consider what happens when penetration constraints are added and removed.  They cycle through a stack,
+        //so the penetration constraints in the solver group's listing have inconsistent ordering.  Reloading the simulation
+        //doesn't reset the penetration constraint pools, so suddenly everything is nonrepeatable, even single threaded.
+
+        //By having the update use the order defined by contact addition/removal, determinism is maintained (so long as contact addition/removal is deterministic!)
+
+        ///<summary>
+        /// Performs the frame's configuration step.
+        ///</summary>
+        ///<param name="dt">Timestep duration.</param>
+        public sealed override void Update(float dt)
+        {
+            for (int i = 0; i < penetrationConstraints.count; i++)
+                UpdateUpdateable(penetrationConstraints.Elements[i], dt);
+            UpdateUpdateable(slidingFriction, dt);
+            UpdateUpdateable(twistFriction, dt);
+        }
 
 
+
+        /// <summary>
+        /// Performs any pre-solve iteration work that needs exclusive
+        /// access to the members of the solver updateable.
+        /// Usually, this is used for applying warmstarting impulses.
+        /// </summary>
+        public sealed override void ExclusiveUpdate()
+        {
+            for (int i = 0; i < penetrationConstraints.count; i++)
+                ExclusiveUpdateUpdateable(penetrationConstraints.Elements[i]);
+            ExclusiveUpdateUpdateable(slidingFriction);
+            ExclusiveUpdateUpdateable(twistFriction);
+        }
+
+
+        /// <summary>
+        /// Computes one iteration of the constraint to meet the solver updateable's goal.
+        /// </summary>
+        /// <returns>The rough applied impulse magnitude.</returns>
+        public sealed override float SolveIteration()
+        {
+
+            int activeConstraints = 0;
+            for (int i = 0; i < penetrationConstraints.count; i++)
+                SolveUpdateable(penetrationConstraints.Elements[i], ref activeConstraints);
+            SolveUpdateable(slidingFriction, ref activeConstraints);
+            SolveUpdateable(twistFriction, ref activeConstraints);
+
+
+            isActiveInSolver = activeConstraints > 0;
+
+            return solverSettings.minimumImpulse + 1; //Never let the system deactivate due to low impulses; solver group takes care of itself.
+        }
 
     }
 }

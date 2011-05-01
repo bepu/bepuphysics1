@@ -16,13 +16,12 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
     ///<summary>
     /// Handles a triangle-convex collision pair.
     ///</summary>
-    public class TriangleConvexPairHandler : ConvexPairHandler
+    public class TriangleConvexPairHandler : ConvexConstraintPairHandler
     {
         ConvexCollidable<TriangleShape> triangle;
         ConvexCollidable convex;
 
         TriangleConvexContactManifold contactManifold = new TriangleConvexContactManifold();
-        ConvexContactManifoldConstraint contactConstraint = new ConvexContactManifoldConstraint();
 
         protected override Collidable CollidableA
         {
@@ -40,10 +39,6 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         protected override Entities.Entity EntityB
         {
             get { return triangle.entity; }
-        }
-        protected override ContactManifoldConstraint ContactConstraint
-        {
-            get { return contactConstraint; }
         }
         protected override ContactManifold ContactManifold
         {

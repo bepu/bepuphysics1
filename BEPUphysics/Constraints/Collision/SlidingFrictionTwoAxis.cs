@@ -240,10 +240,7 @@ namespace BEPUphysics.Constraints.Collision
         ///<param name="dt">Timestep duration.</param>
         public override void Update(float dt)
         {
-            entityA = contactManifoldConstraint.EntityA;
-            entityB = contactManifoldConstraint.EntityB;
-            entityADynamic = entityA != null && entityA.isDynamic;
-            entityBDynamic = entityB != null && entityB.isDynamic;
+
 
             contactCount = contactManifoldConstraint.penetrationConstraints.count;
             switch (contactCount)
@@ -487,6 +484,11 @@ namespace BEPUphysics.Constraints.Collision
             isActive = true;
 
             linearA = new Matrix2X3();
+
+            entityA = contactManifoldConstraint.EntityA;
+            entityB = contactManifoldConstraint.EntityB;
+            entityADynamic = entityA != null && entityA.isDynamic;
+            entityBDynamic = entityB != null && entityB.isDynamic;
         }
 
         internal void CleanUp()

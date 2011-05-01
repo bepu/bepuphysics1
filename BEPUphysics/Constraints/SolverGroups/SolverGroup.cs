@@ -73,6 +73,20 @@ namespace BEPUphysics.Constraints.SolverGroups
             }
         }
 
+        protected void UpdateUpdateable(EntitySolverUpdateable item, float dt)
+        {
+            item.SolverSettings.currentIterations = 0;
+            item.SolverSettings.iterationsAtZeroImpulse = 0;
+            if (item.isActiveInSolver)
+                item.Update(dt);
+        }
+
+        protected void ExclusiveUpdateUpdateable(EntitySolverUpdateable item)
+        {
+            if (item.isActiveInSolver)
+                item.ExclusiveUpdate();
+        }
+
         ///<summary>
         /// Performs the frame's configuration step.
         ///</summary>
@@ -81,13 +95,11 @@ namespace BEPUphysics.Constraints.SolverGroups
         {
             for (int i = 0; i < solverUpdateables.count; i++)
             {
-                var item = solverUpdateables.Elements[i];
-                item.SolverSettings.currentIterations = 0;
-                item.SolverSettings.iterationsAtZeroImpulse = 0;
-                if (item.isActiveInSolver)
-                    item.Update(dt);
+                UpdateUpdateable(solverUpdateables.Elements[i], dt);
             }
         }
+
+
 
         /// <summary>
         /// Performs any pre-solve iteration work that needs exclusive
@@ -98,9 +110,47 @@ namespace BEPUphysics.Constraints.SolverGroups
         {
             for (int i = 0; i < solverUpdateables.count; i++)
             {
-                var item = solverUpdateables.Elements[i];
-                if (item.isActiveInSolver)
-                    item.ExclusiveUpdate();
+                ExclusiveUpdateUpdateable(solverUpdateables.Elements[i]);
+            }
+        }
+
+        /// <summary>
+        /// Solves a child updateable.  Some children may override the group's update method;
+        /// this avoids code repeat.
+        /// </summary>
+        /// <param name="item"></param>
+        protected void SolveUpdateable(EntitySolverUpdateable item, ref int activeConstraints)
+        {
+            if (item.isActiveInSolver)
+            {
+                SolverSettings subSolverSettings = item.solverSettings;
+
+                subSolverSettings.currentIterations++;
+                if (subSolverSettings.currentIterations <= solver.iterationLimit &&
+                    subSolverSettings.currentIterations <= subSolverSettings.maximumIterations)
+                {
+                    if (item.SolveIteration() < subSolverSettings.minimumImpulse)
+                    {
+                        subSolverSettings.iterationsAtZeroImpulse++;
+                        if (subSolverSettings.iterationsAtZeroImpulse > subSolverSettings.minimumIterations)
+                            item.isActiveInSolver = false;
+                        else
+                        {
+                            activeConstraints++;
+                        }
+
+                    }
+                    else
+                    {
+                        subSolverSettings.iterationsAtZeroImpulse = 0;
+                        activeConstraints++;
+                    }
+                }
+                else
+                {
+                    item.isActiveInSolver = false;
+                }
+
             }
         }
 
@@ -111,58 +161,9 @@ namespace BEPUphysics.Constraints.SolverGroups
         public override float SolveIteration()
         {
             int activeConstraints = 0;
-            EntitySolverUpdateable item;
             for (int i = 0; i < solverUpdateables.count; i++)
             {
-                item = solverUpdateables.Elements[i];
-
-                if (item.isActiveInSolver)
-                {
-                    SolverSettings subSolverSettings = item.solverSettings;
-
-                    subSolverSettings.currentIterations++;
-                    if (subSolverSettings.currentIterations <= solver.iterationLimit &&
-                        subSolverSettings.currentIterations <= subSolverSettings.maximumIterations)
-                    {
-                        if (item.SolveIteration() < subSolverSettings.minimumImpulse)
-                        {
-                            subSolverSettings.iterationsAtZeroImpulse++;
-                            if (subSolverSettings.iterationsAtZeroImpulse > subSolverSettings.minimumIterations)
-                                item.isActiveInSolver = false;
-                            else
-                            {
-                                activeConstraints++;
-                            }
-
-                        }
-                        else
-                        {
-                            subSolverSettings.iterationsAtZeroImpulse = 0;
-                            activeConstraints++;
-                        }
-                    }
-                    else
-                    {
-                        item.isActiveInSolver = false;
-                    }
-
-                    //float lambda = 0;
-                    //if (++subSolverSettings.currentIterations > solver.iterationLimit ||
-                    //    subSolverSettings.currentIterations > subSolverSettings.maximumIterations ||
-                    //    ((lambda = item.SolveIteration()) < subSolverSettings.minimumImpulse &&
-                    //    ++subSolverSettings.iterationsAtZeroImpulse > subSolverSettings.minimumIterations))
-                    //{
-                    //    item.isActiveInSolver = false;
-                    //}
-                    //else //If it's greater than the minimum impulse, reset the count.
-                    //{
-                    //    subSolverSettings.iterationsAtZeroImpulse = 0;
-                    //    activeConstraints++;
-                    //}
-                    //if (lambda != 0 && lambda < subSolverSettings.minimumImpulse)
-                    //    Debug.WriteLine("BREAK>");
-                }
-
+                SolveUpdateable(solverUpdateables.Elements[i], ref activeConstraints);
             }
             isActiveInSolver = activeConstraints > 0;
             return solverSettings.minimumImpulse + 1; //Never let the system deactivate due to low impulses; solver group takes care of itself.
@@ -182,7 +183,7 @@ namespace BEPUphysics.Constraints.SolverGroups
                 {
                     solverUpdateables.Add(solverUpdateable);
                     solverUpdateable.SolverGroup = this;
-                    Solver = solver;
+                    solverUpdateable.Solver = solver;
                     OnInvolvedEntitiesChanged();
                 }
                 else

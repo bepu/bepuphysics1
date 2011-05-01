@@ -111,10 +111,7 @@ namespace BEPUphysics.Constraints.Collision
         ///<param name="dt">Timestep duration.</param>
         public override void Update(float dt)
         {
-            entityA = contactManifoldConstraint.EntityA;
-            entityB = contactManifoldConstraint.EntityB;
-            entityADynamic = entityA != null && entityA.isDynamic;
-            entityBDynamic = entityB != null && entityB.isDynamic;
+
 
             //Compute the jacobian......  Real hard!
             Vector3 normal = contactManifoldConstraint.penetrationConstraints.Elements[0].contact.Normal;
@@ -206,6 +203,11 @@ namespace BEPUphysics.Constraints.Collision
         {
             this.contactManifoldConstraint = contactManifoldConstraint;
             isActive = true;
+
+            entityA = contactManifoldConstraint.EntityA;
+            entityB = contactManifoldConstraint.EntityB;
+            entityADynamic = entityA != null && entityA.isDynamic;
+            entityBDynamic = entityB != null && entityB.isDynamic;
         }
 
         internal void CleanUp()

@@ -24,7 +24,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
 
         public abstract int ContactCount { get; }
 
-        protected int previousContactCount;
+        protected internal int previousContactCount;
 
 
         protected CollidablePairHandler()

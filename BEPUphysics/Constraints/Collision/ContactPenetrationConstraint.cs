@@ -52,6 +52,12 @@ namespace BEPUphysics.Constraints.Collision
             this.contactManifoldConstraint = contactManifoldConstraint;
             this.contact = contact;
             isActive = true;
+
+            entityA = contactManifoldConstraint.EntityA;
+            entityB = contactManifoldConstraint.EntityB;
+            entityADynamic = entityA != null && entityA.isDynamic;
+            entityBDynamic = entityB != null && entityB.isDynamic;
+
         }
 
         ///<summary>
@@ -65,6 +71,8 @@ namespace BEPUphysics.Constraints.Collision
             entityA = null;
             entityB = null;
             isActive = false;
+
+
         }
 
         /// <summary>
@@ -154,11 +162,6 @@ namespace BEPUphysics.Constraints.Collision
         ///<param name="dt">Timestep duration.</param>
         public override void Update(float dt)
         {
-            entityA = contactManifoldConstraint.EntityA;
-            entityB = contactManifoldConstraint.EntityB;
-            entityADynamic = entityA != null && entityA.isDynamic;
-            entityBDynamic = entityB != null && entityB.isDynamic;
-
             //Set up the jacobians.
             linearAX = -contact.Normal.X;
             linearAY = -contact.Normal.Y;

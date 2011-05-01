@@ -1,11 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
+using System;
 
 namespace BEPUphysics.CollisionTests
 {
     ///<summary>
     /// Contact data created by collision detection.
     ///</summary>
-    public struct ContactData
+    public struct ContactData :IEquatable<ContactData>
     {
         /// <summary>
         /// Amount of penetration between the two objects.
@@ -37,6 +38,16 @@ namespace BEPUphysics.CollisionTests
         public override string ToString()
         {
             return Position + ", " + Normal;
+        }
+
+
+
+        public bool Equals(ContactData other)
+        {
+            return other.PenetrationDepth == PenetrationDepth &&
+                other.Id == Id &&
+                other.Normal == Normal &&
+                other.Position == Position;
         }
     }
 }

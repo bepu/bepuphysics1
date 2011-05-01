@@ -25,7 +25,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                 return new ReadOnlyList<Contact>(contacts);
             }
         }
-        protected ResourcePool<Contact> unusedContacts;
+        protected UnsafeResourcePool<Contact> unusedContacts;
 
 
         protected void RemoveQueuedContacts()

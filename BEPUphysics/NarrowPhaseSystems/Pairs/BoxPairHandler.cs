@@ -16,13 +16,12 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
     ///<summary>
     /// Pair handler that manages a pair of two boxes.
     ///</summary>
-    public class BoxPairHandler : ConvexPairHandler
+    public class BoxPairHandler : ConvexConstraintPairHandler
     {
         ConvexCollidable<BoxShape> boxA;
         ConvexCollidable<BoxShape> boxB;
 
         BoxContactManifold contactManifold = new BoxContactManifold();
-        ConvexContactManifoldConstraint contactConstraint = new ConvexContactManifoldConstraint();
 
         protected override Collidable CollidableA
         {
@@ -42,11 +41,6 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         protected override Entities.Entity EntityB
         {
             get { return boxB.entity; }
-        }
-
-        protected override ContactManifoldConstraint ContactConstraint
-        {
-            get { return contactConstraint; }
         }
 
         protected override ContactManifold ContactManifold

@@ -491,6 +491,8 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             triangle = null;
             convex = null;
             state = CollisionState.Plane;
+            escapeAttempts = 0;
+            localSeparatingAxis = new Vector3();
             Updated = false;
         }
 

@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using BEPUphysics.ResourceManagement;
 using BEPUphysics.DataStructures;
+using System.Collections.Generic;
 
 namespace BEPUphysics.Constraints.Collision
 {
@@ -12,7 +13,6 @@ namespace BEPUphysics.Constraints.Collision
     ///</summary>
     public class NonConvexContactManifoldConstraint : ContactManifoldConstraint
     {
-        //This contact manifold constraint covers any number of contact points.
         //Unlike the convex manifold constraint, this constraint enforces no requirements
         //on the contact data.  The collisions can form a nonconvex patch.  They can have differing normals.
         //This is required for proper collision handling on large structures
@@ -27,7 +27,7 @@ namespace BEPUphysics.Constraints.Collision
         ///</summary>
         public ReadOnlyCollection<ContactPenetrationConstraint> ContactPenetrationConstraints { get; private set; }
 
-        ResourcePool<ContactPenetrationConstraint> penetrationConstraintPool = new UnsafeResourcePool<ContactPenetrationConstraint>(4);
+        Stack<ContactPenetrationConstraint> penetrationConstraintPool = new Stack<ContactPenetrationConstraint>(4);
 
         internal RawList<ContactFrictionConstraint> frictionConstraints;
         ///<summary>
@@ -35,7 +35,7 @@ namespace BEPUphysics.Constraints.Collision
         ///</summary>
         public ReadOnlyCollection<ContactFrictionConstraint> ContactFrictionConstraints { get; private set; }
 
-        ResourcePool<ContactFrictionConstraint> frictionConstraintPool = new UnsafeResourcePool<ContactFrictionConstraint>(4);
+        Stack<ContactFrictionConstraint> frictionConstraintPool = new Stack<ContactFrictionConstraint>(4);
 
 
         ///<summary>
@@ -55,11 +55,11 @@ namespace BEPUphysics.Constraints.Collision
             for (int i = 0; i < 4; i++)
             {
                 var penetrationConstraint = new ContactPenetrationConstraint();
-                penetrationConstraintPool.GiveBack(penetrationConstraint);
+                penetrationConstraintPool.Push(penetrationConstraint);
                 Add(penetrationConstraint);
 
                 var frictionConstraint = new ContactFrictionConstraint();
-                frictionConstraintPool.GiveBack(frictionConstraint);
+                frictionConstraintPool.Push(frictionConstraint);
                 Add(frictionConstraint);
             }
             
@@ -77,7 +77,7 @@ namespace BEPUphysics.Constraints.Collision
                 var penetrationConstraint = penetrationConstraints.Elements[i];
                 penetrationConstraint.CleanUp();
                 penetrationConstraints.RemoveAt(i);
-                penetrationConstraintPool.GiveBack(penetrationConstraint);
+                penetrationConstraintPool.Push(penetrationConstraint);
             }
 
             for (int i = frictionConstraints.count - 1; i >= 0; i--)
@@ -85,7 +85,7 @@ namespace BEPUphysics.Constraints.Collision
                 var frictionConstraint = frictionConstraints.Elements[i];
                 frictionConstraint.CleanUp();
                 frictionConstraints.RemoveAt(i);
-                frictionConstraintPool.GiveBack(frictionConstraint);
+                frictionConstraintPool.Push(frictionConstraint);
             }
 
 
@@ -110,11 +110,11 @@ namespace BEPUphysics.Constraints.Collision
         ///<param name="contact">Contact to add.</param>
         public override void AddContact(Contact contact)
         {
-            var penetrationConstraint = penetrationConstraintPool.Take();
+            var penetrationConstraint = penetrationConstraintPool.Pop();
             penetrationConstraint.Setup(this, contact);
             penetrationConstraints.Add(penetrationConstraint);
 
-            var frictionConstraint = frictionConstraintPool.Take();
+            var frictionConstraint = frictionConstraintPool.Pop();
             frictionConstraint.Setup(this, penetrationConstraint);
             frictionConstraints.Add(frictionConstraint);
 
@@ -134,7 +134,7 @@ namespace BEPUphysics.Constraints.Collision
                 {
                     penetrationConstraint.CleanUp();
                     penetrationConstraints.RemoveAt(i);
-                    penetrationConstraintPool.GiveBack(penetrationConstraint);
+                    penetrationConstraintPool.Push(penetrationConstraint);
                     break;
                 }
             }
@@ -144,8 +144,8 @@ namespace BEPUphysics.Constraints.Collision
                 if (frictionConstraint.PenetrationConstraint == penetrationConstraint)
                 {
                     frictionConstraint.CleanUp();
-                    frictionConstraints.RemoveAt(i); 
-                    frictionConstraintPool.GiveBack(frictionConstraint);
+                    frictionConstraints.RemoveAt(i);
+                    frictionConstraintPool.Push(frictionConstraint);
                     break;
                 }
             }
@@ -155,6 +155,54 @@ namespace BEPUphysics.Constraints.Collision
 
 
 
+        //NOTE: Even though the order of addition to the solver group ensures penetration constraints come first, the
+        //order of penetration constraints themselves matters in terms of determinism!
+        //Consider what happens when penetration constraints are added and removed.  They cycle through a stack,
+        //so the penetration constraints in the solver group's listing have inconsistent ordering.  Reloading the simulation
+        //doesn't reset the penetration constraint pools, so suddenly everything is nonrepeatable, even single threaded.
 
+        //By having the update use the order defined by contact addition/removal, determinism is maintained (so long as contact addition/removal is deterministic!)
+
+        ///<summary>
+        /// Performs the frame's configuration step.
+        ///</summary>
+        ///<param name="dt">Timestep duration.</param>
+        public sealed override void Update(float dt)
+        {
+            for (int i = 0; i < penetrationConstraints.count; i++)
+                UpdateUpdateable(penetrationConstraints.Elements[i], dt);
+            for (int i = 0; i < frictionConstraints.count; i++)
+                UpdateUpdateable(frictionConstraints.Elements[i], dt);
+        }
+
+
+        /// <summary>
+        /// Performs any pre-solve iteration work that needs exclusive
+        /// access to the members of the solver updateable.
+        /// Usually, this is used for applying warmstarting impulses.
+        /// </summary>
+        public sealed override void ExclusiveUpdate()
+        {
+            for (int i = 0; i < penetrationConstraints.count; i++)
+                ExclusiveUpdateUpdateable(penetrationConstraints.Elements[i]);
+            for (int i = 0; i < frictionConstraints.count; i++)
+                ExclusiveUpdateUpdateable(frictionConstraints.Elements[i]);
+        }
+
+
+        /// <summary>
+        /// Computes one iteration of the constraint to meet the solver updateable's goal.
+        /// </summary>
+        /// <returns>The rough applied impulse magnitude.</returns>
+        public sealed override float SolveIteration()
+        {
+            int activeConstraints = 0;
+            for (int i = 0; i < penetrationConstraints.count; i++)
+                SolveUpdateable(penetrationConstraints.Elements[i], ref activeConstraints);
+            for (int i = 0; i < frictionConstraints.count; i++)
+                SolveUpdateable(frictionConstraints.Elements[i], ref activeConstraints);
+            isActiveInSolver = activeConstraints > 0;
+            return solverSettings.minimumImpulse + 1; //Never let the system deactivate due to low impulses; solver group takes care of itself.
+        }
     }
 }

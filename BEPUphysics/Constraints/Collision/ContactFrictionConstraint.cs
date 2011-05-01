@@ -69,6 +69,11 @@ namespace BEPUphysics.Constraints.Collision
             linearAX = 0;
             linearAY = 0;
             linearAZ = 0;
+
+            entityA = contactManifoldConstraint.EntityA;
+            entityB = contactManifoldConstraint.EntityB;
+            entityAIsDynamic = entityA != null && entityA.isDynamic;
+            entityBIsDynamic = entityB != null && entityB.isDynamic;
         }
 
         ///<summary>
@@ -174,10 +179,7 @@ namespace BEPUphysics.Constraints.Collision
         /// <param name="dt">Time since the last frame.</param>
         public override void Update(float dt)
         {
-            entityA = contactManifoldConstraint.EntityA;
-            entityB = contactManifoldConstraint.EntityB;
-            entityAIsDynamic = entityA != null && entityA.isDynamic;
-            entityBIsDynamic = entityB != null && entityB.isDynamic;
+
 
 
             //Compute the three dimensional relative velocity at the point.
