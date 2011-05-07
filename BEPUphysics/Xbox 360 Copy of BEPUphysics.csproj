@@ -61,7 +61,12 @@
     <Compile Include="BroadPhaseSystems\IBoundingBoxOwner.cs" />
     <Compile Include="BroadPhaseSystems\IBroadPhaseEntryOwner.cs" />
     <Compile Include="BroadPhaseSystems\IQueryAccelerator.cs" />
-    <Compile Include="BroadPhaseSystems\SweepAndPrune.cs" />
+    <Compile Include="BroadPhaseSystems\SortAndSweep\Grid2DEntry.cs" />
+    <Compile Include="BroadPhaseSystems\SortAndSweep\Grid2DSortAndSweep.cs" />
+    <Compile Include="BroadPhaseSystems\SortAndSweep\GridCell2D.cs" />
+    <Compile Include="BroadPhaseSystems\SortAndSweep\SortAndSweep1D.cs" />
+    <Compile Include="BroadPhaseSystems\SortAndSweep\SortAndSweep3D.cs" />
+    <Compile Include="BroadPhaseSystems\SortAndSweep\SortedGrid2DSet.cs" />
     <Compile Include="Collidables\Collidable.cs" />
     <Compile Include="Collidables\CollidableCollection.cs" />
     <Compile Include="Collidables\CollidablePair.cs" />

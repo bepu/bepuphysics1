@@ -56,6 +56,9 @@ namespace BEPUphysicsDemos.Demos
                             2, 2, 2, 15);
                         Space.Add(toAdd);
                     }
+
+
+
             game.ModelDrawer.Add(staticMesh.Mesh);
             game.Camera.Position = new Vector3(0, 10, 40);
 
@@ -71,6 +74,6 @@ namespace BEPUphysicsDemos.Demos
         }
 
 
-   
+
     }
 }

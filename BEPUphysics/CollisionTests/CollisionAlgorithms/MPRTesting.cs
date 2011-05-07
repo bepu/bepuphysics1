@@ -74,11 +74,15 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
 
             Vector3 v3A, v3B, v3;
+            int count = 0;
             while (true)
             {
                 //Find a final extreme point using the normal of the plane defined by v0, v1, v2.
                 MinkowskiToolbox.GetLocalMinkowskiExtremePoint(shapeA, shapeB, ref n, ref localTransformB, out v3A, out v3B, out v3);
 
+                if (count > MPRToolbox.OuterIterationLimit)
+                    break;
+                count++;
                 //By now, the simplex is a tetrahedron, but it is not known whether or not the origin ray found earlier actually passes through the portal
                 //defined by v1, v2, v3.
 
@@ -181,11 +185,12 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
                 //If the plane which generated the normal is very close to the extreme point, then we're at the surface
                 //and we have not found the origin; it's either just BARELY inside, or it is outside.  Assume it's outside.
-                if (dot2 - dot < Toolbox.BigEpsilon) // TODO: Could use a dynamic epsilon for possibly better behavior.
+                if (dot2 - dot < Toolbox.BigEpsilon || count > MPRToolbox.InnerIterationLimit) // TODO: Could use a dynamic epsilon for possibly better behavior.
                 {
                     position = new Vector3();
                     return false;
                 }
+                count++;
 
                 //Still haven't exited, so refine the portal.
                 //Test origin against the three planes that separate the new portal candidates: (v1,v4,v0) (v2,v4,v0) (v3,v4,v0)
@@ -267,10 +272,15 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             Vector3.Cross(ref v1, ref v2, out n);
 
             Vector3 v3;
+            int count = 0;
             while (true)
             {
                 //Find a final extreme point using the normal of the plane defined by v0, v1, v2.
                 MinkowskiToolbox.GetLocalMinkowskiExtremePoint(shapeA, shapeB, ref n, ref localTransformB, out v3);
+
+                if (count > MPRToolbox.OuterIterationLimit)
+                    break;
+                count++;
 
                 //By now, the simplex is a tetrahedron, but it is not known whether or not the ray actually passes through the portal
                 //defined by v1, v2, v3.
@@ -302,11 +312,12 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 break;
             }
 
-            if (!VerifySimplex(ref v1, ref v2, ref v3, ref direction))
-                Debug.WriteLine("Break.");
+            //if (!VerifySimplex(ref v1, ref v2, ref v3, ref direction))
+            //    Debug.WriteLine("Break.");
 
 
             // Refine the portal.
+            count = 0;
             while (true)
             {
                 //Compute the outward facing normal.
@@ -326,7 +337,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 float supportDot;
                 Vector3.Dot(ref v4, ref n, out supportDot);
 
-                if (supportDot - dot < Toolbox.BigEpsilon) // TODO: Could use a dynamic epsilon for possibly better behavior.
+                if (supportDot - dot < Toolbox.BigEpsilon || count > MPRToolbox.InnerIterationLimit) // TODO: Could use a dynamic epsilon for possibly better behavior.
                 {
                     normal = n;
                     float normalLengthInverse = 1 / normal.Length();
@@ -377,6 +388,8 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                     }
                 }
 
+                count++;
+
                 //Here's an unoptimized equivalent without the scalar triple product reorder.
                 #region Equivalent refinement
                 //Vector3.Cross(ref v1, ref v4, out temp1);
@@ -413,8 +426,8 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 //}
                 #endregion
 
-                if (!VerifySimplex(ref v1, ref v2, ref v3, ref direction))
-                    Debug.WriteLine("Break.");
+                //if (!VerifySimplex(ref v1, ref v2, ref v3, ref direction))
+                //    Debug.WriteLine("Break.");
             }
         }
 

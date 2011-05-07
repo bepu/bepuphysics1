@@ -102,6 +102,7 @@
     <Compile Include="Demos\CollisionFilteringDemo.cs" />
     <Compile Include="Demos\ColosseumDemo.cs" />
     <Compile Include="Demos\CompoundBodiesDemo.cs" />
+    <Compile Include="Demos\TestDemo4.cs" />
     <Compile Include="Demos\TestDemo3.cs" />
     <Compile Include="Demos\TestDemo.cs" />
     <Compile Include="Demos\DetectorVolumeDemo.cs" />

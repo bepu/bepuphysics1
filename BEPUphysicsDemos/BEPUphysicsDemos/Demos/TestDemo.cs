@@ -53,9 +53,10 @@ namespace BEPUphysicsDemos.Demos
         public TestDemo(DemosGame game)
             : base(game)
         {
+
+
             Vector3[] vertices;
             int[] indices;
-
 
             TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("playground"), out vertices, out indices);
             AffineTransform transform = new AffineTransform(new Vector3(1, 1, 1), Quaternion.Identity, new Vector3(0, -30, 0));

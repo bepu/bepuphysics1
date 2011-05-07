@@ -99,9 +99,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BroadPhaseSystems\BruteForce.cs" />
+    <Compile Include="BroadPhaseSystems\SortAndSweep\Grid2DEntry.cs" />
+    <Compile Include="BroadPhaseSystems\SortAndSweep\Grid2DSortAndSweep.cs" />
     <Compile Include="BroadPhaseSystems\Hierarchies\DynamicHierarchyNode.cs" />
     <None Include="DataStructures\Deprecated\MeshBoundingBoxTree.cs" />
-    <Compile Include="BroadPhaseSystems\SweepAndPrune.cs" />
+    <Compile Include="BroadPhaseSystems\SortAndSweep\GridCell2D.cs" />
+    <Compile Include="BroadPhaseSystems\SortAndSweep\SortAndSweep1D.cs" />
+    <Compile Include="BroadPhaseSystems\SortAndSweep\SortAndSweep3D.cs" />
+    <Compile Include="BroadPhaseSystems\SortAndSweep\SortedGrid2DSet.cs" />
     <Compile Include="Collidables\Events\IContactEventTriggerer.cs" />
     <Compile Include="Collidables\Events\IEntryEventTriggerer.cs" />
     <Compile Include="Collidables\MobileCollidables\MobileMeshCollidable.cs" />

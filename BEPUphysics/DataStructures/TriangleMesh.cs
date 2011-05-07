@@ -222,7 +222,14 @@ namespace BEPUphysics.DataStructures
 
         }
 
-        internal static void AddMesh(ModelMesh collisionModelMesh, Matrix transform, List<Vector3> vertices, List<int> indices)
+        /// <summary>
+        /// Adds a mesh's vertices and indices to the given lists.
+        /// </summary>
+        /// <param name="collisionModelMesh">Model to use for the collision shape.</param>
+        /// <param name="transform">Transform to apply to the mesh.</param>
+        /// <param name="vertices">List to receive vertices from the mesh.</param>
+        /// <param name="indices">List to receive indices from the mesh.</param>
+        public static void AddMesh(ModelMesh collisionModelMesh, Matrix transform, List<Vector3> vertices, List<int> indices)
         {
             foreach (ModelMeshPart meshPart in collisionModelMesh.MeshParts)
             {
@@ -350,7 +357,14 @@ namespace BEPUphysics.DataStructures
 
         }
 
-        internal static void AddMesh(ModelMesh collisionModelMesh, Matrix transform, List<Vector3> vertices, List<int> indices)
+        /// <summary>
+        /// Adds a mesh's vertices and indices to the given lists.
+        /// </summary>
+        /// <param name="collisionModelMesh">Model to use for the collision shape.</param>
+        /// <param name="transform">Transform to apply to the mesh.</param>
+        /// <param name="vertices">List to receive vertices from the mesh.</param>
+        /// <param name="indices">List to receive indices from the mesh.</param>
+        public static void AddMesh(ModelMesh collisionModelMesh, Matrix transform, List<Vector3> vertices, List<int> indices)
         {
             foreach (ModelMeshPart meshPart in collisionModelMesh.MeshParts)
             {

@@ -107,7 +107,8 @@ namespace BEPUphysicsDemos
                                                     typeof (DetectorVolumeDemo),
                                                     typeof (TestDemo),
                                                     typeof (TestDemo2),
-                                                    typeof (TestDemo3)
+                                                    typeof (TestDemo3),
+                                                    typeof (TestDemo4)
                                                 };
 
 
@@ -172,6 +173,7 @@ namespace BEPUphysicsDemos
 
 #else
             currentSimulation = (Demo)Activator.CreateInstance(demoType, new object[] { this });
+            //currentSimulation = new TestDemo4(this);
 #endif
             
             #region DisplayObject creation

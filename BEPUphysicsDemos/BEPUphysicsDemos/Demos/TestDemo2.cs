@@ -51,7 +51,7 @@ namespace BEPUphysicsDemos.Demos
             bool overlapped = MPRTesting.GetLocalOverlapPosition(shapeA, shapeB, ref transformB, out overlap);
             Vector3 normal;
             float depth;
-            Vector3 direction = Vector3.Up + Vector3.Right;
+            Vector3 direction = new Vector3(0, -1, 0);
             MPRTesting.LocalSurfaceCast(shapeA, shapeB, ref transformB, ref direction, out depth, out normal);
 
             ContactData contactData;
@@ -84,6 +84,21 @@ namespace BEPUphysicsDemos.Demos
             //        !MPRToolbox.IsPointInsideShape(ref contactData.Position, shapeB, ref transformB)))
             //        Debug.WriteLine("Break.");
             //}
+
+            //Do these tests with rotationally immobile objects.
+            CollisionDetectionSettings.DefaultMargin = 0;
+            var ground = new Box(new Vector3(0, 0, 0), 10, 1, 10);
+            Space.Add(ground);
+
+            Space.ForceUpdater.Gravity = new Vector3();
+            Entity e = new TransformableEntity(new Vector3(0, 2, 0), new BoxShape(1, 1, 1), Matrix3X3.Identity, 1);
+            e.LocalInertiaTensorInverse = new Matrix3X3();
+            CollisionRules.AddRule(e, ground, CollisionRule.NoSolver);
+            Space.Add(e);
+            //Space.Add(new TransformableEntity(new Vector3(0, 4, 0), new BoxShape(1, 1, 1), Matrix3X3.Identity, 1));
+            //Space.Add( new TransformableEntity(new Vector3(0, 6, 0), new BoxShape(1, 1, 1), Matrix3X3.Identity, 1));
+
+
 
         }
 

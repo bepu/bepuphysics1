@@ -61,8 +61,28 @@ namespace BEPUphysics.DataStructures
             count = elements.Count;
         }
 
-
+        /// <summary>
+        /// Removes an element from the list.
+        /// </summary>
+        /// <param name="index">Index of the element to remove.</param>
         public void RemoveAt(int index)
+        {
+            if (index >= count)
+            {
+                throw new ArgumentOutOfRangeException("index");
+            }
+            count--;
+            if (index < count)
+                Array.Copy(Elements, index + 1, Elements, index, count - index);
+
+            Elements[count] = default(T);
+        }
+
+        /// <summary>
+        /// Removes an element from the list without maintaining order.
+        /// </summary>
+        /// <param name="index">Index of the element to remove.</param>
+        public void FastRemoveAt(int index)
         {
             if (index >= count)
             {
@@ -173,6 +193,22 @@ namespace BEPUphysics.DataStructures
         }
 
         /// <summary>
+        /// Removes the first occurrence of a specific object from the collection without maintaining element order.
+        /// </summary>
+        /// <returns>
+        /// true if <paramref name="item"/> was successfully removed from the <see cref="T:System.Collections.Generic.ICollection`1"/>; otherwise, false. This method also returns false if <paramref name="item"/> is not found in the original <see cref="T:System.Collections.Generic.ICollection`1"/>.
+        /// </returns>
+        /// <param name="item">The object to remove from the <see cref="T:System.Collections.Generic.ICollection`1"/>.</param><exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.ICollection`1"/> is read-only.</exception>
+        public bool FastRemove(T item)
+        {
+            int index = IndexOf(item);
+            if (index == -1)
+                return false;
+            FastRemoveAt(index);
+            return true;
+        }
+
+        /// <summary>
         /// Determines the index of a specific item in the <see cref="T:System.Collections.Generic.IList`1"/>.
         /// </summary>
         /// <returns>
@@ -188,13 +224,45 @@ namespace BEPUphysics.DataStructures
         #region IList<T> Members
 
 
+        /// <summary>
+        /// Inserts the element at the specified index.
+        /// </summary>
+        /// <param name="index">Index to insert the item.</param>
+        /// <param name="item">Element to insert.</param>
         public void Insert(int index, T item)
         {
             if (index < count)
             {
-                T previousValue = Elements[index];
+                if (count == Elements.Length)
+                {
+                    Capacity = Elements.Length * 2;
+                }
+
+                Array.Copy(Elements, index, Elements, index + 1, count - index);
                 Elements[index] = item;
-                Add(previousValue);
+                count++;
+            }
+            else
+                Add(item);
+        }
+        /// <summary>
+        /// Inserts the element at the specified index without maintaining list order.
+        /// </summary>
+        /// <param name="index">Index to insert the item.</param>
+        /// <param name="item">Element to insert.</param>
+        public void FastInsert(int index, T item)
+        {
+            if (index < count)
+            {
+                if (count == Elements.Length)
+                {
+                    Capacity = Elements.Length * 2;
+                }
+
+                Array.Copy(Elements, index, Elements, index + 1, count - index);
+                Elements[count] = Elements[index];
+                Elements[index] = item;
+                count++;
             }
             else
                 Add(item);
