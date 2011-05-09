@@ -97,6 +97,14 @@ namespace BEPUphysicsDemos.Demos
         }
 
         /// <summary>
+        /// Performs arbitrary drawing associated with this demo.
+        /// </summary>
+        public virtual void Draw()
+        {
+
+        }
+
+        /// <summary>
         /// Cleans up this simulation before moving to the next one.
         /// </summary>
         public virtual void CleanUp()

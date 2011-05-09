@@ -33,7 +33,7 @@ namespace BEPUphysicsDemos.Demos
     /// <summary>
     /// Demo showing a wall of blocks stacked up.
     /// </summary>
-    public class TestDemo4 : StandardDemo
+    public class TestingBroadPhases : StandardDemo
     {
 
         Random rand = new Random(0);
@@ -42,7 +42,7 @@ namespace BEPUphysicsDemos.Demos
         /// Constructs a new demo.
         /// </summary>
         /// <param name="game">Game owning this demo.</param>
-        public TestDemo4(DemosGame game)
+        public TestingBroadPhases(DemosGame game)
             : base(game)
         {
             Space.Solver.IterationLimit = 0;
@@ -56,7 +56,7 @@ namespace BEPUphysicsDemos.Demos
             Grid2DSortAndSweep grid2DSOS = new Grid2DSortAndSweep(Space.ThreadManager);
 
             RawList<Entity> entities = new RawList<Entity>();
-            for (int k = 0; k < 200000; k++)
+            for (int k = 0; k < 200; k++)
             {
                 Vector3 position = new Vector3((float)(rand.NextDouble() * (box.Max.X - box.Min.X) + box.Min.X),
                                                (float)(rand.NextDouble() * (box.Max.Y - box.Min.Y) + box.Min.Y),

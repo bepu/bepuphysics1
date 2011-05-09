@@ -102,7 +102,6 @@
     <Compile Include="Demos\CollisionFilteringDemo.cs" />
     <Compile Include="Demos\ColosseumDemo.cs" />
     <Compile Include="Demos\CompoundBodiesDemo.cs" />
-    <Compile Include="Demos\TestDemo4.cs" />
     <Compile Include="Demos\TestDemo3.cs" />
     <Compile Include="Demos\TestDemo.cs" />
     <Compile Include="Demos\DetectorVolumeDemo.cs" />
@@ -126,6 +125,7 @@
     <Compile Include="Demos\SpaceshipDemo.cs" />
     <Compile Include="Demos\TerrainDemo.cs" />
     <Compile Include="Demos\TestDemo2.cs" />
+    <Compile Include="Demos\TestingBroadPhases.cs" />
     <Compile Include="Demos\TornadoDemo.cs" />
     <Compile Include="Demos\UnfortunateGuyDemo.cs" />
     <Compile Include="Demos\DiscreteVsContinuousDemo.cs" />

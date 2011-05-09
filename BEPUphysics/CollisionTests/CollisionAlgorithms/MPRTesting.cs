@@ -16,6 +16,15 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
         //   If there does not exist a desired separating direction, continue progressing along the same direction until the surface is hit.
         //   
 
+        public static Vector3 DEBUGlastRayDirection;
+        public static Vector3 DEBUGlastNormal;
+        public static Vector3 DEBUGlastPosition;
+        public static float DEBUGlastDepth;
+        public static float DEBUGlastRayT;
+        public static Vector3 DEBUGlastV1;
+        public static Vector3 DEBUGlastV2;
+        public static Vector3 DEBUGlastV3;
+
         public static bool GetOverlapPosition(ConvexShape shapeA, ConvexShape shapeB, ref RigidTransform transformA, ref RigidTransform transformB, out Vector3 position)
         {
             RigidTransform localTransformB;
@@ -36,6 +45,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             if (localTransformB.Position.LengthSquared() < Toolbox.Epsilon)
             {
                 position = new Vector3();
+                DEBUGlastPosition = position;
                 return true;
             }
 
@@ -167,6 +177,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                     float v2Weight = v0v1ov3volume * inverseTotalVolume;
                     float v3Weight = 1 - v0Weight - v1Weight - v2Weight;
                     position = v1Weight * v1A + v2Weight * v2A + v3Weight * v3A;
+                    DEBUGlastPosition = position;
                     return true;
                 }
 
@@ -188,6 +199,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 if (dot2 - dot < Toolbox.BigEpsilon || count > MPRToolbox.InnerIterationLimit) // TODO: Could use a dynamic epsilon for possibly better behavior.
                 {
                     position = new Vector3();
+                    DEBUGlastPosition = position;
                     return false;
                 }
                 count++;
@@ -344,6 +356,21 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                     Vector3.Multiply(ref normal, normalLengthInverse, out normal);
                     //Find the distance from the origin to the plane.
                     depth = dot * normalLengthInverse;
+
+                    //DEBUG STUFF:
+                    //Compute the ray cast hit location.
+                    //The plane is very close to the surface, and the ray is known to pass through it.
+                    //dot is the rate.
+                    Vector3.Dot(ref normal, ref direction, out dot);
+                    //supportDot is the distance to the plane.
+                    Vector3.Dot(ref normal, ref v1, out supportDot);
+                    DEBUGlastRayT = supportDot / dot;
+                    DEBUGlastRayDirection = direction;
+                    DEBUGlastDepth = depth;
+                    DEBUGlastNormal = normal;
+                    DEBUGlastV1 = v1;
+                    DEBUGlastV2 = v2;
+                    DEBUGlastV3 = v3;
                     return;
                 }
 
