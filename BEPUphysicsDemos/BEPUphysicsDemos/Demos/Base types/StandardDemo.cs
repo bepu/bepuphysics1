@@ -222,8 +222,6 @@ namespace BEPUphysicsDemos.Demos
 
             #endregion
 
-            if (Game.KeyboardInput.IsKeyDown(Keys.P))
-                Debug.WriteLine("Break.");
             base.Update(dt); //Base.update updates the space, which needs to be done before the character or vehicle are updated.
 
             character.Update(Space.TimeStepSettings.TimeStepDuration, Game.PreviousKeyboardInput, Game.KeyboardInput, Game.PreviousGamePadInput, Game.GamePadInput);

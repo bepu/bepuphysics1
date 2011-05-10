@@ -131,6 +131,8 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 break;
             }
 
+            if (!VerifySimplex(ref v0, ref v1, ref v2, ref v3, ref localTransformB.Position))
+                Debug.WriteLine("Break.");
 
 
             // Refine the portal.
@@ -241,6 +243,9 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                     }
                 }
 
+                if (!VerifySimplex(ref v0, ref v1, ref v2, ref v3, ref localTransformB.Position))
+                    Debug.WriteLine("Break.");
+
             }
 
 
@@ -283,6 +288,19 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             //Set n for the first iteration.
             Vector3.Cross(ref v1, ref v2, out n);
 
+            //It's possible that v1 and v2 were constructed in such a way that 'n' is not properly calibrated
+            //relative to the direction vector.
+            float dot;
+            Vector3.Dot(ref n, ref direction, out dot);
+            if (dot > 0)
+            {
+                //It's not properly calibrated.  Flip the winding (and the previously calculated normal).
+                Vector3.Negate(ref n, out n);
+                temp1 = v1;
+                v1 = v2;
+                v2 = temp1;
+            }
+
             Vector3 v3;
             int count = 0;
             while (true)
@@ -299,7 +317,6 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
                 // If the direction is outside the plane defined by v1,v0,v3, then the portal is invalid.
                 Vector3.Cross(ref v1, ref v3, out temp1);
-                float dot;
                 Vector3.Dot(ref temp1, ref direction, out dot);
                 if (dot < 0)
                 {
@@ -324,8 +341,8 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 break;
             }
 
-            //if (!VerifySimplex(ref v1, ref v2, ref v3, ref direction))
-            //    Debug.WriteLine("Break.");
+            if (!VerifySimplex(ref Toolbox.ZeroVector, ref v1, ref v2, ref v3, ref direction))
+                Debug.WriteLine("Break.");
 
 
             // Refine the portal.
@@ -344,7 +361,6 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
 
                 //If the plane which generated the normal is very close to the extreme point, then we're at the surface.
-                float dot;
                 Vector3.Dot(ref n, ref v1, out dot);
                 float supportDot;
                 Vector3.Dot(ref v4, ref n, out supportDot);
@@ -453,24 +469,26 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 //}
                 #endregion
 
-                //if (!VerifySimplex(ref v1, ref v2, ref v3, ref direction))
-                //    Debug.WriteLine("Break.");
+                if (!VerifySimplex(ref Toolbox.ZeroVector, ref v1, ref v2, ref v3, ref direction))
+                    Debug.WriteLine("Break.");
             }
         }
 
-        static bool VerifySimplex(ref Vector3 v1, ref Vector3 v2, ref Vector3 v3, ref Vector3 direction)
+        static bool VerifySimplex(ref Vector3 v0, ref Vector3 v1, ref Vector3 v2, ref Vector3 v3, ref Vector3 direction)
         {
+
+
             //v1, v0, v3
-            Vector3 cross = Vector3.Cross(-v1, v3 - v1);
+            Vector3 cross = Vector3.Cross(v0 - v1, v3 - v1);
             float planeProduct1 = Vector3.Dot(cross, direction);
             //v3, v0, v2
-            cross = Vector3.Cross(-v3, v2 - v3);
+            cross = Vector3.Cross(v0 - v3, v2 - v3);
             float planeProduct2 = Vector3.Dot(cross, direction);
             //v2, v0, v1
-            cross = Vector3.Cross(-v2, v1 - v2);
+            cross = Vector3.Cross(v0 - v2, v1 - v2);
             float planeProduct3 = Vector3.Dot(cross, direction);
-            return (planeProduct3 <= 0 && planeProduct3 <= 0 && planeProduct3 <= 0) ||
-                (planeProduct3 >= 0 && planeProduct3 >= 0 && planeProduct3 >= 0);
+            return (planeProduct1 <= 0 && planeProduct2 <= 0 && planeProduct3 <= 0) ||
+                (planeProduct1 >= 0 && planeProduct2 >= 0 && planeProduct3 >= 0);
         }
     }
 }

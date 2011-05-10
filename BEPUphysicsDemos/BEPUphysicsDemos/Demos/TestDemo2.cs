@@ -117,11 +117,37 @@ namespace BEPUphysicsDemos.Demos
         float boxWidth, boxHeight, boxLength;
 
 
+        Vector3 rayCastDirection = Vector3.Up;
+
         public override void Update(float dt)
         {
 
+            if (Game.KeyboardInput.IsKeyDown(Keys.Left))
+                rayCastDirection = Vector3.Transform(rayCastDirection, Matrix.CreateFromAxisAngle(Vector3.Forward, .01f));
+            if (Game.KeyboardInput.IsKeyDown(Keys.Right))
+                rayCastDirection = Vector3.Transform(rayCastDirection, Matrix.CreateFromAxisAngle(Vector3.Forward, -.01f));
+            if (Game.KeyboardInput.IsKeyDown(Keys.Down))
+                rayCastDirection = Vector3.Transform(rayCastDirection, Matrix.CreateFromAxisAngle(Vector3.Right, .01f));
+            if (Game.KeyboardInput.IsKeyDown(Keys.Up))
+                rayCastDirection = Vector3.Transform(rayCastDirection, Matrix.CreateFromAxisAngle(Vector3.Right, -.01f));
+
+
+            if (Game.KeyboardInput.IsKeyDown(Keys.P))
+                Debug.WriteLine("Break.");
 
             base.Update(dt);
+
+            RigidTransform localTransformB;
+            RigidTransform aTransform = a.CollisionInformation.WorldTransform, bTransform = b.CollisionInformation.WorldTransform;
+            MinkowskiToolbox.GetLocalTransform(ref aTransform, ref bTransform, out localTransformB);
+            Vector3 position;
+            if (MPRTesting.GetLocalOverlapPosition((a.CollisionInformation.Shape as ConvexShape), (b.CollisionInformation.Shape as ConvexShape), ref localTransformB, out position))
+            {
+                //Vector3 rayCastDirection = new Vector3(1,0,0);// (Vector3.Normalize(localDirection) + Vector3.Normalize(collidableB.worldTransform.Position - collidableA.worldTransform.Position)) / 2;
+                float depth;
+                Vector3 normal;
+                MPRTesting.LocalSurfaceCast((a.CollisionInformation.Shape as ConvexShape), (b.CollisionInformation.Shape as ConvexShape), ref localTransformB, ref rayCastDirection, out depth, out normal);
+            }
 
             //Construct explicit minkowski sum.
             Vector3[] aLines = new Vector3[8];
