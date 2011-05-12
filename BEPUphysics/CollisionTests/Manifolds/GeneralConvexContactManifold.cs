@@ -78,22 +78,33 @@ namespace BEPUphysics.CollisionTests.Manifolds
 
             //Now, generate a contact between the two shapes.
             ContactData contact;
-            if (pairTester.GenerateContactCandidate(out contact) && IsContactUnique(ref contact))
+            if (pairTester.GenerateContactCandidate(out contact))
             {
-                //Check if adding the new contact would overflow the manifold.
-                if (contacts.count == 4)
+                if (IsContactUnique(ref contact))
                 {
-                    //Adding that contact would overflow the manifold.  Reduce to the best subset.
-                    bool addCandidate;
-                    ContactReducer.ReduceContacts(contacts, ref contact, contactIndicesToRemove, out addCandidate);
-                    RemoveQueuedContacts();
-                    if (addCandidate)
+                    //Check if adding the new contact would overflow the manifold.
+                    if (contacts.count == 4)
+                    {
+                        //Adding that contact would overflow the manifold.  Reduce to the best subset.
+                        bool addCandidate;
+                        ContactReducer.ReduceContacts(contacts, ref contact, contactIndicesToRemove, out addCandidate);
+                        RemoveQueuedContacts();
+                        if (addCandidate)
+                            Add(ref contact);
+                    }
+                    else
+                    {
+                        //Won't overflow the manifold, so just toss it in.
                         Add(ref contact);
+                    }
                 }
-                else
+            }
+            else
+            {
+                //No collision, clean out the manifold.
+                for (int i = contacts.count - 1; i >= 0; i--)
                 {
-                    //Won't overflow the manifold, so just toss it in.
-                    Add(ref contact);
+                    Remove(i);
                 }
             }
 

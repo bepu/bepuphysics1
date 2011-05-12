@@ -88,9 +88,9 @@ namespace BEPUphysicsDemos.Demos
             //Do these tests with rotationally immobile objects.
             CollisionDetectionSettings.DefaultMargin = 0;
             groundWidth = 10;
-            groundHeight = 0f;
+            groundHeight = .1f;
             groundLength = 10;
-            a = new Box(new Vector3(0, -5, 0), groundWidth, groundHeight, groundLength);
+            a = new Box(new Vector3(0, -5, 0), groundWidth, groundHeight, groundLength, 1);
             //a = new TransformableEntity(new Vector3(0,0,0), new TriangleShape(new Vector3(-5, -5, -5), new Vector3(5, -5, -5), new Vector3(-5, -5, 5)), Matrix3X3.Identity);
             Space.Add(a);
 
@@ -99,8 +99,10 @@ namespace BEPUphysicsDemos.Demos
             boxHeight = .05f;
             boxLength = .25f;
             b = new TransformableEntity(new Vector3(0, 2, 0), new BoxShape(boxWidth, boxHeight, boxLength), Matrix3X3.Identity, 1);
-            //b = new Triangle(new Vector3(0, 2, 0), new Vector3(1, 2, 0), new Vector3(1, 2, 0), 1);
-            //box.LocalInertiaTensorInverse = new Matrix3X3();
+            //b = new Cone(new Vector3(0, 2, 0), .2f, .1f, 1);
+
+            //b = new Capsule(new Vector3(0, 2, 0), 1, .5f, 1);
+            //b.LocalInertiaTensorInverse = new Matrix3X3();
             CollisionRules.AddRule(b, a, CollisionRule.NoSolver);
             b.IsAlwaysActive = true;
             Space.Add(b);
@@ -140,126 +142,151 @@ namespace BEPUphysicsDemos.Demos
             RigidTransform localTransformB;
             RigidTransform aTransform = a.CollisionInformation.WorldTransform, bTransform = b.CollisionInformation.WorldTransform;
             MinkowskiToolbox.GetLocalTransform(ref aTransform, ref bTransform, out localTransformB);
+
             Vector3 position;
             if (MPRTesting.GetLocalOverlapPosition((a.CollisionInformation.Shape as ConvexShape), (b.CollisionInformation.Shape as ConvexShape), ref localTransformB, out position))
             {
                 //Vector3 rayCastDirection = new Vector3(1,0,0);// (Vector3.Normalize(localDirection) + Vector3.Normalize(collidableB.worldTransform.Position - collidableA.worldTransform.Position)) / 2;
-                float depth;
+                float previousT;
+                Vector3 previousNormal;
+                float t;
                 Vector3 normal;
-                MPRTesting.LocalSurfaceCast((a.CollisionInformation.Shape as ConvexShape), (b.CollisionInformation.Shape as ConvexShape), ref localTransformB, ref rayCastDirection, out depth, out normal);
+
+                rayCastDirection = localTransformB.Position;
+                MPRTesting.LocalSurfaceCast((a.CollisionInformation.Shape as ConvexShape), (b.CollisionInformation.Shape as ConvexShape), ref localTransformB, ref rayCastDirection, out previousT, out previousNormal);
+                //Vector3 secondDirection = Vector3.Cross(rayCastDirection, Vector3.Up);
+                //MPRTesting.LocalSurfaceCast((a.CollisionInformation.Shape as ConvexShape), (b.CollisionInformation.Shape as ConvexShape), ref localTransformB, ref secondDirection, out t, out normal);
+                //if (t < previousT)
+                //{
+                //    previousNormal = normal;
+                //    previousT = t;
+                //}
+                //Vector3 thirdDirection = Vector3.Cross(secondDirection, rayCastDirection);
+                //MPRTesting.LocalSurfaceCast((a.CollisionInformation.Shape as ConvexShape), (b.CollisionInformation.Shape as ConvexShape), ref localTransformB, ref thirdDirection, out t, out normal);
+                //if (t < previousT)
+                //{
+                //    previousNormal = normal;
+                //    previousT = t;
+                //}
+                //Vector3 fourthDirection = -secondDirection;
+                //MPRTesting.LocalSurfaceCast((a.CollisionInformation.Shape as ConvexShape), (b.CollisionInformation.Shape as ConvexShape), ref localTransformB, ref fourthDirection, out t, out normal);
+                //if (t < previousT)
+                //{
+                //    previousNormal = normal;
+                //    previousT = t;
+                //} 
+                //Vector3 fifthDirection = -thirdDirection;
+                //MPRTesting.LocalSurfaceCast((a.CollisionInformation.Shape as ConvexShape), (b.CollisionInformation.Shape as ConvexShape), ref localTransformB, ref fifthDirection, out t, out normal);
+                //if (t < previousT)
+                //{
+                //    previousNormal = normal;
+                //    previousT = t;
+                //}
+
+                //Correct the penetration depth.
+
+                MPRTesting.LocalSurfaceCast((a.CollisionInformation.Shape as ConvexShape), (b.CollisionInformation.Shape as ConvexShape), ref localTransformB, ref previousNormal, out t, out normal);
+                contactDepth = t;
+                contactNormal = previousNormal;
+
+                ////Converge to local minimum.
+                //while (true)
+                //{
+                //    MPRTesting.LocalSurfaceCast((a.CollisionInformation.Shape as ConvexShape), (b.CollisionInformation.Shape as ConvexShape), ref localTransformB, ref previousNormal, out t, out normal);
+                //    if (previousT - t <= Toolbox.BigEpsilon)
+                //        break;
+
+                //    previousT = t;
+                //    previousNormal = normal;
+                //}
             }
 
-            //Construct explicit minkowski sum.
-            Vector3[] aLines = new Vector3[8];
-            aLines[0] = new Vector3(-boxWidth / 2, -boxHeight / 2, -boxLength / 2);
-            aLines[1] = new Vector3(-boxWidth / 2, -boxHeight / 2, boxLength / 2);
-            aLines[2] = new Vector3(-boxWidth / 2, boxHeight / 2, -boxLength / 2);
-            aLines[3] = new Vector3(-boxWidth / 2, boxHeight / 2, boxLength / 2);
-            aLines[4] = new Vector3(boxWidth / 2, -boxHeight / 2, -boxLength / 2);
-            aLines[5] = new Vector3(boxWidth / 2, -boxHeight / 2, boxLength / 2);
-            aLines[6] = new Vector3(boxWidth / 2, boxHeight / 2, -boxLength / 2);
-            aLines[7] = new Vector3(boxWidth / 2, boxHeight / 2, boxLength / 2);
+            #region Box Box minkowski sum
+            ////Construct explicit minkowski sum.
+            //Vector3[] aLines = new Vector3[8];
+            //aLines[0] = new Vector3(-boxWidth / 2, -boxHeight / 2, -boxLength / 2);
+            //aLines[1] = new Vector3(-boxWidth / 2, -boxHeight / 2, boxLength / 2);
+            //aLines[2] = new Vector3(-boxWidth / 2, boxHeight / 2, -boxLength / 2);
+            //aLines[3] = new Vector3(-boxWidth / 2, boxHeight / 2, boxLength / 2);
+            //aLines[4] = new Vector3(boxWidth / 2, -boxHeight / 2, -boxLength / 2);
+            //aLines[5] = new Vector3(boxWidth / 2, -boxHeight / 2, boxLength / 2);
+            //aLines[6] = new Vector3(boxWidth / 2, boxHeight / 2, -boxLength / 2);
+            //aLines[7] = new Vector3(boxWidth / 2, boxHeight / 2, boxLength / 2);
 
-            for (int i = 0; i < 8; i++)
-                aLines[i] = Vector3.Transform(aLines[i], b.WorldTransform);
+            //Vector3[] bLines = new Vector3[8];
+            //bLines[0] = new Vector3(-groundWidth / 2, -groundHeight / 2, -groundLength / 2);
+            //bLines[1] = new Vector3(-groundWidth / 2, -groundHeight / 2, groundLength / 2);
+            //bLines[2] = new Vector3(-groundWidth / 2, groundHeight / 2, -groundLength / 2);
+            //bLines[3] = new Vector3(-groundWidth / 2, groundHeight / 2, groundLength / 2);
+            //bLines[4] = new Vector3(groundWidth / 2, -groundHeight / 2, -groundLength / 2);
+            //bLines[5] = new Vector3(groundWidth / 2, -groundHeight / 2, groundLength / 2);
+            //bLines[6] = new Vector3(groundWidth / 2, groundHeight / 2, -groundLength / 2);
+            //bLines[7] = new Vector3(groundWidth / 2, groundHeight / 2, groundLength / 2);
 
-            Vector3[] bLines = new Vector3[8];
-            bLines[0] = new Vector3(-groundWidth / 2, -groundHeight / 2, -groundLength / 2);
-            bLines[1] = new Vector3(-groundWidth / 2, -groundHeight / 2, groundLength / 2);
-            bLines[2] = new Vector3(-groundWidth / 2, groundHeight / 2, -groundLength / 2);
-            bLines[3] = new Vector3(-groundWidth / 2, groundHeight / 2, groundLength / 2);
-            bLines[4] = new Vector3(groundWidth / 2, -groundHeight / 2, -groundLength / 2);
-            bLines[5] = new Vector3(groundWidth / 2, -groundHeight / 2, groundLength / 2);
-            bLines[6] = new Vector3(groundWidth / 2, groundHeight / 2, -groundLength / 2);
-            bLines[7] = new Vector3(groundWidth / 2, groundHeight / 2, groundLength / 2);
+            //for (int i = 0; i < 8; i++)
+            //    aLines[i] = Vector3.Transform(aLines[i], localTransformB.Matrix);
 
-            for (int i = 0; i < 8; i++)
-                bLines[i] = Vector3.Transform(bLines[i], a.WorldTransform);
-
-            List<Vector3> vertices = new List<Vector3>();
-            for (int i = 0; i < 8; i++)
-            {
-                for (int j = 0; j < 8; j++)
-                {
-
-                    if (b.CollisionInformation.Pairs.Count > 0)
-                    {
-                        if (b.CollisionInformation.Pairs[0].BroadPhaseOverlap.EntryA == b.CollisionInformation)
-                            vertices.Add(aLines[i] - bLines[j]);
-                        else
-                            vertices.Add(bLines[i] - aLines[j]);
-                    }
-                    else
-                    {
-                        vertices.Add(bLines[i] - aLines[j]);
-                    }
-                }
-            }
-
-            var indices = new List<int>();
-            Toolbox.GetConvexHull(vertices, indices);
-
-            //var vertices = new List<Vector3>();
-            //Vector3 max;
-            //var direction = new Vector3();
-            //int NumSamples = 24;
-            //float angleChange = MathHelper.TwoPi / NumSamples;
-
-            //RigidTransform groundTransform = a.CollisionInformation.WorldTransform;
-            //RigidTransform boxTransform = b.CollisionInformation.WorldTransform;
-            //RigidTransform localTransformB;
-            //if (b.CollisionInformation.Pairs.Count == 0 || b.CollisionInformation.Pairs[0].BroadPhaseOverlap.EntryA == a.CollisionInformation)
-            //    MinkowskiToolbox.GetLocalTransform(ref groundTransform, ref boxTransform, out localTransformB);
-            //else
-            //    MinkowskiToolbox.GetLocalTransform(ref boxTransform, ref groundTransform, out localTransformB);
-
-            //for (int i = 1; i < NumSamples / 2 - 1; i++)
+            //List<Vector3> vertices = new List<Vector3>();
+            //for (int i = 0; i < 8; i++)
             //{
-            //    float phi = MathHelper.PiOver2 - i * angleChange;
-            //    var sinPhi = (float)Math.Sin(phi);
-            //    var cosPhi = (float)Math.Cos(phi);
-            //    for (int j = 0; j < NumSamples; j++)
+            //    for (int j = 0; j < 8; j++)
             //    {
-            //        float theta = j * angleChange;
-            //        direction.X = (float)Math.Cos(theta) * cosPhi;
-            //        direction.Y = sinPhi;
-            //        direction.Z = (float)Math.Sin(theta) * cosPhi;
 
-            //        if (b.CollisionInformation.Pairs.Count == 0 || b.CollisionInformation.Pairs[0].BroadPhaseOverlap.EntryA == a.CollisionInformation)
+            //        if (b.CollisionInformation.Pairs.Count > 0)
             //        {
-            //            MinkowskiToolbox.GetLocalMinkowskiExtremePoint(a.CollisionInformation.Shape as ConvexShape, b.CollisionInformation.Shape as ConvexShape, ref direction, ref localTransformB, out max);
-            //            //RigidTransform.Transform(ref max, ref groundTransform, out max);
+            //            if (b.CollisionInformation.Pairs[0].BroadPhaseOverlap.EntryA == b.CollisionInformation)
+            //                vertices.Add(aLines[i] - bLines[j]);
+            //            else
+            //                vertices.Add(bLines[i] - aLines[j]);
             //        }
             //        else
             //        {
-            //            MinkowskiToolbox.GetLocalMinkowskiExtremePoint(b.CollisionInformation.Shape as ConvexShape, a.CollisionInformation.Shape as ConvexShape, ref direction, ref localTransformB, out max);
-            //            //RigidTransform.Transform(ref max, ref boxTransform, out max);
+            //            vertices.Add(bLines[i] - aLines[j]);
             //        }
-            //        vertices.Add(max);
             //    }
-            //}
-
-            //if (b.CollisionInformation.Pairs.Count == 0 || b.CollisionInformation.Pairs[0].BroadPhaseOverlap.EntryA == a.CollisionInformation)
-            //{
-            //    MinkowskiToolbox.GetLocalMinkowskiExtremePoint(a.CollisionInformation.Shape as ConvexShape, b.CollisionInformation.Shape as ConvexShape, ref Toolbox.UpVector, ref localTransformB, out max);
-            //    //RigidTransform.Transform(ref max, ref groundTransform, out max);
-            //    vertices.Add(max);
-            //    MinkowskiToolbox.GetLocalMinkowskiExtremePoint(a.CollisionInformation.Shape as ConvexShape, b.CollisionInformation.Shape as ConvexShape, ref Toolbox.DownVector, ref localTransformB, out max);
-            //    //RigidTransform.Transform(ref max, ref groundTransform, out max);
-            //    vertices.Add(max);
-            //}
-            //else
-            //{
-            //    MinkowskiToolbox.GetLocalMinkowskiExtremePoint(b.CollisionInformation.Shape as ConvexShape, a.CollisionInformation.Shape as ConvexShape, ref Toolbox.UpVector, ref localTransformB, out max);
-            //    //RigidTransform.Transform(ref max, ref boxTransform, out max);
-            //    vertices.Add(max);
-            //    MinkowskiToolbox.GetLocalMinkowskiExtremePoint(b.CollisionInformation.Shape as ConvexShape, a.CollisionInformation.Shape as ConvexShape, ref Toolbox.DownVector, ref localTransformB, out max);
-            //    //RigidTransform.Transform(ref max, ref boxTransform, out max);
-            //    vertices.Add(max);
             //}
 
             //var indices = new List<int>();
             //Toolbox.GetConvexHull(vertices, indices);
+            #endregion
+
+            #region Arbitrary minkowski sum
+            var vertices = new List<Vector3>();
+            Vector3 max;
+            var direction = new Vector3();
+            int NumSamples = 16;
+            float angleChange = MathHelper.TwoPi / NumSamples;
+
+            for (int i = 1; i < NumSamples / 2 - 1; i++)
+            {
+                float phi = MathHelper.PiOver2 - i * angleChange;
+                var sinPhi = (float)Math.Sin(phi);
+                var cosPhi = (float)Math.Cos(phi);
+                for (int j = 0; j < NumSamples; j++)
+                {
+                    float theta = j * angleChange;
+                    direction.X = (float)Math.Cos(theta) * cosPhi;
+                    direction.Y = sinPhi;
+                    direction.Z = (float)Math.Sin(theta) * cosPhi;
+
+
+                    MinkowskiToolbox.GetLocalMinkowskiExtremePoint(a.CollisionInformation.Shape as ConvexShape, b.CollisionInformation.Shape as ConvexShape, ref direction, ref localTransformB, out max);
+
+                    vertices.Add(max);
+                }
+            }
+
+
+            MinkowskiToolbox.GetLocalMinkowskiExtremePoint(a.CollisionInformation.Shape as ConvexShape, b.CollisionInformation.Shape as ConvexShape, ref Toolbox.UpVector, ref localTransformB, out max);
+            vertices.Add(max);
+            MinkowskiToolbox.GetLocalMinkowskiExtremePoint(a.CollisionInformation.Shape as ConvexShape, b.CollisionInformation.Shape as ConvexShape, ref Toolbox.DownVector, ref localTransformB, out max);
+            vertices.Add(max);
+
+
+
+            var indices = new List<int>();
+            Toolbox.GetConvexHull(vertices, indices);
+            #endregion
 
             minkowskiLines.Clear();
             for (int i = 0; i < indices.Count; i += 3)
@@ -301,6 +328,8 @@ namespace BEPUphysicsDemos.Demos
 
         List<VertexPositionColor> minkowskiLines = new List<VertexPositionColor>();
 
+        Vector3 contactNormal;
+        float contactDepth;
 
         VertexPositionColor[] lines = new VertexPositionColor[12];
         public override void Draw()
@@ -312,10 +341,10 @@ namespace BEPUphysicsDemos.Demos
             lines[1] = new VertexPositionColor(basePosition + MPRTesting.DEBUGlastRayDirection * MPRTesting.DEBUGlastRayT, Color.Red);
             //Add the normal.  It goes from the surface hit plus the normal.
             lines[2] = new VertexPositionColor(basePosition + MPRTesting.DEBUGlastRayDirection * MPRTesting.DEBUGlastRayT, Color.Purple);
-            lines[3] = new VertexPositionColor(basePosition + MPRTesting.DEBUGlastRayDirection * MPRTesting.DEBUGlastRayT + MPRTesting.DEBUGlastNormal, Color.Purple);
+            lines[3] = new VertexPositionColor(basePosition + MPRTesting.DEBUGlastRayDirection * MPRTesting.DEBUGlastRayT + contactNormal, Color.Purple);
             //Add another line from the contact position along the normal with the depth.
             lines[4] = new VertexPositionColor(basePosition, Color.White);
-            lines[5] = new VertexPositionColor(basePosition + MPRTesting.DEBUGlastNormal * MPRTesting.DEBUGlastDepth, Color.White);
+            lines[5] = new VertexPositionColor(basePosition + contactNormal * contactDepth, Color.White);
 
             //Add the v1v2v3 triangle.
             lines[6] = new VertexPositionColor(MPRTesting.DEBUGlastV1, Color.Red);

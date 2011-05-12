@@ -420,7 +420,7 @@ namespace BEPUphysicsDemos
                         {
                             contactCount++;
                             collisionNormalList.Add(new VertexPositionColor(information.Contact.Position, Color.White));
-                            collisionNormalList.Add(new VertexPositionColor(information.Contact.Position + information.Contact.Normal, Color.White));
+                            collisionNormalList.Add(new VertexPositionColor(information.Contact.Position + information.Contact.Normal * information.Contact.PenetrationDepth, Color.White));
                         }
                     }
                 }

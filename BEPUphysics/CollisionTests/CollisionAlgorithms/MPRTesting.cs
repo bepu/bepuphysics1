@@ -251,7 +251,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
         }
 
-        public static void LocalSurfaceCast(ConvexShape shapeA, ConvexShape shapeB, ref RigidTransform localTransformB, ref Vector3 direction, out float depth, out Vector3 normal)
+        public static void LocalSurfaceCast(ConvexShape shapeA, ConvexShape shapeB, ref RigidTransform localTransformB, ref Vector3 direction, out float t, out Vector3 normal)
         {
             // Local surface cast is very similar to regular MPR.  However, instead of starting at an interior point and targeting the origin,
             // the ray starts at the origin (a point known to be in both shapeA and shapeB), and just goes towards the direction until the surface
@@ -309,7 +309,12 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 MinkowskiToolbox.GetLocalMinkowskiExtremePoint(shapeA, shapeB, ref n, ref localTransformB, out v3);
 
                 if (count > MPRToolbox.OuterIterationLimit)
-                    break;
+                {
+                    //Can't enclose the origin! That's a bit odd; something is wrong.
+                    t = float.MaxValue;
+                    normal = Toolbox.UpVector;
+                    return;
+                }
                 count++;
 
                 //By now, the simplex is a tetrahedron, but it is not known whether or not the ray actually passes through the portal
@@ -367,22 +372,25 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
                 if (supportDot - dot < Toolbox.BigEpsilon || count > MPRToolbox.InnerIterationLimit) // TODO: Could use a dynamic epsilon for possibly better behavior.
                 {
-                    normal = n;
-                    float normalLengthInverse = 1 / normal.Length();
-                    Vector3.Multiply(ref normal, normalLengthInverse, out normal);
-                    //Find the distance from the origin to the plane.
-                    depth = dot * normalLengthInverse;
+                    //normal = n;
+                    //float normalLengthInverse = 1 / normal.Length();
+                    //Vector3.Multiply(ref normal, normalLengthInverse, out normal);
+                    ////Find the distance from the origin to the plane.
+                    //t = dot * normalLengthInverse;
 
-                    //DEBUG STUFF:
-                    //Compute the ray cast hit location.
+                    Vector3.Normalize(ref n, out normal);
                     //The plane is very close to the surface, and the ray is known to pass through it.
                     //dot is the rate.
                     Vector3.Dot(ref normal, ref direction, out dot);
                     //supportDot is the distance to the plane.
                     Vector3.Dot(ref normal, ref v1, out supportDot);
-                    DEBUGlastRayT = supportDot / dot;
+                    t = supportDot / dot;
+
+                    //DEBUG STUFF:
+
+                    DEBUGlastRayT = t;
                     DEBUGlastRayDirection = direction;
-                    DEBUGlastDepth = depth;
+                    DEBUGlastDepth = t;
                     DEBUGlastNormal = normal;
                     DEBUGlastV1 = v1;
                     DEBUGlastV2 = v2;
