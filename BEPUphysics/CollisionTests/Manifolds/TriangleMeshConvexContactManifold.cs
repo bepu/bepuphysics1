@@ -113,18 +113,23 @@ namespace BEPUphysics.CollisionTests.Manifolds
 
                 //Now, generate a contact between the two shapes.
                 ContactData contact;
-                if (pairTester.GenerateContactCandidate(out contact))
+                TinyStructList<ContactData> contactList;
+                if (pairTester.GenerateContactCandidate(out contactList))
                 {
-                    if (UseImprovedBoundaryHandling)
+                    for (int j = 0; j < contactList.count; j++)
                     {
-                        if (AnalyzeCandidate(ref indices, pairTester, ref contact))
+                        contactList.Get(j, out contact);
+                        if (UseImprovedBoundaryHandling)
+                        {
+                            if (AnalyzeCandidate(ref indices, pairTester, ref contact))
+                            {
+                                AddLocalContact(ref contact, ref orientation);
+                            }
+                        }
+                        else
                         {
                             AddLocalContact(ref contact, ref orientation);
                         }
-                    }
-                    else
-                    {
-                        AddLocalContact(ref contact, ref orientation);
                     }
                 }
 

@@ -98,31 +98,42 @@ namespace BEPUphysics.CollisionTests.Manifolds
 
             //Now, generate a contact between the two shapes.
             ContactData contact;
-            if (pairTester.GenerateContactCandidate(out contact))
+            TinyStructList<ContactData> contactList;
+            if (pairTester.GenerateContactCandidate(out contactList))
             {
-                //Put the contact into world space.
-                Matrix3X3.Transform(ref contact.Position, ref orientation, out contact.Position);
-                Vector3.Add(ref contact.Position, ref convex.worldTransform.Position, out contact.Position);
-                Matrix3X3.Transform(ref contact.Normal, ref orientation, out contact.Normal);
-                //Check if the contact is unique before proceeding.
-                if (IsContactUnique(ref contact))
+                for (int i = 0; i < contactList.count; i++)
                 {
-                    //Check if adding the new contact would overflow the manifold.
-                    if (contacts.count == 4)
+                    contactList.Get(i, out contact);
+                    //Put the contact into world space.
+                    Matrix3X3.Transform(ref contact.Position, ref orientation, out contact.Position);
+                    Vector3.Add(ref contact.Position, ref convex.worldTransform.Position, out contact.Position);
+                    Matrix3X3.Transform(ref contact.Normal, ref orientation, out contact.Normal);
+                    //Check if the contact is unique before proceeding.
+                    if (IsContactUnique(ref contact))
                     {
-                        //Adding that contact would overflow the manifold.  Reduce to the best subset.
-                        bool addCandidate;
-                        ContactReducer.ReduceContacts(contacts, ref contact, contactIndicesToRemove, out addCandidate);
-                        RemoveQueuedContacts();
-                        if (addCandidate)
+                        //Check if adding the new contact would overflow the manifold.
+                        if (contacts.count == 4)
+                        {
+                            //Adding that contact would overflow the manifold.  Reduce to the best subset.
+                            bool addCandidate;
+                            ContactReducer.ReduceContacts(contacts, ref contact, contactIndicesToRemove, out addCandidate);
+                            RemoveQueuedContacts();
+                            if (addCandidate)
+                                Add(ref contact);
+                        }
+                        else
+                        {
+                            //Won't overflow the manifold, so just toss it in PROVIDED that it isn't too close to something else.
                             Add(ref contact);
-                    }
-                    else
-                    {
-                        //Won't overflow the manifold, so just toss it in PROVIDED that it isn't too close to something else.
-                        Add(ref contact);
+                        }
                     }
                 }
+            }
+            else
+            {
+                //Clear out the contacts, it's separated.
+                for (int i = contacts.count - 1; i >= 0; i--)
+                    Remove(i);
             }
 
         }

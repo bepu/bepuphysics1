@@ -84,23 +84,24 @@ namespace BEPUphysicsDemos.Demos
             //        !MPRToolbox.IsPointInsideShape(ref contactData.Position, shapeB, ref transformB)))
             //        Debug.WriteLine("Break.");
             //}
-
+            
             //Do these tests with rotationally immobile objects.
             CollisionDetectionSettings.DefaultMargin = 0;
             groundWidth = 10;
             groundHeight = .1f;
             groundLength = 10;
-            a = new Box(new Vector3(0, -5, 0), groundWidth, groundHeight, groundLength, 1);
-            //a = new TransformableEntity(new Vector3(0,0,0), new TriangleShape(new Vector3(-5, -5, -5), new Vector3(5, -5, -5), new Vector3(-5, -5, 5)), Matrix3X3.Identity);
+            //a = new Box(new Vector3(0, -5, 0), groundWidth, groundHeight, groundLength, 1);
+            //a = new TransformableEntity(new Vector3(0,0,0), new TriangleShape(new Vector3(-5, -5, -5), new Vector3(5, -5, -5), new Vector3(-5, -5, 5)), Matrix3X3.Identity);         
+            a = new Triangle(new Vector3(0, -5, 0), new Vector3(5, -5, 0), new Vector3(5, -5, 5), 1);
             Space.Add(a);
-
+            
             Space.ForceUpdater.Gravity = new Vector3();
-            boxWidth = 1;
-            boxHeight = .05f;
-            boxLength = .25f;
+            boxWidth = .25f;
+            boxHeight = 1;
+            boxLength = .05f;
             b = new TransformableEntity(new Vector3(0, 2, 0), new BoxShape(boxWidth, boxHeight, boxLength), Matrix3X3.Identity, 1);
             //b = new Cone(new Vector3(0, 2, 0), .2f, .1f, 1);
-
+            //b = new Capsule(new Vector3(0, 2, 0), 1, .5f, 1);
             //b = new Capsule(new Vector3(0, 2, 0), 1, .5f, 1);
             //b.LocalInertiaTensorInverse = new Matrix3X3();
             CollisionRules.AddRule(b, a, CollisionRule.NoSolver);
@@ -109,7 +110,13 @@ namespace BEPUphysicsDemos.Demos
             //Space.Add(new TransformableEntity(new Vector3(0, 4, 0), new BoxShape(1, 1, 1), Matrix3X3.Identity, 1));
             //Space.Add( new TransformableEntity(new Vector3(0, 6, 0), new BoxShape(1, 1, 1), Matrix3X3.Identity, 1));
 
-
+            Vector3[] vertices = new Vector3[] { new Vector3(0, -5, 0), new Vector3(5, -5, 0), new Vector3(5, -5, 5) };
+            int[] indices = new int[] { 0, 1, 2 };
+            StaticMesh mesh = new StaticMesh(vertices, indices);
+            Space.Add(mesh);
+            mesh.ImproveBoundaryBehavior = false;
+            game.ModelDrawer.Add(mesh.Mesh);
+            mesh.CollisionRules.Personal = CollisionRule.NoSolver;
 
         }
 

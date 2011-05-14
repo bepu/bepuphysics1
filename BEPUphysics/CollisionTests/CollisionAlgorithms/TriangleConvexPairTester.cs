@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.MathExtensions;
 using BEPUphysics.Settings;
+using BEPUphysics.DataStructures;
 
 namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 {
@@ -30,22 +31,23 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
         ///<summary>
         /// Generates a contact between the triangle and convex.
         ///</summary>
-        ///<param name="contact">Contact between the shapes, if any.</param>
+        ///<param name="contactList">Contact between the shapes, if any.</param>
         ///<returns>Whether or not the shapes are colliding.</returns>
-        public bool GenerateContactCandidate(out ContactData contact)
+        public bool GenerateContactCandidate(out TinyStructList<ContactData> contactList)
         {
+            previousState = state;
             switch (state)
             {
                 case CollisionState.Plane:
-                    return DoPlaneTest(out contact);
+                    return DoPlaneTest(out contactList);
                 case CollisionState.ExternalSeparated:
-                    return DoExternalSeparated(out contact);
+                    return DoExternalSeparated(out contactList);
                 case CollisionState.ExternalNear:
-                    return DoExternalNear(out contact);
+                    return DoExternalNear(out contactList);
                 case CollisionState.Deep:
-                    return DoDeepContact(out contact);
+                    return DoDeepContact(out contactList);
                 default:
-                    contact = new ContactData();
+                    contactList = new TinyStructList<ContactData>();
                     return false;
             }
 
@@ -54,7 +56,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
         }
 
 
-        private bool DoPlaneTest(out ContactData contact)
+        private bool DoPlaneTest(out TinyStructList<ContactData> contactList)
         {
 
 
@@ -68,6 +70,8 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             //If the distance along the normal is positive, then the convex is 'behind' that normal.
             float dotA;
             Vector3.Dot(ref triangle.vA, ref reverseNormal, out dotA);
+
+            contactList = new TinyStructList<ContactData>();
             switch (triangle.sidedness)
             {
                 case TriangleSidedness.DoubleSided:
@@ -84,7 +88,6 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                     if (dotA < 0)
                     {
                         //The reverse normal is pointing towards the convex.
-                        contact = new ContactData();
                         return false;
                     }
                     break;
@@ -92,7 +95,6 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                     if (dotA > 0)
                     {
                         //The reverse normal is pointing away from the convex.
-                        contact = new ContactData();
                         return false;
                     }
 
@@ -116,7 +118,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             if (GetVoronoiRegion(ref extremePoint) != VoronoiRegion.ABC)
             {
                 state = CollisionState.ExternalSeparated;
-                return DoExternalSeparated(out contact);
+                return DoExternalSeparated(out contactList);
             }
 
 
@@ -142,7 +144,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 //All that's left is to create the contact.
 
 
-                contact = new ContactData();
+                var contact = new ContactData();
                 //Displacement is from A to B.  point = A + t * AB, where t = marginA / margin.
                 if (marginSum > Toolbox.Epsilon) //This can be zero! It would cause a NaN is unprotected.
                     Vector3.Multiply(ref offset, convex.collisionMargin / marginSum, out contact.Position); //t * AB
@@ -160,14 +162,14 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 if (contact.PenetrationDepth > marginSum)
                 {
                     //Check to see if the inner sphere is touching the plane.
-                    //This overrides other depth tests.
+                    //This does not override other tests; there can be more than one contact from a single triangle.
 
                     ContactData alternateContact;
-                    if (TryInnerSphereContact(out alternateContact))
+                    if (TryInnerSphereContact(out alternateContact))// && alternateContact.PenetrationDepth > contact.PenetrationDepth)
                     {
-                        contact = alternateContact;
-                        return true;
+                        contactList.Add(ref alternateContact);
                     }
+
                     //The convex object is stuck deep in the plane!
                     //The most problematic case for this is when
                     //an object is right on top of a cliff.
@@ -178,16 +180,22 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                     //Verify that the depth is correct by trying another approach.
                     CollisionState previousState = state;
                     state = CollisionState.ExternalNear;
-                    if (DoExternalNear(out alternateContact))
+                    TinyStructList<ContactData> alternateContacts;
+                    if (DoExternalNear(out alternateContacts))
                     {
-                        if (alternateContact.PenetrationDepth + .01f < contact.PenetrationDepth) //Bias against the MPR test's result, since the plane version will probably have a better position.
+                        alternateContacts.Get(0, out alternateContact);
+                        if (alternateContact.PenetrationDepth + .01f < contact.PenetrationDepth) //Bias against the subtest's result, since the plane version will probably have a better position.
                         {
                             //It WAS a bad contact.
-                            contact = alternateContact;
+                            contactList.Add(ref alternateContact);
+                            //DoDeepContact (which can be called from within DoExternalNear) can generate two contacts, but the second contact would just be an inner sphere (which we already generated).
+                            //DoExternalNear can only generate one contact.  So we only need the first contact!
+                            //TODO: This is a fairly fragile connection between the two stages.  Consider robustifying. (Also, the TryInnerSphereContact is done twice! This process is very rare for marginful pairs, though)
                         }
                         else
                         {
                             //Well, it really is just that deep.
+                            contactList.Add(ref contact);
                             state = previousState;
                         }
                     }
@@ -200,10 +208,13 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                         return false;
                     }
                 }
+                else
+                {
+                    contactList.Add(ref contact);
+                }
                 return true;
 
             }
-            contact = new ContactData();
             return false;
 
 
@@ -222,20 +233,20 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
 
 
-        private bool DoExternalSeparated(out ContactData contact)
+        private bool DoExternalSeparated(out TinyStructList<ContactData> contactList)
         {
 
             if (GJKToolbox.AreShapesIntersecting(convex, triangle, ref Toolbox.RigidIdentity, ref Toolbox.RigidIdentity, ref localSeparatingAxis))
             {
                 state = CollisionState.ExternalNear;
-                return DoExternalNear(out contact);
+                return DoExternalNear(out contactList);
             }
             TryToEscape();
-            contact = new ContactData();
+            contactList = new TinyStructList<ContactData>();
             return false;
         }
 
-        private bool DoExternalNear(out ContactData contact)
+        private bool DoExternalNear(out TinyStructList<ContactData> contactList)
         {
 
             Vector3 closestA, closestB;
@@ -250,24 +261,26 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             Vector3.Add(ref triangle.vA, ref triangle.vB, out triangleCentroid);
             Vector3.Add(ref triangleCentroid, ref triangle.vC, out triangleCentroid);
             Vector3.Multiply(ref triangleCentroid, .33333333f, out triangleCentroid);
+
             var initialSimplex = new CachedSimplex();
             initialSimplex.State = SimplexState.Point;
             initialSimplex.LocalSimplexB.A = triangleCentroid;
             if (GJKToolbox.GetClosestPoints(convex, triangle, ref Toolbox.RigidIdentity, ref Toolbox.RigidIdentity, ref initialSimplex, out closestA, out closestB))
             {
                 state = CollisionState.Deep;
-                return DoDeepContact(out contact);
+                return DoDeepContact(out contactList);
             }
             Vector3 displacement;
             Vector3.Subtract(ref closestB, ref closestA, out displacement);
+            localDirection = displacement; //Cache the displacement vector for use in the deep contact system.
             float distanceSquared = displacement.LengthSquared();
             float margin = convex.collisionMargin + triangle.collisionMargin;
 
-
+            contactList = new TinyStructList<ContactData>();
             if (distanceSquared < margin * margin)
             {
                 //Try to generate a contact.
-                contact = new ContactData();
+                var contact = new ContactData();
 
                 //Determine if the normal points in the appropriate direction given the sidedness of the triangle.
                 if (triangle.sidedness != TriangleSidedness.DoubleSided)
@@ -286,7 +299,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
 
                 //Displacement is from A to B.  point = A + t * AB, where t = marginA / margin.
-                if (margin > Toolbox.Epsilon) //This can be zero! It would cause a NaN is unprotected.
+                if (margin > Toolbox.Epsilon) //This can be zero! It would cause a NaN if unprotected.
                     Vector3.Multiply(ref displacement, convex.collisionMargin / margin, out contact.Position); //t * AB
                 else contact.Position = new Vector3();
                 Vector3.Add(ref closestA, ref contact.Position, out contact.Position); //A + t * AB.
@@ -300,46 +313,207 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
 
 
-
+                contactList.Add(ref contact);
                 TryToEscape(ref contact.Position);
                 return true;
 
             }
             //Too far to make a contact- move back to separation.
             state = CollisionState.ExternalSeparated;
-            contact = new ContactData();
             return false;
         }
 
-        private bool DoDeepContact(out ContactData contact)
+        CollisionState previousState;
+        Vector3 localDirection;
+        bool cameFromShallow = false;
+        private bool DoDeepContact(out TinyStructList<ContactData> contactList)
         {
-            if (TryInnerSphereContact(out contact))
-                return true;
 
-            if (MPRToolbox.AreObjectsColliding(convex, triangle, ref Toolbox.RigidIdentity, ref Toolbox.RigidIdentity, out contact))
+            //Vector3 triangleNormal, ab, ac;
+            //Vector3.Subtract(ref triangle.vB, ref triangle.vA, out ab);
+            //Vector3.Subtract(ref triangle.vC, ref triangle.vA, out ac);
+            //Vector3.Cross(ref ab, ref ac, out triangleNormal);
+            //float dot;
+            //if (previousState == CollisionState.ExternalSeparated || previousState == CollisionState.Plane) //If it was shallow before, then its closest points will be used to find the normal.
+            //{
+
+            //    //Instead of using relative velocity as a heuristic, use the triangle's normal.  Calibrate it to point the correct direction.
+            //    //The backup direction of A-B tends to pick directions that point outward, so the normal will almost always be a good perpendicular option.
+            //    //If ExternalNear runs immediately before, though, it may be wiser to just use its separating axis instead.
+
+            //    //The calibrated direction can't just be based on the center position of the object, though.
+            //    //It needs to be compared against 
+            //    Vector3.Dot(ref triangleNormal, ref triangle.vA, out dot);
+            //    if (dot < 0)
+            //        Vector3.Negate(ref triangleNormal, out localDirection);
+            //    else
+            //        localDirection = triangleNormal;
+            //}
+            //if (localDirection.LengthSquared() < Toolbox.Epsilon)
+            //    localDirection = Vector3.Up;
+
+            //Vector3 center;
+            //Vector3.Add(ref triangle.vA, ref triangle.vB, out center);
+            //Vector3.Add(ref center, ref triangle.vC, out center);
+            //Vector3.Divide(ref center, 3, out center);
+
+
+            //if (MPRTesting.GetContact(convex, triangle, ref Toolbox.RigidIdentity, ref Toolbox.RigidIdentity, ref center, ref localDirection, out contact))
+            //{
+            //    //Determine if the normal points in the appropriate direction given the sidedness of the triangle.
+            //    if (triangle.sidedness != TriangleSidedness.DoubleSided)
+            //    {
+            //        Vector3.Dot(ref triangleNormal, ref contact.Normal, out dot);
+            //        if (triangle.sidedness == TriangleSidedness.Clockwise && dot > 0)
+            //            return false;
+            //        if (triangle.sidedness == TriangleSidedness.Counterclockwise && dot < 0)
+            //            return false;
+            //    }
+
+            //    if (contact.PenetrationDepth < convex.collisionMargin + triangle.collisionMargin)
+            //        state = CollisionState.ExternalNear;
+            //    return true;
+            //}
+            ////This is rare, but could happen.
+            //state = CollisionState.ExternalSeparated;
+            //return false;
+
+            if (!cameFromShallow && previousState == CollisionState.ExternalNear)
+                cameFromShallow = true;
+
+            //Find the origin to triangle center offset.
+            Vector3 center;
+            Vector3.Add(ref triangle.vA, ref triangle.vB, out center);
+            Vector3.Add(ref center, ref triangle.vC, out center);
+            Vector3.Divide(ref center, 3, out center);
+
+            ContactData contact;
+
+            contactList = new TinyStructList<ContactData>();
+
+            if (MPRTesting.GetLocalOverlapPosition(convex, triangle, ref center, ref Toolbox.RigidIdentity, out contact.Position))
             {
-                //Determine if the normal points in the appropriate direction given the sidedness of the triangle.
-                if (triangle.sidedness != TriangleSidedness.DoubleSided)
+
+                if (false)//cameFromShallow)
                 {
+                    //Only have to use the local direction found by the previous shallow run.
+
+                }
+                else
+                {
+                    //Try the depth along the positive triangle normal.
                     Vector3 triangleNormal, ab, ac;
                     Vector3.Subtract(ref triangle.vB, ref triangle.vA, out ab);
                     Vector3.Subtract(ref triangle.vC, ref triangle.vA, out ac);
                     Vector3.Cross(ref ab, ref ac, out triangleNormal);
+                    triangleNormal.Normalize();
+                    MPRTesting.LocalSurfaceCast(convex, triangle, ref Toolbox.RigidIdentity, ref triangleNormal, out contact.PenetrationDepth, out contact.Normal);
+
+                    //Try the depth along the negative triangle normal.
+
+                    Vector3 candidateNormal;
+                    float candidateDepth;
+                    Vector3.Negate(ref triangleNormal, out triangleNormal);
+                    MPRTesting.LocalSurfaceCast(convex, triangle, ref Toolbox.RigidIdentity, ref triangleNormal, out candidateDepth, out candidateNormal);
+                    if (candidateDepth < contact.PenetrationDepth)
+                        contact.Normal = candidateNormal;
+
                     float dot;
-                    Vector3.Dot(ref triangleNormal, ref contact.Normal, out dot);
-                    if (triangle.sidedness == TriangleSidedness.Clockwise && dot > 0)
-                        return false;
-                    if (triangle.sidedness == TriangleSidedness.Counterclockwise && dot < 0)
-                        return false;
+
+                    //Project the direction onto the triangle plane.
+                    Vector3.Dot(ref triangleNormal, ref center, out dot);
+                    Vector3 trianglePlaneDirection;
+                    Vector3.Multiply(ref triangleNormal, dot, out trianglePlaneDirection);
+                    Vector3.Subtract(ref center, ref trianglePlaneDirection, out trianglePlaneDirection);
+                    dot = trianglePlaneDirection.LengthSquared();
+                    if (dot > Toolbox.Epsilon)
+                    {
+                        Vector3.Divide(ref trianglePlaneDirection, (float)Math.Sqrt(dot), out trianglePlaneDirection);
+                        MPRTesting.LocalSurfaceCast(convex, triangle, ref Toolbox.RigidIdentity, ref trianglePlaneDirection, out candidateDepth, out candidateNormal);
+                        if (candidateDepth < contact.PenetrationDepth)
+                            contact.Normal = candidateNormal;
+                    }
+
+
                 }
 
+
+                //Correct the penetration depth.
+                MPRTesting.LocalSurfaceCast(convex, triangle, ref Toolbox.RigidIdentity, ref contact.Normal, out contact.PenetrationDepth, out center); //Center is just a trash variable now.
+
+
+                ////The local casting can optionally continue.  Eventually, it will converge to the local minimum.
+                //while (true)
+                //{
+                //    MPRTesting.LocalSurfaceCast(collidableA.Shape, collidableB.Shape, ref localTransformB, ref contact.Normal, out depthCandidate, out normalCandidate);
+                //    if (contact.PenetrationDepth - depthCandidate <= Toolbox.BigEpsilon)
+                //        break;
+
+                //    contact.PenetrationDepth = depthCandidate;
+                //    contact.Normal = normalCandidate;
+                //}
+
+                contact.Id = -1;
+
                 if (contact.PenetrationDepth < convex.collisionMargin + triangle.collisionMargin)
+                {
+                    cameFromShallow = false;
                     state = CollisionState.ExternalNear; //If it's emerged from the deep contact, we can go back to using the preferred GJK method.
-                return true;
+                }
+                contactList.Add(ref contact);
             }
-            //This is rare, but could happen.
+
+
+
+            if (TryInnerSphereContact(out contact))
+            {
+                contactList.Add(ref contact);
+            }
+            if (contactList.count > 0)
+                return true;
+
             state = CollisionState.ExternalSeparated;
+            cameFromShallow = false;
             return false;
+
+
+
+
+
+
+
+
+
+
+
+            //if (MPRToolbox.AreObjectsColliding(convex, triangle, ref Toolbox.RigidIdentity, ref Toolbox.RigidIdentity, out contact))
+            //{
+            //    //Determine if the normal points in the appropriate direction given the sidedness of the triangle.
+            //    if (triangle.sidedness != TriangleSidedness.DoubleSided)
+            //    {
+            //        Vector3 triangleNormal, ab, ac;
+            //        Vector3.Subtract(ref triangle.vB, ref triangle.vA, out ab);
+            //        Vector3.Subtract(ref triangle.vC, ref triangle.vA, out ac);
+            //        Vector3.Cross(ref ab, ref ac, out triangleNormal);
+            //        float dot;
+            //        Vector3.Dot(ref triangleNormal, ref contact.Normal, out dot);
+            //        if (triangle.sidedness == TriangleSidedness.Clockwise && dot > 0)
+            //            return false;
+            //        if (triangle.sidedness == TriangleSidedness.Counterclockwise && dot < 0)
+            //            return false;
+            //    }
+
+            //    if (contact.PenetrationDepth < convex.collisionMargin + triangle.collisionMargin)
+            //        state = CollisionState.ExternalNear; //If it's emerged from the deep contact, we can go back to using the preferred GJK method.
+            //    return true;
+            //}
+            ////This is rare, but could happen.
+            //state = CollisionState.ExternalSeparated;
+            //return false;
+
+
+
+
         }
 
 
@@ -383,8 +557,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                     contact.Normal = triangle.GetNormal(Toolbox.RigidIdentity);
                 }
 
-                //The penetration depth could also be approximated rather than computed.  This is basically an approximation anyway.
-                contact.PenetrationDepth = MPRToolbox.FindPenetrationDepth(triangle, convex, ref contact.Position, ref Toolbox.RigidIdentity, ref contact.Normal);
+                contact.PenetrationDepth = convex.minimumRadius - length;
                 contact.Id = -1;
                 return true;
             }

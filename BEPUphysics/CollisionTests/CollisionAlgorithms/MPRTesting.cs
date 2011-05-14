@@ -37,12 +37,18 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
         public static bool GetLocalOverlapPosition(ConvexShape shapeA, ConvexShape shapeB, ref RigidTransform localTransformB, out Vector3 position)
         {
+            return GetLocalOverlapPosition(shapeA, shapeB, ref localTransformB.Position, ref localTransformB, out position);
+        }
+
+        //Sometimes we need to be able to define an origin ray which is not based on the transforms.
+        public static bool GetLocalOverlapPosition(ConvexShape shapeA, ConvexShape shapeB, ref Vector3 originRay, ref RigidTransform localTransformB, out Vector3 position)
+        {
             //Compute the origin ray.  This points from a point known to be inside the minkowski sum to the origin.
             //The centers of the shapes are used to create the interior point.
 
             //It's possible that the two objects' centers are overlapping, or very very close to it.  In this case, 
             //they are obviously colliding and we can immediately exit.
-            if (localTransformB.Position.LengthSquared() < Toolbox.Epsilon)
+            if (originRay.LengthSquared() < Toolbox.Epsilon)
             {
                 position = new Vector3();
                 DEBUGlastPosition = position;
@@ -50,7 +56,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             }
 
             Vector3 v0;
-            Vector3.Negate(ref localTransformB.Position, out v0); //Since we're in A's local space, A-B is just -B.
+            Vector3.Negate(ref originRay, out v0); //Since we're in A's local space, A-B is just -B.
 
 
 
@@ -58,7 +64,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             //To do this, first guess a portal.
             //This implementation is similar to that of the original XenoCollide.
             //'n' will be the direction used to find supports throughout the algorithm.
-            Vector3 n = localTransformB.Position;
+            Vector3 n = originRay;
             Vector3 v1;
             Vector3 v1A, v1B; //extreme point contributions from each shape.  Used later to compute contact position; could be used to cache simplex too.
             MinkowskiToolbox.GetLocalMinkowskiExtremePoint(shapeA, shapeB, ref n, ref localTransformB, out v1A, out v1B, out v1);
@@ -164,11 +170,11 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                     float ov1v2v3volume;
                     Vector3.Dot(ref cross, ref v3, out ov1v2v3volume);
 
-                    Vector3.Cross(ref localTransformB.Position, ref temp2, out cross);
+                    Vector3.Cross(ref originRay, ref temp2, out cross);
                     float v0ov2v3volume;
                     Vector3.Dot(ref cross, ref temp3, out v0ov2v3volume);
 
-                    Vector3.Cross(ref temp1, ref localTransformB.Position, out cross);
+                    Vector3.Cross(ref temp1, ref originRay, out cross);
                     float v0v1ov3volume;
                     Vector3.Dot(ref cross, ref temp3, out v0v1ov3volume);
 
@@ -210,10 +216,10 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 //Test origin against the three planes that separate the new portal candidates: (v1,v4,v0) (v2,v4,v0) (v3,v4,v0)
                 Vector3.Cross(ref v4, ref v0, out temp1);
                 Vector3.Dot(ref v1, ref temp1, out dot);
-                if (dot > 0)
+                if (dot >= 0)
                 {
                     Vector3.Dot(ref v2, ref temp1, out dot);
-                    if (dot > 0)
+                    if (dot >= 0)
                     {
                         v1 = v4; // Inside v1 & inside v2 ==> eliminate v1
                         v1A = v4A;
@@ -229,7 +235,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 else
                 {
                     Vector3.Dot(ref v3, ref temp1, out dot);
-                    if (dot > 0)
+                    if (dot >= 0)
                     {
                         v2 = v4; // Outside v1 & inside v3 ==> eliminate v2
                         v2A = v4A;
@@ -268,6 +274,13 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             Vector3 n = direction;
             Vector3 v1;
             MinkowskiToolbox.GetLocalMinkowskiExtremePoint(shapeA, shapeB, ref n, ref localTransformB, out v1);
+            //v1 could be zero in some degenerate cases.
+            if (v1.LengthSquared() < Toolbox.Epsilon)
+            {
+                t = 0;
+                normal = n;
+                return;
+            }
 
             //Find another extreme point in a direction perpendicular to the previous.
             Vector3 v2;
@@ -414,10 +427,10 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 //It eliminates the need for extra cross products for the inner if.
                 Vector3.Cross(ref v4, ref direction, out temp1);
                 Vector3.Dot(ref v1, ref temp1, out dot);
-                if (dot > 0)
+                if (dot >= 0)
                 {
                     Vector3.Dot(ref v2, ref temp1, out dot);
-                    if (dot > 0)
+                    if (dot >= 0)
                     {
                         v1 = v4; // Inside v1 & inside v2 ==> eliminate v1
                     }
@@ -429,7 +442,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 else
                 {
                     Vector3.Dot(ref v3, ref temp1, out dot);
-                    if (dot > 0)
+                    if (dot >= 0)
                     {
                         v2 = v4; // Outside v1 & inside v3 ==> eliminate v2
                     }
@@ -497,6 +510,77 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             float planeProduct3 = Vector3.Dot(cross, direction);
             return (planeProduct1 <= 0 && planeProduct2 <= 0 && planeProduct3 <= 0) ||
                 (planeProduct1 >= 0 && planeProduct2 >= 0 && planeProduct3 >= 0);
+        }
+        
+        public static bool GetContact(ConvexShape shapeA, ConvexShape shapeB, ref RigidTransform transformA, ref RigidTransform transformB, ref Vector3 penetrationAxis, out ContactData contact)
+        {
+            Vector3 originRay;
+            Vector3.Subtract(ref transformB.Position, ref transformA.Position, out originRay);
+
+            return GetContact(shapeA, shapeB, ref transformA, ref transformB, ref originRay, ref penetrationAxis, out contact);
+        }
+        public static bool GetContact(ConvexShape shapeA, ConvexShape shapeB, ref RigidTransform transformA, ref RigidTransform transformB, ref Vector3 originRay, ref Vector3 penetrationAxis, out ContactData contact)
+        {
+            RigidTransform localTransformB;
+            MinkowskiToolbox.GetLocalTransform(ref transformA, ref transformB, out localTransformB);
+            if (MPRTesting.GetLocalOverlapPosition(shapeA, shapeB, ref originRay, ref localTransformB, out contact.Position))
+            {
+                //First, try to use the heuristically found direction.  This comes from either the GJK shallow contact separating axis or from the relative velocity.
+                Vector3 rayCastDirection;
+                float lengthSquared = penetrationAxis.LengthSquared();
+                if (lengthSquared > Toolbox.Epsilon)
+                {
+                    Vector3.Divide(ref penetrationAxis, (float)Math.Sqrt(lengthSquared), out rayCastDirection);// (Vector3.Normalize(localDirection) + Vector3.Normalize(collidableB.worldTransform.Position - collidableA.worldTransform.Position)) / 2;
+                    MPRTesting.LocalSurfaceCast(shapeA, shapeB, ref localTransformB, ref rayCastDirection, out contact.PenetrationDepth, out contact.Normal);
+                }
+                else
+                {
+                    contact.PenetrationDepth = float.MaxValue;
+                    contact.Normal = Toolbox.UpVector;
+                }
+                //Try the offset between the origins as a second option.  Sometimes this is a better choice than the relative velocity.
+                //TODO: Could use the position-finding MPR iteration to find the A-B direction hit by continuing even after the origin has been found (optimization).
+                Vector3 normalCandidate;
+                float depthCandidate;
+                lengthSquared = originRay.LengthSquared();
+                if (lengthSquared > Toolbox.Epsilon)
+                {
+                    Vector3.Divide(ref originRay, (float)Math.Sqrt(lengthSquared), out rayCastDirection);
+                    MPRTesting.LocalSurfaceCast(shapeA, shapeB, ref localTransformB, ref rayCastDirection, out depthCandidate, out normalCandidate);
+                    if (depthCandidate < contact.PenetrationDepth)
+                    {
+                        contact.Normal = normalCandidate;
+                    }
+                }
+
+
+                //Correct the penetration depth.
+                MPRTesting.LocalSurfaceCast(shapeA, shapeB, ref localTransformB, ref contact.Normal, out contact.PenetrationDepth, out rayCastDirection);
+
+
+                ////The local casting can optionally continue.  Eventually, it will converge to the local minimum.
+                //while (true)
+                //{
+                //    MPRTesting.LocalSurfaceCast(collidableA.Shape, collidableB.Shape, ref localTransformB, ref contact.Normal, out depthCandidate, out normalCandidate);
+                //    if (contact.PenetrationDepth - depthCandidate <= Toolbox.BigEpsilon)
+                //        break;
+
+                //    contact.PenetrationDepth = depthCandidate;
+                //    contact.Normal = normalCandidate;
+                //}
+
+                contact.Id = -1;
+                //we're still in local space! transform it all back.
+                Matrix3X3 orientation;
+                Matrix3X3.CreateFromQuaternion(ref transformA.Orientation, out orientation);
+                Matrix3X3.Transform(ref contact.Normal, ref orientation, out contact.Normal);
+                //Vector3.Negate(ref contact.Normal, out contact.Normal);
+                Matrix3X3.Transform(ref contact.Position, ref orientation, out contact.Position);
+                Vector3.Add(ref contact.Position, ref transformA.Position, out contact.Position);
+                return true;
+            }
+            contact = new ContactData();
+            return false;
         }
     }
 }

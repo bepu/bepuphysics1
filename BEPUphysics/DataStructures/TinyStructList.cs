@@ -22,7 +22,7 @@ namespace BEPUphysics.DataStructures
         private T entry7;
         private T entry8;
 
-        private int count;
+        internal int count;
 
         /// <summary>
         /// Gets the current number of elements in the list.
