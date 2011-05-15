@@ -324,54 +324,6 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
         private bool DoDeepContact(out TinyStructList<ContactData> contactList)
         {
 
-            //Vector3 triangleNormal, ab, ac;
-            //Vector3.Subtract(ref triangle.vB, ref triangle.vA, out ab);
-            //Vector3.Subtract(ref triangle.vC, ref triangle.vA, out ac);
-            //Vector3.Cross(ref ab, ref ac, out triangleNormal);
-            //float dot;
-            //if (previousState == CollisionState.ExternalSeparated || previousState == CollisionState.Plane) //If it was shallow before, then its closest points will be used to find the normal.
-            //{
-
-            //    //Instead of using relative velocity as a heuristic, use the triangle's normal.  Calibrate it to point the correct direction.
-            //    //The backup direction of A-B tends to pick directions that point outward, so the normal will almost always be a good perpendicular option.
-            //    //If ExternalNear runs immediately before, though, it may be wiser to just use its separating axis instead.
-
-            //    //The calibrated direction can't just be based on the center position of the object, though.
-            //    //It needs to be compared against 
-            //    Vector3.Dot(ref triangleNormal, ref triangle.vA, out dot);
-            //    if (dot < 0)
-            //        Vector3.Negate(ref triangleNormal, out localDirection);
-            //    else
-            //        localDirection = triangleNormal;
-            //}
-            //if (localDirection.LengthSquared() < Toolbox.Epsilon)
-            //    localDirection = Vector3.Up;
-
-            //Vector3 center;
-            //Vector3.Add(ref triangle.vA, ref triangle.vB, out center);
-            //Vector3.Add(ref center, ref triangle.vC, out center);
-            //Vector3.Divide(ref center, 3, out center);
-
-
-            //if (MPRTesting.GetContact(convex, triangle, ref Toolbox.RigidIdentity, ref Toolbox.RigidIdentity, ref center, ref localDirection, out contact))
-            //{
-            //    //Determine if the normal points in the appropriate direction given the sidedness of the triangle.
-            //    if (triangle.sidedness != TriangleSidedness.DoubleSided)
-            //    {
-            //        Vector3.Dot(ref triangleNormal, ref contact.Normal, out dot);
-            //        if (triangle.sidedness == TriangleSidedness.Clockwise && dot > 0)
-            //            return false;
-            //        if (triangle.sidedness == TriangleSidedness.Counterclockwise && dot < 0)
-            //            return false;
-            //    }
-
-            //    if (contact.PenetrationDepth < convex.collisionMargin + triangle.collisionMargin)
-            //        state = CollisionState.ExternalNear;
-            //    return true;
-            //}
-            ////This is rare, but could happen.
-            //state = CollisionState.ExternalSeparated;
-            //return false;
 
             //Find the origin to triangle center offset.
             Vector3 center;
@@ -499,33 +451,6 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
 
 
-
-
-
-            //if (MPRToolbox.AreObjectsColliding(convex, triangle, ref Toolbox.RigidIdentity, ref Toolbox.RigidIdentity, out contact))
-            //{
-            //    //Determine if the normal points in the appropriate direction given the sidedness of the triangle.
-            //    if (triangle.sidedness != TriangleSidedness.DoubleSided)
-            //    {
-            //        Vector3 triangleNormal, ab, ac;
-            //        Vector3.Subtract(ref triangle.vB, ref triangle.vA, out ab);
-            //        Vector3.Subtract(ref triangle.vC, ref triangle.vA, out ac);
-            //        Vector3.Cross(ref ab, ref ac, out triangleNormal);
-            //        float dot;
-            //        Vector3.Dot(ref triangleNormal, ref contact.Normal, out dot);
-            //        if (triangle.sidedness == TriangleSidedness.Clockwise && dot > 0)
-            //            return false;
-            //        if (triangle.sidedness == TriangleSidedness.Counterclockwise && dot < 0)
-            //            return false;
-            //    }
-
-            //    if (contact.PenetrationDepth < convex.collisionMargin + triangle.collisionMargin)
-            //        state = CollisionState.ExternalNear; //If it's emerged from the deep contact, we can go back to using the preferred GJK method.
-            //    return true;
-            //}
-            ////This is rare, but could happen.
-            //state = CollisionState.ExternalSeparated;
-            //return false;
 
 
 

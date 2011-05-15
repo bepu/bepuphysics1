@@ -316,20 +316,20 @@ namespace BEPUphysicsDemos.Demos
         public override void DrawUI()
         {
             //Vector3 screenContactPosition = Game.GraphicsDevice.Viewport.Project(MPRTesting.DEBUGlastPosition, Game.Camera.ProjectionMatrix, Game.Camera.ViewMatrix, Matrix.Identity);
-            Vector3 screenContactPosition = Game.GraphicsDevice.Viewport.Project(Vector3.Zero, Game.Camera.ProjectionMatrix, Game.Camera.ViewMatrix, Matrix.Identity);
-            Game.UIDrawer.Draw(whitePixel, new Rectangle((int)screenContactPosition.X - 2, (int)screenContactPosition.Y - 2, 4, 4), Color.White);
+            //Vector3 screenContactPosition = Game.GraphicsDevice.Viewport.Project(Vector3.Zero, Game.Camera.ProjectionMatrix, Game.Camera.ViewMatrix, Matrix.Identity);
+            //Game.UIDrawer.Draw(whitePixel, new Rectangle((int)screenContactPosition.X - 2, (int)screenContactPosition.Y - 2, 4, 4), Color.White);
 
-            Vector3 v1 = Game.GraphicsDevice.Viewport.Project(MPRTesting.DEBUGlastV1, Game.Camera.ProjectionMatrix, Game.Camera.ViewMatrix, Matrix.Identity);
-            Game.UIDrawer.Draw(whitePixel, new Rectangle((int)v1.X - 3, (int)v1.Y - 3, 6, 6), Color.Red);
+            //Vector3 v1 = Game.GraphicsDevice.Viewport.Project(MPRTesting.DEBUGlastV1, Game.Camera.ProjectionMatrix, Game.Camera.ViewMatrix, Matrix.Identity);
+            //Game.UIDrawer.Draw(whitePixel, new Rectangle((int)v1.X - 3, (int)v1.Y - 3, 6, 6), Color.Red);
 
-            Vector3 v2 = Game.GraphicsDevice.Viewport.Project(MPRTesting.DEBUGlastV2, Game.Camera.ProjectionMatrix, Game.Camera.ViewMatrix, Matrix.Identity);
-            Game.UIDrawer.Draw(whitePixel, new Rectangle((int)v2.X - 3, (int)v2.Y - 3, 6, 6), Color.Red);
+            //Vector3 v2 = Game.GraphicsDevice.Viewport.Project(MPRTesting.DEBUGlastV2, Game.Camera.ProjectionMatrix, Game.Camera.ViewMatrix, Matrix.Identity);
+            //Game.UIDrawer.Draw(whitePixel, new Rectangle((int)v2.X - 3, (int)v2.Y - 3, 6, 6), Color.Red);
 
-            Vector3 v3 = Game.GraphicsDevice.Viewport.Project(MPRTesting.DEBUGlastV3, Game.Camera.ProjectionMatrix, Game.Camera.ViewMatrix, Matrix.Identity);
-            Game.UIDrawer.Draw(whitePixel, new Rectangle((int)v3.X - 3, (int)v3.Y - 3, 6, 6), Color.Red);
+            //Vector3 v3 = Game.GraphicsDevice.Viewport.Project(MPRTesting.DEBUGlastV3, Game.Camera.ProjectionMatrix, Game.Camera.ViewMatrix, Matrix.Identity);
+            //Game.UIDrawer.Draw(whitePixel, new Rectangle((int)v3.X - 3, (int)v3.Y - 3, 6, 6), Color.Red);
 
-            Vector3 rayHit = Game.GraphicsDevice.Viewport.Project(MPRTesting.DEBUGlastRayDirection * MPRTesting.DEBUGlastRayT, Game.Camera.ProjectionMatrix, Game.Camera.ViewMatrix, Matrix.Identity);
-            Game.UIDrawer.Draw(whitePixel, new Rectangle((int)rayHit.X - 3, (int)rayHit.Y - 3, 6, 6), Color.Purple);
+            //Vector3 rayHit = Game.GraphicsDevice.Viewport.Project(MPRTesting.DEBUGlastRayDirection * MPRTesting.DEBUGlastRayT, Game.Camera.ProjectionMatrix, Game.Camera.ViewMatrix, Matrix.Identity);
+            //Game.UIDrawer.Draw(whitePixel, new Rectangle((int)rayHit.X - 3, (int)rayHit.Y - 3, 6, 6), Color.Purple);
 
             base.DrawUI();
         }
@@ -344,37 +344,37 @@ namespace BEPUphysicsDemos.Demos
         {
             //Add the raycast.  Starts at contact position, goes to contact position + rayDirection * T;
             //Vector3 basePosition = MPRTesting.DEBUGlastPosition;
-            Vector3 basePosition = Vector3.Zero;
-            lines[0] = new VertexPositionColor(basePosition, Color.Red);
-            lines[1] = new VertexPositionColor(basePosition + MPRTesting.DEBUGlastRayDirection * MPRTesting.DEBUGlastRayT, Color.Red);
-            //Add the normal.  It goes from the surface hit plus the normal.
-            lines[2] = new VertexPositionColor(basePosition + MPRTesting.DEBUGlastRayDirection * MPRTesting.DEBUGlastRayT, Color.Purple);
-            lines[3] = new VertexPositionColor(basePosition + MPRTesting.DEBUGlastRayDirection * MPRTesting.DEBUGlastRayT + contactNormal, Color.Purple);
-            //Add another line from the contact position along the normal with the depth.
-            lines[4] = new VertexPositionColor(basePosition, Color.White);
-            lines[5] = new VertexPositionColor(basePosition + contactNormal * contactDepth, Color.White);
+            //Vector3 basePosition = Vector3.Zero;
+            //lines[0] = new VertexPositionColor(basePosition, Color.Red);
+            //lines[1] = new VertexPositionColor(basePosition + MPRTesting.DEBUGlastRayDirection * MPRTesting.DEBUGlastRayT, Color.Red);
+            ////Add the normal.  It goes from the surface hit plus the normal.
+            //lines[2] = new VertexPositionColor(basePosition + MPRTesting.DEBUGlastRayDirection * MPRTesting.DEBUGlastRayT, Color.Purple);
+            //lines[3] = new VertexPositionColor(basePosition + MPRTesting.DEBUGlastRayDirection * MPRTesting.DEBUGlastRayT + contactNormal, Color.Purple);
+            ////Add another line from the contact position along the normal with the depth.
+            //lines[4] = new VertexPositionColor(basePosition, Color.White);
+            //lines[5] = new VertexPositionColor(basePosition + contactNormal * contactDepth, Color.White);
 
-            //Add the v1v2v3 triangle.
-            lines[6] = new VertexPositionColor(MPRTesting.DEBUGlastV1, Color.Red);
-            lines[7] = new VertexPositionColor(MPRTesting.DEBUGlastV2, Color.Red);
-            lines[8] = new VertexPositionColor(MPRTesting.DEBUGlastV2, Color.Red);
-            lines[9] = new VertexPositionColor(MPRTesting.DEBUGlastV3, Color.Red);
-            lines[10] = new VertexPositionColor(MPRTesting.DEBUGlastV3, Color.Red);
-            lines[11] = new VertexPositionColor(MPRTesting.DEBUGlastV1, Color.Red);
+            ////Add the v1v2v3 triangle.
+            //lines[6] = new VertexPositionColor(MPRTesting.DEBUGlastV1, Color.Red);
+            //lines[7] = new VertexPositionColor(MPRTesting.DEBUGlastV2, Color.Red);
+            //lines[8] = new VertexPositionColor(MPRTesting.DEBUGlastV2, Color.Red);
+            //lines[9] = new VertexPositionColor(MPRTesting.DEBUGlastV3, Color.Red);
+            //lines[10] = new VertexPositionColor(MPRTesting.DEBUGlastV3, Color.Red);
+            //lines[11] = new VertexPositionColor(MPRTesting.DEBUGlastV1, Color.Red);
 
-            foreach (EffectPass pass in Game.LineDrawer.CurrentTechnique.Passes)
-            {
-                pass.Apply();
+            //foreach (EffectPass pass in Game.LineDrawer.CurrentTechnique.Passes)
+            //{
+            //    pass.Apply();
 
-                Game.GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, lines, 0, lines.Length / 2);
-            }
+            //    Game.GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, lines, 0, lines.Length / 2);
+            //}
 
-            foreach (EffectPass pass in Game.LineDrawer.CurrentTechnique.Passes)
-            {
-                pass.Apply();
+            //foreach (EffectPass pass in Game.LineDrawer.CurrentTechnique.Passes)
+            //{
+            //    pass.Apply();
 
-                Game.GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, minkowskiLines.ToArray(), 0, minkowskiLines.Count / 2);
-            }
+            //    Game.GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, minkowskiLines.ToArray(), 0, minkowskiLines.Count / 2);
+            //}
             base.Draw();
         }
 

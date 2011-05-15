@@ -11,19 +11,17 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 {
     public static class MPRTesting
     {
-        //1) Determine if the shapes are colliding.  Return false if they are ever found not to be.
-        //2) If there exists a desired separating direction, perform a second raycast from the origin to the surface along the direction.
-        //   If there does not exist a desired separating direction, continue progressing along the same direction until the surface is hit.
-        //   
 
-        public static Vector3 DEBUGlastRayDirection;
-        public static Vector3 DEBUGlastNormal;
-        public static Vector3 DEBUGlastPosition;
-        public static float DEBUGlastDepth;
-        public static float DEBUGlastRayT;
-        public static Vector3 DEBUGlastV1;
-        public static Vector3 DEBUGlastV2;
-        public static Vector3 DEBUGlastV3;
+        //public static Vector3 DEBUGlastRayDirection;
+        //public static Vector3 DEBUGlastNormal;
+        //public static Vector3 DEBUGlastPosition;
+        //public static float DEBUGlastDepth;
+        //public static float DEBUGlastRayT;
+        //public static Vector3 DEBUGlastV1;
+        //public static Vector3 DEBUGlastV2;
+        //public static Vector3 DEBUGlastV3;
+
+        public static float SurfaceEpsilon = Toolbox.BigEpsilon;
 
         public static bool GetOverlapPosition(ConvexShape shapeA, ConvexShape shapeB, ref RigidTransform transformA, ref RigidTransform transformB, out Vector3 position)
         {
@@ -51,7 +49,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             if (originRay.LengthSquared() < Toolbox.Epsilon)
             {
                 position = new Vector3();
-                DEBUGlastPosition = position;
+                //DEBUGlastPosition = position;
                 return true;
             }
 
@@ -137,8 +135,8 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 break;
             }
 
-            if (!VerifySimplex(ref v0, ref v1, ref v2, ref v3, ref localTransformB.Position))
-                Debug.WriteLine("Break.");
+            //if (!VerifySimplex(ref v0, ref v1, ref v2, ref v3, ref localTransformB.Position))
+            //    Debug.WriteLine("Break.");
 
 
             // Refine the portal.
@@ -185,7 +183,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                     float v2Weight = v0v1ov3volume * inverseTotalVolume;
                     float v3Weight = 1 - v0Weight - v1Weight - v2Weight;
                     position = v1Weight * v1A + v2Weight * v2A + v3Weight * v3A;
-                    DEBUGlastPosition = position;
+                    //DEBUGlastPosition = position;
                     return true;
                 }
 
@@ -204,10 +202,10 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
                 //If the plane which generated the normal is very close to the extreme point, then we're at the surface
                 //and we have not found the origin; it's either just BARELY inside, or it is outside.  Assume it's outside.
-                if (dot2 - dot < Toolbox.BigEpsilon || count > MPRToolbox.InnerIterationLimit) // TODO: Could use a dynamic epsilon for possibly better behavior.
+                if (dot2 - dot < SurfaceEpsilon || count > MPRToolbox.InnerIterationLimit) // TODO: Could use a dynamic epsilon for possibly better behavior.
                 {
                     position = new Vector3();
-                    DEBUGlastPosition = position;
+                    //DEBUGlastPosition = position;
                     return false;
                 }
                 count++;
@@ -249,8 +247,8 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                     }
                 }
 
-                if (!VerifySimplex(ref v0, ref v1, ref v2, ref v3, ref localTransformB.Position))
-                    Debug.WriteLine("Break.");
+                //if (!VerifySimplex(ref v0, ref v1, ref v2, ref v3, ref localTransformB.Position))
+                //    Debug.WriteLine("Break.");
 
             }
 
@@ -359,8 +357,8 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 break;
             }
 
-            if (!VerifySimplex(ref Toolbox.ZeroVector, ref v1, ref v2, ref v3, ref direction))
-                Debug.WriteLine("Break.");
+            //if (!VerifySimplex(ref Toolbox.ZeroVector, ref v1, ref v2, ref v3, ref direction))
+            //    Debug.WriteLine("Break.");
 
 
             // Refine the portal.
@@ -383,7 +381,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 float supportDot;
                 Vector3.Dot(ref v4, ref n, out supportDot);
 
-                if (supportDot - dot < Toolbox.BigEpsilon || count > MPRToolbox.InnerIterationLimit) // TODO: Could use a dynamic epsilon for possibly better behavior.
+                if (supportDot - dot < SurfaceEpsilon || count > MPRToolbox.InnerIterationLimit) // TODO: Could use a dynamic epsilon for possibly better behavior.
                 {
                     //normal = n;
                     //float normalLengthInverse = 1 / normal.Length();
@@ -391,25 +389,35 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                     ////Find the distance from the origin to the plane.
                     //t = dot * normalLengthInverse;
 
-                    Vector3.Normalize(ref n, out normal);
-                    //The plane is very close to the surface, and the ray is known to pass through it.
-                    //dot is the rate.
-                    Vector3.Dot(ref normal, ref direction, out dot);
-                    //supportDot is the distance to the plane.
-                    Vector3.Dot(ref normal, ref v1, out supportDot);
-                    if (dot > 0)
-                        t = supportDot / dot;
-                    else
-                        t = 0;
-                    //DEBUG STUFF:
+                    float lengthSquared = n.LengthSquared();
+                    if (lengthSquared > Toolbox.Epsilon * .01f)
+                    {
+                        Vector3.Divide(ref n, (float)Math.Sqrt(lengthSquared), out normal);
 
-                    DEBUGlastRayT = t;
-                    DEBUGlastRayDirection = direction;
-                    DEBUGlastDepth = t;
-                    DEBUGlastNormal = normal;
-                    DEBUGlastV1 = v1;
-                    DEBUGlastV2 = v2;
-                    DEBUGlastV3 = v3;
+                        //The plane is very close to the surface, and the ray is known to pass through it.
+                        //dot is the rate.
+                        Vector3.Dot(ref normal, ref direction, out dot);
+                        //supportDot is the distance to the plane.
+                        Vector3.Dot(ref normal, ref v1, out supportDot);
+                        if (dot > 0)
+                            t = supportDot / dot;
+                        else
+                            t = 0;
+                    }
+                    else
+                    {
+                        normal = Vector3.Up;
+                        t = 0;
+                    }
+                    ////DEBUG STUFF:
+
+                    //DEBUGlastRayT = t;
+                    //DEBUGlastRayDirection = direction;
+                    //DEBUGlastDepth = t;
+                    //DEBUGlastNormal = normal;
+                    //DEBUGlastV1 = v1;
+                    //DEBUGlastV2 = v2;
+                    //DEBUGlastV3 = v3;
                     return;
                 }
 
@@ -492,8 +500,8 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 //}
                 #endregion
 
-                if (!VerifySimplex(ref Toolbox.ZeroVector, ref v1, ref v2, ref v3, ref direction))
-                    Debug.WriteLine("Break.");
+                //if (!VerifySimplex(ref Toolbox.ZeroVector, ref v1, ref v2, ref v3, ref direction))
+                //    Debug.WriteLine("Break.");
             }
         }
 
@@ -584,6 +592,8 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             contact = new ContactData();
             return false;
         }
+    
+    
     }
 }
 
