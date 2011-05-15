@@ -123,14 +123,6 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     {
                         contactList.Get(j, out contact);
 
-                        float dot;
-                        Vector3.Dot(ref contact.Normal, ref triangleNormal, out dot);
-                        if ((localTriangleShape.sidedness == TriangleSidedness.Clockwise && dot > 0) || (localTriangleShape.sidedness == TriangleSidedness.Counterclockwise && dot < 0) ||
-                            Keyboard.GetState().IsKeyDown(Keys.O))
-                        {
-                            Debug.WriteLine("Breka.");
-                        }
-
                         if (UseImprovedBoundaryHandling)
                         {
                             if (AnalyzeCandidate(ref indices, pairTester, ref contact))

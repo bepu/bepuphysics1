@@ -32,7 +32,7 @@ namespace BEPUphysicsDemos.Demos
             //This load method wraps the TriangleMesh.GetVerticesAndIndicesFromModel method 
             //to output vertices of type StaticTriangleGroupVertex instead of TriangleMeshVertex or simply Vector3.
             TriangleMesh.GetVerticesAndIndicesFromModel(playgroundModel, out staticTriangleVertices, out staticTriangleIndices);
-            //staticTriangleIndices = new int[] { 0, 1, 2, 0, 2, 3};
+            //staticTriangleIndices = new int[] { 0, 2, 1, 0, 3, 2 };
             //staticTriangleVertices = new Vector3[] { new Vector3(-20, 0, -20), new Vector3(20, 0, -20), new Vector3(20, 0, 20), new Vector3(-20, -4, 20) };
             var staticMesh = new StaticMesh(staticTriangleVertices, staticTriangleIndices, new AffineTransform(Matrix3X3.CreateFromAxisAngle(Vector3.Up, MathHelper.Pi), new Vector3(0, -10, 0)));
             staticMesh.Sidedness = TriangleSidedness.Counterclockwise;
@@ -41,8 +41,8 @@ namespace BEPUphysicsDemos.Demos
             Space.Add(staticMesh);
 
             //Dump some boxes on top of it for fun.
-            int numColumns = 8;
-            int numRows = 8;
+            int numColumns = 20;
+            int numRows = 20;
             int numHigh = 1;
             float separation = 8;
             Entity toAdd;
@@ -55,10 +55,10 @@ namespace BEPUphysicsDemos.Demos
                             separation * i - numRows * separation / 2,
                             30f + k * separation,
                             separation * j - numColumns * separation / 2),
-                            1, .05f, .25f, 15);
+                            1, .1f, 1f, 15);
                         toAdd.PositionUpdateMode = BEPUphysics.PositionUpdating.PositionUpdateMode.Continuous;
-                        (toAdd.CollisionInformation.Shape as ConvexShape).CollisionMargin = 0;
-                        toAdd.IsAlwaysActive = true;
+                        //(toAdd.CollisionInformation.Shape as ConvexShape).CollisionMargin = .00f;
+                        //toAdd.IsAlwaysActive = true;
                         Space.Add(toAdd);
                     }
 

@@ -35,7 +35,6 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
         ///<returns>Whether or not the shapes are colliding.</returns>
         public bool GenerateContactCandidate(out TinyStructList<ContactData> contactList)
         {
-            previousState = state;
             switch (state)
             {
                 case CollisionState.Plane:
@@ -272,7 +271,6 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             }
             Vector3 displacement;
             Vector3.Subtract(ref closestB, ref closestA, out displacement);
-            localDirection = displacement; //Cache the displacement vector for use in the deep contact system.
             float distanceSquared = displacement.LengthSquared();
             float margin = convex.collisionMargin + triangle.collisionMargin;
 
@@ -323,9 +321,6 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             return false;
         }
 
-        CollisionState previousState;
-        Vector3 localDirection;
-        bool cameFromShallow = false;
         private bool DoDeepContact(out TinyStructList<ContactData> contactList)
         {
 
@@ -378,9 +373,6 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             //state = CollisionState.ExternalSeparated;
             //return false;
 
-            if (!cameFromShallow && previousState == CollisionState.ExternalNear)
-                cameFromShallow = true;
-
             //Find the origin to triangle center offset.
             Vector3 center;
             Vector3.Add(ref triangle.vA, ref triangle.vB, out center);
@@ -394,85 +386,74 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             if (MPRTesting.GetLocalOverlapPosition(convex, triangle, ref center, ref Toolbox.RigidIdentity, out contact.Position))
             {
 
-                if (cameFromShallow && localDirection.LengthSquared() > Toolbox.Epsilon)
+                float dot;
+
+
+                Vector3 triangleNormal, ab, ac;
+                Vector3.Subtract(ref triangle.vB, ref triangle.vA, out ab);
+                Vector3.Subtract(ref triangle.vC, ref triangle.vA, out ac);
+                Vector3.Cross(ref ab, ref ac, out triangleNormal);
+                triangleNormal.Normalize();
+
+                //Project the direction onto the triangle plane.
+                Vector3.Dot(ref triangleNormal, ref center, out dot);
+                Vector3 trianglePlaneDirection;
+                Vector3.Multiply(ref triangleNormal, dot, out trianglePlaneDirection);
+                Vector3.Subtract(ref center, ref trianglePlaneDirection, out trianglePlaneDirection);
+                dot = trianglePlaneDirection.LengthSquared();
+                if (dot > Toolbox.Epsilon)
                 {
-                    //Only have to use the local direction found by the previous shallow run.
-                    MPRTesting.LocalSurfaceCast(convex, triangle, ref Toolbox.RigidIdentity, ref localDirection, out contact.PenetrationDepth, out contact.Normal);
-                }
-                else
-                {
-                    float dot;
-
-
-                    Vector3 triangleNormal, ab, ac;
-                    Vector3.Subtract(ref triangle.vB, ref triangle.vA, out ab);
-                    Vector3.Subtract(ref triangle.vC, ref triangle.vA, out ac);
-                    Vector3.Cross(ref ab, ref ac, out triangleNormal);
-                    triangleNormal.Normalize();
-
-                    //Project the direction onto the triangle plane.
-                    Vector3.Dot(ref triangleNormal, ref center, out dot);
-                    Vector3 trianglePlaneDirection;
-                    Vector3.Multiply(ref triangleNormal, dot, out trianglePlaneDirection);
-                    Vector3.Subtract(ref center, ref trianglePlaneDirection, out trianglePlaneDirection);
-                    dot = trianglePlaneDirection.LengthSquared();
-                    if (dot > Toolbox.Epsilon)
+                    Vector3.Divide(ref trianglePlaneDirection, (float)Math.Sqrt(dot), out trianglePlaneDirection);
+                    MPRTesting.LocalSurfaceCast(convex, triangle, ref Toolbox.RigidIdentity, ref trianglePlaneDirection, out contact.PenetrationDepth, out contact.Normal);
+                    //Check to see if the normal is facing in the proper direction, considering that this may not be a two-sided triangle.
+                    Vector3.Dot(ref triangleNormal, ref contact.Normal, out dot);
+                    if ((triangle.sidedness == TriangleSidedness.Clockwise && dot > 0) || (triangle.sidedness == TriangleSidedness.Counterclockwise && dot < 0))
                     {
-                        Vector3.Divide(ref trianglePlaneDirection, (float)Math.Sqrt(dot), out trianglePlaneDirection);
-                        MPRTesting.LocalSurfaceCast(convex, triangle, ref Toolbox.RigidIdentity, ref trianglePlaneDirection, out contact.PenetrationDepth, out contact.Normal);
-                        //Check to see if the normal is facing in the proper direction, considering that this may not be a two-sided triangle.
-                        Vector3.Dot(ref triangleNormal, ref contact.Normal, out dot);
-                        if ((triangle.sidedness == TriangleSidedness.Clockwise && dot > 0) || (triangle.sidedness == TriangleSidedness.Counterclockwise && dot < 0))
-                        {
-                            //Normal was facing the wrong way.
-                            contact.PenetrationDepth = float.MaxValue;
-                            contact.Normal = new Vector3();
-                        }
-                    }
-                    else
-                    {
+                        //Normal was facing the wrong way.
                         contact.PenetrationDepth = float.MaxValue;
                         contact.Normal = new Vector3();
                     }
+                }
+                else
+                {
+                    contact.PenetrationDepth = float.MaxValue;
+                    contact.Normal = new Vector3();
+                }
 
-                    //TODO: Might be able to prune out an entire MPR execution rather than just testing the result.
 
-                    //Try the depth along the positive triangle normal.
+                //Try the depth along the positive triangle normal.
 
-                    Vector3 candidateNormal;
-                    float candidateDepth;
+                Vector3 candidateNormal;
+                float candidateDepth;
+                //If it's clockwise, this direction is unnecessary (the resulting normal would be invalidated by the onesidedness of the triangle).
+                if (triangle.sidedness != TriangleSidedness.Clockwise)
+                {
                     MPRTesting.LocalSurfaceCast(convex, triangle, ref Toolbox.RigidIdentity, ref triangleNormal, out candidateDepth, out candidateNormal);
                     if (candidateDepth < contact.PenetrationDepth)
                     {
-                        //Check to see if the normal is facing in the proper direction, considering that this may not be a two-sided triangle.
-                        Vector3.Dot(ref triangleNormal, ref candidateNormal, out dot);
-                        if (!((triangle.sidedness == TriangleSidedness.Clockwise && dot > 0) || (triangle.sidedness == TriangleSidedness.Counterclockwise && dot < 0)))
-                        {
-                            contact.Normal = candidateNormal;
-                            contact.PenetrationDepth = candidateDepth;
-                        }
+                        contact.Normal = candidateNormal;
+                        contact.PenetrationDepth = candidateDepth;
                     }
+                }
 
-                    //Try the depth along the negative triangle normal.
+                //Try the depth along the negative triangle normal.
 
+                //If it's counterclockwise, this direction is unnecessary (the resulting normal would be invalidated by the onesidedness of the triangle).
+                if (triangle.sidedness != TriangleSidedness.Counterclockwise)
+                {
                     Vector3.Negate(ref triangleNormal, out triangleNormal);
                     MPRTesting.LocalSurfaceCast(convex, triangle, ref Toolbox.RigidIdentity, ref triangleNormal, out candidateDepth, out candidateNormal);
                     if (candidateDepth < contact.PenetrationDepth)
                     {
-                        //Check to see if the normal is facing in the proper direction, considering that this may not be a two-sided triangle.
-                        Vector3.Dot(ref triangleNormal, ref candidateNormal, out dot);
-                        //Note that the signs are flipped on the dot comparisons.  This is because the trianlge normal was negated.
-                        if (!((triangle.sidedness == TriangleSidedness.Clockwise && dot < 0) || (triangle.sidedness == TriangleSidedness.Counterclockwise && dot > 0)))
-                        {
-                            contact.Normal = candidateNormal;
-                            contact.PenetrationDepth = candidateDepth;
-                        }
+                        contact.Normal = candidateNormal;
+                        contact.PenetrationDepth = candidateDepth;
                     }
-
-
-
-
                 }
+
+
+
+
+
 
 
                 //Correct the penetration depth.
@@ -494,7 +475,6 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
                 if (contact.PenetrationDepth < convex.collisionMargin + triangle.collisionMargin)
                 {
-                    cameFromShallow = false;
                     state = CollisionState.ExternalNear; //If it's emerged from the deep contact, we can go back to using the preferred GJK method.
                 }
                 contactList.Add(ref contact);
@@ -510,7 +490,6 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 return true;
 
             state = CollisionState.ExternalSeparated;
-            cameFromShallow = false;
             return false;
 
 
