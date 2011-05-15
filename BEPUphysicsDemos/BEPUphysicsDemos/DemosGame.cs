@@ -420,7 +420,9 @@ namespace BEPUphysicsDemos
                         {
                             contactCount++;
                             collisionNormalList.Add(new VertexPositionColor(information.Contact.Position, Color.White));
+                            collisionNormalList.Add(new VertexPositionColor(information.Contact.Position + information.Contact.Normal * information.Contact.PenetrationDepth, Color.Red));
                             collisionNormalList.Add(new VertexPositionColor(information.Contact.Position + information.Contact.Normal * information.Contact.PenetrationDepth, Color.White));
+                            collisionNormalList.Add(new VertexPositionColor(information.Contact.Position + information.Contact.Normal * (information.Contact.PenetrationDepth + .3f), Color.White));
                         }
                     }
                 }
@@ -431,7 +433,7 @@ namespace BEPUphysicsDemos
                     {
                         pass.Apply();
 
-                        GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, collisionNormalList.ToArray(), 0, contactCount);
+                        GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, collisionNormalList.ToArray(), 0, collisionNormalList.Count / 2);
                     }
                 }
 

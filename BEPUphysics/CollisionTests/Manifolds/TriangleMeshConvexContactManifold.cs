@@ -9,6 +9,7 @@ using BEPUphysics.ResourceManagement;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.MathExtensions;
 using System.Diagnostics;
+using Microsoft.Xna.Framework.Input;
 
 namespace BEPUphysics.CollisionTests.Manifolds
 {
@@ -110,6 +111,8 @@ namespace BEPUphysics.CollisionTests.Manifolds
                 Matrix3X3.TransformTranspose(ref localTriangleShape.vB, ref orientation, out localTriangleShape.vB);
                 Matrix3X3.TransformTranspose(ref localTriangleShape.vC, ref orientation, out localTriangleShape.vC);
 
+                Vector3 triangleNormal = Vector3.Cross(localTriangleShape.vB - localTriangleShape.vA, localTriangleShape.vC - localTriangleShape.vA);
+                triangleNormal.Normalize();
 
                 //Now, generate a contact between the two shapes.
                 ContactData contact;
@@ -119,6 +122,15 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     for (int j = 0; j < contactList.count; j++)
                     {
                         contactList.Get(j, out contact);
+
+                        float dot;
+                        Vector3.Dot(ref contact.Normal, ref triangleNormal, out dot);
+                        if ((localTriangleShape.sidedness == TriangleSidedness.Clockwise && dot > 0) || (localTriangleShape.sidedness == TriangleSidedness.Counterclockwise && dot < 0) ||
+                            Keyboard.GetState().IsKeyDown(Keys.O))
+                        {
+                            Debug.WriteLine("Breka.");
+                        }
+
                         if (UseImprovedBoundaryHandling)
                         {
                             if (AnalyzeCandidate(ref indices, pairTester, ref contact))
@@ -423,19 +435,36 @@ namespace BEPUphysics.CollisionTests.Manifolds
 
         }
 
-        protected void GetNormal(out Vector3 normal)
+        protected void GetNormal(ref Vector3 uncorrectedNormal, out Vector3 normal)
         {
             //Compute the normal of the triangle in the current convex's local space.
             //Note its reliance on the local triangle shape.  It must be initialized to the correct values before this is called.
             Vector3 AB, AC;
             Vector3.Subtract(ref localTriangleShape.vB, ref localTriangleShape.vA, out AB);
             Vector3.Subtract(ref localTriangleShape.vC, ref localTriangleShape.vA, out AC);
-            Vector3.Cross(ref AB, ref AC, out normal);
-            float dot;
-            Vector3.Dot(ref normal, ref localTriangleShape.vA, out dot);
-            //Calibrate the normal so that it points toward the convex.
-            if (dot < 0)
-                Vector3.Negate(ref normal, out normal);
+            //Compute the normal based on the sidedness.
+            switch (localTriangleShape.sidedness)
+            {
+                case TriangleSidedness.DoubleSided:
+                    //If it's double sided, then pick the triangle normal which points in the same direction
+                    //as the contact normal that's going to be corrected.
+                    float dot;
+                    Vector3.Cross(ref AB, ref AC, out normal);
+                    Vector3.Dot(ref normal, ref uncorrectedNormal, out dot);
+                    if (dot < 0)
+                        Vector3.Negate(ref normal, out normal);
+                    break;
+                case TriangleSidedness.Clockwise:
+                    //If it's clockwise, always use ACxAB.
+                    Vector3.Cross(ref AC, ref AB, out normal);
+                    break;
+                default:
+                    //If it's counterclockwise, always use ABxAC.
+                    Vector3.Cross(ref AB, ref AC, out normal);
+                    break;
+            }
+
+            
         }
 
         bool AnalyzeCandidate(ref TriangleIndices indices, TriangleConvexPairTester pairTester, ref ContactData contact)
@@ -449,7 +478,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     vertexContact.Vertex = indices.A;
                     vertexContact.ShouldCorrect = pairTester.state == TriangleConvexPairTester.CollisionState.Deep;
                     if (vertexContact.ShouldCorrect)
-                        GetNormal(out vertexContact.CorrectedNormal);
+                        GetNormal(ref contact.Normal, out vertexContact.CorrectedNormal);
                     else
                         vertexContact.CorrectedNormal = new Vector3();
                     vertexContacts.Add(ref vertexContact);
@@ -467,7 +496,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     vertexContact.Vertex = indices.B;
                     vertexContact.ShouldCorrect = pairTester.state == TriangleConvexPairTester.CollisionState.Deep;
                     if (vertexContact.ShouldCorrect)
-                        GetNormal(out vertexContact.CorrectedNormal);
+                        GetNormal(ref contact.Normal, out vertexContact.CorrectedNormal);
                     else
                         vertexContact.CorrectedNormal = new Vector3();
                     vertexContacts.Add(ref vertexContact);
@@ -485,7 +514,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     vertexContact.Vertex = indices.C;
                     vertexContact.ShouldCorrect = pairTester.state == TriangleConvexPairTester.CollisionState.Deep;
                     if (vertexContact.ShouldCorrect)
-                        GetNormal(out vertexContact.CorrectedNormal);
+                        GetNormal(ref contact.Normal, out vertexContact.CorrectedNormal);
                     else
                         vertexContact.CorrectedNormal = new Vector3();
                     vertexContacts.Add(ref vertexContact);
@@ -504,7 +533,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     edgeContact.ContactData = contact;
                     edgeContact.ShouldCorrect = pairTester.state == TriangleConvexPairTester.CollisionState.Deep;
                     if (edgeContact.ShouldCorrect)
-                        GetNormal(out edgeContact.CorrectedNormal);
+                        GetNormal(ref contact.Normal, out edgeContact.CorrectedNormal);
                     else
                         edgeContact.CorrectedNormal = new Vector3();
                     edgeContacts.Add(ref edgeContact);
@@ -522,7 +551,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     edgeContact.ContactData = contact;
                     edgeContact.ShouldCorrect = pairTester.state == TriangleConvexPairTester.CollisionState.Deep;
                     if (edgeContact.ShouldCorrect)
-                        GetNormal(out edgeContact.CorrectedNormal);
+                        GetNormal(ref contact.Normal, out edgeContact.CorrectedNormal);
                     else
                         edgeContact.CorrectedNormal = new Vector3();
                     edgeContacts.Add(ref edgeContact);
@@ -540,7 +569,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     edgeContact.ContactData = contact;
                     edgeContact.ShouldCorrect = pairTester.state == TriangleConvexPairTester.CollisionState.Deep;
                     if (edgeContact.ShouldCorrect)
-                        GetNormal(out edgeContact.CorrectedNormal);
+                        GetNormal(ref contact.Normal, out edgeContact.CorrectedNormal);
                     else
                         edgeContact.CorrectedNormal = new Vector3();
                     edgeContacts.Add(ref edgeContact);

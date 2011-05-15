@@ -397,8 +397,10 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                     Vector3.Dot(ref normal, ref direction, out dot);
                     //supportDot is the distance to the plane.
                     Vector3.Dot(ref normal, ref v1, out supportDot);
-                    t = supportDot / dot;
-
+                    if (dot > 0)
+                        t = supportDot / dot;
+                    else
+                        t = 0;
                     //DEBUG STUFF:
 
                     DEBUGlastRayT = t;
@@ -511,7 +513,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             return (planeProduct1 <= 0 && planeProduct2 <= 0 && planeProduct3 <= 0) ||
                 (planeProduct1 >= 0 && planeProduct2 >= 0 && planeProduct3 >= 0);
         }
-        
+
         public static bool GetContact(ConvexShape shapeA, ConvexShape shapeB, ref RigidTransform transformA, ref RigidTransform transformB, ref Vector3 penetrationAxis, out ContactData contact)
         {
             Vector3 originRay;

@@ -16,7 +16,7 @@ namespace BEPUphysics.Entities
         {
             get
             {
-                return CollisionInformation;
+                return base.CollisionInformation;
             }
             set
             {
