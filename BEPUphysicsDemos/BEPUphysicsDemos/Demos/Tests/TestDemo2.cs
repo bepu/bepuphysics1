@@ -103,15 +103,15 @@ namespace BEPUphysicsDemos.Demos
             //b = new Cone(new Vector3(0, 2, 0), .2f, .1f, 1);
             //b = new Capsule(new Vector3(0, 2, 0), 1, .5f, 1);
             //b = new Capsule(new Vector3(0, 2, 0), 1, .5f, 1);
-            //b.LocalInertiaTensorInverse = new Matrix3X3();
+            b.LocalInertiaTensorInverse = new Matrix3X3();
             CollisionRules.AddRule(b, a, CollisionRule.NoSolver);
             b.IsAlwaysActive = true;
             Space.Add(b);
             //Space.Add(new TransformableEntity(new Vector3(0, 4, 0), new BoxShape(1, 1, 1), Matrix3X3.Identity, 1));
             //Space.Add( new TransformableEntity(new Vector3(0, 6, 0), new BoxShape(1, 1, 1), Matrix3X3.Identity, 1));
 
-            Vector3[] vertices = new Vector3[] { new Vector3(0, -5, 0), new Vector3(5, -5, 0), new Vector3(5, -5, 5), new Vector3(0, -6, 5) };
-            int[] indices = new int[] { 0, 1, 2, 0, 2, 3 };
+            Vector3[] vertices = new Vector3[] { new Vector3(0, -5, 0), new Vector3(5, -5, 0), new Vector3(5, -5, 5), new Vector3(0, -60, 5) };
+            int[] indices = new int[] { 0, 1, 2 };//, 0, 2, 3 };
             StaticMesh mesh = new StaticMesh(vertices, indices);
             Space.Add(mesh);
             mesh.ImproveBoundaryBehavior = false;

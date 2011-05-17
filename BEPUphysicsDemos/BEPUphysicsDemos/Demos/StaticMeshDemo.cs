@@ -36,15 +36,18 @@ namespace BEPUphysicsDemos.Demos
             //staticTriangleVertices = new Vector3[] { new Vector3(-20, 0, -20), new Vector3(20, 0, -20), new Vector3(20, 0, 20), new Vector3(-20, -4, 20) };
             var staticMesh = new StaticMesh(staticTriangleVertices, staticTriangleIndices, new AffineTransform(Matrix3X3.CreateFromAxisAngle(Vector3.Up, MathHelper.Pi), new Vector3(0, -10, 0)));
             staticMesh.Sidedness = TriangleSidedness.Counterclockwise;
+            staticMesh.ImproveBoundaryBehavior = false;
 
             Space.Add(staticMesh);
 
             //Dump some boxes on top of it for fun.
-            int numColumns = 20;
-            int numRows = 20;
-            int numHigh = 3;
+            int numColumns = 1;
+            int numRows = 1;
+            int numHigh = 1;
             float separation = 8;
             Entity toAdd;
+            CollisionDetectionSettings.ContactMinimumSeparationDistanceSquared = .001f;
+            CollisionDetectionSettings.ContactInvalidationLengthSquared = .001f;
             for (int i = 0; i < numRows; i++)
                 for (int j = 0; j < numColumns; j++)
                     for (int k = 0; k < numHigh; k++)
@@ -54,9 +57,9 @@ namespace BEPUphysicsDemos.Demos
                             separation * i - numRows * separation / 2,
                             30f + k * separation,
                             separation * j - numColumns * separation / 2),
-                            1, .1f, 1f, 15);
+                            1, .05f, .25f, 15);
                         toAdd.PositionUpdateMode = BEPUphysics.PositionUpdating.PositionUpdateMode.Continuous;
-                        //(toAdd.CollisionInformation.Shape as ConvexShape).CollisionMargin = .00f;
+                        (toAdd.CollisionInformation.Shape as ConvexShape).CollisionMargin = .00f;
                         //toAdd.IsAlwaysActive = true;
                         Space.Add(toAdd);
                     }

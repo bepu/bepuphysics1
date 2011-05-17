@@ -574,21 +574,8 @@ namespace BEPUphysics
         /// <returns>Whether or not the point is within the triangle.</returns>
         public static bool IsPointInsideTriangle(ref Vector3 vA, ref Vector3 vB, ref Vector3 vC, ref Vector3 p)
         {
-            //Triangle edge vectors.    
-            Vector3 e0 = vC - vA;
-            Vector3 e1 = vB - vA;
-            Vector3 e2 = p - vA;
-            //Set up precalculations
-            float d00 = e0.LengthSquared();
-            float d01 = Vector3.Dot(e0, e1);
-            float d02 = Vector3.Dot(e0, e2);
-            float d11 = e1.LengthSquared();
-            float d12 = Vector3.Dot(e1, e2);
-            //Find barycoords
-            float denom = 1 / (d00 * d11 - d01 * d01);
-            float u = (d11 * d02 - d01 * d12) * denom;
-            float v = (d00 * d12 - d01 * d02) * denom;
-            float w = 1 - u - v;
+            float u, v, w;
+            GetBarycentricCoordinates(ref p, ref vA, ref vB, ref vC, out u, out v, out w);
             //Are the barycoords valid?
             return (u > -Epsilon) && (v > -Epsilon) && (w > -Epsilon);
         }
@@ -604,21 +591,8 @@ namespace BEPUphysics
         /// <returns>Whether or not the point is within the triangle.</returns>
         public static bool IsPointInsideTriangle(ref Vector3 vA, ref Vector3 vB, ref Vector3 vC, ref Vector3 p, float margin)
         {
-            //Triangle edge vectors.    
-            Vector3 e0 = vC - vA;
-            Vector3 e1 = vB - vA;
-            Vector3 e2 = p - vA;
-            //Set up precalculations
-            float d00 = e0.LengthSquared();
-            float d01 = Vector3.Dot(e0, e1);
-            float d02 = Vector3.Dot(e0, e2);
-            float d11 = e1.LengthSquared();
-            float d12 = Vector3.Dot(e1, e2);
-            //Find barycoords
-            float denom = 1 / (d00 * d11 - d01 * d01);
-            float u = (d11 * d02 - d01 * d12) * denom;
-            float v = (d00 * d12 - d01 * d02) * denom;
-            float w = 1 - u - v;
+            float u, v, w;
+            GetBarycentricCoordinates(ref p, ref vA, ref vB, ref vC, out u, out v, out w);
             //Are the barycoords valid?
             return (u > -margin) && (v > -margin) && (w > -margin);
         }
@@ -2597,7 +2571,54 @@ namespace BEPUphysics
             Quaternion.Multiply(ref halfspinQuaternion, ref normalizedOrientation, out orientationChange);
         }
 
+        /// <summary>
+        /// Gets the barycentric coordinates of the point with respect to a triangle's vertices.
+        /// </summary>
+        /// <param name="point">Point to compute the barycentric coordinates of.</param>
+        /// <param name="v1">First vertex in the triangle.</param>
+        /// <param name="v2">Second vertex in the triangle.</param>
+        /// <param name="v3">Third vertex in the triangle.</param>
+        /// <param name="v1Weight">Weight of the first vertex.</param>
+        /// <param name="v2Weight">Weight of the second vertex.</param>
+        /// <param name="v3Weight">Weight of the third vertex.</param>
+        public static void GetBarycentricCoordinates(ref Vector3 point, ref Vector3 v1, ref Vector3 v2, ref Vector3 v3, out float v1Weight, out float v2Weight, out float v3Weight)
+        {
+            //Triangle edge vectors.   
+            Vector3 e0, e1, e2;
+            Vector3.Subtract(ref v3, ref v1, out e0);
+            Vector3.Subtract(ref v2, ref v1, out e1);
+            Vector3.Subtract(ref point, ref v1, out e2);
 
+            //Set up precalculations
+            float d00 = e0.LengthSquared();
+            float d01;
+            Vector3.Dot(ref e0, ref e1, out d01);
+            float d02;
+            Vector3.Dot(ref e0, ref e2, out d02);
+            float d11 = e1.LengthSquared();
+            float d12;
+            Vector3.Dot(ref e1, ref e2, out d12);
+            //Find barycoords
+            float denom = 1 / (d00 * d11 - d01 * d01);
+            v1Weight = (d11 * d02 - d01 * d12) * denom;
+            v2Weight = (d00 * d12 - d01 * d02) * denom;
+            v3Weight = 1 - v1Weight - v2Weight;
+
+
+
+            //float y2y3 = v2.Y - v3.Y;
+            //float x3x2 = v3.X - v2.X;
+            //float xx3 = point.X - v3.X;
+            //float yy3 = point.Y - v3.Y;
+            //float y1y3 = v1.Y - v3.Y;
+            //float x1x3 = v1.X - v3.X;
+            //v1Weight = (y2y3 * xx3 + x3x2 * yy3) / 
+            //           (y2y3 * x1x3 + x3x2 * y1y3);
+            //v2Weight = (x1x3 * yy3 - y1y3 * xx3) / 
+            //           (y1y3 * x3x2 + x1x3 * y2y3);
+            //v3Weight = 1 - v1Weight - v2Weight;
+
+        }
 
         #endregion
 
@@ -2632,6 +2653,7 @@ namespace BEPUphysics
         }
 
         #endregion
+
 
 
     }

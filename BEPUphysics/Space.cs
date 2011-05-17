@@ -45,10 +45,32 @@ namespace BEPUphysics
             }
         }
 
+        IThreadManager threadManager;
         ///<summary>
         /// Gets or sets the thread manager used by the space.
         ///</summary>
-        public IThreadManager ThreadManager { get; set; }
+        public IThreadManager ThreadManager
+        {
+            get
+            {
+                return threadManager;
+            }
+            set
+            {
+                threadManager = value;
+                DeactivationManager.ThreadManager = value;
+                ForceUpdater.ThreadManager = value;
+                BoundingBoxUpdater.ThreadManager = value;
+                BroadPhase.ThreadManager = value;
+                NarrowPhase.ThreadManager = value;
+                Solver.ThreadManager = value;
+                PositionUpdater.ThreadManager = value;
+                DuringForcesUpdateables.ThreadManager = value;
+                BeforeNarrowPhaseUpdateables.ThreadManager = value;
+                EndOfTimeStepUpdateables.ThreadManager = value;
+                EndOfFrameUpdateables.ThreadManager = value;
+            }
+        }
 
         ///<summary>
         /// Gets or sets the space object buffer used by the space.
@@ -150,9 +172,9 @@ namespace BEPUphysics
             timeStepSettings = new TimeStepSettings();
 
 #if !WINDOWS
-            ThreadManager = new ThreadTaskManager();
+            threadManager = new ThreadTaskManager();
 #else
-            ThreadManager = new SpecializedThreadManager();
+            threadManager = new SpecializedThreadManager();
 #endif
 
             SpaceObjectBuffer = new SpaceObjectBuffer(this);

@@ -111,9 +111,6 @@ namespace BEPUphysics.CollisionTests.Manifolds
                 Matrix3X3.TransformTranspose(ref localTriangleShape.vB, ref orientation, out localTriangleShape.vB);
                 Matrix3X3.TransformTranspose(ref localTriangleShape.vC, ref orientation, out localTriangleShape.vC);
 
-                Vector3 triangleNormal = Vector3.Cross(localTriangleShape.vB - localTriangleShape.vA, localTriangleShape.vC - localTriangleShape.vA);
-                triangleNormal.Normalize();
-
                 //Now, generate a contact between the two shapes.
                 ContactData contact;
                 TinyStructList<ContactData> contactList;
@@ -122,6 +119,9 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     for (int j = 0; j < contactList.count; j++)
                     {
                         contactList.Get(j, out contact);
+
+                        //if (contact.PenetrationDepth > .3f)
+                        //    Debug.WriteLine("Break.");
 
                         if (UseImprovedBoundaryHandling)
                         {
