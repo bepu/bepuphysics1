@@ -198,12 +198,15 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 //Vector3.Subtract(ref velocityA, ref velocityB, out localDirection);
 
                 //The above takes into account angular velocity, but linear velocity alone is a lot more stable and does the job just fine.
-                Vector3.Subtract(ref collidableA.entity.linearVelocity, ref collidableB.entity.linearVelocity, out localDirection);
+                if (collidableA.entity != null && collidableB.entity != null)
+                    Vector3.Subtract(ref collidableA.entity.linearVelocity, ref collidableB.entity.linearVelocity, out localDirection);
+                else
+                    localDirection = localSeparatingAxis;
+
                 if (localDirection.LengthSquared() < Toolbox.Epsilon)
                 {
                     localDirection = Vector3.Up;
                 }
-
 
             }
             if (MPRTesting.GetContact(collidableA.Shape, collidableB.Shape, ref collidableA.worldTransform, ref collidableB.worldTransform, ref localDirection, out contact))

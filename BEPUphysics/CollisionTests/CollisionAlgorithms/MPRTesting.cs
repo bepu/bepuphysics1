@@ -21,7 +21,68 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
         //public static Vector3 DEBUGlastV2;
         //public static Vector3 DEBUGlastV3;
 
-        public static float SurfaceEpsilon = Toolbox.Epsilon * .01f;
+        private static float surfaceEpsilon = 1e-7f;
+        /// <summary>
+        /// Gets or sets how close surface-finding based MPR methods have to get before exiting.
+        /// Defaults to 1e-9.
+        /// </summary>
+        public static float SurfaceEpsilon
+        {
+            get
+            {
+                return surfaceEpsilon;
+            }
+            set
+            {
+                if (value > 0)
+                    surfaceEpsilon = value;
+                else throw new Exception("Epsilon must be positive.");
+
+            }
+        }
+
+        private static float depthRefinementEpsilon = 1e-4f; 
+        /// <summary>
+        /// Gets or sets how close the penetration depth refinement system should converge before quitting.
+        /// Making this smaller can help more precisely find a local minimum at the cost of performance.
+        /// The change will likely only be visible on curved shapes, since polytopes will converge extremely rapidly to a precise local minimum.
+        /// Defaults to 1e-4.
+        /// </summary>
+        public static float DepthRefinementEpsilon
+        {
+            get
+            {
+                return depthRefinementEpsilon;
+            }
+            set
+            {
+                if (value > 0)
+                    depthRefinementEpsilon = value;
+                else throw new Exception("Epsilon must be positive.");
+
+            }
+        }
+
+        private static int maximumDepthRefinementIterations = 1;
+        /// <summary>
+        /// Gets or sets the maximum number of iterations to use to reach the local penetration depth minimum when using the RefinePenetration function.
+        /// Increasing this allows the system to work longer to find local penetration minima.
+        /// The change will likely only be visible on curved shapes, since polytopes will converge extremely rapidly to a precise local minimum.
+        /// Defaults to 1.
+        /// </summary>
+        public static int MaximumDepthRefinementIterations
+        {
+            get
+            {
+                return maximumDepthRefinementIterations;
+            }
+            set
+            {
+                if (value > 0)
+                    maximumDepthRefinementIterations = value;
+                else throw new Exception("Iteration count must be positive.");
+            }
+        }
 
         public static bool GetOverlapPosition(ConvexShape shapeA, ConvexShape shapeB, ref RigidTransform transformA, ref RigidTransform transformB, out Vector3 position)
         {
@@ -202,7 +263,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
                 //If the plane which generated the normal is very close to the extreme point, then we're at the surface
                 //and we have not found the origin; it's either just BARELY inside, or it is outside.  Assume it's outside.
-                if (dot2 - dot < SurfaceEpsilon || count > MPRToolbox.InnerIterationLimit) // TODO: Could use a dynamic epsilon for possibly better behavior.
+                if (dot2 - dot < surfaceEpsilon || count > MPRToolbox.InnerIterationLimit) // TODO: Could use a dynamic epsilon for possibly better behavior.
                 {
                     position = new Vector3();
                     //DEBUGlastPosition = position;
@@ -381,7 +442,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 float supportDot;
                 Vector3.Dot(ref v4, ref n, out supportDot);
 
-                if (supportDot - dot < SurfaceEpsilon || count > MPRToolbox.InnerIterationLimit) // TODO: Could use a dynamic epsilon for possibly better behavior.
+                if (supportDot - dot < surfaceEpsilon || count > MPRToolbox.InnerIterationLimit) // TODO: Could use a dynamic epsilon for possibly better behavior.
                 {
                     //normal = n;
                     //float normalLengthInverse = 1 / normal.Length();
@@ -645,7 +706,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 float supportDot;
                 Vector3.Dot(ref v4, ref n, out supportDot);
 
-                if (supportDot - dot < SurfaceEpsilon || count > MPRToolbox.InnerIterationLimit) // TODO: Could use a dynamic epsilon for possibly better behavior.
+                if (supportDot - dot < surfaceEpsilon || count > MPRToolbox.InnerIterationLimit) // TODO: Could use a dynamic epsilon for possibly better behavior.
                 {
                     //normal = n;
                     //float normalLengthInverse = 1 / normal.Length();
@@ -674,7 +735,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                         //We also know that the contact position is on the portal, so we only need to consider the triangle's points (not the tetrahedron's).
                         float v1Weight, v2Weight, v3Weight;
                         Toolbox.GetBarycentricCoordinates(ref contactPosition, ref v1, ref v2, ref v3, out v1Weight, out v2Weight, out v3Weight);
-                        
+
                         Vector3 positionA = v1Weight * v1A + v2Weight * v2A + v3Weight * v3A;
                         Vector3 positionB = v1Weight * v1B + v2Weight * v2B + v3Weight * v3B;
                         Vector3.Add(ref positionA, ref positionB, out contactPosition);
@@ -847,9 +908,11 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                     }
                 }
 
-
                 //Correct the penetration depth.
-                MPRTesting.LocalSurfaceCast(shapeA, shapeB, ref localTransformB, ref contact.Normal, out contact.PenetrationDepth, out rayCastDirection);
+                RefinePenetration(shapeA, shapeB, ref localTransformB, contact.PenetrationDepth, ref contact.Normal, out contact.PenetrationDepth, out contact.Normal);
+
+                ////Correct the penetration depth.
+                //MPRTesting.LocalSurfaceCast(shapeA, shapeB, ref localTransformB, ref contact.Normal, out contact.PenetrationDepth, out rayCastDirection);
 
 
                 ////The local casting can optionally continue.  Eventually, it will converge to the local minimum.
@@ -875,6 +938,34 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             }
             contact = new ContactData();
             return false;
+        }
+
+        public static void RefinePenetration(ConvexShape shapeA, ConvexShape shapeB, ref RigidTransform localTransformB, float initialDepth, ref Vector3 initialNormal, out float penetrationDepth, out Vector3 refinedNormal)
+        {
+            //The local casting can optionally continue.  Eventually, it will converge to the local minimum.
+            int optimizingCount = 0;
+            refinedNormal = initialNormal;
+            penetrationDepth = initialDepth;
+            float candidateDepth;
+            Vector3 candidateNormal;
+            while (true)
+            {
+
+                MPRTesting.LocalSurfaceCast(shapeA, shapeB, ref Toolbox.RigidIdentity, ref refinedNormal, out candidateDepth, out candidateNormal);
+                if (penetrationDepth - candidateDepth <= depthRefinementEpsilon ||
+                    ++optimizingCount >= maximumDepthRefinementIterations)
+                {
+                    //If we've reached the end due to convergence, the normal will be extremely close to correct (if not 100% correct).
+                    //The candidateDepth computed is the previous contact normal's depth.
+                    //The reason why the previous normal is kept is that the last raycast computed the depth for that normal, not the new normal.
+                    penetrationDepth = candidateDepth;
+                    break;
+                }
+
+                penetrationDepth = candidateDepth;
+                refinedNormal = candidateNormal;
+
+            }
         }
 
         public static void Sweep(ConvexShape shapeA, ConvexShape shapeB, ref Vector3 direction, float maximumLength, ref RigidTransform transformA, ref RigidTransform transformB, out float t, out Vector3 normal)

@@ -41,13 +41,11 @@ namespace BEPUphysicsDemos.Demos
             Space.Add(staticMesh);
 
             //Dump some boxes on top of it for fun.
-            int numColumns = 1;
-            int numRows = 1;
+            int numColumns = 20;
+            int numRows = 20;
             int numHigh = 1;
             float separation = 8;
             Entity toAdd;
-            CollisionDetectionSettings.ContactMinimumSeparationDistanceSquared = .001f;
-            CollisionDetectionSettings.ContactInvalidationLengthSquared = .001f;
             for (int i = 0; i < numRows; i++)
                 for (int j = 0; j < numColumns; j++)
                     for (int k = 0; k < numHigh; k++)
@@ -59,8 +57,8 @@ namespace BEPUphysicsDemos.Demos
                             separation * j - numColumns * separation / 2),
                             1, .05f, .25f, 15);
                         toAdd.PositionUpdateMode = BEPUphysics.PositionUpdating.PositionUpdateMode.Continuous;
-                        (toAdd.CollisionInformation.Shape as ConvexShape).CollisionMargin = .00f;
-                        //toAdd.IsAlwaysActive = true;
+                        (toAdd.CollisionInformation.Shape as ConvexShape).CollisionMargin = .01f;
+                        toAdd.IsAlwaysActive = true;
                         Space.Add(toAdd);
                     }
 
