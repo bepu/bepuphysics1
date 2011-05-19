@@ -36,13 +36,13 @@ namespace BEPUphysicsDemos.Demos
             //staticTriangleVertices = new Vector3[] { new Vector3(-20, 0, -20), new Vector3(20, 0, -20), new Vector3(20, 0, 20), new Vector3(-20, -4, 20) };
             var staticMesh = new StaticMesh(staticTriangleVertices, staticTriangleIndices, new AffineTransform(Matrix3X3.CreateFromAxisAngle(Vector3.Up, MathHelper.Pi), new Vector3(0, -10, 0)));
             staticMesh.Sidedness = TriangleSidedness.Counterclockwise;
-            staticMesh.ImproveBoundaryBehavior = false;
+            staticMesh.ImproveBoundaryBehavior = true;
 
             Space.Add(staticMesh);
 
             //Dump some boxes on top of it for fun.
-            int numColumns = 20;
-            int numRows = 20;
+            int numColumns = 10;
+            int numRows = 10;
             int numHigh = 1;
             float separation = 8;
             Entity toAdd;
@@ -55,9 +55,9 @@ namespace BEPUphysicsDemos.Demos
                             separation * i - numRows * separation / 2,
                             30f + k * separation,
                             separation * j - numColumns * separation / 2),
-                            1, .05f, .25f, 15);
+                            1, .25f, .25f, 15);
                         toAdd.PositionUpdateMode = BEPUphysics.PositionUpdating.PositionUpdateMode.Continuous;
-                        (toAdd.CollisionInformation.Shape as ConvexShape).CollisionMargin = .01f;
+                        (toAdd.CollisionInformation.Shape as ConvexShape).CollisionMargin = .04f;
                         toAdd.IsAlwaysActive = true;
                         Space.Add(toAdd);
                     }
