@@ -43,8 +43,8 @@ namespace BEPUphysicsDemos.Demos
             : base(game)
         {
             Box a, b;
-            b = new Box(new Vector3(4, 10, 5), 1, 1, 1, 1);
-            a = new Box(new Vector3(4, 10.2f, 7), 1, 1, 1);
+            a = new Box(new Vector3(4, 10, 5), 1, 1, 1, 1);
+            b = new Box(new Vector3(4, 10.2f, 7), 1, 1, 1);
 
             SwivelHingeJoint joint = new SwivelHingeJoint(a, b, new Vector3(4, 11.975f, 7), new Vector3(0, -1, 0));
             Space.Add(a);

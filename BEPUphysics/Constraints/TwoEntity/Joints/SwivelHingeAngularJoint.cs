@@ -244,7 +244,11 @@ namespace BEPUphysics.Constraints.TwoEntity.Joints
 
             //Compute the jacobian
             Vector3.Cross(ref worldHingeAxis, ref worldTwistAxis, out jacobianA);
-            jacobianA.Normalize();
+            float length = jacobianA.LengthSquared();
+            if (length > Toolbox.Epsilon)
+                Vector3.Divide(ref jacobianA, (float)Math.Sqrt(length), out jacobianA);
+            else
+                jacobianA = new Vector3();
             jacobianB.X = -jacobianA.X;
             jacobianB.Y = -jacobianA.Y;
             jacobianB.Z = -jacobianA.Z;
