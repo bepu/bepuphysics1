@@ -177,6 +177,9 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
         /// <param name="worldTwistAxisB">Twist axis in world space to attach to entity B.</param>
         public void SetupJointTransforms(Vector3 worldTwistAxisA, Vector3 worldTwistAxisB)
         {
+            worldTwistAxisA.Normalize();
+            worldTwistAxisB.Normalize();
+
             Vector3 worldXAxis;
             Vector3.Cross(ref worldTwistAxisA, ref Toolbox.UpVector, out worldXAxis);
             float length = worldXAxis.LengthSquared();

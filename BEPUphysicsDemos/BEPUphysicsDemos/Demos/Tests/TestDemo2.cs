@@ -118,7 +118,6 @@ namespace BEPUphysicsDemos.Demos
             mesh.Sidedness = TriangleSidedness.Counterclockwise;
             game.ModelDrawer.Add(mesh.Mesh);
             mesh.CollisionRules.Personal = CollisionRule.NoSolver;
-
         }
 
         Entity a;
