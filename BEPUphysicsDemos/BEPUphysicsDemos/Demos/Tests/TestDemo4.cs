@@ -38,8 +38,8 @@ namespace BEPUphysicsDemos.Demos
             var compound = new CompoundBody(
                     new List<CompoundShapeEntry>()
                             {
-                                new CompoundShapeEntry(new BoxShape(1,1,1), basePosition + new Vector3(-1,0,0)),
-                                new CompoundShapeEntry( new BoxShape(1,1,1),basePosition +  new Vector3(1,0,0))
+                                new CompoundShapeEntry(new BoxShape(.9f,.9f,.9f), basePosition + new Vector3(-1,0,0)),
+                                new CompoundShapeEntry( new BoxShape(.9f,.9f,.9f),basePosition +  new Vector3(1,0,0))
                             }, 10
             );
 
@@ -79,12 +79,27 @@ namespace BEPUphysicsDemos.Demos
         public TestDemo4(DemosGame game)
             : base(game)
         {
+            Vector3[] vertices = new Vector3[] { new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1), new Vector3(1, 0, 1), new Vector3(0, 0, 2), new Vector3(1, 0, 2) };
+            int[] indices = new int[] { 0, 1, 2, 
+                                        1, 3, 2, 
+                                        2, 3, 4, 
+                                        3, 5, 4 };
+            StaticMesh mesh = new StaticMesh(vertices, indices, new AffineTransform(new Vector3(5, 5, 5), Quaternion.Identity, new Vector3(0, 0, 0)));
+            mesh.Sidedness = TriangleSidedness.Counterclockwise;
+            mesh.ImproveBoundaryBehavior = false;
+            game.ModelDrawer.Add(mesh.Mesh);
+            Space.Add(mesh);
 
-            MakeCar(new Vector3(0, 5, 0));
+            var box = new Box(new Vector3(0, 10, 0), 1, 1, 1, 1);
+            box.Material.KineticFriction = 0;
+            box.Material.StaticFriction = 0;
+            mesh.Material.KineticFriction = 0;
+            mesh.Material.StaticFriction = 0;
+            Space.Add(box);
 
 
 
-            Space.Add(new Box(new Vector3(0, 0, 0), 10, 1, 10));
+            Space.Add(new Box(new Vector3(0, -5, 0), 10, 1, 10));
 
         }
 

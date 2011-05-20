@@ -56,7 +56,7 @@ namespace BEPUphysics.Collidables.MobileCollidables
 
         private CompoundChild GetChild(CompoundChildData data, int index)
         {
-            var instance = data.Entry.Shape.GetMobileInstance();
+            var instance = data.Entry.Shape.GetCollidableInstance();
             if (data.Events != null)
                 instance.events = data.Events;
             if (data.CollisionRules != null)
@@ -68,7 +68,7 @@ namespace BEPUphysics.Collidables.MobileCollidables
 
         private CompoundChild GetChild(CompoundShapeEntry entry, int index)
         {
-            var instance = entry.Shape.GetMobileInstance();
+            var instance = entry.Shape.GetCollidableInstance();
             return new CompoundChild(Shape, instance, index);
         }
 

@@ -23,7 +23,7 @@ namespace BEPUphysics.Entities
     /// Superclass of movable rigid bodies.  Contains information for
     /// both dynamic and kinematic simulation.
     ///</summary>
-    public abstract class Entity :
+    public class Entity :
         IBroadPhaseEntryOwner,
         IDeferredEventCreatorOwner,
         ISimulationIslandMember,
@@ -364,10 +364,23 @@ namespace BEPUphysics.Entities
             }
             set
             {
-                if (value == 0 || float.IsInfinity(value))
+                if (value <= 0 || float.IsNaN(value) || float.IsInfinity(value))
                     BecomeKinematic();
                 else
-                    BecomeDynamic(value);
+                {
+                    if (isDynamic)
+                    {
+                        //If it's already dynamic, then we don't need to recompute the inertia tensor.
+                        //Instead, scale the one we have already.
+                        Matrix3X3 newInertia;
+                        Matrix3X3.Multiply(ref localInertiaTensor, value / mass, out newInertia);
+                        BecomeDynamic(value, newInertia);
+                    }
+                    else
+                    {
+                        BecomeDynamic(value);
+                    }
+                }
             }
         }
 
@@ -492,6 +505,96 @@ namespace BEPUphysics.Entities
 
         }
 
+        ///<summary>
+        /// Constructs a new entity.
+        ///</summary>
+        ///<param name="collisionInformation">Collidable to use with the entity.</param>
+        public Entity(EntityCollidable collisionInformation)
+            :this()
+        {
+            Initialize(collisionInformation);
+        }
+
+        ///<summary>
+        /// Constructs a new entity.
+        ///</summary>
+        ///<param name="collisionInformation">Collidable to use with the entity.</param>
+        ///<param name="mass">Mass of the entity.</param>
+        public Entity(EntityCollidable collisionInformation, float mass)
+            : this()
+        {
+            Initialize(collisionInformation, mass);
+        }
+
+        ///<summary>
+        /// Constructs a new entity.
+        ///</summary>
+        ///<param name="collisionInformation">Collidable to use with the entity.</param>
+        ///<param name="mass">Mass of the entity.</param>
+        /// <param name="inertiaTensor">Inertia tensor of the entity.</param>
+        public Entity(EntityCollidable collisionInformation, float mass, Matrix3X3 inertiaTensor)
+            : this()
+        {
+            Initialize(collisionInformation, mass, inertiaTensor);
+        }
+        ///<summary>
+        /// Constructs a new entity.
+        ///</summary>
+        ///<param name="collisionInformation">Collidable to use with the entity.</param>
+        ///<param name="mass">Mass of the entity.</param>
+        /// <param name="inertiaTensor">Inertia tensor of the entity.</param>
+        /// <param name="volume">Volume of the entity.</param>
+        public Entity(EntityCollidable collisionInformation, float mass, Matrix3X3 inertiaTensor, float volume)
+            : this()
+        {
+            Initialize(collisionInformation, mass, inertiaTensor, volume);
+        }
+
+        ///<summary>
+        /// Constructs a new entity.
+        ///</summary>
+        ///<param name="shape">Shape to use with the entity.</param>
+        public Entity(EntityShape shape)
+            : this()
+        {
+            Initialize(shape.GetCollidableInstance());
+        }
+
+        ///<summary>
+        /// Constructs a new entity.
+        ///</summary>
+        ///<param name="shape">Shape to use with the entity.</param>
+        ///<param name="mass">Mass of the entity.</param>
+        public Entity(EntityShape shape, float mass)
+            : this()
+        {
+            Initialize(shape.GetCollidableInstance(), mass);
+        }
+
+        ///<summary>
+        /// Constructs a new entity.
+        ///</summary>
+        ///<param name="shape">Shape to use with the entity.</param>
+        ///<param name="mass">Mass of the entity.</param>
+        /// <param name="inertiaTensor">Inertia tensor of the entity.</param>
+        public Entity(EntityShape shape, float mass, Matrix3X3 inertiaTensor)
+            : this()
+        {
+            Initialize(shape.GetCollidableInstance(), mass, inertiaTensor);
+        }
+        ///<summary>
+        /// Constructs a new entity.
+        ///</summary>
+        ///<param name="shape">Shape to use with the entity.</param>
+        ///<param name="mass">Mass of the entity.</param>
+        /// <param name="inertiaTensor">Inertia tensor of the entity.</param>
+        /// <param name="volume">Volume of the entity.</param>
+        public Entity(EntityShape shape, float mass, Matrix3X3 inertiaTensor, float volume)
+            : this()
+        {
+            Initialize(shape.GetCollidableInstance(), mass, inertiaTensor, volume);
+        }
+
 
         //These initialize methods make it easier to construct some Entity prefab types.
         protected internal void Initialize(EntityCollidable collisionInformation)
@@ -614,7 +717,7 @@ namespace BEPUphysics.Entities
                         {
                             if (connections[i].ConnectedMembers[j].IsActive && !connections[i].ConnectedMembers[j].IsDynamic)
                             {
-                                isDeactivationCandidate = false; 
+                                isDeactivationCandidate = false;
                                 velocityTimeBelowLimit = 0;
                             }
                         }
@@ -897,7 +1000,7 @@ namespace BEPUphysics.Entities
         /// <param name="localInertiaTensor">Inertia tensor to use for the entity.</param>
         public void BecomeDynamic(float mass, Matrix3X3 localInertiaTensor)
         {
-            if (mass == 0 || float.IsInfinity(mass) || float.IsNaN(mass))
+            if (mass <= 0 || float.IsInfinity(mass) || float.IsNaN(mass))
                 throw new InvalidOperationException("Cannot use a mass of " + mass + " for a dynamic entity.  Consider using a kinematic entity instead.");
             bool previousState = isDynamic;
             isDynamic = true;

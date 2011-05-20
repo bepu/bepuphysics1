@@ -48,7 +48,7 @@ namespace BEPUphysicsDemos.Demos
             Space.Solver.IterationLimit = 0;
             Entity toAdd;
             //BoundingBox box = new BoundingBox(new Vector3(-5, 1, 1), new Vector3(5, 7, 7));
-            BoundingBox box = new BoundingBox(new Vector3(-500, -500, -500), new Vector3(500, 500, 500));
+            BoundingBox box = new BoundingBox(new Vector3(-50, -50, -50), new Vector3(50, 50, 50));
 
             DynamicHierarchy dh = new DynamicHierarchy(Space.ThreadManager);
             SortAndSweep1D sap1d = new SortAndSweep1D(Space.ThreadManager);
@@ -56,7 +56,7 @@ namespace BEPUphysicsDemos.Demos
             Grid2DSortAndSweep grid2DSOS = new Grid2DSortAndSweep(Space.ThreadManager);
 
             RawList<Entity> entities = new RawList<Entity>();
-            for (int k = 0; k < 200; k++)
+            for (int k = 0; k < 10000; k++)
             {
                 Vector3 position = new Vector3((float)(rand.NextDouble() * (box.Max.X - box.Min.X) + box.Min.X),
                                                (float)(rand.NextDouble() * (box.Max.Y - box.Min.Y) + box.Min.Y),

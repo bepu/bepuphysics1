@@ -164,7 +164,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         /// Retrieves an instance of an EntityCollidable that uses this EntityShape.  Mainly used by compound bodies.
         /// </summary>
         /// <returns>EntityCollidable that uses this shape.</returns>
-        public override EntityCollidable GetMobileInstance()
+        public override EntityCollidable GetCollidableInstance()
         {
             return new ConvexCollidable<TransformableShape>(this);
         }

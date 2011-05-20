@@ -80,6 +80,7 @@
     <Compile Include="Demos\ColosseumDemo.cs" />
     <Compile Include="Demos\CompoundBodiesDemo.cs" />
     <Compile Include="Demos\DiscreteVsContinuousDemo.cs" />
+    <Compile Include="Demos\EntityConstructionDemo.cs" />
     <Compile Include="Demos\InstancedMeshDemo.cs" />
     <Compile Include="Demos\PlanetDemo.cs" />
     <Compile Include="Demos\StaticMeshDemo.cs" />

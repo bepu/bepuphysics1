@@ -105,6 +105,7 @@ namespace BEPUphysicsDemos
                                                     typeof (PathFollowingDemo),
                                                     typeof (FishInABarrelDemo),
                                                     typeof (DetectorVolumeDemo),
+                                                    typeof (EntityConstructionDemo),
                                                     typeof (TestDemo),
                                                     typeof (TestDemo2),
                                                     typeof (TestDemo3),

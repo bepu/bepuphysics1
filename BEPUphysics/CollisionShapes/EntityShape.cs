@@ -55,7 +55,7 @@ namespace BEPUphysics.CollisionShapes
         /// Retrieves an instance of an EntityCollidable that uses this EntityShape.  Mainly used by compound bodies.
         /// </summary>
         /// <returns>EntityCollidable that uses this shape.</returns>
-        public abstract EntityCollidable GetMobileInstance();
+        public abstract EntityCollidable GetCollidableInstance();
 
     }
 }

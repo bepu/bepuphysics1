@@ -29,8 +29,8 @@ namespace BEPUphysics.Entities
         ///</summary>
         ///<param name="collisionInformation">Collidable to use with the entity.</param>
         public MorphableEntity(EntityCollidable collisionInformation)
+            : base(collisionInformation)
         {
-            Initialize(collisionInformation);
         }
 
         ///<summary>
@@ -39,8 +39,8 @@ namespace BEPUphysics.Entities
         ///<param name="collisionInformation">Collidable to use with the entity.</param>
         ///<param name="mass">Mass of the entity.</param>
         public MorphableEntity(EntityCollidable collisionInformation, float mass)
+            : base(collisionInformation, mass)
         {
-            Initialize(collisionInformation, mass);
         }
 
         ///<summary>
@@ -50,9 +50,10 @@ namespace BEPUphysics.Entities
         ///<param name="mass">Mass of the entity.</param>
         /// <param name="inertiaTensor">Inertia tensor of the entity.</param>
         public MorphableEntity(EntityCollidable collisionInformation, float mass, Matrix3X3 inertiaTensor)
+            : base(collisionInformation, mass, inertiaTensor)
         {
-            Initialize(collisionInformation, mass, inertiaTensor);
         }
+
         ///<summary>
         /// Constructs a new morphable entity.
         ///</summary>
@@ -61,8 +62,8 @@ namespace BEPUphysics.Entities
         /// <param name="inertiaTensor">Inertia tensor of the entity.</param>
         /// <param name="volume">Volume of the entity.</param>
         public MorphableEntity(EntityCollidable collisionInformation, float mass, Matrix3X3 inertiaTensor, float volume)
+            : base(collisionInformation, mass, inertiaTensor, volume)
         {
-            Initialize(collisionInformation, mass, inertiaTensor, volume);
         }
 
         ///<summary>
@@ -70,8 +71,8 @@ namespace BEPUphysics.Entities
         ///</summary>
         ///<param name="shape">Shape to use with the entity.</param>
         public MorphableEntity(EntityShape shape)
+            : base(shape)
         {
-            Initialize(shape.GetMobileInstance());
         }
 
         ///<summary>
@@ -80,8 +81,8 @@ namespace BEPUphysics.Entities
         ///<param name="shape">Shape to use with the entity.</param>
         ///<param name="mass">Mass of the entity.</param>
         public MorphableEntity(EntityShape shape, float mass)
+            : base(shape, mass)
         {
-            Initialize(shape.GetMobileInstance(), mass);
         }
 
         ///<summary>
@@ -91,9 +92,10 @@ namespace BEPUphysics.Entities
         ///<param name="mass">Mass of the entity.</param>
         /// <param name="inertiaTensor">Inertia tensor of the entity.</param>
         public MorphableEntity(EntityShape shape, float mass, Matrix3X3 inertiaTensor)
+            : base(shape, mass, inertiaTensor)
         {
-            Initialize(shape.GetMobileInstance(), mass, inertiaTensor);
         }
+
         ///<summary>
         /// Constructs a new morphable entity.
         ///</summary>
@@ -102,8 +104,8 @@ namespace BEPUphysics.Entities
         /// <param name="inertiaTensor">Inertia tensor of the entity.</param>
         /// <param name="volume">Volume of the entity.</param>
         public MorphableEntity(EntityShape shape, float mass, Matrix3X3 inertiaTensor, float volume)
+            : base(shape, mass, inertiaTensor, volume)
         {
-            Initialize(shape.GetMobileInstance(), mass, inertiaTensor, volume);
         }
 
         /// <summary>

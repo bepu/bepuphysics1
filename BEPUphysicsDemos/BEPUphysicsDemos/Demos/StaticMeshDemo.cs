@@ -55,10 +55,10 @@ namespace BEPUphysicsDemos.Demos
                             separation * i - numRows * separation / 2,
                             30f + k * separation,
                             separation * j - numColumns * separation / 2),
-                            1, .25f, .25f, 15);
-                        toAdd.PositionUpdateMode = BEPUphysics.PositionUpdating.PositionUpdateMode.Continuous;
-                        (toAdd.CollisionInformation.Shape as ConvexShape).CollisionMargin = .04f;
-                        toAdd.IsAlwaysActive = true;
+                            2, 2, 2, 15);
+                        //toAdd.PositionUpdateMode = BEPUphysics.PositionUpdating.PositionUpdateMode.Continuous;
+                        //(toAdd.CollisionInformation.Shape as ConvexShape).CollisionMargin = .04f;
+                        //toAdd.IsAlwaysActive = true;
                         Space.Add(toAdd);
                     }
 

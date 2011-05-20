@@ -585,7 +585,7 @@ namespace BEPUphysics.CollisionShapes
             throw new System.NotImplementedException();
         }
 
-        public override Collidables.MobileCollidables.EntityCollidable GetMobileInstance()
+        public override Collidables.MobileCollidables.EntityCollidable GetCollidableInstance()
         {
             return new MobileMeshCollidable(this);
         }
