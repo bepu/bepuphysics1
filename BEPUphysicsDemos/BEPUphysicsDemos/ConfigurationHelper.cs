@@ -80,7 +80,6 @@ namespace BEPUphysicsDemos
             SolverSettings.DefaultMinimumIterations = 0;
             space.Solver.IterationLimit = 5;
             GeneralConvexPairTester.UseSimplexCaching = true;
-
         }
 
         /// <summary>

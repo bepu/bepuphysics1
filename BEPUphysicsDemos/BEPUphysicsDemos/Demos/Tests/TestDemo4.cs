@@ -33,7 +33,44 @@ namespace BEPUphysicsDemos.Demos
     /// </summary>
     public class TestDemo4 : StandardDemo
     {
+        void MakeCar(Vector3 basePosition)
+        {
+            var compound = new CompoundBody(
+                    new List<CompoundShapeEntry>()
+                            {
+                                new CompoundShapeEntry(new BoxShape(1,1,1), basePosition + new Vector3(-1,0,0)),
+                                new CompoundShapeEntry( new BoxShape(1,1,1),basePosition +  new Vector3(1,0,0))
+                            }, 10
+            );
 
+            Matrix3X3 wheelOrientation = Matrix3X3.CreateFromAxisAngle(Vector3.Right, MathHelper.PiOver2);
+
+            Cylinder wheel1 = new Cylinder(basePosition + new Vector3(-1, 0, 1), .2f, .5f, 3);
+            wheel1.OrientationMatrix = wheelOrientation;
+            Cylinder wheel2 = new Cylinder(basePosition + new Vector3(-1, 0, -1), .2f, .5f, 3);
+            wheel2.OrientationMatrix = wheelOrientation;
+            Cylinder wheel3 = new Cylinder(basePosition + new Vector3(1, 0, 1), .2f, .5f, 3);
+            wheel3.OrientationMatrix = wheelOrientation;
+            Cylinder wheel4 = new Cylinder(basePosition + new Vector3(1, 0, -1), .2f, .5f, 3);
+            wheel4.OrientationMatrix = wheelOrientation;
+
+            RevoluteJoint revoluteJoint1 = new RevoluteJoint(wheel1, compound, basePosition + new Vector3(-1, 0, 0), Vector3.Forward);
+            RevoluteJoint revoluteJoint2 = new RevoluteJoint(wheel2, compound, basePosition + new Vector3(-1, 0, 0), Vector3.Forward);
+            RevoluteJoint revoluteJoint3 = new RevoluteJoint(wheel3, compound, basePosition + new Vector3(1, 0, 0), Vector3.Forward);
+            RevoluteJoint revoluteJoint4 = new RevoluteJoint(wheel4, compound, basePosition + new Vector3(1, 0, 0), Vector3.Forward);
+
+            Space.Add(wheel1);
+            Space.Add(wheel2);
+            Space.Add(wheel3);
+            Space.Add(wheel4);
+
+            Space.Add(revoluteJoint1);
+            Space.Add(revoluteJoint2);
+            Space.Add(revoluteJoint3);
+            Space.Add(revoluteJoint4);
+
+            Space.Add(compound);
+        }
 
         /// <summary>
         /// Constructs a new demo.
@@ -42,14 +79,10 @@ namespace BEPUphysicsDemos.Demos
         public TestDemo4(DemosGame game)
             : base(game)
         {
-            Box a, b;
-            a = new Box(new Vector3(4, 10, 5), 1, 1, 1, 1);
-            b = new Box(new Vector3(4, 10.2f, 7), 1, 1, 1);
 
-            SwivelHingeJoint joint = new SwivelHingeJoint(a, b, new Vector3(4, 11.975f, 7), new Vector3(0, -1, 0));
-            Space.Add(a);
-            Space.Add(b);
-            Space.Add(joint);
+            MakeCar(new Vector3(0, 5, 0));
+
+
 
             Space.Add(new Box(new Vector3(0, 0, 0), 10, 1, 10));
 

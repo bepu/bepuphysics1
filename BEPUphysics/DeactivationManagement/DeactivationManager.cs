@@ -596,6 +596,8 @@ namespace BEPUphysics.DeactivationManagement
                 {
                     for (int j = 0; j < member.Connections[i].ConnectedMembers.Count; j++)
                     {
+                        if (member.Connections[i].ConnectedMembers[j] == member)
+                            continue; //Don't bother trying to compare against ourselves.  That would cause an erroneous early-out sometimes.
                         SimulationIsland opposingIsland = member.Connections[i].ConnectedMembers[j].SimulationIsland;
                         if (opposingIsland != null)
                         {
