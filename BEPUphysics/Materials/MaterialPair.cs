@@ -1,9 +1,10 @@
-﻿namespace BEPUphysics.Materials
+﻿using System;
+namespace BEPUphysics.Materials
 {
     ///<summary>
     /// A pair of materials.
     ///</summary>
-    public struct MaterialPair
+    public struct MaterialPair :IEquatable<MaterialPair>
     {
         ///<summary>
         /// First material in the pair.
@@ -34,6 +35,17 @@
         public override int GetHashCode()
         {
             return MaterialA.GetHashCode() + MaterialB.GetHashCode();
+        }
+
+
+        /// <summary>
+        /// Determines if the two material pairs have the same materials.
+        /// </summary>
+        /// <param name="other">Other pair to compare against.</param>
+        /// <returns>Whether or not the two pairs have the same materials.</returns>
+        public bool Equals(MaterialPair other)
+        {
+            return (other.MaterialA == MaterialA && other.MaterialB == MaterialB) || (other.MaterialA == MaterialB && other.MaterialB == MaterialA);
         }
     }
 }

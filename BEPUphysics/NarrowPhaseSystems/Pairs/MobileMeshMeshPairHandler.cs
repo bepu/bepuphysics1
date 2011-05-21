@@ -12,6 +12,7 @@ using BEPUphysics.CollisionTests;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.Entities;
 using Microsoft.Xna.Framework;
+using BEPUphysics.Materials;
 
 namespace BEPUphysics.NarrowPhaseSystems.Pairs
 {
@@ -76,14 +77,17 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
 
         int contactCount;
 
+
         ///<summary>
         /// Forces an update of the pair's material properties.
         ///</summary>
-        public override void UpdateMaterialProperties()
+        ///<param name="a">Material of the first member of the pair.</param>
+        ///<param name="b">Material of the second member of the pair.</param>
+        public override void UpdateMaterialProperties(Material a, Material b)
         {
             foreach (var pair in subPairs.Values)
             {
-                pair.pairHandler.UpdateMaterialProperties();
+                pair.pairHandler.UpdateMaterialProperties(a, b);
             }
         }
 

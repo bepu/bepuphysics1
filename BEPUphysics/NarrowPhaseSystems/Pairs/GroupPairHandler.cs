@@ -9,6 +9,7 @@ using BEPUphysics.DataStructures;
 using BEPUphysics.ResourceManagement;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.CollisionTests;
+using BEPUphysics.Materials;
 
 namespace BEPUphysics.NarrowPhaseSystems.Pairs
 {
@@ -50,11 +51,13 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         ///<summary>
         /// Forces an update of the pair's material properties.
         ///</summary>
-        public override void UpdateMaterialProperties()
+        ///<param name="a">Material of the first member of the pair.</param>
+        ///<param name="b">Material of the second member of the pair.</param>
+        public override void UpdateMaterialProperties(Material a, Material b)
         {
             foreach (CollidablePairHandler pairHandler in subPairs.Values)
             {
-                pairHandler.UpdateMaterialProperties();
+                pairHandler.UpdateMaterialProperties(a, b);
             }
         }
 
@@ -93,9 +96,19 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             //Child type needs to null out the references.
         }
 
-
+        //TODO: At the time of writing this, the default project configuration for the Xbox360 didn't allow optional parameters.  Could compress this.
 
         protected void TryToAdd(Collidable a, Collidable b)
+        {
+            TryToAdd(a, b, null, null);
+        }
+
+        protected void TryToAdd(Collidable a, Collidable b, Material materialA)
+        {
+            TryToAdd(a, b, materialA, null);
+        }
+
+        protected void TryToAdd(Collidable a, Collidable b, Material materialA, Material materialB)
         {
             CollisionRule rule;
             if ((rule = CollisionRules.collisionRuleCalculator(a.collisionRules, b.collisionRules)) < CollisionRule.NoNarrowPhasePair)
@@ -104,6 +117,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                 if (!subPairs.ContainsKey(pair))
                 {
                     CollidablePairHandler newPair = NarrowPhaseHelper.GetPairHandler(ref pair, rule);
+                    newPair.UpdateMaterialProperties(materialA, materialB);  //Override the materials, if necessary.
                     if (newPair != null)
                     {
                         newPair.Parent = this;

@@ -8,6 +8,7 @@ using BEPUphysics.CollisionTests.Manifolds;
 using BEPUphysics.CollisionTests;
 using System;
 using BEPUphysics.Constraints.SolverGroups;
+using BEPUphysics.Materials;
 
 namespace BEPUphysics.NarrowPhaseSystems.Pairs
 {
@@ -59,7 +60,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         ///<param name="requester">Collidable requesting the update.</param>
         ///<param name="dt">Timestep duration.</param>
         public abstract void UpdateTimeOfImpact(Collidable requester, float dt);
-        
+
         bool INarrowPhasePair.NeedsUpdate
         {
             get;
@@ -254,8 +255,19 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
 
         ///<summary>
         /// Forces an update of the pair's material properties.
+        /// <param name="materialA">First material to use.</param>
+        /// <param name="materialB">Second material to use.</param>
         ///</summary>
-        public abstract void UpdateMaterialProperties();
+        public abstract void UpdateMaterialProperties(Material materialA, Material materialB);
+
+        ///<summary>
+        /// Forces an update of the pair's material properties.
+        /// Uses default choices (such as the owning entities' materials).
+        ///</summary>
+        public void UpdateMaterialProperties()
+        {
+            UpdateMaterialProperties(null, null);
+        }
 
 
         internal abstract void GetContactInformation(int index, out ContactInformation info);

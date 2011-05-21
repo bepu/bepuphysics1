@@ -127,13 +127,13 @@
     <Content Include="GameThumbnail.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\BEPUphysics\Xbox 360 Copy of BEPUphysics.csproj">
-      <Project>{B71CDDD4-5A86-4C46-9403-E58157736D13}</Project>
-      <Name>Xbox 360 Copy of BEPUphysics</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\BEPUphysicsDrawer\Xbox 360 Copy of BEPUphysicsDrawer.csproj">
       <Project>{8a281807-5353-46c2-963e-3cfaf120ac83}</Project>
       <Name>Xbox 360 Copy of BEPUphysicsDrawer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\BEPUphysics\Xbox 360 Copy of BEPUphysics.csproj">
+      <Project>{B71CDDD4-5A86-4C46-9403-E58157736D13}</Project>
+      <Name>Xbox 360 Copy of BEPUphysics</Name>
     </ProjectReference>
     <ProjectReference Include="..\BEPUphysicsDemosContent\BEPUphysicsDemosContent.contentproj">
       <Name>BEPUphysicsDemosContent %28Content%29</Name>

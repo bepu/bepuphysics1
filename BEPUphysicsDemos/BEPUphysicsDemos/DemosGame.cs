@@ -175,6 +175,7 @@ namespace BEPUphysicsDemos
 
 #else
             currentSimulation = (Demo)Activator.CreateInstance(demoType, new object[] { this });
+            //currentSimulation = new EntityConstructionDemo(this);
 #endif
             
             #region DisplayObject creation

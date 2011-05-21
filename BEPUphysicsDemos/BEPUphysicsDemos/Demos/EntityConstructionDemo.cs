@@ -4,6 +4,10 @@ using BEPUphysics.Entities;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.Collidables.MobileCollidables;
 using System.Collections.Generic;
+using BEPUphysics.CollisionShapes;
+using BEPUphysics.MathExtensions;
+using BEPUphysics.CollisionRuleManagement;
+using BEPUphysics.Materials;
 
 namespace BEPUphysicsDemos.Demos
 {
@@ -19,6 +23,7 @@ namespace BEPUphysicsDemos.Demos
         public EntityConstructionDemo(DemosGame game)
             : base(game)
         {
+
             //An entity is the basic physical simulation object in BEPUphysics.  It represents a rigid body which can be dynamic or kinematic.
             //Dynamic objects can bounce around and respond to collisions using forces.  Kinematic entities can move using velocity,
             //but effectively have infinite inertia and do not respond to collisions or forces.
@@ -125,7 +130,7 @@ namespace BEPUphysicsDemos.Demos
             Space.Add(convexHull);
             //Create a bunch of other shapes using that first shape's properties.  Passing in the inertia and volume allows the new entities to avoid almost
             //all of the initialization costs.  Instead of using a first entity's data, this could also be pulled in from some external source (deserialized save data or something).
-            for (int i = 1; i <= 20; i++)
+            for (int i = 1; i <= 10; i++)
             {
                 Space.Add(new Entity(convexHullShape, convexHull.Mass, convexHull.LocalInertiaTensor, convexHull.Volume) { Position = new Vector3(0, 1 + i * 3, 0) });
             }
@@ -159,7 +164,62 @@ namespace BEPUphysicsDemos.Demos
             convexHull = new Entity(convexHullShape, 2) { Position = center };
             Space.Add(convexHull);
 
-            game.Camera.Position = new Vector3(0, 3, 25);
+
+            //************************
+            //Compound bodies are unique in that they allow you to specify groups of shapes to create a concave shape.
+            //Here's the common simple approach to making a compound body, using a prefab type for now.
+            CompoundBody body = new CompoundBody(new List<CompoundShapeEntry>()
+            {
+                new CompoundShapeEntry(new BoxShape(1, 1, 1), new Vector3(-7, 3, 8), 1),
+                new CompoundShapeEntry(new BoxShape(1, 3, 1), new Vector3(-8, 2, 8), 5),
+                new CompoundShapeEntry(new BoxShape(1, 1, 1), new Vector3(-9, 1, 8), 1)
+            }, 10);
+            Space.Add(body);
+            //Each entry has a shape, a rigid transform (orientation and/or translation), and a weight.
+            //The rigid transform defines the position of the shape in world space.  They will be recentered into local space within the CompoundShape itself (see previous convex hull example).
+            //The 'weight' parameter does not correspond directly to mass, but rather to the contribution of that shape to the whole relative to other shapes.
+            //It used to compute the center position of the shape.  When used by a dynamic entity, it is also used to compute a proper inertia tensor.  The resulting inertia tensor is scaled by the entity's actual mass.
+
+
+            //************************
+            //Just like shapes can be shared between entities, you can re-use a shape for multiple entries within a compound body.
+            var compoundShape = new CompoundShape(new List<CompoundShapeEntry>()
+            {
+                new CompoundShapeEntry(convexHullShape, new Vector3(7, 3, 8), 1),
+                new CompoundShapeEntry(convexHullShape, new RigidTransform(new Vector3(8, 2, 8), Quaternion.CreateFromAxisAngle(Vector3.Forward, MathHelper.PiOver2)), 5),
+                new CompoundShapeEntry(convexHullShape, new Vector3(9, 1, 8), 1)
+            });
+
+            //And just like normal convex shapes can be shared, so can compound shapes!
+            for (int i = 0; i < 3; i++)
+                Space.Add(new Entity(compoundShape, 10) { Position = new Vector3(8, 10 + i * 4, 8) });
+
+            //************************
+            //You can also use compound shapes as subshapes, creating nested compounds.
+            Space.Add(new Entity(new CompoundShape(new List<CompoundShapeEntry>()
+            {
+                new CompoundShapeEntry(compoundShape, new Vector3(7, 5, 8), 1),
+                new CompoundShapeEntry(compoundShape, new Vector3(9, 1, 8), 1)
+            }), 10) { Position = new Vector3(8, 25, 8) });
+
+
+            //************************
+            //Sometimes, it's nice to be able to change how subshapes behave.
+            //This example will use a prefab CompoundBody type, but note that there exists a CompoundCollidable that can be constructed independently as well.
+            //Just like a list of CompoundShapeEntry objects can be ued to construct a compound object, a list of CompoundChildData objects can too.
+            //CompoundChildData objects contain CompoundShapeEntry objects as well as other data to be used by a Collidable instance.
+            //That extra data includes material, events, and collision rules.
+
+            var compoundBody = new CompoundBody(new List<CompoundChildData>()
+            {
+                new CompoundChildData(new CompoundShapeEntry(new CylinderShape(1, 1), new Vector3(0, 2, 8))) { CollisionRules = new CollisionRules() { Personal = CollisionRule.NoBroadPhase } },
+                new CompoundChildData(new CompoundShapeEntry(new BoxShape(3, 1, 3), new Vector3(0, 1, 8))) { Material = new Material(3, 3, 0) }
+            }, 10);
+            Space.Add(compoundBody);
+
+            //In this example, one of the two blocks doesn't collide with anything.  The other does collide, and has a very high friction material.
+
+            Game.Camera.Position = new Vector3(0, 3, 25);
         }
 
         /// <summary>

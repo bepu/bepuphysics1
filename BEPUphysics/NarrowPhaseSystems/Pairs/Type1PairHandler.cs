@@ -13,6 +13,7 @@ using Microsoft.Xna.Framework;
 using BEPUphysics.MathExtensions;
 using BEPUphysics.ResourceManagement;
 using BEPUphysics.CollisionShapes.ConvexShapes;
+using BEPUphysics.Materials;
 
 namespace BEPUphysics.NarrowPhaseSystems.Pairs
 {
@@ -68,11 +69,11 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         ///<summary>
         /// Forces an update of the pair's material properties.
         ///</summary>
-        public override void UpdateMaterialProperties()
+        public override void UpdateMaterialProperties(Material a, Material b)
         {
             ContactConstraint.UpdateMaterialProperties(
-              EntityA == null ? null : EntityA.material,
-              EntityB == null ? null : EntityB.material);
+                a == null ? EntityA == null ? null : EntityA.material : a,
+                b == null ? EntityB == null ? null : EntityB.material : b);
         }
 
 
