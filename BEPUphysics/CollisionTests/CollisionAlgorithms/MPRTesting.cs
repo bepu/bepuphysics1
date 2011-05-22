@@ -63,12 +63,12 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             }
         }
 
-        private static int maximumDepthRefinementIterations = 1;
+        private static int maximumDepthRefinementIterations = 3;
         /// <summary>
         /// Gets or sets the maximum number of iterations to use to reach the local penetration depth minimum when using the RefinePenetration function.
         /// Increasing this allows the system to work longer to find local penetration minima.
         /// The change will likely only be visible on curved shapes, since polytopes will converge extremely rapidly to a precise local minimum.
-        /// Defaults to 1.
+        /// Defaults to 3.
         /// </summary>
         public static int MaximumDepthRefinementIterations
         {
@@ -869,16 +869,9 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
         public static bool GetContact(ConvexShape shapeA, ConvexShape shapeB, ref RigidTransform transformA, ref RigidTransform transformB, ref Vector3 penetrationAxis, out ContactData contact)
         {
-            Vector3 originRay;
-            Vector3.Subtract(ref transformB.Position, ref transformA.Position, out originRay);
-
-            return GetContact(shapeA, shapeB, ref transformA, ref transformB, ref originRay, ref penetrationAxis, out contact);
-        }
-        public static bool GetContact(ConvexShape shapeA, ConvexShape shapeB, ref RigidTransform transformA, ref RigidTransform transformB, ref Vector3 originRay, ref Vector3 penetrationAxis, out ContactData contact)
-        {
             RigidTransform localTransformB;
             MinkowskiToolbox.GetLocalTransform(ref transformA, ref transformB, out localTransformB);
-            if (MPRTesting.GetLocalOverlapPosition(shapeA, shapeB, ref originRay, ref localTransformB, out contact.Position))
+            if (MPRTesting.GetLocalOverlapPosition(shapeA, shapeB, ref localTransformB.Position, ref localTransformB, out contact.Position))
             {
                 //First, try to use the heuristically found direction.  This comes from either the GJK shallow contact separating axis or from the relative velocity.
                 Vector3 rayCastDirection;
@@ -897,16 +890,20 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 //TODO: Could use the position-finding MPR iteration to find the A-B direction hit by continuing even after the origin has been found (optimization).
                 Vector3 normalCandidate;
                 float depthCandidate;
-                lengthSquared = originRay.LengthSquared();
+                lengthSquared = localTransformB.Position.LengthSquared();
                 if (lengthSquared > Toolbox.Epsilon)
                 {
-                    Vector3.Divide(ref originRay, (float)Math.Sqrt(lengthSquared), out rayCastDirection);
+                    Vector3.Divide(ref localTransformB.Position, (float)Math.Sqrt(lengthSquared), out rayCastDirection);
                     MPRTesting.LocalSurfaceCast(shapeA, shapeB, ref localTransformB, ref rayCastDirection, out depthCandidate, out normalCandidate);
                     if (depthCandidate < contact.PenetrationDepth)
                     {
                         contact.Normal = normalCandidate;
+                        contact.PenetrationDepth = depthCandidate;
                     }
                 }
+
+                //if (contact.PenetrationDepth > 1)
+                //    Debug.WriteLine("Break.");
 
                 //Correct the penetration depth.
                 RefinePenetration(shapeA, shapeB, ref localTransformB, contact.PenetrationDepth, ref contact.Normal, out contact.PenetrationDepth, out contact.Normal);
@@ -951,7 +948,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             while (true)
             {
 
-                MPRTesting.LocalSurfaceCast(shapeA, shapeB, ref Toolbox.RigidIdentity, ref refinedNormal, out candidateDepth, out candidateNormal);
+                MPRTesting.LocalSurfaceCast(shapeA, shapeB, ref localTransformB, ref refinedNormal, out candidateDepth, out candidateNormal);
                 if (penetrationDepth - candidateDepth <= depthRefinementEpsilon ||
                     ++optimizingCount >= maximumDepthRefinementIterations)
                 {

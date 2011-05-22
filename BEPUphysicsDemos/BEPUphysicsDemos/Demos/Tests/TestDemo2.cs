@@ -90,9 +90,9 @@ namespace BEPUphysicsDemos.Demos
             groundWidth = 10;
             groundHeight = .1f;
             groundLength = 10;
-            //a = new Box(new Vector3(0, -5, 0), groundWidth, groundHeight, groundLength, 1);
+            a = new Box(new Vector3(0, -5, 0), groundWidth, groundHeight, groundLength, 1);
             //a = new TransformableEntity(new Vector3(0,0,0), new TriangleShape(new Vector3(-5, -5, -5), new Vector3(5, -5, -5), new Vector3(-5, -5, 5)), Matrix3X3.Identity);         
-            a = new Triangle(new Vector3(0, -5, 0), new Vector3(5, -5, 0), new Vector3(5, -5, 5), 1);
+            //a = new Triangle(new Vector3(0, -5, 0), new Vector3(5, -5, 0), new Vector3(5, -5, 5), 1);
             Space.Add(a);
             
             Space.ForceUpdater.Gravity = new Vector3();
@@ -110,14 +110,14 @@ namespace BEPUphysicsDemos.Demos
             //Space.Add(new TransformableEntity(new Vector3(0, 4, 0), new BoxShape(1, 1, 1), Matrix3X3.Identity, 1));
             //Space.Add( new TransformableEntity(new Vector3(0, 6, 0), new BoxShape(1, 1, 1), Matrix3X3.Identity, 1));
 
-            Vector3[] vertices = new Vector3[] { new Vector3(0, -5, 0), new Vector3(5, -5, 0), new Vector3(5, -5, 5), new Vector3(0, -60, 5) };
-            int[] indices = new int[] { 0, 1, 2 , 0, 2, 3 };
-            StaticMesh mesh = new StaticMesh(vertices, indices);
-            Space.Add(mesh);
-            mesh.ImproveBoundaryBehavior = true;
-            mesh.Sidedness = TriangleSidedness.Counterclockwise;
-            game.ModelDrawer.Add(mesh.Mesh);
-            mesh.CollisionRules.Personal = CollisionRule.NoSolver;
+            //Vector3[] vertices = new Vector3[] { new Vector3(0, -5, 0), new Vector3(5, -5, 0), new Vector3(5, -5, 5), new Vector3(0, -60, 5) };
+            //int[] indices = new int[] { 0, 1, 2 , 0, 2, 3 };
+            //StaticMesh mesh = new StaticMesh(vertices, indices);
+            //Space.Add(mesh);
+            //mesh.ImproveBoundaryBehavior = true;
+            //mesh.Sidedness = TriangleSidedness.Counterclockwise;
+            //game.ModelDrawer.Add(mesh.Mesh);
+            //mesh.CollisionRules.Personal = CollisionRule.NoSolver;
         }
 
         Entity a;

@@ -8,6 +8,7 @@ using BEPUphysics.CollisionShapes;
 using BEPUphysics.MathExtensions;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.Materials;
+using BEPUphysics.Settings;
 
 namespace BEPUphysicsDemos.Demos
 {
@@ -23,7 +24,6 @@ namespace BEPUphysicsDemos.Demos
         public EntityConstructionDemo(DemosGame game)
             : base(game)
         {
-
             //An entity is the basic physical simulation object in BEPUphysics.  It represents a rigid body which can be dynamic or kinematic.
             //Dynamic objects can bounce around and respond to collisions using forces.  Kinematic entities can move using velocity,
             //but effectively have infinite inertia and do not respond to collisions or forces.
@@ -40,7 +40,7 @@ namespace BEPUphysicsDemos.Demos
 
             //We'll start with such an entity for the kinematic ground.  Notice how it allows the definition of position and shape data all in the constructor.
             //It has other overloads that allow you to specify a mass (for a dynamic object) or a full MotionState instead of just a position.
-            Box ground = new Box(new Vector3(0, -.5f, 0), 25, 1, 25);
+            Box ground = new Box(new Vector3(0, -.5f, 0), 50, 1, 50);
             Space.Add(ground);
 
             //If you examine the ground's CollisionInformation property, you'll find that it is a generic method which returns a ConvexCollidable<BoxShape>.

@@ -84,6 +84,7 @@ namespace BEPUphysicsDemos
                                                     typeof (TerrainDemo),
                                                     typeof (StaticMeshDemo),
                                                     typeof (InstancedMeshDemo),
+                                                    typeof (EntityConstructionDemo),
                                                     typeof (MultipendulumDemo),
                                                     typeof (ClothDemo),
                                                     typeof (EarthquakeDemo),
@@ -105,7 +106,6 @@ namespace BEPUphysicsDemos
                                                     typeof (PathFollowingDemo),
                                                     typeof (FishInABarrelDemo),
                                                     typeof (DetectorVolumeDemo),
-                                                    typeof (EntityConstructionDemo),
                                                     typeof (TestDemo),
                                                     typeof (TestDemo2),
                                                     typeof (TestDemo3),
@@ -175,7 +175,6 @@ namespace BEPUphysicsDemos
 
 #else
             currentSimulation = (Demo)Activator.CreateInstance(demoType, new object[] { this });
-            //currentSimulation = new EntityConstructionDemo(this);
 #endif
             
             #region DisplayObject creation
