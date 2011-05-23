@@ -9,6 +9,7 @@ using BEPUphysics.DataStructures;
 using BEPUphysics.ResourceManagement;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.CollisionTests;
+using Microsoft.Xna.Framework;
 
 namespace BEPUphysics.NarrowPhaseSystems.Pairs
 {
@@ -19,7 +20,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
     {
         ConvexCollidable convexInfo;
 
-        
+
         protected override Collidable CollidableB
         {
             get { return convexInfo; }
@@ -42,7 +43,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             convexInfo = entryA as ConvexCollidable;
             if (convexInfo == null)
             {
-                convexInfo = entryB as ConvexCollidable; 
+                convexInfo = entryB as ConvexCollidable;
                 if (convexInfo == null)
                 {
                     throw new Exception("Inappropriate types used to initialize pair.");
@@ -77,7 +78,6 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
 
 
         }
-
 
     }
 }

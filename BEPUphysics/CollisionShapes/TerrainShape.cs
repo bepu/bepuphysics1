@@ -3,6 +3,7 @@ using BEPUphysics.CollisionTests.Manifolds;
 using Microsoft.Xna.Framework;
 using BEPUphysics.MathExtensions;
 using BEPUphysics.DataStructures;
+using BEPUphysics.CollisionShapes.ConvexShapes;
 
 namespace BEPUphysics.CollisionShapes
 {
@@ -147,8 +148,6 @@ namespace BEPUphysics.CollisionShapes
             boundingBox.Max.Y = maxYvertex.Y + transform.Translation.Y;
             boundingBox.Max.Z = maxZvertex.Z + transform.Translation.Z;
         }
-
-        //TODO: Allow sidedness management.  Sometimes it's helpful to have backside hits.
         ///<summary>
         /// Tests a ray against the terrain shape.
         ///</summary>
@@ -158,6 +157,19 @@ namespace BEPUphysics.CollisionShapes
         ///<param name="hit">Hit data of the ray cast, if any.</param>
         ///<returns>Whether or not the ray hit the transformed terrain shape.</returns>
         public bool RayCast(ref Ray ray, float maximumLength, ref AffineTransform transform, out RayHit hit)
+        {
+            return RayCast(ref ray, maximumLength, ref transform, TriangleSidedness.Counterclockwise, out hit);
+        }
+        ///<summary>
+        /// Tests a ray against the terrain shape.
+        ///</summary>
+        ///<param name="ray">Ray to test against the shape.</param>
+        ///<param name="maximumLength">Maximum length of the ray in units of the ray direction's length.</param>
+        ///<param name="transform">Transform to apply to the terrain shape during the test.</param>
+        ///<param name="sidedness">Sidedness of the triangles to use when raycasting.</param>
+        ///<param name="hit">Hit data of the ray cast, if any.</param>
+        ///<returns>Whether or not the ray hit the transformed terrain shape.</returns>
+        public bool RayCast(ref Ray ray, float maximumLength, ref AffineTransform transform, TriangleSidedness sidedness, out RayHit hit)
         {
             hit = new RayHit();
             //Put the ray into local space.
@@ -296,13 +308,13 @@ namespace BEPUphysics.CollisionShapes
                     if (quadTriangleOrganization == QuadTriangleOrganization.BottomLeftUpperRight)
                     {
                         //Always perform the raycast as if Y+ in local space is the way the triangles are facing.
-                        didHit1 = Toolbox.FindRayTriangleIntersection(ref localRay, maximumLength, ConvexShapes.TriangleSidedness.Counterclockwise, ref v1, ref v2, ref v3, out hit1);
-                        didHit2 = Toolbox.FindRayTriangleIntersection(ref localRay, maximumLength, ConvexShapes.TriangleSidedness.Counterclockwise, ref v2, ref v4, ref v3, out hit2);
+                        didHit1 = Toolbox.FindRayTriangleIntersection(ref localRay, maximumLength, sidedness, ref v1, ref v2, ref v3, out hit1);
+                        didHit2 = Toolbox.FindRayTriangleIntersection(ref localRay, maximumLength, sidedness, ref v2, ref v4, ref v3, out hit2);
                     }
                     else //if (quadTriangleOrganization == CollisionShapes.QuadTriangleOrganization.BottomRightUpperLeft)
                     {
-                        didHit1 = Toolbox.FindRayTriangleIntersection(ref localRay, maximumLength, ConvexShapes.TriangleSidedness.Counterclockwise, ref v1, ref v2, ref v4, out hit1);
-                        didHit2 = Toolbox.FindRayTriangleIntersection(ref localRay, maximumLength, ConvexShapes.TriangleSidedness.Counterclockwise, ref v1, ref v4, ref v3, out hit2);
+                        didHit1 = Toolbox.FindRayTriangleIntersection(ref localRay, maximumLength, sidedness, ref v1, ref v2, ref v4, out hit1);
+                        didHit2 = Toolbox.FindRayTriangleIntersection(ref localRay, maximumLength, sidedness, ref v1, ref v4, ref v3, out hit2);
                     }
                     if (didHit1 && didHit2)
                     {

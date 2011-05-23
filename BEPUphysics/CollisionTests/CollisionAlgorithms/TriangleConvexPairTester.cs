@@ -720,10 +720,21 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 {
                     //The direction is undefined.  Use the triangle's normal.
                     //One sided triangles can only face in the appropriate direction.
-                    if (triangle.sidedness == TriangleSidedness.Clockwise)
-                        contact.Normal = triangleNormal;
+                    float normalLength = triangleNormal.LengthSquared();
+                    if (triangleNormal.LengthSquared() > Toolbox.Epsilon)
+                    {
+                        Vector3.Divide(ref triangleNormal, (float)Math.Sqrt(normalLength), out triangleNormal);
+                        if (triangle.sidedness == TriangleSidedness.Clockwise)
+                            contact.Normal = triangleNormal;
+                        else
+                            Vector3.Negate(ref triangleNormal, out contact.Normal);
+                    }
                     else
-                        Vector3.Negate(ref triangleNormal, out contact.Normal);
+                    {
+                        //Degenerate triangle!
+                        contact = new ContactData();
+                        return false;
+                    }
                 }
 
                 contact.PenetrationDepth = convex.minimumRadius - length;

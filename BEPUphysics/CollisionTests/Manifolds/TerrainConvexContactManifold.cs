@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework;
 using BEPUphysics.DataStructures;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.MathExtensions;
+using BEPUphysics.Settings;
 
 namespace BEPUphysics.CollisionTests.Manifolds
 {
@@ -64,7 +65,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
             indices = overlappedTriangles.Elements[i];
             terrain.Shape.GetTriangle(ref indices, ref terrain.worldTransform, out localTriangleShape.vA, out localTriangleShape.vB, out localTriangleShape.vC);
             localTriangleShape.collisionMargin = 0;
-            
+
             //Calibrate the sidedness of the triangle such that it's always facing up.
             //TODO: There's quite a bit of redundancy in here with other systems.
 
@@ -89,6 +90,49 @@ namespace BEPUphysics.CollisionTests.Manifolds
         protected internal override void CleanUpOverlappingTriangles()
         {
             overlappedTriangles.Clear();
+        }
+
+
+        protected override void ProcessCandidates(RawValueList<ContactData> candidates)
+        {
+            //If the candidates list is empty, then let's see if the convex is in the 'thickness' of the terrain.
+            if (candidates.count == 0 & terrain.thickness > 0)
+            {
+                RayHit rayHit;
+                Ray ray = new Ray() { Position = convex.worldTransform.Position, Direction = terrain.worldTransform.LinearTransform.Up };
+                ray.Direction.Normalize();
+                //The raycast has to use flipped sidedness, since we're casting from the bottom up.
+                if (terrain.Shape.RayCast(ref ray, terrain.thickness, ref terrain.worldTransform, TriangleSidedness.Clockwise, out rayHit))
+                {
+                    //Found a hit!
+                    rayHit.Normal.Normalize();
+                    float dot;
+                    Vector3.Dot(ref ray.Direction, ref rayHit.Normal, out dot);
+
+                    ContactData newContact = new ContactData()
+                    {
+                        Normal = rayHit.Normal,
+                        Position = convex.worldTransform.Position,
+                        Id = 2,
+                        PenetrationDepth = -rayHit.T * dot + CollisionDetectionSettings.AllowedPenetration//Add a little extra penetration to ensure that it breaches the surface.
+                    };
+                    bool found = false;
+                    for (int i = 0; i < contacts.count; i++)
+                    {
+                        if (contacts.Elements[i].Id == 2)
+                        {
+                            //As set above, an id of 2 corresponds to a contact created from this raycast process.
+                            contacts.Elements[i].Normal = newContact.Normal;
+                            contacts.Elements[i].Position = newContact.Position;
+                            contacts.Elements[i].PenetrationDepth = newContact.PenetrationDepth;
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found)
+                        candidates.Add(ref newContact);
+                }
+            }
         }
 
         protected override bool UseImprovedBoundaryHandling

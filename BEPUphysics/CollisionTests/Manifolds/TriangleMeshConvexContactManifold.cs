@@ -119,10 +119,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     for (int j = 0; j < contactList.count; j++)
                     {
                         contactList.Get(j, out contact);
-
-                        //if (contact.PenetrationDepth > .3f)
-                        //    Debug.WriteLine("Break.");
-
+                        
                         if (UseImprovedBoundaryHandling)
                         {
                             if (AnalyzeCandidate(ref indices, pairTester, ref contact))

@@ -103,6 +103,45 @@ namespace BEPUphysics.Collidables
             }
         }
 
+
+        internal float thickness;
+        /// <summary>
+        /// Gets or sets the thickness of the terrain.  The thickness 
+        /// </summary>
+        public float Thickness
+        {
+            get
+            {
+                return thickness;
+            }
+            set
+            {
+                if (value < 0)
+                    throw new Exception("Cannot use a negative thickness value.");
+
+                //Modify the bounding box to include the new thickness.
+                Vector3 down = Vector3.Normalize(worldTransform.LinearTransform.Down);
+                Vector3 thicknessOffset = down * (value - thickness);
+                //Use the down direction rather than the thicknessOffset to determine which
+                //component of the bounding box to subtract, since the down direction contains all
+                //previous extra thickness.
+                if (down.X < 0)
+                    boundingBox.Min.X += thicknessOffset.X;
+                else
+                    boundingBox.Max.X += thicknessOffset.X;
+                if (down.Y < 0)
+                    boundingBox.Min.Y += thicknessOffset.Y;
+                else
+                    boundingBox.Max.Y += thicknessOffset.Y;
+                if (down.Z < 0)
+                    boundingBox.Min.Z += thicknessOffset.Z;
+                else
+                    boundingBox.Max.Z += thicknessOffset.Z;
+
+                thickness = value;
+            }
+        }
+
         readonly Action<Material> materialChangedDelegate;
         void OnMaterialChanged(Material newMaterial)
         {
@@ -152,6 +191,20 @@ namespace BEPUphysics.Collidables
         public void UpdateBoundingBox()
         {
             Shape.GetBoundingBox(ref worldTransform, out boundingBox);
+            //Include the thickness of the terrain.
+            Vector3 thicknessOffset = Vector3.Normalize(worldTransform.LinearTransform.Down) * thickness;
+            if (thicknessOffset.X < 0)
+                boundingBox.Min.X += thicknessOffset.X;
+            else
+                boundingBox.Max.X += thicknessOffset.X;
+            if (thicknessOffset.Y < 0)
+                boundingBox.Min.Y += thicknessOffset.Y;
+            else
+                boundingBox.Max.Y += thicknessOffset.Y;
+            if (thicknessOffset.Z < 0)
+                boundingBox.Min.Z += thicknessOffset.Z;
+            else
+                boundingBox.Max.Z += thicknessOffset.Z;
         }
 
         protected internal override bool IsActive

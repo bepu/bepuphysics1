@@ -85,5 +85,10 @@ namespace BEPUphysics.BroadPhaseSystems
         }
 
         #endregion
+
+        public override string ToString()
+        {
+            return "{" + entryA + ", " + entryB + "}";
+        }
     }
 }

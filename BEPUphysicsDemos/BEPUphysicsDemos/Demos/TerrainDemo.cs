@@ -3,6 +3,12 @@ using BEPUphysics.Collidables;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.MathExtensions;
 using Microsoft.Xna.Framework;
+using BEPUphysics.Settings;
+using BEPUphysics.CollisionTests.CollisionAlgorithms;
+using BEPUphysics.CollisionRuleManagement;
+using BEPUphysics.NarrowPhaseSystems.Pairs;
+using BEPUphysics.CollisionTests.Manifolds;
+using System.Diagnostics;
 
 namespace BEPUphysicsDemos.Demos
 {
@@ -43,25 +49,49 @@ namespace BEPUphysicsDemos.Demos
                     new Vector3(xSpacing, 1, zSpacing),
                     Quaternion.Identity,
                     new Vector3(-xLength * xSpacing / 2, 0, -zLength * zSpacing / 2)));
+            terrain.Thickness = 50;
+
+            //MotionSettings.DefaultPositionUpdateMode = BEPUphysics.PositionUpdating.PositionUpdateMode.Continuous;
 
             Space.Add(terrain);
-
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 20; i++)
             {
-                for (int j = 0; j < 3; j++)
+                for (int j = 0; j < 20; j++)
                 {
-                    for (int k = 0; k < 5; k++)
+                    for (int k = 0; k < 1; k++)
                     {
-                        Space.Add(new Box(
-                            new Vector3(0 + i * 4, 100 + -j * 10, 0 + k * 4),
-                            2 + i * j * k,
-                            2 + i * j * k,
-                            2 + i * j * k,
-                            4 + 20 * i * j * k));
+                        Space.Add(new Sphere(new Vector3(0 + i * 4, 1000 + -j * 10, 0 + k * 4), 1, 1));
+                        //Space.Add(new Box(
+                        //    new Vector3(0 + i * 4, 1000 + -j * 10, 0 + k * 4),
+                        //    2 + i * j * k,
+                        //    2 + i * j * k,
+                        //    2 + i * j * k,
+                        //    4 + 20 * i * j * k));
                     }
                 }
             }
 
+
+            //Random rand = new Random();
+
+
+            //for (int i = 0; i < 7; i++)
+            //{
+            //    for (int j = 0; j < 7; j++)
+            //    {
+            //        for (int k = 0; k < 8; k++)
+            //        {
+            //            Vector3 position =
+            //                new Vector3((float)rand.NextDouble() * 10 + i * 128,
+            //                    400 + -j * 2,
+            //                    (float)rand.NextDouble() * 10 + k * 128);
+            //            float radius = (float)rand.NextDouble() + 1;
+            //            Space.Add(new Sphere(position,
+            //                radius,
+            //                radius * radius * radius));
+            //        }
+            //    }
+            //}
 
 
 
@@ -70,6 +100,16 @@ namespace BEPUphysicsDemos.Demos
             game.Camera.Position = new Vector3(0, 30, 20);
 
         }
+
+        public override void Update(float dt)
+        {
+            if (Game.KeyboardInput.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.P))
+                Debug.WriteLine("Break.");
+            base.Update(dt);
+
+        }
+
+
 
         /// <summary>
         /// Gets the name of the simulation.
