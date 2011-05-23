@@ -125,6 +125,9 @@ namespace BEPUphysics.CollisionTests.Manifolds
                             contacts.Elements[i].Normal = newContact.Normal;
                             contacts.Elements[i].Position = newContact.Position;
                             contacts.Elements[i].PenetrationDepth = newContact.PenetrationDepth;
+                            supplementData.Elements[i].BasePenetrationDepth = newContact.PenetrationDepth;
+                            supplementData.Elements[i].LocalOffsetA = new Vector3();
+                            supplementData.Elements[i].LocalOffsetB = ray.Position; //convex local position in mesh.
                             found = true;
                             break;
                         }
@@ -147,6 +150,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
         public override void CleanUp()
         {
             terrain = null;
+            convex = null;
             base.CleanUp();
         }
 

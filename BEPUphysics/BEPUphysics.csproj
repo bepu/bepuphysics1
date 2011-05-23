@@ -111,6 +111,7 @@
     <Compile Include="Collidables\Events\IEntryEventTriggerer.cs" />
     <Compile Include="Collidables\MobileCollidables\MobileMeshCollidable.cs" />
     <Compile Include="CollisionShapes\MobileMeshShape.cs" />
+    <Compile Include="CollisionTests\CollisionAlgorithms\TriangleSpherePairTester.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\MPRTesting.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\TriangleMeshConvexPairTester.cs" />
     <Compile Include="CollisionTests\Manifolds\BoxSphereContactManifold.cs" />
@@ -118,6 +119,7 @@
     <Compile Include="CollisionTests\Manifolds\MobileMeshStaticMeshContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\SphereContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\MobileMeshConvexContactManifold.cs" />
+    <Compile Include="CollisionTests\VoronoiRegion.cs" />
     <Compile Include="DataStructures\BoundingBoxTree.cs" />
     <Compile Include="DataStructures\MeshBoundingBoxTree.cs" />
     <Compile Include="DataStructures\MeshBoundingBoxTreeData.cs" />

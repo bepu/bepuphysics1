@@ -103,6 +103,7 @@
     <Compile Include="Demos\ColosseumDemo.cs" />
     <Compile Include="Demos\CompoundBodiesDemo.cs" />
     <Compile Include="Demos\EntityConstructionDemo.cs" />
+    <Compile Include="Demos\Tests\TerrainTesting.cs" />
     <Compile Include="Demos\Tests\TestDemo3.cs" />
     <Compile Include="Demos\Tests\TestDemo.cs" />
     <Compile Include="Demos\DetectorVolumeDemo.cs" />

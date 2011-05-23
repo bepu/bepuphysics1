@@ -5,6 +5,7 @@ using BEPUphysics.ResourceManagement;
 using Microsoft.Xna.Framework;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.MathExtensions;
+using BEPUphysics.CollisionTests;
 
 namespace BEPUphysics
 {
@@ -250,8 +251,8 @@ namespace BEPUphysics
         /// <param name="c">Third vertex of triangle.</param>
         /// <param name="p">Point for comparison.</param>
         /// <param name="closestPoint">Closest point on tetrahedron to point.</param>
-        /// <returns>Whether or not the closest point was on the face of the triangle.</returns>
-        public static bool GetClosestPointOnTriangleToPoint(ref Vector3 a, ref Vector3 b, ref Vector3 c, ref Vector3 p, out Vector3 closestPoint)
+        /// <returns>Voronoi region containing the closest point.</returns>
+        public static VoronoiRegion GetClosestPointOnTriangleToPoint(ref Vector3 a, ref Vector3 b, ref Vector3 c, ref Vector3 p, out Vector3 closestPoint)
         {
             float v, w;
             Vector3 ab;
@@ -268,7 +269,7 @@ namespace BEPUphysics
             if (d1 <= 0 && d2 < 0)
             {
                 closestPoint = a;
-                return false;
+                return VoronoiRegion.A;
             }
             //Vertex region B?
             Vector3 bp;
@@ -280,7 +281,7 @@ namespace BEPUphysics
             if (d3 >= 0 && d4 <= d3)
             {
                 closestPoint = b;
-                return false;
+                return VoronoiRegion.B;
             }
             //Edge region AB?
             float vc = d1 * d4 - d3 * d2;
@@ -289,7 +290,7 @@ namespace BEPUphysics
                 v = d1 / (d1 - d3);
                 Vector3.Multiply(ref ab, v, out closestPoint);
                 Vector3.Add(ref closestPoint, ref a, out closestPoint);
-                return false;
+                return VoronoiRegion.AB;
             }
             //Vertex region C?
             Vector3 cp;
@@ -301,7 +302,7 @@ namespace BEPUphysics
             if (d6 >= 0 && d5 <= d6)
             {
                 closestPoint = c;
-                return false;
+                return VoronoiRegion.C;
             }
             //Edge region AC?
             float vb = d5 * d2 - d1 * d6;
@@ -310,7 +311,7 @@ namespace BEPUphysics
                 w = d2 / (d2 - d6);
                 Vector3.Multiply(ref ac, w, out closestPoint);
                 Vector3.Add(ref closestPoint, ref a, out closestPoint);
-                return false;
+                return VoronoiRegion.AC;
             }
             //Edge region BC?
             float va = d3 * d6 - d5 * d4;
@@ -320,7 +321,7 @@ namespace BEPUphysics
                 Vector3.Subtract(ref c, ref b, out closestPoint);
                 Vector3.Multiply(ref closestPoint, w, out closestPoint);
                 Vector3.Add(ref closestPoint, ref b, out closestPoint);
-                return false;
+                return VoronoiRegion.BC;
             }
             //Inside triangle?
             float denom = 1 / (va + vb + vc);
@@ -332,7 +333,7 @@ namespace BEPUphysics
             Vector3.Multiply(ref ac, w, out acw);
             Vector3.Add(ref a, ref abv, out closestPoint);
             Vector3.Add(ref closestPoint, ref acw, out closestPoint);
-            return true;
+            return VoronoiRegion.ABC;
         }
 
         /// <summary>

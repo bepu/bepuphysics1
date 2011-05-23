@@ -365,7 +365,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
         private bool TryInnerSphereContact(out ContactData contact)
         {
             Vector3 closestPoint;
-            if (Toolbox.GetClosestPointOnTriangleToPoint(ref triangle.vA, ref triangle.vB, ref triangle.vC, ref Toolbox.ZeroVector, out closestPoint))
+            if (Toolbox.GetClosestPointOnTriangleToPoint(ref triangle.vA, ref triangle.vB, ref triangle.vC, ref Toolbox.ZeroVector, out closestPoint) == CollisionTests.VoronoiRegion.ABC)
             {
                 state = CollisionState.Plane;
             }

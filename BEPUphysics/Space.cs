@@ -100,12 +100,32 @@ namespace BEPUphysics
         /// The bounding box updater updates the bounding box of mobile collidables each frame.
         ///</summary>
         public BoundingBoxUpdater BoundingBoxUpdater { get; set; }
+        private BroadPhase broadPhase;
         /// <summary>
         /// Gets or sets the broad phase used by the space.
         /// The broad phase finds overlaps between broad phase entries and passes
         /// them off to the narrow phase for processing.
         /// </summary>
-        public BroadPhase BroadPhase { get; set; }
+        public BroadPhase BroadPhase
+        {
+            get
+            {
+                return broadPhase;
+            }
+            set
+            {
+                broadPhase = value;
+                if (NarrowPhase != null)
+                    if (value != null)
+                    {
+                        NarrowPhase.BroadPhaseOverlaps = broadPhase.Overlaps;
+                    }
+                    else
+                    {
+                        NarrowPhase.BroadPhaseOverlaps = null;
+                    }
+            }
+        }
         ///<summary>
         /// Gets or sets the narrow phase used by the space.
         /// The narrow phase uses overlaps found by the broad phase

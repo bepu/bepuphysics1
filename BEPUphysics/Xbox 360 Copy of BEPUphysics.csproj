@@ -114,6 +114,7 @@
     <Compile Include="CollisionTests\CollisionAlgorithms\TriangleConvexPairTester.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\SphereTester.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\TriangleMeshConvexPairTester.cs" />
+    <Compile Include="CollisionTests\CollisionAlgorithms\TriangleSpherePairTester.cs" />
     <Compile Include="CollisionTests\ContactData.cs" />
     <Compile Include="CollisionTests\Manifolds\BoxContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\BoxSphereContactManifold.cs" />
@@ -128,6 +129,7 @@
     <Compile Include="CollisionTests\Manifolds\TerrainConvexContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\TriangleConvexContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\TriangleMeshConvexContactManifold.cs" />
+    <Compile Include="CollisionTests\VoronoiRegion.cs" />
     <Compile Include="Constraints\Collision\ContactFrictionConstraint.cs" />
     <Compile Include="Constraints\Collision\ContactManifoldConstraint.cs" />
     <Compile Include="Constraints\Collision\ContactManifoldConstraintGroup.cs" />

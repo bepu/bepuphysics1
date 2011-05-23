@@ -270,172 +270,6 @@ namespace BEPUphysics.CollisionTests.Manifolds
         }
 
 
-        TriangleConvexPairTester.VoronoiRegion GetRegion(TriangleConvexPairTester pairTester, ref ContactData contact)
-        {
-
-            switch (pairTester.state)
-            {
-                case TriangleConvexPairTester.CollisionState.Deep:
-                case TriangleConvexPairTester.CollisionState.ExternalNear:
-                    //Deep contact can produce non-triangle normals while still being within the triangle.
-                    //To solve this problem, find the voronoi region to which the contact belongs using its normal.
-                    //The voronoi region will be either the most extreme vertex, or the edge that includes
-                    //the first and second most extreme vertices.
-                    //If the normal dotted with an extreme edge direction is near 0, then it belongs to the edge.
-                    //Otherwise, it belongs to the vertex.
-                    //MPR tends to produce 'approximate' normals, though.
-                    //Use a fairly forgiving epsilon.
-                    float dotA, dotB, dotC;
-                    Vector3.Dot(ref localTriangleShape.vA, ref contact.Normal, out dotA);
-                    Vector3.Dot(ref localTriangleShape.vB, ref contact.Normal, out dotB);
-                    Vector3.Dot(ref localTriangleShape.vC, ref contact.Normal, out dotC);
-
-                    //Since normal points from convex to triangle always, reverse dot signs.
-                    dotA = -dotA;
-                    dotB = -dotB;
-                    dotC = -dotC;
-
-
-                    float faceEpsilon = .01f;
-                    const float edgeEpsilon = .01f;
-
-                    float edgeDot;
-                    Vector3 edgeDirection;
-                    if (dotA > dotB && dotA > dotC)
-                    {
-                        //A is extreme.
-                        if (dotB > dotC)
-                        {
-                            //B is second most extreme.
-                            if (Math.Abs(dotA - dotC) < faceEpsilon)
-                            {
-                                //The normal is basically a face normal.  This can happen at the edges occasionally.
-                                return TriangleConvexPairTester.VoronoiRegion.ABC;
-                            }
-                            else
-                            {
-                                Vector3.Subtract(ref localTriangleShape.vB, ref localTriangleShape.vA, out edgeDirection);
-                                Vector3.Dot(ref edgeDirection, ref contact.Normal, out edgeDot);
-                                if (edgeDot * edgeDot < edgeDirection.LengthSquared() * edgeEpsilon)
-                                    return TriangleConvexPairTester.VoronoiRegion.AB;
-                                else
-                                    return TriangleConvexPairTester.VoronoiRegion.A;
-                            }
-                        }
-                        else
-                        {
-                            //C is second most extreme.
-                            if (Math.Abs(dotA - dotB) < faceEpsilon)
-                            {
-                                //The normal is basically a face normal.  This can happen at the edges occasionally.
-                                return TriangleConvexPairTester.VoronoiRegion.ABC;
-                            }
-                            else
-                            {
-                                Vector3.Subtract(ref localTriangleShape.vC, ref localTriangleShape.vA, out edgeDirection);
-                                Vector3.Dot(ref edgeDirection, ref contact.Normal, out edgeDot);
-                                if (edgeDot * edgeDot < edgeDirection.LengthSquared() * edgeEpsilon)
-                                    return TriangleConvexPairTester.VoronoiRegion.AC;
-                                else
-                                    return TriangleConvexPairTester.VoronoiRegion.A;
-                            }
-                        }
-                    }
-                    else if (dotB > dotC)
-                    {
-                        //B is extreme.
-                        if (dotC > dotA)
-                        {
-                            //C is second most extreme.
-                            if (Math.Abs(dotB - dotA) < faceEpsilon)
-                            {
-                                //The normal is basically a face normal.  This can happen at the edges occasionally.
-                                return TriangleConvexPairTester.VoronoiRegion.ABC;
-                            }
-                            else
-                            {
-                                Vector3.Subtract(ref localTriangleShape.vC, ref localTriangleShape.vB, out edgeDirection);
-                                Vector3.Dot(ref edgeDirection, ref contact.Normal, out edgeDot);
-                                if (edgeDot * edgeDot < edgeDirection.LengthSquared() * edgeEpsilon)
-                                    return TriangleConvexPairTester.VoronoiRegion.BC;
-                                else
-                                    return TriangleConvexPairTester.VoronoiRegion.B;
-                            }
-                        }
-                        else
-                        {
-                            //A is second most extreme.
-                            if (Math.Abs(dotB - dotC) < faceEpsilon)
-                            {
-                                //The normal is basically a face normal.  This can happen at the edges occasionally.
-                                return TriangleConvexPairTester.VoronoiRegion.ABC;
-                            }
-                            else
-                            {
-                                Vector3.Subtract(ref localTriangleShape.vA, ref localTriangleShape.vB, out edgeDirection);
-                                Vector3.Dot(ref edgeDirection, ref contact.Normal, out edgeDot);
-                                if (edgeDot * edgeDot < edgeDirection.LengthSquared() * edgeEpsilon)
-                                    return TriangleConvexPairTester.VoronoiRegion.AB;
-                                else
-                                    return TriangleConvexPairTester.VoronoiRegion.B;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        //C is extreme.
-                        if (dotA > dotB)
-                        {
-                            //A is second most extreme.
-                            if (Math.Abs(dotC - dotB) < faceEpsilon)
-                            {
-                                //The normal is basically a face normal.  This can happen at the edges occasionally.
-                                return TriangleConvexPairTester.VoronoiRegion.ABC;
-                            }
-                            else
-                            {
-                                Vector3.Subtract(ref localTriangleShape.vA, ref localTriangleShape.vC, out edgeDirection);
-                                Vector3.Dot(ref edgeDirection, ref contact.Normal, out edgeDot);
-                                if (edgeDot * edgeDot < edgeDirection.LengthSquared() * edgeEpsilon)
-                                    return TriangleConvexPairTester.VoronoiRegion.AC;
-                                else
-                                    return TriangleConvexPairTester.VoronoiRegion.C;
-                            }
-                        }
-                        else
-                        {
-                            //B is second most extreme.
-                            if (Math.Abs(dotC - dotA) < faceEpsilon)
-                            {
-                                //The normal is basically a face normal.  This can happen at the edges occasionally.
-                                return TriangleConvexPairTester.VoronoiRegion.ABC;
-                            }
-                            else
-                            {
-                                Vector3.Subtract(ref localTriangleShape.vB, ref localTriangleShape.vC, out edgeDirection);
-                                Vector3.Dot(ref edgeDirection, ref contact.Normal, out edgeDot);
-                                if (edgeDot * edgeDot < edgeDirection.LengthSquared() * edgeEpsilon)
-                                    return TriangleConvexPairTester.VoronoiRegion.BC;
-                                else
-                                    return TriangleConvexPairTester.VoronoiRegion.C;
-                            }
-                        }
-                    }
-                case TriangleConvexPairTester.CollisionState.Plane:
-                    //This can only happen if it's actually from the plane (and thus a face contact)
-                    //OR it was an escape attempt, which will only happen with a contact when 
-                    //the contact is found to be on the face.
-                    return TriangleConvexPairTester.VoronoiRegion.ABC;
-
-                default:
-                    return pairTester.GetVoronoiRegion(ref contact.Position);
-            }
-
-
-
-
-        }
-
         protected void GetNormal(ref Vector3 uncorrectedNormal, out Vector3 normal)
         {
             //Compute the normal of the triangle in the current convex's local space.
@@ -470,14 +304,14 @@ namespace BEPUphysics.CollisionTests.Manifolds
 
         bool AnalyzeCandidate(ref TriangleIndices indices, TriangleConvexPairTester pairTester, ref ContactData contact)
         {
-            switch (GetRegion(pairTester, ref contact))
+            switch (pairTester.GetRegion(ref contact))
             {
-                case TriangleConvexPairTester.VoronoiRegion.A:
+                case VoronoiRegion.A:
                     //Add the contact.
                     VertexContact vertexContact;
                     vertexContact.ContactData = contact;
                     vertexContact.Vertex = indices.A;
-                    vertexContact.ShouldCorrect = pairTester.state == TriangleConvexPairTester.CollisionState.Deep;
+                    vertexContact.ShouldCorrect = pairTester.ShouldCorrectContactNormal;
                     if (vertexContact.ShouldCorrect)
                         GetNormal(ref contact.Normal, out vertexContact.CorrectedNormal);
                     else
@@ -491,11 +325,11 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     blockedVertexRegions.Add(indices.B);
                     blockedVertexRegions.Add(indices.C);
                     break;
-                case TriangleConvexPairTester.VoronoiRegion.B:
+                case VoronoiRegion.B:
                     //Add the contact.
                     vertexContact.ContactData = contact;
                     vertexContact.Vertex = indices.B;
-                    vertexContact.ShouldCorrect = pairTester.state == TriangleConvexPairTester.CollisionState.Deep;
+                    vertexContact.ShouldCorrect = pairTester.ShouldCorrectContactNormal;
                     if (vertexContact.ShouldCorrect)
                         GetNormal(ref contact.Normal, out vertexContact.CorrectedNormal);
                     else
@@ -509,11 +343,11 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     blockedVertexRegions.Add(indices.A);
                     blockedVertexRegions.Add(indices.C);
                     break;
-                case TriangleConvexPairTester.VoronoiRegion.C:
+                case VoronoiRegion.C:
                     //Add the contact.
                     vertexContact.ContactData = contact;
                     vertexContact.Vertex = indices.C;
-                    vertexContact.ShouldCorrect = pairTester.state == TriangleConvexPairTester.CollisionState.Deep;
+                    vertexContact.ShouldCorrect = pairTester.ShouldCorrectContactNormal;
                     if (vertexContact.ShouldCorrect)
                         GetNormal(ref contact.Normal, out vertexContact.CorrectedNormal);
                     else
@@ -527,12 +361,12 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     blockedVertexRegions.Add(indices.A);
                     blockedVertexRegions.Add(indices.C);
                     break;
-                case TriangleConvexPairTester.VoronoiRegion.AB:
+                case VoronoiRegion.AB:
                     //Add the contact.
                     EdgeContact edgeContact;
                     edgeContact.Edge = new Edge(indices.A, indices.B);
                     edgeContact.ContactData = contact;
-                    edgeContact.ShouldCorrect = pairTester.state == TriangleConvexPairTester.CollisionState.Deep;
+                    edgeContact.ShouldCorrect = pairTester.ShouldCorrectContactNormal;
                     if (edgeContact.ShouldCorrect)
                         GetNormal(ref contact.Normal, out edgeContact.CorrectedNormal);
                     else
@@ -546,11 +380,11 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     blockedVertexRegions.Add(indices.B);
                     blockedVertexRegions.Add(indices.C);
                     break;
-                case TriangleConvexPairTester.VoronoiRegion.AC:
+                case VoronoiRegion.AC:
                     //Add the contact.
                     edgeContact.Edge = new Edge(indices.A, indices.C);
                     edgeContact.ContactData = contact;
-                    edgeContact.ShouldCorrect = pairTester.state == TriangleConvexPairTester.CollisionState.Deep;
+                    edgeContact.ShouldCorrect = pairTester.ShouldCorrectContactNormal;
                     if (edgeContact.ShouldCorrect)
                         GetNormal(ref contact.Normal, out edgeContact.CorrectedNormal);
                     else
@@ -564,11 +398,11 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     blockedVertexRegions.Add(indices.B);
                     blockedVertexRegions.Add(indices.C);
                     break;
-                case TriangleConvexPairTester.VoronoiRegion.BC:
+                case VoronoiRegion.BC:
                     //Add the contact.
                     edgeContact.Edge = new Edge(indices.B, indices.C);
                     edgeContact.ContactData = contact;
-                    edgeContact.ShouldCorrect = pairTester.state == TriangleConvexPairTester.CollisionState.Deep;
+                    edgeContact.ShouldCorrect = pairTester.ShouldCorrectContactNormal;
                     if (edgeContact.ShouldCorrect)
                         GetNormal(ref contact.Normal, out edgeContact.CorrectedNormal);
                     else

@@ -60,6 +60,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
         public override void CleanUp()
         {
             mesh = null;
+            convex = null;
             base.CleanUp();
         }
 

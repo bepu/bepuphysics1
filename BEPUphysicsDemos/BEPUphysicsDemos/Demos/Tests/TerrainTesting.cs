@@ -16,13 +16,13 @@ namespace BEPUphysicsDemos.Demos
     /// <summary>
     /// Boxes fall onto a large terrain.  Try driving around on it!
     /// </summary>
-    public class TerrainDemo : StandardDemo
+    public class TerrainTesting : StandardDemo
     {
         /// <summary>
         /// Constructs a new demo.
         /// </summary>
         /// <param name="game">Game owning this demo.</param>
-        public TerrainDemo(DemosGame game)
+        public TerrainTesting(DemosGame game)
             : base(game)
         {
             //x and y, in terms of heightmaps, refer to their local x and y coordinates.  In world space, they correspond to x and z.
@@ -40,7 +40,7 @@ namespace BEPUphysicsDemos.Demos
                     float x = i - xLength / 2;
                     float z = j - zLength / 2;
                     //heights[i,j] = (float)(x * y / 1000f);
-                    heights[i, j] = (float)(10 * (Math.Sin(x / 8) + Math.Sin(z / 8)));
+                    heights[i, j] = (float)(2 * (Math.Sin(x / 8) + Math.Sin(z / 8)));
                     //heights[i,j] = 3 * (float)Math.Sin(x * y / 100f);
                     //heights[i,j] = (x * x * x * y - y * y * y * x) / 1000f;
                 }
@@ -55,13 +55,13 @@ namespace BEPUphysicsDemos.Demos
             //MotionSettings.DefaultPositionUpdateMode = BEPUphysics.PositionUpdating.PositionUpdateMode.Continuous;
 
             Space.Add(terrain);
-            for (int i = 0; i < 20; i++)
+            for (int i = 0; i < 7; i++)
             {
-                for (int j = 0; j < 20; j++)
+                for (int j = 0; j < 7; j++)
                 {
-                    for (int k = 0; k < 1; k++)
+                    for (int k = 0; k < 8; k++)
                     {
-                        Space.Add(new Sphere(new Vector3(0 + i * 4, 1000 + -j * 10, 0 + k * 4), 1, 1));
+                        Space.Add(new Sphere(new Vector3(0 + i * 8, 100 + -j * 10, 0 + k * 8), 0.5f, 1));
                         //Space.Add(new Box(
                         //    new Vector3(0 + i * 4, 1000 + -j * 10, 0 + k * 4),
                         //    2 + i * j * k,
@@ -102,13 +102,6 @@ namespace BEPUphysicsDemos.Demos
 
         }
 
-        public override void Update(float dt)
-        {
-            if (Game.KeyboardInput.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.P))
-                Debug.WriteLine("Break.");
-            base.Update(dt);
-
-        }
 
 
 
