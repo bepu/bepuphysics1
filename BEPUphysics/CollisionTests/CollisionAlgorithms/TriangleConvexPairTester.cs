@@ -583,8 +583,13 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                     }
                 }
 
-
-
+                //It's possible for the normal to still face the 'wrong' direction according to one sided triangles.
+                if (triangle.sidedness != TriangleSidedness.DoubleSided)
+                {
+                    Vector3.Dot(ref triangleNormal, ref contact.Normal, out dot);
+                    if (dot < 0)
+                        return false;
+                }
 
 
 

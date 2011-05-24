@@ -45,17 +45,17 @@ namespace BEPUphysics.NarrowPhaseSystems
             collisionManagers.Add(new TypePair(typeof(ConvexCollidable<WrappedShape>), typeof(ConvexCollidable<TriangleShape>)), triangleConvexFactory);
             collisionManagers.Add(new TypePair(typeof(ConvexCollidable<ConvexHullShape>), typeof(ConvexCollidable<TriangleShape>)), triangleConvexFactory);
 
-            var staticTriangleMeshConvexFactory = new StaticMeshConvexPairFactory();
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<BoxShape>), typeof(StaticMesh)), staticTriangleMeshConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<SphereShape>), typeof(StaticMesh)), staticTriangleMeshConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<CapsuleShape>), typeof(StaticMesh)), staticTriangleMeshConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<TriangleShape>), typeof(StaticMesh)), staticTriangleMeshConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<CylinderShape>), typeof(StaticMesh)), staticTriangleMeshConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<ConeShape>), typeof(StaticMesh)), staticTriangleMeshConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<TransformableShape>), typeof(StaticMesh)), staticTriangleMeshConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<MinkowskiSumShape>), typeof(StaticMesh)), staticTriangleMeshConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<WrappedShape>), typeof(StaticMesh)), staticTriangleMeshConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<ConvexHullShape>), typeof(StaticMesh)), staticTriangleMeshConvexFactory);
+            var staticMeshConvexFactory = new StaticMeshConvexPairFactory();
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<BoxShape>), typeof(StaticMesh)), staticMeshConvexFactory);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<SphereShape>), typeof(StaticMesh)), new StaticMeshSpherePairFactory());
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<CapsuleShape>), typeof(StaticMesh)), staticMeshConvexFactory);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<TriangleShape>), typeof(StaticMesh)), staticMeshConvexFactory);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<CylinderShape>), typeof(StaticMesh)), staticMeshConvexFactory);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<ConeShape>), typeof(StaticMesh)), staticMeshConvexFactory);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<TransformableShape>), typeof(StaticMesh)), staticMeshConvexFactory);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<MinkowskiSumShape>), typeof(StaticMesh)), staticMeshConvexFactory);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<WrappedShape>), typeof(StaticMesh)), staticMeshConvexFactory);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<ConvexHullShape>), typeof(StaticMesh)), staticMeshConvexFactory);
 
             var terrainConvexFactory = new TerrainConvexPairFactory();
             collisionManagers.Add(new TypePair(typeof(ConvexCollidable<BoxShape>), typeof(Terrain)), terrainConvexFactory);
@@ -71,7 +71,7 @@ namespace BEPUphysics.NarrowPhaseSystems
 
             var instancedMeshConvexFactory = new InstancedMeshConvexPairFactory();
             collisionManagers.Add(new TypePair(typeof(ConvexCollidable<BoxShape>), typeof(InstancedMesh)), instancedMeshConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<SphereShape>), typeof(InstancedMesh)), instancedMeshConvexFactory);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<SphereShape>), typeof(InstancedMesh)), new InstancedMeshSpherePairFactory());
             collisionManagers.Add(new TypePair(typeof(ConvexCollidable<CapsuleShape>), typeof(InstancedMesh)), instancedMeshConvexFactory);
             collisionManagers.Add(new TypePair(typeof(ConvexCollidable<TriangleShape>), typeof(InstancedMesh)), instancedMeshConvexFactory);
             collisionManagers.Add(new TypePair(typeof(ConvexCollidable<CylinderShape>), typeof(InstancedMesh)), instancedMeshConvexFactory);
@@ -100,7 +100,7 @@ namespace BEPUphysics.NarrowPhaseSystems
 
             var mobileMeshConvexFactory = new MobileMeshConvexPairFactory();
             collisionManagers.Add(new TypePair(typeof(ConvexCollidable<BoxShape>), typeof(MobileMeshCollidable)), mobileMeshConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<SphereShape>), typeof(MobileMeshCollidable)), mobileMeshConvexFactory);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<SphereShape>), typeof(MobileMeshCollidable)), new MobileMeshSpherePairFactory());
             collisionManagers.Add(new TypePair(typeof(ConvexCollidable<CapsuleShape>), typeof(MobileMeshCollidable)), mobileMeshConvexFactory);
             collisionManagers.Add(new TypePair(typeof(ConvexCollidable<TriangleShape>), typeof(MobileMeshCollidable)), mobileMeshConvexFactory);
             collisionManagers.Add(new TypePair(typeof(ConvexCollidable<CylinderShape>), typeof(MobileMeshCollidable)), mobileMeshConvexFactory);

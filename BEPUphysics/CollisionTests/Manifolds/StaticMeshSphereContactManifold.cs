@@ -1,19 +1,18 @@
 ﻿using System;
 using BEPUphysics.Collidables;
 using BEPUphysics.Collidables.MobileCollidables;
-using Microsoft.Xna.Framework;
 using BEPUphysics.DataStructures;
-using BEPUphysics.MathExtensions;
-using BEPUphysics.ResourceManagement;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
+using BEPUphysics.ResourceManagement;
 
 namespace BEPUphysics.CollisionTests.Manifolds
 {
     ///<summary>
-    /// Manages persistent contacts between a convex and an instanced mesh.
+    /// Manages persistent contacts between a static mesh and a convex.
     ///</summary>
-    public class InstancedMeshConvexContactManifold : InstancedMeshContactManifold
+    public class StaticMeshConvexContactManifold : StaticMeshContactManifold
     {
+
 
         UnsafeResourcePool<TriangleConvexPairTester> testerPool = new UnsafeResourcePool<TriangleConvexPairTester>();
         protected override void GiveBackTester(CollisionAlgorithms.TrianglePairTester tester)

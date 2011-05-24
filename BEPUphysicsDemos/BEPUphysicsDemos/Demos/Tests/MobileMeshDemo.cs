@@ -26,31 +26,13 @@ namespace BEPUphysicsDemos.Demos
     /// <summary>
     /// Demo showing a wall of blocks stacked up.
     /// </summary>
-    public class TestDemo : StandardDemo
+    public class MobileMeshDemo : StandardDemo
     {
-        void ConstructStuff()
-        {
-            CompoundBody body = new CompoundBody(
-            new List<CompoundShapeEntry>
-            {
-                new CompoundShapeEntry(new BoxShape(1,1,1), new Vector3(0,.5f,0)),
-                new CompoundShapeEntry(new BoxShape(2,1,2), new Vector3(0,-.5f,0))
-            }, 10);
-            Cylinder wheel = new Cylinder(new Vector3(0, .5f, 0), .1f, 1, 1);
-            CollisionRules.AddRule(body, wheel, CollisionRule.NoBroadPhase);
-            var joint = new RevoluteJoint(body, wheel, new Vector3(0, 1, 0), Vector3.Up);
-            joint.Motor.IsActive = true;
-            joint.Motor.Settings.VelocityMotor.GoalVelocity = 1;
-            Space.Add(body);
-            Space.Add(wheel);
-            Space.Add(joint);
-        }
-
         /// <summary>
         /// Constructs a new demo.
         /// </summary>
         /// <param name="game">Game owning this demo.</param>
-        public TestDemo(DemosGame game)
+        public MobileMeshDemo(DemosGame game)
             : base(game)
         {
 
@@ -58,18 +40,18 @@ namespace BEPUphysicsDemos.Demos
             Vector3[] vertices;
             int[] indices;
 
-            TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("playground"), out vertices, out indices);
-            AffineTransform transform = new AffineTransform(new Vector3(1, 1, 1), Quaternion.Identity, new Vector3(0, -30, 0));
-            StaticMesh staticMesh = new StaticMesh(vertices, indices, transform);
+            //TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("playground"), out vertices, out indices);
+            //AffineTransform transform = new AffineTransform(new Vector3(1, 1, 1), Quaternion.Identity, new Vector3(0, -30, 0));
+            //StaticMesh staticMesh = new StaticMesh(vertices, indices, transform);
             //Space.Add(staticMesh);
             //game.ModelDrawer.Add(staticMesh.Mesh);
 
-            TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("cube"), out vertices, out indices);
-            MotionSettings.DefaultPositionUpdateMode = PositionUpdateMode.Continuous;
+            TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("hollowsphere"), out vertices, out indices);
+            //MotionSettings.DefaultPositionUpdateMode = PositionUpdateMode.Continuous;
             ShapeDistributionInformation info;
-            transform = new AffineTransform(new Vector3(1, 1, 1), Quaternion.CreateFromAxisAngle(new Vector3(1, 0, 0), MathHelper.Pi), new Vector3(0, 0, 0));
-            //transform = new AffineTransform(new Vector3(.03f, .03f, .03f), Quaternion.Identity, new Vector3(0, 0, 0));
-            var shape = new MobileMeshShape(vertices, indices, transform, MobileMeshSolidity.DoubleSided, out info);
+            //var transform = AffineTransform.Identity;// new AffineTransform(new Vector3(1, 1, 1), Quaternion.CreateFromAxisAngle(new Vector3(1, 0, 0), MathHelper.Pi), new Vector3(0, 0, 0));
+            var transform = new AffineTransform(new Vector3(.03f, .03f, .03f), Quaternion.Identity, new Vector3(0, 0, 0));
+            var shape = new MobileMeshShape(vertices, indices, transform, MobileMeshSolidity.Solid, out info);
             //CollisionResponseSettings.PenetrationRecoveryStiffness = 1f;
             //CollisionResponseSettings.MaximumPositionCorrectionSpeed = float.MaxValue;
 
@@ -107,7 +89,7 @@ namespace BEPUphysicsDemos.Demos
             //    Space.Add(toAdd);
             //}
 
-            Space.Add(new Box(new Vector3(0, -10, 0), 100, 100, 100));
+            Space.Add(new Box(new Vector3(0, -10, 0), 100, 1, 100));
             game.Camera.Position = new Vector3(0, 20, 45);
             game.Camera.Yaw = 0;
             game.Camera.Pitch = 0;
@@ -233,7 +215,7 @@ namespace BEPUphysicsDemos.Demos
         /// </summary>
         public override string Name
         {
-            get { return "Test"; }
+            get { return "MobileMesh"; }
         }
 
         public override void CleanUp()

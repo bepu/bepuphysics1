@@ -116,6 +116,12 @@
     <Compile Include="CollisionTests\CollisionAlgorithms\MPRTesting.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\TriangleMeshConvexPairTester.cs" />
     <Compile Include="CollisionTests\Manifolds\BoxSphereContactManifold.cs" />
+    <Compile Include="CollisionTests\Manifolds\MobileMeshSphereContactManifold.cs" />
+    <Compile Include="CollisionTests\Manifolds\MobileMeshContactManifold.cs" />
+    <Compile Include="CollisionTests\Manifolds\InstancedMeshSphereContactManifold.cs" />
+    <Compile Include="CollisionTests\Manifolds\InstancedMeshContactManifold.cs" />
+    <Compile Include="CollisionTests\Manifolds\StaticMeshSphereContactManifold.cs" />
+    <Compile Include="CollisionTests\Manifolds\StaticMeshContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\TerrainConvexContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\MobileMeshMeshContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\MobileMeshStaticMeshContactManifold.cs" />
@@ -244,6 +250,9 @@
     <Compile Include="Entities\Prefabs\Triangle.cs" />
     <Compile Include="Entities\Prefabs\WrappedBody.cs" />
     <Compile Include="NarrowPhaseSystems\Factories\CompoundMobileMeshPairFactory.cs" />
+    <Compile Include="NarrowPhaseSystems\Factories\MobileMeshSpherePairFactory.cs" />
+    <Compile Include="NarrowPhaseSystems\Factories\InstancedMeshSpherePairFactory.cs" />
+    <Compile Include="NarrowPhaseSystems\Factories\StaticMeshSpherePairFactory.cs" />
     <Compile Include="NarrowPhaseSystems\Factories\TerrainSpherePairFactory.cs" />
     <Compile Include="NarrowPhaseSystems\Factories\MobileMeshStaticMeshPairFactory.cs" />
     <Compile Include="NarrowPhaseSystems\Factories\MobileMeshConvexPairFactory.cs" />
@@ -253,6 +262,12 @@
     <Compile Include="NarrowPhaseSystems\Pairs\ConvexPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\CompoundGroupPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\ConvexConstraintPairHandler.cs" />
+    <Compile Include="NarrowPhaseSystems\Pairs\MobileMeshSpherePairHandler.cs" />
+    <Compile Include="NarrowPhaseSystems\Pairs\MobileMeshPairHandler.cs" />
+    <Compile Include="NarrowPhaseSystems\Pairs\InstancedMeshSpherePairHandler.cs" />
+    <Compile Include="NarrowPhaseSystems\Pairs\InstancedMeshPairHandler.cs" />
+    <Compile Include="NarrowPhaseSystems\Pairs\StaticMeshSpherePairHandler.cs" />
+    <Compile Include="NarrowPhaseSystems\Pairs\StaticMeshPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\TerrainPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\TerrainSpherePairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\MobileMeshStaticMeshPairHandler.cs" />

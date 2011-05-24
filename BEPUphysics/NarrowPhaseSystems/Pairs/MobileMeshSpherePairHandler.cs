@@ -6,25 +6,27 @@ using BEPUphysics.CollisionTests;
 using BEPUphysics.CollisionTests.CollisionAlgorithms.GJK;
 using BEPUphysics.CollisionTests.Manifolds;
 using BEPUphysics.Constraints.Collision;
+using BEPUphysics.DataStructures;
 using BEPUphysics.PositionUpdating;
 using BEPUphysics.Settings;
 using Microsoft.Xna.Framework;
-using BEPUphysics.CollisionShapes.ConvexShapes;
+using BEPUphysics.MathExtensions;
 using BEPUphysics.ResourceManagement;
+using BEPUphysics.CollisionShapes.ConvexShapes;
 
 namespace BEPUphysics.NarrowPhaseSystems.Pairs
 {
     ///<summary>
-    /// Handles a static mesh-convex collision pair.
+    /// Handles a mobile mesh-sphere collision pair.
     ///</summary>
-    public class StaticMeshConvexPairHandler : StaticMeshPairHandler
+    public class MobileMeshSpherePairHandler : MobileMeshPairHandler
     {
-
-        StaticMeshConvexContactManifold contactManifold = new StaticMeshConvexContactManifold();
-        protected override StaticMeshContactManifold MeshManifold
+        MobileMeshSphereContactManifold contactManifold = new MobileMeshSphereContactManifold();
+        protected override MobileMeshContactManifold MeshManifold
         {
             get { return contactManifold; }
         }
+
 
 
     }

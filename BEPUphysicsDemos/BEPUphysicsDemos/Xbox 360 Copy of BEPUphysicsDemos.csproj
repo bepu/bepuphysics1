@@ -101,8 +101,8 @@
     <Compile Include="Demos\SleepModeDemo.cs" />
     <Compile Include="Demos\SpaceshipDemo.cs" />
     <Compile Include="Demos\TerrainDemo.cs" />
+    <Compile Include="Demos\Tests\MobileMeshDemo.cs" />
     <Compile Include="Demos\Tests\TerrainTesting.cs" />
-    <Compile Include="Demos\Tests\TestDemo.cs" />
     <Compile Include="Demos\Tests\TestDemo2.cs" />
     <Compile Include="Demos\Tests\TestDemo3.cs" />
     <Compile Include="Demos\Tests\TestDemo4.cs" />

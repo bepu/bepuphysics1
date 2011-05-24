@@ -15,12 +15,12 @@ using BEPUphysics.ResourceManagement;
 namespace BEPUphysics.NarrowPhaseSystems.Pairs
 {
     ///<summary>
-    /// Handles a static mesh-convex collision pair.
+    /// Handles a static mesh-sphere collision pair.
     ///</summary>
-    public class StaticMeshConvexPairHandler : StaticMeshPairHandler
+    public class StaticMeshSpherePairHandler : StaticMeshPairHandler
     {
 
-        StaticMeshConvexContactManifold contactManifold = new StaticMeshConvexContactManifold();
+        StaticMeshSphereContactManifold contactManifold = new StaticMeshSphereContactManifold();
         protected override StaticMeshContactManifold MeshManifold
         {
             get { return contactManifold; }
