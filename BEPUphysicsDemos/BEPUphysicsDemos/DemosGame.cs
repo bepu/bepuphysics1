@@ -110,7 +110,7 @@ namespace BEPUphysicsDemos
                                                     typeof (TestDemo2),
                                                     typeof (TestDemo3),
                                                     typeof (TestingBroadPhases),
-                                                    typeof (TestDemo4),
+                                                    typeof (MPRCastingDemo),
                                                     typeof (TerrainTesting)
                                                 };
 
@@ -175,7 +175,8 @@ namespace BEPUphysicsDemos
                                                     .Invoke(new object[] { this });
 
 #else
-            currentSimulation = (Demo)Activator.CreateInstance(demoType, new object[] { this });
+            //currentSimulation = (Demo)Activator.CreateInstance(demoType, new object[] { this });
+            currentSimulation = new MPRCastingDemo(this);
 #endif
             
             #region DisplayObject creation

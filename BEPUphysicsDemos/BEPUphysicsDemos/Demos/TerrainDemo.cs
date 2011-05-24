@@ -50,16 +50,16 @@ namespace BEPUphysicsDemos.Demos
                     new Vector3(xSpacing, 1, zSpacing),
                     Quaternion.Identity,
                     new Vector3(-xLength * xSpacing / 2, 0, -zLength * zSpacing / 2)));
-            terrain.Thickness = 50;
+            //terrain.Thickness = 50;
 
-            //MotionSettings.DefaultPositionUpdateMode = BEPUphysics.PositionUpdating.PositionUpdateMode.Continuous;
+            MotionSettings.DefaultPositionUpdateMode = BEPUphysics.PositionUpdating.PositionUpdateMode.Continuous;
 
             Space.Add(terrain);
             for (int i = 0; i < 20; i++)
             {
                 for (int j = 0; j < 20; j++)
                 {
-                    for (int k = 0; k < 1; k++)
+                    for (int k = 0; k < 5; k++)
                     {
                         Space.Add(new Sphere(new Vector3(0 + i * 4, 1000 + -j * 10, 0 + k * 4), 1, 1));
                         //Space.Add(new Box(
