@@ -14,11 +14,11 @@ using BEPUphysics.ResourceManagement;
 namespace BEPUphysics.NarrowPhaseSystems.Pairs
 {
     ///<summary>
-    /// Handles a terrain-convex collision pair.
+    /// Handles a terrain-sphere collision pair.
     ///</summary>
-    public sealed class TerrainConvexPairHandler : TerrainPairHandler
+    public sealed class TerrainSpherePairHandler : TerrainPairHandler
     {
-        protected TerrainConvexContactManifold contactManifold = new TerrainConvexContactManifold();
+        protected TerrainSphereContactManifold contactManifold = new TerrainSphereContactManifold();
         protected override TerrainContactManifold TerrainManifold
         {
             get { return contactManifold; }

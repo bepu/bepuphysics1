@@ -19,12 +19,14 @@ namespace BEPUphysics.CollisionTests.Manifolds
     public abstract class TriangleMeshConvexContactManifold : ContactManifold
     {
         protected RawValueList<ContactSupplementData> supplementData = new RawValueList<ContactSupplementData>(4);
-        Dictionary<TriangleIndices, TriangleConvexPairTester> activePairTesters = new Dictionary<TriangleIndices, TriangleConvexPairTester>(4);
+        Dictionary<TriangleIndices, TrianglePairTester> activePairTesters = new Dictionary<TriangleIndices, TrianglePairTester>(4);
         RawValueList<ContactData> candidatesToAdd;
         RawValueList<ContactData> reducedCandidates = new RawValueList<ContactData>();
         protected TriangleShape localTriangleShape = new TriangleShape();
+        
+        protected abstract TrianglePairTester GetTester();
 
-        UnsafeResourcePool<TriangleConvexPairTester> pairTestersPool = new UnsafeResourcePool<TriangleConvexPairTester>(4);
+        protected abstract void GiveBackTester(TrianglePairTester tester);
 
         HashSet<int> blockedVertexRegions = new HashSet<int>();
         HashSet<Edge> blockedEdgeRegions = new HashSet<Edge>();
@@ -93,10 +95,10 @@ namespace BEPUphysics.CollisionTests.Manifolds
                 ConfigureTriangle(i, out indices);
 
                 //Find a pairtester for the triangle.
-                TriangleConvexPairTester pairTester;
+                TrianglePairTester pairTester;
                 if (!activePairTesters.TryGetValue(indices, out pairTester))
                 {
-                    pairTester = pairTestersPool.Take();
+                    pairTester = GetTester();
                     pairTester.Initialize(convex.Shape, localTriangleShape);
                     activePairTesters.Add(indices, pairTester);
                 }
@@ -203,7 +205,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
             //This will only remove 8 stale ones per frame, but it doesn't really matter.
             //VERY rarely will there be more than 8 in a single frame, and they will be immediately taken care of in the subsequent frame.
             var toRemove = new TinyList<TriangleIndices>();
-            foreach (KeyValuePair<TriangleIndices, TriangleConvexPairTester> pair in activePairTesters)
+            foreach (KeyValuePair<TriangleIndices, TrianglePairTester> pair in activePairTesters)
             {
                 if (!pair.Value.Updated)
                 {
@@ -220,7 +222,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
             {
                 var pairTester = activePairTesters[toRemove[i]];
                 pairTester.CleanUp();
-                pairTestersPool.GiveBack(pairTester);
+                GiveBackTester(pairTester);
                 activePairTesters.Remove(toRemove[i]);
             }
 
@@ -302,7 +304,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
             
         }
 
-        bool AnalyzeCandidate(ref TriangleIndices indices, TriangleConvexPairTester pairTester, ref ContactData contact)
+        bool AnalyzeCandidate(ref TriangleIndices indices, TrianglePairTester pairTester, ref ContactData contact)
         {
             switch (pairTester.GetRegion(ref contact))
             {
@@ -524,10 +526,10 @@ namespace BEPUphysics.CollisionTests.Manifolds
             supplementData.Clear();
             contacts.Clear();
             convex = null;
-            foreach (KeyValuePair<TriangleIndices, TriangleConvexPairTester> pair in activePairTesters)
+            foreach (KeyValuePair<TriangleIndices, TrianglePairTester> pair in activePairTesters)
             {
                 pair.Value.CleanUp();
-                pairTestersPool.GiveBack(pair.Value);
+                GiveBackTester(pair.Value);
             }
             activePairTesters.Clear();
             CleanUpOverlappingTriangles();

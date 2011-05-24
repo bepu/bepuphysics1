@@ -12,18 +12,13 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
     ///<summary>
     /// Persistent tester that compares triangles against convex objects.
     ///</summary>
-    public class TriangleConvexPairTester
+    public sealed class TriangleConvexPairTester : TrianglePairTester
     {
-        internal TriangleShape triangle;
         internal ConvexShape convex;
 
         internal CollisionState state = CollisionState.Plane;
         private const int EscapeAttemptPeriod = 10;
         int escapeAttempts;
-        ///<summary>
-        /// Whether or not the pair tester was updated during the last attempt.
-        ///</summary>
-        public bool Updated;
 
         Vector3 localSeparatingAxis;
 
@@ -34,7 +29,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
         ///</summary>
         ///<param name="contactList">Contact between the shapes, if any.</param>
         ///<returns>Whether or not the shapes are colliding.</returns>
-        public bool GenerateContactCandidate(out TinyStructList<ContactData> contactList)
+        public override bool GenerateContactCandidate(out TinyStructList<ContactData> contactList)
         {
             switch (state)
             {
@@ -820,7 +815,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
         ///</summary>
         ///<param name="convex">Convex shape to use.</param>
         ///<param name="triangle">Triangle shape to use.</param>
-        public void Initialize(ConvexShape convex, TriangleShape triangle)
+        public override void Initialize(ConvexShape convex, TriangleShape triangle)
         {
             this.convex = convex;
             this.triangle = triangle;
@@ -829,7 +824,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
         /// <summary>
         /// Cleans up the pair tester.
         /// </summary>
-        public void CleanUp()
+        public override void CleanUp()
         {
             triangle = null;
             convex = null;
@@ -848,7 +843,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
         }
 
 
-        public VoronoiRegion GetRegion(ref ContactData contact)
+        public override VoronoiRegion GetRegion(ref ContactData contact)
         {
             switch (state)
             {
@@ -1009,7 +1004,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             }
         }
 
-        public bool ShouldCorrectContactNormal
+        public override bool ShouldCorrectContactNormal
         {
             get
             {

@@ -7,9 +7,9 @@ using BEPUphysics.CollisionTests.CollisionAlgorithms;
 
 namespace BEPUphysics.CollisionTests.Manifolds
 {
-    public class TerrainConvexContactManifold : TerrainContactManifold
+    public class TerrainSphereContactManifold : TerrainContactManifold
     {
-        UnsafeResourcePool<TriangleConvexPairTester> testerPool = new UnsafeResourcePool<TriangleConvexPairTester>();
+        UnsafeResourcePool<TriangleSpherePairTester> testerPool = new UnsafeResourcePool<TriangleSpherePairTester>();
         protected override TrianglePairTester GetTester()
         {
             return testerPool.Take();
@@ -17,7 +17,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
 
         protected override void GiveBackTester(TrianglePairTester tester)
         {
-            testerPool.GiveBack((TriangleConvexPairTester)tester);
+            testerPool.GiveBack((TriangleSpherePairTester)tester);
         }
 
     }

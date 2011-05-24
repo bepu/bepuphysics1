@@ -30,8 +30,8 @@ namespace BEPUphysicsDemos.Demos
             int xLength = 256;
             int zLength = 256;
 
-            float xSpacing = 8f;
-            float zSpacing = 8f;
+            float xSpacing = 1f;
+            float zSpacing = 1f;
             var heights = new float[xLength, zLength];
             for (int i = 0; i < xLength; i++)
             {
@@ -50,9 +50,12 @@ namespace BEPUphysicsDemos.Demos
                     new Vector3(xSpacing, 1, zSpacing),
                     Quaternion.Identity,
                     new Vector3(-xLength * xSpacing / 2, 0, -zLength * zSpacing / 2)));
-            terrain.Thickness = 50;
+            terrain.Thickness = 0;
 
-            //MotionSettings.DefaultPositionUpdateMode = BEPUphysics.PositionUpdating.PositionUpdateMode.Continuous;
+            MotionSettings.DefaultPositionUpdateMode = BEPUphysics.PositionUpdating.PositionUpdateMode.Continuous;
+
+            //ConfigurationHelper.ApplySuperSpeedySettings(Space);
+            //Space.Solver.IterationLimit = 1;
 
             Space.Add(terrain);
             for (int i = 0; i < 7; i++)
@@ -61,7 +64,10 @@ namespace BEPUphysicsDemos.Demos
                 {
                     for (int k = 0; k < 8; k++)
                     {
-                        Space.Add(new Sphere(new Vector3(0 + i * 8, 100 + -j * 10, 0 + k * 8), 0.5f, 1));
+                        Space.Add(new Sphere(new Vector3(0 + i * 8, 100 + -j * 10, 0 + k * 8), 0.5f, 1)
+                        {
+                            LocalInertiaTensorInverse = new Matrix3X3()
+                        });
                         //Space.Add(new Box(
                         //    new Vector3(0 + i * 4, 1000 + -j * 10, 0 + k * 4),
                         //    2 + i * j * k,

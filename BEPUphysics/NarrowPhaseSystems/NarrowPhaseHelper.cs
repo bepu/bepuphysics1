@@ -59,7 +59,7 @@ namespace BEPUphysics.NarrowPhaseSystems
 
             var terrainConvexFactory = new TerrainConvexPairFactory();
             collisionManagers.Add(new TypePair(typeof(ConvexCollidable<BoxShape>), typeof(Terrain)), terrainConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<SphereShape>), typeof(Terrain)), terrainConvexFactory);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<SphereShape>), typeof(Terrain)), new TerrainSpherePairFactory());
             collisionManagers.Add(new TypePair(typeof(ConvexCollidable<CapsuleShape>), typeof(Terrain)), terrainConvexFactory);
             collisionManagers.Add(new TypePair(typeof(ConvexCollidable<TriangleShape>), typeof(Terrain)), terrainConvexFactory);
             collisionManagers.Add(new TypePair(typeof(ConvexCollidable<CylinderShape>), typeof(Terrain)), terrainConvexFactory);

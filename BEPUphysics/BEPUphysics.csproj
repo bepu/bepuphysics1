@@ -111,14 +111,17 @@
     <Compile Include="Collidables\Events\IEntryEventTriggerer.cs" />
     <Compile Include="Collidables\MobileCollidables\MobileMeshCollidable.cs" />
     <Compile Include="CollisionShapes\MobileMeshShape.cs" />
+    <Compile Include="CollisionTests\CollisionAlgorithms\TrianglePairTester.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\TriangleSpherePairTester.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\MPRTesting.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\TriangleMeshConvexPairTester.cs" />
     <Compile Include="CollisionTests\Manifolds\BoxSphereContactManifold.cs" />
+    <Compile Include="CollisionTests\Manifolds\TerrainConvexContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\MobileMeshMeshContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\MobileMeshStaticMeshContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\SphereContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\MobileMeshConvexContactManifold.cs" />
+    <Compile Include="CollisionTests\Manifolds\TerrainSphereContactManifold.cs" />
     <Compile Include="CollisionTests\VoronoiRegion.cs" />
     <Compile Include="DataStructures\BoundingBoxTree.cs" />
     <Compile Include="DataStructures\MeshBoundingBoxTree.cs" />
@@ -166,7 +169,7 @@
     <Compile Include="CollisionTests\CollisionAlgorithms\SphereTester.cs" />
     <Compile Include="CollisionTests\Manifolds\BoxContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\InstancedMeshConvexContactManifold.cs" />
-    <Compile Include="CollisionTests\Manifolds\TerrainConvexContactManifold.cs" />
+    <Compile Include="CollisionTests\Manifolds\TerrainContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\TriangleMeshConvexContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\StaticMeshConvexContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\TriangleConvexContactManifold.cs" />
@@ -241,6 +244,7 @@
     <Compile Include="Entities\Prefabs\Triangle.cs" />
     <Compile Include="Entities\Prefabs\WrappedBody.cs" />
     <Compile Include="NarrowPhaseSystems\Factories\CompoundMobileMeshPairFactory.cs" />
+    <Compile Include="NarrowPhaseSystems\Factories\TerrainSpherePairFactory.cs" />
     <Compile Include="NarrowPhaseSystems\Factories\MobileMeshStaticMeshPairFactory.cs" />
     <Compile Include="NarrowPhaseSystems\Factories\MobileMeshConvexPairFactory.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\CompoundMobileMeshPairHandler.cs" />
@@ -249,6 +253,8 @@
     <Compile Include="NarrowPhaseSystems\Pairs\ConvexPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\CompoundGroupPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\ConvexConstraintPairHandler.cs" />
+    <Compile Include="NarrowPhaseSystems\Pairs\TerrainPairHandler.cs" />
+    <Compile Include="NarrowPhaseSystems\Pairs\TerrainSpherePairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\MobileMeshStaticMeshPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\MobileMeshMeshPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\GroupPairHandler.cs" />

@@ -86,6 +86,7 @@
     <Compile Include="CollisionTests\CollisionAlgorithms\GJK\Simplex.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\MPRTesting.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\TriangleMeshConvexPairTester.cs" />
+    <Compile Include="CollisionTests\CollisionAlgorithms\TrianglePairTester.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\TriangleSpherePairTester.cs" />
     <Compile Include="CollisionTests\ContactData.cs" />
     <Compile Include="CollisionTests\Manifolds\BoxContactManifold.cs" />
@@ -98,7 +99,9 @@
     <Compile Include="CollisionTests\Manifolds\MobileMeshStaticMeshContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\SphereContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\StaticMeshConvexContactManifold.cs" />
+    <Compile Include="CollisionTests\Manifolds\TerrainContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\TerrainConvexContactManifold.cs" />
+    <Compile Include="CollisionTests\Manifolds\TerrainSphereContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\TriangleConvexContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\TriangleMeshConvexContactManifold.cs" />
     <Compile Include="CollisionTests\VoronoiRegion.cs" />
@@ -140,6 +143,7 @@
     <Compile Include="NarrowPhaseSystems\Factories\CompoundMobileMeshPairFactory.cs" />
     <Compile Include="NarrowPhaseSystems\Factories\MobileMeshConvexPairFactory.cs" />
     <Compile Include="NarrowPhaseSystems\Factories\MobileMeshStaticMeshPairFactory.cs" />
+    <Compile Include="NarrowPhaseSystems\Factories\TerrainSpherePairFactory.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\CompoundGroupPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\CompoundMobileMeshPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\ConvexConstraintPairHandler.cs" />
@@ -148,6 +152,8 @@
     <Compile Include="NarrowPhaseSystems\Pairs\MobileMeshConvexPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\MobileMeshMeshPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\MobileMeshStaticMeshPairHandler.cs" />
+    <Compile Include="NarrowPhaseSystems\Pairs\TerrainPairHandler.cs" />
+    <Compile Include="NarrowPhaseSystems\Pairs\TerrainSpherePairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\Type1PairHandler.cs" />
     <Compile Include="OtherSpaceStages\BoundingBoxUpdater.cs" />
     <Compile Include="OtherSpaceStages\DeferredEventDispatcher.cs" />

@@ -2,6 +2,8 @@
 using BEPUphysics.Collidables;
 using BEPUphysics.Collidables.MobileCollidables;
 using BEPUphysics.DataStructures;
+using BEPUphysics.CollisionTests.CollisionAlgorithms;
+using BEPUphysics.ResourceManagement;
 
 namespace BEPUphysics.CollisionTests.Manifolds
 {
@@ -10,6 +12,8 @@ namespace BEPUphysics.CollisionTests.Manifolds
     ///</summary>
     public class StaticMeshConvexContactManifold : TriangleMeshConvexContactManifold
     {
+
+
         protected StaticMesh mesh;
 
         internal RawList<int> overlappedTriangles = new RawList<int>(4);
@@ -85,6 +89,16 @@ namespace BEPUphysics.CollisionTests.Manifolds
 
         }
 
+        UnsafeResourcePool<TriangleConvexPairTester> testerPool = new UnsafeResourcePool<TriangleConvexPairTester>();
+        protected override void GiveBackTester(CollisionAlgorithms.TrianglePairTester tester)
+        {
+            testerPool.GiveBack((TriangleConvexPairTester)tester);
+        }
+
+        protected override CollisionAlgorithms.TrianglePairTester GetTester()
+        {
+            return testerPool.Take();
+        }
 
     }
 }
