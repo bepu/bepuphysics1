@@ -135,9 +135,27 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             if (n.LengthSquared() < Toolbox.Epsilon)
             {
                 //v1 and v0 could be parallel.
-                Vector3.Cross(ref v1, ref Toolbox.UpVector, out n);
-                if (n.LengthSquared() < Toolbox.Epsilon)
-                    Vector3.Cross(ref v1, ref Toolbox.RightVector, out n);
+                //This isn't a bad thing- it means the direction is exactly aligned with the extreme point offset.
+                //In other words, if the raycast is followed out to the surface, it will arrive at the extreme point!
+                //If the origin is further along this direction than the extreme point, then there is no intersection.
+                //If the origin is within this extreme point, then there is an intersection.
+                float dot;
+                Vector3.Dot(ref v1, ref originRay, out dot);
+                if (dot < 0)
+                {
+                    //Origin is outside.
+                    position = new Vector3();
+                    return false;
+                }
+                //Origin is inside.
+                //Compute barycentric coordinates along simplex (segment).
+                float dotv0;
+                //Dot > 0, so dotv0 starts out negative.
+                Vector3.Dot(ref v0, ref originRay, out dotv0);
+                float barycentricCoordinate = -dotv0 / (dot - dotv0);
+                //Vector3.Subtract(ref v1A, ref v0A, out offset); //'v0a' is just the zero vector, so there's no need to calculate the offset.
+                Vector3.Multiply(ref v1A, barycentricCoordinate, out position);
+                return true;
             }
             MinkowskiToolbox.GetLocalMinkowskiExtremePoint(shapeA, shapeB, ref n, ref localTransformB, out v2A, out v2B, out v2);
 
@@ -216,6 +234,8 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                     //Compute the barycentric coordinates of the origin.
                     //This is done by computing the scaled volume (parallelepiped) of the tetrahedra 
                     //formed by each triangle of the v0v1v2v3 tetrahedron and the origin.
+
+                    //TODO: consider a different approach using T parameter or something.
                     Vector3.Subtract(ref v1, ref v0, out temp1);
                     Vector3.Subtract(ref v2, ref v0, out temp2);
                     Vector3.Subtract(ref v3, ref v0, out temp3);
@@ -346,10 +366,25 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             Vector3.Cross(ref direction, ref v1, out n);
             if (n.LengthSquared() < Toolbox.Epsilon)
             {
-                //direction and v1 could be parallel.
-                Vector3.Cross(ref v1, ref Toolbox.UpVector, out n);
-                if (n.LengthSquared() < Toolbox.Epsilon)
-                    Vector3.Cross(ref v1, ref Toolbox.RightVector, out n);
+                //v1 and v0 could be parallel.
+                //This isn't a bad thing- it means the direction is exactly aligned with the extreme point offset.
+                //In other words, if the raycast is followed out to the surface, it will arrive at the extreme point!
+
+                float rayLengthSquared = direction.LengthSquared();
+                if (rayLengthSquared > Toolbox.Epsilon * .01f)
+                    Vector3.Divide(ref direction, (float)Math.Sqrt(rayLengthSquared), out normal);
+                else
+                    normal = new Vector3();
+
+                float rate;
+                Vector3.Dot(ref  normal, ref direction, out rate);
+                float distance;
+                Vector3.Dot(ref  normal, ref v1, out distance);
+                if (rate > 0)
+                    t = distance / rate;
+                else
+                    t = 0;
+                return;
             }
             MinkowskiToolbox.GetLocalMinkowskiExtremePoint(shapeA, shapeB, ref n, ref localTransformB, out v2);
 
@@ -716,8 +751,12 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             //Perform the usual local raycast, but use the swept minkowski difference.
             //Once the surface is found, the final t parameter of the ray is equal to the sweep distance minus the local raycast computed t parameter.
 
+
+
             RigidTransform localTransformB;
             MinkowskiToolbox.GetLocalTransform(ref transformA, ref transformB, out localTransformB);
+
+
             //First: Compute the sweep amount along the sweep direction.
             //This sweep amount needs to expand the minkowski difference to fully intersect the plane defined by the sweep direction and origin.
             float sweepLength;
@@ -774,12 +813,36 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             //Find another extreme point in a direction perpendicular to the previous.
             Vector3 v2;
             Vector3.Cross(ref localDirection, ref v1, out n);
-            if (n.LengthSquared() < Toolbox.Epsilon)
+            if (n.LengthSquared() < Toolbox.Epsilon * .01f)
             {
-                //direction and v1 could be parallel.
-                Vector3.Cross(ref v1, ref Toolbox.UpVector, out n);
-                if (n.LengthSquared() < Toolbox.Epsilon)
-                    Vector3.Cross(ref v1, ref Toolbox.RightVector, out n);
+                //v1 and v0 could be parallel.
+                //This isn't a bad thing- it means the direction is exactly aligned with the extreme point offset.
+                //In other words, if the raycast is followed out to the surface, it will arrive at the extreme point!
+
+                float rayLengthSquared = localDirection.LengthSquared();
+                if (rayLengthSquared > Toolbox.Epsilon * .01f)
+                    Vector3.Divide(ref localDirection, (float)Math.Sqrt(rayLengthSquared), out hit.Normal);
+                else
+                    hit.Normal = new Vector3();
+
+                float rate;
+                Vector3.Dot(ref  hit.Normal, ref localDirection, out rate);
+                float distance;
+                Vector3.Dot(ref  hit.Normal, ref v1, out distance);
+                if (rate > 0)
+                    hit.T = sweepLength - distance / rate;
+                else
+                    hit.T = sweepLength;
+
+                if (hit.T < 0)
+                    hit.T = 0;
+
+                Vector3.Transform(ref hit.Normal, ref transformA.Orientation, out hit.Normal);
+                Vector3.Multiply(ref localDirection, hit.T, out hit.Location); //Note negation.  The local direction has been negative the entire time!
+                Vector3.Add(ref hit.Location, ref transformA.Position, out hit.Location);
+                return hit.T <= 1;
+
+
             }
             GetSweptExtremePoint(shapeA, shapeB, ref localTransformB, ref sweep, ref n, out v2);
 
@@ -979,12 +1042,22 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             //Find another extreme point in a direction perpendicular to the previous.
             Vector3 v2;
             Vector3.Cross(ref v1, ref v0, out n);
-            if (n.LengthSquared() < Toolbox.Epsilon)
+            if (n.LengthSquared() < Toolbox.Epsilon * .01f)
             {
                 //v1 and v0 could be parallel.
-                Vector3.Cross(ref v1, ref Toolbox.UpVector, out n);
-                if (n.LengthSquared() < Toolbox.Epsilon)
-                    Vector3.Cross(ref v1, ref Toolbox.RightVector, out n);
+                //This isn't a bad thing- it means the direction is exactly aligned with the extreme point offset.
+                //In other words, if the raycast is followed out to the surface, it will arrive at the extreme point!
+                //If the origin is further along this direction than the extreme point, then there is no intersection.
+                //If the origin is within this extreme point, then there is an intersection.
+                float dot;
+                Vector3.Dot(ref v1, ref localTransformB.Position, out dot);
+                if (dot < 0)
+                {
+                    //Origin is outside.
+                    return false;
+                }
+                //Origin is inside.
+                return true;
             }
             GetSweptExtremePoint(shapeA, shapeB, ref localTransformB, ref sweep, ref n, out v2);
 
@@ -993,6 +1066,8 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             Vector3.Subtract(ref v1, ref v0, out temp1);
             Vector3.Subtract(ref v2, ref v0, out temp2);
             Vector3.Cross(ref temp1, ref temp2, out n);
+
+
 
 
             Vector3 v3;

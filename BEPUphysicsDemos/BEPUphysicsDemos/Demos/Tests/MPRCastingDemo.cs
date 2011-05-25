@@ -25,6 +25,7 @@ using BEPUphysics.CollisionTests;
 using BEPUphysics;
 using BEPUphysics.EntityStateManagement;
 using BEPUphysics.ResourceManagement;
+using BEPUphysics.NarrowPhaseSystems;
 
 namespace BEPUphysicsDemos.Demos
 {
@@ -41,9 +42,10 @@ namespace BEPUphysicsDemos.Demos
         public MPRCastingDemo(DemosGame game)
             : base(game)
         {
-            a = new Box(new Vector3(0, 10, 0), 1, 1, 1);
+            a = new Box(new Vector3(0, 10, 0), 100, 1, 100);
             b = new Box(new Vector3(0, 0, 0), 1, 1, 1);
-
+            CollisionRules.AddRule(a, b, CollisionRule.NoSolver);
+            NarrowPhaseHelper.CollisionManagers.Remove(new TypePair(typeof(ConvexCollidable<BoxShape>), typeof(ConvexCollidable<BoxShape>)));
             Space.Add(a);
             Space.Add(b);
 
@@ -80,7 +82,7 @@ namespace BEPUphysicsDemos.Demos
             if (Game.KeyboardInput.IsKeyDown(Keys.P))
                 Debug.WriteLine("Breka.");
             if (hit = MPRTesting.Sweep(a.CollisionInformation.Shape, b.CollisionInformation.Shape, ref sweepA, ref sweepB, ref aTransform, ref bTransform, out hitData))
-            //if (hit = GJKToolbox.ConvexCast(a.CollisionInformation.Shape, b.CollisionInformation.Shape, ref sweepA, ref sweepB, ref aTransform, ref bTransform, out hitData))
+                //if (hit = GJKToolbox.ConvexCast(a.CollisionInformation.Shape, b.CollisionInformation.Shape, ref sweepA, ref sweepB, ref aTransform, ref bTransform, out hitData))
             {
                 a.Position = aTransform.Position + sweepA * hitData.T;
                 b.Position = bTransform.Position + sweepB * hitData.T;
