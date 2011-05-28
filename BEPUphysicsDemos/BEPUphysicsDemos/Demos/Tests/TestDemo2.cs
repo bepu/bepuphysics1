@@ -90,9 +90,9 @@ namespace BEPUphysicsDemos.Demos
             groundWidth = 10;
             groundHeight = .1f;
             groundLength = 10;
-            a = new Box(new Vector3(0, -5, 0), groundWidth, groundHeight, groundLength, 1);
+            //a = new Box(new Vector3(0, -5, 0), groundWidth, groundHeight, groundLength, 1);
             //a = new TransformableEntity(new Vector3(0,0,0), new TriangleShape(new Vector3(-5, -5, -5), new Vector3(5, -5, -5), new Vector3(-5, -5, 5)), Matrix3X3.Identity);         
-            //a = new Triangle(new Vector3(0, -5, 0), new Vector3(5, -5, 0), new Vector3(5, -5, 5), 1);
+            a = new Triangle(new Vector3(0, -5, 0), new Vector3(5, -5, 0), new Vector3(5, -5, 5), 1);
             Space.Add(a);
             
             Space.ForceUpdater.Gravity = new Vector3();

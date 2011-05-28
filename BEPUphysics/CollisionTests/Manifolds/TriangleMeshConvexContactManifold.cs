@@ -23,7 +23,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
         RawValueList<ContactData> candidatesToAdd;
         RawValueList<ContactData> reducedCandidates = new RawValueList<ContactData>();
         protected TriangleShape localTriangleShape = new TriangleShape();
-        
+
         protected abstract TrianglePairTester GetTester();
 
         protected abstract void GiveBackTester(TrianglePairTester tester);
@@ -45,7 +45,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                 return convex;
             }
         }
-        
+
         ///<summary>
         /// Constructs a new contact manifold.
         ///</summary>
@@ -121,7 +121,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     for (int j = 0; j < contactList.count; j++)
                     {
                         contactList.Get(j, out contact);
-                        
+
                         if (UseImprovedBoundaryHandling)
                         {
                             if (AnalyzeCandidate(ref indices, pairTester, ref contact))
@@ -250,7 +250,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     Add(ref candidatesToAdd.Elements[i]);
                 }
             }
-            
+
 
 
 
@@ -301,7 +301,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     break;
             }
 
-            
+
         }
 
         bool AnalyzeCandidate(ref TriangleIndices indices, TrianglePairTester pairTester, ref ContactData contact)
@@ -361,7 +361,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     blockedEdgeRegions.Add(new Edge(indices.B, indices.C));
                     blockedEdgeRegions.Add(new Edge(indices.A, indices.C));
                     blockedVertexRegions.Add(indices.A);
-                    blockedVertexRegions.Add(indices.C);
+                    blockedVertexRegions.Add(indices.B);
                     break;
                 case VoronoiRegion.AB:
                     //Add the contact.
@@ -514,7 +514,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
 
         protected virtual void ProcessCandidates(RawValueList<ContactData> candidates)
         {
-            
+
         }
 
 

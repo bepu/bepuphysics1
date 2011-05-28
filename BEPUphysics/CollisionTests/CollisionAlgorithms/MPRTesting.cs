@@ -759,8 +759,19 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
             //First: Compute the sweep amount along the sweep direction.
             //This sweep amount needs to expand the minkowski difference to fully intersect the plane defined by the sweep direction and origin.
+
+            float rayLengthSquared = localDirection.LengthSquared();
             float sweepLength;
-            Vector3.Dot(ref localTransformB.Position, ref localDirection, out sweepLength);
+            if (rayLengthSquared > Toolbox.Epsilon * .01f)
+            {
+                Vector3.Dot(ref localTransformB.Position, ref localDirection, out sweepLength);
+                sweepLength /= rayLengthSquared;
+            }
+            else
+            {
+                rayLengthSquared = 0;
+                sweepLength = 0;
+            }
             //If the sweep direction is found to be negative, the ray can be thought of as pointing away from the shape.
             //Do not sweep backward.
             bool negativeLength;
@@ -772,7 +783,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             Vector3 sweep;
             Vector3.Multiply(ref localDirection, sweepLength, out sweep);
             //Check to see if the origin is contained within the swept shape.
-            if (!AreSweptShapesIntersecting(shapeA, shapeB, ref sweep, ref localTransformB))
+            if (!AreSweptShapesIntersecting(shapeA, shapeB, ref sweep, ref localTransformB, out hit.Location))
             {
                 //The origin is not contained within the sweep volume.  The raycast definitely misses.
                 hit.T = float.MaxValue;
@@ -787,7 +798,9 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 hit.T = 0;
                 Vector3.Normalize(ref localDirection, out hit.Normal);
                 Vector3.Transform(ref hit.Normal, ref transformA.Orientation, out hit.Normal);
-                hit.Location = transformA.Position;
+                //hit.Location = hit.T * localDirection;
+                Vector3.Transform(ref hit.Location, ref transformA.Orientation, out hit.Location);
+                Vector3.Add(ref hit.Location, ref transformA.Position, out hit.Location);
                 return true;
             }
             #endregion
@@ -806,7 +819,9 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 hit.T = 0;
                 Vector3.Normalize(ref n, out hit.Normal);
                 Vector3.Transform(ref hit.Normal, ref transformA.Orientation, out hit.Normal);
-                hit.Location = transformA.Position;
+                //hit.Location = hit.T * localDirection;
+                Vector3.Transform(ref hit.Location, ref transformA.Orientation, out hit.Location);
+                Vector3.Add(ref hit.Location, ref transformA.Position, out hit.Location);
                 return true;
             }
 
@@ -819,7 +834,6 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 //This isn't a bad thing- it means the direction is exactly aligned with the extreme point offset.
                 //In other words, if the raycast is followed out to the surface, it will arrive at the extreme point!
 
-                float rayLengthSquared = localDirection.LengthSquared();
                 if (rayLengthSquared > Toolbox.Epsilon * .01f)
                     Vector3.Divide(ref localDirection, (float)Math.Sqrt(rayLengthSquared), out hit.Normal);
                 else
@@ -838,7 +852,8 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                     hit.T = 0;
 
                 Vector3.Transform(ref hit.Normal, ref transformA.Orientation, out hit.Normal);
-                Vector3.Multiply(ref localDirection, hit.T, out hit.Location); //Note negation.  The local direction has been negative the entire time!
+                //hit.Location = hit.T * localDirection;
+                Vector3.Transform(ref hit.Location, ref transformA.Orientation, out hit.Location);
                 Vector3.Add(ref hit.Location, ref transformA.Position, out hit.Location);
                 return hit.T <= 1;
 
@@ -964,7 +979,8 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
 
                     Vector3.Transform(ref hit.Normal, ref transformA.Orientation, out hit.Normal);
-                    Vector3.Multiply(ref localDirection, hit.T, out hit.Location); //Note negation.  The local direction has been negative the entire time!
+                    //hit.Location = hit.T * localDirection;
+                    Vector3.Transform(ref hit.Location, ref transformA.Orientation, out hit.Location);
                     Vector3.Add(ref hit.Location, ref transformA.Position, out hit.Location);
                     return hit.T <= 1;
                 }
@@ -1008,14 +1024,6 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
         }
 
-        static void GetSweptExtremePoint(ConvexShape shapeA, ConvexShape shapeB, ref RigidTransform localTransformB, ref Vector3 sweep, ref Vector3 extremePointDirection, out Vector3 extremePoint)
-        {
-            MinkowskiToolbox.GetLocalMinkowskiExtremePoint(shapeA, shapeB, ref extremePointDirection, ref localTransformB, out extremePoint);
-            float dot;
-            Vector3.Dot(ref extremePointDirection, ref sweep, out dot);
-            if (dot > 0)
-                Vector3.Add(ref extremePoint, ref sweep, out extremePoint);
-        }
 
         public static bool AreSweptShapesIntersecting(ConvexShape shapeA, ConvexShape shapeB, ref Vector3 sweep, ref RigidTransform localTransformB)
         {
@@ -1178,6 +1186,261 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 //if (!VerifySimplex(ref v0, ref v1, ref v2, ref v3, ref localTransformB.Position))
                 //    Debug.WriteLine("Break.");
 
+            }
+        }
+
+        public static bool AreSweptShapesIntersecting(ConvexShape shapeA, ConvexShape shapeB, ref Vector3 sweep, ref RigidTransform localTransformB, out Vector3 position)
+        {
+            //It's possible that the two objects' centers are overlapping, or very very close to it.  In this case, 
+            //they are obviously colliding and we can immediately exit.
+            if (localTransformB.Position.LengthSquared() < Toolbox.Epsilon)
+            {
+                position = new Vector3();
+                return true;
+            }
+
+            Vector3 v0;
+            Vector3.Negate(ref localTransformB.Position, out v0); //Since we're in A's local space, A-B is just -B.
+
+
+
+            //Now that the origin ray is known, create a portal through which the ray passes.
+            //To do this, first guess a portal.
+            //This implementation is similar to that of the original XenoCollide.
+            //'n' will be the direction used to find supports throughout the algorithm.
+            Vector3 n = localTransformB.Position;
+            Vector3 v1;
+            Vector3 v1A; //extreme point contributions from each shape.  Used later to compute contact position; could be used to cache simplex too.
+            //MinkowskiToolbox.GetLocalMinkowskiExtremePoint(shapeA, shapeB, ref n, ref localTransformB, out v1A, out v1B, out v1);
+            GetSweptExtremePoint(shapeA, shapeB, ref localTransformB, ref sweep, ref n, out v1A, out v1);
+
+            //Find another extreme point in a direction perpendicular to the previous.
+            Vector3 v2;
+            Vector3 v2A;
+            Vector3.Cross(ref v1, ref v0, out n);
+            if (n.LengthSquared() < Toolbox.Epsilon)
+            {
+                //v1 and v0 could be parallel.
+                //This isn't a bad thing- it means the direction is exactly aligned with the extreme point offset.
+                //In other words, if the raycast is followed out to the surface, it will arrive at the extreme point!
+                //If the origin is further along this direction than the extreme point, then there is no intersection.
+                //If the origin is within this extreme point, then there is an intersection.
+                float dot;
+                Vector3.Dot(ref v1, ref localTransformB.Position, out dot);
+                if (dot < 0)
+                {
+                    //Origin is outside.
+                    position = new Vector3();
+                    return false;
+                }
+                //Origin is inside.
+                //Compute barycentric coordinates along simplex (segment).
+                float dotv0;
+                //Dot > 0, so dotv0 starts out negative.
+                Vector3.Dot(ref v0, ref localTransformB.Position, out dotv0);
+                float barycentricCoordinate = -dotv0 / (dot - dotv0);
+                //Vector3.Subtract(ref v1A, ref v0A, out offset); //'v0a' is just the zero vector, so there's no need to calculate the offset.
+                Vector3.Multiply(ref v1A, barycentricCoordinate, out position);
+                return true;
+            }
+            //MinkowskiToolbox.GetLocalMinkowskiExtremePoint(shapeA, shapeB, ref n, ref localTransformB, out v2A, out v2B, out v2);
+            GetSweptExtremePoint(shapeA, shapeB, ref localTransformB, ref sweep, ref n, out v2A, out v2);
+
+            Vector3 temp1, temp2;
+            //Set n for the first iteration.
+            Vector3.Subtract(ref v1, ref v0, out temp1);
+            Vector3.Subtract(ref v2, ref v0, out temp2);
+            Vector3.Cross(ref temp1, ref temp2, out n);
+
+
+            Vector3 v3A, v3;
+            int count = 0;
+            while (true)
+            {
+                //Find a final extreme point using the normal of the plane defined by v0, v1, v2.
+                //MinkowskiToolbox.GetLocalMinkowskiExtremePoint(shapeA, shapeB, ref n, ref localTransformB, out v3A, out v3B, out v3);
+                GetSweptExtremePoint(shapeA, shapeB, ref localTransformB, ref sweep, ref n, out v3A, out v3);
+
+                if (count > MPRToolbox.OuterIterationLimit)
+                    break;
+                count++;
+                //By now, the simplex is a tetrahedron, but it is not known whether or not the origin ray found earlier actually passes through the portal
+                //defined by v1, v2, v3.
+
+                // If the origin is outside the plane defined by v1,v0,v3, then the portal is invalid.
+                Vector3.Cross(ref v1, ref v3, out temp1);
+                float dot;
+                Vector3.Dot(ref temp1, ref v0, out dot);
+                if (dot < 0)
+                {
+                    //Replace the point that was on the inside of the plane (v2) with the new extreme point.
+                    v2 = v3;
+                    v2A = v3A;
+                    // Calculate the normal of the plane that will be used to find a new extreme point.
+                    Vector3.Subtract(ref v1, ref v0, out temp1);
+                    Vector3.Subtract(ref v3, ref v0, out temp2);
+                    Vector3.Cross(ref temp1, ref temp2, out n);
+                    continue;
+                }
+
+                // If the origin is outside the plane defined by v3,v0,v2, then the portal is invalid.
+                Vector3.Cross(ref v3, ref v2, out temp1);
+                Vector3.Dot(ref temp1, ref v0, out dot);
+                if (dot < 0)
+                {
+                    //Replace the point that was on the inside of the plane (v1) with the new extreme point.
+                    v1 = v3;
+                    v1A = v3A;
+                    // Calculate the normal of the plane that will be used to find a new extreme point.
+                    Vector3.Subtract(ref v2, ref v0, out temp1);
+                    Vector3.Subtract(ref v3, ref v0, out temp2);
+                    Vector3.Cross(ref temp1, ref temp2, out n);
+                    continue;
+                }
+                break;
+            }
+
+            //if (!VerifySimplex(ref v0, ref v1, ref v2, ref v3, ref localTransformB.Position))
+            //    Debug.WriteLine("Break.");
+
+
+            // Refine the portal.
+            while (true)
+            {
+                //Test the origin against the plane defined by v1, v2, v3.  If it's inside, we're done.
+                //Compute the outward facing normal.
+                Vector3.Subtract(ref v3, ref v2, out temp1);
+                Vector3.Subtract(ref v1, ref v2, out temp2);
+                Vector3.Cross(ref temp1, ref temp2, out n);
+                float dot;
+                Vector3.Dot(ref n, ref v1, out dot);
+                if (dot > 0)
+                {
+                    Vector3 temp3;
+                    //Compute the barycentric coordinates of the origin.
+                    //This is done by computing the scaled volume (parallelepiped) of the tetrahedra 
+                    //formed by each triangle of the v0v1v2v3 tetrahedron and the origin.
+
+                    //TODO: consider a different approach using T parameter or something.
+                    Vector3.Subtract(ref v1, ref v0, out temp1);
+                    Vector3.Subtract(ref v2, ref v0, out temp2);
+                    Vector3.Subtract(ref v3, ref v0, out temp3);
+
+                    Vector3 cross;
+                    Vector3.Cross(ref temp1, ref temp2, out cross);
+                    float v0v1v2v3volume;
+                    Vector3.Dot(ref cross, ref temp3, out v0v1v2v3volume);
+
+                    Vector3.Cross(ref v1, ref v2, out cross);
+                    float ov1v2v3volume;
+                    Vector3.Dot(ref cross, ref v3, out ov1v2v3volume);
+
+                    Vector3.Cross(ref localTransformB.Position, ref temp2, out cross);
+                    float v0ov2v3volume;
+                    Vector3.Dot(ref cross, ref temp3, out v0ov2v3volume);
+
+                    Vector3.Cross(ref temp1, ref localTransformB.Position, out cross);
+                    float v0v1ov3volume;
+                    Vector3.Dot(ref cross, ref temp3, out v0v1ov3volume);
+
+
+                    float inverseTotalVolume = 1 / v0v1v2v3volume;
+                    float v0Weight = ov1v2v3volume * inverseTotalVolume;
+                    float v1Weight = v0ov2v3volume * inverseTotalVolume;
+                    float v2Weight = v0v1ov3volume * inverseTotalVolume;
+                    float v3Weight = 1 - v0Weight - v1Weight - v2Weight;
+                    position = v1Weight * v1A + v2Weight * v2A + v3Weight * v3A;
+                    //DEBUGlastPosition = position;
+                    return true;
+                }
+
+                //We haven't yet found the origin.  Find the support point in the portal's outward facing direction.
+                Vector3 v4, v4A;
+                //MinkowskiToolbox.GetLocalMinkowskiExtremePoint(shapeA, shapeB, ref n, ref localTransformB, out v4A, out v4B, out v4); 
+                GetSweptExtremePoint(shapeA, shapeB, ref localTransformB, ref sweep, ref n, out v4A, out v4);
+
+                //If the origin is further along the direction than the extreme point, it's not inside the shape.
+                float dot2;
+                Vector3.Dot(ref v4, ref n, out dot2);
+                if (dot2 < 0)
+                {
+                    //The origin is outside!
+                    position = new Vector3();
+                    return false;
+                }
+
+                //If the plane which generated the normal is very close to the extreme point, then we're at the surface
+                //and we have not found the origin; it's either just BARELY inside, or it is outside.  Assume it's outside.
+                if (dot2 - dot < surfaceEpsilon || count > MPRToolbox.InnerIterationLimit) // TODO: Could use a dynamic epsilon for possibly better behavior.
+                {
+                    position = new Vector3();
+                    //DEBUGlastPosition = position;
+                    return false;
+                }
+                count++;
+
+                //Still haven't exited, so refine the portal.
+                //Test origin against the three planes that separate the new portal candidates: (v1,v4,v0) (v2,v4,v0) (v3,v4,v0)
+                Vector3.Cross(ref v4, ref v0, out temp1);
+                Vector3.Dot(ref v1, ref temp1, out dot);
+                if (dot >= 0)
+                {
+                    Vector3.Dot(ref v2, ref temp1, out dot);
+                    if (dot >= 0)
+                    {
+                        v1 = v4; // Inside v1 & inside v2 ==> eliminate v1
+                        v1A = v4A;
+                    }
+                    else
+                    {
+                        v3 = v4; // Inside v1 & outside v2 ==> eliminate v3
+                        v3A = v4A;
+                    }
+                }
+                else
+                {
+                    Vector3.Dot(ref v3, ref temp1, out dot);
+                    if (dot >= 0)
+                    {
+                        v2 = v4; // Outside v1 & inside v3 ==> eliminate v2
+                        v2A = v4A;
+                    }
+                    else
+                    {
+                        v1 = v4; // Outside v1 & outside v3 ==> eliminate v1
+                        v1A = v4A;
+                    }
+                }
+
+                //if (!VerifySimplex(ref v0, ref v1, ref v2, ref v3, ref localTransformB.Position))
+                //    Debug.WriteLine("Break.");
+
+            }
+
+
+        }
+
+
+        static void GetSweptExtremePoint(ConvexShape shapeA, ConvexShape shapeB, ref RigidTransform localTransformB, ref Vector3 sweep, ref Vector3 extremePointDirection, out Vector3 extremePoint)
+        {
+            MinkowskiToolbox.GetLocalMinkowskiExtremePoint(shapeA, shapeB, ref extremePointDirection, ref localTransformB, out extremePoint);
+            float dot;
+            Vector3.Dot(ref extremePointDirection, ref sweep, out dot);
+            if (dot > 0)
+                Vector3.Add(ref extremePoint, ref sweep, out extremePoint);
+        }
+
+
+        static void GetSweptExtremePoint(ConvexShape shapeA, ConvexShape shapeB, ref RigidTransform localTransformB, ref Vector3 sweep, ref Vector3 extremePointDirection, out Vector3 extremePointA, out Vector3 extremePoint)
+        {
+            Vector3 b;
+            MinkowskiToolbox.GetLocalMinkowskiExtremePoint(shapeA, shapeB, ref extremePointDirection, ref localTransformB, out extremePointA, out b, out extremePoint);
+            float dot;
+            Vector3.Dot(ref extremePointDirection, ref sweep, out dot);
+            if (dot > 0)
+            {
+                Vector3.Add(ref extremePoint, ref sweep, out extremePoint);
+                Vector3.Add(ref extremePointA, ref sweep, out extremePointA);
             }
         }
 

@@ -433,34 +433,37 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
                 //TODO: This tests all three edge axes with a full MPR raycast.  That's not really necessary; the correct edge normal should be discoverable, resulting in a single MPR raycast.
 
-                Vector3 p;
-                //Direction is in the AB edge zone.
-                //Compute the edge normal using AB x (AO x AB).
-                Vector3 AB, AO, ABnormal;
-                Vector3.Subtract(ref triangle.vB, ref triangle.vA, out AB);
+                //Find the edge directions that will be tested with MPR.
+                Vector3 AO, BO, CO;
+                Vector3 AB, BC, CA;
                 Vector3.Subtract(ref center, ref triangle.vA, out AO);
-                Vector3.Cross(ref AO, ref AB, out p);
-                Vector3.Cross(ref AB, ref p, out ABnormal);
-
-                //Direction is in the BC edge zone.
-                //Compute the edge normal using BC x (BO x BC).
-                Vector3 BC, BO, BCnormal;
-                Vector3.Subtract(ref triangle.vC, ref triangle.vB, out BC);
                 Vector3.Subtract(ref center, ref triangle.vB, out BO);
-                Vector3.Cross(ref BO, ref BC, out p);
-                Vector3.Cross(ref BC, ref p, out BCnormal);
-
-                //Direction is in the CA edge zone.
-                //Compute the edge normal using CA x (CO x CA).
-                Vector3 CA, CO, CAnormal;
-                Vector3.Subtract(ref triangle.vA, ref triangle.vC, out CA);
                 Vector3.Subtract(ref center, ref triangle.vC, out CO);
-                Vector3.Cross(ref CO, ref CA, out p);
-                Vector3.Cross(ref CA, ref p, out CAnormal);
+                Vector3.Subtract(ref triangle.vB, ref triangle.vA, out AB);
+                Vector3.Subtract(ref triangle.vC, ref triangle.vB, out BC);
+                Vector3.Subtract(ref triangle.vA, ref triangle.vC, out CA);
+
+                Vector3 ABnormal, BCnormal, CAnormal;
+                //Project the center onto the edge to find the direction from the center to the edge AB.
+                Vector3.Dot(ref AO, ref AB, out dot);
+                Vector3.Multiply(ref AB, dot / AB.LengthSquared(), out ABnormal);
+                Vector3.Subtract(ref AO, ref ABnormal, out ABnormal);
+
+                //Project the center onto the edge to find the direction from the center to the edge BC.
+                Vector3.Dot(ref BO, ref BC, out dot);
+                Vector3.Multiply(ref BC, dot / BC.LengthSquared(), out BCnormal);
+                Vector3.Subtract(ref BO, ref BCnormal, out BCnormal);
+
+                //Project the center onto the edge to find the direction from the center to the edge BC.
+                Vector3.Dot(ref CO, ref CA, out dot);
+                Vector3.Multiply(ref CA, dot / CA.LengthSquared(), out CAnormal);
+                Vector3.Subtract(ref CO, ref CAnormal, out CAnormal);
+
 
                 ABnormal.Normalize();
                 BCnormal.Normalize();
                 CAnormal.Normalize();
+
 
                 MPRTesting.LocalSurfaceCast(convex, triangle, ref Toolbox.RigidIdentity, ref ABnormal, out contact.PenetrationDepth, out contact.Normal);
                 //Check to see if the normal is facing in the proper direction, considering that this may not be a two-sided triangle.
@@ -472,6 +475,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                     Vector3 previousNormal = contact.Normal;
                     Vector3.Dot(ref contact.Normal, ref triangleNormal, out dot);
 
+                    Vector3 p;
                     Vector3.Multiply(ref contact.Normal, dot, out p);
                     Vector3.Subtract(ref contact.Normal, ref p, out contact.Normal);
                     float length = contact.Normal.LengthSquared();
@@ -501,6 +505,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                     Vector3 previousNormal = candidateNormal;
                     Vector3.Dot(ref candidateNormal, ref triangleNormal, out dot);
 
+                    Vector3 p;
                     Vector3.Multiply(ref candidateNormal, dot, out p);
                     Vector3.Subtract(ref candidateNormal, ref p, out candidateNormal);
                     float length = candidateNormal.LengthSquared();
@@ -533,6 +538,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                     Vector3 previousNormal = candidateNormal;
                     Vector3.Dot(ref candidateNormal, ref triangleNormal, out dot);
 
+                    Vector3 p;
                     Vector3.Multiply(ref candidateNormal, dot, out p);
                     Vector3.Subtract(ref candidateNormal, ref p, out candidateNormal);
                     float length = candidateNormal.LengthSquared();
@@ -678,10 +684,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
         private bool TryInnerSphereContact(out ContactData contact)
         {
             Vector3 closestPoint;
-            if (Toolbox.GetClosestPointOnTriangleToPoint(ref triangle.vA, ref triangle.vB, ref triangle.vC, ref Toolbox.ZeroVector, out closestPoint) == VoronoiRegion.ABC)
-            {
-                state = CollisionState.Plane;
-            }
+            Toolbox.GetClosestPointOnTriangleToPoint(ref triangle.vA, ref triangle.vB, ref triangle.vC, ref Toolbox.ZeroVector, out closestPoint);
             float length = closestPoint.LengthSquared();
             float minimumRadius = convex.minimumRadius * (MotionSettings.CoreShapeScaling + .01f);
             if (length < minimumRadius * minimumRadius)
@@ -850,163 +853,151 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
         public override VoronoiRegion GetRegion(ref ContactData contact)
         {
-            switch (state)
+            //Deep contact can produce non-triangle normals while still being within the triangle.
+            //To solve this problem, find the voronoi region to which the contact belongs using its normal.
+            //The voronoi region will be either the most extreme vertex, or the edge that includes
+            //the first and second most extreme vertices.
+            //If the normal dotted with an extreme edge direction is near 0, then it belongs to the edge.
+            //Otherwise, it belongs to the vertex.
+            //MPR tends to produce 'approximate' normals, though.
+            //Use a fairly forgiving epsilon.
+            float dotA, dotB, dotC;
+            Vector3.Dot(ref triangle.vA, ref contact.Normal, out dotA);
+            Vector3.Dot(ref triangle.vB, ref contact.Normal, out dotB);
+            Vector3.Dot(ref triangle.vC, ref contact.Normal, out dotC);
+
+            //Since normal points from convex to triangle always, reverse dot signs.
+            dotA = -dotA;
+            dotB = -dotB;
+            dotC = -dotC;
+
+
+            float faceEpsilon = .01f;
+            const float edgeEpsilon = .01f;
+
+            float edgeDot;
+            Vector3 edgeDirection;
+            if (dotA > dotB && dotA > dotC)
             {
-                case TriangleConvexPairTester.CollisionState.Deep:
-                case TriangleConvexPairTester.CollisionState.ExternalNear:
-                    //Deep contact can produce non-triangle normals while still being within the triangle.
-                    //To solve this problem, find the voronoi region to which the contact belongs using its normal.
-                    //The voronoi region will be either the most extreme vertex, or the edge that includes
-                    //the first and second most extreme vertices.
-                    //If the normal dotted with an extreme edge direction is near 0, then it belongs to the edge.
-                    //Otherwise, it belongs to the vertex.
-                    //MPR tends to produce 'approximate' normals, though.
-                    //Use a fairly forgiving epsilon.
-                    float dotA, dotB, dotC;
-                    Vector3.Dot(ref triangle.vA, ref contact.Normal, out dotA);
-                    Vector3.Dot(ref triangle.vB, ref contact.Normal, out dotB);
-                    Vector3.Dot(ref triangle.vC, ref contact.Normal, out dotC);
-
-                    //Since normal points from convex to triangle always, reverse dot signs.
-                    dotA = -dotA;
-                    dotB = -dotB;
-                    dotC = -dotC;
-
-
-                    float faceEpsilon = .01f;
-                    const float edgeEpsilon = .01f;
-
-                    float edgeDot;
-                    Vector3 edgeDirection;
-                    if (dotA > dotB && dotA > dotC)
+                //A is extreme.
+                if (dotB > dotC)
+                {
+                    //B is second most extreme.
+                    if (Math.Abs(dotA - dotC) < faceEpsilon)
                     {
-                        //A is extreme.
-                        if (dotB > dotC)
-                        {
-                            //B is second most extreme.
-                            if (Math.Abs(dotA - dotC) < faceEpsilon)
-                            {
-                                //The normal is basically a face normal.  This can happen at the edges occasionally.
-                                return VoronoiRegion.ABC;
-                            }
-                            else
-                            {
-                                Vector3.Subtract(ref triangle.vB, ref triangle.vA, out edgeDirection);
-                                Vector3.Dot(ref edgeDirection, ref contact.Normal, out edgeDot);
-                                if (edgeDot * edgeDot < edgeDirection.LengthSquared() * edgeEpsilon)
-                                    return VoronoiRegion.AB;
-                                else
-                                    return VoronoiRegion.A;
-                            }
-                        }
-                        else
-                        {
-                            //C is second most extreme.
-                            if (Math.Abs(dotA - dotB) < faceEpsilon)
-                            {
-                                //The normal is basically a face normal.  This can happen at the edges occasionally.
-                                return VoronoiRegion.ABC;
-                            }
-                            else
-                            {
-                                Vector3.Subtract(ref triangle.vC, ref triangle.vA, out edgeDirection);
-                                Vector3.Dot(ref edgeDirection, ref contact.Normal, out edgeDot);
-                                if (edgeDot * edgeDot < edgeDirection.LengthSquared() * edgeEpsilon)
-                                    return VoronoiRegion.AC;
-                                else
-                                    return VoronoiRegion.A;
-                            }
-                        }
-                    }
-                    else if (dotB > dotC)
-                    {
-                        //B is extreme.
-                        if (dotC > dotA)
-                        {
-                            //C is second most extreme.
-                            if (Math.Abs(dotB - dotA) < faceEpsilon)
-                            {
-                                //The normal is basically a face normal.  This can happen at the edges occasionally.
-                                return VoronoiRegion.ABC;
-                            }
-                            else
-                            {
-                                Vector3.Subtract(ref triangle.vC, ref triangle.vB, out edgeDirection);
-                                Vector3.Dot(ref edgeDirection, ref contact.Normal, out edgeDot);
-                                if (edgeDot * edgeDot < edgeDirection.LengthSquared() * edgeEpsilon)
-                                    return VoronoiRegion.BC;
-                                else
-                                    return VoronoiRegion.B;
-                            }
-                        }
-                        else
-                        {
-                            //A is second most extreme.
-                            if (Math.Abs(dotB - dotC) < faceEpsilon)
-                            {
-                                //The normal is basically a face normal.  This can happen at the edges occasionally.
-                                return VoronoiRegion.ABC;
-                            }
-                            else
-                            {
-                                Vector3.Subtract(ref triangle.vA, ref triangle.vB, out edgeDirection);
-                                Vector3.Dot(ref edgeDirection, ref contact.Normal, out edgeDot);
-                                if (edgeDot * edgeDot < edgeDirection.LengthSquared() * edgeEpsilon)
-                                    return VoronoiRegion.AB;
-                                else
-                                    return VoronoiRegion.B;
-                            }
-                        }
+                        //The normal is basically a face normal.  This can happen at the edges occasionally.
+                        return VoronoiRegion.ABC;
                     }
                     else
                     {
-                        //C is extreme.
-                        if (dotA > dotB)
-                        {
-                            //A is second most extreme.
-                            if (Math.Abs(dotC - dotB) < faceEpsilon)
-                            {
-                                //The normal is basically a face normal.  This can happen at the edges occasionally.
-                                return VoronoiRegion.ABC;
-                            }
-                            else
-                            {
-                                Vector3.Subtract(ref triangle.vA, ref triangle.vC, out edgeDirection);
-                                Vector3.Dot(ref edgeDirection, ref contact.Normal, out edgeDot);
-                                if (edgeDot * edgeDot < edgeDirection.LengthSquared() * edgeEpsilon)
-                                    return VoronoiRegion.AC;
-                                else
-                                    return VoronoiRegion.C;
-                            }
-                        }
+                        Vector3.Subtract(ref triangle.vB, ref triangle.vA, out edgeDirection);
+                        Vector3.Dot(ref edgeDirection, ref contact.Normal, out edgeDot);
+                        if (edgeDot * edgeDot < edgeDirection.LengthSquared() * edgeEpsilon)
+                            return VoronoiRegion.AB;
                         else
-                        {
-                            //B is second most extreme.
-                            if (Math.Abs(dotC - dotA) < faceEpsilon)
-                            {
-                                //The normal is basically a face normal.  This can happen at the edges occasionally.
-                                return VoronoiRegion.ABC;
-                            }
-                            else
-                            {
-                                Vector3.Subtract(ref triangle.vB, ref triangle.vC, out edgeDirection);
-                                Vector3.Dot(ref edgeDirection, ref contact.Normal, out edgeDot);
-                                if (edgeDot * edgeDot < edgeDirection.LengthSquared() * edgeEpsilon)
-                                    return VoronoiRegion.BC;
-                                else
-                                    return VoronoiRegion.C;
-                            }
-                        }
+                            return VoronoiRegion.A;
                     }
-                case TriangleConvexPairTester.CollisionState.Plane:
-                    //This can only happen if it's actually from the plane (and thus a face contact)
-                    //OR it was an escape attempt, which will only happen with a contact when 
-                    //the contact is found to be on the face.
-                    return VoronoiRegion.ABC;
-
-                default:
-                    return GetVoronoiRegion(ref contact.Position);
+                }
+                else
+                {
+                    //C is second most extreme.
+                    if (Math.Abs(dotA - dotB) < faceEpsilon)
+                    {
+                        //The normal is basically a face normal.  This can happen at the edges occasionally.
+                        return VoronoiRegion.ABC;
+                    }
+                    else
+                    {
+                        Vector3.Subtract(ref triangle.vC, ref triangle.vA, out edgeDirection);
+                        Vector3.Dot(ref edgeDirection, ref contact.Normal, out edgeDot);
+                        if (edgeDot * edgeDot < edgeDirection.LengthSquared() * edgeEpsilon)
+                            return VoronoiRegion.AC;
+                        else
+                            return VoronoiRegion.A;
+                    }
+                }
             }
+            else if (dotB > dotC)
+            {
+                //B is extreme.
+                if (dotC > dotA)
+                {
+                    //C is second most extreme.
+                    if (Math.Abs(dotB - dotA) < faceEpsilon)
+                    {
+                        //The normal is basically a face normal.  This can happen at the edges occasionally.
+                        return VoronoiRegion.ABC;
+                    }
+                    else
+                    {
+                        Vector3.Subtract(ref triangle.vC, ref triangle.vB, out edgeDirection);
+                        Vector3.Dot(ref edgeDirection, ref contact.Normal, out edgeDot);
+                        if (edgeDot * edgeDot < edgeDirection.LengthSquared() * edgeEpsilon)
+                            return VoronoiRegion.BC;
+                        else
+                            return VoronoiRegion.B;
+                    }
+                }
+                else
+                {
+                    //A is second most extreme.
+                    if (Math.Abs(dotB - dotC) < faceEpsilon)
+                    {
+                        //The normal is basically a face normal.  This can happen at the edges occasionally.
+                        return VoronoiRegion.ABC;
+                    }
+                    else
+                    {
+                        Vector3.Subtract(ref triangle.vA, ref triangle.vB, out edgeDirection);
+                        Vector3.Dot(ref edgeDirection, ref contact.Normal, out edgeDot);
+                        if (edgeDot * edgeDot < edgeDirection.LengthSquared() * edgeEpsilon)
+                            return VoronoiRegion.AB;
+                        else
+                            return VoronoiRegion.B;
+                    }
+                }
+            }
+            else
+            {
+                //C is extreme.
+                if (dotA > dotB)
+                {
+                    //A is second most extreme.
+                    if (Math.Abs(dotC - dotB) < faceEpsilon)
+                    {
+                        //The normal is basically a face normal.  This can happen at the edges occasionally.
+                        return VoronoiRegion.ABC;
+                    }
+                    else
+                    {
+                        Vector3.Subtract(ref triangle.vA, ref triangle.vC, out edgeDirection);
+                        Vector3.Dot(ref edgeDirection, ref contact.Normal, out edgeDot);
+                        if (edgeDot * edgeDot < edgeDirection.LengthSquared() * edgeEpsilon)
+                            return VoronoiRegion.AC;
+                        else
+                            return VoronoiRegion.C;
+                    }
+                }
+                else
+                {
+                    //B is second most extreme.
+                    if (Math.Abs(dotC - dotA) < faceEpsilon)
+                    {
+                        //The normal is basically a face normal.  This can happen at the edges occasionally.
+                        return VoronoiRegion.ABC;
+                    }
+                    else
+                    {
+                        Vector3.Subtract(ref triangle.vB, ref triangle.vC, out edgeDirection);
+                        Vector3.Dot(ref edgeDirection, ref contact.Normal, out edgeDot);
+                        if (edgeDot * edgeDot < edgeDirection.LengthSquared() * edgeEpsilon)
+                            return VoronoiRegion.BC;
+                        else
+                            return VoronoiRegion.C;
+                    }
+                }
+            }
+
         }
 
         public override bool ShouldCorrectContactNormal

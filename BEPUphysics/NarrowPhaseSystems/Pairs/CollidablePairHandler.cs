@@ -163,11 +163,9 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         public virtual void Initialize(BroadPhaseEntry entryA, BroadPhaseEntry entryB)
         {
             //Child initialization is responsible for setting up the entries.
+            //Child initialization is responsible for setting up the material.
             //Child initialization is responsible for setting up the manifold.
             //Child initialization is responsible for setting up the constraint.
-
-
-            UpdateMaterialProperties();
 
             if (!suppressEvents)
             {

@@ -42,16 +42,16 @@ namespace BEPUphysicsDemos.Demos
         public MPRCastingDemo(DemosGame game)
             : base(game)
         {
-            a = new Box(new Vector3(0, 10, 0), 100, 1, 100);
+            a = new Box(new Vector3(0, 10, 0), 1, 1, 1);
             b = new Box(new Vector3(0, 0, 0), 1, 1, 1);
             CollisionRules.AddRule(a, b, CollisionRule.NoSolver);
             NarrowPhaseHelper.CollisionManagers.Remove(new TypePair(typeof(ConvexCollidable<BoxShape>), typeof(ConvexCollidable<BoxShape>)));
             Space.Add(a);
             Space.Add(b);
-
-            aTransform = new RigidTransform(new Vector3(0, 0, 0), Quaternion.Identity);
-
-            bTransform = new RigidTransform(new Vector3(0, 10, 0), Quaternion.Identity);
+            a.Orientation = Quaternion.Identity;// Quaternion.CreateFromAxisAngle(new Vector3(1, 0, 0), MathHelper.PiOver4);
+            b.Orientation = Quaternion.Identity;
+            aTransform = new RigidTransform(new Vector3(0, 0, 0), a.Orientation);
+            bTransform = new RigidTransform(new Vector3(0, 10, 0), b.Orientation);
 
             game.Camera.Position = new Vector3(0, 5, 17);
         }
@@ -82,7 +82,7 @@ namespace BEPUphysicsDemos.Demos
             if (Game.KeyboardInput.IsKeyDown(Keys.P))
                 Debug.WriteLine("Breka.");
             if (hit = MPRTesting.Sweep(a.CollisionInformation.Shape, b.CollisionInformation.Shape, ref sweepA, ref sweepB, ref aTransform, ref bTransform, out hitData))
-                //if (hit = GJKToolbox.ConvexCast(a.CollisionInformation.Shape, b.CollisionInformation.Shape, ref sweepA, ref sweepB, ref aTransform, ref bTransform, out hitData))
+            //if (hit = GJKToolbox.ConvexCast(a.CollisionInformation.Shape, b.CollisionInformation.Shape, ref sweepA, ref sweepB, ref aTransform, ref bTransform, out hitData))
             {
                 a.Position = aTransform.Position + sweepA * hitData.T;
                 b.Position = bTransform.Position + sweepB * hitData.T;

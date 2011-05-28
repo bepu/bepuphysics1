@@ -74,6 +74,8 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
 
             base.Initialize(entryA, entryB);
 
+            UpdateMaterialProperties(convex.entity.material, instancedMesh.material);
+
         }
 
 

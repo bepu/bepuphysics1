@@ -19,7 +19,12 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
     public abstract class ConvexPairHandler : Type1PairHandler
     {
 
+        public override void Initialize(BroadPhaseEntry entryA, BroadPhaseEntry entryB)
+        {
+            UpdateMaterialProperties();
 
+            base.Initialize(entryA, entryB);
+        }
 
         ///<summary>
         /// Updates the time of impact for the pair.
