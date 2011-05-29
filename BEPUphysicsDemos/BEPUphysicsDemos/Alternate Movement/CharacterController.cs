@@ -9,6 +9,8 @@ using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.UpdateableSystems;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.CollisionTests.CollisionAlgorithms.GJK;
+using BEPUphysics.Collidables;
+using BEPUphysics.Collidables.MobileCollidables;
 
 namespace BEPUphysicsDemos
 {
@@ -207,11 +209,11 @@ namespace BEPUphysicsDemos
         /// <param name="dt">Simulation seconds since the last update.</param>
         void IEndOfTimeStepUpdateable.Update(float dt)
         {
-            Entity supportEntity;
+            Collidable supportCollidable;
             Vector3 supportLocation, supportNormal, supportLocationVelocity;
             float supportDistance;
 
-            if (FindSupport(out supportEntity, out supportLocation, out supportNormal, out supportDistance, out supportLocationVelocity))
+            if (FindSupport(out supportCollidable, out supportLocation, out supportNormal, out supportDistance, out supportLocationVelocity))
             {
                 IsSupported = true;
                 Support(supportLocationVelocity, supportNormal, supportDistance);
@@ -240,7 +242,7 @@ namespace BEPUphysicsDemos
         /// <param name="supportDistance">Distance from the maximum step height on the character down to where the latest support location was found.</param>
         /// <param name="supportLocationVelocity">Velocity of the support location on the support entity.</param>
         /// <returns>Whether or not a support was located.</returns>
-        private bool FindSupport(out Entity supportEntity, out Vector3 supportLocation, out Vector3 supportNormal, out float supportDistance, out Vector3 supportLocationVelocity)
+        private bool FindSupport(out Collidable supportCollidable, out Vector3 supportLocation, out Vector3 supportNormal, out float supportDistance, out Vector3 supportLocationVelocity)
         {
             //If there's no traction, it shouldn't try to 'step down' anything so there's no need to extend the cast.
             float maximumDistance;
@@ -248,8 +250,6 @@ namespace BEPUphysicsDemos
                 maximumDistance = maximumStepHeight * 2;
             else
                 maximumDistance = maximumStepHeight;
-            //If the object is flying around in the air, it looks a bit weird for it to lock onto a surface when it gets close.  Instead only glue speed while grounded.
-            float glueSpeedToUse = IsSupported ? glueSpeed : .01f;
             var sweep = new Vector3(0, -maximumDistance, 0);
             Vector3 startingLocation = Body.Position + feetSupportFinderOffset;
 
@@ -261,10 +261,10 @@ namespace BEPUphysicsDemos
             //  This allows the character keep standing on whatever it was that it was standing on before the "step" failed.
             Vector3 hitLocation = new Vector3(), stepHitLocation = new Vector3();
             Vector3 hitNormal = new Vector3(), stepHitNormal = new Vector3();
-            Entity hitEntity = null, stepHitEntity = null;
+            Collidable hitCollidable = null, stepHitCollidable = null;
             float distance = float.MaxValue, stepDistance = float.MaxValue;
 
-            foreach (Entity candidate in feetCollisionPairCollector.CollisionInformation.OverlappedEntities)
+            foreach (var candidate in feetCollisionPairCollector.CollisionInformation.OverlappedCollidables)
             {
 
                 //for (int i = 0; i < feetCollisionPairCollector.CollisionInformation.Pairs.Count; i++)
@@ -275,60 +275,60 @@ namespace BEPUphysicsDemos
                 //The comparisons are all kept on a "parent" as opposed to "collider" level so that interaction with compound shapes is simpler.
                 //Entity candidate = pair.ColliderA == feetCollisionPairCollector ? pair.ColliderB : pair.ColliderA;
                 //Ensure that the candidate is a valid supporting entity.
-                if (candidate.CollisionInformation.CollisionRules.Personal > CollisionRule.Normal)
+                if (candidate.CollisionRules.Personal > CollisionRule.Normal)
                     continue; //It is invalid!
 
                 //Fire a convex cast at the candidate and determine some details! 
-                ConvexShape targetShape = candidate.CollisionInformation.Shape as ConvexShape;
-                if (targetShape != null)
+
+                RigidTransform sweepTransform = new RigidTransform(startingLocation);
+                RayHit rayHit;
+                //if (GJKToolbox.ConvexCast(castingShape, targetShape, ref sweep,
+                //                          ref sweepTransform, ref targetTransform,
+                //                          out rayHit))
+                if (candidate.ConvexCast(castingShape, ref sweepTransform, ref sweep, out rayHit))
                 {
-                    RigidTransform sweepTransform = new RigidTransform(startingLocation);
-                    RigidTransform targetTransform = new RigidTransform(candidate.Position, candidate.Orientation);
-                    RayHit rayHit;
-                    if (GJKToolbox.ConvexCast(castingShape, targetShape, ref sweep,
-                                              ref sweepTransform, ref targetTransform,
-                                              out rayHit))
+                    //tempHitNormal *= -1;
+                    rayHit.T *= maximumDistance;
+                    if (rayHit.T < stepDistance)
                     {
-                        //tempHitNormal *= -1;
-                        rayHit.T *= maximumDistance;
-                        if (rayHit.T < stepDistance)
-                        {
-                            stepDistance = rayHit.T;
-                            stepHitLocation = rayHit.Location;
-                            stepHitNormal = rayHit.Normal;
-                            stepHitEntity = candidate;
-                        }
-                        if (rayHit.T < distance &&
-                            //If the hit is within a small margin range at the base of the character...
-                            rayHit.T >= maximumStepHeight - Body.CollisionInformation.Shape.CollisionMargin - supportMargin && rayHit.T <= maximumStepHeight)
-                        {
-                            //Then this could be one of the non-step supports.
-                            distance = rayHit.T;
-                            hitLocation = rayHit.Location;
-                            hitNormal = rayHit.Normal;
-                            hitEntity = candidate;
-                        }
+                        stepDistance = rayHit.T;
+                        stepHitLocation = rayHit.Location;
+                        stepHitNormal = rayHit.Normal;
+                        stepHitCollidable = candidate;
                     }
+                    if (rayHit.T < distance &&
+                        //If the hit is within a small margin range at the base of the character...
+                        rayHit.T >= maximumStepHeight - Body.CollisionInformation.Shape.CollisionMargin - supportMargin && rayHit.T <= maximumStepHeight)
+                    {
+                        //Then this could be one of the non-step supports.
+                        distance = rayHit.T;
+                        hitLocation = rayHit.Location;
+                        hitNormal = rayHit.Normal;
+                        hitCollidable = candidate;
+                    }
+
                 }
             }
-            Vector3 candidateLocationVelocity;
+            Vector3 candidateLocationVelocity = new Vector3();
             if (stepDistance != float.MaxValue)
             {
                 stepHitNormal.Normalize();
-                candidateLocationVelocity = stepHitEntity.LinearVelocity + //linear component
-                                            Vector3.Cross(stepHitEntity.AngularVelocity, stepHitLocation - stepHitEntity.Position);
+                var entityCollidable = (stepHitCollidable as EntityCollidable);
+                if (entityCollidable != null)
+                    candidateLocationVelocity = entityCollidable.Entity.LinearVelocity + //linear component
+                                                Vector3.Cross(entityCollidable.Entity.AngularVelocity, stepHitLocation - entityCollidable.Entity.Position);
                 //linear velocity of point on body relative to center
 
                 //Analyze the hits.
                 //Convert the 'times of impact' along the cast into distance by multiplying by the length of the cast.
                 //Verify the "stepped" hit.  If it's invalid, go with the "non step" hit.
                 if (stepDistance > 0 && //If hit distance was zero, it would probably mean that the outer convex cast found a wall (or something not steppable).
-                    Body.LinearVelocity.Y - candidateLocationVelocity.Y < glueSpeedToUse && //Don't try to 'glue' to the ground if we're just flying away from it.
+                    Body.LinearVelocity.Y - candidateLocationVelocity.Y < glueSpeed && //Don't try to 'glue' to the ground if we're just flying away from it.
                     IsSupportSlopeWalkable(stepHitNormal) && //In order for this to be stepped on, it should be walkable.
                     (stepDistance > maximumStepHeight || IsStepSafe(stepDistance))) //If its planning to step up, make sure its safe to do so.
                 {
                     //Successfully found a stepping location.
-                    supportEntity = stepHitEntity;
+                    supportCollidable = stepHitCollidable;
                     supportLocation = stepHitLocation;
                     supportNormal = stepHitNormal;
                     supportDistance = stepDistance;
@@ -339,15 +339,17 @@ namespace BEPUphysicsDemos
                 {
                     //Once it makes it here, it means there exists a support around the feet.
                     //Compute a new velocity for the feet support.
-                    candidateLocationVelocity = hitEntity.LinearVelocity + //linear component
-                                                Vector3.Cross(hitEntity.AngularVelocity, hitLocation - hitEntity.Position);
+                    entityCollidable = (hitCollidable as EntityCollidable);
+                    if (entityCollidable != null)
+                        candidateLocationVelocity = entityCollidable.Entity.LinearVelocity + //linear component
+                                                Vector3.Cross(entityCollidable.Entity.AngularVelocity, hitLocation - entityCollidable.Entity.Position);
                     //linear velocity of point on body relative to center
 
                     //The only condition that matters for a near-feet support is that the character is approaching the support rather than flying up away.
-                    if (Body.LinearVelocity.Y - candidateLocationVelocity.Y < glueSpeedToUse)
+                    if (Body.LinearVelocity.Y - candidateLocationVelocity.Y < glueSpeed)
                     {
                         //While the step failed, there's still the backup of looking at the places right around the feet.
-                        supportEntity = hitEntity;
+                        supportCollidable = hitCollidable;
                         supportLocation = hitLocation;
                         supportNormal = Vector3.Normalize(hitNormal);
                         supportDistance = distance;
@@ -356,7 +358,7 @@ namespace BEPUphysicsDemos
                     }
                 }
             }
-            supportEntity = null;
+            supportCollidable = null;
             supportLocation = Toolbox.NoVector;
             supportNormal = Toolbox.NoVector;
             supportDistance = float.MaxValue;

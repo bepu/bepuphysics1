@@ -22,7 +22,7 @@ namespace BEPUphysicsDemos.Demos
     /// </summary>
     public abstract class StandardDemo : Demo
     {
-        protected SimpleCharacterControllerInput character;
+        protected CharacterControllerInput character;
         protected float grabDistance;
         protected MotorizedGrabSpring grabber;
         protected LineDisplayObjectBase grabberGraphic;
@@ -36,7 +36,7 @@ namespace BEPUphysicsDemos.Demos
             : base(game)
         {
             //Creates the player character (C).
-            character = new SimpleCharacterControllerInput(Space, game.Camera);
+            character = new CharacterControllerInput(Space, game.Camera);
             //Creates the drivable vehicle (V).
             var wheelModel = game.Content.Load<Model>("carWheel");
             var wheelTexture = game.Content.Load<Texture2D>("wheel");
@@ -85,6 +85,8 @@ namespace BEPUphysicsDemos.Demos
 
         public override void Update(float dt)
         {
+            if (Game.KeyboardInput.IsKeyDown(Keys.O))
+                Debug.WriteLine("Break.");
             #region Kapow-Shooter Input
 
             //Update kapow-shooter

@@ -206,6 +206,39 @@ namespace BEPUphysics.Collidables.MobileCollidables
             return false;
         }
 
+        /// <summary>
+        /// Casts a convex shape against the collidable.
+        /// </summary>
+        /// <param name="castShape">Shape to cast.</param>
+        /// <param name="startingTransform">Initial transform of the shape.</param>
+        /// <param name="sweep">Sweep to apply to the shape.</param>
+        /// <param name="hit">Hit data, if any.</param>
+        /// <returns>Whether or not the cast hit anything.</returns>
+        public override bool ConvexCast(CollisionShapes.ConvexShapes.ConvexShape castShape, ref RigidTransform startingTransform, ref Vector3 sweep, out RayHit hit)
+        {
+            hit = new RayHit();
+            BoundingBox boundingBox;
+            Toolbox.GetExpandedBoundingBox(ref castShape, ref startingTransform, ref sweep, out boundingBox);
+            var hitElements = Resources.GetCompoundChildList();
+            if (hierarchy.Tree.GetOverlaps(boundingBox, hitElements))
+            {
+                hit.T = float.MaxValue;
+                for (int i = 0; i < hitElements.count; i++)
+                {
+                    var candidate = hitElements.Elements[i].CollisionInformation;
+                    RayHit tempHit;
+                    if (candidate.ConvexCast(castShape, ref startingTransform, ref sweep, out tempHit) && tempHit.T < hit.T)
+                    {
+                        hit = tempHit;
+                    }
+                }
+                Resources.GiveBack(hitElements);
+                return hit.T != float.MaxValue;
+            }
+            Resources.GiveBack(hitElements);
+            return false;
+        }
+
     }
 
     ///<summary>

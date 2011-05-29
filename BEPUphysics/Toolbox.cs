@@ -2228,6 +2228,43 @@ namespace BEPUphysics
             return true;
         }
 
+
+        /// <summary>
+        /// Computes a bounding box and expands it.
+        /// </summary>
+        /// <param name="shape">Shape to compute the bounding box of.</param>
+        /// <param name="transform">Transform to use to position the shape.</param>
+        /// <param name="sweep">Extra to add to the bounding box.</param>
+        /// <param name="boundingBox">Expanded bounding box.</param>
+        public static void GetExpandedBoundingBox(ref ConvexShape shape, ref RigidTransform transform, ref Vector3 sweep, out BoundingBox boundingBox)
+        {
+            shape.GetBoundingBox(ref transform, out boundingBox);
+            ExpandBoundingBox(ref boundingBox, ref sweep);
+
+        }
+        /// <summary>
+        /// Expands a bounding box by the given sweep.
+        /// </summary>
+        /// <param name="boundingBox">Bounding box to expand.</param>
+        /// <param name="sweep">Sweep to expand the bounding box with.</param>
+        public static void ExpandBoundingBox(ref BoundingBox boundingBox, ref Vector3 sweep)
+        {
+            if (sweep.X > 0)
+                boundingBox.Max.X += sweep.X;
+            else
+                boundingBox.Min.X += sweep.X;
+
+            if (sweep.Y > 0)
+                boundingBox.Max.Y += sweep.Y;
+            else
+                boundingBox.Min.Y += sweep.Y;
+
+            if (sweep.Z > 0)
+                boundingBox.Max.Z += sweep.Z;
+            else
+                boundingBox.Min.Z += sweep.Z;
+        }
+
         /// <summary>
         /// Clamps a value between a minimum and maximum.
         /// </summary>
@@ -2654,6 +2691,7 @@ namespace BEPUphysics
         }
 
         #endregion
+
 
 
 

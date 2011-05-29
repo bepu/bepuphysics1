@@ -71,6 +71,7 @@ namespace BEPUphysics.BroadPhaseSystems
         /// <param name="rayHit">Hit location of the ray on the entry, if any.</param>
         /// <returns>Whether or not the ray hit the entry.</returns>
         public abstract bool RayCast(Ray ray, float maximumLength, out RayHit rayHit);
+
         
         /// <summary>
         /// Gets or sets the user data associated with this entry.

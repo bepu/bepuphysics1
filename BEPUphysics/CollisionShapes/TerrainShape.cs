@@ -490,7 +490,7 @@ namespace BEPUphysics.CollisionShapes
         ///</summary>
         ///<param name="localSpaceBoundingBox">Bounding box in the local space of the terrain shape.</param>
         ///<param name="overlappedTriangles">Triangles whose bounding boxes overlap the input bounding box.</param>
-        public void GetOverlaps(BoundingBox localSpaceBoundingBox, RawList<TriangleMeshConvexContactManifold.TriangleIndices> overlappedTriangles)
+        public bool GetOverlaps(BoundingBox localSpaceBoundingBox, RawList<TriangleMeshConvexContactManifold.TriangleIndices> overlappedTriangles)
         {
             int minX = Math.Max((int)localSpaceBoundingBox.Min.X, 0);
             int minY = Math.Max((int)localSpaceBoundingBox.Min.Z, 0);
@@ -566,6 +566,7 @@ namespace BEPUphysics.CollisionShapes
 
                 }
             }
+            return overlappedTriangles.count > 0;
         }
 
         ///<summary>

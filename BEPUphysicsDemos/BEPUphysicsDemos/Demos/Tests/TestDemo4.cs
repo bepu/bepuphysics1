@@ -51,6 +51,7 @@ namespace BEPUphysicsDemos.Demos
             for (int i = 0; i < 100; i++)
             {
                 var c = new Cylinder(new Vector3(0, 3, 1 + i * 2), .2f, .35f, 1);
+                //c.CollisionInformation.Shape.CollisionMargin = .19f;
                 c.LinearVelocity = new Vector3(7 + i * .5f, 0, 0);
                 c.Material = m;
                 Space.Add(c);

@@ -6,6 +6,9 @@ using BEPUphysics.NarrowPhaseSystems.Pairs;
 using BEPUphysics.CollisionRuleManagement;
 using System;
 using BEPUphysics.Collidables.Events;
+using BEPUphysics.CollisionShapes.ConvexShapes;
+using BEPUphysics.MathExtensions;
+using Microsoft.Xna.Framework;
 
 namespace BEPUphysics.Collidables
 {
@@ -89,6 +92,7 @@ namespace BEPUphysics.Collidables
         }
 
 
+        public abstract bool ConvexCast(ConvexShape castShape, ref RigidTransform startingTransform, ref Vector3 sweep, out RayHit hit);
     }
 
 

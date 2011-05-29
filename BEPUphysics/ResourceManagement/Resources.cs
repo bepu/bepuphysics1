@@ -30,6 +30,7 @@ namespace BEPUphysics.ResourceManagement
             SubPoolVectorList = new LockingResourcePool<List<Vector3>>();
             SubPoolEntityRawList = new LockingResourcePool<RawList<Entity>>(16);
             SubPoolTriangleShape = new LockingResourcePool<TriangleShape>();
+            SubPoolTriangleIndicesList = new LockingResourcePool<RawList<BEPUphysics.CollisionTests.Manifolds.TriangleMeshConvexContactManifold.TriangleIndices>>();
         }
 
         //#if WINDOWS
@@ -143,6 +144,7 @@ namespace BEPUphysics.ResourceManagement
         static ResourcePool<RawList<Entity>> SubPoolEntityRawList;//= new LockingResourcePool<RawList<Entity>>(16);
         static ResourcePool<TriangleShape> SubPoolTriangleShape;// = new LockingResourcePool<TriangleShape>();
         static ResourcePool<RawList<CompoundChild>> SubPoolCompoundChildList;//= new LockingResourcePool<RawList<CompoundChild>>();
+        static ResourcePool<RawList<BEPUphysics.CollisionTests.Manifolds.TriangleMeshConvexContactManifold.TriangleIndices>> SubPoolTriangleIndicesList;
         //#endif
         /// <summary>
         /// Retrieves a ray cast result list from the resource pool.
@@ -330,9 +332,23 @@ namespace BEPUphysics.ResourceManagement
             SubPoolTriangleShape.GiveBack(triangle);
         }
 
+        /// <summary>
+        /// Retrieves a TriangleIndices list from the resource pool.
+        /// </summary>
+        /// <returns>TriangleIndices list.</returns>
+        public static RawList<BEPUphysics.CollisionTests.Manifolds.TriangleMeshConvexContactManifold.TriangleIndices> GetTriangleIndicesList()
+        {
+            return SubPoolTriangleIndicesList.Take();
+        }
 
-
-
-
+        /// <summary>
+        /// Returns a resource to the pool.
+        /// </summary>
+        /// <param name="triangleIndices">TriangleIndices list to return.</param>
+        public static void GiveBack(RawList<BEPUphysics.CollisionTests.Manifolds.TriangleMeshConvexContactManifold.TriangleIndices> triangleIndices)
+        {
+            triangleIndices.Clear();
+            SubPoolTriangleIndicesList.GiveBack(triangleIndices);
+        }
     }
 }
