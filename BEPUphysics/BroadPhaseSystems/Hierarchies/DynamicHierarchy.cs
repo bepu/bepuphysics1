@@ -712,12 +712,14 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
             }
         }
 
+        public static bool DEBUGAllowRefit = true;
         protected override void UpdateSingleThreaded()
         {
             Overlaps.Clear();
             lock (Locker)
             {
-                Root.BinaryUpdateNode();
+                if (DEBUGAllowRefit)
+                    Root.BinaryUpdateNode();
                 Root.BinaryCollideAgainst(Root);
             }
         }

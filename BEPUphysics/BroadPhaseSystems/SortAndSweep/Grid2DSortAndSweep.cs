@@ -212,6 +212,11 @@ namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
 
         void UpdateCell(int i)
         {
+            //TODO: Consider permuting.
+            //In some simulations, there may be a ton of unoccupied cells.
+            //It would be best to distribute these over the threads.
+            //(int)((i * 122949823L) % cellSet.count)
+            //(i * 122949823L) % cellSet.count
             cellSet.cells.Elements[i].UpdateOverlaps(this);
         }
     }

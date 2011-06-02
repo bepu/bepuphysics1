@@ -296,14 +296,14 @@ namespace BEPUphysics.DataStructures
             internal override bool TryToInsert(LeafNode node, out Node treeNode)
             {
                 ////The following can make the tree shorter, but it actually hurt query times in testing.
-                //bool aIsLeaf = ChildA.IsLeaf;
-                //bool bIsLeaf = ChildB.IsLeaf;
+                //bool aIsLeaf = childA.IsLeaf;
+                //bool bIsLeaf = childB.IsLeaf;
                 //if (aIsLeaf && !bIsLeaf)
                 //{
                 //    //Just put us with the leaf.  Keeps the tree shallower.
                 //    BoundingBox merged;
-                //    BoundingBox.CreateMerged(ref ChildA.BoundingBox, ref node.BoundingBox, out merged);
-                //    ChildA = new InternalNode() { BoundingBox = merged, ChildA = this.ChildA, ChildB = node };
+                //    BoundingBox.CreateMerged(ref childA.BoundingBox, ref node.BoundingBox, out merged);
+                //    childA = new InternalNode() { BoundingBox = merged, childA = this.childA, childB = node };
                 //    treeNode = null;
                 //    return true;
                 //}
@@ -311,8 +311,8 @@ namespace BEPUphysics.DataStructures
                 //{
                 //    //Just put us with the leaf.  Keeps the tree shallower.
                 //    BoundingBox merged;
-                //    BoundingBox.CreateMerged(ref ChildA.BoundingBox, ref node.BoundingBox, out merged);
-                //    ChildB = new InternalNode() { BoundingBox = merged, ChildA = node, ChildB = this.ChildB };
+                //    BoundingBox.CreateMerged(ref childB.BoundingBox, ref node.BoundingBox, out merged);
+                //    childB = new InternalNode() { BoundingBox = merged, childA = node, childB = this.childB };
                 //    treeNode = null;
                 //    return true;
                 //}

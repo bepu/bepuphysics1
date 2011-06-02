@@ -101,13 +101,13 @@
     <Compile Include="Demos\SleepModeDemo.cs" />
     <Compile Include="Demos\SpaceshipDemo.cs" />
     <Compile Include="Demos\TerrainDemo.cs" />
+    <Compile Include="Demos\Tests\BroadPhasesTestDemo.cs" />
     <Compile Include="Demos\Tests\MobileMeshDemo.cs" />
     <Compile Include="Demos\Tests\MPRCastingDemo.cs" />
     <Compile Include="Demos\Tests\TerrainTesting.cs" />
     <Compile Include="Demos\Tests\TestDemo2.cs" />
     <Compile Include="Demos\Tests\TestDemo3.cs" />
     <Compile Include="Demos\Tests\TestDemo4.cs" />
-    <Compile Include="Demos\Tests\TestingBroadPhases.cs" />
     <Compile Include="Demos\TornadoDemo.cs" />
     <Compile Include="Demos\UnfortunateGuyDemo.cs" />
     <Compile Include="Demos\WallDemo.cs" />

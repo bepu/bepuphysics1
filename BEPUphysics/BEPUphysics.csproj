@@ -99,6 +99,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BroadPhaseSystems\BruteForce.cs" />
+    <Compile Include="BroadPhaseSystems\Hierarchies\TopDown\DynamicHierarchy4.cs" />
+    <Compile Include="BroadPhaseSystems\Hierarchies\TopDown\DynamicHierarchyNode4.cs" />
+    <Compile Include="BroadPhaseSystems\Hierarchies\IncrementalImprovement\DynamicHierarchy3.cs" />
+    <Compile Include="BroadPhaseSystems\Hierarchies\IncrementalImprovement\DynamicHierarchyNode3.cs" />
+    <Compile Include="BroadPhaseSystems\Hierarchies\IncrementalImprovement\DynamicHierarchyQueryAccelerator3.cs" />
+    <Compile Include="BroadPhaseSystems\Hierarchies\Insertion\DynamicHierarchy2.cs" />
+    <Compile Include="BroadPhaseSystems\Hierarchies\Insertion\DynamicHierarchyNode2.cs" />
     <Compile Include="BroadPhaseSystems\SortAndSweep\Grid2DEntry.cs" />
     <Compile Include="BroadPhaseSystems\SortAndSweep\Grid2DSortAndSweep.cs" />
     <Compile Include="BroadPhaseSystems\Hierarchies\DynamicHierarchyNode.cs" />

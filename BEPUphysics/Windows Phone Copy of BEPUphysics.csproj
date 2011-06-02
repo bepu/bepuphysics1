@@ -64,6 +64,13 @@
     <Compile Include="BroadPhaseSystems\Hierarchies\DynamicHierarchyNode.cs" />
     <Compile Include="BroadPhaseSystems\Hierarchies\DynamicHierarchy.cs" />
     <Compile Include="BroadPhaseSystems\Hierarchies\DynamicHierarchyQueryAccelerator.cs" />
+    <Compile Include="BroadPhaseSystems\Hierarchies\IncrementalImprovement\DynamicHierarchy3.cs" />
+    <Compile Include="BroadPhaseSystems\Hierarchies\IncrementalImprovement\DynamicHierarchyNode3.cs" />
+    <Compile Include="BroadPhaseSystems\Hierarchies\IncrementalImprovement\DynamicHierarchyQueryAccelerator3.cs" />
+    <Compile Include="BroadPhaseSystems\Hierarchies\Insertion\DynamicHierarchy2.cs" />
+    <Compile Include="BroadPhaseSystems\Hierarchies\Insertion\DynamicHierarchyNode2.cs" />
+    <Compile Include="BroadPhaseSystems\Hierarchies\TopDown\DynamicHierarchy4.cs" />
+    <Compile Include="BroadPhaseSystems\Hierarchies\TopDown\DynamicHierarchyNode4.cs" />
     <Compile Include="BroadPhaseSystems\IBoundingBoxOwner.cs" />
     <Compile Include="BroadPhaseSystems\IBroadPhaseEntryOwner.cs" />
     <Compile Include="BroadPhaseSystems\IQueryAccelerator.cs" />
