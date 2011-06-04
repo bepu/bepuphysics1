@@ -109,60 +109,66 @@ namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
 
         protected override void UpdateMultithreaded()
         {
-            Overlaps.Clear();
-            //Update the entries!
-            ThreadManager.ForLoop(0, entries.count, updateEntry);
-            //Update the cells!
-            ThreadManager.ForLoop(0, cellSet.count, updateCell);
+            lock (Locker)
+            {
+                Overlaps.Clear();
+                //Update the entries!
+                ThreadManager.ForLoop(0, entries.count, updateEntry);
+                //Update the cells!
+                ThreadManager.ForLoop(0, cellSet.count, updateCell);
+            }
         }
 
         protected override void UpdateSingleThreaded()
         {
-            Overlaps.Clear();
-            //Update the placement of objects.
-            for (int i = 0; i < entries.count; i++)
+            lock (Locker)
             {
-                //Compute the current cells occupied by the entry.
-                var entry = entries.Elements[i];
-                Int2 min, max;
-                ComputeCell(ref entry.item.boundingBox.Min, out min);
-                ComputeCell(ref entry.item.boundingBox.Max, out max);
-                //For any cell that used to be occupied (defined by the previous min/max),
-                //remove the entry.
-                for (int j = entry.previousMin.Y; j <= entry.previousMax.Y; j++)
+                Overlaps.Clear();
+                //Update the placement of objects.
+                for (int i = 0; i < entries.count; i++)
                 {
-                    for (int k = entry.previousMin.Z; k <= entry.previousMax.Z; k++)
+                    //Compute the current cells occupied by the entry.
+                    var entry = entries.Elements[i];
+                    Int2 min, max;
+                    ComputeCell(ref entry.item.boundingBox.Min, out min);
+                    ComputeCell(ref entry.item.boundingBox.Max, out max);
+                    //For any cell that used to be occupied (defined by the previous min/max),
+                    //remove the entry.
+                    for (int j = entry.previousMin.Y; j <= entry.previousMax.Y; j++)
                     {
-                        if (j >= min.Y && j <= max.Y && k >= min.Z && k <= max.Z)
-                            continue; //This cell is currently occupied, do not remove.
-                        var index = new Int2();
-                        index.Y = j;
-                        index.Z = k;
-                        cellSet.Remove(ref index, entry);
+                        for (int k = entry.previousMin.Z; k <= entry.previousMax.Z; k++)
+                        {
+                            if (j >= min.Y && j <= max.Y && k >= min.Z && k <= max.Z)
+                                continue; //This cell is currently occupied, do not remove.
+                            var index = new Int2();
+                            index.Y = j;
+                            index.Z = k;
+                            cellSet.Remove(ref index, entry);
+                        }
                     }
-                }
-                //For any cell that is newly occupied (was not previously contained),
-                //add the entry.
-                for (int j = min.Y; j <= max.Y; j++)
-                {
-                    for (int k = min.Z; k <= max.Z; k++)
+                    //For any cell that is newly occupied (was not previously contained),
+                    //add the entry.
+                    for (int j = min.Y; j <= max.Y; j++)
                     {
-                        if (j >= entry.previousMin.Y && j <= entry.previousMax.Y && k >= entry.previousMin.Z && k <= entry.previousMax.Z)
-                            continue; //This cell is already occupied, do not add.
-                        var index = new Int2();
-                        index.Y = j;
-                        index.Z = k;
-                        cellSet.Add(ref index, entry);
+                        for (int k = min.Z; k <= max.Z; k++)
+                        {
+                            if (j >= entry.previousMin.Y && j <= entry.previousMax.Y && k >= entry.previousMin.Z && k <= entry.previousMax.Z)
+                                continue; //This cell is already occupied, do not add.
+                            var index = new Int2();
+                            index.Y = j;
+                            index.Z = k;
+                            cellSet.Add(ref index, entry);
+                        }
                     }
+                    entry.previousMin = min;
+                    entry.previousMax = max;
                 }
-                entry.previousMin = min;
-                entry.previousMax = max;
-            }
 
-            //Update each cell to find the overlaps.
-            for (int i = 0; i < cellSet.count; i++)
-            {
-                cellSet.cells.Elements[i].UpdateOverlaps(this);
+                //Update each cell to find the overlaps.
+                for (int i = 0; i < cellSet.count; i++)
+                {
+                    cellSet.cells.Elements[i].UpdateOverlaps(this);
+                }
             }
         }
 

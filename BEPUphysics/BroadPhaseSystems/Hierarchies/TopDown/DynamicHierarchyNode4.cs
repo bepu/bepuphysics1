@@ -33,6 +33,12 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies.TopDown
         internal abstract void RetrieveNodes(RawList<LeafNode> leafNodes);
 
 
+
+        internal abstract void CollectMultithreadingNodes(int splitDepth, int currentDepth, RawList<Node> multithreadingSourceNodes);
+
+        internal abstract void PostRefit(int splitDepth, int currentDepth);
+
+        internal abstract void GetMultithreadedOverlaps(Node opposingNode, int splitDepth, int currentDepth, DynamicHierarchy4 owner, RawList<DynamicHierarchy4.NodePair> multithreadingSourceOverlaps);
     }
 
     internal sealed class InternalNode : Node
@@ -312,7 +318,7 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies.TopDown
             Reconstruct(leafNodes, 0, leafNodes.count);
             leafNodes.Clear();
             nodeListPool.GiveBack(leafNodes);
-            
+
 
         }
 
@@ -391,7 +397,149 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies.TopDown
 
 
         }
-        
+
+        internal override void CollectMultithreadingNodes(int splitDepth, int currentDepth, RawList<Node> multithreadingSourceNodes)
+        {
+            if (currentVolume > maximumVolume)
+            {
+                //Very rarely, one of these extremely high level nodes will need to be revalidated.  This isn't great.
+                //We may lose a frame.  This could be independently multithreaded, but the benefit is unknown.
+                Revalidate();
+                return;
+            }
+            if (currentDepth == splitDepth)
+            {
+                //We are deep enough in the tree where our children will act as the starting point for multithreaded refits.
+                //The split depth ensures that we have enough tasks to thread across our core count.
+                multithreadingSourceNodes.Add(childA);
+                multithreadingSourceNodes.Add(childB);
+            }
+            else
+            {
+                childA.CollectMultithreadingNodes(splitDepth, currentDepth + 1, multithreadingSourceNodes);
+                childB.CollectMultithreadingNodes(splitDepth, currentDepth + 1, multithreadingSourceNodes);
+            }
+        }
+
+        internal override void PostRefit(int splitDepth, int currentDepth)
+        {
+            if (splitDepth > currentDepth)
+            {
+                //We are not yet back to the nodes that triggered the multithreaded split.
+                //Need to go deeper into the tree.
+                childA.PostRefit(splitDepth, currentDepth + 1);
+                childB.PostRefit(splitDepth, currentDepth + 1);
+            }
+            BoundingBox.CreateMerged(ref childA.BoundingBox, ref childB.BoundingBox, out BoundingBox);
+            currentVolume = (BoundingBox.Max.X - BoundingBox.Min.X) * (BoundingBox.Max.Y - BoundingBox.Min.Y) * (BoundingBox.Max.Z - BoundingBox.Min.Z);
+        }
+
+        internal override void GetMultithreadedOverlaps(Node opposingNode, int splitDepth, int currentDepth, DynamicHierarchy4 owner, RawList<DynamicHierarchy4.NodePair> multithreadingSourceOverlaps)
+        {
+            bool intersects;
+            if (currentDepth == splitDepth)
+            {
+                //We've reached the depth where our child comparisons will be multithreaded.
+                if (this == opposingNode)
+                {
+                    //We are being compared against ourselves!
+                    //Obviously we're an internal node, so spawn three children:
+                    //A versus A:
+                    if (!childA.IsLeaf) //This is performed in the child method usually by convention, but this saves some time.
+                        multithreadingSourceOverlaps.Add(new DynamicHierarchy4.NodePair() { a = childA, b = childA });
+                    //B versus B:
+                    if (!childB.IsLeaf) //This is performed in the child method usually by convention, but this saves some time.
+                        multithreadingSourceOverlaps.Add(new DynamicHierarchy4.NodePair() { a = childB, b = childB });
+                    //A versus B (if they intersect):
+                    childA.BoundingBox.Intersects(ref childB.BoundingBox, out intersects);
+                    if (intersects)
+                        multithreadingSourceOverlaps.Add(new DynamicHierarchy4.NodePair() { a = childA, b = childB });
+
+                }
+                else
+                {
+                    //Two different nodes.  The other one may be a leaf.
+                    if (opposingNode.IsLeaf)
+                    {
+                        //If it's a leaf, go deeper in our hierarchy, but not the opposition.
+                        childA.BoundingBox.Intersects(ref opposingNode.BoundingBox, out intersects);
+                        if (intersects)
+                            multithreadingSourceOverlaps.Add(new DynamicHierarchy4.NodePair() { a = childA, b = opposingNode });
+                        childB.BoundingBox.Intersects(ref opposingNode.BoundingBox, out intersects);
+                        if (intersects)
+                            multithreadingSourceOverlaps.Add(new DynamicHierarchy4.NodePair() { a = childB, b = opposingNode });
+                    }
+                    else
+                    {
+                        var opposingChildA = opposingNode.ChildA;
+                        var opposingChildB = opposingNode.ChildB;
+                        //If it's not a leaf, try to go deeper in both hierarchies.
+                        childA.BoundingBox.Intersects(ref opposingChildA.BoundingBox, out intersects);
+                        if (intersects)
+                            multithreadingSourceOverlaps.Add(new DynamicHierarchy4.NodePair() { a = childA, b = opposingChildA });
+                        childA.BoundingBox.Intersects(ref opposingChildB.BoundingBox, out intersects);
+                        if (intersects)
+                            multithreadingSourceOverlaps.Add(new DynamicHierarchy4.NodePair() { a = childA, b = opposingChildB });
+                        childB.BoundingBox.Intersects(ref opposingChildA.BoundingBox, out intersects);
+                        if (intersects)
+                            multithreadingSourceOverlaps.Add(new DynamicHierarchy4.NodePair() { a = childB, b = opposingChildA });
+                        childB.BoundingBox.Intersects(ref opposingChildB.BoundingBox, out intersects);
+                        if (intersects)
+                            multithreadingSourceOverlaps.Add(new DynamicHierarchy4.NodePair() { a = childB, b = opposingChildB });
+                    }
+                }
+                return;
+            }
+            if (this == opposingNode)
+            {
+                //We are being compared against ourselves!
+                //Obviously we're an internal node, so spawn three children:
+                //A versus A:
+                if (!childA.IsLeaf) //This is performed in the child method usually by convention, but this saves some time.
+                    childA.GetMultithreadedOverlaps(childA, splitDepth, currentDepth + 1, owner, multithreadingSourceOverlaps);
+                //B versus B:
+                if (!childB.IsLeaf) //This is performed in the child method usually by convention, but this saves some time.
+                    childB.GetMultithreadedOverlaps(childB, splitDepth, currentDepth + 1, owner, multithreadingSourceOverlaps);
+                //A versus B (if they intersect):
+                childA.BoundingBox.Intersects(ref childB.BoundingBox, out intersects);
+                if (intersects)
+                    childA.GetMultithreadedOverlaps(childB, splitDepth, currentDepth + 1, owner, multithreadingSourceOverlaps);
+
+            }
+            else
+            {
+                //Two different nodes.  The other one may be a leaf.
+                if (opposingNode.IsLeaf)
+                {
+                    //If it's a leaf, go deeper in our hierarchy, but not the opposition.
+                    childA.BoundingBox.Intersects(ref opposingNode.BoundingBox, out intersects);
+                    if (intersects)
+                        childA.GetMultithreadedOverlaps(opposingNode, splitDepth, currentDepth + 1, owner, multithreadingSourceOverlaps);
+                    childB.BoundingBox.Intersects(ref opposingNode.BoundingBox, out intersects);
+                    if (intersects)
+                        childB.GetMultithreadedOverlaps(opposingNode, splitDepth, currentDepth + 1, owner, multithreadingSourceOverlaps);
+                }
+                else
+                {
+                    var opposingChildA = opposingNode.ChildA;
+                    var opposingChildB = opposingNode.ChildB;
+                    //If it's not a leaf, try to go deeper in both hierarchies.
+                    childA.BoundingBox.Intersects(ref opposingChildA.BoundingBox, out intersects);
+                    if (intersects)
+                        childA.GetMultithreadedOverlaps(opposingChildA, splitDepth, currentDepth + 1, owner, multithreadingSourceOverlaps);
+                    childA.BoundingBox.Intersects(ref opposingChildB.BoundingBox, out intersects);
+                    if (intersects)
+                        childA.GetMultithreadedOverlaps(opposingChildB, splitDepth, currentDepth + 1, owner, multithreadingSourceOverlaps);
+                    childB.BoundingBox.Intersects(ref opposingChildA.BoundingBox, out intersects);
+                    if (intersects)
+                        childB.GetMultithreadedOverlaps(opposingChildA, splitDepth, currentDepth + 1, owner, multithreadingSourceOverlaps);
+                    childB.BoundingBox.Intersects(ref opposingChildB.BoundingBox, out intersects);
+                    if (intersects)
+                        childB.GetMultithreadedOverlaps(opposingChildB, splitDepth, currentDepth + 1, owner, multithreadingSourceOverlaps);
+                }
+            }
+        }
+
 
         static XComparer xComparer = new XComparer();
         static YComparer yComparer = new YComparer();
@@ -546,6 +694,53 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies.TopDown
         {
             Refit();
             leafNodes.Add(this);
+        }
+
+        internal override void CollectMultithreadingNodes(int splitDepth, int currentDepth, RawList<Node> multithreadingSourceNodes)
+        {
+            //This could happen if there are almost no elements in the tree.  No biggie- do nothing!
+        }
+
+        internal override void PostRefit(int splitDepth, int currentDepth)
+        {
+            //This could happen if there are almost no elements in the tree.  Just do a normal leaf refit.
+            BoundingBox = element.boundingBox;
+        }
+
+        internal override void GetMultithreadedOverlaps(Node opposingNode, int splitDepth, int currentDepth, DynamicHierarchy4 owner, RawList<DynamicHierarchy4.NodePair> multithreadingSourceOverlaps)
+        {
+            bool intersects;
+            //note: This is never executed when the opposing node is the current node.
+            if (opposingNode.IsLeaf)
+            {
+                //We're both leaves!  Our parents have already done the testing for us, so we know we're overlapping.
+                owner.TryToAddOverlap(element, opposingNode.Element);
+            }
+            else
+            {
+                var opposingChildA = opposingNode.ChildA;
+                var opposingChildB = opposingNode.ChildB;
+                if (splitDepth == currentDepth)
+                {
+                    //Time to add the child overlaps to the multithreading set!
+                    BoundingBox.Intersects(ref opposingChildA.BoundingBox, out intersects);
+                    if (intersects)
+                        multithreadingSourceOverlaps.Add(new DynamicHierarchy4.NodePair() { a = this, b = opposingChildA });
+                    BoundingBox.Intersects(ref opposingChildB.BoundingBox, out intersects);
+                    if (intersects)
+                        multithreadingSourceOverlaps.Add(new DynamicHierarchy4.NodePair() { a = this, b = opposingChildB });
+
+                    return;
+                }
+                //If it's not a leaf, try to go deeper in the opposing hierarchy.
+                BoundingBox.Intersects(ref opposingChildA.BoundingBox, out intersects);
+                if (intersects)
+                    GetOverlaps(opposingChildA, owner);
+                BoundingBox.Intersects(ref opposingChildB.BoundingBox, out intersects);
+                if (intersects)
+                    GetOverlaps(opposingChildB, owner);
+
+            }
         }
     }
 }

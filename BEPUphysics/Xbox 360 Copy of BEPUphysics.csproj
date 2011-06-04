@@ -65,11 +65,13 @@
     <Compile Include="BroadPhaseSystems\Hierarchies\Insertion\DynamicHierarchyNode2.cs" />
     <Compile Include="BroadPhaseSystems\Hierarchies\TopDown\DynamicHierarchy4.cs" />
     <Compile Include="BroadPhaseSystems\Hierarchies\TopDown\DynamicHierarchyNode4.cs" />
+    <Compile Include="BroadPhaseSystems\Hierarchies\TopDown\DynamicHierarchyQueryAccelerator4.cs" />
     <Compile Include="BroadPhaseSystems\IBoundingBoxOwner.cs" />
     <Compile Include="BroadPhaseSystems\IBroadPhaseEntryOwner.cs" />
     <Compile Include="BroadPhaseSystems\IQueryAccelerator.cs" />
     <Compile Include="BroadPhaseSystems\SortAndSweep\Grid2DEntry.cs" />
     <Compile Include="BroadPhaseSystems\SortAndSweep\Grid2DSortAndSweep.cs" />
+    <Compile Include="BroadPhaseSystems\SortAndSweep\Grid2DSortAndSweepQueryAccelerator.cs" />
     <Compile Include="BroadPhaseSystems\SortAndSweep\GridCell2D.cs" />
     <Compile Include="BroadPhaseSystems\SortAndSweep\SortAndSweep1D.cs" />
     <Compile Include="BroadPhaseSystems\SortAndSweep\SortAndSweep3D.cs" />

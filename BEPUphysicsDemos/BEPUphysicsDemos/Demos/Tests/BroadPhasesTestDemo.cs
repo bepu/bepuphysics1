@@ -50,15 +50,20 @@ namespace BEPUphysicsDemos.Demos
             Space.Solver.IterationLimit = 0;
             Entity toAdd;
             //BoundingBox box = new BoundingBox(new Vector3(-5, 1, 1), new Vector3(5, 7, 7));
-            BoundingBox box = new BoundingBox(new Vector3(-200, -200, -200), new Vector3(200, 200, 200));
+            BoundingBox box = new BoundingBox(new Vector3(-50, -50, -50), new Vector3(50, 50, 50));
 
-            DynamicHierarchy dh = new DynamicHierarchy();
-            DynamicHierarchy2 dh2 = new DynamicHierarchy2();
-            DynamicHierarchy3 dh3 = new DynamicHierarchy3();
-            DynamicHierarchy4 dh4 = new DynamicHierarchy4();
-            SortAndSweep1D sap1d = new SortAndSweep1D();
+            DynamicHierarchy dh = new DynamicHierarchy(Space.ThreadManager);
+            DynamicHierarchy4 dh4 = new DynamicHierarchy4(Space.ThreadManager);
+            SortAndSweep1D sap1d = new SortAndSweep1D(Space.ThreadManager);
+            Grid2DSortAndSweep grid2DSOS = new Grid2DSortAndSweep(Space.ThreadManager);
+            //DynamicHierarchy dh = new DynamicHierarchy();
+            //DynamicHierarchy4 dh4 = new DynamicHierarchy4();
+            //SortAndSweep1D sap1d = new SortAndSweep1D();
+            //Grid2DSortAndSweep grid2DSOS = new Grid2DSortAndSweep();
+
+            //DynamicHierarchy2 dh2 = new DynamicHierarchy2();
+            //DynamicHierarchy3 dh3 = new DynamicHierarchy3();
             //SortAndSweep3D sap3d = new SortAndSweep3D();
-            Grid2DSortAndSweep grid2DSOS = new Grid2DSortAndSweep();
 
             RawList<Entity> entities = new RawList<Entity>();
             for (int k = 0; k < 1000; k++)
@@ -71,13 +76,14 @@ namespace BEPUphysicsDemos.Demos
                 toAdd.CollisionInformation.UpdateBoundingBox(0);
                 //Space.Add(toAdd);
                 dh.Add(toAdd.CollisionInformation);
-                dh2.Add(toAdd.CollisionInformation);
-                //dh3.Add(toAdd.CollisionInformation);
                 dh4.Add(toAdd.CollisionInformation);
                 sap1d.Add(toAdd.CollisionInformation);
-                //sap3d.Add(toAdd.CollisionInformation);
                 grid2DSOS.Add(toAdd.CollisionInformation);
                 entities.Add(toAdd);
+
+                //dh2.Add(toAdd.CollisionInformation);
+                //dh3.Add(toAdd.CollisionInformation);
+                //sap3d.Add(toAdd.CollisionInformation);
             }
 
             //List<int> depths = new List<int>();
@@ -95,7 +101,7 @@ namespace BEPUphysicsDemos.Demos
             grid2DSOS.Update();
             sap1d.Update();
             dh.Update();
-            dh2.Update();
+            //dh2.Update();
             //dh3.Update();
             dh4.Update();
             //DynamicHierarchy.DEBUGAllowRefit = false;
@@ -108,21 +114,21 @@ namespace BEPUphysicsDemos.Demos
             {
                 //DH
                 startTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
-                dh.Update();
+                //dh.Update();
                 endTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
                 DHtime += endTime - startTime;
 
-                //DH2
-                startTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
-                dh2.Update();
-                endTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
-                DH2time += endTime - startTime;
+                ////DH2
+                //startTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
+                ////dh2.Update();
+                //endTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
+                //DH2time += endTime - startTime;
 
-                //DH3
-                startTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
-                //dh3.Update();
-                endTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
-                DH3time += endTime - startTime;
+                ////DH3
+                //startTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
+                ////dh3.Update();
+                //endTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
+                //DH3time += endTime - startTime;
 
                 //DH4
                 startTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
@@ -134,14 +140,14 @@ namespace BEPUphysicsDemos.Demos
 
                 //SAP1D
                 startTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
-                sap1d.Update();
+                //sap1d.Update();
                 endTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
                 SAP1Dtime += endTime - startTime;
 
 
                 //Grid2D SOS
                 startTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
-                grid2DSOS.Update();
+                //grid2DSOS.Update();
                 endTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
                 grid2DSOStime += endTime - startTime;
 
@@ -155,11 +161,17 @@ namespace BEPUphysicsDemos.Demos
                 //    if (!grid2DSOS.Overlaps.Contains(dh2.Overlaps[j]))
                 //        Debug.WriteLine("Break.");
                 //}
-                for (int j = 0; j < grid2DSOS.Overlaps.Count; j++)
-                {
-                    if (!dh2.Overlaps.Contains(grid2DSOS.Overlaps[j]))
-                        break;
-                }
+                //for (int j = 0; j < grid2DSOS.Overlaps.Count; j++)
+                //{
+                //    if (!dh2.Overlaps.Contains(grid2DSOS.Overlaps[j]))
+                //        break;
+                //}
+
+                //for (int j = 0; j < grid2DSOS.Overlaps.Count; j++)
+                //{
+                //    if (!dh4.Overlaps.Contains(grid2DSOS.Overlaps[j]))
+                //        break;
+                //}
 
                 //for (int j = 0; j < dh.Overlaps.Count; j++)
                 //{
@@ -190,18 +202,15 @@ namespace BEPUphysicsDemos.Demos
             grid2DSOStime /= numRuns;
 
 
-            DynamicHierarchy.DEBUGAllowRefit = true;
-            DynamicHierarchy2.DEBUGAllowRefit = true;
-            DynamicHierarchy4.DEBUGAllowRefit = true;
         }
 
         void MoveEntities(RawList<Entity> entities)
         {
             for (int i = 0; i < entities.Count; i++)
             {
-                float speed = 100;
-                entities[i].Position += new Vector3((float)rand.NextDouble() * speed - speed * .5f, (float)rand.NextDouble() * speed - speed * .5f, (float)rand.NextDouble() * speed - speed * .5f);
-                //entities[i].Position += new Vector3(speed, 0, 0);
+                float speed = .1f;
+                //entities[i].Position += new Vector3((float)rand.NextDouble() * speed - speed * .5f, (float)rand.NextDouble() * speed - speed * .5f, (float)rand.NextDouble() * speed - speed * .5f);
+                entities[i].Position += new Vector3(0, speed, 0);
                 entities[i].CollisionInformation.UpdateBoundingBox(0);
             }
         }
@@ -218,11 +227,9 @@ namespace BEPUphysicsDemos.Demos
         {
             base.DrawUI();
             Game.DataTextDrawer.Draw("Time per DH:    ", DHtime * 1000000, new Vector2(50, 50));
-            Game.DataTextDrawer.Draw("Time per DH2:    ", DH2time * 1000000, new Vector2(50, 80));
-            Game.DataTextDrawer.Draw("Time per DH3:    ", DH3time * 1000000, new Vector2(50, 110));
-            Game.DataTextDrawer.Draw("Time per DH4:    ", DH4time * 1000000, new Vector2(50, 140));
-            Game.DataTextDrawer.Draw("Time per SAP1D: ", SAP1Dtime * 1000000, new Vector2(50, 170));
-            Game.DataTextDrawer.Draw("Time per Grid2DSortAndSweep: ", grid2DSOStime * 1000000, new Vector2(50, 200));
+            Game.DataTextDrawer.Draw("Time per DH4:    ", DH4time * 1000000, new Vector2(50, 80));
+            Game.DataTextDrawer.Draw("Time per SAP1D: ", SAP1Dtime * 1000000, new Vector2(50, 110));
+            Game.DataTextDrawer.Draw("Time per Grid2DSortAndSweep: ", grid2DSOStime * 1000000, new Vector2(50, 140));
         }
 
 
