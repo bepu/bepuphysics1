@@ -191,7 +191,7 @@ namespace BEPUphysics.Collidables
         ///<summary>
         /// Updates the bounding box of the terrain.
         ///</summary>
-        public void UpdateBoundingBox()
+        public override void UpdateBoundingBox()
         {
             Shape.GetBoundingBox(ref worldTransform, out boundingBox);
             //Include the thickness of the terrain.

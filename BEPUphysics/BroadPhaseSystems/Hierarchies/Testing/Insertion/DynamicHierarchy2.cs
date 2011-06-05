@@ -6,7 +6,7 @@ using BEPUphysics.DataStructures;
 using Microsoft.Xna.Framework;
 using System.Runtime.InteropServices;
 
-namespace BEPUphysics.BroadPhaseSystems.Hierarchies.Insertion
+namespace BEPUphysics.BroadPhaseSystems.Hierarchies.Testing.Insertion
 {
     public class DynamicHierarchy2 : BroadPhase
     {

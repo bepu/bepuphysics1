@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace BEPUphysics.BroadPhaseSystems.Hierarchies
+namespace BEPUphysics.BroadPhaseSystems.Hierarchies.Testing.Old
 {
     /// <summary>
     /// Node within the binary hierarchy.
     /// </summary>
-    public class DynamicHierarchyNode3
+    public class DynamicHierarchyNodeOld
     {
         /// <summary>
         /// Bounding box all entities that are children of the node.
@@ -17,20 +17,20 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
 
         internal AxisComparer axisComparer = new AxisComparer(ComparerAxis.X);
 
-        internal List<DynamicHierarchyNode3> children = new List<DynamicHierarchyNode3>(2);
+        internal List<DynamicHierarchyNodeOld> children = new List<DynamicHierarchyNodeOld>(2);
         internal float currentVolume;
         internal List<BroadPhaseEntry> entries = new List<BroadPhaseEntry>(8);
-        internal DynamicHierarchy3 hierarchy;
+        internal DynamicHierarchyOld hierarchy;
         internal float maximumAllowedVolume;
 
         /// <summary>
         /// Constructs a DBH node.
         /// </summary>
-        public DynamicHierarchyNode3()
+        public DynamicHierarchyNodeOld()
         {
         }
 
-        internal DynamicHierarchyNode3(DynamicHierarchy3 hierarchyOwner)
+        internal DynamicHierarchyNodeOld(DynamicHierarchyOld hierarchyOwner)
         {
             hierarchy = hierarchyOwner;
         }
@@ -88,7 +88,7 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
                 lineEndpoints.Add(new VertexPositionColor(boundingBoxCorners[6], Color.DarkRed));
                 lineEndpoints.Add(new VertexPositionColor(boundingBoxCorners[7], Color.DarkRed));
             }
-            foreach (var child in children)
+            foreach (DynamicHierarchyNodeOld child in children)
             {
                 child.CollectBoundingBoxLines(lineEndpoints, includeInternalNodes);
             }
@@ -103,12 +103,12 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
             {
                 //Internal Node
                 float minimumDistance = float.MaxValue;
-                DynamicHierarchyNode3 minimumNode = null;
+                DynamicHierarchyNodeOld minimumNode = null;
                 float x = (e.boundingBox.Max.X + e.boundingBox.Min.X) * .5f;
                 float y = (e.boundingBox.Max.Y + e.boundingBox.Min.Y) * .5f;
                 float z = (e.boundingBox.Max.Z + e.boundingBox.Min.Z) * .5f;
                 Vector3 min, max;
-                foreach (var node in children)
+                foreach (DynamicHierarchyNodeOld node in children)
                 {
                     min = node.BoundingBox.Min;
                     max = node.BoundingBox.Max;
@@ -138,7 +138,7 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
             }
         }
 
-        internal void BinaryCollideAgainst(DynamicHierarchyNode3 node)
+        internal void BinaryCollideAgainst(DynamicHierarchyNodeOld node)
         {
             //Base idea: recurse down the tree whenever child bounding boxes overlap.
             //Attempt to get to the base case of leaf vs. leaf.
@@ -254,7 +254,7 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
                 if (children.Count > 0)
                 {
                     //Internal Node
-                    foreach (var node in children)
+                    foreach (DynamicHierarchyNodeOld node in children)
                     {
                         node.BinaryUpdateNode();
                     }
@@ -288,7 +288,7 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
                 BoundingBox.Intersects(ref box, out intersecting);
                 if (intersecting)
                 {
-                    foreach (var child in children)
+                    foreach (DynamicHierarchyNodeOld child in children)
                     {
                         child.BoundingBox.Intersects(ref box, out intersecting);
                         if (intersecting)
@@ -300,7 +300,7 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
             }
             else
             {
-                foreach (var e in entries)
+                foreach (BroadPhaseEntry e in entries)
                 {
                     e.boundingBox.Intersects(ref box, out intersecting);
                     if (intersecting)
@@ -317,7 +317,7 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
                 BoundingBox.Intersects(ref sphere, out intersecting);
                 if (intersecting)
                 {
-                    foreach (var child in children)
+                    foreach (DynamicHierarchyNodeOld child in children)
                     {
                         child.BoundingBox.Intersects(ref sphere, out intersecting);
                         if (intersecting)
@@ -329,7 +329,7 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
             }
             else
             {
-                foreach (var e in entries)
+                foreach (BroadPhaseEntry e in entries)
                 {
                     e.boundingBox.Intersects(ref sphere, out intersecting);
                     if (intersecting)
@@ -344,7 +344,7 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
             {
                 if (BoundingBox.Intersects(frustum))
                 {
-                    foreach (var child in children)
+                    foreach (DynamicHierarchyNodeOld child in children)
                     {
                         if (child.BoundingBox.Intersects(frustum))
                         {
@@ -355,7 +355,7 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
             }
             else
             {
-                foreach (var e in entries)
+                foreach (BroadPhaseEntry e in entries)
                 {
                     if (e.boundingBox.Intersects(frustum))
                         outputEntries.Add(e);
@@ -367,7 +367,7 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
         {
             if (children.Count > 0)
             {
-                foreach (var child in children)
+                foreach (DynamicHierarchyNodeOld child in children)
                 {
                     float? aabbtoi;
                     ray.Intersects(ref child.BoundingBox, out aabbtoi);
@@ -379,7 +379,7 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
             }
             else
             {
-                foreach (var e in entries)
+                foreach (BroadPhaseEntry e in entries)
                 {
                     float? toi;
                     ray.Intersects(ref e.boundingBox, out toi);
@@ -395,7 +395,7 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
         {
             if (children.Count > 0)
             {
-                foreach (var child in children)
+                foreach (DynamicHierarchyNodeOld child in children)
                 {
                     float? aabbtoi;
                     ray.Intersects(ref child.BoundingBox, out aabbtoi);
@@ -407,7 +407,7 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
             }
             else
             {
-                foreach (var e in entries)
+                foreach (BroadPhaseEntry e in entries)
                 {
                     float? toi;
                     ray.Intersects(ref e.boundingBox, out toi);
@@ -425,7 +425,7 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
             //Each half is given to a child.
 
             //Clear out old tree.
-            foreach (DynamicHierarchyNode3 node in children)
+            foreach (DynamicHierarchyNodeOld node in children)
             {
                 hierarchy.GiveBack(node);
             }
@@ -434,8 +434,8 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
             axisComparer.axis = minimumAxis;
             entries.Sort(axisComparer);
 
-            DynamicHierarchyNode3 left = hierarchy.GetNode();
-            DynamicHierarchyNode3 right = hierarchy.GetNode();
+            DynamicHierarchyNodeOld left = hierarchy.GetNode();
+            DynamicHierarchyNodeOld right = hierarchy.GetNode();
 
             for (int i = 0; i < entries.Count / 2; i++)
             {
@@ -449,7 +449,7 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
             children.Add(left);
 
 
-            foreach (var node in children)
+            foreach (DynamicHierarchyNodeOld node in children)
             {
                 node.Revalidate();
             }
@@ -504,7 +504,7 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
                 {
                     //Debug.WriteLine("Whoa there nelly,.");
                     //Victim of removal.  Get rid of the children, they're not necessary.
-                    foreach (var node in children)
+                    foreach (DynamicHierarchyNodeOld node in children)
                     {
                         hierarchy.GiveBack(node);
                     }
@@ -521,7 +521,7 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
 
 
             //Clear out old tree.
-            foreach (var child in children)
+            foreach (DynamicHierarchyNodeOld child in children)
             {
                 hierarchy.GiveBack(child);
             }
@@ -530,8 +530,8 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
             //Top-down reconstruction.
             Vector3 min = BoundingBox.Min;
             Vector3 max = BoundingBox.Max;
-            var left = hierarchy.GetNode();
-            var right = hierarchy.GetNode();
+            DynamicHierarchyNodeOld left = hierarchy.GetNode();
+            DynamicHierarchyNodeOld right = hierarchy.GetNode();
             float xDifference = max.X - min.X;
             float yDifference = max.Y - min.Y;
             float zDifference = max.Z - min.Z;
@@ -624,7 +624,7 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
                 if (children.Count > 0)
                 {
                     //Internal Node
-                    foreach (var node in children)
+                    foreach (DynamicHierarchyNodeOld node in children)
                     {
                         node.UpdateNode();
                     }

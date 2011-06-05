@@ -14,8 +14,10 @@ namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
     /// Broad phase implementation that partitions objects into a 2d grid, and then performs a sort and sweep on the final axis.
     /// </summary>
     /// <remarks>
-    /// This broad phase typically has very good collision performance and scales very well with multithreading, but its query times can sometimes be worse than tree-based systems
-    /// since it must scan cells.  Keeping rays as short as possible helps avoid unnecessary cell checks.</remarks>
+    /// This broad phase typically has very good collision performance and scales well with multithreading, but its query times can sometimes be worse than tree-based systems
+    /// since it must scan cells.  Keeping rays as short as possible helps avoid unnecessary cell checks.
+    /// The performance can degrade noticeably in some situations involving significant off-axis motion.
+    /// </remarks>
     public class Grid2DSortAndSweep : BroadPhase
     {
         /// <summary>
@@ -53,6 +55,10 @@ namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
         RawList<Grid2DEntry> entries = new RawList<Grid2DEntry>();
         Action<int> updateEntry, updateCell;
 
+        /// <summary>
+        /// Constructs a grid-based sort and sweep broad phase.
+        /// </summary>
+        /// <param name="threadManager">Thread manager to use for the broad phase.</param>
         public Grid2DSortAndSweep(IThreadManager threadManager)
             :base(threadManager)
         {
@@ -60,7 +66,9 @@ namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
             updateCell = UpdateCell;
             QueryAccelerator = new Grid2DSortAndSweepQueryAccelerator(this);
         }
-
+        /// <summary>
+        /// Constructs a grid-based sort and sweep broad phase.
+        /// </summary>
         public Grid2DSortAndSweep()
         {
             updateEntry = UpdateEntry;
@@ -68,9 +76,20 @@ namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
             QueryAccelerator = new Grid2DSortAndSweepQueryAccelerator(this);
         }
 
+        UnsafeResourcePool<Grid2DEntry> entryPool = new UnsafeResourcePool<Grid2DEntry>();
+        /// <summary>
+        /// Adds an entry to the broad phase.
+        /// </summary>
+        /// <param name="entry">Entry to add.</param>
         public override void Add(BroadPhaseEntry entry)
         {
-            var newEntry = new Grid2DEntry(entry);
+            //Entities do not set up their own bounding box before getting stuck in here.  If they're all zeroed out, the tree will be horrible.
+            Vector3 offset;
+            Vector3.Subtract(ref entry.boundingBox.Max, ref entry.boundingBox.Min, out offset);
+            if (offset.X * offset.Y * offset.Z == 0)
+                entry.UpdateBoundingBox();
+            var newEntry = entryPool.Take();
+            newEntry.Initialize(entry);
             entries.Add(newEntry);
             //Add the object to the grid.
             for (int i = newEntry.previousMin.Y; i <= newEntry.previousMax.Y; i++)
@@ -85,6 +104,10 @@ namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
             }
         }
 
+        /// <summary>
+        /// Removes an entry from the broad phase.
+        /// </summary>
+        /// <param name="entry">Entry to remove.</param>
         public override void Remove(BroadPhaseEntry entry)
         {
             for (int i = 0; i < entries.count; i++)
@@ -104,6 +127,8 @@ namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
                             cellSet.Remove(ref index, gridEntry);
                         }
                     }
+                    gridEntry.item = null;
+                    entryPool.GiveBack(gridEntry);
                     return;
                 }
             }
@@ -174,9 +199,15 @@ namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
             }
         }
 
+        //TODO: Cell change operations take a while.  Spin lock can't efficiently wait that long.
+        //This causes some pretty horrible scaling problems in some scenarios.
+        //Improving the cell set operations directly should improve that problem and the query times noticeably.
+
+
         SpinLock cellSetLocker = new SpinLock();
         void UpdateEntry(int i)
         {
+
             //Compute the current cells occupied by the entry.
             var entry = entries.Elements[i];
             Int2 min, max;

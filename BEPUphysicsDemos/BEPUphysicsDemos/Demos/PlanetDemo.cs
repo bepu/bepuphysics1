@@ -3,6 +3,7 @@ using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.UpdateableSystems.ForceFields;
 using BEPUphysicsDemos.SampleCode;
 using Microsoft.Xna.Framework;
+using System.Collections.Generic;
 
 namespace BEPUphysicsDemos.Demos
 {
@@ -28,10 +29,10 @@ namespace BEPUphysicsDemos.Demos
 
             //Drop the "meteorites" on the planet.
             Entity toAdd;
-            int numColumns = 7;
-            int numRows = 7;
-            int numHigh = 7;
-            float separation = 3;
+            int numColumns = 10;
+            int numRows = 10;
+            int numHigh = 10;
+            float separation = 5;
             for (int i = 0; i < numRows; i++)
                 for (int j = 0; j < numColumns; j++)
                     for (int k = 0; k < numHigh; k++)
@@ -43,7 +44,7 @@ namespace BEPUphysicsDemos.Demos
 
                         Space.Add(toAdd);
                     }
-            game.Camera.Position = new Vector3(0, 00, 150);
+            game.Camera.Position = new Vector3(0, 0, 150);
         }
 
         /// <summary>

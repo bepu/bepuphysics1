@@ -15,6 +15,7 @@ using BEPUphysics.UpdateableSystems;
 using Microsoft.Xna.Framework;
 using BEPUphysics.ResourceManagement;
 using System.Collections.ObjectModel;
+using BEPUphysics.BroadPhaseSystems.SortAndSweep;
 
 namespace BEPUphysics
 {
@@ -562,7 +563,7 @@ namespace BEPUphysics
         public bool RayCast(Ray ray, float maximumLength, IList<RayCastResult> outputRayCastResults)
         {
             var outputIntersections = Resources.GetCollisionEntryList();
-            if (BroadPhase.QueryAccelerator.RayCast(ray, outputIntersections))
+            if (BroadPhase.QueryAccelerator.RayCast(ray, maximumLength, outputIntersections))
             {
 
                 for (int i = 0; i < outputIntersections.count; i++)
@@ -590,7 +591,7 @@ namespace BEPUphysics
         public bool RayCast(Ray ray, float maximumLength, Func<BroadPhaseEntry, bool> filter, IList<RayCastResult> outputRayCastResults)
         {
             var outputIntersections = Resources.GetCollisionEntryList();
-            if (BroadPhase.QueryAccelerator.RayCast(ray, outputIntersections))
+            if (BroadPhase.QueryAccelerator.RayCast(ray, maximumLength, outputIntersections))
             {
 
                 for (int i = 0; i < outputIntersections.count; i++)

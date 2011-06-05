@@ -1,6 +1,8 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 using BEPUphysics.CollisionRuleManagement;
+using BEPUphysics.CollisionShapes.ConvexShapes;
+using BEPUphysics.MathExtensions;
 
 namespace BEPUphysics.BroadPhaseSystems
 {
@@ -71,6 +73,21 @@ namespace BEPUphysics.BroadPhaseSystems
         /// <param name="rayHit">Hit location of the ray on the entry, if any.</param>
         /// <returns>Whether or not the ray hit the entry.</returns>
         public abstract bool RayCast(Ray ray, float maximumLength, out RayHit rayHit);
+
+        /// <summary>
+        /// Sweeps a convex shape against the entry.
+        /// </summary>
+        /// <param name="castShape">Swept shape.</param>
+        /// <param name="startingTransform">Beginning location and orientation of the cast shape.</param>
+        /// <param name="sweep">Sweep motion to apply to the cast shape.</param>
+        /// <param name="hit">Hit location of the ray on the entry, if any.</param>
+        /// <returns>Whether or not the ray hit the entry.</returns>
+        public abstract bool ConvexCast(ConvexShape castShape, ref RigidTransform startingTransform, ref Vector3 sweep, out RayHit hit);
+
+        /// <summary>
+        /// Updates the bounding box to the current state of the entry.
+        /// </summary>
+        public abstract void UpdateBoundingBox();
 
         
         /// <summary>

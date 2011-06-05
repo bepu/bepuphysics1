@@ -1,15 +1,15 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 
-namespace BEPUphysics.BroadPhaseSystems.Hierarchies.TopDown
+namespace BEPUphysics.BroadPhaseSystems.Hierarchies.Testing.Old
 {
     ///<summary>
     /// Interface to the DynamicHierarchy's volume query systems.
     ///</summary>
-    public class DynamicHierarchyQueryAccelerator4 : IQueryAccelerator
+    public class DynamicHierarchyQueryAcceleratorOld : IQueryAccelerator
     {
-        private readonly DynamicHierarchy4 hierarchy;
-        internal DynamicHierarchyQueryAccelerator4(DynamicHierarchy4 hierarchy)
+        private readonly DynamicHierarchyOld hierarchy;
+        internal DynamicHierarchyQueryAcceleratorOld(DynamicHierarchyOld hierarchy)
         {
             this.hierarchy = hierarchy;
         }
@@ -21,7 +21,7 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies.TopDown
         /// <param name="entries">Entries of the space which intersect the bounding box.</param>
         public void GetEntries(BoundingBox box, IList<BroadPhaseEntry> entries)
         {
-            hierarchy.root.GetOverlaps(ref box, entries);
+            hierarchy.Root.GetEntities(ref box, entries);
 
         }
 
@@ -32,7 +32,7 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies.TopDown
         /// <param name="entries">Entries of the space which intersect the frustum.</param>
         public void GetEntries(BoundingFrustum frustum, IList<BroadPhaseEntry> entries)
         {
-            hierarchy.root.GetOverlaps(ref frustum, entries);
+            hierarchy.Root.GetEntities(ref frustum, entries);
 
         }
 
@@ -43,7 +43,7 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies.TopDown
         /// <param name="entries">Entries of the space which intersect the sphere.</param>
         public void GetEntries(BoundingSphere sphere, IList<BroadPhaseEntry> entries)
         {
-            hierarchy.root.GetOverlaps(ref sphere, entries);
+            hierarchy.Root.GetEntities(ref sphere, entries);
 
         }
 
@@ -56,7 +56,7 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies.TopDown
         /// <param name="entries">Entries which have bounding boxes that overlap the ray.</param>
         public bool RayCast(Ray ray, float maximumLength, IList<BroadPhaseEntry> entries)
         {
-            hierarchy.root.GetOverlaps(ref ray, maximumLength, entries);
+            hierarchy.Root.RayCast(ref ray, maximumLength, entries);
 
             return entries.Count > 0;
         }
@@ -69,7 +69,7 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies.TopDown
         /// <param name="entries">Entries which have bounding boxes that overlap the ray.</param>
         public bool RayCast(Ray ray, IList<BroadPhaseEntry> entries)
         {
-            hierarchy.root.GetOverlaps(ref ray, float.MaxValue, entries);
+            hierarchy.Root.RayCast(ref ray, entries);
 
             return entries.Count > 0;
         }

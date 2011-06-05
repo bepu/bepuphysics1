@@ -23,17 +23,12 @@ namespace BEPUphysicsDemos.Demos
             Space.Add(kapow);
             Space.Solver.IterationLimit = 1; //Essentially no sustained contacts, so don't need to worry about accuracy.
             Space.ForceUpdater.Gravity = Vector3.Zero;
-#if XBOX360
-            int numColumns = 7;
-            int numRows = 7;
-            int numHigh = 7;
-            float separation = 5;
-#else
+
             int numColumns = 15;
             int numRows = 15;
             int numHigh = 15;
             float separation = 3;
-#endif
+
             Entity toAdd;
 
             for (int i = 0; i < numRows; i++)

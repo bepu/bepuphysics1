@@ -7,7 +7,7 @@ using BEPUphysics.DataStructures;
 using BEPUphysics.ResourceManagement;
 using System.Diagnostics;
 
-namespace BEPUphysics.BroadPhaseSystems.Hierarchies.Insertion
+namespace BEPUphysics.BroadPhaseSystems.Hierarchies.Testing.Insertion
 {
     internal abstract class Node
     {

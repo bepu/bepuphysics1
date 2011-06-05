@@ -20,11 +20,9 @@ namespace BEPUphysicsDemos.Demos
             //Create a bunch of blocks.
             int zOffset = 5;
             int numRows = 1;
-#if !WINDOWS
-            int numColumns = 20;
-#else
+
             int numColumns = 40;
-#endif
+
             Entity toAdd;
             for (int i = 0; i < numRows; i++)
             {

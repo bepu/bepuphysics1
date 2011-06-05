@@ -99,17 +99,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BroadPhaseSystems\BruteForce.cs" />
-    <Compile Include="BroadPhaseSystems\Hierarchies\TopDown\DynamicHierarchy4.cs" />
-    <Compile Include="BroadPhaseSystems\Hierarchies\TopDown\DynamicHierarchyNode4.cs" />
-    <Compile Include="BroadPhaseSystems\Hierarchies\IncrementalImprovement\DynamicHierarchy3.cs" />
-    <Compile Include="BroadPhaseSystems\Hierarchies\IncrementalImprovement\DynamicHierarchyNode3.cs" />
-    <Compile Include="BroadPhaseSystems\Hierarchies\IncrementalImprovement\DynamicHierarchyQueryAccelerator3.cs" />
-    <Compile Include="BroadPhaseSystems\Hierarchies\Insertion\DynamicHierarchy2.cs" />
-    <Compile Include="BroadPhaseSystems\Hierarchies\Insertion\DynamicHierarchyNode2.cs" />
-    <Compile Include="BroadPhaseSystems\Hierarchies\TopDown\DynamicHierarchyQueryAccelerator4.cs" />
+    <Compile Include="BroadPhaseSystems\Hierarchies\DynamicHierarchy.cs" />
+    <Compile Include="BroadPhaseSystems\Hierarchies\DynamicHierarchyNode.cs" />
+    <Compile Include="BroadPhaseSystems\Hierarchies\Testing\Insertion\DynamicHierarchy2.cs" />
+    <Compile Include="BroadPhaseSystems\Hierarchies\Testing\Insertion\DynamicHierarchyNode2.cs" />
+    <Compile Include="BroadPhaseSystems\Hierarchies\DynamicHierarchyQueryAccelerator.cs" />
     <Compile Include="BroadPhaseSystems\SortAndSweep\Grid2DEntry.cs" />
     <Compile Include="BroadPhaseSystems\SortAndSweep\Grid2DSortAndSweep.cs" />
-    <Compile Include="BroadPhaseSystems\Hierarchies\DynamicHierarchyNode.cs" />
+    <Compile Include="BroadPhaseSystems\Hierarchies\Testing\Old\DynamicHierarchyNodeOld.cs" />
     <None Include="DataStructures\Deprecated\MeshBoundingBoxTree.cs" />
     <Compile Include="BroadPhaseSystems\SortAndSweep\Grid2DSortAndSweepQueryAccelerator.cs" />
     <Compile Include="BroadPhaseSystems\SortAndSweep\GridCell2D.cs" />
@@ -149,8 +146,8 @@
     <Compile Include="BroadPhaseSystems\BroadPhase.cs" />
     <Compile Include="BroadPhaseSystems\BroadPhaseEntry.cs" />
     <Compile Include="BroadPhaseSystems\BroadPhaseOverlap.cs" />
-    <Compile Include="BroadPhaseSystems\Hierarchies\DynamicHierarchy.cs" />
-    <Compile Include="BroadPhaseSystems\Hierarchies\DynamicHierarchyQueryAccelerator.cs" />
+    <Compile Include="BroadPhaseSystems\Hierarchies\Testing\Old\DynamicHierarchyOld.cs" />
+    <Compile Include="BroadPhaseSystems\Hierarchies\Testing\Old\DynamicHierarchyQueryAcceleratorOld.cs" />
     <Compile Include="Collidables\CollidableCollection.cs" />
     <Compile Include="Collidables\CollidablePair.cs" />
     <Compile Include="Collidables\EntityCollidableCollection.cs" />

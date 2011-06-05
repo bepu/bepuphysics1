@@ -106,6 +106,13 @@ namespace BEPUphysics.Collidables.MobileCollidables
             }
         }
 
+        /// <summary>
+        /// Updates the bounding box to the current state of the entry.
+        /// </summary>
+        public override void UpdateBoundingBox()
+        {
+            UpdateBoundingBox(0);
+        }
 
         ///<summary>
         /// Updates the bounding box of the mobile collidable.

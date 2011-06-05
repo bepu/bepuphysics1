@@ -49,7 +49,7 @@ namespace BEPUphysics.Collidables
             {
                 (mesh.Data as TransformableMeshData).WorldTransform = value;
                 mesh.Tree.Refit();
-                boundingBox = mesh.Tree.BoundingBox;
+                UpdateBoundingBox();
             }
         }
 
@@ -61,8 +61,6 @@ namespace BEPUphysics.Collidables
         public StaticMesh(Vector3[] vertices, int[] indices)
         {
             base.Shape = new StaticMeshShape(vertices, indices);
-            mesh = new TriangleMesh(Shape.TriangleMeshData);
-            boundingBox = mesh.Tree.BoundingBox;
             collisionRules.group = CollisionRules.DefaultKinematicCollisionGroup;
             events = new ContactEventManager<StaticMesh>(this);
 
@@ -80,7 +78,6 @@ namespace BEPUphysics.Collidables
         public StaticMesh(Vector3[] vertices, int[] indices, AffineTransform worldTransform)
         {
             base.Shape = new StaticMeshShape(vertices, indices, worldTransform);
-
             collisionRules.group = CollisionRules.DefaultKinematicCollisionGroup;
             events = new ContactEventManager<StaticMesh>(this);
 
@@ -179,6 +176,14 @@ namespace BEPUphysics.Collidables
         protected override void OnShapeChanged(CollisionShape collisionShape)
         {
             mesh = new TriangleMesh(Shape.TriangleMeshData);
+            UpdateBoundingBox();
+        }
+
+        /// <summary>
+        /// Updates the bounding box to the current state of the entry.
+        /// </summary>
+        public override void UpdateBoundingBox()
+        {
             boundingBox = mesh.Tree.BoundingBox;
         }
 

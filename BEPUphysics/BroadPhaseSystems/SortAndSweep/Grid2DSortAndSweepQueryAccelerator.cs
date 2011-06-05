@@ -21,6 +21,9 @@ namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
 
         public bool RayCast(Microsoft.Xna.Framework.Ray ray, float maximumLength, IList<BroadPhaseEntry> outputIntersections)
         {
+            if (maximumLength == float.MaxValue) 
+                throw new NotSupportedException("The Grid2DSortAndSweep broad phase cannot accelerate infinite ray casts.  Consider specifying a maximum length or using a broad phase which supports infinite ray casts.");
+        
             //Use 2d line rasterization.
             //Compute the exit location in the cell.
             //Test against each bounding box up until the exit value is reached.
@@ -148,7 +151,11 @@ namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
             //Create a bounding box based on the bounding sphere.
             //Compute the min and max of the bounding box.
             //Loop through the cells and select bounding boxes which overlap the x axis.
+#if !WINDOWS
+            Vector3 offset = new Vector3();
+#else
             Vector3 offset;
+#endif
             offset.X = boundingShape.Radius;
             offset.Y = offset.X;
             offset.Z = offset.Y;

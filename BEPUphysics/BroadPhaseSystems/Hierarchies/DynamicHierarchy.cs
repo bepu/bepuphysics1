@@ -1,725 +1,179 @@
 ﻿using System;
 using System.Collections.Generic;
-using BEPUphysics.ResourceManagement;
+using System.Linq;
+using System.Text;
+using BEPUphysics.DataStructures;
 using Microsoft.Xna.Framework;
+using System.Runtime.InteropServices;
 using BEPUphysics.Threading;
+using BEPUphysics.ResourceManagement;
 
 namespace BEPUphysics.BroadPhaseSystems.Hierarchies
 {
-    ///<summary>
-    /// Broadphase which uses a dynamically changing bounding box tree to calculate overlaps.
-    /// It has good insertion and update speed.
-    ///</summary>
+    /// <summary>
+    /// Broad phase that incrementally updates the internal tree acceleration structure.
+    /// </summary>
+    /// <remarks>
+    /// This is a good all-around broad phase; its performance is consistent and all queries are supported and speedy.
+    /// The memory usage is higher than simple one-axis sort and sweep, but a bit lower than the Grid2DSortAndSweep option.
+    /// </remarks>
     public class DynamicHierarchy : BroadPhase
     {
-        private readonly ResourcePool<DynamicHierarchyNode> dynamicHierarchyNodes = new LockingResourcePool<DynamicHierarchyNode>(128);
-
-        internal DynamicHierarchyNode GetNode()
-        {
-            //Debug.WriteLine("S: " + dynamicHierarchyNodes.sharedPool.Count);
-            //Debug.WriteLine("TS: " + dynamicHierarchyNodes.threadSpecificPools.Length);
-
-            var toReturn = dynamicHierarchyNodes.Take();
-
-            toReturn.hierarchy = this;
-            return toReturn;
-
-        }
-
-        internal void GiveBack(DynamicHierarchyNode node)
-        {
-            foreach (var childNode in node.children)
-            {
-                GiveBack(childNode);
-            }
-            node.entries.Clear();
-            node.currentVolume = 0;
-            node.maximumAllowedVolume = 0;
-            node.children.Clear();
-
-            dynamicHierarchyNodes.GiveBack(node);
-        }
+        internal Node root;
 
         /// <summary>
-        /// When an internal node is revalidated, its volume is stored.  When a node's volume exceeds its stored volume multiplied by this factor, it is revalidated again.
-        /// </summary>
-        public float MaximumAllowedVolumeFactor = 1.4f;
-
-        /// <summary>
-        /// Maximum fraction of a parent's entities that a child can inherit.
-        /// If a child has as much or more, the validation process is done over again to ensure a more even split.
-        /// </summary>
-        public float MaximumChildEntityLoad = .8f;
-
-        /// <summary>
-        /// The maximum number of entities present in the leaf nodes of the hierarchy.
-        /// </summary>
-        public int MaximumEntitiesInLeaves = 2;
-
-        /// <summary>
-        /// The number of entities needed in a particular node to use the multithreaded reconstruction method on it.
-        /// If the node has less, the current thread does the remainder of the subtree itself.
-        /// This only applies if multithreading is currently being used.
-        /// </summary>
-        public int MinimumNodeEntitiesRequiredToMultithread = 100;
-
-        /// <summary>
-        /// Highest parent in the hierarchy.
-        /// </summary>
-        public DynamicHierarchyNode Root;
-
-        /// <summary>
-        /// Constructs a new instance of the hierarchy and sets up the root node.
+        /// Constructs a new dynamic hierarchy broad phase.
         /// </summary>
         public DynamicHierarchy()
         {
-            Root = new DynamicHierarchyNode(this);
-            revalidateMultithreadedDelegate = RevalidateMultithreaded;
-            updateCollisionMultithreadedSubFunctionDelegate = UpdateCollisionMultithreadedSubFunction;
-            updateCollisionsMultithreadedSubFunctionTaskOverheadDelegate = UpdateCollisionsMultithreadedSubFunctionTaskOverhead;
+            multithreadedRefit = MultithreadedRefit;
+            multithreadedOverlap = MultithreadedOverlap;
             QueryAccelerator = new DynamicHierarchyQueryAccelerator(this);
         }
 
         /// <summary>
-        /// Constructs a new instance of the hierarchy and sets up the root node.
+        /// Constructs a new dynamic hierarchy broad phase.
         /// </summary>
+        /// <param name="threadManager">Thread manager to use in the broad phase.</param>
         public DynamicHierarchy(IThreadManager threadManager)
             : base(threadManager)
         {
-            Root = new DynamicHierarchyNode(this);
-            revalidateMultithreadedDelegate = RevalidateMultithreaded;
-            updateCollisionMultithreadedSubFunctionDelegate = UpdateCollisionMultithreadedSubFunction;
-            updateCollisionsMultithreadedSubFunctionTaskOverheadDelegate = UpdateCollisionsMultithreadedSubFunctionTaskOverhead;
-
+            multithreadedRefit = MultithreadedRefit;
+            multithreadedOverlap = MultithreadedOverlap;
             QueryAccelerator = new DynamicHierarchyQueryAccelerator(this);
         }
 
-        /// <summary>
-        /// Adds an entity to the hierarchy.  Called automatically by the Space owning this broad phase system when an entity is added.
-        /// </summary>
-        /// <param name="entry">Entry to add.</param>
-        public override void Add(BroadPhaseEntry entry)
+        #region Multithreading
+
+        protected override void UpdateMultithreaded()
         {
             lock (Locker)
             {
+                //To multithread the tree traversals, we have to do a little single threaded work.
+                //Dive down into the tree far enough that there are enough nodes to split amongst all the threads in the thread manager.
+                int splitDepth = (int)Math.Ceiling(Math.Log(ThreadManager.ThreadCount, 2));
 
-                Root.Add(entry);
+                root.CollectMultithreadingNodes(splitDepth, 1, multithreadingSourceNodes);
+                //Go through every node and refit it.
+                ThreadManager.ForLoop(0, multithreadingSourceNodes.count, multithreadedRefit);
+                multithreadingSourceNodes.Clear();
+                //Now that the subtrees belonging to the source nodes are refit, refit the top nodes.
+                //Sometimes, this will go deeper than necessary because the refit process may require an extremely high level (nonmultithreaded) revalidation.
+                //The waste cost is a matter of nanoseconds due to the simplicity of the operations involved.
+                root.PostRefit(splitDepth, 1);
 
+                //The trees are now fully refit (and revalidated, if the refit process found it to be necessary).
+                //The overlap traversal is conceptually similar to the multithreaded refit, but is a bit easier since there's no need to go back up the stack.
+                Overlaps.Clear();
+                root.GetMultithreadedOverlaps(root, splitDepth, 1, this, multithreadingSourceOverlaps);
+                ThreadManager.ForLoop(0, multithreadingSourceOverlaps.count, multithreadedOverlap);
+                multithreadingSourceOverlaps.Clear();
             }
 
         }
 
-
-        /// <summary>
-        /// Removes an entity from the hierarchy.  Called automatically by the Space owning this broad phase system when an entity is removed.
-        /// </summary>
-        /// <param name="entry">Entry to add.</param>
-        public override void Remove(BroadPhaseEntry entry)
+        internal struct NodePair
         {
-            lock (Locker)
-            {
-                Root.Remove(entry, Root.entries.IndexOf(entry));
-
-            }
-
+            internal Node a;
+            internal Node b;
         }
 
-        internal void TryToAdd(BroadPhaseEntry entryA, BroadPhaseEntry entryB)
+        RawList<Node> multithreadingSourceNodes = new RawList<Node>(4);
+        Action<int> multithreadedRefit;
+        void MultithreadedRefit(int i)
         {
-            bool intersects;
-            entryA.boundingBox.Intersects(ref entryB.boundingBox, out intersects);
-            if (intersects)
-                TryToAddOverlap(entryA, entryB);
+            multithreadingSourceNodes.Elements[i].Refit();
         }
 
-        #region For Multithreading
-
-        private readonly Queue<DynamicHierarchyNode> aNodes = new Queue<DynamicHierarchyNode>();
-        private readonly Queue<DynamicHierarchyNode> bNodes = new Queue<DynamicHierarchyNode>();
-        private readonly ResourcePool<HierarchyNodeComparison> nodeComparisons = new LockingResourcePool<HierarchyNodeComparison>(128);
-        private readonly Action<object> revalidateMultithreadedDelegate;
-        private readonly Action<object> updateCollisionMultithreadedSubFunctionDelegate;
-        private readonly Action<object> updateCollisionsMultithreadedSubFunctionTaskOverheadDelegate;
-        private readonly Queue<HierarchyNodeComparison> usedComparisons = new Queue<HierarchyNodeComparison>(128);
-
-        private static void UpdateCollisionMultithreadedSubFunction(object information)
+        RawList<NodePair> multithreadingSourceOverlaps = new RawList<NodePair>(10);
+        Action<int> multithreadedOverlap;
+        void MultithreadedOverlap(int i)
         {
-            var comparison = information as HierarchyNodeComparison;
-
-            comparison.a.BinaryCollideAgainst(comparison.b);
-        }
-
-        private HierarchyNodeComparison GetNodeComparison(DynamicHierarchyNode aNode, DynamicHierarchyNode bNode)
-        {
-            var toReturn = nodeComparisons.Take();
-            toReturn.Setup(aNode, bNode);
-            usedComparisons.Enqueue(toReturn);
-            return toReturn;
-        }
-
-        private void GiveBack(HierarchyNodeComparison comparison)
-        {
-            nodeComparisons.GiveBack(comparison);
-        }
-
-        private void RedoSplitMultithreaded(object information)
-        {
-            var node = information as DynamicHierarchyNode;
-            foreach (var child in node.children)
-            {
-                GiveBack(child);
-            }
-            node.children.Clear();
-
-            node.entries.Sort(node.axisComparer);
-
-            var left = GetNode();
-            var right = GetNode();
-
-            for (int i = 0; i < node.entries.Count / 2; i++)
-            {
-                right.entries.Add(node.entries[i]);
-            }
-            for (int i = node.entries.Count / 2; i < node.entries.Count; i++)
-            {
-                left.entries.Add(node.entries[i]);
-            }
-
-            node.children.Add(left);
-            node.children.Add(right);
-            if (right.entries.Count >= MinimumNodeEntitiesRequiredToMultithread)
-                ThreadManager.EnqueueTask(revalidateMultithreadedDelegate, right);
-            else
-                right.Revalidate();
-            if (left.entries.Count >= MinimumNodeEntitiesRequiredToMultithread)
-                ThreadManager.EnqueueTask(revalidateMultithreadedDelegate, left);
-            else
-                left.Revalidate();
-        }
-
-        private void RevalidateMultithreaded(object information)
-        {
-            var node = information as DynamicHierarchyNode;
-            if (node.entries.Count > 0)
-            {
-                node.BoundingBox = node.entries[0].boundingBox;
-                for (int i = 1; i < node.entries.Count; i++)
-                {
-                    BoundingBox.CreateMerged(ref node.BoundingBox, ref node.entries[i].boundingBox, out node.BoundingBox);
-                }
-            }
-            else
-                node.BoundingBox = new BoundingBox();
-            if (node.entries.Count <= MaximumEntitiesInLeaves)
-            {
-                //Revalidating this node won't do anything.
-                if (node.children.Count > 0)
-                {
-                    //Debug.WriteLine("Whoa there nelly,.");
-                    //Victim of removal.  Get rid of the children, they're not necessary.
-                    foreach (var oldChild in node.children)
-                    {
-                        GiveBack(oldChild);
-                    }
-                    node.children.Clear();
-                }
-                return;
-            }
-
-
-            Vector3 difference;
-            Vector3.Subtract(ref node.BoundingBox.Max, ref node.BoundingBox.Min, out difference);
-            node.currentVolume = difference.X * difference.Y * difference.Z;
-            node.maximumAllowedVolume = node.currentVolume * MaximumAllowedVolumeFactor;
-
-
-            //Clear out old tree.
-            foreach (var oldChild in node.children)
-            {
-                GiveBack(oldChild);
-            }
-            node.children.Clear();
-
-            //Top-down reconstruction.
-            Vector3 min = node.BoundingBox.Min;
-            Vector3 max = node.BoundingBox.Max;
-            var left = GetNode();
-            var right = GetNode();
-            float xDifference = max.X - min.X;
-            float yDifference = max.Y - min.Y;
-            float zDifference = max.Z - min.Z;
-            float midpoint;
-            DynamicHierarchyNode.ComparerAxis minimumAxis;
-            if (xDifference > yDifference && xDifference > zDifference)
-            {
-                minimumAxis = DynamicHierarchyNode.ComparerAxis.X;
-                midpoint = (max.X + min.X) * .5f;
-                foreach (var e in node.entries)
-                {
-                    float x = (e.boundingBox.Max.X + e.boundingBox.Min.X) * .5f;
-                    if (x > midpoint)
-                        left.entries.Add(e);
-                    else
-                        right.entries.Add(e);
-                }
-            }
-            else if (yDifference > xDifference && yDifference > zDifference)
-            {
-                minimumAxis = DynamicHierarchyNode.ComparerAxis.Z;
-                midpoint = (max.Y + min.Y) * .5f;
-                foreach (var e in node.entries)
-                {
-                    float y = (e.boundingBox.Max.Y + e.boundingBox.Min.Y) * .5f;
-                    if (y > midpoint)
-                        left.entries.Add(e);
-                    else
-                        right.entries.Add(e);
-                }
-            }
-            else // if (zDifference > xDifference && zDifference > yDifference)
-            {
-                minimumAxis = DynamicHierarchyNode.ComparerAxis.Z;
-                midpoint = (max.Z + min.Z) * .5f;
-                foreach (var e in node.entries)
-                {
-                    float z = (e.boundingBox.Max.Z + e.boundingBox.Min.Z) * .5f;
-                    if (z > midpoint)
-                        left.entries.Add(e);
-                    else
-                        right.entries.Add(e);
-                }
-            }
-
-            var maxEntityCount = (int)(node.entries.Count * MaximumChildEntityLoad);
-            if (left.entries.Count >= maxEntityCount)
-            {
-                GiveBack(left);
-                GiveBack(right);
-                node.axisComparer.axis = minimumAxis;
-                RedoSplitMultithreaded(node);
-            }
-            else
-            {
-                if (right.entries.Count >= maxEntityCount)
-                {
-                    GiveBack(left);
-                    GiveBack(right);
-                    node.axisComparer.axis = minimumAxis;
-                    RedoSplitMultithreaded(node);
-                }
-                else
-                {
-                    node.children.Add(left);
-                    node.children.Add(right);
-                    if (right.entries.Count >= MinimumNodeEntitiesRequiredToMultithread)
-                        ThreadManager.EnqueueTask(revalidateMultithreadedDelegate, right);
-                    else
-                        right.Revalidate();
-                    if (left.entries.Count >= MinimumNodeEntitiesRequiredToMultithread)
-                        ThreadManager.EnqueueTask(revalidateMultithreadedDelegate, left);
-                    else
-                        left.Revalidate();
-                }
-            }
-        }
-
-        private void UpdateCollisionsMultithreaded()
-        {
-            //Basic idea is to use a breadth first traversal.  When a certain number of nodes are visited in a tree of any significant complexity
-            //compared to the number of threads available, all further visitable nodes are enqueued as tasks to be solved in parallel.
-            //This doesn't scale infinitely, but works great for times when the number of nodes is much larger than the number of threads.
-            //This avoids the task queue's significant overhead since there's only as many tasks enqueued as there are threads (within a factor of 4).
-            aNodes.Enqueue(Root);
-            bNodes.Enqueue(Root);
-            DynamicHierarchyNode aNode, bNode;
-            bool shouldUseTasks = false;
-            while (aNodes.Count > 0)
-            {
-                aNode = aNodes.Dequeue();
-                bNode = bNodes.Dequeue();
-                if (!shouldUseTasks && aNodes.Count >= ThreadManager.ThreadCount - 1)
-                    shouldUseTasks = true;
-                if (shouldUseTasks)
-                {
-                    //Toss the job off to a thread.
-                    ThreadManager.EnqueueTask(updateCollisionMultithreadedSubFunctionDelegate, GetNodeComparison(aNode, bNode));
-                }
-                else
-                {
-                    //Base idea: recurse down the tree whenever child bounding boxes overlap.
-                    //Attempt to get to the base case of leaf vs. leaf.
-                    bool intersecting;
-                    if (aNode == bNode)
-                    {
-                        //Very simple case; the test between the nodes
-                        if (aNode.children.Count == 0)
-                        {
-                            //Leafwise tests
-                            for (int i = 0; i < aNode.entries.Count - 1; i++)
-                            {
-                                for (int j = i + 1; j < aNode.entries.Count; j++)
-                                {
-                                    TryToAdd(aNode.entries[i], aNode.entries[j]);
-                                }
-                            }
-                        }
-                        else
-                        {
-                            //Nodewise test
-
-                            aNode.children[0].BoundingBox.Intersects(ref aNode.children[1].BoundingBox, out intersecting);
-                            if (intersecting)
-                            {
-                                //aNode.children[0].binaryCollideAgainst(aNode.children[1]);
-                                aNodes.Enqueue(aNode.children[0]);
-                                bNodes.Enqueue(aNode.children[1]);
-                            }
-
-
-                            //Self test
-                            aNodes.Enqueue(aNode.children[0]);
-                            bNodes.Enqueue(aNode.children[0]);
-                            aNodes.Enqueue(aNode.children[1]);
-                            bNodes.Enqueue(aNode.children[1]);
-                        }
-                    }
-                    else
-                    {
-                        if (aNode.children.Count > 0 && bNode.children.Count > 0)
-                        {
-                            //Both involved nodes are not leaves.
-                            aNode.children[0].BoundingBox.Intersects(ref bNode.children[0].BoundingBox, out intersecting);
-                            if (intersecting)
-                            {
-                                //aNode.children[0].binaryCollideAgainst(bNode.children[0]);
-                                aNodes.Enqueue(aNode.children[0]);
-                                bNodes.Enqueue(bNode.children[0]);
-                            }
-
-                            aNode.children[0].BoundingBox.Intersects(ref bNode.children[1].BoundingBox, out intersecting);
-                            if (intersecting)
-                            {
-                                //aNode.children[0].binaryCollideAgainst(bNode.children[1]);
-                                aNodes.Enqueue(aNode.children[0]);
-                                bNodes.Enqueue(bNode.children[1]);
-                            }
-
-                            aNode.children[1].BoundingBox.Intersects(ref bNode.children[0].BoundingBox, out intersecting);
-                            if (intersecting)
-                            {
-                                //aNode.children[1].binaryCollideAgainst(bNode.children[0]);
-                                aNodes.Enqueue(aNode.children[1]);
-                                bNodes.Enqueue(bNode.children[0]);
-                            }
-
-                            aNode.children[1].BoundingBox.Intersects(ref bNode.children[1].BoundingBox, out intersecting);
-                            if (intersecting)
-                            {
-                                //aNode.children[1].binaryCollideAgainst(bNode.children[1]);
-                                aNodes.Enqueue(aNode.children[1]);
-                                bNodes.Enqueue(bNode.children[1]);
-                            }
-                        }
-                        else if (aNode.children.Count > 0)
-                        {
-                            //Opposing node is a leaf.
-                            aNode.children[0].BoundingBox.Intersects(ref bNode.BoundingBox, out intersecting);
-                            if (intersecting)
-                            {
-                                //aNode.children[0].binaryCollideAgainst(bNode);
-                                aNodes.Enqueue(aNode.children[0]);
-                                bNodes.Enqueue(bNode);
-                            }
-
-                            aNode.children[1].BoundingBox.Intersects(ref bNode.BoundingBox, out intersecting);
-                            if (intersecting)
-                            {
-                                //aNode.children[1].binaryCollideAgainst(bNode);
-                                aNodes.Enqueue(aNode.children[1]);
-                                bNodes.Enqueue(bNode);
-                            }
-                        }
-                        else if (bNode.children.Count > 0)
-                        {
-                            //I'm a leaf
-                            aNode.BoundingBox.Intersects(ref bNode.children[0].BoundingBox, out intersecting);
-                            if (intersecting)
-                            {
-                                //aNode.binaryCollideAgainst(bNode.children[0]);
-                                aNodes.Enqueue(aNode);
-                                bNodes.Enqueue(bNode.children[0]);
-                            }
-
-                            aNode.BoundingBox.Intersects(ref bNode.children[1].BoundingBox, out intersecting);
-                            if (intersecting)
-                            {
-                                //aNode.binaryCollideAgainst(bNode.children[1]);
-                                aNodes.Enqueue(aNode);
-                                bNodes.Enqueue(bNode.children[1]);
-                            }
-                        }
-                        else
-                        {
-                            //Both leaves!
-                            //Entity vs. entity test.
-                            for (int i = 0; i < aNode.entries.Count; i++)
-                            {
-                                for (int j = 0; j < bNode.entries.Count; j++)
-                                {
-                                    TryToAdd(aNode.entries[i], bNode.entries[j]);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        private void UpdateCollisionsMultithreadedSubFunctionTaskOverhead(object information)
-        {
-            var comparison = information as HierarchyNodeComparison;
-            var aNode = comparison.a;
-            var bNode = comparison.b;
-
-            //Base idea: recurse down the tree whenever child bounding boxes overlap.
-            //Attempt to get to the base case of leaf vs. leaf.
-            bool intersecting;
-            if (aNode == bNode)
-            {
-                //Very simple case; the test between the nodes
-                if (aNode.children.Count == 0)
-                {
-                    //Leafwise tests
-                    for (int i = 0; i < aNode.entries.Count - 1; i++)
-                    {
-                        for (int j = i + 1; j < aNode.entries.Count; j++)
-                        {
-                            TryToAdd(aNode.entries[i], aNode.entries[j]);
-                        }
-                    }
-                }
-                else
-                {
-                    //Nodewise test
-
-                    aNode.children[0].BoundingBox.Intersects(ref aNode.children[1].BoundingBox, out intersecting);
-                    if (intersecting)
-                    {
-                        //aNode.children[0].binaryCollideAgainst(aNode.children[1]);
-                        ThreadManager.EnqueueTask(updateCollisionsMultithreadedSubFunctionTaskOverheadDelegate, GetNodeComparison(aNode.children[0], bNode.children[1]));
-                        //aNodes.Enqueue(aNode.children[0]);
-                        //bNodes.Enqueue(aNode.children[1]);
-                    }
-
-
-                    //Self test
-                    ThreadManager.EnqueueTask(updateCollisionsMultithreadedSubFunctionTaskOverheadDelegate, GetNodeComparison(aNode.children[0], aNode.children[0]));
-                    ThreadManager.EnqueueTask(updateCollisionsMultithreadedSubFunctionTaskOverheadDelegate, GetNodeComparison(aNode.children[1], aNode.children[1]));
-                    //aNodes.Enqueue(aNode.children[0]);
-                    //bNodes.Enqueue(aNode.children[0]);
-                    //aNodes.Enqueue(aNode.children[1]);
-                    //bNodes.Enqueue(aNode.children[1]);
-                }
-            }
-            else
-            {
-                if (aNode.children.Count > 0 && bNode.children.Count > 0)
-                {
-                    //Both involved nodes are not leaves.
-                    aNode.children[0].BoundingBox.Intersects(ref bNode.children[0].BoundingBox, out intersecting);
-                    if (intersecting)
-                    {
-                        //aNode.children[0].binaryCollideAgainst(bNode.children[0]);
-                        ThreadManager.EnqueueTask(updateCollisionsMultithreadedSubFunctionTaskOverheadDelegate, GetNodeComparison(aNode.children[0], bNode.children[0]));
-                        //aNodes.Enqueue(aNode.children[0]);
-                        //bNodes.Enqueue(bNode.children[0]);
-                    }
-
-                    aNode.children[0].BoundingBox.Intersects(ref bNode.children[1].BoundingBox, out intersecting);
-                    if (intersecting)
-                    {
-                        //aNode.children[0].binaryCollideAgainst(bNode.children[1]);
-                        ThreadManager.EnqueueTask(updateCollisionsMultithreadedSubFunctionTaskOverheadDelegate, GetNodeComparison(aNode.children[0], bNode.children[1]));
-                        //aNodes.Enqueue(aNode.children[0]);
-                        //bNodes.Enqueue(bNode.children[1]);
-                    }
-
-                    aNode.children[1].BoundingBox.Intersects(ref bNode.children[0].BoundingBox, out intersecting);
-                    if (intersecting)
-                    {
-                        //aNode.children[1].binaryCollideAgainst(bNode.children[0]);
-                        ThreadManager.EnqueueTask(updateCollisionsMultithreadedSubFunctionTaskOverheadDelegate, GetNodeComparison(aNode.children[1], bNode.children[0]));
-                        //aNodes.Enqueue(aNode.children[1]);
-                        //bNodes.Enqueue(bNode.children[0]);
-                    }
-
-                    aNode.children[1].BoundingBox.Intersects(ref bNode.children[1].BoundingBox, out intersecting);
-                    if (intersecting)
-                    {
-                        //aNode.children[1].binaryCollideAgainst(bNode.children[1]);
-                        ThreadManager.EnqueueTask(updateCollisionsMultithreadedSubFunctionTaskOverheadDelegate, GetNodeComparison(aNode.children[1], bNode.children[1]));
-                        //aNodes.Enqueue(aNode.children[1]);
-                        //bNodes.Enqueue(bNode.children[1]);
-                    }
-                }
-                else if (aNode.children.Count > 0)
-                {
-                    //Opposing node is a leaf.
-                    aNode.children[0].BoundingBox.Intersects(ref bNode.BoundingBox, out intersecting);
-                    if (intersecting)
-                    {
-                        //aNode.children[0].binaryCollideAgainst(bNode);
-                        ThreadManager.EnqueueTask(updateCollisionsMultithreadedSubFunctionTaskOverheadDelegate, GetNodeComparison(aNode.children[0], bNode));
-                        //aNodes.Enqueue(aNode.children[0]);
-                        //bNodes.Enqueue(bNode);
-                    }
-
-                    aNode.children[1].BoundingBox.Intersects(ref bNode.BoundingBox, out intersecting);
-                    if (intersecting)
-                    {
-                        //aNode.children[1].binaryCollideAgainst(bNode);
-                        ThreadManager.EnqueueTask(updateCollisionsMultithreadedSubFunctionTaskOverheadDelegate, GetNodeComparison(aNode.children[1], bNode));
-                        //aNodes.Enqueue(aNode.children[1]);
-                        //bNodes.Enqueue(bNode);
-                    }
-                }
-                else if (bNode.children.Count > 0)
-                {
-                    //I'm a leaf
-                    aNode.BoundingBox.Intersects(ref bNode.children[0].BoundingBox, out intersecting);
-                    if (intersecting)
-                    {
-                        //aNode.binaryCollideAgainst(bNode.children[0]);
-                        ThreadManager.EnqueueTask(updateCollisionsMultithreadedSubFunctionTaskOverheadDelegate, GetNodeComparison(aNode, bNode.children[0]));
-                        //aNodes.Enqueue(aNode);
-                        //bNodes.Enqueue(bNode.children[0]);
-                    }
-
-                    aNode.BoundingBox.Intersects(ref bNode.children[1].BoundingBox, out intersecting);
-                    if (intersecting)
-                    {
-                        //aNode.binaryCollideAgainst(bNode.children[1]);
-                        ThreadManager.EnqueueTask(updateCollisionsMultithreadedSubFunctionTaskOverheadDelegate, GetNodeComparison(aNode, bNode.children[1]));
-                        //aNodes.Enqueue(aNode);
-                        //bNodes.Enqueue(bNode.children[1]);
-                    }
-                }
-                else
-                {
-                    //Both leaves!
-                    //Entity vs. entity test.
-                    for (int i = 0; i < aNode.entries.Count; i++)
-                    {
-                        for (int j = 0; j < bNode.entries.Count; j++)
-                        {
-                            TryToAdd(aNode.entries[i], bNode.entries[j]);
-                        }
-                    }
-                }
-            }
-        }
-
-        private void UpdateNodeMultithreaded(DynamicHierarchyNode node)
-        {
-            //revalidate();
-            //return;
-            /*float totalChildrenSum = 0;
-            Vector3 diff;
-                
-            foreach (DynamicHierarchyNode child in children)
-            {
-                Vector3.Subtract(ref child.boundingBox.Max, ref child.boundingBox.Min, out diff);
-                totalChildrenSum += (diff.X * diff.Y * diff.Z);
-            }
-            if(currentVolume / totalChildrenSum < .9f)*/
-            if (node.currentVolume > node.maximumAllowedVolume)
-            {
-                //Debug.WriteLine("volume exceeded, current: " + currentVolume + ", max: " + maximumAllowedVolume);
-                if (node.entries.Count >= MinimumNodeEntitiesRequiredToMultithread)
-                    ThreadManager.EnqueueTask(revalidateMultithreadedDelegate, node);
-                else
-                    node.Revalidate();
-            }
-            else
-            {
-                if (node.children.Count > 0)
-                {
-                    //Internal Node
-                    foreach (DynamicHierarchyNode child in node.children)
-                    {
-                        UpdateNodeMultithreaded(child);
-                    }
-                    node.BoundingBox = node.children[0].BoundingBox;
-                    for (int i = 1; i < node.children.Count; i++)
-                    {
-                        BoundingBox.CreateMerged(ref node.BoundingBox, ref node.children[i].BoundingBox, out node.BoundingBox);
-                    }
-                }
-                else
-                {
-                    //Leaf Node
-                    if (node.entries.Count > 0) //don't try to merge anything if there's nothing!
-                    {
-                        node.BoundingBox = node.entries[0].boundingBox;
-                        for (int i = 1; i < node.entries.Count; i++)
-                        {
-                            BoundingBox.CreateMerged(ref node.BoundingBox, ref node.entries[i].boundingBox, out node.BoundingBox);
-                        }
-                    }
-                    else
-                        node.BoundingBox = new BoundingBox();
-                }
-                Vector3 difference;
-                Vector3.Subtract(ref node.BoundingBox.Max, ref node.BoundingBox.Min, out difference);
-                node.currentVolume = difference.X * difference.Y * difference.Z;
-            }
-        }
-
-        private class HierarchyNodeComparison
-        {
-            internal DynamicHierarchyNode a;
-            internal DynamicHierarchyNode b;
-
-            internal void Setup(DynamicHierarchyNode aNode, DynamicHierarchyNode bNode)
-            {
-                a = aNode;
-                b = bNode;
-            }
+            var overlap = multithreadingSourceOverlaps.Elements[i];
+            overlap.a.GetOverlaps(overlap.b, this);
         }
 
         #endregion
 
-
-        protected override void UpdateMultithreaded()
-        {
-            Overlaps.Clear();
-            lock (Locker)
-            {
-                UpdateNodeMultithreaded(Root);
-                ThreadManager.WaitForTaskCompletion();
-
-
-                //root.binaryUpdateNode();
-
-                UpdateCollisionsMultithreaded();
-                ThreadManager.WaitForTaskCompletion();
-                while (usedComparisons.Count > 0)
-                {
-                    GiveBack(usedComparisons.Dequeue());
-                }
-
-                //root.binaryCollideAgainst(root);
-            }
-        }
-
         protected override void UpdateSingleThreaded()
         {
-            Overlaps.Clear();
             lock (Locker)
             {
-                Root.BinaryUpdateNode();
-                Root.BinaryCollideAgainst(Root);
+                root.Refit();
+
+                Overlaps.Clear();
+                root.GetOverlaps(root, this);
             }
         }
+
+        UnsafeResourcePool<LeafNode> leafNodes = new UnsafeResourcePool<LeafNode>();
+
+        /// <summary>
+        /// Adds an entry to the hierarchy.
+        /// </summary>
+        /// <param name="entry">Entry to remove.</param>
+        public override void Add(BroadPhaseEntry entry)
+        {
+            //Entities do not set up their own bounding box before getting stuck in here.  If they're all zeroed out, the tree will be horrible.
+            Vector3 offset;
+            Vector3.Subtract(ref entry.boundingBox.Max, ref entry.boundingBox.Min, out offset);
+            if (offset.X * offset.Y * offset.Z == 0)
+                entry.UpdateBoundingBox();
+            //Could buffer additions to get a better construction in the tree.
+            var node = leafNodes.Take();
+            node.Initialize(entry);
+            if (root == null)
+            {
+                //Empty tree.  This is the first and only node.
+                root = node;
+            }
+            else
+            {
+                if (root.IsLeaf) //Root is alone.
+                    root.TryToInsert(node, out root);
+                else
+                {
+                    BoundingBox.CreateMerged(ref node.BoundingBox, ref root.BoundingBox, out root.BoundingBox);
+                    var internalNode = (InternalNode)root;
+                    Vector3.Subtract(ref root.BoundingBox.Max, ref root.BoundingBox.Min, out offset);
+                    internalNode.currentVolume = offset.X * offset.Y * offset.Z;
+                    //internalNode.maximumVolume = internalNode.currentVolume * InternalNode.MaximumVolumeScale;
+                    //The caller is responsible for the merge.
+                    var treeNode = root;
+                    while (!treeNode.TryToInsert(node, out treeNode)) ;//TryToInsert returns the next node, if any, and updates node bounding box.
+                }
+            }
+        }
+        /// <summary>
+        /// Removes an entry from the hierarchy.
+        /// </summary>
+        /// <param name="entry">Entry to remove.</param>
+        public override void Remove(BroadPhaseEntry entry)
+        {
+            if (root == null)
+                throw new InvalidOperationException("Entry not present in the hierarchy.");
+            LeafNode leafNode;
+            if (root.Remove(entry, out leafNode, out root))
+            {
+                leafNode.CleanUp();
+                leafNodes.GiveBack(leafNode);
+            }
+            else
+                throw new InvalidOperationException("Entry not present in the hierarchy.");
+        }
+
+        #region Debug
+        internal void Analyze(List<int> depths, out int nodeCount)
+        {
+            nodeCount = 0;
+            root.Analyze(depths, 0, ref nodeCount);
+        }
+
+        internal void ForceRevalidation()
+        {
+            (root as InternalNode).Revalidate();
+        }
+        #endregion
     }
+
 }

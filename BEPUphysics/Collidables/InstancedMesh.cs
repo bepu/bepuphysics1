@@ -37,10 +37,17 @@ namespace BEPUphysics.Collidables
             }
         }
 
+        /// <summary>
+        /// Updates the bounding box to the current state of the entry.
+        /// </summary>
+        public override void UpdateBoundingBox()
+        {
+            Shape.ComputeBoundingBox(ref worldTransform, out boundingBox);
+        }
 
         protected override void OnShapeChanged(CollisionShape collisionShape)
         {
-            Shape.ComputeBoundingBox(ref worldTransform, out boundingBox);
+            UpdateBoundingBox();
         }
 
         ///<summary>

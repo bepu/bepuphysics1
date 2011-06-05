@@ -92,7 +92,6 @@ namespace BEPUphysics.Collidables
         }
 
 
-        public abstract bool ConvexCast(ConvexShape castShape, ref RigidTransform startingTransform, ref Vector3 sweep, out RayHit hit);
     }
 
 

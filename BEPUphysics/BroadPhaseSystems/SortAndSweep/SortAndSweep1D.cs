@@ -8,8 +8,20 @@ using BEPUphysics.Threading;
 
 namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
 {
+    /// <summary>
+    /// Simple and standard implementation of the one-axis sort and sweep (sweep and prune) algorithm.
+    /// </summary>
+    /// <remarks>
+    /// In small scenarios, it can be the quickest option.  It uses very little memory.
+    /// However, it tends to scale poorly relative to other options and can slow down significantly when entries cluster along the axis.
+    /// Additionally, it supports no queries at all.
+    /// </remarks>
     public class SortAndSweep1D : BroadPhase
     {
+        /// <summary>
+        /// Constructs a new sort and sweep broad phase.
+        /// </summary>
+        /// <param name="threadManager">Thread manager to use in the broad phase.</param>
         public SortAndSweep1D(IThreadManager threadManager)
             : base(threadManager)
         {
@@ -17,6 +29,9 @@ namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
             backbuffer = new RawList<BroadPhaseEntry>();
         }
 
+        /// <summary>
+        /// Constructs a new sort and sweep broad phase.
+        /// </summary>
         public SortAndSweep1D()
         {
 
@@ -26,8 +41,17 @@ namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
 
 
         RawList<BroadPhaseEntry> entries = new RawList<BroadPhaseEntry>();
+        /// <summary>
+        /// Adds an entry to the broad phase.
+        /// </summary>
+        /// <param name="entry">Entry to add.</param>
         public override void Add(BroadPhaseEntry entry)
         {
+            //Entities do not set up their own bounding box before getting stuck in here.  If they're all zeroed out, the tree will be horrible.
+            Vector3 offset;
+            Vector3.Subtract(ref entry.boundingBox.Max, ref entry.boundingBox.Min, out offset);
+            if (offset.X * offset.Y * offset.Z == 0)
+                entry.UpdateBoundingBox();
             //binary search for the approximately correct location.  This helps prevent large first-frame sort times.
             int minIndex = 0; //inclusive
             int maxIndex = entries.count; //exclusive
@@ -46,6 +70,10 @@ namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
             entries.Insert(index, entry);
         }
 
+        /// <summary>
+        /// Removes an entry from the broad phase.
+        /// </summary>
+        /// <param name="entry">Entry to remove.</param>
         public override void Remove(BroadPhaseEntry entry)
         {
             entries.Remove(entry);
@@ -77,6 +105,8 @@ namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
 
             }
 
+            //TODO: Multithreaded sorting could help in some large cases.
+            //The overhead involved in this implementation is way too high for reasonable object counts.
             //for (int i = 0; i < sortSegmentCount; i++)
             //    SortSection(i);
 

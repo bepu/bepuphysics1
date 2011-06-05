@@ -67,7 +67,7 @@ namespace BEPUphysics.Entities.Prefabs
             if (length > 0)
             {
                 Vector3.Divide(ref segmentDirection, length, out segmentDirection);
-                Toolbox.GetQuaternionBetweenNormalizedVectors(ref segmentDirection, ref Toolbox.UpVector, out orientation);
+                Toolbox.GetQuaternionBetweenNormalizedVectors(ref Toolbox.UpVector, ref segmentDirection, out orientation);
             }
             else
                 orientation = Quaternion.Identity;
@@ -83,7 +83,13 @@ namespace BEPUphysics.Entities.Prefabs
             : this((end - start).Length(), radius)
         {
             float length;
+            Quaternion orientation;
             GetCapsuleInformation(ref start, ref end, out orientation, out length);
+            this.Orientation = orientation;
+            Vector3 position;
+            Vector3.Add(ref start, ref end, out position);
+            Vector3.Multiply(ref position, .5f, out position);
+            this.Position = position;
         }
 
 
@@ -98,7 +104,13 @@ namespace BEPUphysics.Entities.Prefabs
             : this((end - start).Length(), radius, mass)
         {
             float length;
+            Quaternion orientation;
             GetCapsuleInformation(ref start, ref end, out orientation, out length);
+            this.Orientation = orientation;
+            Vector3 position;
+            Vector3.Add(ref start, ref end, out position);
+            Vector3.Multiply(ref position, .5f, out position);
+            this.Position = position;
         }
 
         /// <summary>
