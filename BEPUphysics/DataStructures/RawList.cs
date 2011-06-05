@@ -55,7 +55,7 @@ namespace BEPUphysics.DataStructures
         ///</summary>
         ///<param name="elements">List to copy.</param>
         public RawList(IList<T> elements)
-            : this(elements.Count)
+            : this(Math.Max(elements.Count, 4))
         {
             elements.CopyTo(Elements, 0);
             count = elements.Count;

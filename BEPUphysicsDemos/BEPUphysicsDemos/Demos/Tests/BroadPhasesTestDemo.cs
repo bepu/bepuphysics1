@@ -37,7 +37,12 @@ namespace BEPUphysicsDemos.Demos
     /// </summary>
     public class BroadPhasesTestDemo : StandardDemo
     {
-
+        enum Test
+        {
+            Update,
+            RayCast,
+            BoundingBoxQuery
+        }
         Random rand = new Random(0);
 
         /// <summary>
@@ -50,12 +55,12 @@ namespace BEPUphysicsDemos.Demos
             Space.Solver.IterationLimit = 0;
             Entity toAdd;
             //BoundingBox box = new BoundingBox(new Vector3(-5, 1, 1), new Vector3(5, 7, 7));
-            BoundingBox box = new BoundingBox(new Vector3(-50, -50, -50), new Vector3(50, 50, 50));
+            BoundingBox box = new BoundingBox(new Vector3(-500, -500, -500), new Vector3(500, 500, 500));
 
             DynamicHierarchy dh = new DynamicHierarchy(Space.ThreadManager);
             DynamicHierarchy4 dh4 = new DynamicHierarchy4(Space.ThreadManager);
-            SortAndSweep1D sap1d = new SortAndSweep1D(Space.ThreadManager);
-            Grid2DSortAndSweep grid2DSOS = new Grid2DSortAndSweep(Space.ThreadManager);
+            SortAndSweep1D sas1d = new SortAndSweep1D(Space.ThreadManager);
+            Grid2DSortAndSweep grid2DSAS = new Grid2DSortAndSweep(Space.ThreadManager);
             //DynamicHierarchy dh = new DynamicHierarchy();
             //DynamicHierarchy4 dh4 = new DynamicHierarchy4();
             //SortAndSweep1D sap1d = new SortAndSweep1D();
@@ -66,7 +71,7 @@ namespace BEPUphysicsDemos.Demos
             //SortAndSweep3D sap3d = new SortAndSweep3D();
 
             RawList<Entity> entities = new RawList<Entity>();
-            for (int k = 0; k < 1000; k++)
+            for (int k = 0; k < 78125; k++)
             {
                 Vector3 position = new Vector3((float)(rand.NextDouble() * (box.Max.X - box.Min.X) + box.Min.X),
                                                (float)(rand.NextDouble() * (box.Max.Y - box.Min.Y) + box.Min.Y),
@@ -77,129 +82,210 @@ namespace BEPUphysicsDemos.Demos
                 //Space.Add(toAdd);
                 dh.Add(toAdd.CollisionInformation);
                 dh4.Add(toAdd.CollisionInformation);
-                sap1d.Add(toAdd.CollisionInformation);
-                grid2DSOS.Add(toAdd.CollisionInformation);
+                sas1d.Add(toAdd.CollisionInformation);
+                grid2DSAS.Add(toAdd.CollisionInformation);
                 entities.Add(toAdd);
 
-                //dh2.Add(toAdd.CollisionInformation);
-                //dh3.Add(toAdd.CollisionInformation);
-                //sap3d.Add(toAdd.CollisionInformation);
             }
 
-            //List<int> depths = new List<int>();
-            //int nodeCount;
-            //dh2.Analyze(depths, out nodeCount);
-
-            //depths.Clear();
-            //dh2.ForceRevalidation();
-            //dh2.Analyze(depths, out nodeCount);
 
             Space.ForceUpdater.Gravity = new Vector3();
 
-            int numRuns = 1000;
+            int numRuns = 100000;
             //Prime the system.
-            grid2DSOS.Update();
-            sap1d.Update();
+            grid2DSAS.Update();
+            sas1d.Update();
             dh.Update();
-            //dh2.Update();
-            //dh3.Update();
             dh4.Update();
-            //DynamicHierarchy.DEBUGAllowRefit = false;
-            //DynamicHierarchy2.DEBUGAllowRefit = false;
-            //DynamicHierarchy4.DEBUGAllowRefit = false;
+            var testType = Test.BoundingBoxQuery;
 
             double startTime, endTime;
 
-            for (int i = 0; i < numRuns; i++)
+            switch (testType)
             {
-                //DH
-                startTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
-                //dh.Update();
-                endTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
-                DHtime += endTime - startTime;
+                #region Update Timing
+                case Test.Update:
+                    for (int i = 0; i < numRuns; i++)
+                    {
+                        //DH
+                        startTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
+                        dh.Update();
+                        endTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
+                        DHtime += endTime - startTime;
 
-                ////DH2
-                //startTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
-                ////dh2.Update();
-                //endTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
-                //DH2time += endTime - startTime;
+                        //DH4
+                        startTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
+                        dh4.Update();
+                        endTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
+                        DH4time += endTime - startTime;
 
-                ////DH3
-                //startTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
-                ////dh3.Update();
-                //endTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
-                //DH3time += endTime - startTime;
+                        //SAP1D
+                        startTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
+                        sas1d.Update();
+                        endTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
+                        SAS1Dtime += endTime - startTime;
 
-                //DH4
-                startTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
-                dh4.Update();
-                endTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
-                DH4time += endTime - startTime;
+                        //Grid2D SOS
+                        startTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
+                        grid2DSAS.Update();
+                        endTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
+                        grid2DSAStime += endTime - startTime;
+
+                        //if (sap1d.Overlaps.Count != dh.Overlaps.Count)
+                        //    Debug.WriteLine("SAP1D Failure");
+                        //if (grid2DSOS.Overlaps.Count != dh.Overlaps.Count)
+                        //    Debug.WriteLine("grid2DSOS Failure");
+
+                        //for (int j = 0; j < dh2.Overlaps.Count; j++)
+                        //{
+                        //    if (!grid2DSOS.Overlaps.Contains(dh2.Overlaps[j]))
+                        //        Debug.WriteLine("Break.");
+                        //}
+                        //for (int j = 0; j < grid2DSOS.Overlaps.Count; j++)
+                        //{
+                        //    if (!dh2.Overlaps.Contains(grid2DSOS.Overlaps[j]))
+                        //        break;
+                        //}
+
+                        //for (int j = 0; j < grid2DSOS.Overlaps.Count; j++)
+                        //{
+                        //    if (!dh4.Overlaps.Contains(grid2DSOS.Overlaps[j]))
+                        //        break;
+                        //}
+
+                        //for (int j = 0; j < dh.Overlaps.Count; j++)
+                        //{
+                        //    if (!dh.Overlaps[j].EntryA.BoundingBox.Intersects(dh.Overlaps[j].EntryB.BoundingBox))
+                        //        Debug.WriteLine("Break.");
+                        //}
+
+                        //for (int j = 0; j < sap1d.Overlaps.Count; j++)
+                        //{
+                        //    if (!sap1d.Overlaps[j].EntryA.BoundingBox.Intersects(sap1d.Overlaps[j].EntryB.BoundingBox))
+                        //        Debug.WriteLine("Break.");
+                        //}
+
+                        //for (int j = 0; j < grid2DSOS.Overlaps.Count; j++)
+                        //{
+                        //    if (!grid2DSOS.Overlaps[j].EntryA.BoundingBox.Intersects(grid2DSOS.Overlaps[j].EntryB.BoundingBox))
+                        //        Debug.WriteLine("Break.");
+                        //}
+
+                        //MoveEntities(entities);
+                    }
+                    break;
+                #endregion
+                #region Ray cast timing
+                case Test.RayCast:
+                    float rayLength = 100;
+                    RawList<Ray> rays = new RawList<Ray>();
+                    for (int i = 0; i < numRuns; i++)
+                    {
+                        rays.Add(new Ray()
+                        {
+                            Position = new Vector3((float)(rand.NextDouble() * (box.Max.X - box.Min.X) + box.Min.X),
+                                               (float)(rand.NextDouble() * (box.Max.Y - box.Min.Y) + box.Min.Y),
+                                               (float)(rand.NextDouble() * (box.Max.Z - box.Min.Z) + box.Min.Z)),
+                            Direction = Vector3.Normalize(new Vector3((float)(rand.NextDouble() - .5), (float)(rand.NextDouble() - .5), (float)(rand.NextDouble() - .5)))
+                        });
+                    }
+                    RawList<BroadPhaseEntry> outputIntersections = new RawList<BroadPhaseEntry>();
 
 
+                    //DH
+                    startTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
+                    for (int i = 0; i < numRuns; i++)
+                    {
+                        dh.QueryAccelerator.RayCast(rays.Elements[i], rayLength, outputIntersections);
+                        outputIntersections.Clear();
 
-                //SAP1D
-                startTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
-                //sap1d.Update();
-                endTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
-                SAP1Dtime += endTime - startTime;
+                    }
+                    endTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
+                    DHtime = endTime - startTime;
 
+                    //DH4
+                    startTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
+                    for (int i = 0; i < numRuns; i++)
+                    {
+                        dh4.QueryAccelerator.RayCast(rays.Elements[i], rayLength, outputIntersections);
+                        outputIntersections.Clear();
+                    }
 
-                //Grid2D SOS
-                startTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
-                //grid2DSOS.Update();
-                endTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
-                grid2DSOStime += endTime - startTime;
+                    endTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
+                    DH4time = endTime - startTime;
 
-                //if (sap1d.Overlaps.Count != dh.Overlaps.Count)
-                //    Debug.WriteLine("SAP1D Failure");
-                //if (grid2DSOS.Overlaps.Count != dh.Overlaps.Count)
-                //    Debug.WriteLine("grid2DSOS Failure");
+                    //Grid2DSAS
+                    startTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
+                    for (int i = 0; i < numRuns; i++)
+                    {
+                        grid2DSAS.QueryAccelerator.RayCast(rays.Elements[i], rayLength, outputIntersections);
+                        outputIntersections.Clear();
+                    }
+                    endTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
+                    grid2DSAStime = endTime - startTime;
+                    break;
+                #endregion
+                #region Bounding box query timing
+                case Test.BoundingBoxQuery:
+                    float boundingBoxSize = 10;
+                    var boundingBoxes = new RawList<BoundingBox>();
+                    Vector3 offset = new Vector3(boundingBoxSize / 2, boundingBoxSize / 2, boundingBoxSize / 2);
+                    for (int i = 0; i < numRuns; i++)
+                    {
+                        Vector3 center = new Vector3((float)(rand.NextDouble() * (box.Max.X - box.Min.X) + box.Min.X),
+                                                     (float)(rand.NextDouble() * (box.Max.Y - box.Min.Y) + box.Min.Y),
+                                                     (float)(rand.NextDouble() * (box.Max.Z - box.Min.Z) + box.Min.Z));
+                        boundingBoxes.Add(new BoundingBox()
+                        {
+                            Min = center - offset,
+                            Max = center + offset
+                        });
+                    }
 
-                //for (int j = 0; j < dh2.Overlaps.Count; j++)
-                //{
-                //    if (!grid2DSOS.Overlaps.Contains(dh2.Overlaps[j]))
-                //        Debug.WriteLine("Break.");
-                //}
-                //for (int j = 0; j < grid2DSOS.Overlaps.Count; j++)
-                //{
-                //    if (!dh2.Overlaps.Contains(grid2DSOS.Overlaps[j]))
-                //        break;
-                //}
+                    outputIntersections = new RawList<BroadPhaseEntry>();
 
-                //for (int j = 0; j < grid2DSOS.Overlaps.Count; j++)
-                //{
-                //    if (!dh4.Overlaps.Contains(grid2DSOS.Overlaps[j]))
-                //        break;
-                //}
+                    //DH
+                    startTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
+                    for (int i = 0; i < numRuns; i++)
+                    {
+                        dh.QueryAccelerator.GetEntries(boundingBoxes.Elements[i], outputIntersections);
+                        outputIntersections.Clear();
 
-                //for (int j = 0; j < dh.Overlaps.Count; j++)
-                //{
-                //    if (!dh.Overlaps[j].EntryA.BoundingBox.Intersects(dh.Overlaps[j].EntryB.BoundingBox))
-                //        Debug.WriteLine("Break.");
-                //}
+                    }
+                    endTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
+                    DHtime = endTime - startTime;
 
-                //for (int j = 0; j < sap1d.Overlaps.Count; j++)
-                //{
-                //    if (!sap1d.Overlaps[j].EntryA.BoundingBox.Intersects(sap1d.Overlaps[j].EntryB.BoundingBox))
-                //        Debug.WriteLine("Break.");
-                //}
+                    //DH4
+                    startTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
+                    for (int i = 0; i < numRuns; i++)
+                    {
+                        dh4.QueryAccelerator.GetEntries(boundingBoxes.Elements[i], outputIntersections);
+                        outputIntersections.Clear();
+                    }
 
-                //for (int j = 0; j < grid2DSOS.Overlaps.Count; j++)
-                //{
-                //    if (!grid2DSOS.Overlaps[j].EntryA.BoundingBox.Intersects(grid2DSOS.Overlaps[j].EntryB.BoundingBox))
-                //        Debug.WriteLine("Break.");
-                //}
+                    endTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
+                    DH4time = endTime - startTime;
 
-                //MoveEntities(entities);
+                    //Grid2DSAS
+                    startTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
+                    for (int i = 0; i < numRuns; i++)
+                    {
+                        grid2DSAS.QueryAccelerator.GetEntries(boundingBoxes.Elements[i], outputIntersections);
+                        outputIntersections.Clear();
+                    }
+                    endTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
+                    grid2DSAStime = endTime - startTime;
+                    break;
+                #endregion
             }
+
 
             DHtime /= numRuns;
             DH2time /= numRuns;
             DH3time /= numRuns;
             DH4time /= numRuns;
-            SAP1Dtime /= numRuns;
-            grid2DSOStime /= numRuns;
+            SAS1Dtime /= numRuns;
+            grid2DSAStime /= numRuns;
 
 
         }
@@ -219,17 +305,17 @@ namespace BEPUphysicsDemos.Demos
         double DH2time;
         double DH3time;
         double DH4time;
-        double SAP1Dtime;
+        double SAS1Dtime;
         double SAP3Dtime;
-        double grid2DSOStime;
+        double grid2DSAStime;
 
         public override void DrawUI()
         {
             base.DrawUI();
-            Game.DataTextDrawer.Draw("Time per DH:    ", DHtime * 1000000, new Vector2(50, 50));
-            Game.DataTextDrawer.Draw("Time per DH4:    ", DH4time * 1000000, new Vector2(50, 80));
-            Game.DataTextDrawer.Draw("Time per SAP1D: ", SAP1Dtime * 1000000, new Vector2(50, 110));
-            Game.DataTextDrawer.Draw("Time per Grid2DSortAndSweep: ", grid2DSOStime * 1000000, new Vector2(50, 140));
+            Game.DataTextDrawer.Draw("Time per DH:    ", DHtime * 1e9f, new Vector2(50, 50));
+            Game.DataTextDrawer.Draw("Time per DH4:    ", DH4time * 1e9f, new Vector2(50, 80));
+            Game.DataTextDrawer.Draw("Time per SAP1D: ", SAS1Dtime * 1e9f, new Vector2(50, 110));
+            Game.DataTextDrawer.Draw("Time per Grid2DSortAndSweep: ", grid2DSAStime * 1e9f, new Vector2(50, 140));
         }
 
 

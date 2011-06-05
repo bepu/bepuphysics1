@@ -20,24 +20,29 @@ namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
             sortingHash = hash;
         }
 
-        internal void Add(Grid2DEntry entry)
+        internal int GetIndex(float x)
         {
-            //binary search for the approximately correct location.  This helps prevent large first-frame sort times.
             int minIndex = 0; //inclusive
             int maxIndex = entries.count; //exclusive
             int index = 0;
             while (maxIndex - minIndex > 0)
             {
                 index = (maxIndex + minIndex) / 2;
-                if (entries.Elements[index].item.boundingBox.Min.X > entry.item.boundingBox.Min.X)
+                if (entries.Elements[index].item.boundingBox.Min.X > x)
                     maxIndex = index;
-                else if (entries.Elements[index].item.boundingBox.Min.X < entry.item.boundingBox.Min.X)
+                else if (entries.Elements[index].item.boundingBox.Min.X < x)
                     minIndex = ++index;
                 else
                     break; //Found an equal value!
 
             }
-            entries.Insert(index, entry);
+            return index;
+        }
+
+        internal void Add(Grid2DEntry entry)
+        {
+            //binary search for the approximately correct location.  This helps prevent large first-frame sort times.
+            entries.Insert(GetIndex(entry.item.boundingBox.Min.X), entry);
         }
 
         internal void Remove(Grid2DEntry entry)

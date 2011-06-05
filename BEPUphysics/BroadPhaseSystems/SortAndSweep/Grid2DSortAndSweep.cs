@@ -47,7 +47,7 @@ namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
         UnsafeResourcePool<GridCell2D> cellPool = new UnsafeResourcePool<GridCell2D>();
 
 
-        SortedGrid2DSet cellSet = new SortedGrid2DSet();
+        internal SortedGrid2DSet cellSet = new SortedGrid2DSet();
 
 
         RawList<Grid2DEntry> entries = new RawList<Grid2DEntry>();
@@ -58,12 +58,14 @@ namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
         {
             updateEntry = UpdateEntry;
             updateCell = UpdateCell;
+            QueryAccelerator = new Grid2DSortAndSweepQueryAccelerator(this);
         }
 
         public Grid2DSortAndSweep()
         {
             updateEntry = UpdateEntry;
             updateCell = UpdateCell;
+            QueryAccelerator = new Grid2DSortAndSweepQueryAccelerator(this);
         }
 
         public override void Add(BroadPhaseEntry entry)
