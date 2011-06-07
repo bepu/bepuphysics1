@@ -85,7 +85,13 @@ namespace BEPUphysics.NarrowPhaseSystems
         ///<summary>
         /// Gets the list of Pairs managed by the narrow phase.
         ///</summary>
-        public ReadOnlyCollection<INarrowPhasePair> Pairs { get; private set; }
+        public ReadOnlyList<INarrowPhasePair> Pairs
+        {
+            get
+            {
+                return new ReadOnlyList<INarrowPhasePair>(narrowPhasePairs);
+            }
+        }
 
         ///<summary>
         /// Gets or sets the time step settings used by the narrow phase.
@@ -109,7 +115,6 @@ namespace BEPUphysics.NarrowPhaseSystems
             TimeStepSettings = timeStepSettings;
             updateBroadPhaseOverlapDelegate = UpdateBroadPhaseOverlap;
             multithreadedRemovalLoopDelegate = MultithreadedRemovalLoopBody;
-            Pairs = new ReadOnlyCollection<INarrowPhasePair>(narrowPhasePairs);
             Enabled = true;
         }
 

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using BEPUphysics.Constraints;
 using BEPUphysics.DeactivationManagement;
+using BEPUphysics.DataStructures;
 
 namespace BEPUphysics.Entities
 {
@@ -9,14 +10,14 @@ namespace BEPUphysics.Entities
     ///</summary>
     public class EntitySolverUpdateableCollection : IEnumerable<EntitySolverUpdateable>
     {
-        private List<ISimulationIslandConnection> connections;
+        private RawList<ISimulationIslandConnection> connections;
 
 
         /// <summary>
         /// Constructs a new constraint collection.
         /// </summary>
         /// <param name="connections">Solver updateables to enumerate over.</param>
-        public EntitySolverUpdateableCollection(List<ISimulationIslandConnection> connections)
+        public EntitySolverUpdateableCollection(RawList<ISimulationIslandConnection> connections)
         {
             this.connections = connections;
         }
@@ -45,7 +46,7 @@ namespace BEPUphysics.Entities
         ///</summary>
         public struct Enumerator : IEnumerator<EntitySolverUpdateable>
         {
-            private List<ISimulationIslandConnection> connections;
+            private RawList<ISimulationIslandConnection> connections;
             private int index;
             private EntitySolverUpdateable current;
 
@@ -53,7 +54,7 @@ namespace BEPUphysics.Entities
             /// Constructs an enumerator for the solver updateables list.
             /// </summary>
             /// <param name="connections">List of solver updateables to enumerate.</param>
-            public Enumerator(List<ISimulationIslandConnection> connections)
+            public Enumerator(RawList<ISimulationIslandConnection> connections)
             {
                 this.connections = connections;
                 index = -1;

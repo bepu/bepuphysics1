@@ -17,7 +17,13 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         ///<summary>
         /// Gets the point set of the convex hull.
         ///</summary>
-        public ReadOnlyCollection<Vector3> Vertices { get; private set; }
+        public ReadOnlyList<Vector3> Vertices
+        {
+            get
+            {
+                return new ReadOnlyList<Vector3>(vertices);
+            }
+        }
         RawList<Vector3> vertices;
 
         ///<summary>
@@ -36,7 +42,6 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             Vector3 center = ComputeCenter(vertices, surfaceVertices);
             this.vertices = new RawList<Vector3>(surfaceVertices);
             Resources.GiveBack(surfaceVertices);
-            Vertices = new ReadOnlyCollection<Vector3>(this.vertices);
 
             OnShapeChanged();
         }
@@ -57,7 +62,6 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             center = ComputeCenter(vertices, surfaceVertices);
             this.vertices = new RawList<Vector3>(surfaceVertices);
             Resources.GiveBack(surfaceVertices);
-            Vertices = new ReadOnlyCollection<Vector3>(this.vertices);
 
             OnShapeChanged();
         }
@@ -80,7 +84,6 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             //Ensure that the convex hull is centered on its local origin.
             center = ComputeCenter(vertices, outputHullTriangleIndices, outputUniqueSurfaceVertices);
             this.vertices = new RawList<Vector3>(outputUniqueSurfaceVertices);
-            Vertices = new ReadOnlyCollection<Vector3>(this.vertices);
 
             OnShapeChanged();
         }

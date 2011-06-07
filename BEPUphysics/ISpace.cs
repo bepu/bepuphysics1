@@ -4,6 +4,7 @@ using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.Entities;
 using Microsoft.Xna.Framework;
 using System.Collections.ObjectModel;
+using BEPUphysics.DataStructures;
 
 namespace BEPUphysics
 {
@@ -37,7 +38,7 @@ namespace BEPUphysics
         ///<summary>
         /// Gets the list of entities in the space.
         ///</summary>
-        ReadOnlyCollection<Entity> Entities { get; }
+        ReadOnlyList<Entity> Entities { get; }
 
         /// <summary>
         /// Tests a ray against the space.

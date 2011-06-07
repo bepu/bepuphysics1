@@ -11,23 +11,18 @@ namespace BEPUphysics.Constraints.SolverGroups
     /// </summary>
     public abstract class SolverGroup : EntitySolverUpdateable
     {
-        private readonly ReadOnlyCollection<EntitySolverUpdateable> readOnlySolverUpdateables;
         internal readonly RawList<EntitySolverUpdateable> solverUpdateables = new RawList<EntitySolverUpdateable>();
 
-        /// <summary>
-        /// Instantiates some internal values.
-        /// </summary>
-        protected SolverGroup()
-        {
-            readOnlySolverUpdateables = new ReadOnlyCollection<EntitySolverUpdateable>(solverUpdateables);
-        }
 
         /// <summary>
         /// Gets the solver updateables managed by this solver group.
         /// </summary>
-        public ReadOnlyCollection<EntitySolverUpdateable> SolverUpdateables
+        public ReadOnlyList<EntitySolverUpdateable> SolverUpdateables
         {
-            get { return readOnlySolverUpdateables; }
+            get
+            {
+                return new ReadOnlyList<EntitySolverUpdateable>(solverUpdateables);
+            }
         }
 
 

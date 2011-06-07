@@ -9,6 +9,7 @@ using BEPUphysics.Collidables.Events;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.MathExtensions;
 using Microsoft.Xna.Framework;
+using BEPUphysics.DataStructures;
 
 namespace BEPUphysics.Collidables
 {
@@ -20,7 +21,6 @@ namespace BEPUphysics.Collidables
     {
         protected Collidable()
         {
-            Pairs = new ReadOnlyCollection<CollidablePairHandler>(pairs);
             shapeChangedDelegate = OnShapeChanged;
         }
 
@@ -64,13 +64,19 @@ namespace BEPUphysics.Collidables
         }
 
 
-        internal List<CollidablePairHandler> pairs = new List<CollidablePairHandler>();
+        internal RawList<CollidablePairHandler> pairs = new RawList<CollidablePairHandler>();
         ///<summary>
         /// Gets the list of pairs associated with the collidable.
         /// These pairs are found by the broad phase and are managed by the narrow phase;
         /// they can contain other collidables, entities, and contacts.
         ///</summary>
-        public ReadOnlyCollection<CollidablePairHandler> Pairs { get; private set; }
+        public ReadOnlyList<CollidablePairHandler> Pairs
+        {
+            get
+            {
+                return new ReadOnlyList<CollidablePairHandler>(pairs);
+            }
+        }
 
         ///<summary>
         /// Gets a list of all other collidables that this collidable overlaps.

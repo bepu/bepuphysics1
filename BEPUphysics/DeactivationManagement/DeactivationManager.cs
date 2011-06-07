@@ -106,7 +106,6 @@ namespace BEPUphysics.DeactivationManagement
         {
             Enabled = true;
             multithreadedCandidacyLoopDelegate = MultithreadedCandidacyLoop;
-            SimulationIslands = new ReadOnlyCollection<SimulationIsland>(simulationIslands);
             this.timeStepSettings = timeStepSettings;
         }
 
@@ -135,7 +134,13 @@ namespace BEPUphysics.DeactivationManagement
         ///<summary>
         /// Gets the simulation islands currently in the manager.
         ///</summary>
-        public ReadOnlyCollection<SimulationIsland> SimulationIslands { get; private set; }
+        public ReadOnlyList<SimulationIsland> SimulationIslands
+        {
+            get
+            {
+                return new ReadOnlyList<SimulationIsland>(simulationIslands);
+            }
+        }
 
         UnsafeResourcePool<SimulationIsland> islandPool = new UnsafeResourcePool<SimulationIsland>();
 

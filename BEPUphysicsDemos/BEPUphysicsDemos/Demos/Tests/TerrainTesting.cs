@@ -30,8 +30,8 @@ namespace BEPUphysicsDemos.Demos
             int xLength = 256;
             int zLength = 256;
 
-            float xSpacing = 1f;
-            float zSpacing = 1f;
+            float xSpacing = 8f;
+            float zSpacing = 8f;
             var heights = new float[xLength, zLength];
             for (int i = 0; i < xLength; i++)
             {
@@ -58,15 +58,15 @@ namespace BEPUphysicsDemos.Demos
             //Space.Solver.IterationLimit = 1;
 
             Space.Add(terrain);
-            for (int i = 0; i < 7; i++)
+            for (int i = 0; i < 10; i++)
             {
-                for (int j = 0; j < 7; j++)
+                for (int j = 0; j < 30; j++)
                 {
-                    for (int k = 0; k < 8; k++)
+                    for (int k = 0; k < 10; k++)
                     {
-                        Space.Add(new Sphere(new Vector3(0 + i * 8, 100 + -j * 10, 0 + k * 8), 0.5f, 1)
+                        Space.Add(new Sphere(new Vector3(0 + i * 3, 20 + j * 3, 0 + k * 3), 0.5f, 1)
                         {
-                            LocalInertiaTensorInverse = new Matrix3X3()
+                            //LocalInertiaTensorInverse = new Matrix3X3()
                         });
                         //Space.Add(new Box(
                         //    new Vector3(0 + i * 4, 1000 + -j * 10, 0 + k * 4),

@@ -25,12 +25,18 @@ namespace BEPUphysics.Constraints
         /// <summary>
         /// List of all entities affected by this updateable.
         /// </summary>
-        protected internal readonly RawList<Entity> involvedEntities = new RawList<Entity>();
+        protected internal readonly RawList<Entity> involvedEntities = new RawList<Entity>(2);
 
         ///<summary>
         /// Gets the entities that this solver updateable is involved with.
         ///</summary>
-        public ReadOnlyCollection<Entity> InvolvedEntities { get; private set; }
+        public ReadOnlyList<Entity> InvolvedEntities
+        {
+            get
+            {
+                return new ReadOnlyList<Entity>(involvedEntities);
+            }
+        }
 
 
         
@@ -50,10 +56,6 @@ namespace BEPUphysics.Constraints
         /// </summary>
         public SolverGroup SolverGroup { get; protected internal set; }
 
-        protected EntitySolverUpdateable()
-        {
-            InvolvedEntities = new ReadOnlyCollection<Entity>(involvedEntities);
-        }
 
         /// <summary>
         /// Acquires exclusive access to all entities involved in the solver updateable.

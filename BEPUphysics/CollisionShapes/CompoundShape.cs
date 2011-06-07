@@ -142,11 +142,12 @@ namespace BEPUphysics.CollisionShapes
         ///<summary>
         /// Gets the list of shapes in the compound shape.
         ///</summary>
-        ///<exception cref="Exception">Thrown if the set shapes list has 0 shapes in it.</exception>
-        public ReadOnlyCollection<CompoundShapeEntry> Shapes
+        public ReadOnlyList<CompoundShapeEntry> Shapes
         {
-            get;
-            private set;
+            get
+            {
+                return new ReadOnlyList<CompoundShapeEntry>(shapes);
+            }
         }
 
 
@@ -171,7 +172,6 @@ namespace BEPUphysics.CollisionShapes
             {
                 throw new Exception("Compound shape must have at least 1 subshape.");
             }
-            Shapes = new ReadOnlyCollection<CompoundShapeEntry>(this.shapes);
         }
 
         ///<summary>
@@ -193,7 +193,6 @@ namespace BEPUphysics.CollisionShapes
             {
                 throw new Exception("Compound shape must have at least 1 subshape.");
             }
-            Shapes = new ReadOnlyCollection<CompoundShapeEntry>(this.shapes);
         }
 
         #region EntityShape members and support

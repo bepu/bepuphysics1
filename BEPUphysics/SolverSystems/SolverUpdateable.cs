@@ -2,6 +2,7 @@
 using BEPUphysics.Constraints;
 using System.Collections.ObjectModel;
 using BEPUphysics.DeactivationManagement;
+using BEPUphysics.DataStructures;
 
 namespace BEPUphysics.SolverSystems
 {
@@ -10,11 +11,6 @@ namespace BEPUphysics.SolverSystems
     ///</summary>
     public abstract class SolverUpdateable : ISimulationIslandConnection, ISpaceObject
     {
-
-        protected SolverUpdateable()
-        {
-            connectedMembersReadOnly = new ReadOnlyCollection<ISimulationIslandMember>(connectedMembers);
-        }
 
         protected internal Solver solver;
         ///<summary>
@@ -167,9 +163,8 @@ namespace BEPUphysics.SolverSystems
 
 
         //Connected members are handled slightly differently from involved entities.
-        protected internal List<ISimulationIslandMember> connectedMembers = new List<ISimulationIslandMember>();
-        private ReadOnlyCollection<ISimulationIslandMember> connectedMembersReadOnly;
-        ReadOnlyCollection<ISimulationIslandMember> ISimulationIslandConnection.ConnectedMembers { get { return connectedMembersReadOnly; } }
+        protected internal RawList<ISimulationIslandMember> connectedMembers = new RawList<ISimulationIslandMember>(2);
+        ReadOnlyList<ISimulationIslandMember> ISimulationIslandConnection.ConnectedMembers { get { return new ReadOnlyList<ISimulationIslandMember>(connectedMembers); } }
 
 
         void ISimulationIslandConnection.AddReferencesToConnectedMembers()

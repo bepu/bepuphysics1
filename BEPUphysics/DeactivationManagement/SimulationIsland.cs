@@ -28,7 +28,13 @@ namespace BEPUphysics.DeactivationManagement
         ///<summary>
         /// Gets the list of members in the island.
         ///</summary>
-        public ReadOnlyCollection<ISimulationIslandMember> Members { get; private set; }
+        public ReadOnlyList<ISimulationIslandMember> Members
+        {
+            get
+            {
+                return new ReadOnlyList<ISimulationIslandMember>(members);
+            }
+        }
 
         //TODO: Readonly accessible members list?
         //TODO: Should members list be hash-based collections?
@@ -42,7 +48,6 @@ namespace BEPUphysics.DeactivationManagement
             memberActivatedDelegate = MemberActivated;
             becameDeactivationCandidateDelegate = BecameDeactivationCandidate;
             becameNonDeactivationCandidateDelegate = BecameNonDeactivationCandidate;
-            Members = new ReadOnlyCollection<ISimulationIslandMember>(members);
         }
 
         Action<ISimulationIslandMember> memberActivatedDelegate;

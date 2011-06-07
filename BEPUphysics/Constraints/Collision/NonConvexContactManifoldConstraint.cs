@@ -25,7 +25,13 @@ namespace BEPUphysics.Constraints.Collision
         ///<summary>
         /// Gets the penetration constraints in the manifold.
         ///</summary>
-        public ReadOnlyCollection<ContactPenetrationConstraint> ContactPenetrationConstraints { get; private set; }
+        public ReadOnlyList<ContactPenetrationConstraint> ContactPenetrationConstraints
+        {
+            get
+            {
+                return new ReadOnlyList<ContactPenetrationConstraint>(penetrationConstraints);
+            }
+        }
 
         Stack<ContactPenetrationConstraint> penetrationConstraintPool = new Stack<ContactPenetrationConstraint>(4);
 
@@ -33,7 +39,13 @@ namespace BEPUphysics.Constraints.Collision
         ///<summary>
         /// Gets the friction constraints in the manifold.
         ///</summary>
-        public ReadOnlyCollection<ContactFrictionConstraint> ContactFrictionConstraints { get; private set; }
+        public ReadOnlyList<ContactFrictionConstraint> ContactFrictionConstraints
+        {
+            get
+            {
+                return new ReadOnlyList<ContactFrictionConstraint>(frictionConstraints);
+            }
+        }
 
         Stack<ContactFrictionConstraint> frictionConstraintPool = new Stack<ContactFrictionConstraint>(4);
 
@@ -49,8 +61,6 @@ namespace BEPUphysics.Constraints.Collision
 
             penetrationConstraints = new RawList<ContactPenetrationConstraint>(4);
             frictionConstraints = new RawList<ContactFrictionConstraint>(4);
-            ContactPenetrationConstraints = new ReadOnlyCollection<ContactPenetrationConstraint>(penetrationConstraints);
-            ContactFrictionConstraints = new ReadOnlyCollection<ContactFrictionConstraint>(frictionConstraints);
 
             for (int i = 0; i < 4; i++)
             {

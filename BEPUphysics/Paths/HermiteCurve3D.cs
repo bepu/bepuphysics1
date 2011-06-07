@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Microsoft.Xna.Framework;
+using BEPUphysics.DataStructures;
 
 namespace BEPUphysics.Paths
 {
@@ -14,15 +15,17 @@ namespace BEPUphysics.Paths
         /// </summary>
         protected List<Vector3> tangents = new List<Vector3>();
 
-        protected HermiteCurve3D()
-        {
-            Tangents = new ReadOnlyCollection<Vector3>(tangents);
-        }
 
         /// <summary>
         /// Gets the tangents used by the curve per control point.
         /// </summary>
-        public ReadOnlyCollection<Vector3> Tangents { get; private set; }
+        public ReadOnlyList<Vector3> Tangents
+        {
+            get
+            {
+                return new ReadOnlyList<Vector3>(tangents);
+            }
+        }
 
         /// <summary>
         /// Evaluates the curve section starting at the control point index using

@@ -32,10 +32,12 @@ namespace BEPUphysics.Collidables.MobileCollidables
         ///<summary>
         /// Gets a list of the children in the collidable.
         ///</summary>
-        public ReadOnlyCollection<CompoundChild> Children
+        public ReadOnlyList<CompoundChild> Children
         {
-            get;
-            private set;
+            get
+            {
+                return new ReadOnlyList<CompoundChild>(children);
+            }
         }
 
 
@@ -87,7 +89,6 @@ namespace BEPUphysics.Collidables.MobileCollidables
             }
             base.Shape = new CompoundShape(shapeList);
             hierarchy = new CompoundHierarchy(this);
-            Children = new ReadOnlyCollection<CompoundChild>(this.children);
  
         }
 
@@ -107,7 +108,6 @@ namespace BEPUphysics.Collidables.MobileCollidables
             }
             base.Shape = new CompoundShape(shapeList, out center);
             hierarchy = new CompoundHierarchy(this);
-            Children = new ReadOnlyCollection<CompoundChild>(this.children);
 
         }
 
@@ -125,7 +125,6 @@ namespace BEPUphysics.Collidables.MobileCollidables
                 this.children.Add(child);
             }
             hierarchy = new CompoundHierarchy(this);
-            Children = new ReadOnlyCollection<CompoundChild>(this.children);
  
         }
 

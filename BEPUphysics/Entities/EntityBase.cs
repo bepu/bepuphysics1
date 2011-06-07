@@ -16,6 +16,7 @@ using BEPUphysics.Constraints;
 using System.Collections.ObjectModel;
 using BEPUphysics.CollisionShapes;
 using BEPUphysics.CollisionRuleManagement;
+using BEPUphysics.DataStructures;
 
 namespace BEPUphysics.Entities
 {
@@ -494,7 +495,6 @@ namespace BEPUphysics.Entities
 
         protected Entity()
         {
-            Connections = new ReadOnlyCollection<ISimulationIslandConnection>(connections);
             BufferedStates = new EntityBufferedStates(this);
 
             material = new Material();
@@ -665,12 +665,18 @@ namespace BEPUphysics.Entities
             connections.Remove(connection);
         }
 
-        protected internal List<ISimulationIslandConnection> connections = new List<ISimulationIslandConnection>();
+        protected internal RawList<ISimulationIslandConnection> connections = new RawList<ISimulationIslandConnection>();
 
         ///<summary>
         /// Gets the connections associated with this member.
         ///</summary>
-        public ReadOnlyCollection<ISimulationIslandConnection> Connections { get; private set; }
+        public ReadOnlyList<ISimulationIslandConnection> Connections
+        {
+            get
+            {
+                return new ReadOnlyList<ISimulationIslandConnection>(connections);
+            }
+        }
 
         float velocityTimeBelowLimit;
         float previousVelocity;

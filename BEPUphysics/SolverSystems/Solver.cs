@@ -22,7 +22,13 @@ namespace BEPUphysics.SolverSystems
         ///<summary>
         /// Gets the list of solver updateables in the solver.
         ///</summary>
-        public ReadOnlyCollection<SolverUpdateable> SolverUpdateables { get; private set; }
+        public ReadOnlyList<SolverUpdateable> SolverUpdateables
+        {
+            get
+            {
+                return new ReadOnlyList<SolverUpdateable>(solverUpdateables);
+            }
+        }
         protected internal TimeStepSettings timeStepSettings;
         ///<summary>
         /// Gets or sets the time step settings used by the solver.
@@ -58,7 +64,6 @@ namespace BEPUphysics.SolverSystems
             DeactivationManager = deactivationManager;
             multithreadedPrestepDelegate = MultithreadedPrestep;
             multithreadedIterationDelegate = MultithreadedIteration;
-            SolverUpdateables = new ReadOnlyCollection<SolverUpdateable>(solverUpdateables);
             Enabled = true;
         }
         ///<summary>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using BEPUphysics.Threading;
 using BEPUphysics.Entities;
+using BEPUphysics.DataStructures;
 
 namespace BEPUphysics.EntityStateManagement
 {
@@ -22,12 +23,18 @@ namespace BEPUphysics.EntityStateManagement
         ///</summary>
         public InterpolatedStatesManager InterpolatedStates { get; private set; }
 
-        internal List<Entity> entities = new List<Entity>();
+        internal RawList<Entity> entities = new RawList<Entity>();
 
         ///<summary>
         /// Gets the list of entities in the manager.
         ///</summary>
-        public ReadOnlyCollection<Entity> Entities { get; private set; }
+        public ReadOnlyList<Entity> Entities
+        {
+            get
+            {
+                return new ReadOnlyList<Entity>(entities);
+            }
+        }
 
         bool enabled;
         ///<summary>
@@ -62,7 +69,6 @@ namespace BEPUphysics.EntityStateManagement
         {
             InterpolatedStates = new InterpolatedStatesManager(this);
             ReadBuffers = new StateReadBuffers(this);
-            Entities = new ReadOnlyCollection<Entity>(entities);
 
         }
 
@@ -74,7 +80,6 @@ namespace BEPUphysics.EntityStateManagement
         {
             InterpolatedStates = new InterpolatedStatesManager(this, threadManager);
             ReadBuffers = new StateReadBuffers(this, threadManager);
-            Entities = new ReadOnlyCollection<Entity>(entities);
         }
 
 

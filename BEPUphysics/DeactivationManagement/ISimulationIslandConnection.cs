@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using BEPUphysics.DataStructures;
 
 namespace BEPUphysics.DeactivationManagement
 {
@@ -15,7 +16,7 @@ namespace BEPUphysics.DeactivationManagement
         ///<summary>
         /// Gets the simulation island members associated with this connection.
         ///</summary>
-        ReadOnlyCollection<ISimulationIslandMember> ConnectedMembers { get; }
+        ReadOnlyList<ISimulationIslandMember> ConnectedMembers { get; }
 
         ///<summary>
         /// Adds references to the connection to all connected members.

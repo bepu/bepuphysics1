@@ -17,7 +17,7 @@ namespace BEPUphysics.Entities.Prefabs
         ///<summary>
         /// Gets the list of shapes in the compound.
         ///</summary>
-        public ReadOnlyCollection<CompoundShapeEntry> Shapes
+        public ReadOnlyList<CompoundShapeEntry> Shapes
         {
             get
             {

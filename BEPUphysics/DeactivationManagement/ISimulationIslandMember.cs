@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using BEPUphysics.DataStructures;
 
 namespace BEPUphysics.DeactivationManagement
 {
@@ -26,7 +27,7 @@ namespace BEPUphysics.DeactivationManagement
         ///<summary>
         /// Gets the connections associated with this member.
         ///</summary>
-        ReadOnlyCollection<ISimulationIslandConnection> Connections { get; }
+        ReadOnlyList<ISimulationIslandConnection> Connections { get; }
 
         //The system needs to be able to know if it's a deactivation candidate.
         //Possibly pass in the activity manager so that its settings can be observed from within the candidate

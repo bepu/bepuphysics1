@@ -16,6 +16,7 @@ using Microsoft.Xna.Framework;
 using BEPUphysics.ResourceManagement;
 using System.Collections.ObjectModel;
 using BEPUphysics.BroadPhaseSystems.SortAndSweep;
+using BEPUphysics.DataStructures;
 
 namespace BEPUphysics
 {
@@ -179,7 +180,7 @@ namespace BEPUphysics
         ///<summary>
         /// Gets the list of entities in the space.
         ///</summary>
-        public ReadOnlyCollection<Entity> Entities
+        public ReadOnlyList<Entity> Entities
         {
             get { return BufferedStates.Entities; }
         }

@@ -50,7 +50,13 @@ namespace BEPUphysics.Constraints.Collision
         ///<summary>
         /// Gets the penetration constraints used by the manifold.
         ///</summary>
-        public ReadOnlyCollection<ContactPenetrationConstraint> ContactPenetrationConstraints { get; private set; }
+        public ReadOnlyList<ContactPenetrationConstraint> ContactPenetrationConstraints
+        {
+            get
+            {
+                return new ReadOnlyList<ContactPenetrationConstraint>(penetrationConstraints);
+            }
+        }
 
         Stack<ContactPenetrationConstraint> penetrationConstraintPool = new Stack<ContactPenetrationConstraint>(4);
 
@@ -65,7 +71,6 @@ namespace BEPUphysics.Constraints.Collision
 
 
             penetrationConstraints = new RawList<ContactPenetrationConstraint>(4);
-            ContactPenetrationConstraints = new ReadOnlyCollection<ContactPenetrationConstraint>(penetrationConstraints);
 
 
             //Order matters in this adding process.  Sliding friction computes some information used by the twist friction, and both use penetration impulses.

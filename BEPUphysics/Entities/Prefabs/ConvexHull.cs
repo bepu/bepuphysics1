@@ -4,6 +4,7 @@ using BEPUphysics.EntityStateManagement;
 using Microsoft.Xna.Framework;
 using System.Collections.ObjectModel;
 using BEPUphysics.CollisionShapes.ConvexShapes;
+using BEPUphysics.DataStructures;
 
 namespace BEPUphysics.Entities.Prefabs
 {
@@ -15,7 +16,7 @@ namespace BEPUphysics.Entities.Prefabs
         /// <summary>
         /// List of the points composing the surface of the convex hull in local space.
         /// </summary>
-        public ReadOnlyCollection<Vector3> Vertices
+        public ReadOnlyList<Vector3> Vertices
         {
             get
             {
