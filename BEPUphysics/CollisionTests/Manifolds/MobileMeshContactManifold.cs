@@ -8,6 +8,7 @@ using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.CollisionShapes;
 using BEPUphysics.ResourceManagement;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
+using System.Diagnostics;
 
 namespace BEPUphysics.CollisionTests.Manifolds
 {
@@ -119,7 +120,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
         Vector3 lastValidConvexPosition;
         protected override void ProcessCandidates(RawValueList<ContactData> candidates)
         {
-            if (Mesh.Shape.solidity == MobileMeshSolidity.Solid)
+            if (candidates.count == 0 && Mesh.Shape.solidity == MobileMeshSolidity.Solid)
             {
 
                 //If there's no new contacts on the mesh and it's supposed to be a solid,
@@ -150,9 +151,10 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     {
                         //This is unlikely; just pick something completely arbitrary then.
                         ray.Direction = Vector3.Up;
+                        rayDirectionLength = 1;
                     }
                 }
-
+                Vector3.Divide(ref ray.Direction, (float)Math.Sqrt(rayDirectionLength), out ray.Direction);
 
                 RayHit hit;
                 if (mesh.Shape.IsRayOriginInMesh(ref ray, out hit))
@@ -167,7 +169,8 @@ namespace BEPUphysics.CollisionTests.Manifolds
 
                     float factor;
                     Vector3.Dot(ref ray.Direction, ref newContact.Normal, out factor);
-                    newContact.PenetrationDepth = Math.Abs(factor / (float)Math.Sqrt(rayDirectionLength)) * hit.T + convex.Shape.minimumRadius;
+                    newContact.PenetrationDepth = -factor * hit.T + convex.Shape.minimumRadius;
+
                     Matrix3X3.Transform(ref newContact.Normal, ref orientation, out newContact.Normal);
 
                     //Do not yet create a new contact.  Check to see if an 'inner contact' with id == 2 already exists.
@@ -186,7 +189,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                             break;
                         }
                     }
-                    if (addContact)
+                    if (addContact && contacts.count == 0)
                         Add(ref newContact);
 
                 }
