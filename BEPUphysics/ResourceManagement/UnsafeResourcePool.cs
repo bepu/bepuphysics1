@@ -73,11 +73,11 @@ namespace BEPUphysics.ResourceManagement
             {
                 stack.Pop();
             }
-            foreach (T t in stack)
-            {
-                if (InstanceInitializer != null)
+            if (InstanceInitializer != null)
+                foreach (T t in stack)
+                {
                     InstanceInitializer(t);
-            }
+                }
             while (stack.Count < initialResourceCount)
             {
                 stack.Push(CreateNewResource());

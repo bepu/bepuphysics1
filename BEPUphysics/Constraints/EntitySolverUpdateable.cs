@@ -17,7 +17,7 @@ namespace BEPUphysics.Constraints
     public abstract class EntitySolverUpdateable : SolverUpdateable//, ISolverBatchUpdateable
     {
         
-        private readonly EntityComparer comparer = new EntityComparer();
+        private static EntityComparer comparer = new EntityComparer();
         //protected internal SolverBatch batch;
 
 

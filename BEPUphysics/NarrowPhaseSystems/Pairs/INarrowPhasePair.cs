@@ -1,5 +1,4 @@
 ﻿using BEPUphysics.BroadPhaseSystems;
-using BEPUphysics.NarrowPhaseSystems.Factories;
 
 namespace BEPUphysics.NarrowPhaseSystems.Pairs
 {

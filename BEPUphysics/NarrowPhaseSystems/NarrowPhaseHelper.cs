@@ -2,118 +2,238 @@
 using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.Collidables;
 using BEPUphysics.Collidables.MobileCollidables;
-using BEPUphysics.NarrowPhaseSystems.Factories;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.CollisionShapes.ConvexShapes;
+using BEPUphysics.DataStructures;
 
 namespace BEPUphysics.NarrowPhaseSystems
 {
+    /// <summary>
+    /// Contains the various factories that are used by default in the engine.
+    /// </summary>
+    public class Factories
+    {
+        /// <summary>
+        /// Gets the factory for the box-box case.
+        /// </summary>
+        public NarrowPhasePairFactory<BoxPairHandler> BoxBox { get; private set; }
+        /// <summary>
+        /// Gets the factory for the box-sphere case.
+        /// </summary>
+        public NarrowPhasePairFactory<BoxSpherePairHandler> BoxSphere { get; private set; }
+        /// <summary>
+        /// Gets the factory for the sphere-sphere case.
+        /// </summary>
+        public NarrowPhasePairFactory<SpherePairHandler> SphereSphere { get; private set; }
+        /// <summary>
+        /// Gets the factory for the convex-convex case.  This works for any two convexes, though some other special cases (e.g. box-box) supersede it.
+        /// </summary>
+        public NarrowPhasePairFactory<GeneralConvexPairHandler> ConvexConvex { get; private set; }
+        /// <summary>
+        /// Gets the factory for the triangle-convex case.
+        /// </summary>
+        public NarrowPhasePairFactory<TriangleConvexPairHandler> TriangleConvex { get; private set; }
+        /// <summary>
+        /// Gets the factory for the compound-convex case.
+        /// </summary>
+        public NarrowPhasePairFactory<CompoundConvexPairHandler> CompoundConvex { get; private set; }
+        /// <summary>
+        /// Gets the factory for the compound-compound case.
+        /// </summary>
+        public NarrowPhasePairFactory<CompoundPairHandler> CompoundCompound { get; private set; }
+        /// <summary>
+        /// Gets the factory for the compound-static mesh case.
+        /// </summary>
+        public NarrowPhasePairFactory<CompoundStaticMeshPairHandler> CompoundStaticMesh { get; private set; }
+        /// <summary>
+        /// Gets the factory for the compound-terrain case.
+        /// </summary>
+        public NarrowPhasePairFactory<CompoundTerrainPairHandler> CompoundTerrain { get; private set; }
+        /// <summary>
+        /// Gets the factory for the compound-instanced mesh case.
+        /// </summary>
+        public NarrowPhasePairFactory<CompoundInstancedMeshPairHandler> CompoundInstancedMesh { get; private set; }
+        /// <summary>
+        /// Gets the factory for the compound-mobile mesh case.
+        /// </summary>
+        public NarrowPhasePairFactory<CompoundMobileMeshPairHandler> CompoundMobileMesh { get; private set; }
+        /// <summary>
+        /// Gets the factory for the static mesh-convex case.
+        /// </summary>
+        public NarrowPhasePairFactory<StaticMeshConvexPairHandler> StaticMeshConvex { get; private set; }
+        /// <summary>
+        /// Gets the factory for the static mesh-sphere case.
+        /// </summary>
+        public NarrowPhasePairFactory<StaticMeshSpherePairHandler> StaticMeshSphere { get; private set; }
+        /// <summary>
+        /// Gets the factory for the terrain-convex case.
+        /// </summary>
+        public NarrowPhasePairFactory<TerrainConvexPairHandler> TerrainConvex { get; private set; }
+        /// <summary>
+        /// Gets the factory for the terrain-sphere case.
+        /// </summary>
+        public NarrowPhasePairFactory<TerrainSpherePairHandler> TerrainSphere { get; private set; }
+        /// <summary>
+        /// Gets the factory for the instanced mesh-convex case.
+        /// </summary>
+        public NarrowPhasePairFactory<InstancedMeshConvexPairHandler> InstancedMeshConvex { get; private set; }
+        /// <summary>
+        /// Gets the factory for the instanced mesh-sphere case.
+        /// </summary>
+        public NarrowPhasePairFactory<InstancedMeshSpherePairHandler> InstancedMeshSphere { get; private set; }
+        /// <summary>
+        /// Gets the factory for the mobile mesh-convex case.
+        /// </summary>
+        public NarrowPhasePairFactory<MobileMeshConvexPairHandler> MobileMeshConvex { get; private set; }
+        /// <summary>
+        /// Gets the factory for the mobile mesh-sphere case.
+        /// </summary>
+        public NarrowPhasePairFactory<MobileMeshSpherePairHandler> MobileMeshSphere { get; private set; }
+        /// <summary>
+        /// Gets the factory for the mobile mesh-static mesh case.
+        /// </summary>
+        public NarrowPhasePairFactory<MobileMeshStaticMeshPairHandler> MobileMeshStaticMesh { get; private set; }
+
+        RawList<NarrowPhasePairFactory> factories = new RawList<NarrowPhasePairFactory>();
+        /// <summary>
+        /// Gets a collection of all the default factories.
+        /// </summary>
+        public ReadOnlyList<NarrowPhasePairFactory> All
+        {
+            get
+            {
+                return new ReadOnlyList<NarrowPhasePairFactory>(factories);
+            }
+        }
+
+        /// <summary>
+        /// Constructs all factories.
+        /// </summary>
+        public Factories()
+        {
+            factories.Add(BoxBox = new NarrowPhasePairFactory<BoxPairHandler>());
+            factories.Add(BoxSphere = new NarrowPhasePairFactory<BoxSpherePairHandler>());
+            factories.Add(SphereSphere = new NarrowPhasePairFactory<SpherePairHandler>());
+            factories.Add(ConvexConvex = new NarrowPhasePairFactory<GeneralConvexPairHandler>());
+            factories.Add(TriangleConvex = new NarrowPhasePairFactory<TriangleConvexPairHandler>());
+            factories.Add(CompoundConvex = new NarrowPhasePairFactory<CompoundConvexPairHandler>());
+            factories.Add(CompoundCompound = new NarrowPhasePairFactory<CompoundPairHandler>());
+            factories.Add(CompoundStaticMesh = new NarrowPhasePairFactory<CompoundStaticMeshPairHandler>());
+            factories.Add(CompoundTerrain = new NarrowPhasePairFactory<CompoundTerrainPairHandler>());
+            factories.Add(CompoundInstancedMesh = new NarrowPhasePairFactory<CompoundInstancedMeshPairHandler>());
+            factories.Add(CompoundMobileMesh = new NarrowPhasePairFactory<CompoundMobileMeshPairHandler>());
+            factories.Add(StaticMeshConvex = new NarrowPhasePairFactory<StaticMeshConvexPairHandler>());
+            factories.Add(StaticMeshSphere = new NarrowPhasePairFactory<StaticMeshSpherePairHandler>());
+            factories.Add(TerrainConvex = new NarrowPhasePairFactory<TerrainConvexPairHandler>());
+            factories.Add(TerrainSphere = new NarrowPhasePairFactory<TerrainSpherePairHandler>());
+            factories.Add(InstancedMeshConvex = new NarrowPhasePairFactory<InstancedMeshConvexPairHandler>());
+            factories.Add(InstancedMeshSphere = new NarrowPhasePairFactory<InstancedMeshSpherePairHandler>());
+            factories.Add(MobileMeshConvex = new NarrowPhasePairFactory<MobileMeshConvexPairHandler>());
+            factories.Add(MobileMeshSphere = new NarrowPhasePairFactory<MobileMeshSpherePairHandler>());
+            factories.Add(MobileMeshStaticMesh = new NarrowPhasePairFactory<MobileMeshStaticMeshPairHandler>());
+        }
+
+
+    }
 
     ///<summary>
     /// Contains the collision managers dictionary and other helper methods for creating pairs.
     ///</summary>
     public static class NarrowPhaseHelper
     {
-
-        ///<summary>
-        /// The fallback factory used for convex pairs.
-        ///</summary>
-        public static NarrowPhasePairFactory GeneralConvexPairFactory
+        /// <summary>
+        /// Gets the factories used by default to construct various pair types in the narrow phase.
+        /// These do not necessarily reflect the state of the narrow phase helper's CollisionManagers dictionary
+        /// if changes are made to its entries.
+        /// </summary>
+        public static Factories Factories
         {
             get;
-            set;
+            private set;
         }
 
         static NarrowPhaseHelper()
         {
+            Factories = new NarrowPhaseSystems.Factories();
             collisionManagers = new Dictionary<TypePair, NarrowPhasePairFactory>();
-            GeneralConvexPairFactory = new GeneralConvexFactory();
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<BoxShape>), typeof(ConvexCollidable<BoxShape>)), new BoxPairFactory());
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<BoxShape>), typeof(ConvexCollidable<SphereShape>)), new BoxSpherePairFactory());
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<SphereShape>), typeof(ConvexCollidable<SphereShape>)), new SpherePairFactory());
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<BoxShape>), typeof(ConvexCollidable<BoxShape>)), Factories.BoxBox);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<BoxShape>), typeof(ConvexCollidable<SphereShape>)), Factories.BoxSphere);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<SphereShape>), typeof(ConvexCollidable<SphereShape>)), Factories.SphereSphere);
 
-            var triangleConvexFactory = new TriangleConvexPairFactory();
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<BoxShape>), typeof(ConvexCollidable<TriangleShape>)), triangleConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<SphereShape>), typeof(ConvexCollidable<TriangleShape>)), triangleConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<CapsuleShape>), typeof(ConvexCollidable<TriangleShape>)), triangleConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<TriangleShape>), typeof(ConvexCollidable<TriangleShape>)), triangleConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<CylinderShape>), typeof(ConvexCollidable<TriangleShape>)), triangleConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<ConeShape>), typeof(ConvexCollidable<TriangleShape>)), triangleConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<TransformableShape>), typeof(ConvexCollidable<TriangleShape>)), triangleConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<MinkowskiSumShape>), typeof(ConvexCollidable<TriangleShape>)), triangleConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<WrappedShape>), typeof(ConvexCollidable<TriangleShape>)), triangleConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<ConvexHullShape>), typeof(ConvexCollidable<TriangleShape>)), triangleConvexFactory);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<BoxShape>), typeof(ConvexCollidable<TriangleShape>)), Factories.TriangleConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<SphereShape>), typeof(ConvexCollidable<TriangleShape>)), Factories.TriangleConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<CapsuleShape>), typeof(ConvexCollidable<TriangleShape>)), Factories.TriangleConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<TriangleShape>), typeof(ConvexCollidable<TriangleShape>)), Factories.TriangleConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<CylinderShape>), typeof(ConvexCollidable<TriangleShape>)), Factories.TriangleConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<ConeShape>), typeof(ConvexCollidable<TriangleShape>)), Factories.TriangleConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<TransformableShape>), typeof(ConvexCollidable<TriangleShape>)), Factories.TriangleConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<MinkowskiSumShape>), typeof(ConvexCollidable<TriangleShape>)), Factories.TriangleConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<WrappedShape>), typeof(ConvexCollidable<TriangleShape>)), Factories.TriangleConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<ConvexHullShape>), typeof(ConvexCollidable<TriangleShape>)), Factories.TriangleConvex);
 
-            var staticMeshConvexFactory = new StaticMeshConvexPairFactory();
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<BoxShape>), typeof(StaticMesh)), staticMeshConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<SphereShape>), typeof(StaticMesh)), new StaticMeshSpherePairFactory());
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<CapsuleShape>), typeof(StaticMesh)), staticMeshConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<TriangleShape>), typeof(StaticMesh)), staticMeshConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<CylinderShape>), typeof(StaticMesh)), staticMeshConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<ConeShape>), typeof(StaticMesh)), staticMeshConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<TransformableShape>), typeof(StaticMesh)), staticMeshConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<MinkowskiSumShape>), typeof(StaticMesh)), staticMeshConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<WrappedShape>), typeof(StaticMesh)), staticMeshConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<ConvexHullShape>), typeof(StaticMesh)), staticMeshConvexFactory);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<BoxShape>), typeof(StaticMesh)), Factories.StaticMeshConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<SphereShape>), typeof(StaticMesh)), Factories.StaticMeshSphere);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<CapsuleShape>), typeof(StaticMesh)), Factories.StaticMeshConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<TriangleShape>), typeof(StaticMesh)), Factories.StaticMeshConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<CylinderShape>), typeof(StaticMesh)), Factories.StaticMeshConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<ConeShape>), typeof(StaticMesh)), Factories.StaticMeshConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<TransformableShape>), typeof(StaticMesh)), Factories.StaticMeshConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<MinkowskiSumShape>), typeof(StaticMesh)), Factories.StaticMeshConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<WrappedShape>), typeof(StaticMesh)), Factories.StaticMeshConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<ConvexHullShape>), typeof(StaticMesh)), Factories.StaticMeshConvex);
 
-            var terrainConvexFactory = new TerrainConvexPairFactory();
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<BoxShape>), typeof(Terrain)), terrainConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<SphereShape>), typeof(Terrain)), new TerrainSpherePairFactory());
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<CapsuleShape>), typeof(Terrain)), terrainConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<TriangleShape>), typeof(Terrain)), terrainConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<CylinderShape>), typeof(Terrain)), terrainConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<ConeShape>), typeof(Terrain)), terrainConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<TransformableShape>), typeof(Terrain)), terrainConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<MinkowskiSumShape>), typeof(Terrain)), terrainConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<WrappedShape>), typeof(Terrain)), terrainConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<ConvexHullShape>), typeof(Terrain)), terrainConvexFactory);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<BoxShape>), typeof(Terrain)), Factories.TerrainConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<SphereShape>), typeof(Terrain)), Factories.TerrainSphere);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<CapsuleShape>), typeof(Terrain)), Factories.TerrainConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<TriangleShape>), typeof(Terrain)), Factories.TerrainConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<CylinderShape>), typeof(Terrain)), Factories.TerrainConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<ConeShape>), typeof(Terrain)), Factories.TerrainConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<TransformableShape>), typeof(Terrain)), Factories.TerrainConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<MinkowskiSumShape>), typeof(Terrain)), Factories.TerrainConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<WrappedShape>), typeof(Terrain)), Factories.TerrainConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<ConvexHullShape>), typeof(Terrain)), Factories.TerrainConvex);
 
-            var instancedMeshConvexFactory = new InstancedMeshConvexPairFactory();
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<BoxShape>), typeof(InstancedMesh)), instancedMeshConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<SphereShape>), typeof(InstancedMesh)), new InstancedMeshSpherePairFactory());
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<CapsuleShape>), typeof(InstancedMesh)), instancedMeshConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<TriangleShape>), typeof(InstancedMesh)), instancedMeshConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<CylinderShape>), typeof(InstancedMesh)), instancedMeshConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<ConeShape>), typeof(InstancedMesh)), instancedMeshConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<TransformableShape>), typeof(InstancedMesh)), instancedMeshConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<MinkowskiSumShape>), typeof(InstancedMesh)), instancedMeshConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<WrappedShape>), typeof(InstancedMesh)), instancedMeshConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<ConvexHullShape>), typeof(InstancedMesh)), instancedMeshConvexFactory);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<BoxShape>), typeof(InstancedMesh)), Factories.InstancedMeshConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<SphereShape>), typeof(InstancedMesh)), Factories.InstancedMeshSphere);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<CapsuleShape>), typeof(InstancedMesh)), Factories.InstancedMeshConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<TriangleShape>), typeof(InstancedMesh)), Factories.InstancedMeshConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<CylinderShape>), typeof(InstancedMesh)), Factories.InstancedMeshConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<ConeShape>), typeof(InstancedMesh)), Factories.InstancedMeshConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<TransformableShape>), typeof(InstancedMesh)), Factories.InstancedMeshConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<MinkowskiSumShape>), typeof(InstancedMesh)), Factories.InstancedMeshConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<WrappedShape>), typeof(InstancedMesh)), Factories.InstancedMeshConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<ConvexHullShape>), typeof(InstancedMesh)), Factories.InstancedMeshConvex);
 
-            var compoundConvexFactory = new CompoundConvexPairFactory();
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<BoxShape>), typeof(CompoundCollidable)), compoundConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<SphereShape>), typeof(CompoundCollidable)), compoundConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<CapsuleShape>), typeof(CompoundCollidable)), compoundConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<TriangleShape>), typeof(CompoundCollidable)), compoundConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<CylinderShape>), typeof(CompoundCollidable)), compoundConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<ConeShape>), typeof(CompoundCollidable)), compoundConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<TransformableShape>), typeof(CompoundCollidable)), compoundConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<MinkowskiSumShape>), typeof(CompoundCollidable)), compoundConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<WrappedShape>), typeof(CompoundCollidable)), compoundConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<ConvexHullShape>), typeof(CompoundCollidable)), compoundConvexFactory);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<BoxShape>), typeof(CompoundCollidable)), Factories.CompoundConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<SphereShape>), typeof(CompoundCollidable)), Factories.CompoundConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<CapsuleShape>), typeof(CompoundCollidable)), Factories.CompoundConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<TriangleShape>), typeof(CompoundCollidable)), Factories.CompoundConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<CylinderShape>), typeof(CompoundCollidable)), Factories.CompoundConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<ConeShape>), typeof(CompoundCollidable)), Factories.CompoundConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<TransformableShape>), typeof(CompoundCollidable)), Factories.CompoundConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<MinkowskiSumShape>), typeof(CompoundCollidable)), Factories.CompoundConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<WrappedShape>), typeof(CompoundCollidable)), Factories.CompoundConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<ConvexHullShape>), typeof(CompoundCollidable)), Factories.CompoundConvex);
 
-            collisionManagers.Add(new TypePair(typeof(CompoundCollidable), typeof(CompoundCollidable)), new CompoundPairFactory());
-            collisionManagers.Add(new TypePair(typeof(CompoundCollidable), typeof(StaticMesh)), new CompoundStaticMeshPairFactory());
-            collisionManagers.Add(new TypePair(typeof(CompoundCollidable), typeof(Terrain)), new CompoundTerrainPairFactory());
-            collisionManagers.Add(new TypePair(typeof(CompoundCollidable), typeof(InstancedMesh)), new CompoundInstancedMeshPairFactory());
+            collisionManagers.Add(new TypePair(typeof(CompoundCollidable), typeof(CompoundCollidable)), Factories.CompoundCompound);
+            collisionManagers.Add(new TypePair(typeof(CompoundCollidable), typeof(StaticMesh)), Factories.CompoundStaticMesh);
+            collisionManagers.Add(new TypePair(typeof(CompoundCollidable), typeof(Terrain)), Factories.CompoundTerrain);
+            collisionManagers.Add(new TypePair(typeof(CompoundCollidable), typeof(InstancedMesh)), Factories.CompoundInstancedMesh);
 
-            var mobileMeshConvexFactory = new MobileMeshConvexPairFactory();
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<BoxShape>), typeof(MobileMeshCollidable)), mobileMeshConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<SphereShape>), typeof(MobileMeshCollidable)), new MobileMeshSpherePairFactory());
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<CapsuleShape>), typeof(MobileMeshCollidable)), mobileMeshConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<TriangleShape>), typeof(MobileMeshCollidable)), mobileMeshConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<CylinderShape>), typeof(MobileMeshCollidable)), mobileMeshConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<ConeShape>), typeof(MobileMeshCollidable)), mobileMeshConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<TransformableShape>), typeof(MobileMeshCollidable)), mobileMeshConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<MinkowskiSumShape>), typeof(MobileMeshCollidable)), mobileMeshConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<WrappedShape>), typeof(MobileMeshCollidable)), mobileMeshConvexFactory);
-            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<ConvexHullShape>), typeof(MobileMeshCollidable)), mobileMeshConvexFactory);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<BoxShape>), typeof(MobileMeshCollidable)), Factories.MobileMeshConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<SphereShape>), typeof(MobileMeshCollidable)), Factories.MobileMeshSphere);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<CapsuleShape>), typeof(MobileMeshCollidable)), Factories.MobileMeshConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<TriangleShape>), typeof(MobileMeshCollidable)), Factories.MobileMeshConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<CylinderShape>), typeof(MobileMeshCollidable)), Factories.MobileMeshConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<ConeShape>), typeof(MobileMeshCollidable)), Factories.MobileMeshConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<TransformableShape>), typeof(MobileMeshCollidable)), Factories.MobileMeshConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<MinkowskiSumShape>), typeof(MobileMeshCollidable)), Factories.MobileMeshConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<WrappedShape>), typeof(MobileMeshCollidable)), Factories.MobileMeshConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<ConvexHullShape>), typeof(MobileMeshCollidable)), Factories.MobileMeshConvex);
 
-            collisionManagers.Add(new TypePair(typeof(CompoundCollidable), typeof(MobileMeshCollidable)), new CompoundMobileMeshPairFactory());
-            collisionManagers.Add(new TypePair(typeof(MobileMeshCollidable), typeof(StaticMesh)), new MobileMeshStaticMeshPairFactory());
-
-
+            collisionManagers.Add(new TypePair(typeof(CompoundCollidable), typeof(MobileMeshCollidable)), Factories.CompoundMobileMesh);
+            collisionManagers.Add(new TypePair(typeof(MobileMeshCollidable), typeof(StaticMesh)), Factories.MobileMeshStaticMesh);
         }
 
         internal static Dictionary<TypePair, NarrowPhasePairFactory> collisionManagers;
@@ -142,7 +262,7 @@ namespace BEPUphysics.NarrowPhaseSystems
             NarrowPhasePairFactory factory;
             if (collisionManagers.TryGetValue(new TypePair(pair.entryA.GetType(), pair.entryB.GetType()), out factory))
             {
-                INarrowPhasePair toReturn = factory.GetNarrowPhasePair(pair);
+                INarrowPhasePair toReturn = factory.GetNarrowPhasePair();
                 toReturn.BroadPhaseOverlap = pair;
                 toReturn.Factory = factory;
                 return toReturn;
@@ -152,9 +272,9 @@ namespace BEPUphysics.NarrowPhaseSystems
             var b = pair.entryB as ConvexCollidable;
             if (a != null && b != null)
             {
-                INarrowPhasePair toReturn = GeneralConvexPairFactory.GetNarrowPhasePair(pair);
+                INarrowPhasePair toReturn = Factories.ConvexConvex.GetNarrowPhasePair();
                 toReturn.BroadPhaseOverlap = pair;
-                toReturn.Factory = GeneralConvexPairFactory;
+                toReturn.Factory = Factories.ConvexConvex;
                 return toReturn;
             }
             return null;

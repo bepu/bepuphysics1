@@ -10,6 +10,7 @@ using BEPUphysics.NarrowPhaseSystems.Pairs;
 using BEPUphysics.CollisionTests.Manifolds;
 using System.Diagnostics;
 using BEPUphysics.BroadPhaseSystems.SortAndSweep;
+using BEPUphysics.NarrowPhaseSystems;
 
 namespace BEPUphysicsDemos.Demos
 {
@@ -52,11 +53,13 @@ namespace BEPUphysicsDemos.Demos
                     new Vector3(-xLength * xSpacing / 2, 0, -zLength * zSpacing / 2)));
             terrain.Thickness = 0;
 
-            MotionSettings.DefaultPositionUpdateMode = BEPUphysics.PositionUpdating.PositionUpdateMode.Continuous;
+            //MotionSettings.DefaultPositionUpdateMode = BEPUphysics.PositionUpdating.PositionUpdateMode.Continuous;
+
+            NarrowPhaseHelper.Factories.SphereSphere.EnsureCount(5000);
+            NarrowPhaseHelper.Factories.TerrainSphere.EnsureCount(5000);
 
             //ConfigurationHelper.ApplySuperSpeedySettings(Space);
             //Space.Solver.IterationLimit = 1;
-
             Space.Add(terrain);
             for (int i = 0; i < 10; i++)
             {
@@ -67,6 +70,7 @@ namespace BEPUphysicsDemos.Demos
                         Space.Add(new Sphere(new Vector3(0 + i * 3, 20 + j * 3, 0 + k * 3), 0.5f, 1)
                         {
                             //LocalInertiaTensorInverse = new Matrix3X3()
+                            //Tag = "noDisplayObject"
                         });
                         //Space.Add(new Box(
                         //    new Vector3(0 + i * 4, 1000 + -j * 10, 0 + k * 4),

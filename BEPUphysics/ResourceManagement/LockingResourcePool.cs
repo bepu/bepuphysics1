@@ -74,11 +74,11 @@ namespace BEPUphysics.ResourceManagement
                 stack.TryUnsafeDequeueFirst(out toRemove);
             }
             int length = stack.lastIndex - stack.firstIndex + 1; //lastIndex is inclusive, so add 1.
-            for (int i = 0; i < length; i++)
-            {
-                if (InstanceInitializer != null)
+            if (InstanceInitializer != null)
+                for (int i = 0; i < length; i++)
+                {
                     InstanceInitializer(stack.array[(stack.firstIndex + i) % stack.array.Length]);
-            }
+                }
             while (stack.Count < initialResourceCount)
             {
                 stack.UnsafeEnqueue(CreateNewResource());

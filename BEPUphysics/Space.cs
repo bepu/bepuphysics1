@@ -191,6 +191,8 @@ namespace BEPUphysics
         ///</summary>
         public Space()
         {
+            NarrowPhaseHelper.CollisionManagers = NarrowPhaseHelper.CollisionManagers; //Forces the NarrowPhaseHelper to run the static constructor.  Better to do it now instead of mid-simulation.
+
             timeStepSettings = new TimeStepSettings();
 
 #if !WINDOWS

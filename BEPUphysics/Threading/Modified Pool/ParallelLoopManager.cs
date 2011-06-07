@@ -101,7 +101,7 @@ namespace BEPUphysics.Threading
 
             workerCount = workers.Count;
 
-            //FIGURE OUT OPTIMAL STUFF
+            //TODO: The job splitting could be tuned possibly.
             int iterationCount = endIndex - beginIndex;
             int tasksPerThread = Math.Max(minimumTasksPerThread, iterationCount / maximumIterationsPerTask);
             int taskSubdivisions = workerCount * tasksPerThread;
