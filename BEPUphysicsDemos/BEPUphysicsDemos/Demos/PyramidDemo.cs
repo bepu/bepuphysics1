@@ -18,7 +18,7 @@ namespace BEPUphysicsDemos.Demos
             : base(game)
         {
             float boxSize = 2f;
-            int boxCount = 20;
+            int boxCount = 120;
             float platformLength = Math.Min(50, boxCount * boxSize + 10);
             Space.Add(new Box(new Vector3(0, -.5f, 0), boxCount * boxSize + 20, 1,
                               platformLength));

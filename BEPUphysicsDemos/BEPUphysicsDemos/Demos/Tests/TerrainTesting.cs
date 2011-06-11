@@ -57,20 +57,23 @@ namespace BEPUphysicsDemos.Demos
 
             NarrowPhaseHelper.Factories.SphereSphere.EnsureCount(5000);
             NarrowPhaseHelper.Factories.TerrainSphere.EnsureCount(5000);
+            //Space.BroadPhase = new Grid2DSortAndSweep(Space.ThreadManager);
 
             //ConfigurationHelper.ApplySuperSpeedySettings(Space);
-            //Space.Solver.IterationLimit = 1;
+            //Space.ForceUpdater.Gravity = new Vector3();
+            Space.Solver.IterationLimit = 1;
             Space.Add(terrain);
             for (int i = 0; i < 10; i++)
             {
-                for (int j = 0; j < 30; j++)
+                for (int j = 0; j < 40; j++)
                 {
                     for (int k = 0; k < 10; k++)
                     {
                         Space.Add(new Sphere(new Vector3(0 + i * 3, 20 + j * 3, 0 + k * 3), 0.5f, 1)
                         {
                             //LocalInertiaTensorInverse = new Matrix3X3()
-                            //Tag = "noDisplayObject"
+                            Tag = "noDisplayObject",
+                            IsAlwaysActive = true
                         });
                         //Space.Add(new Box(
                         //    new Vector3(0 + i * 4, 1000 + -j * 10, 0 + k * 4),
@@ -109,6 +112,35 @@ namespace BEPUphysicsDemos.Demos
             game.ModelDrawer.Add(terrain);
 
             game.Camera.Position = new Vector3(0, 30, 20);
+
+            ////Pre-simulate.
+            //for (int i = 0; i < 150; i++)
+            //{
+            //    Space.Update();
+            //}
+
+            //int numRuns = 10;
+            ////Space.BeforeNarrowPhaseUpdateables.Enabled = false;
+            ////Space.DuringForcesUpdateables.Enabled = false;
+            ////Space.EndOfTimeStepUpdateables.Enabled = false;
+            ////Space.EndOfFrameUpdateables.Enabled = false;
+
+            ////Space.EntityStateWriteBuffer.Enabled = false;
+            ////Space.BufferedStates.Enabled = false;
+            ////Space.DeactivationManager.Enabled = false;
+            ////Space.SpaceObjectBuffer.Enabled = false;
+            ////Space.DeferredEventDispatcher.Enabled = false;
+            ////Space.BoundingBoxUpdater.Enabled = false;
+
+            ////Space.BroadPhase.Enabled = false;
+            ////Space.NarrowPhase.Enabled = false;
+            ////Space.ForceUpdater.Enabled = false;
+            //////Space.Solver.Enabled = false;
+            ////Space.PositionUpdater.Enabled = false;
+            //for (int i = 0; i < numRuns; i++)
+            //{
+            //    Space.Update();
+            //}
 
         }
 

@@ -20,7 +20,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
     ///<summary>
     /// Handles a standard pair handler that has a direct manifold and constraint.
     ///</summary>
-    public abstract class Type1PairHandler : CollidablePairHandler
+    public abstract class StandardPairHandler : CollidablePairHandler
     {
 
         protected abstract ContactManifold ContactManifold { get; }
@@ -29,7 +29,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         ///<summary>
         /// Constructs a pair handler.
         ///</summary>
-        protected Type1PairHandler()
+        protected StandardPairHandler()
         {
             //Child type constructors construct manifold first.
             ContactManifold.ContactAdded += OnContactAdded;

@@ -16,7 +16,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
     ///<summary>
     /// Handles a terrain-convex collision pair.
     ///</summary>
-    public abstract class TerrainPairHandler : Type1PairHandler
+    public abstract class TerrainPairHandler : StandardPairHandler
     {
         Terrain terrain;
         ConvexCollidable convex;

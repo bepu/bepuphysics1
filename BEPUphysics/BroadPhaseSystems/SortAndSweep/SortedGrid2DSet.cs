@@ -9,6 +9,12 @@ namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
 {
     internal class SortedGrid2DSet
     {
+        //TODO: The cell set is the number one reason why Grid2DSortAndSweep fails in corner cases.
+        //One option:
+        //Instead of trying to maintain a sorted set, stick to a dictionary + RawList combo.
+        //The update phase can add active cell-object pairs to a raw list.  Could do bottom-up recreation too, though contention might be an issue.
+        //Another option: Some other parallel-enumerable set, possibly with tricky hashing.
+
         internal RawList<GridCell2D> cells = new RawList<GridCell2D>();
         UnsafeResourcePool<GridCell2D> cellPool = new UnsafeResourcePool<GridCell2D>();
 

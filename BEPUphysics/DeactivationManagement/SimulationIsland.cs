@@ -151,7 +151,7 @@ namespace BEPUphysics.DeactivationManagement
             //TODO: Should it wake the island up?
             if (member.SimulationIsland == this)
             {
-                members.Remove(member);
+                members.FastRemove(member);
                 member.SimulationIsland = null;
                 member.Activated -= memberActivatedDelegate;
                 member.BecameDeactivationCandidate -= becameDeactivationCandidateDelegate;
@@ -170,7 +170,7 @@ namespace BEPUphysics.DeactivationManagement
         {
             //TODO: If this becomes a hash-based system, this method is pointless.
             ISimulationIslandMember member = members.Elements[i];
-            members.RemoveAt(i);
+            members.FastRemoveAt(i);
             member.SimulationIsland = null;
             member.Activated -= memberActivatedDelegate;
             member.BecameDeactivationCandidate -= becameDeactivationCandidateDelegate;

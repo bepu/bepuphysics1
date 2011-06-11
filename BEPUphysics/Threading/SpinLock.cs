@@ -2,10 +2,11 @@
 
 namespace BEPUphysics.Threading
 {
-    internal class SpinLock
+    public class SpinLock
     {
         private const int SleepInterval = 10;
         private int owner = -1;
+
 
         public void Enter()
         {
@@ -31,6 +32,7 @@ namespace BEPUphysics.Threading
             if (attempt % SleepInterval == SleepInterval - 1)
             {
                 Thread.Sleep(0);
+                //Thread.Yield();
                 //TODO: Thread.Yield on windows?
                 //Check multithreaded bookmarks performance conscious
                 //and .netspinlock

@@ -128,7 +128,6 @@ namespace BEPUphysics.DeactivationManagement
         //TODO: Simulation Island Deactivation
 
         RawList<ISimulationIslandMember> simulationIslandMembers = new RawList<ISimulationIslandMember>();
-        //TODO: Public readonly access? Different structure?
         RawList<SimulationIsland> simulationIslands = new RawList<SimulationIsland>();
 
         ///<summary>
@@ -196,7 +195,8 @@ namespace BEPUphysics.DeactivationManagement
         Action<int> multithreadedCandidacyLoopDelegate;
         void MultithreadedCandidacyLoop(int i)
         {
-            simulationIslandMembers.Elements[i].UpdateDeactivationCandidacy(timeStepSettings.TimeStepDuration);
+            if (simulationIslandMembers.Elements[i].IsActive)
+                simulationIslandMembers.Elements[i].UpdateDeactivationCandidacy(timeStepSettings.TimeStepDuration);
         }
 
         protected override void UpdateMultithreaded()
@@ -224,8 +224,19 @@ namespace BEPUphysics.DeactivationManagement
             while (numberOfEntitiesDeactivated < maximumDeactivationsPerFrame && simulationIslands.count > 0)
             {
                 deactivationIslandIndex = (deactivationIslandIndex + 1) % simulationIslands.count;
-                simulationIslands.Elements[deactivationIslandIndex].TryToDeactivate();
-                numberOfEntitiesDeactivated += simulationIslands.Elements[deactivationIslandIndex].members.count;
+                var island = simulationIslands.Elements[deactivationIslandIndex];
+                if (island.members.count == 0)
+                {
+                    //Found an orphan island left over from merge procedures or removal procedures.
+                    //Shoo it on out.
+                    simulationIslands.FastRemoveAt(deactivationIslandIndex);
+                    GiveBackIsland(island);
+                }
+                else
+                {
+                    island.TryToDeactivate();
+                    numberOfEntitiesDeactivated += island.members.count;
+                }
             }
         }
 
@@ -299,13 +310,17 @@ namespace BEPUphysics.DeactivationManagement
             for (int i = s2.members.count - 1; i >= 0; i--)
             {
                 ISimulationIslandMember member = s2.members.Elements[i];
-                s2.RemoveAt(i);
+                s2.RemoveAt(i); //This is done instead of a clear because removing also modifies event hooks.
                 s1.Add(member);
             }
 
-            s2.members.Clear();
-            simulationIslands.Remove(s2);
-            GiveBackIsland(s2);
+            //By now, s2 is empty.  But we will not remove it!
+            //Removing it here would require that we perform an O(n) index lookup on the whole simulationIslands list.
+            //Instead, leave it floating in the list as an orphan.  The deactivation attempt loop will catch it eventually and
+            //remove it using an extremely fast FastRemoveAt.
+            //It sounds like a micro-optimization, but this code is running singlethreadedly- it needs to be as fast as possible because
+            //we're wasting time that could be spent working all cores!
+
 
             //The larger one survives.
             return s1;
@@ -494,6 +509,8 @@ namespace BEPUphysics.DeactivationManagement
                     GiveBackIsland(island);
                     //Even though we appear to have connections, the island was only me!
                     //We can stop now.
+                    //Note that we do NOT remove the island from the simulation islands list here.
+                    //That would take an O(n) search.  Instead, orphan it and let the TryToDeactivate loop find it.
                     return;
                 }
             }

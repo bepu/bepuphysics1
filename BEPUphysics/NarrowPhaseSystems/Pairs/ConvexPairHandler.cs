@@ -16,7 +16,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
     ///<summary>
     /// Pair handler that manages a pair of two boxes.
     ///</summary>
-    public abstract class ConvexPairHandler : Type1PairHandler
+    public abstract class ConvexPairHandler : StandardPairHandler
     {
 
         public override void Initialize(BroadPhaseEntry entryA, BroadPhaseEntry entryB)

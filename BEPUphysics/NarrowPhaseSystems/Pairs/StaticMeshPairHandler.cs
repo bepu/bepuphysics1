@@ -17,7 +17,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
     ///<summary>
     /// Handles a static mesh-convex collision pair.
     ///</summary>
-    public abstract class StaticMeshPairHandler : Type1PairHandler
+    public abstract class StaticMeshPairHandler : StandardPairHandler
     {
         StaticMesh mesh;
         ConvexCollidable convex;

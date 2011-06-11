@@ -1203,7 +1203,7 @@ namespace BEPUphysics.Entities
             //The pair method works in such a way that, when this method is run asynchronously, there will be no race conditions.
             for (int i = 0; i < collisionInformation.pairs.Count; i++)
             {
-                collisionInformation.pairs[i].UpdateTimeOfImpact(collisionInformation, dt);
+                collisionInformation.pairs.Elements[i].UpdateTimeOfImpact(collisionInformation, dt);
             }
         }
 
@@ -1212,8 +1212,8 @@ namespace BEPUphysics.Entities
             float minimumToi = 1;
             for (int i = 0; i < collisionInformation.pairs.Count; i++)
             {
-                if (collisionInformation.pairs[i].timeOfImpact < minimumToi)
-                    minimumToi = collisionInformation.pairs[i].timeOfImpact;
+                if (collisionInformation.pairs.Elements[i].timeOfImpact < minimumToi)
+                    minimumToi = collisionInformation.pairs.Elements[i].timeOfImpact;
             }
 
             //The orientation was already updated by the PreUpdatePosition.

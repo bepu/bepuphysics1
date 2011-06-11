@@ -19,7 +19,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
     ///<summary>
     /// Handles a mobile mesh-convex collision pair.
     ///</summary>
-    public abstract class MobileMeshPairHandler : Type1PairHandler
+    public abstract class MobileMeshPairHandler : StandardPairHandler
     {
         MobileMeshCollidable mobileMesh;
         ConvexCollidable convex;

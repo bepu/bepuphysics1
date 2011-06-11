@@ -81,12 +81,21 @@ namespace BEPUphysics.UpdateableSystems.ForceFields
         }
 
         /// <summary>
+        /// Performs any custom logic desired prior to the force application.
+        /// </summary>
+        protected virtual void PreUpdate()
+        {
+
+        }
+
+        /// <summary>
         /// Applies forces specified by the given calculation delegate to bodies in the volume.
         /// Called automatically when needed by the owning Space.
         /// </summary>
         /// <param name="dt">Time since the last frame in simulation seconds.</param>
         void IDuringForcesUpdateable.Update(float dt)
         {
+            PreUpdate();
             affectedEntities = Shape.GetPossiblyAffectedEntities();
             if (AllowMultithreading && ThreadManager.ThreadCount > 1)
             {

@@ -81,7 +81,7 @@ namespace BEPUphysics.NarrowPhaseSystems
         public RawList<BroadPhaseOverlap> BroadPhaseOverlaps { get { return broadPhaseOverlaps; } set { broadPhaseOverlaps = value; } }
 
         Dictionary<BroadPhaseOverlap, INarrowPhasePair> overlapMapping = new Dictionary<BroadPhaseOverlap, INarrowPhasePair>();
-        List<INarrowPhasePair> narrowPhasePairs = new List<INarrowPhasePair>();
+        RawList<INarrowPhasePair> narrowPhasePairs = new RawList<INarrowPhasePair>();
         ///<summary>
         /// Gets the list of Pairs managed by the narrow phase.
         ///</summary>
@@ -207,18 +207,19 @@ namespace BEPUphysics.NarrowPhaseSystems
             //In a subsequent frame, the system will get rid of it.  This has an advantage of lowering the (somewhat tiny) per frame cost of removal management.
             //Additionally, in highly chaotic situations where collisions are constantly being created/destroyed, spreading out the computations
             //smooths the work out a bit.
-            if (narrowPhasePairs.Count < MultithreadedRemovalCutoff) //TODO: Configurable cutoff?
+            if (narrowPhasePairs.count < MultithreadedRemovalCutoff) //TODO: Configurable cutoff?
             {
                 RemoveStaleOverlaps();
             }
             else
             {
-                ThreadManager.ForLoop(0, narrowPhasePairs.Count, multithreadedRemovalLoopDelegate);
+                //TODO: This is... questionable.  Multithreading on such a small phase combined with linear index finding should make this slower than the single threaded case.
+                //Preferably, get rid of the need for this stage.
+                ThreadManager.ForLoop(0, narrowPhasePairs.count, multithreadedRemovalLoopDelegate);
                 INarrowPhasePair overlapToRemove;
                 while (overlapsToRemove.TryUnsafeDequeueFirst(out overlapToRemove))
                 {
-                    narrowPhasePairs[narrowPhasePairs.IndexOf(overlapToRemove)] = narrowPhasePairs[narrowPhasePairs.Count - 1];
-                    narrowPhasePairs.RemoveAt(narrowPhasePairs.Count - 1);
+                    narrowPhasePairs.FastRemove(overlapToRemove);
                     OnRemovePair(overlapToRemove);
                 }
             }
@@ -248,7 +249,6 @@ namespace BEPUphysics.NarrowPhaseSystems
         void RemoveStaleOverlaps()
         {
             //Remove stale objects.
-            //TODO: This could benefit from a custom data structure (a tiny amount).
             //TODO: This could possibly be done with a computation spreading approach.
             //Problem: Consider a collision pair that has contacts one frame, and in the next, no longer even has a broad phase overlap.
             //It will receive no update, and the collision pair will still have a contact in it.
@@ -257,16 +257,14 @@ namespace BEPUphysics.NarrowPhaseSystems
             //In a subsequent frame, the system will get rid of it.  This has an advantage of lowering the (somewhat tiny) per frame cost of removal management.
             //Additionally, in highly chaotic situations where collisions are constantly being created/destroyed, spreading out the computations
             //smooths the work out a bit.
-            for (int i = narrowPhasePairs.Count - 1; i >= 0; i--)
+            for (int i = narrowPhasePairs.count - 1; i >= 0; i--)
             {
-                INarrowPhasePair narrowPhaseObject = narrowPhasePairs[i];
+                INarrowPhasePair narrowPhaseObject = narrowPhasePairs.Elements[i];
                 if (narrowPhaseObject.NeedsUpdate &&
                     //Overlap will not be refreshed if entries are inactive, but shouldn't remove narrow phase pair.
                     (narrowPhaseObject.BroadPhaseOverlap.entryA.IsActive || narrowPhaseObject.BroadPhaseOverlap.entryB.IsActive))
                 {
-                    narrowPhasePairs[i] = narrowPhasePairs[narrowPhasePairs.Count - 1];
-                    narrowPhasePairs.RemoveAt(narrowPhasePairs.Count - 1);
-
+                    narrowPhasePairs.FastRemoveAt(i);
                     OnRemovePair(narrowPhaseObject);
                 }
                 else

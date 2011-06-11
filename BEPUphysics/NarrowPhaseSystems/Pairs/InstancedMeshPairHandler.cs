@@ -19,7 +19,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
     ///<summary>
     /// Handles a instanced mesh-convex collision pair.
     ///</summary>
-    public abstract class InstancedMeshPairHandler : Type1PairHandler
+    public abstract class InstancedMeshPairHandler : StandardPairHandler
     {
         InstancedMesh instancedMesh;
         ConvexCollidable convex;

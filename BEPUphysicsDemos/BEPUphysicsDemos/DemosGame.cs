@@ -13,6 +13,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
+using BEPUphysics.Settings;
 
 #endregion
 
@@ -176,8 +177,8 @@ namespace BEPUphysicsDemos
                                                     .Invoke(new object[] { this });
 
 #else
-            //currentSimulation = (Demo)Activator.CreateInstance(demoType, new object[] { this });
-            currentSimulation = new TerrainTesting(this);
+            currentSimulation = (Demo)Activator.CreateInstance(demoType, new object[] { this });
+            //currentSimulation = new TestDemo4(this);
 #endif
             #region DisplayObject creation
 
