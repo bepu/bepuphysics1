@@ -17,7 +17,6 @@ namespace BEPUphysics.Constraints
     public abstract class EntitySolverUpdateable : SolverUpdateable//, ISolverBatchUpdateable
     {
         
-        private static EntityComparer comparer = new EntityComparer();
         //protected internal SolverBatch batch;
 
 
@@ -233,6 +232,7 @@ namespace BEPUphysics.Constraints
             involvedEntities.Sort(comparer);
         }
 
+        private static EntityComparer comparer = new EntityComparer();
         private class EntityComparer : IComparer<Entity>
         {
             #region IComparer<Entity> Members

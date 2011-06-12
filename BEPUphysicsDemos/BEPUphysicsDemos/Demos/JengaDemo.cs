@@ -33,6 +33,7 @@ namespace BEPUphysicsDemos.Demos
             //is all about stability (it's jenga!).  Increase the iterations a bit.
             //Even though it's using twice as many iterations, it will early-out
             //before reaching the limit MOST of the time.
+            //It's still pretty playable at around 7-8 max iterations, though.
             Space.Solver.IterationLimit = 20;
 
             for (int i = 0; i < numBlocksTall; i++)

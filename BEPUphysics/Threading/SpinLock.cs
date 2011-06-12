@@ -39,20 +39,7 @@ namespace BEPUphysics.Threading
             }
             else
             {
-#if WINDOWS
                 Thread.SpinWait(3 << attempt);
-#else
-                for (int i = 0; i < 3 << attempt; i++)
-                {
-                    //This isn't functionally necessary.
-                    //It does, however, prevent the system from optimizing the loop out.
-                    if (i == int.MaxValue)
-                        Thread.Sleep(1);
-
-                    //TODO: Volatile read?  If it gets released, immediately exit and run to check.
-                    
-                }
-#endif
             }
         }
     }

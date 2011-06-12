@@ -63,7 +63,7 @@ namespace BEPUphysics.SolverSystems
             TimeStepSettings = timeStepSettings;
             DeactivationManager = deactivationManager;
             multithreadedPrestepDelegate = MultithreadedPrestep;
-            multithreadedIterationDelegate = MultithreadedIteration2;
+            multithreadedIterationDelegate = MultithreadedIteration;
             Enabled = true;
         }
         ///<summary>
@@ -137,33 +137,6 @@ namespace BEPUphysics.SolverSystems
             }
         }
 
-        static int[] primesOld =  { 45589, 45599, 45613, 45631, 45641, 45659, 45667, 45673, 45677, 45691, 
-                                 45697, 45707, 45737, 45751, 45757, 45763, 45767, 45779, 45817, 45821,
-                                 45823, 45827, 45833, 45841, 45853, 45863, 45869, 45887, 45893, 45943, 
-                                 45949, 45953, 45959, 45971, 45979, 45989, 46021, 46027, 46049, 46051, 
-                                 46061, 46073, 46091, 46093, 46099, 46103, 46133, 46141, 46147, 46153, 
-                                 46171, 46181, 46183, 46187, 46199, 46219, 46229, 46237, 46261, 46271, 
-                                 46273, 46279, 46301, 46307, 46309, 46327, 46337};
-        private void GetCoefficients(out int a, out int b)
-        {
-            //Interlocked increment wraps on overflow.
-            int index = Math.Abs(Interlocked.Increment(ref primeIndex)) % primesOld.Length;
-            if (solverUpdateables.count >= primesOld[0])
-            {
-                //Very few simulations have such a crazy number of updateables, but it's not unheard of.
-                //Can't use a larger prime than 46337, since that would overflow and destroy the permutation.
-                //This leaves us with shifting alone.
-                a = 1;
-            }
-            else
-            {
-                a = primesOld[index];
-            }
-            //Compute the shift amount.  This should be a positive number from 0 to 366078, keeping it from wrapping.
-            b = (int)(((uint)index * (uint)primesOld[index]) % 366079);
-        }
-
-
         int primeIndex;
         static long[] primes = {
                                     472882049, 492876847,
@@ -192,142 +165,19 @@ namespace BEPUphysics.SolverSystems
                                     941083987, 961748927,
                                     961748941, 982451653
                                };
-        RawList<long> iterationCoefficients = new RawList<long>();
-        void ComputeIterationCoefficients()
+        long prime;
+        void ComputeIterationCoefficient()
         {
-            iterationCoefficients.Clear();
-            for (int i = 0; i < iterationLimit; i++)
-            {
-                iterationCoefficients.Add(primes[primeIndex = (primeIndex + 1) % primes.Length]);
-            }
+            prime = primes[primeIndex = (primeIndex + 1) % primes.Length];
         }
 
         Action<int> multithreadedIterationDelegate;
-        void MultithreadedIterationOld(int i)
-        {
-            int a, b;
-            GetCoefficients(out a, out b);
-            int solverCount = solverUpdateables.count;
-            for (int j = 0; j < solverCount; j++)
-            {
-                var updateable = solverUpdateables.Elements[(a * j + b) % solverCount];
-
-                SolverSettings solverSettings = updateable.solverSettings;
-                //Updateables only ever go from active to inactive during iterations,
-                //so it's safe to check for activity before we do hard (synchronized) work.
-                if (updateable.isActiveInSolver)
-                {
-                    //Consider getting rid of this.
-                    //Odd order- why does it need to increment to figure out that it's gone over the limit?
-                    //Seems like it would be best handled with a reorder.
-                    //This is basically 'claiming' an iteration to work on, though- but if we don't care
-                    //about the possibility that it might occasionally do extra work (quite rarely),
-                    //we could avoid the use of the interlocked increment altogether in favor of a volatile/unsafe increment.
-                    int incrementedIterations = Interlocked.Increment(ref solverSettings.currentIterations);
-                    if (incrementedIterations > iterationLimit ||
-                        incrementedIterations > solverSettings.maximumIterations)
-                    {
-                        updateable.isActiveInSolver = false;
-                    }
-                    else
-                    {
-                        updateable.EnterLock();
-                        try
-                        {
-                            if (updateable.SolveIteration() < solverSettings.minimumImpulse)
-                            {
-                                solverSettings.iterationsAtZeroImpulse++;
-                                if (solverSettings.iterationsAtZeroImpulse > solverSettings.minimumIterations)
-                                    updateable.isActiveInSolver = false;
-                            }
-                            else
-                            {
-                                solverSettings.iterationsAtZeroImpulse = 0;
-                            }
-                        }
-                        finally
-                        {
-                            updateable.ExitLock();
-                        }
-                    }
-
-
-                }
-            }
-
-
-        }
-
         void MultithreadedIteration(int i)
         {
             //'i' is currently an index into an implicit array of solver updateables that goes from 0 to solverUpdateables.count * iterationLimit.
-            //It includes iterationLimit copies of each updateable.  Each copied segment is permuted using the prime.
-            //TODO: See if the simplified version of this produces as good/better results.  I.e. permute across the whole solverUpdateables.count * iterationLimit array.
-            //Since the primes are now in the hundreds of millions, they can handle huge iteration counts for ridiculous numbers of updateables without failing.
-            //That would avoid a division and some more trivial math.
-
-            //The simplification would not be the same as the singlethreaded version, then.
-            int count = solverUpdateables.count;
-            int iteration = i / count;
-            var updateable = solverUpdateables.Elements[((i - iteration * count) * iterationCoefficients.Elements[iteration]) % count];
-
-
-            SolverSettings solverSettings = updateable.solverSettings;
-            //Updateables only ever go from active to inactive during iterations,
-            //so it's safe to check for activity before we do hard (synchronized) work.
-            if (updateable.isActiveInSolver)
-            {
-                //Consider getting rid of this.
-                //Odd order- why does it need to increment to figure out that it's gone over the limit?
-                //Seems like it would be best handled with a reorder.
-                //This is basically 'claiming' an iteration to work on, though- but if we don't care
-                //about the possibility that it might occasionally do extra work (quite rarely),
-                //we could avoid the use of the interlocked increment altogether in favor of a volatile/unsafe increment.
-                int incrementedIterations = Interlocked.Increment(ref solverSettings.currentIterations);
-                if (incrementedIterations > iterationLimit ||
-                    incrementedIterations > solverSettings.maximumIterations)
-                {
-                    updateable.isActiveInSolver = false;
-                }
-                else
-                {
-                    updateable.EnterLock();
-                    try
-                    {
-                        if (updateable.SolveIteration() < solverSettings.minimumImpulse)
-                        {
-                            solverSettings.iterationsAtZeroImpulse++;
-                            if (solverSettings.iterationsAtZeroImpulse > solverSettings.minimumIterations)
-                                updateable.isActiveInSolver = false;
-                        }
-                        else
-                        {
-                            solverSettings.iterationsAtZeroImpulse = 0;
-                        }
-                    }
-                    finally
-                    {
-                        updateable.ExitLock();
-                    }
-                }
-
-
-            }
-
-
-
-        }
-        void MultithreadedIteration2(int i)
-        {
-            //'i' is currently an index into an implicit array of solver updateables that goes from 0 to solverUpdateables.count * iterationLimit.
-            //It includes iterationLimit copies of each updateable.  Each copied segment is permuted using the prime.
-            //TODO: See if the simplified version of this produces as good/better results.  I.e. permute across the whole solverUpdateables.count * iterationLimit array.
-            //Since the primes are now in the hundreds of millions, they can handle huge iteration counts for ridiculous numbers of updateables without failing.
-            //That would avoid a division and some more trivial math.
-
-            //The simplification would not be the same as the singlethreaded version, then.
-            //var updateable = solverUpdateables.Elements[((i * iterationCoefficients.Elements[0]) % (solverUpdateables.count * iterationLimit)) % solverUpdateables.count];
-            var updateable = solverUpdateables.Elements[(i * iterationCoefficients.Elements[0]) % solverUpdateables.count];
+            //It includes iterationLimit copies of each updateable.
+            //Permute the entire set with duplicates.
+            var updateable = solverUpdateables.Elements[(i * prime) % solverUpdateables.count];
 
 
             SolverSettings solverSettings = updateable.solverSettings;
@@ -379,7 +229,7 @@ namespace BEPUphysics.SolverSystems
         protected override void UpdateMultithreaded()
         {
             ThreadManager.ForLoop(0, solverUpdateables.count, multithreadedPrestepDelegate);
-            ComputeIterationCoefficients();
+            ComputeIterationCoefficient();
             ThreadManager.ForLoop(0, iterationLimit * solverUpdateables.count, multithreadedIterationDelegate);
         }
 
@@ -391,14 +241,11 @@ namespace BEPUphysics.SolverSystems
                 UnsafePrestep(solverUpdateables.Elements[i]);
             }
 
-            for (int i = 0; i < iterationLimit; i++)
+            int totalCount = iterationLimit * solverUpdateables.count;
+            ComputeIterationCoefficient();
+            for (int i = 0; i < totalCount; i++)
             {
-                int a, b;
-                GetCoefficients(out a, out b);
-                for (int j = 0; j < count; j++)
-                {
-                    UnsafeSolveIteration(solverUpdateables.Elements[(a * j + b) % count]);
-                }
+                UnsafeSolveIteration(solverUpdateables.Elements[(i * prime) % solverUpdateables.count]);
             }
 
 
