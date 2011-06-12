@@ -17,6 +17,7 @@ using System.Collections.ObjectModel;
 using BEPUphysics.CollisionShapes;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.DataStructures;
+using BEPUphysics.Threading;
 
 namespace BEPUphysics.Entities
 {
@@ -424,12 +425,25 @@ namespace BEPUphysics.Entities
             }
         }
 
-        protected internal object locker = new object();
+        //protected internal object locker = new object();
+        /////<summary>
+        ///// Gets the synchronization object used by systems that need
+        ///// exclusive access to the entity's properties.
+        /////</summary>
+        //public object Locker
+        //{
+        //    get
+        //    {
+        //        return locker;
+        //    }
+        //}
+
+        protected internal SpinLock locker = new SpinLock();
         ///<summary>
         /// Gets the synchronization object used by systems that need
         /// exclusive access to the entity's properties.
         ///</summary>
-        public object Locker
+        public SpinLock Locker
         {
             get
             {

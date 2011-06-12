@@ -64,7 +64,10 @@ namespace BEPUphysics.Constraints
             for (int i = 0; i < numberOfInvolvedEntities; i++)
             {
                 if (involvedEntities.Elements[i].isDynamic) //Only need to lock dynamic entities.
-                    Monitor.Enter(involvedEntities.Elements[i].locker);
+                {
+                    involvedEntities.Elements[i].locker.Enter();
+                    //Monitor.Enter(involvedEntities.Elements[i].locker);
+                }
             }
         }
 
@@ -77,7 +80,8 @@ namespace BEPUphysics.Constraints
             for (int i = numberOfInvolvedEntities - 1; i >= 0; i--)
             {
                 if (involvedEntities.Elements[i].isDynamic) //Only need to lock dynamic entities.
-                    Monitor.Exit(involvedEntities[i].locker);
+                    involvedEntities.Elements[i].locker.Exit();
+                    //Monitor.Exit(involvedEntities[i].locker);
             }
         }
 

@@ -44,8 +44,8 @@ namespace BEPUphysics.Threading
         private int minimumTasksPerThread = 3;
         private int maximumIterationsPerTask = 80;
 #else
-        int minimumTasksPerThread = 1;
-        int maximumIterationsPerTask = 200;
+        int minimumTasksPerThread = 3;
+        int maximumIterationsPerTask = 80;
 #endif
         internal int jobIndex;
         internal int maxJobIndex;

@@ -55,8 +55,8 @@ namespace BEPUphysicsDemos.Demos
 
             //MotionSettings.DefaultPositionUpdateMode = BEPUphysics.PositionUpdating.PositionUpdateMode.Continuous;
 
-            NarrowPhaseHelper.Factories.SphereSphere.EnsureCount(5000);
-            NarrowPhaseHelper.Factories.TerrainSphere.EnsureCount(5000);
+            //NarrowPhaseHelper.Factories.SphereSphere.EnsureCount(5000);
+            //NarrowPhaseHelper.Factories.TerrainSphere.EnsureCount(5000);
             //Space.BroadPhase = new Grid2DSortAndSweep(Space.ThreadManager);
 
             //ConfigurationHelper.ApplySuperSpeedySettings(Space);
@@ -65,14 +65,14 @@ namespace BEPUphysicsDemos.Demos
             Space.Add(terrain);
             for (int i = 0; i < 10; i++)
             {
-                for (int j = 0; j < 40; j++)
+                for (int j = 0; j < 4; j++)
                 {
                     for (int k = 0; k < 10; k++)
                     {
                         Space.Add(new Sphere(new Vector3(0 + i * 3, 20 + j * 3, 0 + k * 3), 0.5f, 1)
                         {
                             //LocalInertiaTensorInverse = new Matrix3X3()
-                            Tag = "noDisplayObject",
+                            //Tag = "noDisplayObject",
                             IsAlwaysActive = true
                         });
                         //Space.Add(new Box(

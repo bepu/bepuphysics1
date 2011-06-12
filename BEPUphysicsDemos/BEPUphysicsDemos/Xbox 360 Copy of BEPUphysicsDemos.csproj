@@ -108,6 +108,7 @@
     <Compile Include="Demos\Tests\TestDemo2.cs" />
     <Compile Include="Demos\Tests\TestDemo3.cs" />
     <Compile Include="Demos\Tests\TestDemo4.cs" />
+    <Compile Include="Demos\Tests\ThreadingTestDemo.cs" />
     <Compile Include="Demos\TornadoDemo.cs" />
     <Compile Include="Demos\UnfortunateGuyDemo.cs" />
     <Compile Include="Demos\WallDemo.cs" />

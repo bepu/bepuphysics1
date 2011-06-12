@@ -196,7 +196,7 @@ namespace BEPUphysics
             timeStepSettings = new TimeStepSettings();
 
 #if !WINDOWS
-            threadManager = new ThreadTaskManager();
+            threadManager = new SpecializedThreadManager();
 #else
             threadManager = new SpecializedThreadManager();
 #endif

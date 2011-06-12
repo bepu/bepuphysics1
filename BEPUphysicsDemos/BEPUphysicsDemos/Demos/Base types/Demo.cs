@@ -36,7 +36,7 @@ namespace BEPUphysicsDemos.Demos
             {
                 for (int i = 0; i < Environment.ProcessorCount; i++)
                 {
-                    //Space.ThreadManager.AddThread();
+                    Space.ThreadManager.AddThread();
                 }
             }
 #endif
@@ -60,9 +60,9 @@ namespace BEPUphysicsDemos.Demos
         public DemosGame Game { get; private set; }
 
         /// <summary>
-        /// Gets the space this simulation runs in.
+        /// Gets or sets the space this simulation runs in.
         /// </summary>
-        public Space Space { get; private set; }
+        public Space Space { get; set; }
 
         /// <summary>
         /// Updates the game.
