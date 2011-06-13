@@ -9,7 +9,7 @@ namespace BEPUphysics.Threading
     /// </summary>
     public class SpinLock
     {
-        private const int MaximumSpinWait = 50;
+        private const int MaximumSpinWait = 15;
         private const int SleepInterval = 10;
         private int owner = -1;
 
