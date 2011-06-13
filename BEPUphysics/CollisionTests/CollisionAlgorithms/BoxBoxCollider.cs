@@ -4,6 +4,7 @@ using BEPUphysics.DataStructures;
 using BEPUphysics.MathExtensions;
 using Microsoft.Xna.Framework;
 using BEPUphysics.CollisionShapes.ConvexShapes;
+using System.Diagnostics;
 
 namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 {
@@ -2293,12 +2294,13 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             if (minimumFeature == 2)
             {
                 Vector3 position;
-                float depth;
+                //float depth;
                 int id;
-                GetEdgeEdgeContact(a, b, ref transformA.Position, ref aO, ref transformB.Position, ref bO, ref minimumAxis, out position, out depth, out id);
+                //In the edge-edge case, there's only one contact.  The minimumDistance computed earlier is the proper distance between the two, so the GetEdgeEdgeContact doesn't need to compute it.
+                GetEdgeEdgeContact(a, b, ref transformA.Position, ref aO, ref transformB.Position, ref bO, ref minimumAxis, out position, out id);
 #if ALLOWUNSAFE
                 contactData.D1.Position = position;
-                contactData.D1.Depth = depth;
+                contactData.D1.Depth = minimumDistance; 
                 contactData.D1.Id = id;
                 contactData.Count = 1;
 #else
@@ -2313,6 +2315,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             {
                 minimumDistance -= antiEdgeBias;
                 GetFaceContacts(a, b, ref transformA.Position, ref aO, ref transformB.Position, ref bO, minimumFeature == 0, ref minimumAxis, out contactData);
+
             }
 
             distance = minimumDistance;
@@ -2321,7 +2324,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
         }
 
 
-        internal static void GetEdgeEdgeContact(BoxShape a, BoxShape b, ref Vector3 positionA, ref Matrix3X3 orientationA, ref Vector3 positionB, ref Matrix3X3 orientationB, ref Vector3 mtd, out Vector3 point, out float depth, out int id)
+        internal static void GetEdgeEdgeContact(BoxShape a, BoxShape b, ref Vector3 positionA, ref Matrix3X3 orientationA, ref Vector3 positionB, ref Matrix3X3 orientationB, ref Vector3 mtd, out Vector3 point, out int id)
         {
             //Put the minimum translation direction into the local space of each object.
             Vector3 mtdA, mtdB;
@@ -2780,7 +2783,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             //Vector3.Multiply(ref point, .5f, out point);
             point = onA;
 
-            depth = (onB.X - onA.X) * mtd.X + (onB.Y - onA.Y) * mtd.Y + (onB.Z - onA.Z) * mtd.Z;
+            //depth = (onB.X - onA.X) * mtd.X + (onB.Y - onA.Y) * mtd.Y + (onB.Z - onA.Z) * mtd.Z;
 
             id = GetContactId(edgeA1Id, edgeA2Id, edgeB1Id, edgeB2Id);
         }

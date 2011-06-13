@@ -85,14 +85,14 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             float horizontalLengthSquared = direction.X * direction.X + direction.Z * direction.Z;
             if (horizontalLengthSquared > Toolbox.Epsilon)
             {
-                float multiplier = radius / (float)Math.Sqrt(horizontalLengthSquared);
-                extremePoint = new Vector3(direction.X * multiplier, Math.Sign(direction.Y) * halfHeight, direction.Z * multiplier);
+                float multiplier = (radius - collisionMargin) / (float)Math.Sqrt(horizontalLengthSquared);
+                extremePoint = new Vector3(direction.X * multiplier, Math.Sign(direction.Y) * (halfHeight - collisionMargin), direction.Z * multiplier);
             }
             else
             {
-                extremePoint = new Vector3(0, Math.Sign(direction.Y) * halfHeight, 0);
+                extremePoint = new Vector3(0, Math.Sign(direction.Y) * (halfHeight - collisionMargin), 0);
             }
-            
+
         }
 
         /// <summary>
@@ -103,7 +103,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         /// <returns>Maximum radius of the shape.</returns>
         public override float ComputeMaximumRadius()
         {
-            return collisionMargin + (float)Math.Sqrt(radius * radius + halfHeight * halfHeight);
+            return (float)Math.Sqrt(radius * radius + halfHeight * halfHeight);
         }
 
         ///<summary>
@@ -114,7 +114,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         ///<returns>Minimum radius of the shape.</returns>
         public override float ComputeMinimumRadius()
         {
-            return collisionMargin + Math.Min(radius, halfHeight);
+            return Math.Min(radius, halfHeight);
         }
 
         /// <summary>

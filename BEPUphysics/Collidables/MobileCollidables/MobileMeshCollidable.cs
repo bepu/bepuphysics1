@@ -93,46 +93,31 @@ namespace BEPUphysics.Collidables.MobileCollidables
 
             if (Shape.solidity == MobileMeshSolidity.Solid)
             {
-                var hits = Resources.GetRayHitList();
                 //Find all hits.  Use the count to determine the ray started inside or outside.
                 //If it starts inside and we're in 'solid' mode, then return the ray start.
                 //The raycast must be of infinite length at first.  This allows it to determine
                 //if it is inside or outside.
-                if (Shape.TriangleMesh.RayCast(localRay, float.MaxValue, hits))
+                if (Shape.IsLocalRayOriginInMesh(ref localRay, out rayHit))
                 {
-                    if (hits.count % 2 == 0 || Shape.solidity != MobileMeshSolidity.Solid)
+                    //It was inside!
+                    rayHit = new RayHit() { Location = ray.Position, Normal = Vector3.Zero, T = 0 };
+                    return true;
+
+                }
+                else
+                {
+                    if (rayHit.T < maximumLength)
                     {
-                        //Even number of hits; the ray started on the outside.
-                        //Find the earliest hit.
-
-                        rayHit = hits.Elements[0];
-                        for (int i = 1; i < hits.count; i++)
-                        {
-                            if (hits.Elements[i].T < rayHit.T)
-                                rayHit = hits.Elements[i];
-                        }
-
-                        if (rayHit.T < maximumLength)
-                        {
-                            //Transform the hit into world space.
-                            Vector3.Multiply(ref ray.Direction, rayHit.T, out rayHit.Location);
-                            Vector3.Add(ref rayHit.Location, ref ray.Position, out rayHit.Location);
-                            Matrix3X3.Transform(ref rayHit.Normal, ref orientation, out rayHit.Normal);
-                        }
-                        else
-                        {
-                            //The hit was too far away.
-                            Resources.GiveBack(hits);
-                            return false;
-                        }
-
+                        //Transform the hit into world space.
+                        Vector3.Multiply(ref ray.Direction, rayHit.T, out rayHit.Location);
+                        Vector3.Add(ref rayHit.Location, ref ray.Position, out rayHit.Location);
+                        Matrix3X3.Transform(ref rayHit.Normal, ref orientation, out rayHit.Normal);
                     }
                     else
                     {
-                        //Odd number of hits; the ray started on the inside.
-                        rayHit = new RayHit() { Location = ray.Position, Normal = Vector3.Zero, T = 0 };
+                        //The hit was too far away, or there was no hit (in which case T would be float.MaxValue).
+                        return false;
                     }
-                    Resources.GiveBack(hits);
                     return true;
                 }
             }
@@ -206,6 +191,7 @@ namespace BEPUphysics.Collidables.MobileCollidables
         /// <returns>Whether or not the cast hit anything.</returns>
         public override bool ConvexCast(CollisionShapes.ConvexShapes.ConvexShape castShape, ref RigidTransform startingTransform, ref Vector3 sweep, out RayHit hit)
         {
+            //TODO: Solidity.  If the convex cast is inside the solid, it should return t = 0.
             hit = new RayHit();
             BoundingBox boundingBox;
             AffineTransform transform = new AffineTransform();

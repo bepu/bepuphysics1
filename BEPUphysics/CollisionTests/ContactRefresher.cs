@@ -48,7 +48,7 @@ namespace BEPUphysics.CollisionTests
                     Vector3.Subtract(ref newPosB, ref newPosA, out ab);
                     Vector3.Dot(ref ab, ref contacts.Elements[k].Normal, out dot);
                     contacts.Elements[k].PenetrationDepth = data.BasePenetrationDepth - dot;
-                    if (contacts.Elements[k].PenetrationDepth < 0)
+                    if (contacts.Elements[k].PenetrationDepth < -CollisionDetectionSettings.maximumContactDistance)
                         toRemove.Add(k);
                     else
                     {

@@ -83,8 +83,7 @@ namespace BEPUphysics.Collidables.MobileCollidables
         {
             get
             {
-
-                return entity.IsActive;
+                return entity != null ? entity.IsActive : false;
             }
         }
 

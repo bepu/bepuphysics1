@@ -162,6 +162,19 @@ namespace BEPUphysics.Constraints.Collision
         ///<param name="dt">Timestep duration.</param>
         public override void Update(float dt)
         {
+            if (contact.PenetrationDepth < 0)
+            {
+                //The contact is currently in a limbo state.
+                //It is too far away to be used for penetration solving, but isn't far enough away
+                //to remove.  Keeping slightly-too-far contacts around helps with stability.
+                //Note that this contact can still be used for friction!
+                //That's a bit odd, considering we aren't applying any impulses with this constraint.
+                //But, in practice, it doesn't really cause any problems.
+                //Considering the contact was most likely beginning to separate, the normal force is
+                //*probably* low, and the difference is negligible.
+                isActiveInSolver = false;
+                return;
+            }
             //Set up the jacobians.
             linearAX = -contact.Normal.X;
             linearAY = -contact.Normal.Y;

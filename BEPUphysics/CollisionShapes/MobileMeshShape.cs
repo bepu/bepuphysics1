@@ -75,8 +75,90 @@ namespace BEPUphysics.CollisionShapes
         /// leading to very bad jittering.
         /// </summary>
         internal TriangleSidedness solidSidedness;
+        /// <summary>
+        /// If an object is detected to be within the mobile mesh with a penetration depth greater than this limit,
+        /// it will try a different direction to verify that it wasn't a false positive.
+        /// </summary>
+        public static float DepthDoubleCheckLimit = 1;
+        static int numberOfContainmentChecks = 3;
+        /// <summary>
+        /// This is how many tests are required before an object is accepted as actually inside the solid portion of a mesh.
+        /// The reason for the additional tests is robustness; one test may fail, but two is extremely unlikely, and three more so.
+        /// More tests may also introduce false negatives, though they resolve quickly and are generally not as much of a problem as
+        /// false positives.
+        /// Valid values are 1, 2, or 3.  Defaults to 3.
+        /// </summary>
+        public static int NumberOfContainmentChecks
+        {
+            get
+            {
+                return numberOfContainmentChecks;
+            }
+            set
+            {
+                if (value == 1 || value == 2 || value == 3)
+                    numberOfContainmentChecks = value;
+                else
+                    throw new Exception("May only use 1, 2, or 3 containment checks.");
+            }
+        }
 
-        internal bool IsRayOriginInMesh(ref Ray ray, out RayHit hit)
+        /// <summary>
+        /// Tests to see if a ray's origin is contained within the mesh.
+        /// If it is, the hit location is found.
+        /// If it isn't, the hit location is still valid if a hit occurred.
+        /// If the origin isn't inside and there was no hit, the hit has a T value of float.MaxValue.
+        /// </summary>
+        /// <param name="ray">Ray in the local space of the shape to test.</param>
+        /// <param name="hit">The first hit against the mesh, if any.</param>
+        /// <returns>Whether or not the ray origin was in the mesh.</returns>
+        public bool IsLocalRayOriginInMesh(ref Ray ray, out RayHit hit)
+        {
+            if (IsLocalRayOriginInMeshHelper(ref ray, out hit))
+            {
+                if (numberOfContainmentChecks > 1 && hit.T > DepthDoubleCheckLimit)
+                {
+                    //It's an extremely deep penetration... Suspicious.
+                    //Send the ray in the other direction to corroborate the result.
+                    //A false positive can sometimes occur
+                    Ray alternateRay;
+                    Vector3.Negate(ref ray.Direction, out alternateRay.Direction);
+                    alternateRay.Position = ray.Position;
+                    RayHit alternateHit;
+                    if (!IsLocalRayOriginInMeshHelper(ref alternateRay, out alternateHit))
+                    {
+                        //The double check didn't hit anything.  It's very unlikely that the object is actually inside the shape.
+                        return false;
+                    }
+                    else if (numberOfContainmentChecks > 2)
+                    {
+                        //It found a hit in the other direction.  Triple checking is enabled though, so let's try a third direction!
+                        //This one will be perpendicular to the current ray direction.
+                        Vector3.Cross(ref ray.Direction, ref Toolbox.UpVector, out alternateRay.Direction);
+                        float lengthSquared = alternateRay.Direction.LengthSquared();
+                        if (lengthSquared < Toolbox.Epsilon)
+                        {
+                            //The ray direction was already pointing nearly up.  Pick a different direction.
+                            Vector3.Cross(ref ray.Direction, ref Toolbox.RightVector, out alternateRay.Direction);
+                            lengthSquared = alternateRay.Direction.LengthSquared();
+                        }
+                        Vector3.Divide(ref alternateRay.Direction, (float)Math.Sqrt(lengthSquared), out alternateRay.Direction);
+                        alternateRay.Position = ray.Position;
+                        if (!IsLocalRayOriginInMeshHelper(ref alternateRay, out alternateHit))
+                        {
+                            //No hit was found on the third test!  The fact that we had two false positives is extremely improbable,
+                            //but it's better to assume that it is not intersecting.
+                            return false;
+                        }
+                    }
+
+                }
+                return true;
+            }
+            return false;
+        }
+
+        private bool IsLocalRayOriginInMeshHelper(ref Ray ray, out RayHit hit)
         {
             var overlapList = Resources.GetIntList();
             if (triangleMesh.Tree.GetOverlaps(ray, overlapList))
@@ -99,12 +181,14 @@ namespace BEPUphysics.CollisionShapes
                 int hitCount = hits.count;
                 Resources.GiveBack(hits);
                 Resources.GiveBack(overlapList);
+                //An odd number of hits implies that the object started inside.
                 return hitCount % 2 != 0;
             }
             Resources.GiveBack(overlapList);
-            hit = new RayHit();
+            hit = new RayHit() { T = float.MaxValue };
             return false;
         }
+
         /// <summary>
         /// The difference in t parameters in a ray cast under which two hits are considered to be redundant.
         /// </summary>

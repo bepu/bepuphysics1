@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework;
 using BEPUphysics.DataStructures;
 using BEPUphysics.ResourceManagement;
 using BEPUphysics.CollisionShapes.ConvexShapes;
+using System.Diagnostics;
 
 namespace BEPUphysics.CollisionTests.Manifolds
 {
