@@ -191,7 +191,17 @@ namespace BEPUphysics.Collidables.MobileCollidables
         /// <returns>Whether or not the cast hit anything.</returns>
         public override bool ConvexCast(CollisionShapes.ConvexShapes.ConvexShape castShape, ref RigidTransform startingTransform, ref Vector3 sweep, out RayHit hit)
         {
-            //TODO: Solidity.  If the convex cast is inside the solid, it should return t = 0.
+            if (Shape.solidity == MobileMeshSolidity.Solid)
+            {
+                //If the convex cast is inside the mesh and the mesh is solid, it should return t = 0.
+                var ray = new Ray() { Position = startingTransform.Position, Direction = Toolbox.UpVector };
+                if (Shape.IsLocalRayOriginInMesh(ref ray, out hit))
+                {
+
+                    hit = new RayHit() { Location = startingTransform.Position, Normal = new Vector3(), T = 0 };
+                    return true;
+                }
+            }
             hit = new RayHit();
             BoundingBox boundingBox;
             AffineTransform transform = new AffineTransform();
