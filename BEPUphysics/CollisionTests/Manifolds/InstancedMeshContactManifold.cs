@@ -32,7 +32,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
         protected internal override int FindOverlappingTriangles(float dt)
         {
             BoundingBox boundingBox;
-            convex.Shape.GetLocalBoundingBox(ref convex.worldTransform, ref mesh.worldTransform, out boundingBox); 
+            convex.Shape.GetLocalBoundingBox(ref convex.worldTransform, ref mesh.worldTransform, out boundingBox);
             Vector3 transformedVelocity;
             Matrix3X3 inverse;
             Matrix3X3.Invert(ref mesh.worldTransform.LinearTransform, out inverse);
@@ -58,7 +58,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
             return overlappedTriangles.count;
         }
 
-        protected override void ConfigureTriangle(int i, out TriangleIndices indices)
+        protected override bool ConfigureTriangle(int i, out TriangleIndices indices)
         {
             MeshBoundingBoxTreeData data = mesh.Shape.TriangleMesh.Data;
             int triangleIndex = overlappedTriangles.Elements[i];
@@ -66,12 +66,28 @@ namespace BEPUphysics.CollisionTests.Manifolds
             AffineTransform.Transform(ref localTriangleShape.vA, ref mesh.worldTransform, out localTriangleShape.vA);
             AffineTransform.Transform(ref localTriangleShape.vB, ref mesh.worldTransform, out localTriangleShape.vB);
             AffineTransform.Transform(ref localTriangleShape.vC, ref mesh.worldTransform, out localTriangleShape.vC);
+            //In instanced meshes, the bounding box we found in local space could collect more triangles than strictly necessary.
+            //By doing a second pass, we should be able to prune out quite a few of them.
+            BoundingBox triangleAABB;
+            Toolbox.GetTriangleBoundingBox(ref localTriangleShape.vA, ref localTriangleShape.vB, ref localTriangleShape.vC, out triangleAABB);
+            bool toReturn;
+            triangleAABB.Intersects(ref convex.boundingBox, out toReturn);
+            if (!toReturn)
+            {
+                indices = new TriangleIndices();
+                return false;
+            }
+
             localTriangleShape.sidedness = mesh.sidedness;
             localTriangleShape.collisionMargin = 0;
-            indices = new TriangleIndices();
-            indices.A = data.indices[triangleIndex];
-            indices.B = data.indices[triangleIndex + 1];
-            indices.C = data.indices[triangleIndex + 2];
+            indices = new TriangleIndices()
+            {
+                A = data.indices[triangleIndex],
+                B = data.indices[triangleIndex + 1],
+                C = data.indices[triangleIndex + 2]
+            };
+
+            return true;
         }
 
         protected internal override void CleanUpOverlappingTriangles()

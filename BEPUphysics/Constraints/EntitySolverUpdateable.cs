@@ -93,19 +93,35 @@ namespace BEPUphysics.Constraints
         {
             for (int i = 0; i < numberOfInvolvedEntities; i++)
             {
-                if (involvedEntities[i].isDynamic) //Only need to lock dynamic entities.
-                    if (!Monitor.TryEnter(involvedEntities[i].locker))
+                if (involvedEntities.Elements[i].isDynamic) //Only need to lock dynamic entities.
+                    if (!involvedEntities.Elements[i].locker.TryEnter())
                     {
                         //Turns out we can't take all the resources! Immediately drop everything.
                         for (i = i - 1 /*failed on the ith element, so start at the previous*/; i >= 0; i--)
                         {
                             if (involvedEntities[i].isDynamic)
-                                Monitor.Exit(involvedEntities[i].locker);
+                                involvedEntities.Elements[i].locker.Exit();
                         }
                         return false;
                     }
             }
             return true;
+
+            //for (int i = 0; i < numberOfInvolvedEntities; i++)
+            //{
+            //    if (involvedEntities[i].isDynamic) //Only need to lock dynamic entities.
+            //        if (!Monitor.TryEnter(involvedEntities[i].locker))
+            //        {
+            //            //Turns out we can't take all the resources! Immediately drop everything.
+            //            for (i = i - 1 /*failed on the ith element, so start at the previous*/; i >= 0; i--)
+            //            {
+            //                if (involvedEntities[i].isDynamic)
+            //                    Monitor.Exit(involvedEntities[i].locker);
+            //            }
+            //            return false;
+            //        }
+            //}
+            //return true;
         }
 
 

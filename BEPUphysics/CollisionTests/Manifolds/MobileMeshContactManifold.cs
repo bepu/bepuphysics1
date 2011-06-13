@@ -72,7 +72,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
             return overlappedTriangles.count;
         }
 
-        protected override void ConfigureTriangle(int i, out TriangleIndices indices)
+        protected override bool ConfigureTriangle(int i, out TriangleIndices indices)
         {
             MeshBoundingBoxTreeData data = mesh.Shape.TriangleMesh.Data;
             int triangleIndex = overlappedTriangles.Elements[i];
@@ -82,6 +82,18 @@ namespace BEPUphysics.CollisionTests.Manifolds
             AffineTransform.Transform(ref localTriangleShape.vA, ref transform, out localTriangleShape.vA);
             AffineTransform.Transform(ref localTriangleShape.vB, ref transform, out localTriangleShape.vB);
             AffineTransform.Transform(ref localTriangleShape.vC, ref transform, out localTriangleShape.vC);
+            //In instanced meshes, the bounding box we found in local space could collect more triangles than strictly necessary.
+            //By doing a second pass, we should be able to prune out quite a few of them.
+            BoundingBox triangleAABB;
+            Toolbox.GetTriangleBoundingBox(ref localTriangleShape.vA, ref localTriangleShape.vB, ref localTriangleShape.vC, out triangleAABB);
+            bool toReturn;
+            triangleAABB.Intersects(ref convex.boundingBox, out toReturn);
+            if (!toReturn)
+            {
+                indices = new TriangleIndices();
+                return false;
+            }
+
             TriangleSidedness sidedness;
             switch (mesh.Shape.solidity)
             {
@@ -100,10 +112,14 @@ namespace BEPUphysics.CollisionTests.Manifolds
             }
             localTriangleShape.sidedness = sidedness;
             localTriangleShape.collisionMargin = 0;
-            indices = new TriangleIndices();
-            indices.A = data.indices[triangleIndex];
-            indices.B = data.indices[triangleIndex + 1];
-            indices.C = data.indices[triangleIndex + 2];
+            indices = new TriangleIndices()
+            {
+                A = data.indices[triangleIndex],
+                B = data.indices[triangleIndex + 1],
+                C = data.indices[triangleIndex + 2]
+            };
+            return true;
+
         }
 
         protected internal override void CleanUpOverlappingTriangles()
@@ -116,7 +132,33 @@ namespace BEPUphysics.CollisionTests.Manifolds
             get { return mesh.improveBoundaryBehavior; }
         }
 
-
+        /// <summary>
+        /// If an object is detected to be within the mobile mesh with a penetration depth greater than this limit,
+        /// it will try a different direction to verify that it wasn't a false positive.
+        /// </summary>
+        public static float DepthDoubleCheckLimit = 1;
+        static int numberOfContainmentChecks = 3;
+        /// <summary>
+        /// This is how many tests are required before an object is accepted as actually inside the solid portion of a mesh.
+        /// The reason for the additional tests is robustness; one test may fail, but two is extremely unlikely, and three more so.
+        /// More tests may also introduce false negatives, though they resolve quickly and are generally not as much of a problem as
+        /// false positives.
+        /// Valid values are 1, 2, or 3.  Defaults to 3.
+        /// </summary>
+        public static int NumberOfContainmentChecks
+        {
+            get
+            {
+                return numberOfContainmentChecks;
+            }
+            set
+            {
+                if (value == 1 || value == 2 || value == 3)
+                    numberOfContainmentChecks = value;
+                else
+                    throw new Exception("May only use 1, 2, or 3 containment checks.");
+            }
+        }
         Vector3 lastValidConvexPosition;
         protected override void ProcessCandidates(RawValueList<ContactData> candidates)
         {
@@ -159,6 +201,45 @@ namespace BEPUphysics.CollisionTests.Manifolds
                 RayHit hit;
                 if (mesh.Shape.IsRayOriginInMesh(ref ray, out hit))
                 {
+                    #region Double Checking
+                    if (numberOfContainmentChecks > 1 && hit.T > DepthDoubleCheckLimit)
+                    {
+                        //It's an extremely deep penetration... Suspicious.
+                        //Send the ray in the other direction to corroborate the result.
+                        //A false positive can sometimes occur
+                        Ray alternateRay;
+                        Vector3.Negate(ref ray.Direction, out alternateRay.Direction);
+                        alternateRay.Position = ray.Position;
+                        RayHit alternateHit;
+                        if (!mesh.Shape.IsRayOriginInMesh(ref alternateRay, out alternateHit))
+                        {
+                            //The double check didn't hit anything.  It's very unlikely that the object is actually inside the shape.
+                            return;
+                        }
+                        else if (numberOfContainmentChecks > 2)
+                        {
+                            //It found a hit in the other direction.  Triple checking is enabled though, so let's try a third direction!
+                            //This one will be perpendicular to the current ray direction.
+                            Vector3.Cross(ref ray.Direction, ref Toolbox.UpVector, out alternateRay.Direction);
+                            float lengthSquared = alternateRay.Direction.LengthSquared();
+                            if (lengthSquared < Toolbox.Epsilon)
+                            {
+                                //The ray direction was already pointing nearly up.  Pick a different direction.
+                                Vector3.Cross(ref ray.Direction, ref Toolbox.RightVector, out alternateRay.Direction);
+                                lengthSquared = alternateRay.Direction.LengthSquared();
+                            }
+                            Vector3.Divide(ref alternateRay.Direction, (float)Math.Sqrt(lengthSquared), out alternateRay.Direction);
+                            alternateRay.Position = ray.Position;
+                            if (!mesh.Shape.IsRayOriginInMesh(ref alternateRay, out alternateHit))
+                            {
+                                //No hit was found on the third test!  The fact that we had two false positives is extremely improbable,
+                                //but it's better to assume that it is not intersecting.
+                                return;
+                            }
+                        }
+
+                    }
+                    #endregion
                     ContactData newContact = new ContactData();
                     newContact.Id = 2; //Give it a special id so that we know that it came from the inside.
                     Matrix3X3.Transform(ref ray.Position, ref orientation, out newContact.Position);

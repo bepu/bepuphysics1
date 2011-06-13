@@ -63,11 +63,11 @@ namespace BEPUphysicsDemos.Demos
             //Space.ForceUpdater.Gravity = new Vector3();
             Space.Solver.IterationLimit = 1;
             Space.Add(terrain);
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 20; i++)
             {
-                for (int j = 0; j < 4; j++)
+                for (int j = 0; j < 10; j++)
                 {
-                    for (int k = 0; k < 10; k++)
+                    for (int k = 0; k < 20; k++)
                     {
                         Space.Add(new Sphere(new Vector3(0 + i * 3, 20 + j * 3, 0 + k * 3), 0.5f, 1)
                         {

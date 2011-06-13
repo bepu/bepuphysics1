@@ -68,7 +68,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
 
         protected abstract bool UseImprovedBoundaryHandling { get; }
         protected internal abstract int FindOverlappingTriangles(float dt);
-        protected abstract void ConfigureTriangle(int i, out TriangleIndices indices);
+        protected abstract bool ConfigureTriangle(int i, out TriangleIndices indices);
         protected internal abstract void CleanUpOverlappingTriangles();
 
         ///<summary>
@@ -92,56 +92,58 @@ namespace BEPUphysics.CollisionTests.Manifolds
             {
                 //Initialize the local triangle.
                 TriangleIndices indices;
-                ConfigureTriangle(i, out indices);
-
-                //Find a pairtester for the triangle.
-                TrianglePairTester pairTester;
-                if (!activePairTesters.TryGetValue(indices, out pairTester))
+                if (ConfigureTriangle(i, out indices))
                 {
-                    pairTester = GetTester();
-                    pairTester.Initialize(convex.Shape, localTriangleShape);
-                    activePairTesters.Add(indices, pairTester);
-                }
-                pairTester.Updated = true;
 
-
-                //Put the triangle into the local space of the convex.
-                Vector3.Subtract(ref localTriangleShape.vA, ref convex.worldTransform.Position, out localTriangleShape.vA);
-                Vector3.Subtract(ref localTriangleShape.vB, ref convex.worldTransform.Position, out localTriangleShape.vB);
-                Vector3.Subtract(ref localTriangleShape.vC, ref convex.worldTransform.Position, out localTriangleShape.vC);
-                Matrix3X3.TransformTranspose(ref localTriangleShape.vA, ref orientation, out localTriangleShape.vA);
-                Matrix3X3.TransformTranspose(ref localTriangleShape.vB, ref orientation, out localTriangleShape.vB);
-                Matrix3X3.TransformTranspose(ref localTriangleShape.vC, ref orientation, out localTriangleShape.vC);
-
-                //Now, generate a contact between the two shapes.
-                ContactData contact;
-                TinyStructList<ContactData> contactList;
-                if (pairTester.GenerateContactCandidate(out contactList))
-                {
-                    for (int j = 0; j < contactList.count; j++)
+                    //Find a pairtester for the triangle.
+                    TrianglePairTester pairTester;
+                    if (!activePairTesters.TryGetValue(indices, out pairTester))
                     {
-                        contactList.Get(j, out contact);
+                        pairTester = GetTester();
+                        pairTester.Initialize(convex.Shape, localTriangleShape);
+                        activePairTesters.Add(indices, pairTester);
+                    }
+                    pairTester.Updated = true;
 
-                        if (UseImprovedBoundaryHandling)
+
+                    //Put the triangle into the local space of the convex.
+                    Vector3.Subtract(ref localTriangleShape.vA, ref convex.worldTransform.Position, out localTriangleShape.vA);
+                    Vector3.Subtract(ref localTriangleShape.vB, ref convex.worldTransform.Position, out localTriangleShape.vB);
+                    Vector3.Subtract(ref localTriangleShape.vC, ref convex.worldTransform.Position, out localTriangleShape.vC);
+                    Matrix3X3.TransformTranspose(ref localTriangleShape.vA, ref orientation, out localTriangleShape.vA);
+                    Matrix3X3.TransformTranspose(ref localTriangleShape.vB, ref orientation, out localTriangleShape.vB);
+                    Matrix3X3.TransformTranspose(ref localTriangleShape.vC, ref orientation, out localTriangleShape.vC);
+
+                    //Now, generate a contact between the two shapes.
+                    ContactData contact;
+                    TinyStructList<ContactData> contactList;
+                    if (pairTester.GenerateContactCandidate(out contactList))
+                    {
+                        for (int j = 0; j < contactList.count; j++)
                         {
-                            if (AnalyzeCandidate(ref indices, pairTester, ref contact))
+                            contactList.Get(j, out contact);
+
+                            if (UseImprovedBoundaryHandling)
+                            {
+                                if (AnalyzeCandidate(ref indices, pairTester, ref contact))
+                                {
+                                    AddLocalContact(ref contact, ref orientation);
+                                }
+                            }
+                            else
                             {
                                 AddLocalContact(ref contact, ref orientation);
                             }
                         }
-                        else
-                        {
-                            AddLocalContact(ref contact, ref orientation);
-                        }
                     }
-                }
 
-                //Get the voronoi region from the contact candidate generation.  Possibly just recalculate, since most of the systems don't calculate it.
-                //Depending on which voronoi region it is in (Switch on enumeration), identify the indices composing that region.  For face contacts, don't bother- just add it if unique.
-                //For AB, AC, or BC, add an Edge to the blockedEdgeRegions set with the corresponding indices.
-                //For A, B, or C, add the index of the vertex to the blockedVertexRegions set.
-                //If the edge/vertex is already present in the set, then DO NOT add the contact.
-                //When adding a contact, add ALL other voronoi regions to the blocked sets. 
+                    //Get the voronoi region from the contact candidate generation.  Possibly just recalculate, since most of the systems don't calculate it.
+                    //Depending on which voronoi region it is in (Switch on enumeration), identify the indices composing that region.  For face contacts, don't bother- just add it if unique.
+                    //For AB, AC, or BC, add an Edge to the blockedEdgeRegions set with the corresponding indices.
+                    //For A, B, or C, add the index of the vertex to the blockedVertexRegions set.
+                    //If the edge/vertex is already present in the set, then DO NOT add the contact.
+                    //When adding a contact, add ALL other voronoi regions to the blocked sets. 
+                }
 
             }
 

@@ -67,7 +67,7 @@ namespace BEPUphysicsDemos.Demos
             {
                 Space.Remove(Space.Entities[i]);
             }
-            SolverSettings.DefaultMinimumIterations = 10;
+            SolverSettings.DefaultMinimumIterations = 100;
 
             int width = 15;
             int height = 15;
@@ -106,7 +106,7 @@ namespace BEPUphysicsDemos.Demos
             : base(game)
         {
 
-            int numRuns = 1;
+            int numRuns = 10;
             int numFrames = 100;
 
 

@@ -35,7 +35,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
             return overlappedTriangles.count;
         }
 
-        protected override void ConfigureTriangle(int i, out TriangleIndices indices)
+        protected override bool ConfigureTriangle(int i, out TriangleIndices indices)
         {
             int triangleIndex = overlappedTriangles.Elements[i];
             mesh.Mesh.Data.GetTriangle(triangleIndex, out localTriangleShape.vA, out localTriangleShape.vB, out localTriangleShape.vC);
@@ -45,6 +45,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
             indices.A = mesh.Mesh.Data.indices[triangleIndex];
             indices.B = mesh.Mesh.Data.indices[triangleIndex + 1];
             indices.C = mesh.Mesh.Data.indices[triangleIndex + 2];
+            return true;
         }
 
         protected internal override void CleanUpOverlappingTriangles()

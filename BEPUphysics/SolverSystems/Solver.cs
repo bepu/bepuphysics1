@@ -185,40 +185,33 @@ namespace BEPUphysics.SolverSystems
             //so it's safe to check for activity before we do hard (synchronized) work.
             if (updateable.isActiveInSolver)
             {
-                //Consider getting rid of this.
-                //Odd order- why does it need to increment to figure out that it's gone over the limit?
-                //Seems like it would be best handled with a reorder.
-                //This is basically 'claiming' an iteration to work on, though- but if we don't care
-                //about the possibility that it might occasionally do extra work (quite rarely),
-                //we could avoid the use of the interlocked increment altogether in favor of a volatile/unsafe increment.
-                int incrementedIterations = solverSettings.currentIterations++;// Interlocked.Increment(ref solverSettings.currentIterations);
+                int incrementedIterations = -1;
+                updateable.EnterLock();
+                //This duplicate test protects against the possibility that the updateable went inactive between the first check and the lock.
+                if (updateable.isActiveInSolver)
+                {
+                    if (updateable.SolveIteration() < solverSettings.minimumImpulse)
+                    {
+                        solverSettings.iterationsAtZeroImpulse++;
+                        if (solverSettings.iterationsAtZeroImpulse > solverSettings.minimumIterations)
+                            updateable.isActiveInSolver = false;
+                    }
+                    else
+                    {
+                        solverSettings.iterationsAtZeroImpulse = 0;
+                    }
+
+                    //Increment the iteration count.
+                    incrementedIterations = solverSettings.currentIterations++;
+                }
+                updateable.ExitLock();
+                //Since the updateables only ever go from active to inactive, it's safe to check outside of the lock.
+                //Keeping this if statement out of the lock allows other waiters to get to work a few nanoseconds faster.
                 if (incrementedIterations > iterationLimit ||
                     incrementedIterations > solverSettings.maximumIterations)
                 {
                     updateable.isActiveInSolver = false;
                 }
-                else
-                {
-                    updateable.EnterLock();
-                    try
-                    {
-                        if (updateable.SolveIteration() < solverSettings.minimumImpulse)
-                        {
-                            solverSettings.iterationsAtZeroImpulse++;
-                            if (solverSettings.iterationsAtZeroImpulse > solverSettings.minimumIterations)
-                                updateable.isActiveInSolver = false;
-                        }
-                        else
-                        {
-                            solverSettings.iterationsAtZeroImpulse = 0;
-                        }
-                    }
-                    finally
-                    {
-                        updateable.ExitLock();
-                    }
-                }
-
 
             }
 

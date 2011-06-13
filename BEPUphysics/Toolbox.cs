@@ -2266,6 +2266,104 @@ namespace BEPUphysics
         }
 
         /// <summary>
+        /// Computes the bounding box of three points.
+        /// </summary>
+        /// <param name="a">First vertex of the triangle.</param>
+        /// <param name="b">Second vertex of the triangle.</param>
+        /// <param name="c">Third vertex of the triangle.</param>
+        /// <param name="aabb">Bounding box of the triangle.</param>
+        public static void GetTriangleBoundingBox(ref Vector3 a, ref Vector3 b, ref Vector3 c, out BoundingBox aabb)
+        {
+#if !WINDOWS
+            aabb = new BoundingBox();
+#endif
+            //X axis
+            if (a.X > b.X && a.X > c.X)
+            {
+                //A is max
+                aabb.Max.X = a.X;
+                if (b.X > c.X)
+                    aabb.Min.X = c.X; //C is min
+                else
+                    aabb.Min.X = b.X; //B is min
+            }
+            else if (b.X > c.X)
+            {
+                //B is max
+                aabb.Max.X = b.X;
+                if (a.X > c.X)
+                    aabb.Min.X = c.X; //C is min
+                else
+                    aabb.Min.X = a.X; //A is min
+            }
+            else
+            {
+                //C is max
+                aabb.Max.X = c.X;
+                if (a.X > b.X)
+                    aabb.Min.X = b.X; //B is min
+                else
+                    aabb.Min.X = a.X; //A is min
+            }
+            //Y axis
+            if (a.Y > b.Y && a.Y > c.Y)
+            {
+                //A is max
+                aabb.Max.Y = a.Y;
+                if (b.Y > c.Y)
+                    aabb.Min.Y = c.Y; //C is min
+                else
+                    aabb.Min.Y = b.Y; //B is min
+            }
+            else if (b.Y > c.Y)
+            {
+                //B is max
+                aabb.Max.Y = b.Y;
+                if (a.Y > c.Y)
+                    aabb.Min.Y = c.Y; //C is min
+                else
+                    aabb.Min.Y = a.Y; //A is min
+            }
+            else
+            {
+                //C is max
+                aabb.Max.Y = c.Y;
+                if (a.Y > b.Y)
+                    aabb.Min.Y = b.Y; //B is min
+                else
+                    aabb.Min.Y = a.Y; //A is min
+            }
+            //Z axis
+            if (a.Z > b.Z && a.Z > c.Z)
+            {
+                //A is max
+                aabb.Max.Z = a.Z;
+                if (b.Z > c.Z)
+                    aabb.Min.Z = c.Z; //C is min
+                else
+                    aabb.Min.Z = b.Z; //B is min
+            }
+            else if (b.Z > c.Z)
+            {
+                //B is max
+                aabb.Max.Z = b.Z;
+                if (a.Z > c.Z)
+                    aabb.Min.Z = c.Z; //C is min
+                else
+                    aabb.Min.Z = a.Z; //A is min
+            }
+            else
+            {
+                //C is max
+                aabb.Max.Z = c.Z;
+                if (a.Z > b.Z)
+                    aabb.Min.Z = b.Z; //B is min
+                else
+                    aabb.Min.Z = a.Z; //A is min
+            }
+        }
+
+        /// <summary>
         /// Clamps a value between a minimum and maximum.
         /// </summary>
         /// <param name="n">Value to clamp.</param>
@@ -2691,6 +2789,7 @@ namespace BEPUphysics
         }
 
         #endregion
+
 
 
 

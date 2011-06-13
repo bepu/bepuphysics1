@@ -46,7 +46,7 @@ namespace BEPUphysicsDemos.Demos
             //Space.Add(staticMesh);
             //game.ModelDrawer.Add(staticMesh.Mesh);
 
-            TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("tube"), out vertices, out indices);
+            TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("hollowsphere"), out vertices, out indices);
             //MotionSettings.DefaultPositionUpdateMode = PositionUpdateMode.Continuous;
             ShapeDistributionInformation info;
             var transform = AffineTransform.Identity;// new AffineTransform(new Vector3(1, 1, 1), Quaternion.CreateFromAxisAngle(new Vector3(1, 0, 0), MathHelper.Pi), new Vector3(0, 0, 0));
@@ -81,15 +81,15 @@ namespace BEPUphysicsDemos.Demos
                 //entityMesh.IsAlwaysActive = true;
             }
 
-            for (int j = 0; j < 100; j++)
+            for (int j = 0; j < 500; j++)
             {
-                var toAdd = new Box(new Vector3(0, 35 + j * 0, 0), 2, 2, 2, 1);
+                var toAdd = new Box(new Vector3(0, 35 + j * -.1f, 0), 2, 2, 2, 1);
                 //toAdd.Material.KineticFriction = 0;
                 //toAdd.Material.StaticFriction = 0;
                 Space.Add(toAdd);
             }
 
-            Space.Add(new Box(new Vector3(0, -10, 0), 100, 1, 100));
+            Space.Add(new Box(new Vector3(0, -10, 0), 1, 1, 1));
             game.Camera.Position = new Vector3(0, 20, 45);
             game.Camera.Yaw = 0;
             game.Camera.Pitch = 0;

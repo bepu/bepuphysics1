@@ -109,6 +109,7 @@ namespace BEPUphysics.CollisionShapes
         /// The difference in t parameters in a ray cast under which two hits are considered to be redundant.
         /// </summary>
         public static float MeshHitUniquenessThreshold = .0001f;
+
         internal bool IsHitUnique(RawList<RayHit> hits, ref RayHit hit)
         {
             for (int i = 0; i < hits.count; i++)

@@ -18,9 +18,9 @@ namespace BEPUphysicsDemos.Demos
             game.Camera.Position = new Vector3(0, 8, 25);
             Space.Add(new Box(new Vector3(0, 0, 0), 120, 1, 120));
 
-            int numColumns = 15;
-            int numRows = 15;
-            int numHigh = 25;
+            int numColumns = 5;
+            int numRows = 5;
+            int numHigh = 5;
             float xSpacing = 2.09f;
             float ySpacing = 2.08f;
             float zSpacing = 2.09f;

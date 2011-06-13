@@ -34,6 +34,7 @@ namespace BEPUphysicsDemos.Demos
                                 blockHeight * .5f + j * (blockHeight),
                                 0),
                             blockWidth, blockHeight, blockLength, 10);
+                    toAdd.IsAlwaysActive = true;
                     Space.Add(toAdd);
                 }
             }

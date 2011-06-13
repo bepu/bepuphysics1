@@ -60,7 +60,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
             return overlappedTriangles.count;
         }
 
-        protected override void ConfigureTriangle(int i, out TriangleIndices indices)
+        protected override bool ConfigureTriangle(int i, out TriangleIndices indices)
         {
             indices = overlappedTriangles.Elements[i];
             terrain.Shape.GetTriangle(ref indices, ref terrain.worldTransform, out localTriangleShape.vA, out localTriangleShape.vB, out localTriangleShape.vC);
@@ -85,6 +85,9 @@ namespace BEPUphysics.CollisionTests.Manifolds
             {
                 localTriangleShape.sidedness = TriangleSidedness.Counterclockwise;
             }
+            //Unlike other 'instanced' geometries, terrains are almost always axis aligned in some way and/or have low triangle density relative to what they are colliding with.
+            //Instead of performing additional tests, just assume that it's a fairly regular situation.
+            return true;
         }
 
         protected internal override void CleanUpOverlappingTriangles()

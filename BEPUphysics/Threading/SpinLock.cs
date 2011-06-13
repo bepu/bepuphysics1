@@ -1,4 +1,5 @@
 ﻿using System.Threading;
+using System;
 
 namespace BEPUphysics.Threading
 {
@@ -8,12 +9,13 @@ namespace BEPUphysics.Threading
     /// </summary>
     public class SpinLock
     {
+        private const int MaximumSpinWait = 50;
         private const int SleepInterval = 10;
         private int owner = -1;
 
 
         /// <summary>
-        /// Enters the critical section.  This is not reentrant.
+        /// Enters the critical section.  A thread cannot attempt to enter the spinlock if it already owns the spinlock.
         /// </summary>
         public void Enter()
         {
@@ -21,9 +23,18 @@ namespace BEPUphysics.Threading
             while (Interlocked.CompareExchange(ref owner, 0, -1) != -1)
             {
                 //Lock is owned by someone else.
-                WaitBriefly(count++);
+                count++;
+                WaitBriefly(ref count);
             }
             //It's my lock now!
+        }
+
+        /// <summary>
+        /// Attempts to enters the critical section.  A thread cannot attempt to enter the spinlock if it already owns the spinlock.
+        /// </summary>
+        public bool TryEnter()
+        {
+            return Interlocked.CompareExchange(ref owner, 0, -1) == -1;
         }
 
         /// <summary>
@@ -38,9 +49,9 @@ namespace BEPUphysics.Threading
             owner = -1;
         }
 
-        internal void WaitBriefly(int attempt)
+        internal void WaitBriefly(ref int attempt)
         {
-            if (attempt % SleepInterval == SleepInterval - 1)
+            if (attempt == SleepInterval)
             {
 #if WINDOWS
                 Thread.Yield();
@@ -50,10 +61,11 @@ namespace BEPUphysics.Threading
                 //TODO: Thread.Yield on windows?
                 //Check multithreaded bookmarks performance conscious
                 //and .netspinlock
+                attempt -= SleepInterval;
             }
             else
             {
-                Thread.SpinWait(3 << attempt);
+                Thread.SpinWait(Math.Min(3 << attempt, MaximumSpinWait));
             }
         }
     }
