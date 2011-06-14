@@ -29,9 +29,9 @@ namespace BEPUphysicsDemos.Demos
 
             //Drop the "meteorites" on the planet.
             Entity toAdd;
-            int numColumns = 10;
-            int numRows = 10;
-            int numHigh = 10;
+            int numColumns = 20;
+            int numRows = 40;
+            int numHigh = 20;
             float separation = 5;
             for (int i = 0; i < numRows; i++)
                 for (int j = 0; j < numColumns; j++)
@@ -41,7 +41,6 @@ namespace BEPUphysicsDemos.Demos
                         toAdd.LinearVelocity = new Vector3(30, 0, 0);
                         toAdd.LinearDamping = 0;
                         toAdd.AngularDamping = 0;
-
                         Space.Add(toAdd);
                     }
             game.Camera.Position = new Vector3(0, 0, 150);

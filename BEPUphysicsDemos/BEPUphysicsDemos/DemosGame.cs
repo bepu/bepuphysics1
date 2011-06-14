@@ -382,9 +382,11 @@ namespace BEPUphysicsDemos
 
             currentSimulation.Update(dt);
 
-            ConstraintDrawer.Update();
+            if (displayConstraints)
+                ConstraintDrawer.Update();
 
-            ModelDrawer.Update();
+            if (displayEntities)
+                ModelDrawer.Update();
             base.Update(gameTime);
         }
 

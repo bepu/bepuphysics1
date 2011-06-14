@@ -11,7 +11,7 @@ namespace BEPUphysics.UpdateableSystems.ForceFields
     /// </summary>
     public class VolumeForceFieldShape : ForceFieldShape
     {
-        private readonly List<Entity> affectedEntities = new List<Entity>();
+        private readonly RawList<Entity> affectedEntities = new RawList<Entity>();
         private readonly RawList<BroadPhaseEntry> affectedEntries = new RawList<BroadPhaseEntry>();
 
         /// <summary>

@@ -132,7 +132,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
             get { return mesh.improveBoundaryBehavior; }
         }
 
-
+        float previousDepth = 0;
         Vector3 lastValidConvexPosition;
         protected override void ProcessCandidates(RawValueList<ContactData> candidates)
         {
@@ -207,12 +207,18 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     }
                     if (addContact && contacts.count == 0)
                         Add(ref newContact);
-
+                    previousDepth = newContact.PenetrationDepth;
                 }
                 else
                 {
-                    //We're not touching the mesh.
-                    lastValidConvexPosition = ray.Position;
+                    //It's possible that we had a false negative.  The previous frame may have been in deep intersection, and this frame just failed to come to the same conclusion.
+                    //If we set the target location to the current location, the object will never escape the mesh.  Instead, only do that if two frames agree that we are no longer colliding.
+                    if (previousDepth > 0)
+                    {
+                        //We're not touching the mesh.
+                        lastValidConvexPosition = ray.Position;
+                    }
+                    previousDepth = 0;
 
                 }
             }

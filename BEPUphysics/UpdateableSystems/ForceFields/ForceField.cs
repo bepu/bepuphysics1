@@ -4,6 +4,7 @@ using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.Entities;
 using Microsoft.Xna.Framework;
 using BEPUphysics.Threading;
+using BEPUphysics.DataStructures;
 
 namespace BEPUphysics.UpdateableSystems.ForceFields
 {
@@ -106,7 +107,8 @@ namespace BEPUphysics.UpdateableSystems.ForceFields
             {
                 currentTimestep = dt;
                 //No multithreading, so do it directly.
-                for (int i = 0; i < affectedEntities.Count; i++)
+                int count = affectedEntities.Count;
+                for (int i = 0; i < count; i++)
                 {
                     CalculateImpulsesSubfunction(i);
                 }
