@@ -16,7 +16,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
     /// <summary>
     /// Contains a triangle collidable and its index.  Used by mobile mesh-mesh collisions.
     /// </summary>
-    public struct TriangleEntry:IEquatable<TriangleEntry>
+    public struct TriangleEntry : IEquatable<TriangleEntry>
     {
         /// <summary>
         /// Index of the triangle that was the source of this entry.
@@ -72,7 +72,14 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             }
         }
 
-
+        /// <summary>
+        /// Material of the first collidable.
+        /// </summary>
+        protected abstract Material MaterialA { get; }
+        /// <summary>
+        /// Material of the second collidable.
+        /// </summary>
+        protected abstract Material MaterialB { get; }
 
         ///<summary>
         /// Constructs a new compound-convex pair handler.
@@ -140,7 +147,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             {
                 var collidablePair = new CollidablePair(CollidableA, entry.Collidable = GetOpposingCollidable(index));
                 var newPair = NarrowPhaseHelper.GetPairHandler(ref collidablePair);
-                newPair.UpdateMaterialProperties();  //Override the materials, if necessary.  Meshes don't currently support custom materials but..
+                newPair.UpdateMaterialProperties(MaterialA, MaterialB);  //Override the materials, if necessary.  Meshes don't currently support custom materials but..
                 if (newPair != null)
                 {
                     newPair.Parent = this;
@@ -162,7 +169,8 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         /// Configure a triangle from CollidableB to represent the object at the given index.
         /// </summary>
         /// <param name="entry">Entry to configure.</param>
-        protected abstract void ConfigureCollidable(TriangleEntry entry);
+        /// <param name="dt">Time step duration.</param>
+        protected abstract void ConfigureCollidable(TriangleEntry entry, float dt);
 
         /// <summary>
         /// Cleans up the collidable.
@@ -205,7 +213,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             {
                 if (pair.Value.BroadPhaseOverlap.collisionRule < CollisionRule.NoNarrowPhaseUpdate) //Don't test if the collision rules say don't.
                 {
-                    ConfigureCollidable(pair.Key);
+                    ConfigureCollidable(pair.Key, dt);
                     pair.Value.UpdateCollision(dt);
                 }
             }

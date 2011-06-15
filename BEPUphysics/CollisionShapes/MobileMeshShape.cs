@@ -48,6 +48,17 @@ namespace BEPUphysics.CollisionShapes
             }
         }
 
+        /// <summary>
+        /// Gets the transform used by the local mesh shape.
+        /// </summary>
+        public AffineTransform Transform
+        {
+            get
+            {
+                return ((TransformableMeshData)triangleMesh.Data).worldTransform;
+            }
+        }
+
         RawList<Vector3> surfaceVertices = new RawList<Vector3>();
 
         internal MobileMeshSolidity solidity = MobileMeshSolidity.DoubleSided;
@@ -59,6 +70,30 @@ namespace BEPUphysics.CollisionShapes
             get
             {
                 return solidity;
+            }
+        }
+
+        /// <summary>
+        /// Returns the sidedness of the shape.  This is a convenience property based on the Solidity property.
+        /// If the shape is solid, this returns whatever sidedness is needed to have the triangles of the shape face outward.
+        /// </summary>
+        public TriangleSidedness Sidedness
+        {
+            get
+            {
+                switch (solidity)
+                {
+                    case MobileMeshSolidity.Clockwise:
+                        return TriangleSidedness.Clockwise;
+                    case MobileMeshSolidity.Counterclockwise:
+                        return TriangleSidedness.Counterclockwise;
+                    case MobileMeshSolidity.DoubleSided:
+                        return TriangleSidedness.DoubleSided;
+                    case MobileMeshSolidity.Solid:
+                        return solidSidedness;
+
+                }
+                return TriangleSidedness.DoubleSided;
             }
         }
 
@@ -540,58 +575,9 @@ namespace BEPUphysics.CollisionShapes
         //    }
         //}
 
-        ///<summary>
-        /// Computes the bounding box of the transformed mesh shape.
-        ///</summary>
-        ///<param name="shapeTransform">Transform to apply to the shape during the bounding box calculation.</param>
-        ///<param name="boundingBox">Bounding box containing the transformed mesh shape.</param>
-        public void GetBoundingBox(ref RigidTransform shapeTransform, out BoundingBox boundingBox)
+        private void GetBoundingBox(ref Matrix3X3 o, out BoundingBox boundingBox)
         {
-            ////TODO: Could use an approximate bounding volume.  Would be cheaper at runtime and use less memory, though the box would be bigger.
-            //Matrix3X3 o;
-            //Matrix3X3.CreateFromQuaternion(ref shapeTransform.Orientation, out o);
-            ////Sample the local directions from the orientation matrix, implicitly transposed.
-            //Vector3 right = new Vector3(o.M11 * 100000, o.M21 * 100000, o.M31 * 100000);
-            //Vector3 up = new Vector3(o.M12 * 100000, o.M22 * 100000, o.M32 * 100000);
-            //Vector3 backward = new Vector3(o.M13 * 100000, o.M23 * 100000, o.M33 * 100000);
-            //Vector3 left, down, forward;
-            //Vector3.Negate(ref right, out left);
-            //Vector3.Negate(ref up, out down);
-            //Vector3.Negate(ref backward, out forward);
-            //for (int i = 0; i < extents.count; i++)
-            //{
-            //    extents.Elements[i].Clamp(ref right);
-            //    extents.Elements[i].Clamp(ref left);
-            //    extents.Elements[i].Clamp(ref up);
-            //    extents.Elements[i].Clamp(ref down);
-            //    extents.Elements[i].Clamp(ref backward);
-            //    extents.Elements[i].Clamp(ref forward);
-            //}
-
-            //Matrix3X3.Transform(ref right, ref o, out right);
-            //Matrix3X3.Transform(ref left, ref o, out left);
-            //Matrix3X3.Transform(ref down, ref o, out down);
-            //Matrix3X3.Transform(ref up, ref o, out up);
-            //Matrix3X3.Transform(ref forward, ref o, out forward);
-            //Matrix3X3.Transform(ref backward, ref o, out backward);
-
-
-            //boundingBox.Max.X = shapeTransform.Position.X + right.X;
-            //boundingBox.Max.Y = shapeTransform.Position.Y + up.Y;
-            //boundingBox.Max.Z = shapeTransform.Position.Z + backward.Z;
-
-            //boundingBox.Min.X = shapeTransform.Position.X + left.X;
-            //boundingBox.Min.Y = shapeTransform.Position.Y + down.Y;
-            //boundingBox.Min.Z = shapeTransform.Position.Z + forward.Z;
-
-
-#if !WINDOWS
-            boundingBox = new BoundingBox();
-#endif
-            Matrix3X3 o;
-            Matrix3X3.CreateFromQuaternion(ref shapeTransform.Orientation, out o);
-            //Sample the local directions from the orientation matrix, implicitly transposed.
-
+            //Sample the local directions from the matrix, implicitly transposed.
             Vector3 rightDirection = new Vector3(o.M11, o.M21, o.M31);
             Vector3 upDirection = new Vector3(o.M12, o.M22, o.M32);
             Vector3 backDirection = new Vector3(o.M13, o.M23, o.M33);
@@ -640,7 +626,25 @@ namespace BEPUphysics.CollisionShapes
 
             }
 
+            //Incorporate the collision margin.
+            Vector3.Multiply(ref rightDirection, meshCollisionMargin / (float)Math.Sqrt(rightDirection.Length()), out rightDirection);
+            Vector3.Multiply(ref upDirection, meshCollisionMargin / (float)Math.Sqrt(upDirection.Length()), out upDirection);
+            Vector3.Multiply(ref backDirection, meshCollisionMargin / (float)Math.Sqrt(backDirection.Length()), out backDirection);
 
+            var rightElement = surfaceVertices.Elements[right];
+            var leftElement = surfaceVertices.Elements[left];
+            var upElement = surfaceVertices.Elements[up];
+            var downElement = surfaceVertices.Elements[down];
+            var backwardElement = surfaceVertices.Elements[backward];
+            var forwardElement = surfaceVertices.Elements[forward];
+            Vector3.Add(ref rightElement, ref rightDirection, out rightElement);
+            Vector3.Subtract(ref leftElement, ref rightDirection, out leftElement);
+            Vector3.Add(ref upElement, ref upDirection, out upElement);
+            Vector3.Subtract(ref downElement, ref upDirection, out downElement);
+            Vector3.Add(ref backwardElement, ref backDirection, out backwardElement);
+            Vector3.Subtract(ref forwardElement, ref backDirection, out forwardElement);
+
+            //This could be optimized.  Unnecessary transformation information gets computed.
             Vector3 vMinX, vMaxX, vMinY, vMaxY, vMinZ, vMaxZ;
             Matrix3X3.Transform(ref surfaceVertices.Elements[right], ref o, out vMaxX);
             Matrix3X3.Transform(ref surfaceVertices.Elements[left], ref o, out vMinX);
@@ -650,13 +654,106 @@ namespace BEPUphysics.CollisionShapes
             Matrix3X3.Transform(ref surfaceVertices.Elements[forward], ref o, out vMinZ);
 
 
-            boundingBox.Max.X = shapeTransform.Position.X + meshCollisionMargin + vMaxX.X;
-            boundingBox.Max.Y = shapeTransform.Position.Y + meshCollisionMargin + vMaxY.Y;
-            boundingBox.Max.Z = shapeTransform.Position.Z + meshCollisionMargin + vMaxZ.Z;
+            boundingBox.Max.X = vMaxX.X;
+            boundingBox.Max.Y = vMaxY.Y;
+            boundingBox.Max.Z = vMaxZ.Z;
 
-            boundingBox.Min.X = shapeTransform.Position.X - meshCollisionMargin + vMinX.X;
-            boundingBox.Min.Y = shapeTransform.Position.Y - meshCollisionMargin + vMinY.Y;
-            boundingBox.Min.Z = shapeTransform.Position.Z - meshCollisionMargin + vMinZ.Z;
+            boundingBox.Min.X = vMinX.X;
+            boundingBox.Min.Y = vMinY.Y;
+            boundingBox.Min.Z = vMinZ.Z;
+        }
+
+        ///<summary>
+        /// Computes the bounding box of the transformed mesh shape.
+        ///</summary>
+        ///<param name="shapeTransform">Transform to apply to the shape during the bounding box calculation.</param>
+        ///<param name="boundingBox">Bounding box containing the transformed mesh shape.</param>
+        public void GetBoundingBox(ref RigidTransform shapeTransform, out BoundingBox boundingBox)
+        {
+            ////TODO: Could use an approximate bounding volume.  Would be cheaper at runtime and use less memory, though the box would be bigger.
+            //Matrix3X3 o;
+            //Matrix3X3.CreateFromQuaternion(ref shapeTransform.Orientation, out o);
+            ////Sample the local directions from the orientation matrix, implicitly transposed.
+            //Vector3 right = new Vector3(o.M11 * 100000, o.M21 * 100000, o.M31 * 100000);
+            //Vector3 up = new Vector3(o.M12 * 100000, o.M22 * 100000, o.M32 * 100000);
+            //Vector3 backward = new Vector3(o.M13 * 100000, o.M23 * 100000, o.M33 * 100000);
+            //Vector3 left, down, forward;
+            //Vector3.Negate(ref right, out left);
+            //Vector3.Negate(ref up, out down);
+            //Vector3.Negate(ref backward, out forward);
+            //for (int i = 0; i < extents.count; i++)
+            //{
+            //    extents.Elements[i].Clamp(ref right);
+            //    extents.Elements[i].Clamp(ref left);
+            //    extents.Elements[i].Clamp(ref up);
+            //    extents.Elements[i].Clamp(ref down);
+            //    extents.Elements[i].Clamp(ref backward);
+            //    extents.Elements[i].Clamp(ref forward);
+            //}
+
+            //Matrix3X3.Transform(ref right, ref o, out right);
+            //Matrix3X3.Transform(ref left, ref o, out left);
+            //Matrix3X3.Transform(ref down, ref o, out down);
+            //Matrix3X3.Transform(ref up, ref o, out up);
+            //Matrix3X3.Transform(ref forward, ref o, out forward);
+            //Matrix3X3.Transform(ref backward, ref o, out backward);
+
+
+            //boundingBox.Max.X = shapeTransform.Position.X + right.X;
+            //boundingBox.Max.Y = shapeTransform.Position.Y + up.Y;
+            //boundingBox.Max.Z = shapeTransform.Position.Z + backward.Z;
+
+            //boundingBox.Min.X = shapeTransform.Position.X + left.X;
+            //boundingBox.Min.Y = shapeTransform.Position.Y + down.Y;
+            //boundingBox.Min.Z = shapeTransform.Position.Z + forward.Z;
+
+
+            Matrix3X3 o;
+            Matrix3X3.CreateFromQuaternion(ref shapeTransform.Orientation, out o);
+            GetBoundingBox(ref o, out boundingBox);
+
+
+            boundingBox.Max.X += shapeTransform.Position.X;
+            boundingBox.Max.Y += shapeTransform.Position.Y;
+            boundingBox.Max.Z += shapeTransform.Position.Z;
+
+            boundingBox.Min.X += shapeTransform.Position.X;
+            boundingBox.Min.Y += shapeTransform.Position.Y;
+            boundingBox.Min.Z += shapeTransform.Position.Z;
+
+        }
+
+
+        /// <summary>
+        /// Gets the bounding box of the mesh transformed first into world space, and then into the local space of another affine transform.
+        /// </summary>
+        /// <param name="shapeTransform">Transform to use to put the shape into world space.</param>
+        /// <param name="spaceTransform">Used as the frame of reference to compute the bounding box.
+        /// In effect, the shape is transformed by the inverse of the space transform to compute its bounding box in local space.</param>
+        /// <param name="boundingBox">Bounding box in the local space.</param>
+        public void GetLocalBoundingBox(ref RigidTransform shapeTransform, ref AffineTransform spaceTransform, out BoundingBox boundingBox)
+        {
+#if !WINDOWS
+            boundingBox = new BoundingBox();
+#endif
+            //TODO: This method peforms quite a few sqrts because the collision margin can get scaled, and so cannot be applied as a final step.
+            //There should be a better way to do this.
+            //Additionally, this bounding box is not consistent in all cases with the post-add version.  Adding the collision margin at the end can
+            //slightly overestimate the size of a margin expanded shape at the corners, which is fine (and actually important for the box-box special case).
+
+            //Move forward into convex's space, backwards into the new space's local space.
+            AffineTransform transform;
+            AffineTransform.Invert(ref spaceTransform, out transform);
+            AffineTransform.Multiply(ref shapeTransform, ref transform, out transform);
+
+            GetBoundingBox(ref transform.LinearTransform, out boundingBox);
+            boundingBox.Max.X += transform.Translation.X;
+            boundingBox.Max.Y += transform.Translation.Y;
+            boundingBox.Max.Z += transform.Translation.Z;
+
+            boundingBox.Min.X += transform.Translation.X;
+            boundingBox.Min.Y += transform.Translation.Y;
+            boundingBox.Min.Z += transform.Translation.Z;
 
         }
 
@@ -694,6 +791,8 @@ namespace BEPUphysics.CollisionShapes
         {
             return new MobileMeshCollidable(this);
         }
+
+
     }
 
     ///<summary>

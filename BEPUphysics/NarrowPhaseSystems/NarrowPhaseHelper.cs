@@ -94,6 +94,10 @@ namespace BEPUphysics.NarrowPhaseSystems
         /// Gets the factory for the mobile mesh-static mesh case.
         /// </summary>
         public NarrowPhasePairFactory<MobileMeshStaticMeshPairHandler> MobileMeshStaticMesh { get; private set; }
+        /// <summary>
+        /// Gets the factory for the mobile mesh-mobile mesh case.
+        /// </summary>
+        public NarrowPhasePairFactory<MobileMeshMobileMeshPairHandler> MobileMeshMobileMesh { get; private set; }
 
         RawList<NarrowPhasePairFactory> factories = new RawList<NarrowPhasePairFactory>();
         /// <summary>
@@ -132,6 +136,7 @@ namespace BEPUphysics.NarrowPhaseSystems
             factories.Add(MobileMeshConvex = new NarrowPhasePairFactory<MobileMeshConvexPairHandler>());
             factories.Add(MobileMeshSphere = new NarrowPhasePairFactory<MobileMeshSpherePairHandler>());
             factories.Add(MobileMeshStaticMesh = new NarrowPhasePairFactory<MobileMeshStaticMeshPairHandler>());
+            factories.Add(MobileMeshMobileMesh = new NarrowPhasePairFactory<MobileMeshMobileMeshPairHandler>());
         }
 
 
@@ -234,6 +239,8 @@ namespace BEPUphysics.NarrowPhaseSystems
 
             collisionManagers.Add(new TypePair(typeof(CompoundCollidable), typeof(MobileMeshCollidable)), Factories.CompoundMobileMesh);
             collisionManagers.Add(new TypePair(typeof(MobileMeshCollidable), typeof(StaticMesh)), Factories.MobileMeshStaticMesh);
+            collisionManagers.Add(new TypePair(typeof(MobileMeshCollidable), typeof(MobileMeshCollidable)), Factories.MobileMeshMobileMesh);
+            collisionManagers.Add(new TypePair(typeof(MobileMeshCollidable), typeof(TriangleCollidable)), Factories.MobileMeshConvex);
         }
 
         internal static Dictionary<TypePair, NarrowPhasePairFactory> collisionManagers;

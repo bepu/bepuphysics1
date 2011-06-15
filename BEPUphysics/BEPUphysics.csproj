@@ -261,6 +261,7 @@
     <Compile Include="NarrowPhaseSystems\Pairs\ConvexPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\CompoundGroupPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\ConvexConstraintPairHandler.cs" />
+    <Compile Include="NarrowPhaseSystems\Pairs\MobileMeshMobileMeshPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\MeshGroupPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\MobileMeshStaticMeshPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\MobileMeshMeshPairHandler.cs" />

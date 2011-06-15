@@ -40,17 +40,17 @@ namespace BEPUphysicsDemos.Demos
             Vector3[] vertices;
             int[] indices;
 
-            //TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("playground"), out vertices, out indices);
-            //AffineTransform transform = new AffineTransform(new Vector3(1, 1, 1), Quaternion.Identity, new Vector3(0, -30, 0));
-            //StaticMesh staticMesh = new StaticMesh(vertices, indices, transform);
-            //Space.Add(staticMesh);
-            //game.ModelDrawer.Add(staticMesh.Mesh);
+            TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("playground"), out vertices, out indices);
+            AffineTransform transform = new AffineTransform(new Vector3(1, 1, 1), Quaternion.Identity, new Vector3(0, -30, 0));
+            StaticMesh staticMesh = new StaticMesh(vertices, indices, transform);
+            Space.Add(staticMesh);
+            game.ModelDrawer.Add(staticMesh.Mesh);
 
-            TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("hollowsphere"), out vertices, out indices);
+            TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("cube"), out vertices, out indices);
             //MotionSettings.DefaultPositionUpdateMode = PositionUpdateMode.Continuous;
             ShapeDistributionInformation info;
-            var transform = AffineTransform.Identity;// new AffineTransform(new Vector3(1, 1, 1), Quaternion.CreateFromAxisAngle(new Vector3(1, 0, 0), MathHelper.Pi), new Vector3(0, 0, 0));
-            //var transform = new AffineTransform(new Vector3(.26f, .26f, .26f), Quaternion.Identity, new Vector3(0, 0, 0));
+            transform = AffineTransform.Identity;// new AffineTransform(new Vector3(1, 1, 1), Quaternion.CreateFromAxisAngle(new Vector3(1, 0, 0), MathHelper.Pi), new Vector3(0, 0, 0));
+            //transform = new AffineTransform(new Vector3(.06f, .06f, .06f), Quaternion.Identity, new Vector3(0, 0, 0));
             //var transform = new AffineTransform(new Vector3(5f, 5f, 5f), Quaternion.Identity, new Vector3(0, 0, 0));
             var shape = new MobileMeshShape(vertices, indices, transform, MobileMeshSolidity.Solid, out info);
 
@@ -60,18 +60,18 @@ namespace BEPUphysicsDemos.Demos
             kapow = new Sphere(new Vector3(10000, 0, 0), .4f, 1);
             Space.Add(kapow);
             Matrix3X3 inertia;
-            float mass = 1000;
+            float mass = 10;
             //inertia = new Matrix3X3();
             //inertia.M11 = mass;
             //inertia.M22 = mass;
             //inertia.M33 = mass;
             Matrix3X3.Multiply(ref info.VolumeDistribution, mass * InertiaHelper.InertiaTensorScale, out inertia);
-            for (int i = 0; i < 1; i++)
+            for (int i = 0; i < 2; i++)
             {
                 var entityMesh = new Entity<MobileMeshCollidable>(new MobileMeshCollidable(shape), mass, inertia, info.Volume);
-                entityMesh.CollisionInformation.ImproveBoundaryBehavior = true;
-                //entityMesh.IsAlwaysActive = true;
-                entityMesh.Position = new Vector3(0, 40, 0);
+                //entityMesh.CollisionInformation.ImproveBoundaryBehavior = true;
+                entityMesh.IsAlwaysActive = true;
+                entityMesh.Position = new Vector3(i * 1, 20, 0);
                 //CollisionRules.AddRule(entityMesh, kapow, CollisionRule.NoSolver);
                 //entityMesh.AngularVelocity = new Vector3(5, 0, 0);
                 //entityMesh.LinearVelocity = new Vector3(1, 0, 0);
@@ -82,7 +82,7 @@ namespace BEPUphysicsDemos.Demos
                 //entityMesh.IsAlwaysActive = true;
             }
 
-            for (int j = 0; j < 500; j++)
+            for (int j = 0; j < 0; j++)
             {
                 var toAdd = new Box(new Vector3(0, 35 + j * -.1f, 0), 2, 2, 2, 1);
                 //toAdd.Material.KineticFriction = 0;

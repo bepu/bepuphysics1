@@ -10,17 +10,18 @@ using BEPUphysics.ResourceManagement;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.CollisionTests;
 using Microsoft.Xna.Framework;
+using BEPUphysics.MathExtensions;
 
 namespace BEPUphysics.NarrowPhaseSystems.Pairs
 {
     ///<summary>
-    /// Handles a mobile mesh-static mesh collision pair.
+    /// Handles a mobile mesh-mobile mesh collision pair.
     ///</summary>
-    public class MobileMeshStaticMeshPairHandler : MobileMeshMeshPairHandler
+    public class MobileMeshMobileMeshPairHandler : MobileMeshMeshPairHandler
     {
 
 
-        StaticMesh mesh;
+        MobileMeshCollidable mesh;
 
         protected override Collidable CollidableB
         {
@@ -32,25 +33,34 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         }
         protected override Materials.Material MaterialB
         {
-            get { return mesh.material; }
+            get { return mesh.entity.material; }
         }
 
         protected override TriangleCollidable GetOpposingCollidable(int index)
         {
             //Construct a TriangleCollidable from the static mesh.
             var toReturn = Resources.GetTriangleCollidable();
-            toReturn.Shape.sidedness = mesh.sidedness;
+            toReturn.Shape.sidedness = mesh.Shape.Sidedness;
             toReturn.Shape.collisionMargin = mobileMesh.Shape.MeshCollisionMargin;
+            toReturn.Entity = mesh.entity;
             return toReturn;
+        }
+
+        protected override void CleanUpCollidable(TriangleCollidable collidable)
+        {
+            collidable.Entity = null;
+            base.CleanUpCollidable(collidable);
         }
 
         protected override void ConfigureCollidable(TriangleEntry entry, float dt)
         {
-            //Since it's a static mesh, we could technically get away with frontloading this in the GetOpposingCollidable initialization.
-            //However, that would mean changes to the static mesh would not necessarily be reflected properly.  This is not really a huge expense.
-            //Mobile meshes aren't too fast to begin with.
             var shape = entry.Collidable.Shape;
-            mesh.Mesh.Data.GetTriangle(entry.Index, out shape.vA, out shape.vB, out shape.vC);
+            mesh.Shape.TriangleMesh.Data.GetTriangle(entry.Index, out shape.vA, out shape.vB, out shape.vC);
+            Matrix3X3 o;
+            Matrix3X3.CreateFromQuaternion(ref mesh.worldTransform.Orientation, out o);
+            Matrix3X3.Transform(ref shape.vA, ref o, out shape.vA);
+            Matrix3X3.Transform(ref shape.vB, ref o, out shape.vB);
+            Matrix3X3.Transform(ref shape.vC, ref o, out shape.vC);
             Vector3 center;
             Vector3.Add(ref shape.vA, ref shape.vB, out center);
             Vector3.Add(ref center, ref shape.vC, out center);
@@ -58,10 +68,12 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             Vector3.Subtract(ref shape.vA, ref center, out shape.vA);
             Vector3.Subtract(ref shape.vB, ref center, out shape.vB);
             Vector3.Subtract(ref shape.vC, ref center, out shape.vC);
+
+            Vector3.Add(ref center, ref mesh.worldTransform.Position, out center);
             //The bounding box doesn't update by itself.
             entry.Collidable.worldTransform.Position = center;
             entry.Collidable.worldTransform.Orientation = Quaternion.Identity;
-            entry.Collidable.UpdateBoundingBoxInternal(0);
+            entry.Collidable.UpdateBoundingBoxInternal(dt);
         }
 
         ///<summary>
@@ -71,16 +83,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         ///<param name="entryB">Second entry in the pair.</param>
         public override void Initialize(BroadPhaseEntry entryA, BroadPhaseEntry entryB)
         {
-            mesh = entryA as StaticMesh;
-            if (mesh == null)
-            {
-                mesh = entryB as StaticMesh;
-                if (mesh == null)
-                {
-                    throw new Exception("Inappropriate types used to initialize pair.");
-                }
-            }
-
+            mesh = (MobileMeshCollidable)entryB;
 
             base.Initialize(entryA, entryB);
         }
@@ -108,7 +111,12 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         protected override void UpdateContainedPairs()
         {
             var overlappedElements = Resources.GetIntList();
-            mesh.Mesh.Tree.GetOverlaps(mobileMesh.boundingBox, overlappedElements);
+            BoundingBox localBoundingBox;
+            RigidTransform combinedTransform;
+            
+            RigidTransform.TransformByInverse(ref mobileMesh.worldTransform, ref mesh.worldTransform, out combinedTransform);
+            mobileMesh.Shape.GetBoundingBox(ref combinedTransform, out localBoundingBox);
+            mesh.Shape.TriangleMesh.Tree.GetOverlaps(localBoundingBox, overlappedElements);
             for (int i = 0; i < overlappedElements.count; i++)
             {
                 TryToAdd(overlappedElements.Elements[i]);

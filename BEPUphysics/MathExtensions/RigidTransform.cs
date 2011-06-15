@@ -89,19 +89,42 @@ namespace BEPUphysics.MathExtensions
             }
         }
 
+        /// <summary>
+        /// Inverts a rigid transform.
+        /// </summary>
+        /// <param name="transform">Transform to invert.</param>
+        /// <param name="inverse">Inverse of the transform.</param>
+        public static void Invert(ref RigidTransform transform, out RigidTransform inverse)
+        {
+            Quaternion.Conjugate(ref transform.Orientation, out inverse.Orientation);
+            Vector3.Transform(ref transform.Position, ref inverse.Orientation, out inverse.Position);
+            Vector3.Negate(ref inverse.Position, out inverse.Position);
+        }
+
         ///<summary>
         /// Transforms a rigid transform by another rigid transform.
         ///</summary>
-        ///<param name="local">The first, "local" rigid transform.</param>
-        ///<param name="world">The second, "world" rigid transform.</param>
+        ///<param name="a">The first, "local" rigid transform.</param>
+        ///<param name="b">The second, "world" rigid transform.</param>
         ///<param name="combined">Combined rigid transform.</param>
-        public static void Transform(ref RigidTransform local, ref RigidTransform world, out RigidTransform combined)
+        public static void Transform(ref RigidTransform a, ref RigidTransform b, out RigidTransform combined)
         {
             Vector3 intermediate;
-            Vector3.Transform(ref local.Position, ref world.Orientation, out intermediate);
-            Vector3.Add(ref intermediate, ref world.Position, out combined.Position);
-            Quaternion.Concatenate(ref local.Orientation, ref world.Orientation, out combined.Orientation);
+            Vector3.Transform(ref a.Position, ref b.Orientation, out intermediate);
+            Vector3.Add(ref intermediate, ref b.Position, out combined.Position);
+            Quaternion.Concatenate(ref a.Orientation, ref b.Orientation, out combined.Orientation);
 
+        }
+        ///<summary>
+        /// Transforms a rigid transform by another rigid transform's inverse.
+        ///</summary>
+        ///<param name="local">The first rigid transform.</param>
+        ///<param name="world">The second rigid transform, to be inverted.</param>
+        ///<param name="combined">Combined rigid transform.</param>
+        public static void TransformByInverse(ref RigidTransform a, ref RigidTransform b, out RigidTransform combinedTransform)
+        {
+            Invert(ref b, out combinedTransform);
+            Transform(ref a, ref combinedTransform, out combinedTransform);
         }
 
         ///<summary>
@@ -132,5 +155,7 @@ namespace BEPUphysics.MathExtensions
             Quaternion.Conjugate(ref transform.Orientation, out orientation);
             Vector3.Transform(ref intermediate, ref orientation, out result);
         }
+
+
     }
 }

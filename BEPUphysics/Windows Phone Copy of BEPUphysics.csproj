@@ -165,6 +165,7 @@
     <Compile Include="NarrowPhaseSystems\Pairs\MobileMeshMeshPairHandler.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="NarrowPhaseSystems\Pairs\MobileMeshMobileMeshPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\MobileMeshPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\MobileMeshSpherePairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\MobileMeshStaticMeshPairHandler.cs" />

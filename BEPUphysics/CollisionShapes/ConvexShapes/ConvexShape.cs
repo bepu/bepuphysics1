@@ -323,6 +323,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             GetLocalExtremePoint(direction, out forward);
 
 
+            //This could be optimized.  Unnecessary transformation information gets computed.
             Matrix3X3.Transform(ref right, ref transform.LinearTransform, out right);
             Matrix3X3.Transform(ref left, ref transform.LinearTransform, out left);
             Matrix3X3.Transform(ref up, ref transform.LinearTransform, out up);

@@ -73,8 +73,8 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             }
 
             base.Initialize(entryA, entryB);
-
-            UpdateMaterialProperties(convex.entity.material, mobileMesh.entity.material);
+            //It's possible that the convex does not have an entity if it is a proxy for a non-entity collidable.
+            UpdateMaterialProperties(convex.entity != null ? convex.entity.material : null, mobileMesh.entity.material);
         }
 
 
