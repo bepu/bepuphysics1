@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.MathExtensions;
 using BEPUphysics.CollisionTests;
+using BEPUphysics.DataStructures;
 
 namespace BEPUphysics
 {
@@ -345,7 +346,7 @@ namespace BEPUphysics
         /// <param name="p">Point for comparison.</param>
         /// <param name="subsimplex">The source of the voronoi region which contains the point.</param>
         /// <param name="closestPoint">Closest point on tetrahedron to point.</param>
-        public static void GetClosestPointOnTriangleToPoint(ref Vector3 a, ref Vector3 b, ref Vector3 c, ref Vector3 p, List<Vector3> subsimplex, out Vector3 closestPoint)
+        public static void GetClosestPointOnTriangleToPoint(ref Vector3 a, ref Vector3 b, ref Vector3 c, ref Vector3 p, RawList<Vector3> subsimplex, out Vector3 closestPoint)
         {
             subsimplex.Clear();
             float v, w;
@@ -452,7 +453,7 @@ namespace BEPUphysics
         /// <param name="subsimplex">The source of the voronoi region which contains the point, enumerated as a = 0, b = 1, c = 2.</param>
         /// <param name="baryCoords">Barycentric coordinates of the point on the triangle.</param>
         /// <param name="closestPoint">Closest point on tetrahedron to point.</param>
-        public static void GetClosestPointOnTriangleToPoint(List<Vector3> q, int i, int j, int k, ref Vector3 p, List<int> subsimplex, List<float> baryCoords, out Vector3 closestPoint)
+        public static void GetClosestPointOnTriangleToPoint(RawList<Vector3> q, int i, int j, int k, ref Vector3 p, RawList<int> subsimplex, RawList<float> baryCoords, out Vector3 closestPoint)
         {
             subsimplex.Clear();
             baryCoords.Clear();
@@ -1500,7 +1501,7 @@ namespace BEPUphysics
         /// <param name="p">Point for comparison.</param>
         /// <param name="subsimplex">The source of the voronoi region which contains the point.</param>
         /// <param name="closestPoint">Closest point on the tetrahedron to the point.</param>
-        public static void GetClosestPointOnTetrahedronToPoint(ref Vector3 a, ref Vector3 b, ref Vector3 c, ref Vector3 d, ref Vector3 p, List<Vector3> subsimplex, out Vector3 closestPoint)
+        public static void GetClosestPointOnTetrahedronToPoint(ref Vector3 a, ref Vector3 b, ref Vector3 c, ref Vector3 d, ref Vector3 p, RawList<Vector3> subsimplex, out Vector3 closestPoint)
         {
             // Start out assuming point inside all halfspaces, so closest to itself
             subsimplex.Clear();
@@ -1570,10 +1571,10 @@ namespace BEPUphysics
         /// <param name="subsimplex">The source of the voronoi region which contains the point, enumerated as a = 0, b = 1, c = 2, d = 3.</param>
         /// <param name="baryCoords">Barycentric coordinates of p on the tetrahedron.</param>
         /// <param name="closestPoint">Closest point on the tetrahedron to the point.</param>
-        public static void GetClosestPointOnTetrahedronToPoint(List<Vector3> tetrahedron, ref Vector3 p, List<int> subsimplex, List<float> baryCoords, out Vector3 closestPoint)
+        public static void GetClosestPointOnTetrahedronToPoint(RawList<Vector3> tetrahedron, ref Vector3 p, RawList<int> subsimplex, RawList<float> baryCoords, out Vector3 closestPoint)
         {
-            List<int> subsimplexCandidate = Resources.GetIntList();
-            List<float> baryCoordsCandidate = Resources.GetFloatList();
+            var subsimplexCandidate = Resources.GetIntList();
+            var baryCoordsCandidate = Resources.GetFloatList();
             Vector3 a = tetrahedron[0];
             Vector3 b = tetrahedron[1];
             Vector3 c = tetrahedron[2];
@@ -1827,7 +1828,7 @@ namespace BEPUphysics
 
         private static void RemovePointsInPolyhedronIfInside(IList<int> outsidePoints, IList<Vector3> points, IList<int> indices)
         {
-            List<int> outsidePointsTemp = Resources.GetIntList();
+            var outsidePointsTemp = Resources.GetIntList();
             for (int k = 0; k < outsidePoints.Count; k++)
             {
                 outsidePointsTemp.Add(outsidePoints[k]);
@@ -1882,17 +1883,17 @@ namespace BEPUphysics
         public static void GetConvexHull(IList<Vector3> points, IList<int> indices)
         {
             //Points is what will be used as a vertex buffer.
-            List<int> outsidePoints = Resources.GetIntList();
-            List<int> edges = Resources.GetIntList();
+            var outsidePoints = Resources.GetIntList();
+            var edges = Resources.GetIntList();
 
-            List<int> toRemove = Resources.GetIntList();
+            var toRemove = Resources.GetIntList();
             //Populate the outside points
             for (int k = 0; k < points.Count; k++)
             {
                 outsidePoints.Add(k);
             }
             //Find an initial tetrahedron
-            List<int> initialTetrahedron = Resources.GetIntList();
+            var initialTetrahedron = Resources.GetIntList();
             /*float volume = 0;
             Random random = new Random();
             Vector3 dir;

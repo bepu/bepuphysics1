@@ -6,6 +6,7 @@ using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.ResourceManagement;
 using System.Collections.Generic;
 using System;
+using BEPUphysics.Settings;
 
 namespace BEPUphysics.CollisionShapes
 {
@@ -16,6 +17,25 @@ namespace BEPUphysics.CollisionShapes
     ///</summary>
     public class MobileMeshShape : EntityShape
     {
+        private float meshCollisionMargin = CollisionDetectionSettings.DefaultMargin;
+        /// <summary>
+        /// Gets or sets the margin of the mobile mesh to use when colliding with other meshes.
+        /// When colliding with non-mesh shapes, the mobile mesh has no margin.
+        /// </summary>
+        public float MeshCollisionMargin
+        {
+            get
+            {
+                return meshCollisionMargin;
+            }
+            set
+            {
+                if (value < 0)
+                    throw new Exception("Mesh margin must be nonnegative.");
+                meshCollisionMargin = value;
+                OnShapeChanged();
+            }
+        }
         TriangleMesh triangleMesh;
         ///<summary>
         /// Gets or sets the TriangleMesh data structure used by this shape.
@@ -30,7 +50,6 @@ namespace BEPUphysics.CollisionShapes
 
         RawList<Vector3> surfaceVertices = new RawList<Vector3>();
 
-        //TODO: Sidedness on a mobile mesh is a bit weird, since if solidity is enabled, then only one option is permissible.
         internal MobileMeshSolidity solidity = MobileMeshSolidity.DoubleSided;
         ///<summary>
         /// Gets the solidity of the mesh.
@@ -631,13 +650,13 @@ namespace BEPUphysics.CollisionShapes
             Matrix3X3.Transform(ref surfaceVertices.Elements[forward], ref o, out vMinZ);
 
 
-            boundingBox.Max.X = shapeTransform.Position.X + vMaxX.X;
-            boundingBox.Max.Y = shapeTransform.Position.Y + vMaxY.Y;
-            boundingBox.Max.Z = shapeTransform.Position.Z + vMaxZ.Z;
+            boundingBox.Max.X = shapeTransform.Position.X + meshCollisionMargin + vMaxX.X;
+            boundingBox.Max.Y = shapeTransform.Position.Y + meshCollisionMargin + vMaxY.Y;
+            boundingBox.Max.Z = shapeTransform.Position.Z + meshCollisionMargin + vMaxZ.Z;
 
-            boundingBox.Min.X = shapeTransform.Position.X + vMinX.X;
-            boundingBox.Min.Y = shapeTransform.Position.Y + vMinY.Y;
-            boundingBox.Min.Z = shapeTransform.Position.Z + vMinZ.Z;
+            boundingBox.Min.X = shapeTransform.Position.X - meshCollisionMargin + vMinX.X;
+            boundingBox.Min.Y = shapeTransform.Position.Y - meshCollisionMargin + vMinY.Y;
+            boundingBox.Min.Z = shapeTransform.Position.Z - meshCollisionMargin + vMinZ.Z;
 
         }
 

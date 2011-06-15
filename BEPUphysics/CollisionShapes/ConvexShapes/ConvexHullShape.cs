@@ -320,8 +320,8 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             Toolbox.GetConvexHull(vertices, outputSurfaceTriangles, outputLocalSurfaceVertices);
 
             volume = 0;
-            List<float> volumes = Resources.GetFloatList();
-            List<Vector3> centroids = Resources.GetVectorList();
+            var volumes = Resources.GetFloatList();
+            var centroids = Resources.GetVectorList();
             for (int k = 0; k < outputSurfaceTriangles.Count; k += 3)
             {
                 volumes.Add(Vector3.Dot(

@@ -13,26 +13,62 @@ using BEPUphysics.Materials;
 
 namespace BEPUphysics.NarrowPhaseSystems.Pairs
 {
+    /// <summary>
+    /// Contains a triangle collidable and its index.  Used by mobile mesh-mesh collisions.
+    /// </summary>
+    public struct TriangleEntry:IEquatable<TriangleEntry>
+    {
+        /// <summary>
+        /// Index of the triangle that was the source of this entry.
+        /// </summary>
+        public int Index;
+        /// <summary>
+        /// Collidable for the triangle.
+        /// </summary>
+        public TriangleCollidable Collidable;
+
+        /// <summary>
+        /// Gets the hash code of the object.
+        /// </summary>
+        /// <returns>Hash code of the object.</returns>
+        public override int GetHashCode()
+        {
+            return Index;
+        }
+
+
+        /// <summary>
+        /// Determines if two colliders refer to the same triangle.
+        /// </summary>
+        /// <param name="other">Object to compare.</param>
+        /// <returns>Whether or not the objects are equal.</returns>
+        public bool Equals(TriangleEntry other)
+        {
+            return other.Index == Index;
+        }
+    }
+
+    //TODO: Lots of overlap with the GroupPairHandler.
     ///<summary>
-    /// Superclass of pairs which manage multiple sub-collidable pairs.
+    /// Superclass of pair handlers which have multiple index-based collidable child pairs.
     ///</summary>
-    public abstract class GroupPairHandler : CollidablePairHandler, IPairHandlerParent
+    public abstract class MeshGroupPairHandler : CollidablePairHandler, IPairHandlerParent
     {
         ContactManifoldConstraintGroup manifoldConstraintGroup;
-        
-        Dictionary<CollidablePair, CollidablePairHandler> subPairs = new Dictionary<CollidablePair, CollidablePairHandler>();
-        HashSet<CollidablePair> containedPairs = new HashSet<CollidablePair>();
-        RawList<CollidablePair> pairsToRemove = new RawList<CollidablePair>();
+
+        Dictionary<TriangleEntry, CollidablePairHandler> subPairs = new Dictionary<TriangleEntry, CollidablePairHandler>();
+        HashSet<TriangleEntry> containedPairs = new HashSet<TriangleEntry>();
+        RawList<TriangleEntry> pairsToRemove = new RawList<TriangleEntry>();
 
 
         ///<summary>
         /// Gets a list of the pairs associated with children.
         ///</summary>
-        public ReadOnlyDictionary<CollidablePair, CollidablePairHandler> ChildPairs
+        public ReadOnlyDictionary<TriangleEntry, CollidablePairHandler> ChildPairs
         {
             get
             {
-                return new ReadOnlyDictionary<CollidablePair, CollidablePairHandler>(subPairs);
+                return new ReadOnlyDictionary<TriangleEntry, CollidablePairHandler>(subPairs);
             }
         }
 
@@ -41,7 +77,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         ///<summary>
         /// Constructs a new compound-convex pair handler.
         ///</summary>
-        public GroupPairHandler()
+        public MeshGroupPairHandler()
         {
             manifoldConstraintGroup = new ContactManifoldConstraintGroup();
         }
@@ -97,36 +133,44 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             //Child type needs to null out the references.
         }
 
-        //TODO: At the time of writing this, the default project configuration for the Xbox360 didn't allow optional parameters.  Could compress this.
-
-        protected void TryToAdd(Collidable a, Collidable b)
+        protected void TryToAdd(int index)
         {
-            TryToAdd(a, b, null, null);
-        }
-
-        protected void TryToAdd(Collidable a, Collidable b, Material materialA)
-        {
-            TryToAdd(a, b, materialA, null);
-        }
-
-        protected void TryToAdd(Collidable a, Collidable b, Material materialA, Material materialB)
-        {
-            CollisionRule rule;
-            if ((rule = CollisionRules.collisionRuleCalculator(a.collisionRules, b.collisionRules)) < CollisionRule.NoNarrowPhasePair)
+            var entry = new TriangleEntry() { Index = index };
+            if (!subPairs.ContainsKey(entry))
             {
-                var pair = new CollidablePair(a, b);
-                if (!subPairs.ContainsKey(pair))
+                var collidablePair = new CollidablePair(CollidableA, entry.Collidable = GetOpposingCollidable(index));
+                var newPair = NarrowPhaseHelper.GetPairHandler(ref collidablePair);
+                newPair.UpdateMaterialProperties();  //Override the materials, if necessary.  Meshes don't currently support custom materials but..
+                if (newPair != null)
                 {
-                    CollidablePairHandler newPair = NarrowPhaseHelper.GetPairHandler(ref pair, rule);
-                    newPair.UpdateMaterialProperties(materialA, materialB);  //Override the materials, if necessary.
-                    if (newPair != null)
-                    {
-                        newPair.Parent = this;
-                        subPairs.Add(pair, newPair);
-                    }
+                    newPair.Parent = this;
+                    subPairs.Add(entry, newPair);
                 }
-                containedPairs.Add(pair);
             }
+            containedPairs.Add(entry);
+
+        }
+
+        /// <summary>
+        /// Get a collidable from CollidableB to represent the object at the given index.
+        /// </summary>
+        /// <param name="index">Index to create a collidable for.</param>
+        /// <returns>Collidable for the object at the given index.</returns>
+        protected abstract TriangleCollidable GetOpposingCollidable(int index);
+
+        /// <summary>
+        /// Configure a triangle from CollidableB to represent the object at the given index.
+        /// </summary>
+        /// <param name="entry">Entry to configure.</param>
+        protected abstract void ConfigureCollidable(TriangleEntry entry);
+
+        /// <summary>
+        /// Cleans up the collidable.
+        /// </summary>
+        /// <param name="collidable">Collidable to clean up.</param>
+        protected virtual void CleanUpCollidable(TriangleCollidable collidable)
+        {
+            Resources.GiveBack(collidable);
         }
 
         protected abstract void UpdateContainedPairs();
@@ -141,14 +185,14 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
 
             UpdateContainedPairs();
             //Eliminate old pairs.
-            foreach (CollidablePair pair in subPairs.Keys)
+            foreach (var pair in subPairs.Keys)
             {
                 if (!containedPairs.Contains(pair))
                     pairsToRemove.Add(pair);
             }
             for (int i = 0; i < pairsToRemove.count; i++)
             {
-                CollidablePairHandler toReturn = subPairs[pairsToRemove.Elements[i]];
+                var toReturn = subPairs[pairsToRemove.Elements[i]];
                 subPairs.Remove(pairsToRemove.Elements[i]);
                 toReturn.CleanUp();
                 ((INarrowPhasePair)toReturn).Factory.GiveBack(toReturn);
@@ -157,10 +201,13 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             containedPairs.Clear();
             pairsToRemove.Clear();
 
-            foreach (CollidablePairHandler pair in subPairs.Values)
+            foreach (var pair in subPairs)
             {
-                if (pair.BroadPhaseOverlap.collisionRule < CollisionRule.NoNarrowPhaseUpdate) //Don't test if the collision rules say don't.
-                    pair.UpdateCollision(dt);
+                if (pair.Value.BroadPhaseOverlap.collisionRule < CollisionRule.NoNarrowPhaseUpdate) //Don't test if the collision rules say don't.
+                {
+                    ConfigureCollidable(pair.Key);
+                    pair.Value.UpdateCollision(dt);
+                }
             }
 
 

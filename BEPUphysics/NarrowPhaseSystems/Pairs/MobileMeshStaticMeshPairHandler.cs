@@ -14,20 +14,37 @@ using Microsoft.Xna.Framework;
 namespace BEPUphysics.NarrowPhaseSystems.Pairs
 {
     ///<summary>
-    /// Handles a mobile mesh-static mesh collision pair.
+    /// Handles a compound-static mesh collision pair.
     ///</summary>
     public class MobileMeshStaticMeshPairHandler : MobileMeshMeshPairHandler
     {
 
-        StaticMesh staticMesh;
+
+        StaticMesh mesh;
 
         protected override Collidable CollidableB
         {
-            get { return staticMesh; }
+            get { return mesh; }
         }
         protected override Entities.Entity EntityB
         {
             get { return null; }
+        }
+
+        protected override TriangleCollidable GetOpposingCollidable(int index)
+        {
+            //Construct a TriangleCollidable from the static mesh.
+            var toReturn = Resources.GetTriangleCollidable();
+            toReturn.Shape.sidedness = mesh.sidedness;
+            toReturn.Shape.collisionMargin = mobileMesh.Shape.MeshCollisionMargin;
+            return toReturn;
+        }
+
+        protected override void ConfigureCollidable(TriangleEntry entry)
+        {
+            var shape = entry.Collidable.Shape;
+            mesh.Mesh.Data.GetTriangle(entry.Index, out shape.vA, out shape.vB, out shape.vC);
+
         }
 
         ///<summary>
@@ -37,11 +54,11 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         ///<param name="entryB">Second entry in the pair.</param>
         public override void Initialize(BroadPhaseEntry entryA, BroadPhaseEntry entryB)
         {
-            staticMesh = entryA as StaticMesh;
-            if (staticMesh == null)
+            mesh = entryA as StaticMesh;
+            if (mesh == null)
             {
-                staticMesh = entryB as StaticMesh;
-                if (staticMesh == null)
+                mesh = entryB as StaticMesh;
+                if (mesh == null)
                 {
                     throw new Exception("Inappropriate types used to initialize pair.");
                 }
@@ -52,6 +69,8 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         }
 
 
+
+
         ///<summary>
         /// Cleans up the pair handler.
         ///</summary>
@@ -59,7 +78,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         {
 
             base.CleanUp();
-            staticMesh = null;
+            mesh = null;
 
 
         }
@@ -69,20 +88,18 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
 
         protected override void UpdateContainedPairs()
         {
+            //TODO: Static triangle meshes have a worldspace hierarchy that could be more efficiently traversed with a tree vs tree test.
+            //This is just a lot simpler to manage in the short term.
+
             var overlappedElements = Resources.GetIntList();
-            staticMesh.Mesh.Tree.GetOverlaps(mesh.boundingBox, overlappedElements);
-            for (int i = 0; i < overlappedElements.Count; i++)
+            mesh.Mesh.Tree.GetOverlaps(mobileMesh.boundingBox, overlappedElements);
+            for (int i = 0; i < overlappedElements.count; i++)
             {
-                TryToAdd(overlappedElements[i], staticMesh);
+                TryToAdd(overlappedElements.Elements[i]);
             }
 
             Resources.GiveBack(overlappedElements);
 
-        }
-
-        protected override void GetTriangleVertices(int i, out Vector3 vA, out Vector3 vB, out Vector3 vC)
-        {
-            staticMesh.Shape.TriangleMeshData.GetTriangle(i, out vA, out vB, out vC);
         }
 
 

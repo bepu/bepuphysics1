@@ -10,7 +10,7 @@ namespace BEPUphysics.DataStructures
     ///</summary>
     ///<typeparam name="TKey">Type of keys in the dictionary.</typeparam>
     ///<typeparam name="TValue">Type of values in the dictionary.</typeparam>
-    public class ReadOnlyDictionary<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
+    public struct ReadOnlyDictionary<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
     {
         private readonly IDictionary<TKey, TValue> dictionary;
 
@@ -82,7 +82,7 @@ namespace BEPUphysics.DataStructures
         /// <returns>Enumerator for the dictionary.</returns>
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return (dictionary as IEnumerable).GetEnumerator();
+            return dictionary.GetEnumerator();
         }
 
         #endregion

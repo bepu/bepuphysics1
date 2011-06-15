@@ -13,7 +13,7 @@ using BEPUphysics.CollisionTests;
 namespace BEPUphysics.NarrowPhaseSystems.Pairs
 {
     ///<summary>
-    /// Handles a compound and convex collision pair.
+    /// Handles a compound and group collision pair.
     ///</summary>
     public abstract class CompoundGroupPairHandler : GroupPairHandler
     {

@@ -27,7 +27,7 @@ namespace BEPUphysics.Collidables.MobileCollidables
         {
             get
             {
-                return base.Shape as MobileMeshShape;
+                return (MobileMeshShape)shape;
             }
         }
 

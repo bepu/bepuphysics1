@@ -123,7 +123,7 @@ namespace BEPUphysics.Collidables.Events
         {
             if (EventsAreInactive())
             {
-                (this as IDeferredEventCreator).IsActive = false;
+                ((IDeferredEventCreator)this).IsActive = false;
             }
         }
 
@@ -137,7 +137,7 @@ namespace BEPUphysics.Collidables.Events
 
         protected void AddToEventfuls()
         {
-            (this as IDeferredEventCreator).IsActive = true;
+            ((IDeferredEventCreator)this).IsActive = true;
         }
 
         

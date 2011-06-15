@@ -37,7 +37,7 @@ namespace BEPUphysics.Collidables.MobileCollidables
         {
             get
             {
-                return base.Shape as EntityShape;
+                return (EntityShape)shape;
             }
             protected set
             {

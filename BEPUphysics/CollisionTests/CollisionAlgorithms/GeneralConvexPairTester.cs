@@ -325,8 +325,8 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
         ///<param name="shapeB">Second shape in the pair.</param>
         public void Initialize(Collidable shapeA, Collidable shapeB)
         {
-            collidableA = shapeA as ConvexCollidable;
-            collidableB = shapeB as ConvexCollidable;
+            collidableA = (ConvexCollidable)shapeA;
+            collidableB = (ConvexCollidable)shapeB;
             cachedSimplex = new CachedSimplex { State = SimplexState.Point };// new CachedSimplex(informationA.Shape, informationB.Shape, ref informationA.worldTransform, ref informationB.worldTransform);
         }
 

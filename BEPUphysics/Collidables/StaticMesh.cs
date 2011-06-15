@@ -43,11 +43,11 @@ namespace BEPUphysics.Collidables
         {
             get
             {
-                return (mesh.Data as TransformableMeshData).worldTransform;
+                return ((TransformableMeshData)mesh.Data).worldTransform;
             }
             set
             {
-                (mesh.Data as TransformableMeshData).WorldTransform = value;
+                ((TransformableMeshData)mesh.Data).WorldTransform = value;
                 mesh.Tree.Refit();
                 UpdateBoundingBox();
             }
@@ -95,7 +95,7 @@ namespace BEPUphysics.Collidables
         {
             get
             {
-                return base.Shape as StaticMeshShape;
+                return (StaticMeshShape)shape;
             }
         }
 

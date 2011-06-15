@@ -220,6 +220,17 @@ namespace BEPUphysics.DataStructures
             return Array.IndexOf(Elements, item, 0, count);
         }
 
+        /// <summary>
+        /// Copies the elements from the list into an array.
+        /// </summary>
+        /// <returns>An array containing the elements in the list.</returns>
+        public T[] ToArray()
+        {
+            var toReturn = new T[count];
+            Array.Copy(Elements, toReturn, count);
+            return toReturn;
+        }
+
 
         #region IList<T> Members
 
@@ -337,6 +348,7 @@ namespace BEPUphysics.DataStructures
         #endregion
 
 
+
         ///<summary>
         /// Sorts the list.
         ///</summary>
@@ -387,5 +399,7 @@ namespace BEPUphysics.DataStructures
                 index = -1;
             }
         }
+
+
     }
 }

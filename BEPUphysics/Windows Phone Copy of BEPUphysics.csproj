@@ -160,8 +160,11 @@
     <Compile Include="NarrowPhaseSystems\Pairs\GroupPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\InstancedMeshPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\InstancedMeshSpherePairHandler.cs" />
+    <Compile Include="NarrowPhaseSystems\Pairs\MeshGroupPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\MobileMeshConvexPairHandler.cs" />
-    <Compile Include="NarrowPhaseSystems\Pairs\MobileMeshMeshPairHandler.cs" />
+    <Compile Include="NarrowPhaseSystems\Pairs\MobileMeshMeshPairHandler.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="NarrowPhaseSystems\Pairs\MobileMeshPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\MobileMeshSpherePairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\MobileMeshStaticMeshPairHandler.cs" />

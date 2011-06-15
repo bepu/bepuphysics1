@@ -25,11 +25,12 @@ namespace BEPUphysics.ResourceManagement
             SubPoolRayCastResultList = new LockingResourcePool<RawList<RayCastResult>>();
             SubPoolCollisionEntryList = new LockingResourcePool<RawList<BroadPhaseEntry>>();
             SubPoolCompoundChildList = new LockingResourcePool<RawList<CompoundChild>>();
-            SubPoolIntList = new LockingResourcePool<List<int>>();
-            SubPoolFloatList = new LockingResourcePool<List<float>>();
-            SubPoolVectorList = new LockingResourcePool<List<Vector3>>();
+            SubPoolIntList = new LockingResourcePool<RawList<int>>();
+            SubPoolFloatList = new LockingResourcePool<RawList<float>>();
+            SubPoolVectorList = new LockingResourcePool<RawList<Vector3>>();
             SubPoolEntityRawList = new LockingResourcePool<RawList<Entity>>(16);
             SubPoolTriangleShape = new LockingResourcePool<TriangleShape>();
+            SubPoolTriangleCollidables = new LockingResourcePool<TriangleCollidable>();
             SubPoolTriangleIndicesList = new LockingResourcePool<RawList<BEPUphysics.CollisionTests.Manifolds.TriangleMeshConvexContactManifold.TriangleIndices>>();
         }
 
@@ -138,12 +139,13 @@ namespace BEPUphysics.ResourceManagement
         static ResourcePool<RawList<RayHit>> SubPoolRayHitList;// = new LockingResourcePool<RawList<RayHit>>();
         static ResourcePool<RawList<RayCastResult>> SubPoolRayCastResultList;// = new LockingResourcePool<RawList<RayCastResult>>();
         static ResourcePool<RawList<BroadPhaseEntry>> SubPoolCollisionEntryList;// = new LockingResourcePool<RawList<BroadPhaseEntry>>();
-        static ResourcePool<List<int>> SubPoolIntList;// = new LockingResourcePool<List<int>>();
-        static ResourcePool<List<float>> SubPoolFloatList;// = new LockingResourcePool<List<float>>();
-        static ResourcePool<List<Vector3>> SubPoolVectorList;// = new LockingResourcePool<List<Vector3>>();;
+        static ResourcePool<RawList<int>> SubPoolIntList;// = new LockingResourcePool<List<int>>();
+        static ResourcePool<RawList<float>> SubPoolFloatList;// = new LockingResourcePool<List<float>>();
+        static ResourcePool<RawList<Vector3>> SubPoolVectorList;// = new LockingResourcePool<List<Vector3>>();;
         static ResourcePool<RawList<Entity>> SubPoolEntityRawList;//= new LockingResourcePool<RawList<Entity>>(16);
         static ResourcePool<TriangleShape> SubPoolTriangleShape;// = new LockingResourcePool<TriangleShape>();
         static ResourcePool<RawList<CompoundChild>> SubPoolCompoundChildList;//= new LockingResourcePool<RawList<CompoundChild>>();
+        static ResourcePool<TriangleCollidable> SubPoolTriangleCollidables;
         static ResourcePool<RawList<BEPUphysics.CollisionTests.Manifolds.TriangleMeshConvexContactManifold.TriangleIndices>> SubPoolTriangleIndicesList;
         //#endif
         /// <summary>
@@ -226,7 +228,7 @@ namespace BEPUphysics.ResourceManagement
         /// Retrieves a int list from the resource pool.
         /// </summary>
         /// <returns>Empty int list.</returns>
-        public static List<int> GetIntList()
+        public static RawList<int> GetIntList()
         {
             return SubPoolIntList.Take();
         }
@@ -235,7 +237,7 @@ namespace BEPUphysics.ResourceManagement
         /// Returns a resource to the pool.
         /// </summary>
         /// <param name="list">List to return.</param>
-        public static void GiveBack(List<int> list)
+        public static void GiveBack(RawList<int> list)
         {
             list.Clear();
             SubPoolIntList.GiveBack(list);
@@ -245,7 +247,7 @@ namespace BEPUphysics.ResourceManagement
         /// Retrieves a float list from the resource pool.
         /// </summary>
         /// <returns>Empty float list.</returns>
-        public static List<float> GetFloatList()
+        public static RawList<float> GetFloatList()
         {
             return SubPoolFloatList.Take();
         }
@@ -254,7 +256,7 @@ namespace BEPUphysics.ResourceManagement
         /// Returns a resource to the pool.
         /// </summary>
         /// <param name="list">List to return.</param>
-        public static void GiveBack(List<float> list)
+        public static void GiveBack(RawList<float> list)
         {
             list.Clear();
             SubPoolFloatList.GiveBack(list);
@@ -264,7 +266,7 @@ namespace BEPUphysics.ResourceManagement
         /// Retrieves a Vector3 list from the resource pool.
         /// </summary>
         /// <returns>Empty Vector3 list.</returns>
-        public static List<Vector3> GetVectorList()
+        public static RawList<Vector3> GetVectorList()
         {
             return SubPoolVectorList.Take();
         }
@@ -273,12 +275,12 @@ namespace BEPUphysics.ResourceManagement
         /// Returns a resource to the pool.
         /// </summary>
         /// <param name="list">List to return.</param>
-        public static void GiveBack(List<Vector3> list)
+        public static void GiveBack(RawList<Vector3> list)
         {
             list.Clear();
             SubPoolVectorList.GiveBack(list);
         }
-        
+
         /// <summary>
         /// Retrieves an Entity RawList from the resource pool.
         /// </summary>
@@ -329,7 +331,47 @@ namespace BEPUphysics.ResourceManagement
         /// <param name="triangle">Triangle to return.</param>
         public static void GiveBack(TriangleShape triangle)
         {
+            triangle.collisionMargin = 0;
+            triangle.sidedness = TriangleSidedness.DoubleSided;
             SubPoolTriangleShape.GiveBack(triangle);
+        }
+
+
+        /// <summary>
+        /// Retrieves a TriangleCollidable from the resource pool.
+        /// </summary>
+        /// <param name="a">First vertex in the triangle.</param>
+        /// <param name="b">Second vertex in the triangle.</param>
+        /// <param name="c">Third vertex in the triangle.</param>
+        /// <returns>Initialized TriangleCollidable.</returns>
+        public static TriangleCollidable GetTriangleCollidable(ref Vector3 a, ref Vector3 b, ref Vector3 c)
+        {
+            var tri = SubPoolTriangleCollidables.Take();
+            var shape = tri.Shape;
+            shape.vA = a;
+            shape.vB = b;
+            shape.vC = c;
+            return tri;
+
+        }
+
+        /// <summary>
+        /// Retrieves a TriangleCollidable from the resource pool.
+        /// </summary>
+        /// <returns>Initialized TriangleCollidable.</returns>
+        public static TriangleCollidable GetTriangleCollidable()
+        {
+            return SubPoolTriangleCollidables.Take();
+        }
+
+        /// <summary>
+        /// Returns a resource to the pool.
+        /// </summary>
+        /// <param name="triangle">Triangle collidable to return.</param>
+        public static void GiveBack(TriangleCollidable triangle)
+        {
+            triangle.CleanUp();
+            SubPoolTriangleCollidables.GiveBack(triangle);
         }
 
         /// <summary>

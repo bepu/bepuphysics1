@@ -3,6 +3,7 @@ using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.MathExtensions;
 using Microsoft.Xna.Framework;
 using BEPUphysics.ResourceManagement;
+using BEPUphysics.DataStructures;
 
 namespace BEPUphysics.CollisionTests.CollisionAlgorithms.GJK
 {
@@ -31,14 +32,14 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms.GJK
 
             closestA = Toolbox.ZeroVector;
             closestB = Toolbox.ZeroVector;
-            List<Vector3> tempQ = Resources.GetVectorList();
-            List<Vector3> tempA = Resources.GetVectorList();
-            List<Vector3> tempB = Resources.GetVectorList();
-            List<Vector3> q = Resources.GetVectorList();
-            List<Vector3> a = Resources.GetVectorList();
-            List<Vector3> b = Resources.GetVectorList();
-            List<int> subsimplex = Resources.GetIntList();
-            List<float> baryCoords = Resources.GetFloatList();
+            var tempQ = Resources.GetVectorList();
+            var tempA = Resources.GetVectorList();
+            var tempB = Resources.GetVectorList();
+            var q = Resources.GetVectorList();
+            var a = Resources.GetVectorList();
+            var b = Resources.GetVectorList();
+            var subsimplex = Resources.GetIntList();
+            var baryCoords = Resources.GetFloatList();
 
             Vector3 p = Toolbox.ZeroVector, v;
             Vector3 pv;
@@ -147,7 +148,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms.GJK
         /// <param name="q">Set of points to apply coordinates to.</param>
         /// <param name="baryCoords">Barycentric coordinates to apply to the set.</param>
         /// <param name="barycenter">Barycenter of the set defined by the coordinates.</param>
-        internal static void GetBarycenter(List<Vector3> q, List<float> baryCoords, out Vector3 barycenter)
+        internal static void GetBarycenter(RawList<Vector3> q, RawList<float> baryCoords, out Vector3 barycenter)
         {
             barycenter = Toolbox.ZeroVector;
             for (int k = 0; k < q.Count; k++)
@@ -168,7 +169,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms.GJK
         /// <param name="subsimplex">The source of the voronoi region which contains the point, referencing the input list indices.</param>
         /// <param name="baryCoords">Barycentric coordinates of the point on the subsimplex closest to the origin.</param>
         /// <param name="closestPoint">Closest point on the hull of the set to the origin.</param>
-        public static void FindPointOfMinimumNorm(List<Vector3> q, List<int> subsimplex, List<float> baryCoords, out Vector3 closestPoint)
+        public static void FindPointOfMinimumNorm(RawList<Vector3> q, RawList<int> subsimplex, RawList<float> baryCoords, out Vector3 closestPoint)
         {
             subsimplex.Clear();
             baryCoords.Clear();
@@ -221,7 +222,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms.GJK
         /// <param name="subsimplex">The source of the voronoi region which contains the point, enumerated as a = 0, b = 1.</param>
         /// <param name="baryCoords">Barycentric coordinates of the point.</param>
         /// <param name="closestPoint">Closest point on the edge to p.</param>
-        public static void GetClosestPointOnSegmentToPoint(List<Vector3> q, int i, int j, ref Vector3 p, List<int> subsimplex, List<float> baryCoords, out Vector3 closestPoint)
+        public static void GetClosestPointOnSegmentToPoint(RawList<Vector3> q, int i, int j, ref Vector3 p, RawList<int> subsimplex, RawList<float> baryCoords, out Vector3 closestPoint)
         {
             Vector3 a = q[i];
             Vector3 b = q[j];
@@ -273,7 +274,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms.GJK
         /// <param name="subsimplex">The source of the voronoi region which contains the point, enumerated as a = 0, b = 1, c = 2.</param>
         /// <param name="baryCoords">Barycentric coordinates of the point on the triangle.</param>
         /// <param name="closestPoint">Closest point on tetrahedron to point.</param>
-        public static void GetClosestPointOnTriangleToPoint(List<Vector3> q, int i, int j, int k, ref Vector3 p, List<int> subsimplex, List<float> baryCoords, out Vector3 closestPoint)
+        public static void GetClosestPointOnTriangleToPoint(RawList<Vector3> q, int i, int j, int k, ref Vector3 p, RawList<int> subsimplex, RawList<float> baryCoords, out Vector3 closestPoint)
         {
             subsimplex.Clear();
             baryCoords.Clear();
@@ -395,10 +396,10 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms.GJK
         /// <param name="subsimplex">The source of the voronoi region which contains the point, enumerated as a = 0, b = 1, c = 2, d = 3.</param>
         /// <param name="baryCoords">Barycentric coordinates of p on the tetrahedron.</param>
         /// <param name="closestPoint">Closest point on the tetrahedron to the point.</param>
-        public static void GetClosestPointOnTetrahedronToPoint(List<Vector3> tetrahedron, ref Vector3 p, List<int> subsimplex, List<float> baryCoords, out Vector3 closestPoint)
+        public static void GetClosestPointOnTetrahedronToPoint(RawList<Vector3> tetrahedron, ref Vector3 p, RawList<int> subsimplex, RawList<float> baryCoords, out Vector3 closestPoint)
         {
-            List<int> subsimplexCandidate = Resources.GetIntList();
-            List<float> baryCoordsCandidate = Resources.GetFloatList();
+            var subsimplexCandidate = Resources.GetIntList();
+            var baryCoordsCandidate = Resources.GetFloatList();
             Vector3 a = tetrahedron[0];
             Vector3 b = tetrahedron[1];
             Vector3 c = tetrahedron[2];
@@ -591,10 +592,10 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms.GJK
             hitLocation = origin;
             hitNormal = Toolbox.ZeroVector;
             Vector3 v = hitLocation;
-            List<Vector3> simplex = Resources.GetVectorList();
-            List<int> subsimplex = Resources.GetIntList();
-            List<float> baryCoords = Resources.GetFloatList(); //Keep em handy, maybe some day I'll have a use for them.
-            List<Vector3> temp = Resources.GetVectorList();
+            var simplex = Resources.GetVectorList();
+            var subsimplex = Resources.GetIntList();
+            var baryCoords = Resources.GetFloatList(); //Keep em handy, maybe some day I'll have a use for them.
+            var temp = Resources.GetVectorList();
             float vw, vdir;
             float max = -float.MaxValue;
             int count = 0;
@@ -692,14 +693,14 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms.GJK
             Vector3.Subtract(ref sweepB, ref sweepA, out direction);
             Vector3 v;
             Vector3.Subtract(ref transformA.Position, ref transformB.Position, out v);
-            List<Vector3> simplex = Resources.GetVectorList();
-            List<Vector3> simplexA = Resources.GetVectorList();
-            List<Vector3> simplexB = Resources.GetVectorList();
-            List<int> subsimplex = Resources.GetIntList();
-            List<float> baryCoords = Resources.GetFloatList();
-            List<Vector3> temp = Resources.GetVectorList();
-            List<Vector3> tempA = Resources.GetVectorList();
-            List<Vector3> tempB = Resources.GetVectorList();
+            var simplex = Resources.GetVectorList();
+            var simplexA = Resources.GetVectorList();
+            var simplexB = Resources.GetVectorList();
+            var subsimplex = Resources.GetIntList();
+            var baryCoords = Resources.GetFloatList();
+            var temp = Resources.GetVectorList();
+            var tempA = Resources.GetVectorList();
+            var tempB = Resources.GetVectorList();
             float vw, vdir;
             int count = 0;
             float max = -float.MaxValue;

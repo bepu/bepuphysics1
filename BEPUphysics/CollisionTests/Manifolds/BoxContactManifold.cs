@@ -192,8 +192,8 @@ namespace BEPUphysics.CollisionTests.Manifolds
         ///<exception cref="Exception">Thrown when the collidables being used are not of the proper type.</exception>
         public override void Initialize(Collidable newCollidableA, Collidable newCollidableB)
         {
-            boxA = newCollidableA as ConvexCollidable<BoxShape>;
-            boxB = newCollidableB as ConvexCollidable<BoxShape>;
+            boxA = (ConvexCollidable<BoxShape>)newCollidableA;
+            boxB = (ConvexCollidable<BoxShape>)newCollidableB;
 
 
             if (boxA == null || boxB == null)

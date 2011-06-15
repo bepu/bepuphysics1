@@ -2,6 +2,7 @@
 using BEPUphysics.MathExtensions;
 using Microsoft.Xna.Framework;
 using BEPUphysics.ResourceManagement;
+using BEPUphysics.DataStructures;
 
 namespace BEPUphysics.CollisionShapes.ConvexShapes
 {
@@ -54,7 +55,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         ///</summary>
         ///<param name="pointContributions">Point list to average.</param>
         ///<returns>Averaged point.</returns>
-        public static Vector3 AveragePoints(List<Vector3> pointContributions)
+        public static Vector3 AveragePoints(RawList<Vector3> pointContributions)
         {
             Vector3 center = new Vector3();
             for (int i = 0; i < pointContributions.Count; i++)
@@ -103,7 +104,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         ///<param name="pointContributions">Point contributions to the volume distribution.</param>
         ///<param name="center">Location to use as the center for purposes of computing point contributions.</param>
         ///<returns>Volume distribution of the point contributions.</returns>
-        public static Matrix3X3 ComputeVolumeDistribution(List<Vector3> pointContributions, ref Vector3 center)
+        public static Matrix3X3 ComputeVolumeDistribution(RawList<Vector3> pointContributions, ref Vector3 center)
         {
             Matrix3X3 volumeDistribution = new Matrix3X3();
             float pointWeight = 1f / pointContributions.Count;
@@ -124,7 +125,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         ///<param name="shape">Shape to compute the point contributions of.</param>
         ///<param name="volume">Volume of the shape.</param>
         ///<param name="outputPointContributions">Point contributions of the shape.</param>
-        public static void GetPoints(ConvexShape shape, out float volume, List<Vector3> outputPointContributions)
+        public static void GetPoints(ConvexShape shape, out float volume, RawList<Vector3> outputPointContributions)
         {
             RigidTransform transform = RigidTransform.Identity;
             BoundingBox boundingBox;
@@ -214,7 +215,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
 
 
 
-        private static void ScanObject(float rayIncrement, float maxLength, ref Vector3 increment1, ref Vector3 increment2, ref Ray ray, ref RayHit startHit, ref RayHit endHit, List<Vector3> pointContributions, out float volume)
+        private static void ScanObject(float rayIncrement, float maxLength, ref Vector3 increment1, ref Vector3 increment2, ref Ray ray, ref RayHit startHit, ref RayHit endHit, RawList<Vector3> pointContributions, out float volume)
         {
             Vector3 cell;
             Vector3.Multiply(ref ray.Direction, rayIncrement, out cell);

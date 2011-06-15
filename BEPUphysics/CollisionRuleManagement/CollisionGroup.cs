@@ -29,8 +29,7 @@ namespace BEPUphysics.CollisionRuleManagement
         /// <param name="groupA">First CollisionGroup of the pair.</param>
         /// <param name="groupB">Second CollisionGroup of the pair.</param>
         /// <param name="rule">CollisionRule to use between the pair.</param>
-        /// <param name="space">Space to add the rule to.</param>
-        public static void DefineCollisionRule(CollisionGroup groupA, CollisionGroup groupB, CollisionRule rule, Space space)
+        public static void DefineCollisionRule(CollisionGroup groupA, CollisionGroup groupB, CollisionRule rule)
         {
             var pair = new CollisionGroupPair(groupA, groupB);
             if (CollisionRules.CollisionGroupRules.ContainsKey(pair))
@@ -46,11 +45,11 @@ namespace BEPUphysics.CollisionRuleManagement
         /// <param name="bGroups">Second set of groups.</param>
         /// <param name="rule">Collision rule to define between the sets.</param>
         /// <param name="space">Space to add the rules to.</param>
-        public static void DefineCollisionRulesBetweenSets(List<CollisionGroup> aGroups, List<CollisionGroup> bGroups, CollisionRule rule, Space space)
+        public static void DefineCollisionRulesBetweenSets(List<CollisionGroup> aGroups, List<CollisionGroup> bGroups, CollisionRule rule)
         {
             foreach (CollisionGroup group in aGroups)
             {
-                DefineCollisionRulesWithSet(group, bGroups, rule, space);
+                DefineCollisionRulesWithSet(group, bGroups, rule);
             }
         }
 
@@ -60,18 +59,17 @@ namespace BEPUphysics.CollisionRuleManagement
         /// <param name="groups">Set of CollisionGroups.</param>
         /// <param name="self">CollisionRule between each group and itself.</param>
         /// <param name="other">CollisionRule between each group and every other group in the set.</param>
-        /// <param name="space">Space to add the rules to.</param>
-        public static void DefineCollisionRulesInSet(List<CollisionGroup> groups, CollisionRule self, CollisionRule other, Space space)
+        public static void DefineCollisionRulesInSet(List<CollisionGroup> groups, CollisionRule self, CollisionRule other)
         {
             for (int i = 0; i < groups.Count; i++)
             {
-                DefineCollisionRule(groups[i], groups[i], self, space);
+                DefineCollisionRule(groups[i], groups[i], self);
             }
             for (int i = 0; i < groups.Count - 1; i++)
             {
                 for (int j = i + 1; j < groups.Count; j++)
                 {
-                    DefineCollisionRule(groups[i], groups[j], other, space);
+                    DefineCollisionRule(groups[i], groups[j], other);
                 }
             }
         }
@@ -82,12 +80,11 @@ namespace BEPUphysics.CollisionRuleManagement
         /// <param name="group">First CollisionGroup of the pair.</param>
         /// <param name="groups">Set of CollisionGroups; each group will have its CollisionRule with the first group defined.</param>
         /// <param name="rule">CollisionRule to use between the pairs.</param>
-        /// <param name="space">Space to add the rules to.</param>
-        public static void DefineCollisionRulesWithSet(CollisionGroup group, List<CollisionGroup> groups, CollisionRule rule, Space space)
+        public static void DefineCollisionRulesWithSet(CollisionGroup group, List<CollisionGroup> groups, CollisionRule rule)
         {
             foreach (CollisionGroup g in groups)
             {
-                DefineCollisionRule(group, g, rule, space);
+                DefineCollisionRule(group, g, rule);
             }
         }
 
@@ -96,8 +93,7 @@ namespace BEPUphysics.CollisionRuleManagement
         /// </summary>
         /// <param name="groupA">First CollisionGroup of the pair.</param>
         /// <param name="groupB">SecondCollisionGroup of the pair.</param>
-        /// <param name="space">Space to remove the rule from.</param>
-        public static void RemoveCollisionRule(CollisionGroup groupA, CollisionGroup groupB, Space space)
+        public static void RemoveCollisionRule(CollisionGroup groupA, CollisionGroup groupB)
         {
             Dictionary<CollisionGroupPair, CollisionRule> dictionary = CollisionRules.CollisionGroupRules;
             var pair = new CollisionGroupPair(groupA, groupB);
@@ -110,12 +106,11 @@ namespace BEPUphysics.CollisionRuleManagement
         /// </summary>
         /// <param name="aGroups">First set of groups.</param>
         /// <param name="bGroups">Second set of groups.</param>
-        /// <param name="space">Space to remove the rules from.</param>
-        public static void RemoveCollisionRulesBetweenSets(List<CollisionGroup> aGroups, List<CollisionGroup> bGroups, Space space)
+        public static void RemoveCollisionRulesBetweenSets(List<CollisionGroup> aGroups, List<CollisionGroup> bGroups)
         {
             foreach (CollisionGroup group in aGroups)
             {
-                RemoveCollisionRulesWithSet(group, bGroups, space);
+                RemoveCollisionRulesWithSet(group, bGroups);
             }
         }
 
@@ -123,18 +118,17 @@ namespace BEPUphysics.CollisionRuleManagement
         /// Removes any rule between every group in a set with itself and the others in the set for a given space.
         /// </summary>
         /// <param name="groups">Set of CollisionGroups.</param>
-        /// <param name="space">Space to remove the rules from.</param>
-        public static void RemoveCollisionRulesInSet(List<CollisionGroup> groups, Space space)
+        public static void RemoveCollisionRulesInSet(List<CollisionGroup> groups)
         {
             for (int i = 0; i < groups.Count; i++)
             {
-                RemoveCollisionRule(groups[i], groups[i], space);
+                RemoveCollisionRule(groups[i], groups[i]);
             }
             for (int i = 0; i < groups.Count - 1; i++)
             {
                 for (int j = i + 1; j < groups.Count; j++)
                 {
-                    RemoveCollisionRule(groups[i], groups[j], space);
+                    RemoveCollisionRule(groups[i], groups[j]);
                 }
             }
         }
@@ -144,12 +138,11 @@ namespace BEPUphysics.CollisionRuleManagement
         /// </summary>
         /// <param name="group">First CollisionGroup of the pair.</param>
         /// <param name="groups">Set of CollisionGroups; each group will have its CollisionRule with the first group removed.</param>
-        /// <param name="space">Space to remove the rules from.</param>
-        public static void RemoveCollisionRulesWithSet(CollisionGroup group, List<CollisionGroup> groups, Space space)
+        public static void RemoveCollisionRulesWithSet(CollisionGroup group, List<CollisionGroup> groups)
         {
             foreach (CollisionGroup g in groups)
             {
-                RemoveCollisionRule(group, g, space);
+                RemoveCollisionRule(group, g);
             }
         }
 

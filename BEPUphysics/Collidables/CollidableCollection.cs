@@ -134,7 +134,7 @@ namespace BEPUphysics.Collidables
             get
             {
                 //It's guaranteed to be a CollisionInformation, because it's a member of a CollidablePairHandler.
-                return (owner.pairs[index].broadPhaseOverlap.entryA == owner ? owner.pairs[index].broadPhaseOverlap.entryB : owner.pairs[index].broadPhaseOverlap.entryA) as Collidable;
+                return (Collidable)(owner.pairs[index].broadPhaseOverlap.entryA == owner ? owner.pairs[index].broadPhaseOverlap.entryB : owner.pairs[index].broadPhaseOverlap.entryA);
             }
             set
             {

@@ -171,7 +171,7 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
 
         internal void ForceRevalidation()
         {
-            (root as InternalNode).Revalidate();
+            ((InternalNode)root).Revalidate();
         }
         #endregion
     }

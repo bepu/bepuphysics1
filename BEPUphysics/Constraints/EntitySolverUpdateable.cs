@@ -182,7 +182,7 @@ namespace BEPUphysics.Constraints
 
                 //Since we're about to change this updateable's connections, make sure the 
                 //simulation islands hear about it.  This is NOT thread safe.
-                var activityManager = (this as ISimulationIslandConnection).DeactivationManager;
+                var activityManager = ((ISimulationIslandConnection)this).DeactivationManager;
                 if (activityManager != null) //solver != null && SolverGroup == null)
                     activityManager.Remove(this);
                 //Note that the above means that anything in the Solver must belong to an DeactivationManager in order to maintain

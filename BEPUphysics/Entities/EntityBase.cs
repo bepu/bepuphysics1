@@ -405,7 +405,7 @@ namespace BEPUphysics.Entities
 
 
 
-        private EntityCollidable collisionInformation;
+        protected EntityCollidable collisionInformation;
         ///<summary>
         /// Gets the collidable used by the entity.
         ///</summary>
@@ -853,7 +853,7 @@ namespace BEPUphysics.Entities
         {
             get
             {
-                return (this as ISimulationIslandMember).SimulationIsland;
+                return ((ISimulationIslandMember)this).SimulationIsland;
             }
         }
         SimulationIslandSearchState ISimulationIslandMember.SearchState { get; set; }
@@ -983,11 +983,11 @@ namespace BEPUphysics.Entities
             //Notify simulation island of the change.
             if (previousState)
             {
-                if ((this as ISimulationIslandMember).DeactivationManager != null)
-                    (this as ISimulationIslandMember).DeactivationManager.RemoveSimulationIslandFromMember(this);
+                if (((ISimulationIslandMember)this).DeactivationManager != null)
+                    ((ISimulationIslandMember)this).DeactivationManager.RemoveSimulationIslandFromMember(this);
 
-                if ((this as IForceUpdateable).ForceUpdater != null)
-                    (this as IForceUpdateable).ForceUpdater.ForceUpdateableBecomingKinematic(this);
+                if (((IForceUpdateable)this).ForceUpdater != null)
+                    ((IForceUpdateable)this).ForceUpdater.ForceUpdateableBecomingKinematic(this);
             }
             //Change the collision group if it was using the default.
             if (collisionInformation.CollisionRules.Group == CollisionRules.DefaultDynamicCollisionGroup ||
@@ -1030,11 +1030,11 @@ namespace BEPUphysics.Entities
             //Notify simulation island system of the change.
             if (!previousState)
             {
-                if ((this as ISimulationIslandMember).DeactivationManager != null)
-                    (this as ISimulationIslandMember).DeactivationManager.AddSimulationIslandToMember(this);
+                if (((ISimulationIslandMember)this).DeactivationManager != null)
+                    ((ISimulationIslandMember)this).DeactivationManager.AddSimulationIslandToMember(this);
 
-                if ((this as IForceUpdateable).ForceUpdater != null)
-                    (this as IForceUpdateable).ForceUpdater.ForceUpdateableBecomingDynamic(this);
+                if (((IForceUpdateable)this).ForceUpdater != null)
+                    ((IForceUpdateable)this).ForceUpdater.ForceUpdateableBecomingDynamic(this);
             }
             //Change the group if it was using the defaults.
             if (collisionInformation.CollisionRules.Group == CollisionRules.DefaultKinematicCollisionGroup ||
@@ -1200,10 +1200,10 @@ namespace BEPUphysics.Entities
                 positionUpdateMode = value;
                 //Notify our owner of the change, if needed.
                 if (positionUpdateMode != previous &&
-                    (this as IPositionUpdateable).PositionUpdater != null &&
-                    ((this as IPositionUpdateable).PositionUpdater as ContinuousPositionUpdater) != null)
+                    ((IPositionUpdateable)this).PositionUpdater != null &&
+                    (((IPositionUpdateable)this).PositionUpdater as ContinuousPositionUpdater) != null)
                 {
-                    ((this as IPositionUpdateable).PositionUpdater as ContinuousPositionUpdater).UpdateableModeChanged(this, previous);
+                    (((IPositionUpdateable)this).PositionUpdater as ContinuousPositionUpdater).UpdateableModeChanged(this, previous);
                 }
 
             }

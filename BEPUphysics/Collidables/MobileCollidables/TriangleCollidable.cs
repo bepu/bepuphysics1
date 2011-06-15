@@ -1,4 +1,5 @@
 ﻿using BEPUphysics.CollisionShapes.ConvexShapes;
+using Microsoft.Xna.Framework;
 
 namespace BEPUphysics.Collidables.MobileCollidables
 {
@@ -11,7 +12,7 @@ namespace BEPUphysics.Collidables.MobileCollidables
         /// Constructs a new shapeless collidable.
         ///</summary>
         public TriangleCollidable()
-            : base(null)
+            : base(new TriangleShape())
         {
         }
 
@@ -28,10 +29,15 @@ namespace BEPUphysics.Collidables.MobileCollidables
         /// Initializes the collidable using the new triangle shape, but does NOT
         /// fire any shape-changed events.
         ///</summary>
-        ///<param name="triangleShape">New triangle shape to use.</param>
-        public void Initialize(TriangleShape triangleShape)
+        ///<param name="a">First vertex in the triangle.</param>
+        public void Initialize(ref Vector3 a, ref Vector3 b, ref Vector3 c)
         {
-            shape = triangleShape;
+            var shape = Shape;
+            shape.collisionMargin = 0;
+            shape.sidedness = TriangleSidedness.DoubleSided;
+            shape.vA = a;
+            shape.vB = b;
+            shape.vC = c;
         }
 
         ///<summary>
@@ -40,7 +46,6 @@ namespace BEPUphysics.Collidables.MobileCollidables
         public void CleanUp()
         {
             events.RemoveAllEvents();
-            shape = null;
         }
     }
 }

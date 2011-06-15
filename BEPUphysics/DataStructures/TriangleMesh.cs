@@ -334,8 +334,8 @@ namespace BEPUphysics.DataStructures
         /// <param name="indices">Compiled set of indices from the model.</param>
         public static void GetVerticesAndIndicesFromModel(Model collisionModel, out Vector3[] vertices, out int[] indices)
         {
-            List<Vector3> verticesList = Resources.GetVectorList();
-            List<int> indicesList = Resources.GetIntList();
+            var verticesList = new List<Vector3>();
+            var indicesList = new List<int>();
             var transforms = new Matrix[collisionModel.Bones.Count];
             collisionModel.CopyAbsoluteBoneTransformsTo(transforms);
 
@@ -352,8 +352,6 @@ namespace BEPUphysics.DataStructures
             vertices = verticesList.ToArray();
             indices = indicesList.ToArray();
 
-            Resources.GiveBack(verticesList);
-            Resources.GiveBack(indicesList);
 
         }
 
@@ -364,7 +362,7 @@ namespace BEPUphysics.DataStructures
         /// <param name="transform">Transform to apply to the mesh.</param>
         /// <param name="vertices">List to receive vertices from the mesh.</param>
         /// <param name="indices">List to receive indices from the mesh.</param>
-        public static void AddMesh(ModelMesh collisionModelMesh, Matrix transform, List<Vector3> vertices, List<int> indices)
+        public static void AddMesh(ModelMesh collisionModelMesh, Matrix transform, List<Vector3> vertices, IList<int> indices)
         {
             foreach (ModelMeshPart meshPart in collisionModelMesh.MeshParts)
             {

@@ -48,8 +48,6 @@ namespace BEPUphysics.UpdateableSystems
         private RawList<BroadPhaseEntry> entries = new RawList<BroadPhaseEntry>();
         private readonly Dictionary<Entity, ContainmentState> nearbyEntities = new Dictionary<Entity, ContainmentState>();
 
-        private readonly ReadOnlyDictionary<Entity, ContainmentState> readOnlyNearbyEntities;
-
         private CollisionRules collisionRules;
         ///<summary>
         /// Gets or sets the collision rules of the detector volume.
@@ -84,7 +82,6 @@ namespace BEPUphysics.UpdateableSystems
         public DetectorVolume(MeshBoundingBoxTreeData triangleMesh, IQueryAccelerator queryAccelerator)
         {
             TriangleMesh = new TriangleMesh(triangleMesh);
-            readOnlyNearbyEntities = new ReadOnlyDictionary<Entity, ContainmentState>(nearbyEntities);
             QueryAccelerator = queryAccelerator;
         }
 
@@ -93,7 +90,7 @@ namespace BEPUphysics.UpdateableSystems
         /// </summary>
         public ReadOnlyDictionary<Entity, ContainmentState> NearbyEntities
         {
-            get { return readOnlyNearbyEntities; }
+            get { return new ReadOnlyDictionary<Entity, ContainmentState>(nearbyEntities); }
         }
 
         TriangleMesh triangleMesh;
@@ -274,7 +271,7 @@ namespace BEPUphysics.UpdateableSystems
         ///<returns>Whether or not the entity is intersecting the shell.</returns>
         public bool IsEntityIntersectingShell(Entity entity)
         {
-            List<int> triangleIndices = Resources.GetIntList();
+            var triangleIndices = Resources.GetIntList();
 
             bool toReturn = IsEntityIntersectingShell(entity, triangleIndices);
 
@@ -282,7 +279,6 @@ namespace BEPUphysics.UpdateableSystems
             return toReturn;
         }
 
-        LockingResourcePool<TriangleCollidable> triangleInformationPools = new LockingResourcePool<TriangleCollidable>();
         ///<summary>
         /// Determines whether or not an entity is intersecting the triangle shell of a detector volume.
         ///</summary>
@@ -297,23 +293,17 @@ namespace BEPUphysics.UpdateableSystems
             {
                 Vector3 v1, v2, v3;
                 triangleMesh.Data.GetTriangle(i, out v1, out v2, out v3);
-                TriangleShape triangle = Resources.GetTriangle(ref v1, ref v2, ref v3);
-                var collisionInfo = triangleInformationPools.Take();
-                collisionInfo.Initialize(triangle);
+                var triangle = Resources.GetTriangleCollidable(ref v1, ref v2, ref v3);
                 //TODO: Test a TRIANGLE against ANYTHING ELSE.
                 //Requires BOOLEAN tests initially for:
                 //Triangle-Convex
                 //Triangle-CompoundShape
-                var pair = new CollidablePair(entity.CollisionInformation, collisionInfo);
+                var pair = new CollidablePair(entity.CollisionInformation, triangle);
                 if (NarrowPhaseHelper.Intersecting(ref pair))
                 {
-                    collisionInfo.CleanUp();
-                    triangleInformationPools.GiveBack(collisionInfo);
                     Resources.GiveBack(triangle);
                     return true;
                 }
-                collisionInfo.CleanUp();
-                triangleInformationPools.GiveBack(collisionInfo);
                 Resources.GiveBack(triangle);
             }
 

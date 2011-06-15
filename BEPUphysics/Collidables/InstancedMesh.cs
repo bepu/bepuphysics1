@@ -84,7 +84,7 @@ namespace BEPUphysics.Collidables
         {
             get
             {
-                return base.Shape as InstancedMeshShape;
+                return (InstancedMeshShape)shape;
             }
         }
 

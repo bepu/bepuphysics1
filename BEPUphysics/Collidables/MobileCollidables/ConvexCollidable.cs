@@ -26,7 +26,7 @@ namespace BEPUphysics.Collidables.MobileCollidables
         {
             get
             {
-                return base.Shape as ConvexShape;
+                return (ConvexShape)shape;
             }
         }
 
@@ -51,7 +51,7 @@ namespace BEPUphysics.Collidables.MobileCollidables
         {
             get
             {
-                return base.Shape as T;
+                return (T)shape;
             }
         }
 

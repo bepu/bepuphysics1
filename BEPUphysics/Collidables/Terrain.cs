@@ -23,7 +23,7 @@ namespace BEPUphysics.Collidables
         {
             get
             {
-                return base.Shape as TerrainShape;
+                return (TerrainShape)shape;
             }
             set
             {
