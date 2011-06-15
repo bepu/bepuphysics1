@@ -18,6 +18,7 @@ namespace BEPUphysics.Settings
         /// Whether or not to conserve angular momentum.
         /// This produces slightly more realistic angular behavior, but can reduce stability.
         /// Consider using a smaller timestep, enabling RK4 angular integration, or both.
+        /// Do not use singular inertia tensors while momentum conservation is enabled.
         ///</summary>
         public static bool ConserveAngularMomentum;
         ///<summary>

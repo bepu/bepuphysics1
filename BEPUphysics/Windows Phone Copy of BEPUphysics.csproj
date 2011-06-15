@@ -54,31 +54,79 @@
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>strongNameKey.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Collidables\BroadPhaseSystems\Hierarchies\Testing\Insertion\" />
+    <Folder Include="Collidables\BroadPhaseSystems\Hierarchies\Testing\Old\" />
+    <Folder Include="Collidables\BroadPhaseSystems\SortAndSweep\" />
+  </ItemGroup>
   <ItemGroup>
     <None Include="CollisionTests\CollisionAlgorithms\GJK\SimplexBackup.cs" />
-    <Compile Include="BroadPhaseSystems\BroadPhase.cs" />
-    <Compile Include="BroadPhaseSystems\BroadPhaseEntry.cs" />
-    <Compile Include="BroadPhaseSystems\BroadPhaseOverlap.cs" />
-    <Compile Include="BroadPhaseSystems\BruteForce.cs" />
-    <Compile Include="BroadPhaseSystems\Hierarchies\DynamicHierarchy.cs" />
-    <Compile Include="BroadPhaseSystems\Hierarchies\DynamicHierarchyNode.cs" />
-    <Compile Include="BroadPhaseSystems\Hierarchies\DynamicHierarchyQueryAccelerator.cs" />
-    <Compile Include="BroadPhaseSystems\Hierarchies\Testing\Insertion\DynamicHierarchy2.cs" />
-    <Compile Include="BroadPhaseSystems\Hierarchies\Testing\Insertion\DynamicHierarchyNode2.cs" />
-    <Compile Include="BroadPhaseSystems\Hierarchies\Testing\Old\DynamicHierarchyNodeOld.cs" />
-    <Compile Include="BroadPhaseSystems\Hierarchies\Testing\Old\DynamicHierarchyOld.cs" />
-    <Compile Include="BroadPhaseSystems\Hierarchies\Testing\Old\DynamicHierarchyQueryAcceleratorOld.cs" />
-    <Compile Include="BroadPhaseSystems\IBoundingBoxOwner.cs" />
-    <Compile Include="BroadPhaseSystems\IBroadPhaseEntryOwner.cs" />
-    <Compile Include="BroadPhaseSystems\IQueryAccelerator.cs" />
-    <Compile Include="BroadPhaseSystems\SortAndSweep\Grid2DEntry.cs" />
-    <Compile Include="BroadPhaseSystems\SortAndSweep\Grid2DSortAndSweep.cs" />
-    <Compile Include="BroadPhaseSystems\SortAndSweep\Grid2DSortAndSweepQueryAccelerator.cs" />
-    <Compile Include="BroadPhaseSystems\SortAndSweep\GridCell2D.cs" />
-    <Compile Include="BroadPhaseSystems\SortAndSweep\SortAndSweep1D.cs" />
-    <Compile Include="BroadPhaseSystems\SortAndSweep\SortAndSweep3D.cs" />
-    <Compile Include="BroadPhaseSystems\SortAndSweep\SortedGrid2DSet.cs" />
+    <Compile Include="BroadPhaseSystems\BroadPhase.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="BroadPhaseSystems\BroadPhaseEntry.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="BroadPhaseSystems\BroadPhaseOverlap.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="BroadPhaseSystems\BruteForce.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="BroadPhaseSystems\Hierarchies\DynamicHierarchy.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="BroadPhaseSystems\Hierarchies\DynamicHierarchyNode.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="BroadPhaseSystems\Hierarchies\DynamicHierarchyQueryAccelerator.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="BroadPhaseSystems\Hierarchies\Testing\Insertion\DynamicHierarchy2.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="BroadPhaseSystems\Hierarchies\Testing\Insertion\DynamicHierarchyNode2.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="BroadPhaseSystems\Hierarchies\Testing\Old\DynamicHierarchyNodeOld.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="BroadPhaseSystems\Hierarchies\Testing\Old\DynamicHierarchyOld.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="BroadPhaseSystems\Hierarchies\Testing\Old\DynamicHierarchyQueryAcceleratorOld.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="BroadPhaseSystems\IBoundingBoxOwner.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="BroadPhaseSystems\IBroadPhaseEntryOwner.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="BroadPhaseSystems\IQueryAccelerator.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="BroadPhaseSystems\SortAndSweep\Grid2DEntry.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="BroadPhaseSystems\SortAndSweep\Grid2DSortAndSweep.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="BroadPhaseSystems\SortAndSweep\Grid2DSortAndSweepQueryAccelerator.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="BroadPhaseSystems\SortAndSweep\GridCell2D.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="BroadPhaseSystems\SortAndSweep\SortAndSweep1D.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="BroadPhaseSystems\SortAndSweep\SortAndSweep3D.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="BroadPhaseSystems\SortAndSweep\SortedGrid2DSet.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Collidables\Events\IContactEventTriggerer.cs" />
     <Compile Include="Collidables\Events\IEntryEventTriggerer.cs" />
     <Compile Include="Collidables\MobileCollidables\MobileCollidable.cs" />

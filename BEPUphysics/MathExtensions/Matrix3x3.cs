@@ -460,7 +460,7 @@ namespace BEPUphysics.MathExtensions
             matrix.M33 = scale.Z;
             return matrix;
         }
-        
+
 
         /// <summary>
         /// Constructs a non-uniform scaling matrix.
@@ -512,6 +512,127 @@ namespace BEPUphysics.MathExtensions
             float m31 = (matrix.M21 * matrix.M32 - matrix.M22 * matrix.M31) * determinantInverse;
             float m32 = (matrix.M12 * matrix.M31 - matrix.M11 * matrix.M32) * determinantInverse;
             float m33 = (matrix.M11 * matrix.M22 - matrix.M12 * matrix.M21) * determinantInverse;
+
+            result.M11 = m11;
+            result.M12 = m12;
+            result.M13 = m13;
+
+            result.M21 = m21;
+            result.M22 = m22;
+            result.M23 = m23;
+
+            result.M31 = m31;
+            result.M32 = m32;
+            result.M33 = m33;
+        }
+
+        /// <summary>
+        /// Inverts the largest nonsingular submatrix in the matrix, excluding 2x2's that involve M13 or M31, and excluding 1x1's that include nondiagonal elements.
+        /// </summary>
+        /// <param name="matrix">Matrix to be inverted.</param>
+        /// <param name="result">Inverted matrix.</param>
+        internal static void AdaptiveInvert(ref Matrix3X3 matrix, out Matrix3X3 result)
+        {
+            int submatrix;
+            float determinantInverse = 1 / matrix.AdaptiveDeterminant(out submatrix);
+            float m11, m12, m13, m21, m22, m23, m31, m32, m33;
+            switch (submatrix)
+            {
+                case 0: //Full matrix.
+                    m11 = (matrix.M22 * matrix.M33 - matrix.M23 * matrix.M32) * determinantInverse;
+                    m12 = (matrix.M13 * matrix.M32 - matrix.M33 * matrix.M12) * determinantInverse;
+                    m13 = (matrix.M12 * matrix.M23 - matrix.M22 * matrix.M13) * determinantInverse;
+
+                    m21 = (matrix.M23 * matrix.M31 - matrix.M21 * matrix.M33) * determinantInverse;
+                    m22 = (matrix.M11 * matrix.M33 - matrix.M13 * matrix.M31) * determinantInverse;
+                    m23 = (matrix.M13 * matrix.M21 - matrix.M11 * matrix.M23) * determinantInverse;
+
+                    m31 = (matrix.M21 * matrix.M32 - matrix.M22 * matrix.M31) * determinantInverse;
+                    m32 = (matrix.M12 * matrix.M31 - matrix.M11 * matrix.M32) * determinantInverse;
+                    m33 = (matrix.M11 * matrix.M22 - matrix.M12 * matrix.M21) * determinantInverse;
+                    break;
+                case 1: //Upper left matrix, m11, m12, m21, m22.
+                    m11 = matrix.M22 * determinantInverse;
+                    m12 = -matrix.M12 * determinantInverse;
+                    m13 = 0;
+
+                    m21 = -matrix.M21 * determinantInverse;
+                    m22 = matrix.M11 * determinantInverse;
+                    m23 = 0;
+
+                    m31 = 0;
+                    m32 = 0;
+                    m33 = 0;
+                    break;
+                case 2: //Lower right matrix, m22, m23, m32, m33.
+                    m11 = 0;
+                    m12 = 0;
+                    m13 = 0;
+
+                    m21 = 0;
+                    m22 = matrix.M33 * determinantInverse;
+                    m23 = -matrix.M23 * determinantInverse;
+
+                    m31 = 0;
+                    m32 = -matrix.M32 * determinantInverse;
+                    m33 = matrix.M22 * determinantInverse;
+                    break;
+                case 3: //Corners, m11, m31, m13, m33.
+                    m11 = matrix.M33 * determinantInverse;
+                    m12 = 0;
+                    m13 = -matrix.M13 * determinantInverse;
+
+                    m21 = 0;
+                    m22 = 0;
+                    m23 = 0;
+
+                    m31 = -matrix.M31 * determinantInverse;
+                    m32 = 0;
+                    m33 = matrix.M11 * determinantInverse;
+                    break;
+                case 4: //M11
+                    m11 = 1 / matrix.M11;
+                    m12 = 0;
+                    m13 = 0;
+
+                    m21 = 0;
+                    m22 = 0;
+                    m23 = 0;
+
+                    m31 = 0;
+                    m32 = 0;
+                    m33 = 0;
+                    break;
+                case 5: //M22
+                    m11 = 0;
+                    m12 = 0;
+                    m13 = 0;
+
+                    m21 = 0;
+                    m22 = 1 / matrix.M22;
+                    m23 = 0;
+
+                    m31 = 0;
+                    m32 = 0;
+                    m33 = 0;
+                    break;
+                case 6: //M33
+                    m11 = 0;
+                    m12 = 0;
+                    m13 = 0;
+
+                    m21 = 0;
+                    m22 = 0;
+                    m23 = 0;
+
+                    m31 = 0;
+                    m32 = 0;
+                    m33 = 1 / matrix.M33;
+                    break;
+                default: //Completely singular.
+                    m11 = 0; m12 = 0; m13 = 0; m21 = 0; m22 = 0; m23 = 0; m31 = 0; m32 = 0; m33 = 0;
+                    break;
+            }
 
             result.M11 = m11;
             result.M12 = m12;
@@ -1057,6 +1178,67 @@ namespace BEPUphysics.MathExtensions
         }
 
         /// <summary>
+        /// Calculates the determinant of largest nonsingular submatrix, excluding 2x2's that involve M13 or M31, and excluding all 1x1's that involve nondiagonal elements.
+        /// </summary>
+        /// <param name="subMatrixCode">Represents the submatrix that was used to compute the determinant.
+        /// 0 is the full 3x3.  1 is the upper left 2x2.  2 is the lower right 2x2.  3 is the four corners.
+        /// 4 is M11.  5 is M22.  6 is M33.</param>
+        /// <returns>The matrix's determinant.</returns>
+        internal float AdaptiveDeterminant(out int subMatrixCode)
+        {
+            //Try the full matrix first.
+            float determinant = M11 * M22 * M33 + M12 * M23 * M31 + M13 * M21 * M32 -
+                                M31 * M22 * M13 - M32 * M23 * M11 - M33 * M21 * M12;
+            if (determinant != 0) //This could be a little numerically flimsy.  Fortunately, the way this method is used, that doesn't matter!
+            {
+                subMatrixCode = 0;
+                return determinant;
+            }
+            //Try m11, m12, m21, m22.
+            determinant = M11 * M22 - M12 * M21;
+            if (determinant != 0)
+            {
+                subMatrixCode = 1;
+                return determinant;
+            }
+            //Try m22, m23, m32, m33.
+            determinant = M22 * M33 - M23 * M32;
+            if (determinant != 0)
+            {
+                subMatrixCode = 2;
+                return determinant;
+            }
+            //Try m11, m13, m31, m33.
+            determinant = M11 * M33 - M13 * M12;
+            if (determinant != 0)
+            {
+                subMatrixCode = 3;
+                return determinant;
+            }
+            //Try m11.
+            if (M11 != 0)
+            {
+                subMatrixCode = 4;
+                return M11;
+            }
+            //Try m22.
+            if (M22 != 0)
+            {
+                subMatrixCode = 5;
+                return M22;
+            }
+            //Try m33.
+            if (M33 != 0)
+            {
+                subMatrixCode = 6;
+                return M33;
+            }
+            //It's completely singular!
+            subMatrixCode = -1;
+            return 0;
+        }
+
+        /// <summary>
         /// Constructs a quaternion from a 3x3 rotation matrix.
         /// </summary>
         /// <param name="r">Rotation matrix to create the quaternion from.</param>
@@ -1221,6 +1403,6 @@ namespace BEPUphysics.MathExtensions
 
 
 
-   
+
     }
 }

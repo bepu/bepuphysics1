@@ -22,7 +22,6 @@ namespace BEPUphysicsDemos.Demos
             float blockHeight = 1f;
             float blockLength = 1f;
 
-
             for (int i = 0; i < width; i++)
             {
                 for (int j = 0; j < height; j++)
@@ -34,7 +33,6 @@ namespace BEPUphysicsDemos.Demos
                                 blockHeight * .5f + j * (blockHeight),
                                 0),
                             blockWidth, blockHeight, blockLength, 10);
-
                     Space.Add(toAdd);
                 }
             }

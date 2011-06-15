@@ -98,16 +98,24 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BroadPhaseSystems\BroadPhase.cs" />
+    <Compile Include="BroadPhaseSystems\BroadPhaseEntry.cs" />
+    <Compile Include="BroadPhaseSystems\BroadPhaseOverlap.cs" />
     <Compile Include="BroadPhaseSystems\BruteForce.cs" />
     <Compile Include="BroadPhaseSystems\Hierarchies\DynamicHierarchy.cs" />
     <Compile Include="BroadPhaseSystems\Hierarchies\DynamicHierarchyNode.cs" />
+    <Compile Include="BroadPhaseSystems\Hierarchies\DynamicHierarchyQueryAccelerator.cs" />
     <Compile Include="BroadPhaseSystems\Hierarchies\Testing\Insertion\DynamicHierarchy2.cs" />
     <Compile Include="BroadPhaseSystems\Hierarchies\Testing\Insertion\DynamicHierarchyNode2.cs" />
-    <Compile Include="BroadPhaseSystems\Hierarchies\DynamicHierarchyQueryAccelerator.cs" />
-    <Compile Include="BroadPhaseSystems\SortAndSweep\Grid2DEntry.cs" />
-    <Compile Include="BroadPhaseSystems\SortAndSweep\Grid2DSortAndSweep.cs" />
     <Compile Include="BroadPhaseSystems\Hierarchies\Testing\Old\DynamicHierarchyNodeOld.cs" />
+    <Compile Include="BroadPhaseSystems\Hierarchies\Testing\Old\DynamicHierarchyOld.cs" />
+    <Compile Include="BroadPhaseSystems\Hierarchies\Testing\Old\DynamicHierarchyQueryAcceleratorOld.cs" />
+    <Compile Include="BroadPhaseSystems\IBoundingBoxOwner.cs" />
+    <Compile Include="BroadPhaseSystems\IBroadPhaseEntryOwner.cs" />
+    <Compile Include="BroadPhaseSystems\IQueryAccelerator.cs" />
+    <Compile Include="BroadPhaseSystems\SortAndSweep\Grid2DEntry.cs" />
     <None Include="DataStructures\Deprecated\MeshBoundingBoxTree.cs" />
+    <Compile Include="BroadPhaseSystems\SortAndSweep\Grid2DSortAndSweep.cs" />
     <Compile Include="BroadPhaseSystems\SortAndSweep\Grid2DSortAndSweepQueryAccelerator.cs" />
     <Compile Include="BroadPhaseSystems\SortAndSweep\GridCell2D.cs" />
     <Compile Include="BroadPhaseSystems\SortAndSweep\SortAndSweep1D.cs" />
@@ -143,11 +151,6 @@
     <Compile Include="DataStructures\TransformableMeshData.cs" />
     <Compile Include="DataStructures\TreeOverlapPair.cs" />
     <Compile Include="DeactivationManagement\DeactivationManager.cs" />
-    <Compile Include="BroadPhaseSystems\BroadPhase.cs" />
-    <Compile Include="BroadPhaseSystems\BroadPhaseEntry.cs" />
-    <Compile Include="BroadPhaseSystems\BroadPhaseOverlap.cs" />
-    <Compile Include="BroadPhaseSystems\Hierarchies\Testing\Old\DynamicHierarchyOld.cs" />
-    <Compile Include="BroadPhaseSystems\Hierarchies\Testing\Old\DynamicHierarchyQueryAcceleratorOld.cs" />
     <Compile Include="Collidables\CollidableCollection.cs" />
     <Compile Include="Collidables\CollidablePair.cs" />
     <Compile Include="Collidables\EntityCollidableCollection.cs" />
@@ -336,7 +339,6 @@
     <None Include="DataStructures\Deprecated\BoundingBoxTree.cs" />
     <Compile Include="DataStructures\RawValueList.cs" />
     <Compile Include="DataStructures\RawList.cs" />
-    <Compile Include="BroadPhaseSystems\IBoundingBoxOwner.cs" />
     <Compile Include="DataStructures\ObservableDictionary.cs" />
     <Compile Include="DataStructures\HashSet.cs" />
     <Compile Include="DataStructures\ReadOnlyDictionary.cs" />
@@ -357,7 +359,6 @@
     <Compile Include="UpdateableSystems\ForceFields\ForceFieldShape.cs" />
     <Compile Include="UpdateableSystems\ForceFields\InfiniteForceFieldShape.cs" />
     <Compile Include="UpdateableSystems\ForceFields\VolumeForceFieldShape.cs" />
-    <Compile Include="BroadPhaseSystems\IBroadPhaseEntryOwner.cs" />
     <Compile Include="PositionUpdating\ICCDPositionUpdateable.cs" />
     <Compile Include="OtherSpaceStages\IDeferredEventCreator.cs" />
     <Compile Include="OtherSpaceStages\IDeferredEventCreatorOwner.cs" />
@@ -367,7 +368,6 @@
     <Compile Include="EntityStateManagement\InterpolatedStatesManager.cs" />
     <Compile Include="MultithreadedProcessingStage.cs" />
     <Compile Include="MathExtensions\RigidTransform.cs" />
-    <Compile Include="BroadPhaseSystems\IQueryAccelerator.cs" />
     <Compile Include="DeactivationManagement\ISimulationIslandConnection.cs" />
     <Compile Include="DeactivationManagement\ISimulationIslandMember.cs" />
     <Compile Include="Materials\Material.cs" />
@@ -457,7 +457,11 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <None Include="strongNameKey.snk" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Collidables\BroadPhaseSystems\Hierarchies\Testing\Insertion\" />
+    <Folder Include="Collidables\BroadPhaseSystems\Hierarchies\Testing\Old\" />
+    <Folder Include="Collidables\BroadPhaseSystems\SortAndSweep\" />
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\Microsoft.Xna.GameStudio.targets" />
   <!--
