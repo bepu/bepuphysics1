@@ -46,7 +46,7 @@ namespace BEPUphysicsDemos.Demos
             Space.Add(staticMesh);
             game.ModelDrawer.Add(staticMesh.Mesh);
 
-            TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("cube"), out vertices, out indices);
+            TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("tube"), out vertices, out indices);
             //MotionSettings.DefaultPositionUpdateMode = PositionUpdateMode.Continuous;
             ShapeDistributionInformation info;
             transform = AffineTransform.Identity;// new AffineTransform(new Vector3(1, 1, 1), Quaternion.CreateFromAxisAngle(new Vector3(1, 0, 0), MathHelper.Pi), new Vector3(0, 0, 0));
@@ -66,22 +66,26 @@ namespace BEPUphysicsDemos.Demos
             //inertia.M22 = mass;
             //inertia.M33 = mass;
             Matrix3X3.Multiply(ref info.VolumeDistribution, mass * InertiaHelper.InertiaTensorScale, out inertia);
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < 1; i++)
             {
-                var entityMesh = new Entity<MobileMeshCollidable>(new MobileMeshCollidable(shape), mass, inertia, info.Volume);
-                //entityMesh.CollisionInformation.ImproveBoundaryBehavior = true;
-                entityMesh.IsAlwaysActive = true;
-                entityMesh.Position = new Vector3(i * 1, 20, 0);
-                //CollisionRules.AddRule(entityMesh, kapow, CollisionRule.NoSolver);
-                //entityMesh.AngularVelocity = new Vector3(5, 0, 0);
-                //entityMesh.LinearVelocity = new Vector3(1, 0, 0);
-                //entityMesh.Material.KineticFriction = 0;
-                //entityMesh.Material.StaticFriction = 0;
-                //entityMesh.LocalInertiaTensorInverse = new Matrix3X3();
-                Space.Add(entityMesh);
-                //entityMesh.IsAlwaysActive = true;
+                for (int j = 0; j < 1; j++)
+                {
+                    var entityMesh = new Entity<MobileMeshCollidable>(new MobileMeshCollidable(shape), mass, inertia, info.Volume);
+                    entityMesh.PositionUpdateMode = PositionUpdateMode.Continuous;
+                    entityMesh.LinearVelocity = new Vector3(0, -1000, 0);
+                    //entityMesh.CollisionInformation.ImproveBoundaryBehavior = true;
+                    entityMesh.IsAlwaysActive = true;
+                    entityMesh.Position = new Vector3(i * 15, 10, j * 15);
+                    //CollisionRules.AddRule(entityMesh, kapow, CollisionRule.NoSolver);
+                    //entityMesh.AngularVelocity = new Vector3(5, 0, 0);
+                    //entityMesh.LinearVelocity = new Vector3(1, 0, 0);
+                    //entityMesh.Material.KineticFriction = 0;
+                    //entityMesh.Material.StaticFriction = 0;
+                    //entityMesh.LocalInertiaTensorInverse = new Matrix3X3();
+                    Space.Add(entityMesh);
+                    //entityMesh.IsAlwaysActive = true;
+                }
             }
-
             for (int j = 0; j < 0; j++)
             {
                 var toAdd = new Box(new Vector3(0, 35 + j * -.1f, 0), 2, 2, 2, 1);
@@ -91,7 +95,7 @@ namespace BEPUphysicsDemos.Demos
             }
 
             Space.Add(new Box(new Vector3(0, -10, 0), 1, 1, 1));
-            game.Camera.Position = new Vector3(0, 20, 45);
+            game.Camera.Position = new Vector3(0, -10, 5);
             game.Camera.Yaw = 0;
             game.Camera.Pitch = 0;
 

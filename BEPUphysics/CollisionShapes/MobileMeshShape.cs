@@ -133,7 +133,7 @@ namespace BEPUphysics.CollisionShapes
         /// If an object is detected to be within the mobile mesh with a penetration depth greater than this limit,
         /// it will try a different direction to verify that it wasn't a false positive.
         /// </summary>
-        public static float DepthDoubleCheckLimit = 1;
+        public static float DepthDoubleCheckLimit = .2f;
         static int numberOfContainmentChecks = 3;
         /// <summary>
         /// This is how many tests are required before an object is accepted as actually inside the solid portion of a mesh.
@@ -644,14 +644,14 @@ namespace BEPUphysics.CollisionShapes
             Vector3.Add(ref backwardElement, ref backDirection, out backwardElement);
             Vector3.Subtract(ref forwardElement, ref backDirection, out forwardElement);
 
-            //This could be optimized.  Unnecessary transformation information gets computed.
+            //TODO: This could be optimized.  Unnecessary transformation information gets computed.
             Vector3 vMinX, vMaxX, vMinY, vMaxY, vMinZ, vMaxZ;
-            Matrix3X3.Transform(ref surfaceVertices.Elements[right], ref o, out vMaxX);
-            Matrix3X3.Transform(ref surfaceVertices.Elements[left], ref o, out vMinX);
-            Matrix3X3.Transform(ref surfaceVertices.Elements[up], ref o, out vMaxY);
-            Matrix3X3.Transform(ref surfaceVertices.Elements[down], ref o, out vMinY);
-            Matrix3X3.Transform(ref surfaceVertices.Elements[backward], ref o, out vMaxZ);
-            Matrix3X3.Transform(ref surfaceVertices.Elements[forward], ref o, out vMinZ);
+            Matrix3X3.Transform(ref rightElement, ref o, out vMaxX);
+            Matrix3X3.Transform(ref leftElement, ref o, out vMinX);
+            Matrix3X3.Transform(ref upElement, ref o, out vMaxY);
+            Matrix3X3.Transform(ref downElement, ref o, out vMinY);
+            Matrix3X3.Transform(ref backwardElement, ref o, out vMaxZ);
+            Matrix3X3.Transform(ref forwardElement, ref o, out vMinZ);
 
 
             boundingBox.Max.X = vMaxX.X;

@@ -18,6 +18,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
     public abstract class MobileMeshContactManifold : TriangleMeshConvexContactManifold
     {
         protected MobileMeshCollidable mesh;
+        internal int parentContactCount;
 
         internal RawList<int> overlappedTriangles = new RawList<int>(4);
 
@@ -136,7 +137,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
         Vector3 lastValidConvexPosition;
         protected override void ProcessCandidates(RawValueList<ContactData> candidates)
         {
-            if (candidates.count == 0 && Mesh.Shape.solidity == MobileMeshSolidity.Solid)
+            if (candidates.count == 0 && parentContactCount == 0 && Mesh.Shape.solidity == MobileMeshSolidity.Solid)
             {
 
                 //If there's no new contacts on the mesh and it's supposed to be a solid,
@@ -231,6 +232,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
         {
             mesh = null;
             convex = null;
+            parentContactCount = 0;
             base.CleanUp();
         }
 

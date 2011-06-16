@@ -13,6 +13,7 @@ using Microsoft.Xna.Framework;
 using BEPUphysics.MathExtensions;
 using BEPUphysics.ResourceManagement;
 using BEPUphysics.CollisionShapes.ConvexShapes;
+using System.Diagnostics;
 
 namespace BEPUphysics.NarrowPhaseSystems.Pairs
 {
@@ -25,6 +26,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         ConvexCollidable convex;
 
         NonConvexContactManifoldConstraint contactConstraint = new NonConvexContactManifoldConstraint();
+
 
         protected override Collidable CollidableA
         {
@@ -50,7 +52,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         {
             get { return contactConstraint; }
         }
-        protected abstract MobileMeshContactManifold MeshManifold { get; }
+        protected internal abstract MobileMeshContactManifold MeshManifold { get; }
 
         ///<summary>
         /// Initializes the pair handler.
@@ -104,9 +106,9 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             //TODO: This conditional early outing stuff could be pulled up into a common system, along with most of the pair handler.
             var overlap = BroadPhaseOverlap;
             var convexMode = convex.entity == null ? PositionUpdateMode.Discrete : convex.entity.PositionUpdateMode;
-            bool convexIsActive = convex.entity == null ? false : convex.entity.isActive;
+
             if (
-                    (mobileMesh.IsActive || convex.entity == null ? false : convex.entity.isActive) && //At least one has to be active.
+                    (mobileMesh.IsActive || (convex.entity == null ? false : convex.entity.isActive)) && //At least one has to be active.
                     (
                         (
                             convexMode == PositionUpdateMode.Continuous &&   //If both are continuous, only do the process for A.
@@ -136,23 +138,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                 timeOfImpact = 1;
                 if (minimumRadius * minimumRadius < velocitySquared)
                 {
-                    TriangleSidedness sidedness;
-                    switch (mobileMesh.Shape.solidity)
-                    {
-                        case CollisionShapes.MobileMeshSolidity.Clockwise:
-                            sidedness = TriangleSidedness.Clockwise;
-                            break;
-                        case CollisionShapes.MobileMeshSolidity.Counterclockwise:
-                            sidedness = TriangleSidedness.Counterclockwise;
-                            break;
-                        case CollisionShapes.MobileMeshSolidity.DoubleSided:
-                            sidedness = TriangleSidedness.DoubleSided;
-                            break;
-                        case CollisionShapes.MobileMeshSolidity.Solid:
-                        default:
-                            sidedness = mobileMesh.Shape.solidSidedness;
-                            break;
-                    }
+                    TriangleSidedness sidedness = mobileMesh.Shape.Sidedness;
                     Matrix3X3 orientation;
                     Matrix3X3.CreateFromQuaternion(ref mobileMesh.worldTransform.Orientation, out orientation);
                     var triangle = Resources.GetTriangle();

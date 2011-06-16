@@ -120,11 +120,16 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         ///<param name="dt">Timestep duration.</param>
         public override void UpdateCollision(float dt)
         {
+            //Cache some properties.
+            var a = CollidableA;
+            var b = CollidableB;
+            var triggerA = a.EventTriggerer;
+            var triggerB = b.EventTriggerer;
 
             if (!suppressEvents)
             {
-                CollidableA.EventTriggerer.OnPairUpdated(CollidableB, this);
-                CollidableB.EventTriggerer.OnPairUpdated(CollidableA, this);
+                triggerA.OnPairUpdated(b, this);
+                triggerB.OnPairUpdated(a, this);
             }
 
             ContactManifold.Update(dt);
@@ -133,8 +138,8 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             {
                 if (!suppressEvents)
                 {
-                    CollidableA.EventTriggerer.OnPairTouching(CollidableB, this);
-                    CollidableB.EventTriggerer.OnPairTouching(CollidableA, this);
+                    triggerA.OnPairTouching(b, this);
+                    triggerB.OnPairTouching(a, this);
                 }
 
                 if (previousContactCount == 0)
@@ -150,8 +155,8 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                     //And notify the pair members.
                     if (!suppressEvents)
                     {
-                        CollidableA.EventTriggerer.OnInitialCollisionDetected(CollidableB, this);
-                        CollidableB.EventTriggerer.OnInitialCollisionDetected(CollidableA, this);
+                        triggerA.OnInitialCollisionDetected(b, this);
+                        triggerB.OnInitialCollisionDetected(a, this);
                     }
                 }
             }
@@ -167,8 +172,8 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
 
                 if (!suppressEvents)
                 {
-                    CollidableA.EventTriggerer.OnCollisionEnded(CollidableB, this);
-                    CollidableB.EventTriggerer.OnCollisionEnded(CollidableA, this);
+                    triggerA.OnCollisionEnded(b, this);
+                    triggerB.OnCollisionEnded(a, this);
                 }
             }
             previousContactCount = ContactManifold.contacts.count;

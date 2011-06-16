@@ -32,6 +32,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             get { return mobileMesh.entity.material; }
         }
 
+
         ///<summary>
         /// Initializes the pair handler.
         ///</summary>

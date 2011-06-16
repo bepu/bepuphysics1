@@ -22,7 +22,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
     public class MobileMeshConvexPairHandler : MobileMeshPairHandler
     {
         MobileMeshConvexContactManifold contactManifold = new MobileMeshConvexContactManifold();
-        protected override MobileMeshContactManifold MeshManifold
+        protected internal override MobileMeshContactManifold MeshManifold
         {
             get { return contactManifold; }
         }

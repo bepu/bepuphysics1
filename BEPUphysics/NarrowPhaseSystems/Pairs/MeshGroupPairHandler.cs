@@ -56,7 +56,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
     {
         ContactManifoldConstraintGroup manifoldConstraintGroup;
 
-        Dictionary<TriangleEntry, CollidablePairHandler> subPairs = new Dictionary<TriangleEntry, CollidablePairHandler>();
+        Dictionary<TriangleEntry, MobileMeshPairHandler> subPairs = new Dictionary<TriangleEntry, MobileMeshPairHandler>();
         HashSet<TriangleEntry> containedPairs = new HashSet<TriangleEntry>();
         RawList<TriangleEntry> pairsToRemove = new RawList<TriangleEntry>();
 
@@ -64,11 +64,11 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         ///<summary>
         /// Gets a list of the pairs associated with children.
         ///</summary>
-        public ReadOnlyDictionary<TriangleEntry, CollidablePairHandler> ChildPairs
+        public ReadOnlyDictionary<TriangleEntry, MobileMeshPairHandler> ChildPairs
         {
             get
             {
-                return new ReadOnlyDictionary<TriangleEntry, CollidablePairHandler>(subPairs);
+                return new ReadOnlyDictionary<TriangleEntry, MobileMeshPairHandler>(subPairs);
             }
         }
 
@@ -146,7 +146,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             if (!subPairs.ContainsKey(entry))
             {
                 var collidablePair = new CollidablePair(CollidableA, entry.Collidable = GetOpposingCollidable(index));
-                var newPair = NarrowPhaseHelper.GetPairHandler(ref collidablePair);
+                var newPair = (MobileMeshPairHandler)NarrowPhaseHelper.GetPairHandler(ref collidablePair);
                 newPair.UpdateMaterialProperties(MaterialA, MaterialB);  //Override the materials, if necessary.  Meshes don't currently support custom materials but..
                 if (newPair != null)
                 {
@@ -214,6 +214,8 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                 if (pair.Value.BroadPhaseOverlap.collisionRule < CollisionRule.NoNarrowPhaseUpdate) //Don't test if the collision rules say don't.
                 {
                     ConfigureCollidable(pair.Key, dt);
+                    //Update the contact count using our (the parent) contact count so that the child can avoid costly solidity testing.
+                    pair.Value.MeshManifold.parentContactCount = contactCount;
                     pair.Value.UpdateCollision(dt);
                 }
             }
