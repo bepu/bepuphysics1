@@ -130,6 +130,7 @@
     <Compile Include="CollisionTests\CollisionAlgorithms\MPRTesting.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\TriangleMeshConvexPairTester.cs" />
     <Compile Include="CollisionTests\Manifolds\BoxSphereContactManifold.cs" />
+    <Compile Include="CollisionTests\Manifolds\MobileMeshTriangleContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\MobileMeshSphereContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\MobileMeshContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\InstancedMeshSphereContactManifold.cs" />
@@ -142,6 +143,7 @@
     <Compile Include="CollisionTests\Manifolds\SphereContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\MobileMeshConvexContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\TerrainSphereContactManifold.cs" />
+    <Compile Include="CollisionTests\CollisionAlgorithms\TriangleTrianglePairTester.cs" />
     <Compile Include="CollisionTests\VoronoiRegion.cs" />
     <Compile Include="DataStructures\BoundingBoxTree.cs" />
     <Compile Include="DataStructures\MeshBoundingBoxTree.cs" />
@@ -264,6 +266,7 @@
     <Compile Include="NarrowPhaseSystems\Pairs\ConvexPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\CompoundGroupPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\ConvexConstraintPairHandler.cs" />
+    <Compile Include="NarrowPhaseSystems\Pairs\MobileMeshTrianglePairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\MobileMeshMobileMeshPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\MeshGroupPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\MobileMeshStaticMeshPairHandler.cs" />

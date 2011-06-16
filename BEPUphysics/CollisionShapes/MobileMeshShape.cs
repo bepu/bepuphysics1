@@ -74,8 +74,9 @@ namespace BEPUphysics.CollisionShapes
         }
 
         /// <summary>
-        /// Returns the sidedness of the shape.  This is a convenience property based on the Solidity property.
-        /// If the shape is solid, this returns whatever sidedness is needed to have the triangles of the shape face outward.
+        /// Gets or sets the sidedness of the shape.  This is a convenience property based on the Solidity property.
+        /// If the shape is solid, this returns whatever sidedness is computed to make the triangles of the shape face outward.
+        /// If the shape is solid, setting this property will change the sidedness that is used while the shape is solid.
         /// </summary>
         public TriangleSidedness Sidedness
         {
@@ -94,6 +95,26 @@ namespace BEPUphysics.CollisionShapes
 
                 }
                 return TriangleSidedness.DoubleSided;
+            }
+            set
+            {
+                if (solidity == MobileMeshSolidity.Solid)
+                    solidSidedness = value;
+                else
+                {
+                    switch (value)
+                    {
+                        case TriangleSidedness.Clockwise:
+                            solidity = MobileMeshSolidity.Clockwise;
+                            break;
+                        case TriangleSidedness.Counterclockwise:
+                            solidity = MobileMeshSolidity.Counterclockwise;
+                            break;
+                        case TriangleSidedness.DoubleSided:
+                            solidity = MobileMeshSolidity.DoubleSided;
+                            break;
+                    }
+                }
             }
         }
 
@@ -280,9 +301,40 @@ namespace BEPUphysics.CollisionShapes
             ray.Direction = (vA + vB + vC) / 3;
             ray.Direction.Normalize();
 
+            solidSidedness = ComputeSolidSidednessHelper(ray);
+            //TODO: Positions need to be valid for the verifying directions to work properly.
+            ////Find another direction and test it to corroborate the first test.
+            //Ray alternateRay;
+            //alternateRay.Position = ray.Position;
+            //Vector3.Cross(ref ray.Direction, ref Toolbox.UpVector, out alternateRay.Direction);
+            //float lengthSquared = alternateRay.Direction.LengthSquared();
+            //if (lengthSquared < Toolbox.Epsilon)
+            //{
+            //    Vector3.Cross(ref ray.Direction, ref Toolbox.RightVector, out alternateRay.Direction);
+            //    lengthSquared = alternateRay.Direction.LengthSquared();
+            //}
+            //Vector3.Divide(ref alternateRay.Direction, (float)Math.Sqrt(lengthSquared), out alternateRay.Direction);
+            //var sidednessCandidate2 = ComputeSolidSidednessHelper(alternateRay);
+            //if (sidednessCandidate == sidednessCandidate2)
+            //{
+            //    //The two tests agreed! It's very likely that the sidedness is, in fact, in this direction.
+            //    solidSidedness = sidednessCandidate;
+            //}
+            //else
+            //{
+            //    //The two tests disagreed.  Tiebreaker!
+            //    Vector3.Cross(ref alternateRay.Direction, ref ray.Direction, out alternateRay.Direction);
+            //    solidSidedness = ComputeSolidSidednessHelper(alternateRay);
+            //}
+        }
+
+        TriangleSidedness ComputeSolidSidednessHelper(Ray ray)
+        {
+            TriangleSidedness toReturn;
             var hitList = Resources.GetIntList();
             if (triangleMesh.Tree.GetOverlaps(ray, hitList))
             {
+                Vector3 vA, vB, vC;
                 var hits = Resources.GetRayHitList();
                 //Identify the first and last hits.
                 int minimum = 0;
@@ -317,9 +369,9 @@ namespace BEPUphysics.CollisionShapes
                     triangleMesh.Data.GetTriangle(minimum, out vA, out vB, out vC);
                     var normal = Vector3.Cross(vA - vB, vA - vC);
                     if (Vector3.Dot(normal, ray.Direction) < 0)
-                        solidSidedness = TriangleSidedness.Clockwise;
+                        toReturn = TriangleSidedness.Clockwise;
                     else
-                        solidSidedness = TriangleSidedness.Counterclockwise;
+                        toReturn = TriangleSidedness.Counterclockwise;
                 }
                 else
                 {
@@ -329,15 +381,18 @@ namespace BEPUphysics.CollisionShapes
                     triangleMesh.Data.GetTriangle(maximum, out vA, out vB, out vC);
                     var normal = Vector3.Cross(vA - vB, vA - vC);
                     if (Vector3.Dot(normal, ray.Direction) < 0)
-                        solidSidedness = TriangleSidedness.Counterclockwise;
+                        toReturn = TriangleSidedness.Counterclockwise;
                     else
-                        solidSidedness = TriangleSidedness.Clockwise;
+                        toReturn = TriangleSidedness.Clockwise;
                 }
 
                 Resources.GiveBack(hits);
 
             }
+            else
+                toReturn = TriangleSidedness.DoubleSided; //This is a problem...
             Resources.GiveBack(hitList);
+            return toReturn;
         }
 
         void ComputeShapeInformation(TransformableMeshData data, out ShapeDistributionInformation shapeInformation)

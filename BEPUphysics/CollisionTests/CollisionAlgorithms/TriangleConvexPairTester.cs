@@ -12,7 +12,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
     ///<summary>
     /// Persistent tester that compares triangles against convex objects.
     ///</summary>
-    public sealed class TriangleConvexPairTester : TrianglePairTester
+    public class TriangleConvexPairTester : TrianglePairTester
     {
         internal ConvexShape convex;
 
