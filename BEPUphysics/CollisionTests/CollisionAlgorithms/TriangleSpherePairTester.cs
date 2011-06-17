@@ -18,10 +18,6 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
         private VoronoiRegion lastRegion;
 
-        ///<summary>
-        /// Whether or not the pair tester was updated during the last attempt.
-        ///</summary>
-        public bool Updated;
 
         //Relies on the triangle being located in the local space of the convex object.  The convex transform is used to transform the
         //contact points back from the convex's local space into world space.

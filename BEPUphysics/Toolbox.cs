@@ -879,6 +879,80 @@ namespace BEPUphysics
             Vector3.Add(ref c2, ref p2, out c2);
         }
 
+
+        /// <summary>
+        /// Computes closest points c1 and c2 betwen lines p1q1 and p2q2.
+        /// </summary>
+        /// <param name="p1">First point of first segment.</param>
+        /// <param name="q1">Second point of first segment.</param>
+        /// <param name="p2">First point of second segment.</param>
+        /// <param name="q2">Second point of second segment.</param>
+        /// <param name="s">Distance along the line to the point for first segment.</param>
+        /// <param name="t">Distance along the line to the point for second segment.</param>
+        /// <param name="c1">Closest point on first segment.</param>
+        /// <param name="c2">Closest point on second segment.</param>
+        public static void GetClosestPointsBetweenLines(ref Vector3 p1, ref Vector3 q1, ref Vector3 p2, ref Vector3 q2,
+                                                           out float s, out float t, out Vector3 c1, out Vector3 c2)
+        {
+            //Segment direction vectors
+            Vector3 d1;
+            Vector3.Subtract(ref q1, ref p1, out d1);
+            Vector3 d2;
+            Vector3.Subtract(ref q2, ref p2, out d2);
+            Vector3 r;
+            Vector3.Subtract(ref p1, ref p2, out r);
+            //distance
+            float a = d1.LengthSquared();
+            float e = d2.LengthSquared();
+            float f;
+            Vector3.Dot(ref d2, ref r, out f);
+
+            if (a <= Epsilon && e <= Epsilon)
+            {
+                //These segments are more like points.
+                s = t = 0.0f;
+                c1 = p1;
+                c2 = p2;
+                return;
+            }
+            if (a <= Epsilon)
+            {
+                // First segment is basically a point.
+                s = 0.0f;
+                t = MathHelper.Clamp(f / e, 0.0f, 1.0f);
+            }
+            else
+            {
+                float c = Vector3.Dot(d1, r);
+                if (e <= Epsilon)
+                {
+                    // Second segment is basically a point.
+                    t = 0.0f;
+                    s = MathHelper.Clamp(-c / a, 0.0f, 1.0f);
+                }
+                else
+                {
+                    float b = Vector3.Dot(d1, d2);
+                    float denom = a * e - b * b;
+
+                    // If segments not parallel, compute closest point on L1 to L2, and
+                    // clamp to segment S1. Else pick some s (here .5f)
+                    if (denom != 0.0f)
+                        s = MathHelper.Clamp((b * f - c * e) / denom, 0.0f, 1.0f);
+                    else //Parallel, just use .5f
+                        s = .5f;
+
+
+                    t = (b * s + f) / e;
+                }
+            }
+
+            Vector3.Multiply(ref d1, s, out c1);
+            Vector3.Add(ref c1, ref p1, out c1);
+            Vector3.Multiply(ref d2, t, out c2);
+            Vector3.Add(ref c2, ref p2, out c2);
+        }
+
         /// <summary>
         /// Determines the minimum distance between two lines.
         /// </summary>

@@ -112,8 +112,7 @@ namespace BEPUphysicsDemos
                                                     typeof (TestDemo3),
                                                     typeof (BroadPhasesTestDemo),
                                                     typeof (MPRCastingDemo),
-                                                    typeof (TerrainTesting),
-                                                    typeof (ThreadingTestDemo)
+                                                    typeof (TerrainTesting)
                                                 };
 
 
