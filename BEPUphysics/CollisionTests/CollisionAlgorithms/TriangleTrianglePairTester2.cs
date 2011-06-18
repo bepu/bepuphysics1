@@ -32,9 +32,23 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             Vector3 direction;
             Vector3.Subtract(ref closestB, ref closestA, out direction);
             float t = distance * marginA / (marginA + marginB);
+
+            Vector3.Divide(ref direction, distance, out contact.Normal);
+            Vector3.Multiply(ref contact.Normal, t, out contact.Position);
+            Vector3.Add(ref contact.Position, ref closestA, out contact.Position);
+            contact.PenetrationDepth = marginA + marginB - distance;
+            contact.Id = -1;
+        }
+
+        void GetContact(ref Vector3 closestA, ref Vector3 closestB, ref Vector3 normal, float distance, float marginA, float marginB, out ContactData contact)
+        {
+            Vector3 direction;
+            Vector3.Subtract(ref closestB, ref closestA, out direction);
+            float t = marginA / (marginA + marginB);
+
             Vector3.Multiply(ref direction, t, out contact.Position);
             Vector3.Add(ref contact.Position, ref closestA, out contact.Position);
-            Vector3.Divide(ref direction, distance, out contact.Normal);
+            contact.Normal = normal;
             contact.PenetrationDepth = marginA + marginB - distance;
             contact.Id = -1;
         }
@@ -61,6 +75,12 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             //Compute the location of the triangles along their normals.
             float positionA;
             Vector3.Dot(ref triangle.vA, ref normal, out positionA);
+            Vector3 centerA;
+            Vector3.Add(ref triangle.vA, ref triangle.vB, out centerA);
+            Vector3.Add(ref triangle.vC, ref centerA, out centerA);
+            float triangleAPositionOnB;
+            Vector3.Dot(ref centerA, ref normalB, out triangleAPositionOnB);
+            triangleAPositionOnB *= 1 / 3f;
             //Position "B" is known to be zero, because the triangle is centered on the origin.
             //Calibrate triangle A's normal.
             switch (triangle.sidedness)
@@ -78,22 +98,20 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                     positionA = -positionA;
                     break;
             }
-            float dAonB;
-            Vector3.Dot(ref triangle.vA, ref normalB, out dAonB);
             //Calibrate triangle B's normal.
             switch (triangleB.sidedness)
             {
                 case TriangleSidedness.DoubleSided:
-                    if (dAonB < 0)
+                    if (triangleAPositionOnB < 0)
                     {
                         //The normal is pointing away from the other triangle.
                         Vector3.Negate(ref normalB, out normalB);
-                        dAonB = -dAonB;
+                        triangleAPositionOnB = -triangleAPositionOnB;
                     }
                     break;
                 case TriangleSidedness.Clockwise:
                     Vector3.Negate(ref normalB, out normalB);
-                    dAonB = -dAonB;
+                    triangleAPositionOnB = -triangleAPositionOnB;
                     break;
             }
 
@@ -102,11 +120,12 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             Vector3.Dot(ref triangleB.vA, ref normal, out dAonA);
             Vector3.Dot(ref triangleB.vB, ref normal, out dBonA);
             Vector3.Dot(ref triangleB.vC, ref normal, out dConA);
-            dAonA = positionA - dAonA;
-            dBonA = positionA - dBonA;
-            dConA = positionA - dConA;
+            dAonA = dAonA - positionA;
+            dBonA = dBonA - positionA;
+            dConA = dConA - positionA;
             //Go through each vertex on triangle "A" and compute its distances to triangle B's plane.
-            float dBonB, dConB;
+            float dAonB, dBonB, dConB;
+            Vector3.Dot(ref triangle.vA, ref normalB, out dAonB);
             Vector3.Dot(ref triangle.vB, ref normalB, out dBonB);
             Vector3.Dot(ref triangle.vC, ref normalB, out dConB);
 
@@ -119,6 +138,8 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             bool definitelyNotIntersecting = false;
             if (dAonA >= 0 && dBonA >= 0 && dConA >= 0)
             {
+                if (dAonA > collisionMargin && dBonA >= collisionMargin && dConA >= collisionMargin)
+                    return false; //There can be no collision at all!
                 //All vertices on B are on a valid side of triangle A.
                 definitelyNotIntersecting = true;
 
@@ -136,6 +157,8 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             }
             if (dAonB >= 0 && dBonB >= 0 && dConB >= 0)
             {
+                if (dAonB > collisionMargin && dBonB >= collisionMargin && dConB >= collisionMargin)
+                    return false; //There can be no collision at all!
                 //All vertices on A are on a valid side of triangle B.
                 definitelyNotIntersecting = true;
 
@@ -159,27 +182,29 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             //Keep in mind that contact normals should face towards triangle A.
 
             //Test all of B's vertices against triangle A.
+            Vector3 negatedNormalA;
+            Vector3.Negate(ref normal, out negatedNormalA);
             Vector3 closestPointOnTriangle;
-            if (dAonA >= 0 && dAonA < collisionMargin && IsPointInTriangle(ref triangleB.vA, ref triangle.vA, ref triangle.vB, ref triangle.vC, ref normal, dAonA, out closestPointOnTriangle))
+            if (dAonA >= 0 && dAonA < collisionMargin && IsPointInTriangle(ref triangleB.vA, ref triangle.vA, ref triangle.vB, ref triangle.vC, ref normal, -dAonA, out closestPointOnTriangle))
             {
                 ContactData contact;
-                GetContact(ref closestPointOnTriangle, ref triangleB.vA, dAonA, triangle.collisionMargin, triangleB.collisionMargin, out contact);
+                GetContact(ref closestPointOnTriangle, ref triangleB.vA, ref negatedNormalA, dAonA, triangle.collisionMargin, triangleB.collisionMargin, out contact);
                 contact.Id = (int)VoronoiRegion.ABC;
                 contactList.Add(ref contact);
 
             }
-            if (dBonA >= 0 && dBonA < collisionMargin && IsPointInTriangle(ref triangleB.vB, ref triangle.vA, ref triangle.vB, ref triangle.vC, ref normal, dBonA, out closestPointOnTriangle))
+            if (dBonA >= 0 && dBonA < collisionMargin && IsPointInTriangle(ref triangleB.vB, ref triangle.vA, ref triangle.vB, ref triangle.vC, ref normal, -dBonA, out closestPointOnTriangle))
             {
                 ContactData contact;
-                GetContact(ref closestPointOnTriangle, ref triangleB.vB, dBonA, triangle.collisionMargin, triangleB.collisionMargin, out contact);
+                GetContact(ref closestPointOnTriangle, ref triangleB.vB, ref negatedNormalA, dBonA, triangle.collisionMargin, triangleB.collisionMargin, out contact);
                 contact.Id = (int)VoronoiRegion.ABC;
                 contactList.Add(ref contact);
 
             }
-            if (dConA >= 0 && dConA < collisionMargin && IsPointInTriangle(ref triangleB.vC, ref triangle.vA, ref triangle.vB, ref triangle.vC, ref normal, dConA, out closestPointOnTriangle))
+            if (dConA >= 0 && dConA < collisionMargin && IsPointInTriangle(ref triangleB.vC, ref triangle.vA, ref triangle.vB, ref triangle.vC, ref normal, -dConA, out closestPointOnTriangle))
             {
                 ContactData contact;
-                GetContact(ref closestPointOnTriangle, ref triangleB.vB, dConA, triangle.collisionMargin, triangleB.collisionMargin, out contact);
+                GetContact(ref closestPointOnTriangle, ref triangleB.vC, ref negatedNormalA, dConA, triangle.collisionMargin, triangleB.collisionMargin, out contact);
                 contact.Id = (int)VoronoiRegion.ABC;
                 contactList.Add(ref contact);
             }
@@ -188,21 +213,21 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             if (dAonB >= 0 && dAonB < collisionMargin && IsPointInTriangle(ref triangle.vA, ref triangleB.vA, ref triangleB.vB, ref triangleB.vC, ref normalB, -dAonB, out closestPointOnTriangle))
             {
                 ContactData contact;
-                GetContact(ref triangle.vA, ref closestPointOnTriangle, dAonB, triangle.collisionMargin, triangleB.collisionMargin, out contact);
+                GetContact(ref closestPointOnTriangle, ref triangle.vA, ref normalB, dAonB, triangle.collisionMargin, triangleB.collisionMargin, out contact);
                 contact.Id = (int)VoronoiRegion.A;
                 contactList.Add(ref contact);
             }
             if (dBonB >= 0 && dBonB < collisionMargin && IsPointInTriangle(ref triangle.vB, ref triangleB.vA, ref triangleB.vB, ref triangleB.vC, ref normalB, -dBonB, out closestPointOnTriangle))
             {
                 ContactData contact;
-                GetContact(ref triangle.vB, ref closestPointOnTriangle, dBonB, triangle.collisionMargin, triangleB.collisionMargin, out contact);
+                GetContact(ref closestPointOnTriangle, ref triangle.vB, ref normalB, dBonB, triangle.collisionMargin, triangleB.collisionMargin, out contact);
                 contact.Id = (int)VoronoiRegion.B;
                 contactList.Add(ref contact);
             }
             if (dConB >= 0 && dConB < collisionMargin && IsPointInTriangle(ref triangle.vC, ref triangleB.vA, ref triangleB.vB, ref triangleB.vC, ref normalB, -dConB, out closestPointOnTriangle))
             {
                 ContactData contact;
-                GetContact(ref triangle.vC, ref closestPointOnTriangle, dConB, triangle.collisionMargin, triangleB.collisionMargin, out contact);
+                GetContact(ref closestPointOnTriangle, ref triangle.vC, ref normalB, dConB, triangle.collisionMargin, triangleB.collisionMargin, out contact);
                 contact.Id = (int)VoronoiRegion.C;
                 contactList.Add(ref contact);
             }
@@ -319,21 +344,24 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 bool shouldAdd = true;
                 ContactData contact;
                 float depth = collisionMargin - distance;
-                for (int i = 0; i < contactList.count; i++)
+                if (depth >= 0) //Don't add if it's too far away.
                 {
-                    contactList.Get(i, out contact);
-                    if (contact.PenetrationDepth > depth)
+                    for (int i = 0; i < contactList.count; i++)
                     {
-                        //A face contact is closer.  Don't add the edge-edge contact!
-                        shouldAdd = false;
-                        break;
+                        contactList.Get(i, out contact);
+                        if (contact.PenetrationDepth > depth)
+                        {
+                            //A face contact is closer.  Don't add the edge-edge contact!
+                            shouldAdd = false;
+                            break;
+                        }
                     }
-                }
-                if (shouldAdd)
-                {
-                    GetContact(ref closestPointA, ref closestPointB, distance, triangle.collisionMargin, triangleB.collisionMargin, out contact);
-                    contact.Id = (int)region;
-                    contactList.Add(ref contact);
+                    if (shouldAdd)
+                    {
+                        GetContact(ref closestPointB, ref closestPointA, distance, triangle.collisionMargin, triangleB.collisionMargin, out contact);
+                        contact.Id = (int)region;
+                        contactList.Add(ref contact);
+                    }
                 }
                 return contactList.count > 0;
             }
@@ -572,7 +600,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                     if (distanceSquared < collisionMargin * collisionMargin)
                     {
                         ContactData contact;
-                        GetContact(ref closestA, ref closestB, (float)Math.Sqrt(distanceSquared), triangle.collisionMargin, triangleB.collisionMargin, out contact);
+                        GetContact(ref closestB, ref closestA, (float)Math.Sqrt(distanceSquared), triangle.collisionMargin, triangleB.collisionMargin, out contact);
                         contact.Id = (int)regionA2;
                         contactList.Add(ref contact);
                     }
@@ -585,13 +613,13 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 {
                     //The edges are B2 and A1.
                     float s, t;
-                    Toolbox.GetClosestPointsBetweenSegments(ref B21, ref B22, ref A11, ref A12, out s, out t, out closestA, out closestB);
+                    Toolbox.GetClosestPointsBetweenSegments(ref B21, ref B22, ref A11, ref A12, out s, out t, out closestB, out closestA);
                     float distanceSquared;
                     Vector3.DistanceSquared(ref closestA, ref closestB, out distanceSquared);
                     if (distanceSquared < collisionMargin * collisionMargin)
                     {
                         ContactData contact;
-                        GetContact(ref closestA, ref closestB, (float)Math.Sqrt(distanceSquared), triangle.collisionMargin, triangleB.collisionMargin, out contact);
+                        GetContact(ref closestB, ref closestA, (float)Math.Sqrt(distanceSquared), triangle.collisionMargin, triangleB.collisionMargin, out contact);
                         contact.Id = (int)regionA1;
                         contactList.Add(ref contact);
                     }
@@ -629,19 +657,19 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                     Vector3.Multiply(ref edgeContact.Position, .5f, out edgeContact.Position);
                     if (lengthSquared > Toolbox.Epsilon)
                     {
-                        Vector3.Divide(ref cross, (float)Math.Sqrt(lengthSquared), out cross);
+                        Vector3.Divide(ref cross, (float)Math.Sqrt(lengthSquared), out edgeContact.Normal);
                         //Don't bother computing penetration depth using the direction.
                         //Instead, use the distance between B1 and A2.  Project it onto the axis.
                         Vector3 overlapDirection;
-                        Vector3.Subtract(ref A2, ref B1, out overlapDirection);
+                        Vector3.Subtract(ref B1, ref A2, out overlapDirection);
                         float depth;
-                        Vector3.Dot(ref overlapDirection, ref cross, out depth);
-                        float overlapLengthSquared = overlapDirection.LengthSquared();
-                        depth /= overlapLengthSquared;
+                        Vector3.Dot(ref overlapDirection, ref edgeContact.Normal, out depth);
+                        float calibrateDot;
+                        Vector3.Dot(ref centerA, ref edgeContact.Normal, out calibrateDot);
+                        if (calibrateDot < 0)
+                            Vector3.Negate(ref edgeContact.Normal, out edgeContact.Normal);
+                        edgeContact.PenetrationDepth = collisionMargin + Math.Abs(depth);
 
-                        edgeContact.PenetrationDepth = collisionMargin + depth;
-
-                        Vector3.Divide(ref overlapDirection, (float)Math.Sqrt(overlapLengthSquared), out edgeContact.Normal);
                         edgeContact.Id = (int)regionA2;
 
                     }
@@ -667,19 +695,19 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                     Vector3.Multiply(ref edgeContact.Position, .5f, out edgeContact.Position);
                     if (lengthSquared > Toolbox.Epsilon)
                     {
-                        Vector3.Divide(ref cross, (float)Math.Sqrt(lengthSquared), out cross);
+                        Vector3.Divide(ref cross, (float)Math.Sqrt(lengthSquared), out edgeContact.Normal);
                         //Don't bother computing penetration depth using the direction.
                         //Instead, use the distance between B1 and A2.  Project it onto the axis.
                         Vector3 overlapDirection;
                         Vector3.Subtract(ref A1, ref B2, out overlapDirection);
                         float depth;
-                        Vector3.Dot(ref overlapDirection, ref cross, out depth);
-                        float overlapLengthSquared = overlapDirection.LengthSquared();
-                        depth /= overlapLengthSquared;
+                        Vector3.Dot(ref overlapDirection, ref edgeContact.Normal, out depth);
+                        float calibrateDot;
+                        Vector3.Dot(ref centerA, ref edgeContact.Normal, out calibrateDot);
+                        if (calibrateDot < 0)
+                            Vector3.Negate(ref edgeContact.Normal, out edgeContact.Normal);
+                        edgeContact.PenetrationDepth = collisionMargin + Math.Abs(depth);
 
-                        edgeContact.PenetrationDepth = collisionMargin + depth;
-
-                        Vector3.Divide(ref overlapDirection, (float)Math.Sqrt(overlapLengthSquared), out edgeContact.Normal);
                         edgeContact.Id = (int)regionA1;
 
                     }
@@ -697,6 +725,10 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 #region A1 B1 B2 A2
                 if (0 < B1t)
                 {
+                    //The edge contact position is in the middle of the interior interval (B1 B2).
+                    Vector3.Add(ref B1, ref B2, out edgeContact.Position);
+                    Vector3.Multiply(ref edgeContact.Position, .5f, out edgeContact.Position);
+
                     //For A1 B1 B2 A2, that means if B1-A1 < A2-B2, then use A1 and B1 as the involved edges.  Otherwise, use A2 and B2.
                     if (B1t < 1 - B2t)
                     {
@@ -709,23 +741,22 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                         Vector3.Cross(ref edgeA1, ref edgeB1, out cross);
                         float lengthSquared = cross.LengthSquared();
                         edgeContact.PenetrationDepth = float.MaxValue;
-                        Vector3.Add(ref A1, ref B1, out edgeContact.Position);
-                        Vector3.Multiply(ref edgeContact.Position, .5f, out edgeContact.Position);
+
                         if (lengthSquared > Toolbox.Epsilon)
                         {
-                            Vector3.Divide(ref cross, (float)Math.Sqrt(lengthSquared), out cross);
+                            Vector3.Divide(ref cross, (float)Math.Sqrt(lengthSquared), out edgeContact.Normal);
                             //Don't bother computing penetration depth using the direction.
                             //Instead, use the distance between A1 and B1.  Project it onto the axis.
                             Vector3 overlapDirection;
                             Vector3.Subtract(ref A1, ref B1, out overlapDirection);
                             float depth;
-                            Vector3.Dot(ref overlapDirection, ref cross, out depth);
-                            float overlapLengthSquared = overlapDirection.LengthSquared();
-                            depth /= overlapLengthSquared;
+                            Vector3.Dot(ref overlapDirection, ref edgeContact.Normal, out depth);
+                            float calibrateDot;
+                            Vector3.Dot(ref centerA, ref edgeContact.Normal, out calibrateDot);
+                            if (calibrateDot < 0)
+                                Vector3.Negate(ref edgeContact.Normal, out edgeContact.Normal);
+                            edgeContact.PenetrationDepth = collisionMargin + Math.Abs(depth);
 
-                            edgeContact.PenetrationDepth = collisionMargin + depth;
-
-                            Vector3.Divide(ref overlapDirection, (float)Math.Sqrt(overlapLengthSquared), out edgeContact.Normal);
                             edgeContact.Id = (int)regionA1;
 
                         }
@@ -735,29 +766,27 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                         //Full overlap.  Involved edges are A2 and B2.
                         //Compute the edge direction (A2 edge x B2 edge).
                         Vector3 edgeA2, edgeB2;
-                        Vector3.Subtract(ref A22, ref B21, out edgeA2);
+                        Vector3.Subtract(ref A22, ref A21, out edgeA2);
                         Vector3.Subtract(ref B22, ref B21, out edgeB2);
                         Vector3 cross;
                         Vector3.Cross(ref edgeA2, ref edgeB2, out cross);
                         float lengthSquared = cross.LengthSquared();
                         edgeContact.PenetrationDepth = float.MaxValue;
-                        Vector3.Add(ref A2, ref B2, out edgeContact.Position);
-                        Vector3.Multiply(ref edgeContact.Position, .5f, out edgeContact.Position);
                         if (lengthSquared > Toolbox.Epsilon)
                         {
-                            Vector3.Divide(ref cross, (float)Math.Sqrt(lengthSquared), out cross);
+                            Vector3.Divide(ref cross, (float)Math.Sqrt(lengthSquared), out edgeContact.Normal);
                             //Don't bother computing penetration depth using the direction.
                             //Instead, use the distance between A1 and B1.  Project it onto the axis.
                             Vector3 overlapDirection;
                             Vector3.Subtract(ref A2, ref B2, out overlapDirection);
                             float depth;
-                            Vector3.Dot(ref overlapDirection, ref cross, out depth);
-                            float overlapLengthSquared = overlapDirection.LengthSquared();
-                            depth /= overlapLengthSquared;
-
-                            edgeContact.PenetrationDepth = collisionMargin + depth;
-
-                            Vector3.Divide(ref overlapDirection, (float)Math.Sqrt(overlapLengthSquared), out edgeContact.Normal);
+                            Vector3.Dot(ref overlapDirection, ref edgeContact.Normal, out depth);
+                            float calibrateDot;
+                            Vector3.Dot(ref centerA, ref edgeContact.Normal, out calibrateDot);
+                            if (calibrateDot < 0)
+                                Vector3.Negate(ref edgeContact.Normal, out edgeContact.Normal);
+                            edgeContact.PenetrationDepth = collisionMargin + Math.Abs(depth);
+                            
                             edgeContact.Id = (int)regionA2;
 
                         }
@@ -769,8 +798,12 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 #endregion
 
                 #region B1 A1 A2 B2
-                if (0 < B1t)
+                if (0 > B1t)
                 {
+                    //The edge contact position is in the middle of the interior interval (A1 A2).
+                    Vector3.Add(ref A1, ref A2, out edgeContact.Position);
+                    Vector3.Multiply(ref edgeContact.Position, .5f, out edgeContact.Position);
+
                     //For B1 A1 A2 B2, that means if A1-B1 < B2-A2, then use B1 and A1 as the involved edges.  Otherwise, use B2 and A2.
                     if (-B1t < B2t - 1)
                     {
@@ -778,28 +811,27 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                         //Compute the edge direction (B1 edge x A1 edge).
                         Vector3 edgeB1, edgeA1;
                         Vector3.Subtract(ref B12, ref B11, out edgeB1);
-                        Vector3.Subtract(ref A12, ref B11, out edgeA1);
+                        Vector3.Subtract(ref A12, ref A11, out edgeA1);
                         Vector3 cross;
                         Vector3.Cross(ref edgeB1, ref edgeA1, out cross);
                         float lengthSquared = cross.LengthSquared();
                         edgeContact.PenetrationDepth = float.MaxValue;
-                        Vector3.Add(ref B1, ref A1, out edgeContact.Position);
-                        Vector3.Multiply(ref edgeContact.Position, .5f, out edgeContact.Position);
                         if (lengthSquared > Toolbox.Epsilon)
                         {
-                            Vector3.Divide(ref cross, (float)Math.Sqrt(lengthSquared), out cross);
+                            Vector3.Divide(ref cross, (float)Math.Sqrt(lengthSquared), out edgeContact.Normal);
                             //Don't bother computing penetration depth using the direction.
                             //Instead, use the distance between B1 and A1.  Project it onto the axis.
                             Vector3 overlapDirection;
-                            Vector3.Subtract(ref B1, ref A1, out overlapDirection);
+                            Vector3.Subtract(ref edgeContact.Position, ref B1, out overlapDirection);
                             float depth;
-                            Vector3.Dot(ref overlapDirection, ref cross, out depth);
-                            float overlapLengthSquared = overlapDirection.LengthSquared();
-                            depth /= overlapLengthSquared;
+                            Vector3.Dot(ref overlapDirection, ref edgeContact.Normal, out depth);
+                            float calibrateDot;
+                            Vector3.Dot(ref centerA, ref edgeContact.Normal, out calibrateDot);
+                            if (calibrateDot < 0)
+                                Vector3.Negate(ref edgeContact.Normal, out edgeContact.Normal);
+                            edgeContact.PenetrationDepth = collisionMargin + Math.Abs(depth);
 
-                            edgeContact.PenetrationDepth = collisionMargin + depth;
 
-                            Vector3.Divide(ref overlapDirection, (float)Math.Sqrt(overlapLengthSquared), out edgeContact.Normal);
                             edgeContact.Id = (int)regionA1;
 
                         }
@@ -810,28 +842,26 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                         //Compute the edge direction (B2 edge x A2 edge).
                         Vector3 edgeB2, edgeA2;
                         Vector3.Subtract(ref B22, ref B21, out edgeB2);
-                        Vector3.Subtract(ref A22, ref B21, out edgeA2);
+                        Vector3.Subtract(ref A22, ref A21, out edgeA2);
                         Vector3 cross;
                         Vector3.Cross(ref edgeB2, ref edgeA2, out cross);
                         float lengthSquared = cross.LengthSquared();
                         edgeContact.PenetrationDepth = float.MaxValue;
-                        Vector3.Add(ref B2, ref A2, out edgeContact.Position);
-                        Vector3.Multiply(ref edgeContact.Position, .5f, out edgeContact.Position);
                         if (lengthSquared > Toolbox.Epsilon)
                         {
-                            Vector3.Divide(ref cross, (float)Math.Sqrt(lengthSquared), out cross);
+                            Vector3.Divide(ref cross, (float)Math.Sqrt(lengthSquared), out edgeContact.Normal);
                             //Don't bother computing penetration depth using the direction.
-                            //Instead, use the distance between A1 and B1.  Project it onto the axis.
+                            //Instead, use the distance between the edge contact position and B2.  Project it onto the axis.
                             Vector3 overlapDirection;
-                            Vector3.Subtract(ref B2, ref A2, out overlapDirection);
+                            Vector3.Subtract(ref B2, ref edgeContact.Position, out overlapDirection);
                             float depth;
-                            Vector3.Dot(ref overlapDirection, ref cross, out depth);
-                            float overlapLengthSquared = overlapDirection.LengthSquared();
-                            depth /= overlapLengthSquared;
+                            Vector3.Dot(ref overlapDirection, ref edgeContact.Normal, out depth);
+                            float calibrateDot;
+                            Vector3.Dot(ref centerA, ref edgeContact.Normal, out calibrateDot);
+                            if (calibrateDot < 0)
+                                Vector3.Negate(ref edgeContact.Normal, out edgeContact.Normal);
+                            edgeContact.PenetrationDepth = collisionMargin + Math.Abs(depth);
 
-                            edgeContact.PenetrationDepth = collisionMargin + depth;
-
-                            Vector3.Divide(ref overlapDirection, (float)Math.Sqrt(overlapLengthSquared), out edgeContact.Normal);
                             edgeContact.Id = (int)regionA2;
 
                         }
@@ -859,7 +889,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 else
                     deepestOnB = dConB;
                 ContactData faceContact;
-                if (deepestOnA < deepestOnB)
+                if (deepestOnA > deepestOnB)
                 {
                     //A's is the deepest. 
                     faceContact.PenetrationDepth = collisionMargin - deepestOnA;
@@ -874,7 +904,16 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 faceContact.Position = edgeContact.Position;
                 faceContact.Id = (int)VoronoiRegion.ABC;
                 if (faceContact.PenetrationDepth < edgeContact.PenetrationDepth)
+                {
+                    float calibrationDot;
+                    Vector3.Dot(ref faceContact.Normal, ref centerA, out calibrationDot);
+                    if (calibrationDot < 0)
+                    {
+                        Vector3.Negate(ref faceContact.Normal, out faceContact.Normal);
+                    }
                     contactList.Add(ref faceContact);
+  
+                }
                 else
                     contactList.Add(ref edgeContact);
 
@@ -897,7 +936,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             Vector3.Dot(ref a, ref normal, out distanceFromPlane);
             float t;
             if (Math.Abs(dot) > 0)
-                t = distanceFromPlane / dot;
+                t = -distanceFromPlane / dot;
             else
             {
                 //The line is parallel to the plane's surface.

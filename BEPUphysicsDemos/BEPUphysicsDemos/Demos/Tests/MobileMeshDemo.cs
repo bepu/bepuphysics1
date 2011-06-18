@@ -36,6 +36,8 @@ namespace BEPUphysicsDemos.Demos
         public MobileMeshDemo(DemosGame game)
             : base(game)
         {
+
+
             Vector3[] vertices;
             int[] indices;
 

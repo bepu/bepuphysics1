@@ -937,8 +937,8 @@ namespace BEPUphysics
 
                     // If segments not parallel, compute closest point on L1 to L2, and
                     // clamp to segment S1. Else pick some s (here .5f)
-                    if (denom != 0.0f)
-                        s = MathHelper.Clamp((b * f - c * e) / denom, 0.0f, 1.0f);
+                    if (denom != 0f)
+                        s = (b * f - c * e) / denom;
                     else //Parallel, just use .5f
                         s = .5f;
 
