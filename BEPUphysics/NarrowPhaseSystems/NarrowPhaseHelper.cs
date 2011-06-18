@@ -99,6 +99,14 @@ namespace BEPUphysics.NarrowPhaseSystems
         /// </summary>
         public NarrowPhasePairFactory<MobileMeshStaticMeshPairHandler> MobileMeshStaticMesh { get; private set; }
         /// <summary>
+        /// Gets the factory for the mobile mesh-instanced mesh case.
+        /// </summary>
+        public NarrowPhasePairFactory<MobileMeshInstancedMeshPairHandler> MobileMeshInstancedMesh { get; private set; }
+        /// <summary>
+        /// Gets the factory for the mobile mesh-terrain case.
+        /// </summary>
+        public NarrowPhasePairFactory<MobileMeshTerrainPairHandler> MobileMeshTerrain { get; private set; }
+        /// <summary>
         /// Gets the factory for the mobile mesh-mobile mesh case.
         /// </summary>
         public NarrowPhasePairFactory<MobileMeshMobileMeshPairHandler> MobileMeshMobileMesh { get; private set; }
@@ -141,6 +149,8 @@ namespace BEPUphysics.NarrowPhaseSystems
             factories.Add(MobileMeshSphere = new NarrowPhasePairFactory<MobileMeshSpherePairHandler>());
             factories.Add(MobileMeshTriangle = new NarrowPhasePairFactory<MobileMeshTrianglePairHandler>());
             factories.Add(MobileMeshStaticMesh = new NarrowPhasePairFactory<MobileMeshStaticMeshPairHandler>());
+            factories.Add(MobileMeshInstancedMesh = new NarrowPhasePairFactory<MobileMeshInstancedMeshPairHandler>());
+            factories.Add(MobileMeshTerrain = new NarrowPhasePairFactory<MobileMeshTerrainPairHandler>());
             factories.Add(MobileMeshMobileMesh = new NarrowPhasePairFactory<MobileMeshMobileMeshPairHandler>());
         }
 
@@ -244,6 +254,8 @@ namespace BEPUphysics.NarrowPhaseSystems
 
             collisionManagers.Add(new TypePair(typeof(CompoundCollidable), typeof(MobileMeshCollidable)), Factories.CompoundMobileMesh);
             collisionManagers.Add(new TypePair(typeof(MobileMeshCollidable), typeof(StaticMesh)), Factories.MobileMeshStaticMesh);
+            collisionManagers.Add(new TypePair(typeof(MobileMeshCollidable), typeof(InstancedMesh)), Factories.MobileMeshInstancedMesh);
+            collisionManagers.Add(new TypePair(typeof(MobileMeshCollidable), typeof(Terrain)), Factories.MobileMeshTerrain);
             collisionManagers.Add(new TypePair(typeof(MobileMeshCollidable), typeof(MobileMeshCollidable)), Factories.MobileMeshMobileMesh);
             collisionManagers.Add(new TypePair(typeof(MobileMeshCollidable), typeof(TriangleCollidable)), Factories.MobileMeshTriangle);
         }

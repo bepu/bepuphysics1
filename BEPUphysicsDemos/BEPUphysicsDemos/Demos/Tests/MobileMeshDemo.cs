@@ -43,17 +43,32 @@ namespace BEPUphysicsDemos.Demos
 
             TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("playground"), out vertices, out indices);
             AffineTransform transform = new AffineTransform(new Vector3(1, 1, 1), Quaternion.Identity, new Vector3(0, -30, 0));
-            StaticMesh staticMesh = new StaticMesh(vertices, indices, transform);
-            staticMesh.Sidedness = TriangleSidedness.Counterclockwise;
-            Space.Add(staticMesh);
-            game.ModelDrawer.Add(staticMesh.Mesh);
+            //InstancedMesh mesh = new InstancedMesh(new InstancedMeshShape(vertices, indices), transform);
+            StaticMesh mesh = new StaticMesh(vertices, indices, transform);
+            mesh.Sidedness = TriangleSidedness.Counterclockwise;
+            Space.Add(mesh);
+            game.ModelDrawer.Add(mesh.Mesh);
 
-            TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("guy"), out vertices, out indices);
+            //transform = new AffineTransform(new Vector3(5, 1, 5), Quaternion.Identity, new Vector3(0, -30, 0));
+            //float[,] heights = new float[128, 128];
+            //for (int i = 0; i < 128; i++)
+            //{
+            //    for (int j = 0; j < 128; j++)
+            //    {
+            //        heights[i, j] = 5 * (float)(Math.Sin(i / 5f) + Math.Cos(j / 5f));
+            //    }
+
+            //}
+            //Terrain terrain = new Terrain(heights, transform);
+            //Space.Add(terrain);
+            //game.ModelDrawer.Add(terrain);
+
+            TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("tube"), out vertices, out indices);
             //MotionSettings.DefaultPositionUpdateMode = PositionUpdateMode.Continuous;
             ShapeDistributionInformation info;
             //transform = AffineTransform.Identity;// new AffineTransform(new Vector3(1, 1, 1), Quaternion.CreateFromAxisAngle(new Vector3(1, 0, 0), MathHelper.Pi), new Vector3(0, 0, 0));
             //transform = new AffineTransform(new Vector3(.02f, .02f, .02f), Quaternion.Identity, new Vector3(0, 0, 0));
-            transform = new AffineTransform(new Vector3(5f, 5f, 5f), Quaternion.Identity, new Vector3(0, 0, 0));
+            transform = new AffineTransform(new Vector3(1f, 1f, 1f), Quaternion.Identity, new Vector3(0, 0, 0));
             var shape = new MobileMeshShape(vertices, indices, transform, MobileMeshSolidity.Solid, out info);
             //shape.Sidedness = TriangleSidedness.Counterclockwise;
 

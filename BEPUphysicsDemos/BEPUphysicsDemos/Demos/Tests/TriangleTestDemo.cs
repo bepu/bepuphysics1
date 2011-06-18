@@ -30,6 +30,8 @@ namespace BEPUphysicsDemos.Demos
             Vector3 center;
             triangleB = new TriangleShape(new Vector3(-1, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1));
             triangleA = new TriangleShape() { VertexA = new Vector3(0, 1, 0), VertexB = new Vector3(0, 3, 0), VertexC = new Vector3(0, 2, 1) };
+            triangleB.Sidedness = TriangleSidedness.Counterclockwise;
+            triangleA.Sidedness = TriangleSidedness.Counterclockwise;
             pairTester = new TriangleTrianglePairTester2();
             pairTester.Initialize(triangleB, triangleA);
 

@@ -175,6 +175,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
             }
 
+            //TODO: Check margin order relative to edge owners.
             #region Face-vertex tests
             //Instead of generating a single closest point, this generates a contact point for each vertex that is close enough to the triangle.
             //Only the closest edge will be used (if it is closer than any of the vertex contacts), but it will be in addition to these vertex contacts.
@@ -786,7 +787,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                             if (calibrateDot < 0)
                                 Vector3.Negate(ref edgeContact.Normal, out edgeContact.Normal);
                             edgeContact.PenetrationDepth = collisionMargin + Math.Abs(depth);
-                            
+
                             edgeContact.Id = (int)regionA2;
 
                         }
@@ -912,13 +913,41 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                         Vector3.Negate(ref faceContact.Normal, out faceContact.Normal);
                     }
                     contactList.Add(ref faceContact);
-  
+
                 }
                 else
                     contactList.Add(ref edgeContact);
 
-                return true;
             }
+
+            if (triangle.sidedness != TriangleSidedness.DoubleSided || triangleB.sidedness != TriangleSidedness.DoubleSided)
+                for (int i = contactList.count - 1; i >= 0; i--)
+                {
+                    ContactData contact;
+                    contactList.Get(i, out contact);
+                    if (triangle.sidedness != TriangleSidedness.DoubleSided)
+                    {
+                        float dot;
+                        Vector3.Dot(ref normal, ref contact.Normal, out dot);
+                        if (dot < 0)
+                        {
+                            contactList.RemoveAt(i);
+                            continue;
+                        }
+                    }
+                    if (triangleB.sidedness != TriangleSidedness.DoubleSided)
+                    {
+                        float dot;
+                        Vector3.Dot(ref normalB, ref contact.Normal, out dot);
+                        if (dot < 0)
+                        {
+                            contactList.RemoveAt(i);
+                            continue;
+                        }
+                    }
+
+                }
+            return contactList.count > 0;
 
 
         }

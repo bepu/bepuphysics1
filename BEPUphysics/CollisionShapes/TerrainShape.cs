@@ -103,7 +103,7 @@ namespace BEPUphysics.CollisionShapes
             {
                 for (int j = 0; j < heights.GetLength(1); j++)
                 {
-                    Vector3 vertex = new Vector3(i, heights[i,j], j);
+                    Vector3 vertex = new Vector3(i, heights[i, j], j);
                     Matrix3X3.Transform(ref vertex, ref transform.LinearTransform, out vertex);
                     if (vertex.X < minX)
                     {
@@ -416,7 +416,7 @@ namespace BEPUphysics.CollisionShapes
             v = new Vector3();
 #endif
             v.X = i;
-            v.Y = heights[i,j];
+            v.Y = heights[i, j];
             v.Z = j;
         }
 
@@ -441,7 +441,7 @@ namespace BEPUphysics.CollisionShapes
             position = new Vector3();
 #endif
             position.X = i;
-            position.Y = heights[i,j];
+            position.Y = heights[i, j];
             position.Z = j;
             AffineTransform.Transform(ref position, ref transform, out position);
 
@@ -492,9 +492,10 @@ namespace BEPUphysics.CollisionShapes
         ///<param name="overlappedTriangles">Triangles whose bounding boxes overlap the input bounding box.</param>
         public bool GetOverlaps(BoundingBox localSpaceBoundingBox, RawList<TriangleMeshConvexContactManifold.TriangleIndices> overlappedTriangles)
         {
+            int width = heights.GetLength(0);
             int minX = Math.Max((int)localSpaceBoundingBox.Min.X, 0);
             int minY = Math.Max((int)localSpaceBoundingBox.Min.Z, 0);
-            int maxX = Math.Min((int)localSpaceBoundingBox.Max.X, heights.GetLength(0) - 2);
+            int maxX = Math.Min((int)localSpaceBoundingBox.Max.X, width - 2);
             int maxY = Math.Min((int)localSpaceBoundingBox.Max.Z, heights.GetLength(1) - 2);
             for (int i = minX; i <= maxX; i++)
             {
@@ -502,10 +503,10 @@ namespace BEPUphysics.CollisionShapes
                 {
                     //Before adding a triangle to the list, make sure the object isn't too high or low from the quad.
                     float highest, lowest;
-                    float y1 = heights[i,j];
-                    float y2 = heights[i + 1,j];
-                    float y3 = heights[i,j + 1];
-                    float y4 = heights[i + 1,j + 1];
+                    float y1 = heights[i, j];
+                    float y2 = heights[i + 1, j];
+                    float y3 = heights[i, j + 1];
+                    float y4 = heights[i + 1, j + 1];
 
                     highest = y1;
                     lowest = y1;
@@ -538,35 +539,95 @@ namespace BEPUphysics.CollisionShapes
                     if (quadTriangleOrganization == QuadTriangleOrganization.BottomLeftUpperRight)
                     {
                         //v1 v2 v3
-                        indices.A = i + j * heights.GetLength(0);
-                        indices.B = i + 1 + j * heights.GetLength(0);
-                        indices.C = i + (j + 1) * heights.GetLength(0);
+                        indices.A = i + j * width;
+                        indices.B = i + 1 + j * width;
+                        indices.C = i + (j + 1) * width;
                         overlappedTriangles.Add(indices);
 
                         //v2 v4 v3
-                        indices.A = i + 1 + j * heights.GetLength(0);
-                        indices.B = i + 1 + (j + 1) * heights.GetLength(0);
-                        indices.C = i + (j + 1) * heights.GetLength(0);
+                        indices.A = i + 1 + j * width;
+                        indices.B = i + 1 + (j + 1) * width;
+                        indices.C = i + (j + 1) * width;
                         overlappedTriangles.Add(indices);
                     }
                     else //Bottom right, Upper left
                     {
                         //v1 v2 v4
-                        indices.A = i + j * heights.GetLength(0);
-                        indices.B = i + 1 + j * heights.GetLength(0);
-                        indices.C = i + 1 + (j + 1) * heights.GetLength(0);
+                        indices.A = i + j * width;
+                        indices.B = i + 1 + j * width;
+                        indices.C = i + 1 + (j + 1) * width;
                         overlappedTriangles.Add(indices);
 
                         //v1 v4 v3
-                        indices.A = i + j * heights.GetLength(0);
-                        indices.B = i + 1 + (j + 1) * heights.GetLength(0);
-                        indices.C = i + (j + 1) * heights.GetLength(0);
+                        indices.A = i + j * width;
+                        indices.B = i + 1 + (j + 1) * width;
+                        indices.C = i + (j + 1) * width;
                         overlappedTriangles.Add(indices);
                     }
 
                 }
             }
             return overlappedTriangles.count > 0;
+        }
+
+        ///<summary>
+        /// Gets overlapped triangles with the terrain shape with a bounding box in the local space of the shape.
+        ///</summary>
+        ///<param name="localSpaceBoundingBox">Bounding box in the local space of the terrain shape.</param>
+        ///<param name="overlappedTriangles">Indices of triangles whose bounding boxes overlap the input bounding box.</param>
+        public bool GetOverlaps(BoundingBox localBoundingBox, RawList<int> overlappedElements)
+        {
+            int width = heights.GetLength(0);
+            int minX = Math.Max((int)localBoundingBox.Min.X, 0);
+            int minY = Math.Max((int)localBoundingBox.Min.Z, 0);
+            int maxX = Math.Min((int)localBoundingBox.Max.X, width - 2);
+            int maxY = Math.Min((int)localBoundingBox.Max.Z, heights.GetLength(1) - 2);
+            for (int i = minX; i <= maxX; i++)
+            {
+                for (int j = minY; j <= maxY; j++)
+                {
+                    //Before adding a triangle to the list, make sure the object isn't too high or low from the quad.
+                    float highest, lowest;
+                    float y1 = heights[i, j];
+                    float y2 = heights[i + 1, j];
+                    float y3 = heights[i, j + 1];
+                    float y4 = heights[i + 1, j + 1];
+
+                    highest = y1;
+                    lowest = y1;
+                    if (y2 > highest)
+                        highest = y2;
+                    else if (y2 < lowest)
+                        lowest = y2;
+                    if (y3 > highest)
+                        highest = y3;
+                    else if (y3 < lowest)
+                        lowest = y3;
+                    if (y4 > highest)
+                        highest = y4;
+                    else if (y4 < lowest)
+                        lowest = y4;
+
+                    //TODO: If a terrain has subterranean collision, then the 'lowest' needs to be offset.
+
+                    if (localBoundingBox.Max.Y < lowest ||
+                        localBoundingBox.Min.Y > highest)
+                        continue;
+
+                    //Now the local bounding box is very likely intersecting those of the triangles.
+                    //Add the triangles to the list.
+                    var indices = new TriangleMeshConvexContactManifold.TriangleIndices();
+
+                    //v3 v4
+                    //v1 v2
+                    int quadIndex = (i + j * width) * 2;
+                    overlappedElements.Add(quadIndex);
+                    overlappedElements.Add(quadIndex + 1);
+
+
+                }
+            }
+            return overlappedElements.count > 0;
         }
 
         ///<summary>
@@ -582,10 +643,68 @@ namespace BEPUphysics.CollisionShapes
             //Reverse the encoded index:
             //index = i + width * j
             int width = heights.GetLength(0);
-            GetPosition(indices.A % width, indices.A / width, ref transform, out a);
-            GetPosition(indices.B % width, indices.B / width, ref transform, out b);
-            GetPosition(indices.C % width, indices.C / width, ref transform, out c);
+            int columnA = indices.A / width;
+            int rowA = indices.A - columnA * width;
+            int columnB = indices.B / width;
+            int rowB = indices.B - columnB * width;
+            int columnC = indices.C / width;
+            int rowC = indices.C - columnC * width;
+            GetPosition(rowA, columnA, ref transform, out a);
+            GetPosition(rowB, columnB, ref transform, out b);
+            GetPosition(rowC, columnC, ref transform, out c);
         }
+
+        ///<summary>
+        /// Gets a world space triangle in the terrain at the given triangle index.
+        ///</summary>
+        ///<param name="index">Index of the triangle.</param>
+        ///<param name="transform">Transform to apply to the triangle vertices.</param>
+        ///<param name="a">First vertex of the triangle.</param>
+        ///<param name="b">Second vertex of the triangle.</param>
+        ///<param name="c">Third vertex of the triangle.</param>
+        public void GetTriangle(int index, ref AffineTransform transform, out Vector3 a, out Vector3 b, out Vector3 c)
+        {
+            //Find the quad.
+            int quadIndex = index / 2;
+            bool isFirstTriangle = quadIndex * 2 == index;
+            int column = quadIndex / heights.GetLength(0);
+            int row = quadIndex - column * heights.GetLength(0);
+
+            if (quadTriangleOrganization == CollisionShapes.QuadTriangleOrganization.BottomLeftUpperRight)
+            {
+                if (isFirstTriangle)
+                {
+                    GetPosition(row, column, ref transform, out a);
+                    GetPosition(row + 1, column, ref transform, out b);
+                    GetPosition(row, column + 1, ref transform, out c);
+                }
+                else
+                {
+                    GetPosition(row, column + 1, ref transform, out a);
+                    GetPosition(row + 1, column + 1, ref transform, out b);
+                    GetPosition(row + 1, column, ref transform, out c);
+                }
+            }
+            else
+            {
+                //The quad is BottomRightUpperLeft.
+                if (isFirstTriangle)
+                {
+                    GetPosition(row, column, ref transform, out a);
+                    GetPosition(row + 1, column, ref transform, out b);
+                    GetPosition(row + 1, column + 1, ref transform, out c);
+                }
+                else
+                {
+                    GetPosition(row, column, ref transform, out a);
+                    GetPosition(row, column + 1, ref transform, out b);
+                    GetPosition(row + 1, column + 1, ref transform, out c);
+                }
+
+            }
+        }
+
+        
     }
 
     /// <summary>
