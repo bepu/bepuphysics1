@@ -192,6 +192,7 @@
     <Compile Include="DeactivationManagement\SimulationIsland.cs" />
     <Compile Include="Entities\EntityConstraintCollection.cs" />
     <Compile Include="Entities\EntitySolverUpdateableCollection.cs" />
+    <Compile Include="Entities\Prefabs\MobileMesh.cs" />
     <Compile Include="EntityStateManagement\BufferedStatesAccessor.cs" />
     <Compile Include="EntityStateManagement\BufferedStatesManager.cs" />
     <Compile Include="EntityStateManagement\EntityBufferedStates.cs" />

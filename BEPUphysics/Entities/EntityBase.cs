@@ -720,11 +720,13 @@ namespace BEPUphysics.Entities
 
         void ISimulationIslandMember.UpdateDeactivationCandidacy(float dt)
         {
+            //Get total velocity, and see if the entity is losing energy.
             float velocity = linearVelocity.LengthSquared() + angularVelocity.LengthSquared();
             isSlowing = velocity <= previousVelocity;
             if (isDynamic)
             {
 
+                //Update time entity's been under the low-velocity limit, or reset if it's not
                 if (velocity < deactivationManager.velocityLowerLimitSquared)
                     velocityTimeBelowLimit += dt;
                 else
@@ -734,7 +736,7 @@ namespace BEPUphysics.Entities
                 {
                     if (!isDeactivationCandidate)
                     {
-                        //See if the velocity is low enough to make this object a deactivation candidate.
+                        //See if the velocity has been low long enough to make this object a deactivation candidate.
                         if (velocityTimeBelowLimit > deactivationManager.lowVelocityTimeMinimum &&
                             isSlowing) //Only deactivate if it is NOT increasing in speed.
                         {
@@ -759,11 +761,14 @@ namespace BEPUphysics.Entities
                         {
                             if (connections[i].ConnectedMembers[j].IsActive && !connections[i].ConnectedMembers[j].IsDynamic)
                             {
+                                //Active kinematic found! We're not a deactivation candidate, and we can stop searching.
                                 isDeactivationCandidate = false;
                                 velocityTimeBelowLimit = 0;
+                                goto Exit;
                             }
                         }
                     }
+              
 
                 }
                 else
@@ -793,6 +798,7 @@ namespace BEPUphysics.Entities
                     velocityTimeBelowLimit = 0;
                 }
             }
+        Exit:
             previousVelocity = velocity;
         }
 

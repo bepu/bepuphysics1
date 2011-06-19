@@ -85,6 +85,7 @@ namespace BEPUphysicsDemos
                                                     typeof (TerrainDemo),
                                                     typeof (StaticMeshDemo),
                                                     typeof (InstancedMeshDemo),
+                                                    typeof (MobileMeshDemo),
                                                     typeof (EntityConstructionDemo),
                                                     typeof (MultipendulumDemo),
                                                     typeof (ClothDemo),
@@ -107,13 +108,7 @@ namespace BEPUphysicsDemos
                                                     typeof (PathFollowingDemo),
                                                     typeof (FishInABarrelDemo),
                                                     typeof (DetectorVolumeDemo),
-                                                    typeof (MobileMeshDemo),
-                                                    typeof (TestDemo2),
-                                                    typeof (TestDemo3),
-                                                    typeof (BroadPhasesTestDemo),
-                                                    typeof (MPRCastingDemo),
-                                                    typeof (TerrainTesting),
-                                                    typeof (AlignerDemo)
+                                                    typeof (MPRCastingDemo)
                                                 };
 
 

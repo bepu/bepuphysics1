@@ -255,6 +255,7 @@
     <Compile Include="Entities\Prefabs\CompoundBody.cs" />
     <Compile Include="Entities\Prefabs\Cone.cs" />
     <Compile Include="Entities\Prefabs\ConvexHull.cs" />
+    <Compile Include="Entities\Prefabs\MobileMesh.cs" />
     <Compile Include="Entities\Prefabs\Cylinder.cs" />
     <Compile Include="Entities\Prefabs\MinkowskiSum.cs" />
     <Compile Include="Entities\Prefabs\Sphere.cs" />

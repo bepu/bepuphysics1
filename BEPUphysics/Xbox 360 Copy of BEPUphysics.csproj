@@ -223,6 +223,7 @@
     <Compile Include="Entities\Prefabs\ConvexHull.cs" />
     <Compile Include="Entities\Prefabs\Cylinder.cs" />
     <Compile Include="Entities\Prefabs\MinkowskiSum.cs" />
+    <Compile Include="Entities\Prefabs\MobileMesh.cs" />
     <Compile Include="Entities\Prefabs\Sphere.cs" />
     <Compile Include="Entities\Prefabs\TransformableEntity.cs" />
     <Compile Include="Entities\Prefabs\Triangle.cs" />

@@ -11,9 +11,9 @@ using BEPUphysics.Settings;
 namespace BEPUphysics.CollisionShapes
 {
     ///<summary>
-    /// Local space data associated with an instanced mesh.
+    /// Local space data associated with a mobile mesh.
     /// This contains a hierarchy and all the other heavy data needed
-    /// by an InstancedMesh.
+    /// by an MobileMesh.
     ///</summary>
     public class MobileMeshShape : EntityShape
     {
@@ -118,9 +118,31 @@ namespace BEPUphysics.CollisionShapes
             }
         }
 
+        ///<summary>
+        /// Constructs a new mobile mesh shape.
+        ///</summary>
+        ///<param name="vertices">Vertices of the mesh.</param>
+        ///<param name="indices">Indices of the mesh.</param>
+        ///<param name="localTransform">Local transform to apply to the shape.</param>
+        ///<param name="solidity">Solidity state of the shape.</param>
+        public MobileMeshShape(Vector3[] vertices, int[] indices, AffineTransform localTransform, MobileMeshSolidity solidity)
+        {
+            this.solidity = solidity;
+            var data = new TransformableMeshData(vertices, indices, localTransform);
+            ShapeDistributionInformation distributionInfo;
+            ComputeShapeInformation(data, out distributionInfo);
+
+            for (int i = 0; i < surfaceVertices.count; i++)
+            {
+                Vector3.Subtract(ref surfaceVertices.Elements[i], ref distributionInfo.Center, out surfaceVertices.Elements[i]);
+            }
+            triangleMesh = new TriangleMesh(data);
+
+            ComputeSolidSidedness();
+        }
 
         ///<summary>
-        /// Constructs a new instanced mesh shape.
+        /// Constructs a new mobile mesh shape.
         ///</summary>
         ///<param name="vertices">Vertices of the mesh.</param>
         ///<param name="indices">Indices of the mesh.</param>
@@ -632,6 +654,9 @@ namespace BEPUphysics.CollisionShapes
 
         private void GetBoundingBox(ref Matrix3X3 o, out BoundingBox boundingBox)
         {
+#if !WINDOWS
+            boundingBox = new BoundingBox();
+#endif
             //Sample the local directions from the matrix, implicitly transposed.
             Vector3 rightDirection = new Vector3(o.M11, o.M21, o.M31);
             Vector3 upDirection = new Vector3(o.M12, o.M22, o.M32);
@@ -869,8 +894,10 @@ namespace BEPUphysics.CollisionShapes
     }
 
     ///<summary>
-    /// Sidedness of a triangle or mesh.
+    /// Solidity of a triangle or mesh.
     /// A triangle can be double sided, or allow one of its sides to let interacting objects through.
+    /// The entire mesh can be made solid, which means objects on the interior still generate contacts even if there aren't any triangles to hit.
+    /// Solidity requires the mesh to be closed.
     ///</summary>
     public enum MobileMeshSolidity
     {
@@ -887,7 +914,7 @@ namespace BEPUphysics.CollisionShapes
         /// </summary>
         Counterclockwise,
         /// <summary>
-        /// The mesh will treat objects inside of its concave shell as if the mesh had volume.
+        /// The mesh will treat objects inside of its concave shell as if the mesh had volume.  Mesh must be closed for this to work properly.
         /// </summary>
         Solid
     }

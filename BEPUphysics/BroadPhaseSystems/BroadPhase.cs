@@ -63,6 +63,11 @@ namespace BEPUphysics.BroadPhaseSystems
             overlapAddLock.Exit();
         }
 
+        /// <summary>
+        /// Adds a broad phase overlap if the collision rules permit it.
+        /// </summary>
+        /// <param name="entryA">First entry of the overlap.</param>
+        /// <param name="entryB">Second entry of the overlap.</param>
         protected internal void TryToAddOverlap(BroadPhaseEntry entryA, BroadPhaseEntry entryB)
         {
             CollisionRule rule;

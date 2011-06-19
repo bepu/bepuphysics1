@@ -38,82 +38,48 @@ namespace BEPUphysicsDemos.Demos
         {
 
 
-            ShapeDistributionInformation info;
             Vector3[] vertices;
             int[] indices;
 
-            TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("playground"), out vertices, out indices);
-            AffineTransform transform = new AffineTransform(new Vector3(1, 1, 1), Quaternion.Identity, new Vector3(0, -30, 0));
-            //InstancedMesh mesh = new InstancedMesh(new InstancedMeshShape(vertices, indices), transform);
-            //StaticMesh mesh = new StaticMesh(vertices, indices, transform);
-            //mesh.Sidedness = TriangleSidedness.Counterclockwise;
-            Entity mesh = new Entity(new MobileMeshShape(vertices, indices, transform, MobileMeshSolidity.Counterclockwise, out info));
+            //Create a big hollow sphere (squished into an ellipsoid).
+            TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("hollowsphere"), out vertices, out indices);
+            var transform = new AffineTransform(new Vector3(.06f, .04f, .06f), Quaternion.Identity, new Vector3(0, 0, 0));
 
+            //Note that meshes can also be made solid (MobileMeshSolidity.Solid).  This gives meshes a solid collidable volume, instead of just
+            //being thin shells.  However, enabling solidity is more expensive.
+            var mesh = new MobileMesh(vertices, indices, transform, MobileMeshSolidity.Counterclockwise);
+            mesh.Position = new Vector3(0, 0, 0);
+            //Make the mesh spin a bit!
+            mesh.AngularVelocity = new Vector3(0, 1, 0);
             Space.Add(mesh);
-            //game.ModelDrawer.Add(mesh);
 
-            //var transform = new AffineTransform(new Vector3(5, 1, 5), Quaternion.Identity, new Vector3(0, -30, 0));
-            //float[,] heights = new float[128, 128];
-            //for (int i = 0; i < 128; i++)
-            //{
-            //    for (int j = 0; j < 128; j++)
-            //    {
-            //        heights[i, j] = 5 * (float)(Math.Sin(i / 5f) + Math.Cos(j / 5f));
-            //    }
-
-            //}
-            //Terrain terrain = new Terrain(heights, transform);
-            //terrain.Thickness = 1000;
-            //Space.Add(terrain);
-            //game.ModelDrawer.Add(terrain);
-
+            //Add another mobile mesh inside.
             TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("tube"), out vertices, out indices);
-            //MotionSettings.DefaultPositionUpdateMode = PositionUpdateMode.Continuous;
-            //transform = AffineTransform.Identity;// new AffineTransform(new Vector3(1, 1, 1), Quaternion.CreateFromAxisAngle(new Vector3(1, 0, 0), MathHelper.Pi), new Vector3(0, 0, 0));
-            //transform = new AffineTransform(new Vector3(.02f, .02f, .02f), Quaternion.Identity, new Vector3(0, 0, 0));
-            transform = new AffineTransform(new Vector3(1f, 1f, 1f), Quaternion.Identity, new Vector3(0, 0, 0));
-            var shape = new MobileMeshShape(vertices, indices, transform, MobileMeshSolidity.Solid, out info);
-            //shape.Sidedness = TriangleSidedness.Counterclockwise;
+            transform = new AffineTransform(new Vector3(1, 1, 1), Quaternion.Identity, new Vector3(0, 0, 0));
+            mesh = new MobileMesh(vertices, indices, transform, MobileMeshSolidity.Counterclockwise, 10);
+            mesh.Position = new Vector3(0, 10, 0);
+            Space.Add(mesh);
 
-            //Space.ForceUpdater.Gravity = new Vector3();
+            //Create a bunch of boxes.
+#if WINDOWS
+            int numColumns = 5;
+            int numRows = 5;
+            int numHigh = 5;
+#else
+            //Keep the simulation a bit smaller on the xbox.
+            int numColumns = 4;
+            int numRows = 4;
+            int numHigh = 4;
+#endif
+            float separation = 1.5f;
 
-            Space.Remove(kapow);
-            kapow = new Sphere(new Vector3(10000, 0, 0), .4f, 1);
-            Space.Add(kapow);
-            Matrix3X3 inertia;
-            float mass = 10;
-            //inertia = new Matrix3X3();
-            //inertia.M11 = mass;
-            //inertia.M22 = mass;
-            //inertia.M33 = mass;
-            Matrix3X3.Multiply(ref info.VolumeDistribution, mass * InertiaHelper.InertiaTensorScale, out inertia);
-            for (int i = 0; i < 6; i++)
-            {
-                for (int j = 0; j < 6; j++)
-                {
-                    var entityMesh = new Entity(shape, mass, inertia, info.Volume);
-                    //entityMesh.CollisionInformation.ImproveBoundaryBehavior = true;
-                    entityMesh.IsAlwaysActive = true;
-                    entityMesh.Position = new Vector3(i * 25, 5000, j * 25);
-                    entityMesh.LinearVelocity = new Vector3(0, -5000, 0);
-                    entityMesh.PositionUpdateMode = PositionUpdateMode.Continuous;
-                    //CollisionRules.AddRule(entityMesh, kapow, CollisionRule.NoSolver);
-                    //entityMesh.AngularVelocity = new Vector3(5, 0, 0);
-                    //entityMesh.LinearVelocity = new Vector3(1, 0, 0);
-                    //entityMesh.Material.KineticFriction = 0;
-                    //entityMesh.Material.StaticFriction = 0;
-                    //entityMesh.LocalInertiaTensorInverse = new Matrix3X3();
-                    Space.Add(entityMesh);
-                    //entityMesh.IsAlwaysActive = true;
-                }
-            }
-            for (int j = 0; j < 0; j++)
-            {
-                var toAdd = new Box(new Vector3(0, 35 + j * -.1f, 0), 2, 2, 2, 1);
-                //toAdd.Material.KineticFriction = 0;
-                //toAdd.Material.StaticFriction = 0;
-                Space.Add(toAdd);
-            }
+
+            for (int i = 0; i < numRows; i++)
+                for (int j = 0; j < numColumns; j++)
+                    for (int k = 0; k < numHigh; k++)
+                    {
+                        Space.Add(new Box(new Vector3(separation * i, k * separation, separation * j), 1, 1, 1, 5));
+                    }
 
             //Space.Add(new Box(new Vector3(0, -10, 0), 1, 1, 1));
             game.Camera.Position = new Vector3(0, -10, 5);
@@ -135,7 +101,7 @@ namespace BEPUphysicsDemos.Demos
         /// </summary>
         public override string Name
         {
-            get { return "MobileMesh"; }
+            get { return "MobileMeshes"; }
         }
     }
 }

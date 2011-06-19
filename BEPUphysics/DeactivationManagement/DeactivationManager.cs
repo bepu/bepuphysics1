@@ -22,6 +22,7 @@ namespace BEPUphysics.DeactivationManagement
         /// Gets or sets the velocity under which the deactivation system will consider 
         /// objects to be deactivation candidates (if their velocity stays below the limit
         /// for the LowVelocityTimeMinimum).
+        /// Defaults to 0.26.
         ///</summary>
         public float VelocityLowerLimit
         {
@@ -38,6 +39,7 @@ namespace BEPUphysics.DeactivationManagement
         /// <summary>
         /// Gets or sets the time limit above which the deactivation system will consider
         /// objects to be deactivation candidates (if their velocity stays below the VelocityLowerLimit for the duration).
+        /// Defaults to 1.
         /// </summary>
         public float LowVelocityTimeMinimum
         {
@@ -58,6 +60,7 @@ namespace BEPUphysics.DeactivationManagement
         /// Gets or sets whether or not to use a stabilization effect on nearly motionless objects.
         /// This removes a lot of energy from a system when things are settling down, allowing them to go 
         /// to sleep faster.  It also makes most simulations appear a lot more robust.
+        /// Defaults to true.
         ///</summary>
         public bool UseStabilization
         {
@@ -79,12 +82,13 @@ namespace BEPUphysics.DeactivationManagement
 
         ///<summary>
         /// Gets or sets the maximum number of objects to attempt to deactivate each frame.
+        /// Defaults to 100.
         ///</summary>
         public int MaximumDeactivationsPerFrame { get { return maximumDeactivationsPerFrame; } set { maximumDeactivationsPerFrame = value; } }
 
         TimeStepSettings timeStepSettings;
         ///<summary>
-        /// Gets or sets the time step settings used by the deactivation manager in determining which objects 
+        /// Gets or sets the time step settings used by the deactivation manager.
         ///</summary>
         public TimeStepSettings TimeStepSettings
         {
@@ -294,6 +298,7 @@ namespace BEPUphysics.DeactivationManagement
                 return s1;
             }
 
+            //Swap if needed so s1 is the bigger island
             if (s1.members.count < s2.members.count)
             {
                 SimulationIsland biggerIsland;
@@ -302,11 +307,13 @@ namespace BEPUphysics.DeactivationManagement
                 s1 = biggerIsland;
             }
 
+            //If either island is active, activate the other.
             if (s2.isActive && !s1.isActive)
                 s1.Activate();
             if (s1.isActive && !s2.isActive)
                 s2.Activate();
 
+            //Move s2's members to s1.
             for (int i = s2.members.count - 1; i >= 0; i--)
             {
                 ISimulationIslandMember member = s2.members.Elements[i];

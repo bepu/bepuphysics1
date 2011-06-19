@@ -20,6 +20,7 @@ namespace BEPUphysics.Settings
         /// <summary>
         /// In persistent manifolds, if two contacts are too close together, then 
         /// the system will not use one of them.  This avoids redundant constraints.
+        /// Defaults to .01f.
         /// </summary>
         public static float ContactMinimumSeparationDistanceSquared = .01f;
 
@@ -43,7 +44,7 @@ namespace BEPUphysics.Settings
 
         /// <summary>
         /// The default amount of allowed penetration into the margin before position correcting impulses will be applied.
-        /// Defaults to .005f.
+        /// Defaults to .01f.
         /// </summary>
         public static float AllowedPenetration = .01f;
 

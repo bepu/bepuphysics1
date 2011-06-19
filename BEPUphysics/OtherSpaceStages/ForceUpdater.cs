@@ -145,7 +145,7 @@ namespace BEPUphysics.OtherSpaceStages
         /// <param name="updateable">Updateable changing state.</param>
         public void ForceUpdateableBecomingKinematic(IForceUpdateable updateable)
         {
-            //This does not verify that it used to be kinematic.  Small room for unsafety.
+            //This does not verify that it used to be dynamic.  Small room for unsafety.
             if (updateable.ForceUpdater == this)
             {
                 if (!dynamicObjects.Remove(updateable))

@@ -7,6 +7,7 @@
     {
         /// <summary>
         /// Impact velocity above which the bouciness of the object pair is taken into account.  Below the threshold, no extra energy is added.
+        /// Defaults to 1.
         /// </summary>
         public static float BouncinessVelocityThreshold = 1;
 

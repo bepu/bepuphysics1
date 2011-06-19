@@ -29,9 +29,9 @@ namespace BEPUphysicsDemos.Demos
 
             //Drop the "meteorites" on the planet.
             Entity toAdd;
-            int numColumns = 20;
-            int numRows = 40;
-            int numHigh = 20;
+            int numColumns = 10;
+            int numRows = 10;
+            int numHigh = 10;
             float separation = 5;
             for (int i = 0; i < numRows; i++)
                 for (int j = 0; j < numColumns; j++)

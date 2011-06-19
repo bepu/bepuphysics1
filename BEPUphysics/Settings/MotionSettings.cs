@@ -12,6 +12,7 @@ namespace BEPUphysics.Settings
         ///<summary>
         /// Whether or not to use RK4 angular integration.  This can improve simulation quality sometimes, but not always.
         /// It has a slight performance impact.  Enabling this when ConserveAngularMomentum is set to true may be helpful.
+        /// Defaults to false.
         ///</summary>
         public static bool UseRk4AngularIntegration;
         ///<summary>
@@ -19,12 +20,14 @@ namespace BEPUphysics.Settings
         /// This produces slightly more realistic angular behavior, but can reduce stability.
         /// Consider using a smaller timestep, enabling RK4 angular integration, or both.
         /// Do not use singular inertia tensors while momentum conservation is enabled.
+        /// Defaults to false.
         ///</summary>
         public static bool ConserveAngularMomentum;
         ///<summary>
         /// The scaling to apply to the core shapes used for continuous collision detection tests.
         /// Values should be between 0 and 0.99f.  The smaller the value, the smaller the shapes used
         /// to perform CCD are, and more collisions are missed.
+        /// Defaults to .8f.
         ///</summary>
         public static float CoreShapeScaling
         {
@@ -41,6 +44,7 @@ namespace BEPUphysics.Settings
         static float coreShapeScaling = .8f;
         /// <summary>
         /// The default position updating mode used by position updateables.
+        /// Defaults to Discrete.
         /// </summary>
         public static PositionUpdateMode DefaultPositionUpdateMode = PositionUpdateMode.Discrete;
         /// <summary>
@@ -50,6 +54,7 @@ namespace BEPUphysics.Settings
         /// bounding box so that secondary collisions are not missed.
         /// The larger size of bounding boxes can cause an increase in collision pairs during stressful situations,
         /// which can harm performance.
+        /// Defaults to false.
         /// </summary>
         public static bool UseExtraExpansionForContinuousBoundingBoxes;
     }

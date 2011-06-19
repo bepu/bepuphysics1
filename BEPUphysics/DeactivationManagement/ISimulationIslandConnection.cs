@@ -9,7 +9,7 @@ namespace BEPUphysics.DeactivationManagement
     public interface ISimulationIslandConnection
     {
         ///<summary>
-        /// Gets and sets the deactivation member tha owns this connection.
+        /// Gets or sets the deactivation member that owns this connection.
         ///</summary>
         DeactivationManager DeactivationManager { get; set; }
 

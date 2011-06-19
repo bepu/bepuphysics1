@@ -39,7 +39,6 @@ namespace BEPUphysicsDemos.Demos
                         toAdd.Material.Bounciness = 1; //Superbouncy boxes help propagate shock waves.
                         toAdd.LinearDamping = 0f;
                         toAdd.AngularDamping = 0f;
-                        //toAddBox.isTangible = false;
                         Space.Add(toAdd);
                     }
 
