@@ -38,6 +38,15 @@ namespace BEPUphysics.CollisionTests.Manifolds
             get { return mesh.worldTransform; }
         }
 
+        //Expand the convex's bounding box to include the mobile mesh's movement.
+        BoundingBox expandedConvexBoundingBox;
+        public override void Update(float dt)
+        {
+            expandedConvexBoundingBox = convex.boundingBox;
+
+            base.Update(dt);
+        }
+
         protected internal override int FindOverlappingTriangles(float dt)
         {
             BoundingBox boundingBox;

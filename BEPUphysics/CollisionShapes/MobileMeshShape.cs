@@ -812,6 +812,22 @@ namespace BEPUphysics.CollisionShapes
 
         }
 
+        /// <summary>
+        /// Gets the bounding box of the mesh transformed first into world space, and then into the local space of another affine transform.
+        /// </summary>
+        /// <param name="shapeTransform">Transform to use to put the shape into world space.</param>
+        /// <param name="spaceTransform">Used as the frame of reference to compute the bounding box.
+        /// In effect, the shape is transformed by the inverse of the space transform to compute its bounding box in local space.</param>
+        /// <param name="sweep">World space sweep direction to transform and add to the bounding box.</param>
+        /// <param name="boundingBox">Bounding box in the local space.</param>
+        public void GetSweptLocalBoundingBox(ref RigidTransform shapeTransform, ref AffineTransform spaceTransform, ref Vector3 sweep, out BoundingBox boundingBox)
+        {
+            GetLocalBoundingBox(ref shapeTransform, ref spaceTransform, out boundingBox);
+            Vector3 expansion;
+            Matrix3X3.TransformTranspose(ref sweep, ref spaceTransform.LinearTransform, out expansion);
+            Toolbox.ExpandBoundingBox(ref boundingBox, ref expansion);
+        }
+
         public override float ComputeVolume()
         {
             throw new System.NotImplementedException();
@@ -848,6 +864,8 @@ namespace BEPUphysics.CollisionShapes
         }
 
 
+
+      
     }
 
     ///<summary>

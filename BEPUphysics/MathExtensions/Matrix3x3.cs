@@ -406,6 +406,27 @@ namespace BEPUphysics.MathExtensions
             matrix3X3.M32 = matrix4X4.M32;
             matrix3X3.M33 = matrix4X4.M33;
         }
+        /// <summary>
+        /// Creates a 3x3 matrix from an XNA 4x4 matrix.
+        /// </summary>
+        /// <param name="matrix4X4">Matrix to extract a 3x3 matrix from.</param>
+        /// <returns>Upper 3x3 matrix extracted from the XNA matrix.</returns>
+        public static Matrix3X3 CreateFromMatrix(Matrix matrix4X4)
+        {
+            Matrix3X3 matrix3X3;
+            matrix3X3.M11 = matrix4X4.M11;
+            matrix3X3.M12 = matrix4X4.M12;
+            matrix3X3.M13 = matrix4X4.M13;
+
+            matrix3X3.M21 = matrix4X4.M21;
+            matrix3X3.M22 = matrix4X4.M22;
+            matrix3X3.M23 = matrix4X4.M23;
+
+            matrix3X3.M31 = matrix4X4.M31;
+            matrix3X3.M32 = matrix4X4.M32;
+            matrix3X3.M33 = matrix4X4.M33;
+            return matrix3X3;
+        }
 
         /// <summary>
         /// Constructs a uniform scaling matrix.

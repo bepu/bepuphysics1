@@ -104,8 +104,8 @@ namespace BEPUphysics.CollisionTests.Manifolds
                 RayHit rayHit;
                 Ray ray = new Ray() { Position = convex.worldTransform.Position, Direction = terrain.worldTransform.LinearTransform.Up };
                 ray.Direction.Normalize();
-                //The raycast has to use flipped sidedness, since we're casting from the bottom up.
-                if (terrain.Shape.RayCast(ref ray, terrain.thickness, ref terrain.worldTransform, TriangleSidedness.Clockwise, out rayHit))
+                //The raycast has to use doublesidedness, since we're casting from the bottom up.
+                if (terrain.Shape.RayCast(ref ray, terrain.thickness, ref terrain.worldTransform, TriangleSidedness.DoubleSided, out rayHit))
                 {
                     //Found a hit!
                     rayHit.Normal.Normalize();

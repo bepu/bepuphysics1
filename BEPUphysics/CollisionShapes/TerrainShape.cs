@@ -523,7 +523,6 @@ namespace BEPUphysics.CollisionShapes
                     else if (y4 < lowest)
                         lowest = y4;
 
-                    //TODO: If a terrain has subterranean collision, then the 'lowest' needs to be offset.
 
                     if (localSpaceBoundingBox.Max.Y < lowest ||
                         localSpaceBoundingBox.Min.Y > highest)
@@ -608,7 +607,6 @@ namespace BEPUphysics.CollisionShapes
                     else if (y4 < lowest)
                         lowest = y4;
 
-                    //TODO: If a terrain has subterranean collision, then the 'lowest' needs to be offset.
 
                     if (localBoundingBox.Max.Y < lowest ||
                         localBoundingBox.Min.Y > highest)
@@ -616,10 +614,6 @@ namespace BEPUphysics.CollisionShapes
 
                     //Now the local bounding box is very likely intersecting those of the triangles.
                     //Add the triangles to the list.
-                    var indices = new TriangleMeshConvexContactManifold.TriangleIndices();
-
-                    //v3 v4
-                    //v1 v2
                     int quadIndex = (i + j * width) * 2;
                     overlappedElements.Add(quadIndex);
                     overlappedElements.Add(quadIndex + 1);

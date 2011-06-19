@@ -103,7 +103,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
 
 
 
-        protected override void UpdateContainedPairs()
+        protected override void UpdateContainedPairs(float dt)
         {
             var overlappedElements = Resources.GetIntList();
             mesh.Mesh.Tree.GetOverlaps(mobileMesh.boundingBox, overlappedElements);

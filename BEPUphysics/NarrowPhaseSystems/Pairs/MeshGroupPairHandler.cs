@@ -181,7 +181,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             Resources.GiveBack(collidable);
         }
 
-        protected abstract void UpdateContainedPairs();
+        protected abstract void UpdateContainedPairs(float dt);
 
 
         ///<summary>
@@ -191,7 +191,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         protected virtual void UpdateContacts(float dt)
         {
 
-            UpdateContainedPairs();
+            UpdateContainedPairs(dt);
             //Eliminate old pairs.
             foreach (var pair in subPairs.Keys)
             {

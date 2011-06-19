@@ -38,18 +38,21 @@ namespace BEPUphysicsDemos.Demos
         {
 
 
+            ShapeDistributionInformation info;
             Vector3[] vertices;
             int[] indices;
 
             TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("playground"), out vertices, out indices);
             AffineTransform transform = new AffineTransform(new Vector3(1, 1, 1), Quaternion.Identity, new Vector3(0, -30, 0));
             //InstancedMesh mesh = new InstancedMesh(new InstancedMeshShape(vertices, indices), transform);
-            StaticMesh mesh = new StaticMesh(vertices, indices, transform);
-            mesh.Sidedness = TriangleSidedness.Counterclockwise;
-            Space.Add(mesh);
-            game.ModelDrawer.Add(mesh.Mesh);
+            //StaticMesh mesh = new StaticMesh(vertices, indices, transform);
+            //mesh.Sidedness = TriangleSidedness.Counterclockwise;
+            Entity mesh = new Entity(new MobileMeshShape(vertices, indices, transform, MobileMeshSolidity.Counterclockwise, out info));
 
-            //transform = new AffineTransform(new Vector3(5, 1, 5), Quaternion.Identity, new Vector3(0, -30, 0));
+            Space.Add(mesh);
+            //game.ModelDrawer.Add(mesh);
+
+            //var transform = new AffineTransform(new Vector3(5, 1, 5), Quaternion.Identity, new Vector3(0, -30, 0));
             //float[,] heights = new float[128, 128];
             //for (int i = 0; i < 128; i++)
             //{
@@ -60,12 +63,12 @@ namespace BEPUphysicsDemos.Demos
 
             //}
             //Terrain terrain = new Terrain(heights, transform);
+            //terrain.Thickness = 1000;
             //Space.Add(terrain);
             //game.ModelDrawer.Add(terrain);
 
             TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("tube"), out vertices, out indices);
             //MotionSettings.DefaultPositionUpdateMode = PositionUpdateMode.Continuous;
-            ShapeDistributionInformation info;
             //transform = AffineTransform.Identity;// new AffineTransform(new Vector3(1, 1, 1), Quaternion.CreateFromAxisAngle(new Vector3(1, 0, 0), MathHelper.Pi), new Vector3(0, 0, 0));
             //transform = new AffineTransform(new Vector3(.02f, .02f, .02f), Quaternion.Identity, new Vector3(0, 0, 0));
             transform = new AffineTransform(new Vector3(1f, 1f, 1f), Quaternion.Identity, new Vector3(0, 0, 0));
@@ -88,10 +91,12 @@ namespace BEPUphysicsDemos.Demos
             {
                 for (int j = 0; j < 6; j++)
                 {
-                    var entityMesh = new Entity<MobileMeshCollidable>(new MobileMeshCollidable(shape), mass, inertia, info.Volume);
+                    var entityMesh = new Entity(shape, mass, inertia, info.Volume);
                     //entityMesh.CollisionInformation.ImproveBoundaryBehavior = true;
                     entityMesh.IsAlwaysActive = true;
-                    entityMesh.Position = new Vector3(i * 25, 10, j * 25);
+                    entityMesh.Position = new Vector3(i * 25, 5000, j * 25);
+                    entityMesh.LinearVelocity = new Vector3(0, -5000, 0);
+                    entityMesh.PositionUpdateMode = PositionUpdateMode.Continuous;
                     //CollisionRules.AddRule(entityMesh, kapow, CollisionRule.NoSolver);
                     //entityMesh.AngularVelocity = new Vector3(5, 0, 0);
                     //entityMesh.LinearVelocity = new Vector3(1, 0, 0);
@@ -110,7 +115,7 @@ namespace BEPUphysicsDemos.Demos
                 Space.Add(toAdd);
             }
 
-            Space.Add(new Box(new Vector3(0, -10, 0), 1, 1, 1));
+            //Space.Add(new Box(new Vector3(0, -10, 0), 1, 1, 1));
             game.Camera.Position = new Vector3(0, -10, 5);
             game.Camera.Yaw = 0;
             game.Camera.Pitch = 0;
