@@ -98,6 +98,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 case CollisionState.DeepContact:
                     return DoDeepContact(out contact);
             }
+
             contact = new ContactData();
             return false;
         }

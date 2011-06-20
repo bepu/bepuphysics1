@@ -84,6 +84,10 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
 
             base.Initialize(entryA, entryB);
 
+            //Reorder the entries so that the guarantee that the normal points from A to B is satisfied.
+            broadPhaseOverlap.entryA = box;
+            broadPhaseOverlap.entryB = sphere;
+
         }
 
 

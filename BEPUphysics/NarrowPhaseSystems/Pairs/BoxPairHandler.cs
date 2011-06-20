@@ -66,6 +66,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             }
 
             base.Initialize(entryA, entryB);
+
         }
 
 

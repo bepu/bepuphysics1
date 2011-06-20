@@ -80,6 +80,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
             ContactData contact;
             if (pairTester.GenerateContactCandidate(out contact))
             {
+
                 if (IsContactUnique(ref contact))
                 {
                     //Check if adding the new contact would overflow the manifold.

@@ -29,7 +29,7 @@ namespace BEPUphysicsDemos.Demos
     /// <summary>
     /// Demo showing a wall of blocks stacked up.
     /// </summary>
-    public class TestDemo2 : StandardDemo
+    public class MPRTestDemo : StandardDemo
     {
 
 
@@ -37,7 +37,7 @@ namespace BEPUphysicsDemos.Demos
         /// Constructs a new demo.
         /// </summary>
         /// <param name="game">Game owning this demo.</param>
-        public TestDemo2(DemosGame game)
+        public MPRTestDemo(DemosGame game)
             : base(game)
         {
             var shapeA = new BoxShape(1, 1, 1);

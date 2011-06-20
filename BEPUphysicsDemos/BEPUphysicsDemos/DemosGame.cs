@@ -108,7 +108,8 @@ namespace BEPUphysicsDemos
                                                     typeof (PathFollowingDemo),
                                                     typeof (FishInABarrelDemo),
                                                     typeof (DetectorVolumeDemo),
-                                                    typeof (MPRCastingDemo)
+                                                    typeof (MPRCastingDemo),
+                                                    typeof (EntryOrderNormalTestDemo)
                                                 };
 
 

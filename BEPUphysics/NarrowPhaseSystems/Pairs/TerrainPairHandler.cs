@@ -79,6 +79,11 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
 
             UpdateMaterialProperties(convex.entity.material, terrain.material);
 
+
+            //Contact normal goes from A to B.
+            broadPhaseOverlap.entryA = convex;
+            broadPhaseOverlap.entryB = terrain;
+
         }
 
 

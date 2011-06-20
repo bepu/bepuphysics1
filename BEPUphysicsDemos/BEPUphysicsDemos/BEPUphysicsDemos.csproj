@@ -104,7 +104,7 @@
     <Compile Include="Demos\CompoundBodiesDemo.cs" />
     <Compile Include="Demos\EntityConstructionDemo.cs" />
     <Compile Include="Demos\Tests\ThreadingTestDemo.cs" />
-    <Compile Include="Demos\Tests\TestDemo4.cs" />
+    <Compile Include="Demos\Tests\ThreadManagerTestDemo.cs" />
     <Compile Include="Demos\Tests\TerrainTesting.cs" />
     <Compile Include="Demos\Tests\DeterminismTestDemo.cs" />
     <Compile Include="Demos\Tests\MobileMeshDemo.cs" />
@@ -128,10 +128,11 @@
     <Compile Include="Demos\SleepModeDemo.cs" />
     <Compile Include="Demos\SpaceshipDemo.cs" />
     <Compile Include="Demos\TerrainDemo.cs" />
-    <Compile Include="Demos\Tests\TestDemo2.cs" />
+    <Compile Include="Demos\Tests\MPRTestDemo.cs" />
     <Compile Include="Demos\Tests\MPRCastingDemo.cs" />
     <Compile Include="Demos\Tests\BroadPhasesTestDemo.cs" />
     <Compile Include="Demos\Tests\TriangleTestDemo.cs" />
+    <Compile Include="Demos\Tests\EntryOrderNormalTestDemo.cs" />
     <Compile Include="Demos\TornadoDemo.cs" />
     <Compile Include="Demos\UnfortunateGuyDemo.cs" />
     <Compile Include="Demos\DiscreteVsContinuousDemo.cs" />
