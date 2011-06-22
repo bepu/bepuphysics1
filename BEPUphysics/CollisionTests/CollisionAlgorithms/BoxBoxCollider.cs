@@ -2306,7 +2306,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 #else
                 var toAdd = new BoxContactData();
                 toAdd.Position = position;
-                toAdd.Depth = depth;
+                toAdd.Depth = minimumDistance;
                 toAdd.Id = id;
                 contactData.Add(ref toAdd);
 #endif
