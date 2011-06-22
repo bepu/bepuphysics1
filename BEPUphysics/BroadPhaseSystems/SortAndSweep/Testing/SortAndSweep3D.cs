@@ -5,9 +5,9 @@ using System.Text;
 using BEPUphysics.DataStructures;
 using Microsoft.Xna.Framework;
 
-namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
+namespace BEPUphysics.BroadPhaseSystems.SortAndSweep.Testing
 {
-    public class SortAndSweep3D : BroadPhase
+    internal class SortAndSweep3D : BroadPhase
     {
         RawList<BroadPhaseEntry> entriesX = new RawList<BroadPhaseEntry>();
         RawList<BroadPhaseEntry> entriesY = new RawList<BroadPhaseEntry>();

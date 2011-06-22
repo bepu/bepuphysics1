@@ -268,7 +268,7 @@ namespace BEPUphysics.Collidables
                     triangleTransform.Orientation = Quaternion.Identity;
                     triangleTransform.Position = center;
                     RayHit tempHit;
-                    if (MPRTesting.Sweep(castShape, tri, ref sweep, ref Toolbox.ZeroVector, ref startingTransform, ref triangleTransform, out tempHit) && tempHit.T < hit.T)
+                    if (MPRToolbox.Sweep(castShape, tri, ref sweep, ref Toolbox.ZeroVector, ref startingTransform, ref triangleTransform, out tempHit) && tempHit.T < hit.T)
                     {
                         hit = tempHit;
                     }

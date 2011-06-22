@@ -210,7 +210,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 }
 
             }
-            if (MPRTesting.GetContact(collidableA.Shape, collidableB.Shape, ref collidableA.worldTransform, ref collidableB.worldTransform, ref localDirection, out contact))
+            if (MPRToolbox.GetContact(collidableA.Shape, collidableB.Shape, ref collidableA.worldTransform, ref collidableB.worldTransform, ref localDirection, out contact))
             {
                 if (contact.PenetrationDepth < collidableA.Shape.collisionMargin + collidableB.Shape.collisionMargin)
                     state = CollisionState.ShallowContact;

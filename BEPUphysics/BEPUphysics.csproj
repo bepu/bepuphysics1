@@ -119,17 +119,16 @@
     <Compile Include="BroadPhaseSystems\SortAndSweep\Grid2DSortAndSweepQueryAccelerator.cs" />
     <Compile Include="BroadPhaseSystems\SortAndSweep\GridCell2D.cs" />
     <Compile Include="BroadPhaseSystems\SortAndSweep\SortAndSweep1D.cs" />
-    <Compile Include="BroadPhaseSystems\SortAndSweep\SortAndSweep3D.cs" />
+    <Compile Include="BroadPhaseSystems\SortAndSweep\Testing\SortAndSweep3D.cs" />
     <Compile Include="BroadPhaseSystems\SortAndSweep\SortedGrid2DSet.cs" />
     <Compile Include="Collidables\Events\IContactEventTriggerer.cs" />
     <Compile Include="Collidables\Events\IEntryEventTriggerer.cs" />
     <Compile Include="Collidables\MobileCollidables\MobileMeshCollidable.cs" />
     <Compile Include="CollisionShapes\MobileMeshShape.cs" />
-    <Compile Include="CollisionTests\CollisionAlgorithms\TriangleTrianglePairTester2.cs" />
+    <Compile Include="CollisionTests\CollisionAlgorithms\Testing\TriangleTrianglePairTester2.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\TrianglePairTester.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\TriangleSpherePairTester.cs" />
-    <Compile Include="CollisionTests\CollisionAlgorithms\MPRTesting.cs" />
-    <Compile Include="CollisionTests\CollisionAlgorithms\TriangleMeshConvexPairTester.cs" />
+    <Compile Include="CollisionTests\CollisionAlgorithms\MPRToolbox.cs" />
     <Compile Include="CollisionTests\Manifolds\BoxSphereContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\MobileMeshTriangleContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\MobileMeshSphereContactManifold.cs" />
@@ -139,8 +138,6 @@
     <Compile Include="CollisionTests\Manifolds\StaticMeshSphereContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\StaticMeshContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\TerrainConvexContactManifold.cs" />
-    <Compile Include="CollisionTests\Manifolds\MobileMeshMeshContactManifold.cs" />
-    <Compile Include="CollisionTests\Manifolds\MobileMeshStaticMeshContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\SphereContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\MobileMeshConvexContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\TerrainSphereContactManifold.cs" />
@@ -394,7 +391,7 @@
     <Compile Include="MathExtensions\Matrix2x3.cs" />
     <Compile Include="MathExtensions\Matrix3x2.cs" />
     <Compile Include="MathExtensions\Matrix3x3.cs" />
-    <Compile Include="CollisionTests\CollisionAlgorithms\MPRToolbox.cs" />
+    <Compile Include="CollisionTests\CollisionAlgorithms\Testing\MPRToolboxOld.cs" />
     <Compile Include="Collidables\Collidable.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\INarrowPhasePair.cs" />
     <Compile Include="NarrowPhaseSystems\NarrowPhase.cs" />
@@ -464,11 +461,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <None Include="strongNameKey.snk" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Collidables\BroadPhaseSystems\Hierarchies\Testing\Insertion\" />
-    <Folder Include="Collidables\BroadPhaseSystems\Hierarchies\Testing\Old\" />
-    <Folder Include="Collidables\BroadPhaseSystems\SortAndSweep\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\Microsoft.Xna.GameStudio.targets" />
   <!--

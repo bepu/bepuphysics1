@@ -23,8 +23,9 @@ using BEPUphysics.Constraints.SolverGroups;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
 using BEPUphysics.CollisionTests;
 using BEPUphysics;
+using BEPUphysics.CollisionTests.CollisionAlgorithms.Testing;
 
-namespace BEPUphysicsDemos.Demos
+namespace BEPUphysicsDemos.Demos.Tests
 {
     /// <summary>
     /// Demo showing a wall of blocks stacked up.
@@ -48,14 +49,14 @@ namespace BEPUphysicsDemos.Demos
             var transformA = new RigidTransform(new Vector3(0, 0, 0));
             var transformB = new RigidTransform(new Vector3(.5f, .5f, 0));
             Vector3 overlap;
-            bool overlapped = MPRTesting.GetLocalOverlapPosition(shapeA, shapeB, ref transformB, out overlap);
+            bool overlapped = MPRToolbox.GetLocalOverlapPosition(shapeA, shapeB, ref transformB, out overlap);
             Vector3 normal;
             float depth;
             Vector3 direction = new Vector3(0, -1, 0);
-            MPRTesting.LocalSurfaceCast(shapeA, shapeB, ref transformB, ref direction, out depth, out normal);
+            MPRToolbox.LocalSurfaceCast(shapeA, shapeB, ref transformB, ref direction, out depth, out normal);
 
             ContactData contactData;
-            bool overlappedOld = MPRToolbox.AreObjectsColliding(shapeA, shapeB, ref transformA, ref transformB, out contactData);
+            bool overlappedOld = MPRToolboxOld.AreObjectsColliding(shapeA, shapeB, ref transformA, ref transformB, out contactData);
 
             //Random rand = new Random(0);
             //for (int i = 0; i < 10000000; i++)
@@ -151,7 +152,7 @@ namespace BEPUphysicsDemos.Demos
             MinkowskiToolbox.GetLocalTransform(ref aTransform, ref bTransform, out localTransformB);
 
             Vector3 position;
-            if (MPRTesting.GetLocalOverlapPosition((a.CollisionInformation.Shape as ConvexShape), (b.CollisionInformation.Shape as ConvexShape), ref localTransformB, out position))
+            if (MPRToolbox.GetLocalOverlapPosition((a.CollisionInformation.Shape as ConvexShape), (b.CollisionInformation.Shape as ConvexShape), ref localTransformB, out position))
             {
                 //Vector3 rayCastDirection = new Vector3(1,0,0);// (Vector3.Normalize(localDirection) + Vector3.Normalize(collidableB.worldTransform.Position - collidableA.worldTransform.Position)) / 2;
                 float previousT;
@@ -160,7 +161,7 @@ namespace BEPUphysicsDemos.Demos
                 Vector3 normal;
 
                 rayCastDirection = localTransformB.Position;
-                MPRTesting.LocalSurfaceCast((a.CollisionInformation.Shape as ConvexShape), (b.CollisionInformation.Shape as ConvexShape), ref localTransformB, ref rayCastDirection, out previousT, out previousNormal);
+                MPRToolbox.LocalSurfaceCast((a.CollisionInformation.Shape as ConvexShape), (b.CollisionInformation.Shape as ConvexShape), ref localTransformB, ref rayCastDirection, out previousT, out previousNormal);
                 //Vector3 secondDirection = Vector3.Cross(rayCastDirection, Vector3.Up);
                 //MPRTesting.LocalSurfaceCast((a.CollisionInformation.Shape as ConvexShape), (b.CollisionInformation.Shape as ConvexShape), ref localTransformB, ref secondDirection, out t, out normal);
                 //if (t < previousT)
@@ -192,7 +193,7 @@ namespace BEPUphysicsDemos.Demos
 
                 //Correct the penetration depth.
 
-                MPRTesting.LocalSurfaceCast((a.CollisionInformation.Shape as ConvexShape), (b.CollisionInformation.Shape as ConvexShape), ref localTransformB, ref previousNormal, out t, out normal);
+                MPRToolbox.LocalSurfaceCast((a.CollisionInformation.Shape as ConvexShape), (b.CollisionInformation.Shape as ConvexShape), ref localTransformB, ref previousNormal, out t, out normal);
                 contactDepth = t;
                 contactNormal = previousNormal;
 

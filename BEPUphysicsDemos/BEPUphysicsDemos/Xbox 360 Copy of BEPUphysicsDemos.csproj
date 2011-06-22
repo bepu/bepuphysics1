@@ -82,6 +82,7 @@
     <Compile Include="Demos\DiscreteVsContinuousDemo.cs" />
     <Compile Include="Demos\EntityConstructionDemo.cs" />
     <Compile Include="Demos\InstancedMeshDemo.cs" />
+    <Compile Include="Demos\MobileMeshDemo.cs" />
     <Compile Include="Demos\PlanetDemo.cs" />
     <Compile Include="Demos\StaticMeshDemo.cs" />
     <Compile Include="Demos\DetectorVolumeDemo.cs" />
@@ -103,7 +104,6 @@
     <Compile Include="Demos\TerrainDemo.cs" />
     <Compile Include="Demos\Tests\BroadPhasesTestDemo.cs" />
     <Compile Include="Demos\Tests\DeterminismTestDemo.cs" />
-    <Compile Include="Demos\Tests\MobileMeshDemo.cs" />
     <Compile Include="Demos\Tests\MPRCastingDemo.cs" />
     <Compile Include="Demos\Tests\MPRTestDemo.cs" />
     <Compile Include="Demos\Tests\TerrainTesting.cs" />

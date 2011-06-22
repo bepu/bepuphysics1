@@ -6,8 +6,9 @@ using Microsoft.Xna.Framework.Graphics;
 using BEPUphysics.DataStructures;
 using BEPUphysics.CollisionTests;
 using Microsoft.Xna.Framework.Input;
+using BEPUphysics.CollisionTests.CollisionAlgorithms.Testing;
 
-namespace BEPUphysicsDemos.Demos
+namespace BEPUphysicsDemos.Demos.Tests
 {
     /// <summary>
     /// Demo showing a wall of blocks stacked up.

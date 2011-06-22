@@ -107,7 +107,7 @@
     <Compile Include="Demos\Tests\ThreadManagerTestDemo.cs" />
     <Compile Include="Demos\Tests\TerrainTesting.cs" />
     <Compile Include="Demos\Tests\DeterminismTestDemo.cs" />
-    <Compile Include="Demos\Tests\MobileMeshDemo.cs" />
+    <Compile Include="Demos\MobileMeshDemo.cs" />
     <Compile Include="Demos\DetectorVolumeDemo.cs" />
     <Compile Include="Demos\DogbotDemo.cs" />
     <Compile Include="Demos\EarthquakeDemo.cs" />

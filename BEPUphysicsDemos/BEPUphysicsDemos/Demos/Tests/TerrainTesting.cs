@@ -12,7 +12,7 @@ using System.Diagnostics;
 using BEPUphysics.BroadPhaseSystems.SortAndSweep;
 using BEPUphysics.NarrowPhaseSystems;
 
-namespace BEPUphysicsDemos.Demos
+namespace BEPUphysicsDemos.Demos.Tests
 {
     /// <summary>
     /// Boxes fall onto a large terrain.  Try driving around on it!

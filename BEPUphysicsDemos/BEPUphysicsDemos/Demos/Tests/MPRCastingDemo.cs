@@ -27,7 +27,7 @@ using BEPUphysics.EntityStateManagement;
 using BEPUphysics.ResourceManagement;
 using BEPUphysics.NarrowPhaseSystems;
 
-namespace BEPUphysicsDemos.Demos
+namespace BEPUphysicsDemos.Demos.Tests
 {
     /// <summary>
     /// Demo showing a wall of blocks stacked up.
@@ -87,7 +87,7 @@ namespace BEPUphysicsDemos.Demos
             if (Game.KeyboardInput.IsKeyDown(Keys.P))
                 Debug.WriteLine("Breka.");
 
-            if (hit = MPRTesting.Sweep(aShape, bShape, ref sweepA, ref sweepB, ref aTransform, ref bTransform, out hitData))
+            if (hit = MPRToolbox.Sweep(aShape, bShape, ref sweepA, ref sweepB, ref aTransform, ref bTransform, out hitData))
             //if (hit = OldGJKVerifier.ConvexCast(a.CollisionInformation.Shape, b.CollisionInformation.Shape, ref sweepA, ref sweepB, ref aTransform, ref bTransform, out hitData))
             {
                 a.Position = aTransform.Position + sweepA * hitData.T;

@@ -6,7 +6,7 @@ using BEPUphysics.CollisionShapes.ConvexShapes;
 using Microsoft.Xna.Framework;
 using BEPUphysics.DataStructures;
 
-namespace BEPUphysics.CollisionTests.CollisionAlgorithms
+namespace BEPUphysics.CollisionTests.CollisionAlgorithms.Testing
 {
     /// <summary>
     /// Generates candidates between two triangles and manages the persistent state of the pair.

@@ -324,7 +324,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
             contactList = new TinyStructList<ContactData>();
 
-            if (MPRTesting.GetLocalOverlapPosition(convex, triangle, ref center, ref Toolbox.RigidIdentity, out contact.Position))
+            if (MPRToolbox.GetLocalOverlapPosition(convex, triangle, ref center, ref Toolbox.RigidIdentity, out contact.Position))
             {
 
                 float dot;
@@ -465,7 +465,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 CAnormal.Normalize();
 
 
-                MPRTesting.LocalSurfaceCast(convex, triangle, ref Toolbox.RigidIdentity, ref ABnormal, out contact.PenetrationDepth, out contact.Normal);
+                MPRToolbox.LocalSurfaceCast(convex, triangle, ref Toolbox.RigidIdentity, ref ABnormal, out contact.PenetrationDepth, out contact.Normal);
                 //Check to see if the normal is facing in the proper direction, considering that this may not be a two-sided triangle.
                 Vector3.Dot(ref triangleNormal, ref contact.Normal, out dot);
                 if ((triangle.sidedness == TriangleSidedness.Clockwise && dot > 0) || (triangle.sidedness == TriangleSidedness.Counterclockwise && dot < 0))
@@ -495,7 +495,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
                 Vector3 candidateNormal;
                 float candidateDepth;
-                MPRTesting.LocalSurfaceCast(convex, triangle, ref Toolbox.RigidIdentity, ref BCnormal, out candidateDepth, out candidateNormal);
+                MPRToolbox.LocalSurfaceCast(convex, triangle, ref Toolbox.RigidIdentity, ref BCnormal, out candidateDepth, out candidateNormal);
                 //Check to see if the normal is facing in the proper direction, considering that this may not be a two-sided triangle.
                 Vector3.Dot(ref triangleNormal, ref candidateNormal, out dot);
                 if ((triangle.sidedness == TriangleSidedness.Clockwise && dot > 0) || (triangle.sidedness == TriangleSidedness.Counterclockwise && dot < 0))
@@ -528,7 +528,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                     contact.PenetrationDepth = candidateDepth;
                 }
 
-                MPRTesting.LocalSurfaceCast(convex, triangle, ref Toolbox.RigidIdentity, ref CAnormal, out candidateDepth, out candidateNormal);
+                MPRToolbox.LocalSurfaceCast(convex, triangle, ref Toolbox.RigidIdentity, ref CAnormal, out candidateDepth, out candidateNormal);
                 //Check to see if the normal is facing in the proper direction, considering that this may not be a two-sided triangle.
                 Vector3.Dot(ref triangleNormal, ref candidateNormal, out dot);
                 if ((triangle.sidedness == TriangleSidedness.Clockwise && dot > 0) || (triangle.sidedness == TriangleSidedness.Counterclockwise && dot < 0))
@@ -567,7 +567,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 //If it's clockwise, this direction is unnecessary (the resulting normal would be invalidated by the onesidedness of the triangle).
                 if (triangle.sidedness != TriangleSidedness.Clockwise)
                 {
-                    MPRTesting.LocalSurfaceCast(convex, triangle, ref Toolbox.RigidIdentity, ref triangleNormal, out candidateDepth, out candidateNormal);
+                    MPRToolbox.LocalSurfaceCast(convex, triangle, ref Toolbox.RigidIdentity, ref triangleNormal, out candidateDepth, out candidateNormal);
                     if (candidateDepth < contact.PenetrationDepth)
                     {
                         contact.Normal = candidateNormal;
@@ -581,7 +581,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 if (triangle.sidedness != TriangleSidedness.Counterclockwise)
                 {
                     Vector3.Negate(ref triangleNormal, out triangleNormal);
-                    MPRTesting.LocalSurfaceCast(convex, triangle, ref Toolbox.RigidIdentity, ref triangleNormal, out candidateDepth, out candidateNormal);
+                    MPRToolbox.LocalSurfaceCast(convex, triangle, ref Toolbox.RigidIdentity, ref triangleNormal, out candidateDepth, out candidateNormal);
                     if (candidateDepth < contact.PenetrationDepth)
                     {
                         contact.Normal = candidateNormal;
@@ -599,7 +599,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
 
 
-                MPRTesting.RefinePenetration(convex, triangle, ref Toolbox.RigidIdentity, contact.PenetrationDepth, ref contact.Normal, out contact.PenetrationDepth, out contact.Normal);
+                MPRToolbox.RefinePenetration(convex, triangle, ref Toolbox.RigidIdentity, contact.PenetrationDepth, ref contact.Normal, out contact.PenetrationDepth, out contact.Normal);
 
 
 
