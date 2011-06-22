@@ -176,12 +176,12 @@ namespace BEPUphysics.Collidables.MobileCollidables
 
 
         /// <summary>
-        /// Tests a ray against the entry.
+        /// Tests a ray against the collidable.
         /// </summary>
         /// <param name="ray">Ray to test.</param>
         /// <param name="maximumLength">Maximum length, in units of the ray's direction's length, to test.</param>
-        /// <param name="rayHit">Hit location of the ray on the entry, if any.</param>
-        /// <returns>Whether or not the ray hit the entry.</returns>
+        /// <param name="rayHit">Hit location of the ray on the collidable, if any.</param>
+        /// <returns>Whether or not the ray hit the collidable.</returns>
         public override bool RayCast(Ray ray, float maximumLength, out RayHit rayHit)
         {
             rayHit = new RayHit();
@@ -196,6 +196,71 @@ namespace BEPUphysics.Collidables.MobileCollidables
                     if (candidate.RayCast(ray, maximumLength, out tempHit) && tempHit.T < rayHit.T)
                     {
                         rayHit = tempHit;
+                    }
+                }
+                Resources.GiveBack(hitElements);
+                return rayHit.T != float.MaxValue;
+            }
+            Resources.GiveBack(hitElements);
+            return false;
+        }
+
+
+        /// <summary>
+        /// Tests a ray against the compound.
+        /// </summary>
+        /// <param name="ray">Ray to test.</param>
+        /// <param name="maximumLength">Maximum length, in units of the ray's direction's length, to test.</param>
+        /// <param name="rayHit">Hit data and the hit child collidable, if any.</param>
+        /// <returns>Whether or not the ray hit the entry.</returns>
+        public bool RayCast(Ray ray, float maximumLength, out RayCastResult rayHit)
+        {
+            rayHit = new RayCastResult();
+            var hitElements = Resources.GetCompoundChildList();
+            if (hierarchy.Tree.GetOverlaps(ray, maximumLength, hitElements))
+            {
+                rayHit.HitData.T = float.MaxValue;
+                for (int i = 0; i < hitElements.count; i++)
+                {
+                    EntityCollidable candidate = hitElements.Elements[i].CollisionInformation;
+                    RayHit tempHit;
+                    if (candidate.RayCast(ray, maximumLength, out tempHit) && tempHit.T < rayHit.HitData.T)
+                    {
+                        rayHit.HitData = tempHit;
+                        rayHit.HitObject = candidate;
+                    }
+                }
+                Resources.GiveBack(hitElements);
+                return rayHit.HitData.T != float.MaxValue;
+            }
+            Resources.GiveBack(hitElements);
+            return false;
+        }
+
+        /// <summary>
+        /// Tests a ray against the collidable.
+        /// </summary>
+        /// <param name="ray">Ray to test.</param>
+        /// <param name="maximumLength">Maximum length, in units of the ray's direction's length, to test.</param>
+        /// <param name="rayHit">Hit data, if any.</param>
+        /// <param name="hitChild">Child collidable hit by the ray, if any.</param>
+        /// <returns>Whether or not the ray hit the entry.</returns>
+        public bool RayCast(Ray ray, float maximumLength, out RayHit rayHit, out CompoundChild hitChild)
+        {
+            rayHit = new RayHit();
+            hitChild = null;
+            var hitElements = Resources.GetCompoundChildList();
+            if (hierarchy.Tree.GetOverlaps(ray, maximumLength, hitElements))
+            {
+                rayHit.T = float.MaxValue;
+                for (int i = 0; i < hitElements.count; i++)
+                {
+                    EntityCollidable candidate = hitElements.Elements[i].CollisionInformation;
+                    RayHit tempHit;
+                    if (candidate.RayCast(ray, maximumLength, out tempHit) && tempHit.T < rayHit.T)
+                    {
+                        rayHit = tempHit;
+                        hitChild = hitElements.Elements[i];
                     }
                 }
                 Resources.GiveBack(hitElements);

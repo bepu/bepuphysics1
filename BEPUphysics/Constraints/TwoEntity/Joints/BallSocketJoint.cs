@@ -42,8 +42,8 @@ namespace BEPUphysics.Constraints.TwoEntity.Joints
             ConnectionA = connectionA;
             ConnectionB = connectionB;
 
-            OffsetA = anchorLocation - connectionA.position;
-            OffsetB = anchorLocation - connectionB.position;
+            OffsetA = anchorLocation - ConnectionA.position;
+            OffsetB = anchorLocation - ConnectionB.position;
         }
 
         /// <summary>

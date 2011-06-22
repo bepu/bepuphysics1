@@ -103,7 +103,6 @@
     <Compile Include="Demos\TerrainDemo.cs" />
     <Compile Include="Demos\Tests\BroadPhasesTestDemo.cs" />
     <Compile Include="Demos\Tests\DeterminismTestDemo.cs" />
-    <Compile Include="Demos\Tests\EntryOrderNormalTestDemo.cs" />
     <Compile Include="Demos\Tests\MobileMeshDemo.cs" />
     <Compile Include="Demos\Tests\MPRCastingDemo.cs" />
     <Compile Include="Demos\Tests\MPRTestDemo.cs" />

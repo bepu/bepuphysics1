@@ -43,10 +43,10 @@ namespace BEPUphysicsDemos.Demos
         public MPRCastingDemo(DemosGame game)
             : base(game)
         {
-            aShape = new CylinderShape(0, .2f);//1, 0, 1);
-            aShape.CollisionMargin = 0;
             bShape = new BoxShape(1, 0, 1);
-            bShape.CollisionMargin = 0;
+            //bShape.CollisionMargin = 0;
+            aShape = new ConeShape(1, .4f);
+            //aShape.CollisionMargin = 0;
             a = new Entity(aShape);
             b = new Entity(bShape);
             CollisionRules.AddRule(a, b, CollisionRule.NoSolver);
@@ -86,7 +86,7 @@ namespace BEPUphysicsDemos.Demos
 
             if (Game.KeyboardInput.IsKeyDown(Keys.P))
                 Debug.WriteLine("Breka.");
-            
+
             if (hit = MPRTesting.Sweep(aShape, bShape, ref sweepA, ref sweepB, ref aTransform, ref bTransform, out hitData))
             //if (hit = OldGJKVerifier.ConvexCast(a.CollisionInformation.Shape, b.CollisionInformation.Shape, ref sweepA, ref sweepB, ref aTransform, ref bTransform, out hitData))
             {
@@ -106,7 +106,6 @@ namespace BEPUphysicsDemos.Demos
             if (hit)
             {
                 Game.TinyTextDrawer.Draw("Time: ", hitData.T, 10, new Vector2(50, 50));
-                Game.TinyTextDrawer.Draw("Origin position: " + MPRTesting.DEBUGoriginLocation.Y, new Vector2(50, 70));
             }
             else
             {

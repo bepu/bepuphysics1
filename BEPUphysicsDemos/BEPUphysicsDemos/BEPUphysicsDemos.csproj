@@ -132,7 +132,6 @@
     <Compile Include="Demos\Tests\MPRCastingDemo.cs" />
     <Compile Include="Demos\Tests\BroadPhasesTestDemo.cs" />
     <Compile Include="Demos\Tests\TriangleTestDemo.cs" />
-    <Compile Include="Demos\Tests\EntryOrderNormalTestDemo.cs" />
     <Compile Include="Demos\TornadoDemo.cs" />
     <Compile Include="Demos\UnfortunateGuyDemo.cs" />
     <Compile Include="Demos\DiscreteVsContinuousDemo.cs" />

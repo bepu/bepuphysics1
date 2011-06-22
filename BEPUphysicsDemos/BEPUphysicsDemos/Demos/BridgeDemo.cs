@@ -10,6 +10,8 @@ namespace BEPUphysicsDemos.Demos
     /// </summary>
     public class BridgeDemo : StandardDemo
     {
+
+
         /// <summary>
         /// Constructs a new demo.
         /// </summary>

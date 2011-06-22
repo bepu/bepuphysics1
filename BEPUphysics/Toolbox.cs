@@ -2811,9 +2811,9 @@ namespace BEPUphysics
             Vector3.Dot(ref e1, ref e2, out d12);
             //Find barycoords
             float denom = 1 / (d00 * d11 - d01 * d01);
-            v1Weight = (d11 * d02 - d01 * d12) * denom;
+            v3Weight = (d11 * d02 - d01 * d12) * denom;
             v2Weight = (d00 * d12 - d01 * d02) * denom;
-            v3Weight = 1 - v1Weight - v2Weight;
+            v1Weight = 1 - v3Weight - v2Weight;
 
 
 

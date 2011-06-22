@@ -80,7 +80,7 @@ namespace BEPUphysics.BroadPhaseSystems
         /// <param name="castShape">Swept shape.</param>
         /// <param name="startingTransform">Beginning location and orientation of the cast shape.</param>
         /// <param name="sweep">Sweep motion to apply to the cast shape.</param>
-        /// <param name="hit">Hit location of the ray on the entry, if any.</param>
+        /// <param name="hit">Hit data of the ray on the entry, if any.</param>
         /// <returns>Whether or not the ray hit the entry.</returns>
         public abstract bool ConvexCast(ConvexShape castShape, ref RigidTransform startingTransform, ref Vector3 sweep, out RayHit hit);
 
