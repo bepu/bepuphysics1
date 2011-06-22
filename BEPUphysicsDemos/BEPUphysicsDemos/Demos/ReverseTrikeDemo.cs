@@ -190,9 +190,6 @@ namespace BEPUphysicsDemos.Demos
 
         public override void Update(float dt)
         {
-            if (Game.KeyboardInput.IsKeyDown(Keys.P))
-                Debug.WriteLine("Break.");
-
             if (Game.KeyboardInput.IsKeyDown(Keys.NumPad8))
             {
                 //Go forward

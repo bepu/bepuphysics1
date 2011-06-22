@@ -14,6 +14,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
 using BEPUphysics.Settings;
+using BEPUphysics.DataStructures;
 
 #endregion
 
@@ -31,12 +32,13 @@ namespace BEPUphysicsDemos
 
         //Rendering Variables
         public GraphicsDeviceManager Graphics;
-        private readonly List<VertexPositionColor> collisionNormalList = new List<VertexPositionColor>();
-        private readonly List<VertexPositionColor> boundingBoxLines = new List<VertexPositionColor>();
 
         //Rendering tools
         public ModelDrawer ModelDrawer;
         public LineDrawer ConstraintDrawer;
+        public ContactDrawer ContactDrawer;
+        public BoundingBoxDrawer BoundingBoxDrawer;
+        public SimulationIslandDrawer SimulationIslandDrawer;
         public BasicEffect LineDrawer;
         public SpriteBatch UIDrawer;
         public TextDrawer DataTextDrawer;
@@ -140,6 +142,10 @@ namespace BEPUphysicsDemos
             ConstraintDrawer = new LineDrawer(this);
             ConstraintDrawer.DisplayTypes.Add(typeof(GrabSpring), typeof(DisplayGrabSpring));
             ConstraintDrawer.DisplayTypes.Add(typeof(MotorizedGrabSpring), typeof(DisplayMotorizedGrabSpring));
+
+            ContactDrawer = new ContactDrawer(this);
+            BoundingBoxDrawer = new BoundingBoxDrawer(this);
+            SimulationIslandDrawer = new SimulationIslandDrawer(this);
 
             base.Initialize();
         }
@@ -403,175 +409,15 @@ namespace BEPUphysicsDemos
             LineDrawer.View = Camera.ViewMatrix;
             LineDrawer.Projection = Camera.ProjectionMatrix;
 
-            #region Contact Drawing
-
-            //Draw collisions.
             if (displayContacts)
-            {
-                collisionNormalList.Clear();
-                int contactCount = 0;
-                foreach (INarrowPhasePair pair in currentSimulation.Space.NarrowPhase.Pairs)
-                {
-                    var pairHandler = pair as CollidablePairHandler;
-                    if (pairHandler != null)
-                    {
-                        foreach (ContactInformation information in pairHandler.Contacts)
-                        {
-                            contactCount++;
-                            collisionNormalList.Add(new VertexPositionColor(information.Contact.Position, Color.White));
-                            collisionNormalList.Add(new VertexPositionColor(information.Contact.Position + information.Contact.Normal * information.Contact.PenetrationDepth, Color.Red));
-                            collisionNormalList.Add(new VertexPositionColor(information.Contact.Position + information.Contact.Normal * information.Contact.PenetrationDepth, Color.White));
-                            collisionNormalList.Add(new VertexPositionColor(information.Contact.Position + information.Contact.Normal * (information.Contact.PenetrationDepth + .3f), Color.White));
-                        }
-                    }
-                }
-
-                if (contactCount > 0)
-                {
-                    foreach (EffectPass pass in LineDrawer.CurrentTechnique.Passes)
-                    {
-                        pass.Apply();
-
-                        GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, collisionNormalList.ToArray(), 0, collisionNormalList.Count / 2);
-                    }
-                }
-
-            }
-
-            #endregion
-
-            #region bounding box drawing
+                ContactDrawer.Draw(LineDrawer, currentSimulation.Space);
 
             if (displayBoundingBoxes)
-            {
-                if (currentSimulation.Space.Entities.Count > 0)
-                {
-                    boundingBoxLines.Clear();
-
-                    foreach (Entity e in currentSimulation.Space.Entities)
-                    {
-                        Vector3[] boundingBoxCorners = e.CollisionInformation.BoundingBox.GetCorners();
-                        boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[0], Color.DarkRed));
-                        boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[1], Color.DarkRed));
-
-                        boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[0], Color.DarkRed));
-                        boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[3], Color.DarkRed));
-
-                        boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[0], Color.DarkRed));
-                        boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[4], Color.DarkRed));
-
-                        boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[1], Color.DarkRed));
-                        boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[2], Color.DarkRed));
-
-                        boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[1], Color.DarkRed));
-                        boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[5], Color.DarkRed));
-
-                        boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[2], Color.DarkRed));
-                        boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[3], Color.DarkRed));
-
-                        boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[2], Color.DarkRed));
-                        boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[6], Color.DarkRed));
-
-                        boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[3], Color.DarkRed));
-                        boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[7], Color.DarkRed));
-
-                        boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[4], Color.DarkRed));
-                        boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[5], Color.DarkRed));
-
-                        boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[4], Color.DarkRed));
-                        boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[7], Color.DarkRed));
-
-                        boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[5], Color.DarkRed));
-                        boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[6], Color.DarkRed));
-
-                        boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[6], Color.DarkRed));
-                        boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[7], Color.DarkRed));
-                    }
-                    foreach (EffectPass pass in LineDrawer.CurrentTechnique.Passes)
-                    {
-                        pass.Apply();
-                        GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, boundingBoxLines.ToArray(), 0, currentSimulation.Space.Entities.Count * 12);
-                    }
-                }
-            }
-
-            #endregion
-
-            #region Simulation Island Drawing
-
+                BoundingBoxDrawer.Draw(LineDrawer, currentSimulation.Space);
+            
             if (displaySimulationIslands)
-            {
-                if (currentSimulation.Space.Entities.Count > 0)
-                {
-                    boundingBoxLines.Clear();
-                    BoundingBox box;
+                SimulationIslandDrawer.Draw(LineDrawer, currentSimulation.Space);
 
-                    for (int i = 0; i < currentSimulation.Space.DeactivationManager.SimulationIslands.Count; i++)
-                    {
-                        SimulationIsland s = currentSimulation.Space.DeactivationManager.SimulationIslands[i];
-
-                        box = new BoundingBox(new Vector3(float.MaxValue, float.MaxValue, float.MaxValue),
-                                              new Vector3(-float.MaxValue, -float.MaxValue, -float.MaxValue));
-                        for (int j = 0; j < s.Members.Count; j++)
-                        {
-                            var e = s.Members[j] as Entity;
-                            if (e != null)
-                            {
-                                box = BoundingBox.CreateMerged(box, e.CollisionInformation.BoundingBox);
-                            }
-                        }
-
-
-
-                        Color colorToUse = s.IsActive ? Color.DarkGoldenrod : Color.DarkGray;
-                        Vector3[] boundingBoxCorners = box.GetCorners();
-                        boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[0], colorToUse));
-                        boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[1], colorToUse));
-
-                        boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[0], colorToUse));
-                        boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[3], colorToUse));
-
-                        boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[0], colorToUse));
-                        boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[4], colorToUse));
-
-                        boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[1], colorToUse));
-                        boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[2], colorToUse));
-
-                        boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[1], colorToUse));
-                        boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[5], colorToUse));
-
-                        boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[2], colorToUse));
-                        boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[3], colorToUse));
-
-                        boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[2], colorToUse));
-                        boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[6], colorToUse));
-
-                        boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[3], colorToUse));
-                        boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[7], colorToUse));
-
-                        boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[4], colorToUse));
-                        boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[5], colorToUse));
-
-                        boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[4], colorToUse));
-                        boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[7], colorToUse));
-
-                        boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[5], colorToUse));
-                        boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[6], colorToUse));
-
-                        boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[6], colorToUse));
-                        boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[7], colorToUse));
-                    }
-
-                    if (currentSimulation.Space.DeactivationManager.SimulationIslands.Count > 0)
-                        foreach (EffectPass pass in LineDrawer.CurrentTechnique.Passes)
-                        {
-                            pass.Apply();
-                            GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, boundingBoxLines.ToArray(), 0, currentSimulation.Space.DeactivationManager.SimulationIslands.Count * 12);
-                        }
-                }
-            }
-
-            #endregion
 
             #region UI Drawing
 

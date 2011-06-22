@@ -50,6 +50,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Font\TextDrawer.cs" />
+    <Compile Include="Lines\BoundingBoxDrawer.cs" />
+    <Compile Include="Lines\ContactDrawer.cs" />
+    <Compile Include="Lines\SimulationIslandDrawer.cs" />
     <Compile Include="Lines\SolverDisplayObject.cs" />
     <Compile Include="Lines\Display types\DisplayBallSocketJoint.cs" />
     <Compile Include="Lines\Display types\DisplayDistanceJoint.cs" />
