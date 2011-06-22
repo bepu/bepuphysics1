@@ -63,6 +63,7 @@ namespace BEPUphysics.Collidables.MobileCollidables
                 instance.events = data.Events;
             if (data.CollisionRules != null)
                 instance.collisionRules = data.CollisionRules;
+            instance.Tag = data.Tag;
             if (data.Material == null)
                 data.Material = new Material();
             return new CompoundChild(Shape, instance, data.Material, index);
@@ -328,101 +329,11 @@ namespace BEPUphysics.Collidables.MobileCollidables
         /// Material for the new child.
         ///</summary>
         public Material Material;
+        /// <summary>
+        /// Tag to assign to the collidable created for this child.
+        /// </summary>
+        public object Tag;
 
-
-        ///<summary>
-        /// Constructs data for a compound child.
-        ///</summary>
-        ///<param name="entry">Shape entry for the new child.</param>
-        ///<param name="events">Event manager to use in the new child.</param>
-        ///<param name="collisionRules">Collision rules to use in the new child.</param>
-        ///<param name="material">Material to use in the new child.</param>
-        public CompoundChildData(CompoundShapeEntry entry, ContactEventManager<EntityCollidable> events, CollisionRules collisionRules, Material material)
-        {
-            Entry = entry;
-            Events = events;
-            CollisionRules = collisionRules;
-            Material = material;
-        }
-
-        ///<summary>
-        /// Constructs data for a compound child.
-        ///</summary>
-        ///<param name="entry">Shape entry for the new child.</param>
-        ///<param name="events">Event manager to use in the new child.</param>
-        ///<param name="material">Material to use in the new child.</param>
-        public CompoundChildData(CompoundShapeEntry entry, ContactEventManager<EntityCollidable> events, Material material)
-        {
-            Entry = entry;
-            Events = events;
-            CollisionRules = null;
-            Material = material;
-        }
-
-        ///<summary>
-        /// Constructs data for a compound child.
-        ///</summary>
-        ///<param name="entry">Shape entry for the new child.</param>
-        ///<param name="events">Event manager to use in the new child.</param>
-        public CompoundChildData(CompoundShapeEntry entry, ContactEventManager<EntityCollidable> events)
-        {
-            Entry = entry;
-            Events = events;
-            CollisionRules = null;
-            Material = null;
-        }
-
-        ///<summary>
-        /// Constructs data for a compound child.
-        ///</summary>
-        ///<param name="entry">Shape entry for the new child.</param>
-        ///<param name="collisionRules">Collision rules to use in the new child.</param>
-        public CompoundChildData(CompoundShapeEntry entry, CollisionRules collisionRules)
-        {
-            Entry = entry;
-            Events = null;
-            CollisionRules = collisionRules;
-            Material = null;
-        }
-
-        ///<summary>
-        /// Constructs data for a compound child.
-        ///</summary>
-        ///<param name="entry">Shape entry for the new child.</param>
-        ///<param name="collisionRules">Collision rules to use in the new child.</param>
-        ///<param name="material">Material to use in the new child.</param>
-        public CompoundChildData(CompoundShapeEntry entry, CollisionRules collisionRules, Material material)
-        {
-            Entry = entry;
-            Events = null;
-            CollisionRules = collisionRules;
-            Material = material;
-        }
-
-        ///<summary>
-        /// Constructs data for a compound child.
-        ///</summary>
-        ///<param name="entry">Shape entry for the new child.</param>
-        ///<param name="material">Material to use in the new child.</param>
-        public CompoundChildData(CompoundShapeEntry entry, Material material)
-        {
-            Entry = entry;
-            Events = null;
-            CollisionRules = null;
-            Material = material;
-        }
-
-        ///<summary>
-        /// Constructs data for a compound child.
-        ///</summary>
-        ///<param name="entry">Shape entry for the new child.</param>
-        public CompoundChildData(CompoundShapeEntry entry)
-        {
-            Entry = entry;
-            Events = null;
-            CollisionRules = null;
-            Material = null;
-        }
     }
 
 

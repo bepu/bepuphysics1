@@ -103,8 +103,8 @@ namespace BEPUphysicsDemos.Demos
             CollisionRules clawPart1ARules = new CollisionRules();
             var bodies = new List<CompoundChildData>()
             {
-                new CompoundChildData(new CompoundShapeEntry(new BoxShape(1, .25f, .25f), lowerPosition, 3), clawPart1ARules),
-                new CompoundChildData(new CompoundShapeEntry(new ConeShape(1, .125f), lowerPosition + new Vector3(-.375f, .4f, 0), 3), new Material(2,2,0))
+                new CompoundChildData() { Entry = new CompoundShapeEntry(new BoxShape(1, .25f, .25f), lowerPosition, 3), CollisionRules = clawPart1ARules },
+                new CompoundChildData() { Entry = new CompoundShapeEntry(new ConeShape(1, .125f), lowerPosition + new Vector3(-.375f, .4f, 0), 3), Material = new Material(2,2,0) }
             };
 
             var claw = new CompoundBody(bodies, 6);
@@ -127,8 +127,8 @@ namespace BEPUphysicsDemos.Demos
             CollisionRules clawPart1BRules = new CollisionRules();
             bodies = new List<CompoundChildData>()
             {
-                new CompoundChildData(new CompoundShapeEntry(new BoxShape(1, .25f, .25f), lowerPosition, 3), clawPart1BRules),
-                new CompoundChildData(new CompoundShapeEntry(new ConeShape(1, .125f), lowerPosition + new Vector3(.375f, .4f, 0), 3), new Material(2,2,0))
+                new CompoundChildData() { Entry = new CompoundShapeEntry(new BoxShape(1, .25f, .25f), lowerPosition, 3), CollisionRules = clawPart1BRules },
+                new CompoundChildData() { Entry = new CompoundShapeEntry(new ConeShape(1, .125f), lowerPosition + new Vector3(.375f, .4f, 0), 3), Material = new Material(2,2,0) }
             };
             claw = new CompoundBody(bodies, 6);
             Space.Add(claw);

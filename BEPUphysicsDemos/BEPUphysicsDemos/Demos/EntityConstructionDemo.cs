@@ -212,8 +212,8 @@ namespace BEPUphysicsDemos.Demos
 
             var compoundBody = new CompoundBody(new List<CompoundChildData>()
             {
-                new CompoundChildData(new CompoundShapeEntry(new CylinderShape(1, 1), new Vector3(0, 2, 8))) { CollisionRules = new CollisionRules() { Personal = CollisionRule.NoBroadPhase } },
-                new CompoundChildData(new CompoundShapeEntry(new BoxShape(3, 1, 3), new Vector3(0, 1, 8))) { Material = new Material(3, 3, 0) }
+                new CompoundChildData() { Entry = new CompoundShapeEntry(new CylinderShape(1, 1), new Vector3(0, 2, 8)), CollisionRules = new CollisionRules() { Personal = CollisionRule.NoBroadPhase } },
+                new CompoundChildData() { Entry = new CompoundShapeEntry(new BoxShape(3, 1, 3), new Vector3(0, 1, 8)), Material = new Material(3, 3, 0) }
             }, 10);
             Space.Add(compoundBody);
 
