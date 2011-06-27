@@ -49,25 +49,29 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
         {
             lock (Locker)
             {
-                //To multithread the tree traversals, we have to do a little single threaded work.
-                //Dive down into the tree far enough that there are enough nodes to split amongst all the threads in the thread manager.
-                int splitDepth = (int)Math.Ceiling(Math.Log(ThreadManager.ThreadCount, 2));
-
-                root.CollectMultithreadingNodes(splitDepth, 1, multithreadingSourceNodes);
-                //Go through every node and refit it.
-                ThreadManager.ForLoop(0, multithreadingSourceNodes.count, multithreadedRefit);
-                multithreadingSourceNodes.Clear();
-                //Now that the subtrees belonging to the source nodes are refit, refit the top nodes.
-                //Sometimes, this will go deeper than necessary because the refit process may require an extremely high level (nonmultithreaded) revalidation.
-                //The waste cost is a matter of nanoseconds due to the simplicity of the operations involved.
-                root.PostRefit(splitDepth, 1);
-
-                //The trees are now fully refit (and revalidated, if the refit process found it to be necessary).
-                //The overlap traversal is conceptually similar to the multithreaded refit, but is a bit easier since there's no need to go back up the stack.
                 Overlaps.Clear();
-                root.GetMultithreadedOverlaps(root, splitDepth, 1, this, multithreadingSourceOverlaps);
-                ThreadManager.ForLoop(0, multithreadingSourceOverlaps.count, multithreadedOverlap);
-                multithreadingSourceOverlaps.Clear();
+                if (root != null)
+                {
+                    //To multithread the tree traversals, we have to do a little single threaded work.
+                    //Dive down into the tree far enough that there are enough nodes to split amongst all the threads in the thread manager.
+                    int splitDepth = (int)Math.Ceiling(Math.Log(ThreadManager.ThreadCount, 2));
+
+                    root.CollectMultithreadingNodes(splitDepth, 1, multithreadingSourceNodes);
+                    //Go through every node and refit it.
+                    ThreadManager.ForLoop(0, multithreadingSourceNodes.count, multithreadedRefit);
+                    multithreadingSourceNodes.Clear();
+                    //Now that the subtrees belonging to the source nodes are refit, refit the top nodes.
+                    //Sometimes, this will go deeper than necessary because the refit process may require an extremely high level (nonmultithreaded) revalidation.
+                    //The waste cost is a matter of nanoseconds due to the simplicity of the operations involved.
+                    root.PostRefit(splitDepth, 1);
+
+                    //The trees are now fully refit (and revalidated, if the refit process found it to be necessary).
+                    //The overlap traversal is conceptually similar to the multithreaded refit, but is a bit easier since there's no need to go back up the stack.
+
+                    root.GetMultithreadedOverlaps(root, splitDepth, 1, this, multithreadingSourceOverlaps);
+                    ThreadManager.ForLoop(0, multithreadingSourceOverlaps.count, multithreadedOverlap);
+                    multithreadingSourceOverlaps.Clear();
+                }
             }
 
         }
@@ -99,10 +103,13 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
         {
             lock (Locker)
             {
-                root.Refit();
-
                 Overlaps.Clear();
-                root.GetOverlaps(root, this);
+                if (root != null)
+                {
+                    root.Refit();
+
+                    root.GetOverlaps(root, this);
+                }
             }
         }
 
