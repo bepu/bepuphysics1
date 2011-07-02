@@ -105,6 +105,19 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             }
         }
 
+
+        /// <summary>
+        /// Updates the material interaction properties of the pair handler's constraint.
+        /// </summary>
+        /// <param name="properties">Properties to use.</param>
+        public override void UpdateMaterialProperties(InteractionProperties properties)
+        {
+            foreach (CollidablePairHandler pairHandler in subPairs.Values)
+            {
+                pairHandler.UpdateMaterialProperties(properties);
+            }
+        }
+
         ///<summary>
         /// Initializes the pair handler.
         ///</summary>

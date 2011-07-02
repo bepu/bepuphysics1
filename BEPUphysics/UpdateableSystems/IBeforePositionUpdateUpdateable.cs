@@ -1,12 +1,13 @@
 ﻿namespace BEPUphysics.UpdateableSystems
 {
     ///<summary>
-    /// Defines an object which is updated by the space before the narrow phase runs.
+    /// Defines an object which is updated by the space at the end of a time step.
     ///</summary>
-    public interface IBeforeNarrowPhaseUpdateable : ISpaceUpdateable
+    public interface IBeforePositionUpdateUpdateable : ISpaceUpdateable
     {
+
         ///<summary>
-        /// Updates the updateable before the narrow phase.
+        /// Updates the object at the end of a time step.
         ///</summary>
         ///<param name="dt">Time step duration.</param>
         void Update(float dt);

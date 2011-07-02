@@ -1,6 +1,5 @@
 ﻿using BEPUphysics.Entities.Prefabs;
 using Microsoft.Xna.Framework;
-using BEPUphysics.MathExtensions;
 
 namespace BEPUphysicsDemos.Demos
 {
@@ -16,8 +15,6 @@ namespace BEPUphysicsDemos.Demos
         public WallDemo(DemosGame game)
             : base(game)
         {
-
-
             int width = 10;
             int height = 10;
             float blockWidth = 2f;

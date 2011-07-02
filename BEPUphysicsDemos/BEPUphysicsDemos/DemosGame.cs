@@ -15,6 +15,7 @@ using Microsoft.Xna.Framework.Input;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
 using BEPUphysics.Settings;
 using BEPUphysics.DataStructures;
+using BEPUphysicsDemos.Demos.Tests;
 
 #endregion
 
@@ -109,7 +110,9 @@ namespace BEPUphysicsDemos
                                                     typeof (PlanetDemo),
                                                     typeof (PathFollowingDemo),
                                                     typeof (FishInABarrelDemo),
-                                                    typeof (DetectorVolumeDemo)
+                                                    typeof (DetectorVolumeDemo),
+                                                    typeof (ClothTestDemo),
+                                                    typeof(DeterminismTestDemo)
                                                 };
 
 
@@ -414,7 +417,7 @@ namespace BEPUphysicsDemos
 
             if (displayBoundingBoxes)
                 BoundingBoxDrawer.Draw(LineDrawer, currentSimulation.Space);
-            
+
             if (displaySimulationIslands)
                 SimulationIslandDrawer.Draw(LineDrawer, currentSimulation.Space);
 

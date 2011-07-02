@@ -252,9 +252,16 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
 
         ///<summary>
         /// Forces an update of the pair's material properties.
+        ///</summary>
+        /// <param name="properties">Properties to use in the collision.</param>
+
+        public abstract void UpdateMaterialProperties(InteractionProperties properties);
+
+        ///<summary>
+        /// Forces an update of the pair's material properties.
+        ///</summary>
         /// <param name="materialA">First material to use.</param>
         /// <param name="materialB">Second material to use.</param>
-        ///</summary>
         public abstract void UpdateMaterialProperties(Material materialA, Material materialB);
 
         ///<summary>

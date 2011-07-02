@@ -137,6 +137,22 @@ namespace BEPUphysics.SolverSystems
             }
         }
 
+        /// <summary>
+        /// Gets or sets the permutation index used by the solver.  If the simulation is restarting from a given frame,
+        /// setting this index to be consistent is required for deterministic results.
+        /// </summary>
+        public int PermutationIndex
+        {
+            get
+            {
+                return primeIndex;
+            }
+            set
+            {
+                primeIndex = value % primes.Length;
+            }
+        }
+
         int primeIndex;
         static long[] primes = {
                                     472882049, 492876847,

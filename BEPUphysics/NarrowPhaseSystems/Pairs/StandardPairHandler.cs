@@ -78,6 +78,16 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                 b == null ? EntityB == null ? null : EntityB.material : b);
         }
 
+        /// <summary>
+        /// Updates the material interaction properties of the pair handler's constraint.
+        /// </summary>
+        /// <param name="properties">Properties to use.</param>
+        public override void UpdateMaterialProperties(InteractionProperties properties)
+        {
+            ContactConstraint.MaterialInteraction = properties;
+        }
+
+
 
 
         ///<summary>

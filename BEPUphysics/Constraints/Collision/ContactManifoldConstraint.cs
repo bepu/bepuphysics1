@@ -173,5 +173,6 @@ namespace BEPUphysics.Constraints.Collision
                 materialInteraction.Bounciness = 0;
             }
         }
+
     }
 }

@@ -19,7 +19,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
     public abstract class GroupPairHandler : CollidablePairHandler, IPairHandlerParent
     {
         ContactManifoldConstraintGroup manifoldConstraintGroup;
-        
+
         Dictionary<CollidablePair, CollidablePairHandler> subPairs = new Dictionary<CollidablePair, CollidablePairHandler>();
         HashSet<CollidablePair> containedPairs = new HashSet<CollidablePair>();
         RawList<CollidablePair> pairsToRemove = new RawList<CollidablePair>();
@@ -59,6 +59,18 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             foreach (CollidablePairHandler pairHandler in subPairs.Values)
             {
                 pairHandler.UpdateMaterialProperties(a, b);
+            }
+        }
+
+        /// <summary>
+        /// Updates the material interaction properties of the pair handler's constraint.
+        /// </summary>
+        /// <param name="properties">Properties to use.</param>
+        public override void UpdateMaterialProperties(InteractionProperties properties)
+        {
+            foreach (CollidablePairHandler pairHandler in subPairs.Values)
+            {
+                pairHandler.UpdateMaterialProperties(properties);
             }
         }
 

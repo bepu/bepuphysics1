@@ -31,7 +31,7 @@ namespace BEPUphysicsDemos.Demos.Tests
     /// <summary>
     /// Demo showing a wall of blocks stacked up.
     /// </summary>
-    public class TestDemo3 : StandardDemo
+    public class DeterminismTestDemo : StandardDemo
     {
         List<Entity> entities = new List<Entity>();
         int numFrames;
@@ -43,7 +43,7 @@ namespace BEPUphysicsDemos.Demos.Tests
         /// Constructs a new demo.
         /// </summary>
         /// <param name="game">Game owning this demo.</param>
-        public TestDemo3(DemosGame game)
+        public DeterminismTestDemo(DemosGame game)
             : base(game)
         {
 

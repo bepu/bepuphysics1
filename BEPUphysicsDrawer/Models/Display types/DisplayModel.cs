@@ -8,10 +8,8 @@ namespace BEPUphysicsDrawer.Models
     /// </summary>
     public class DisplayModel : SelfDrawingModelDisplayObject
     {
-        private Model myModel;
-
-        private Texture2D myTexture;
-
+        private Model model;
+        
         /// <summary>
         /// Bone transformations of meshes in the model.
         /// </summary>
@@ -33,11 +31,11 @@ namespace BEPUphysicsDrawer.Models
         /// </summary>
         public Model Model
         {
-            get { return myModel; }
+            get { return model; }
             set
             {
-                myModel = value;
-                transforms = new Matrix[myModel.Bones.Count];
+                model = value;
+                transforms = new Matrix[model.Bones.Count];
                 for (int i = 0; i < Model.Meshes.Count; i++)
                 {
                     for (int j = 0; j < Model.Meshes[i].Effects.Count; j++)
@@ -55,28 +53,8 @@ namespace BEPUphysicsDrawer.Models
         /// </summary>
         public Texture2D Texture
         {
-            get { return myTexture; }
-            set
-            {
-                myTexture = value;
-                for (int i = 0; i < Model.Meshes.Count; i++)
-                {
-                    for (int j = 0; j < Model.Meshes[i].Effects.Count; j++)
-                    {
-                        var effect = Model.Meshes[i].Effects[j] as BasicEffect;
-                        if (effect != null)
-                        {
-                            if (value != null)
-                            {
-                                effect.TextureEnabled = true;
-                                effect.Texture = Texture;
-                            }
-                            else
-                                effect.TextureEnabled = false;
-                        }
-                    }
-                }
-            }
+            get;
+            set;
         }
 
 
@@ -101,7 +79,7 @@ namespace BEPUphysicsDrawer.Models
         {
             //This is not a particularly fast method of drawing.
             //It's used very rarely in the demos.
-            myModel.CopyAbsoluteBoneTransformsTo(transforms);
+            model.CopyAbsoluteBoneTransformsTo(transforms);
             for (int i = 0; i < Model.Meshes.Count; i++)
             {
                 for (int j = 0; j < Model.Meshes[i].Effects.Count; j++)
@@ -112,6 +90,14 @@ namespace BEPUphysicsDrawer.Models
                         effect.World = transforms[Model.Meshes[i].ParentBone.Index] * WorldTransform;
                         effect.View = viewMatrix;
                         effect.Projection = projectionMatrix;
+
+                        if (Texture != null)
+                        {
+                            effect.TextureEnabled = true;
+                            effect.Texture = Texture;
+                        }
+                        else
+                            effect.TextureEnabled = false;
                     }
                 }
                 Model.Meshes[i].Draw();

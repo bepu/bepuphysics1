@@ -13,7 +13,7 @@ namespace BEPUphysics.UpdateableSystems
     /// <summary>
     /// Volume in which physically simulated objects have a buoyancy force applied to them based on their density and volume.
     /// </summary>
-    public class FluidVolume : Updateable, IBeforeNarrowPhaseUpdateable
+    public class FluidVolume : Updateable, IDuringForcesUpdateable
     {
         //TODO: The current FluidVolume implementation is awfully awful.
         //It only currently supports horizontal surface planes, since it uses
@@ -261,7 +261,7 @@ namespace BEPUphysics.UpdateableSystems
         /// Called automatically when needed by the owning Space.
         /// </summary>
         /// <param name="dt">Time since last frame in physical logic.</param>
-        void IBeforeNarrowPhaseUpdateable.Update(float dt)
+        void IDuringForcesUpdateable.Update(float dt)
         {
             QueryAccelerator.GetEntries(boundingBox, collisionEntries);
             //TODO: Could integrate the entire thing into the collision detection pipeline.  Applying forces

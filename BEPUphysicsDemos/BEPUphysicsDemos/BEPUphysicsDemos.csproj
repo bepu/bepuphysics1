@@ -82,6 +82,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Alternate Movement\CharacterControllerOld.cs" />
+    <Compile Include="Alternate Movement\CharacterControllerInputOld.cs" />
     <Compile Include="Alternate Movement\CharacterController.cs" />
     <Compile Include="Alternate Movement\CharacterControllerInput.cs" />
     <Compile Include="Alternate Movement\SimpleCharacterController.cs" />
@@ -103,6 +105,7 @@
     <Compile Include="Demos\ColosseumDemo.cs" />
     <Compile Include="Demos\CompoundBodiesDemo.cs" />
     <Compile Include="Demos\EntityConstructionDemo.cs" />
+    <Compile Include="Demos\Tests\ClothTestDemo.cs" />
     <Compile Include="Demos\Tests\ThreadingTestDemo.cs" />
     <Compile Include="Demos\Tests\ThreadManagerTestDemo.cs" />
     <Compile Include="Demos\Tests\TerrainTesting.cs" />

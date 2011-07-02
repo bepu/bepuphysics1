@@ -152,7 +152,7 @@ namespace BEPUphysics.Entities
                     return angularMomentum;
                 else
                 {
-                    Vector3 v; 
+                    Vector3 v;
                     Matrix3X3.Transform(ref angularVelocity, ref inertiaTensor, out v);
                     return v;
                 }
@@ -768,7 +768,7 @@ namespace BEPUphysics.Entities
                             }
                         }
                     }
-              
+
 
                 }
                 else
@@ -1398,6 +1398,14 @@ namespace BEPUphysics.Entities
         BroadPhaseEntry IBroadPhaseEntryOwner.Entry
         {
             get { return collisionInformation; }
+        }
+
+        public override string ToString()
+        {
+            if (Tag == null)
+                return base.ToString();
+            else
+                return base.ToString() + ", " + Tag;
         }
 
 

@@ -168,6 +168,10 @@ namespace BEPUphysics
         ///</summary>
         public BeforeNarrowPhaseUpdateableManager BeforeNarrowPhaseUpdateables { get; set; }
         ///<summary>
+        /// Gets or sets the updateable manager that handles updateables that update right before the position update phase.
+        ///</summary>
+        public BeforePositionUpdateUpdateableManager BeforePositionUpdateUpdateables { get; set; }
+        ///<summary>
         /// Gets or sets the updateable manager that handles updateables that update at the end of a timestep.
         ///</summary>
         public EndOfTimeStepUpdateableManager EndOfTimeStepUpdateables { get; set; }
@@ -215,6 +219,7 @@ namespace BEPUphysics
 
             DuringForcesUpdateables = new DuringForcesUpdateableManager(timeStepSettings, ThreadManager);
             BeforeNarrowPhaseUpdateables = new BeforeNarrowPhaseUpdateableManager(timeStepSettings, ThreadManager);
+            BeforePositionUpdateUpdateables = new BeforePositionUpdateUpdateableManager(timeStepSettings, ThreadManager);
             EndOfTimeStepUpdateables = new EndOfTimeStepUpdateableManager(timeStepSettings, ThreadManager);
             EndOfFrameUpdateables = new EndOfFrameUpdateableManager(timeStepSettings, ThreadManager);
 
@@ -309,6 +314,12 @@ namespace BEPUphysics
             if (beforeNarrowPhaseUpdateable != null)
             {
                 BeforeNarrowPhaseUpdateables.Add(beforeNarrowPhaseUpdateable);
+            }
+
+            IBeforePositionUpdateUpdateable beforePositionUpdateUpdateable = spaceObject as IBeforePositionUpdateUpdateable;
+            if (beforePositionUpdateUpdateable != null)
+            {
+                BeforePositionUpdateUpdateables.Add(beforePositionUpdateUpdateable);
             }
 
             IEndOfTimeStepUpdateable endOfStepUpdateable = spaceObject as IEndOfTimeStepUpdateable;
@@ -415,6 +426,12 @@ namespace BEPUphysics
                 BeforeNarrowPhaseUpdateables.Remove(beforeNarrowPhaseUpdateable);
             }
 
+            IBeforePositionUpdateUpdateable beforePositionUpdateUpdateable = spaceObject as IBeforePositionUpdateUpdateable;
+            if (beforePositionUpdateUpdateable != null)
+            {
+                BeforePositionUpdateUpdateables.Remove(beforePositionUpdateUpdateable);
+            }
+
             IEndOfTimeStepUpdateable endOfStepUpdateable = spaceObject as IEndOfTimeStepUpdateable;
             if (endOfStepUpdateable != null)
             {
@@ -439,11 +456,12 @@ namespace BEPUphysics
             ForceUpdater.Update();
             DuringForcesUpdateables.Update();
             BoundingBoxUpdater.Update();
-            BeforeNarrowPhaseUpdateables.Update();
             BroadPhase.Update();
+            BeforeNarrowPhaseUpdateables.Update();
             NarrowPhase.Update();
             NarrowPhase.FlushGeneratedSolverUpdateables(Solver);
             Solver.Update();
+            BeforePositionUpdateUpdateables.Update();
             PositionUpdater.Update();
             BufferedStates.ReadBuffers.Update();
             DeferredEventDispatcher.Update();

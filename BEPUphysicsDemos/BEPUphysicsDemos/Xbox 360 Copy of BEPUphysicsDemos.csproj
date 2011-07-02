@@ -61,6 +61,8 @@
   <ItemGroup>
     <Compile Include="Alternate Movement\CharacterController.cs" />
     <Compile Include="Alternate Movement\CharacterControllerInput.cs" />
+    <Compile Include="Alternate Movement\CharacterControllerInputOld.cs" />
+    <Compile Include="Alternate Movement\CharacterControllerOld.cs" />
     <Compile Include="Alternate Movement\SimpleCharacterController.cs" />
     <Compile Include="Alternate Movement\SimpleCharacterControllerInput.cs" />
     <Compile Include="Alternate Movement\TankInput.cs" />
@@ -103,6 +105,7 @@
     <Compile Include="Demos\SpaceshipDemo.cs" />
     <Compile Include="Demos\TerrainDemo.cs" />
     <Compile Include="Demos\Tests\BroadPhasesTestDemo.cs" />
+    <Compile Include="Demos\Tests\ClothTestDemo.cs" />
     <Compile Include="Demos\Tests\DeterminismTestDemo.cs" />
     <Compile Include="Demos\Tests\MPRCastingDemo.cs" />
     <Compile Include="Demos\Tests\MPRTestDemo.cs" />

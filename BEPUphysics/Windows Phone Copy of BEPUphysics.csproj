@@ -446,6 +446,7 @@
     <Compile Include="UpdateableSystems\ForceFields\InfiniteForceFieldShape.cs" />
     <Compile Include="UpdateableSystems\ForceFields\VolumeForceFieldShape.cs" />
     <Compile Include="UpdateableSystems\IBeforeNarrowPhaseUpdateable.cs" />
+    <Compile Include="UpdateableSystems\IBeforePositionUpdateUpdateable.cs" />
     <Compile Include="UpdateableSystems\IDuringForcesUpdateable.cs" />
     <Compile Include="UpdateableSystems\IEndOfFrameUpdateable.cs" />
     <Compile Include="UpdateableSystems\IEndOfTimeStepUpdateable.cs" />
