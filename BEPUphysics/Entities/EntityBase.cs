@@ -258,7 +258,10 @@ namespace BEPUphysics.Entities
                     isActive = true;
                     OnActivated();
                 }
-
+                else if (value)
+                {
+                    IsDeactivationCandidate = false;
+                }
             }
         }
 
@@ -819,12 +822,12 @@ namespace BEPUphysics.Entities
                 }
                 else if (!value && isDeactivationCandidate)
                 {
-                    //Even though we the deactivation candidacy is becoming false, 
-                    //the timers don't need to be reset.
-                    //They will automatically reset if the velocity is found to require it.
-                    velocityTimeBelowLimit = 0;
                     isDeactivationCandidate = false;
                     OnBecameNonDeactivationCandidate();
+                }
+                if (!value)
+                {
+                    velocityTimeBelowLimit = 0;
                 }
             }
         }

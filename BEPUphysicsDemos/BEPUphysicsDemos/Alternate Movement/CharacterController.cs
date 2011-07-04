@@ -14,15 +14,30 @@ using BEPUphysics.Materials;
 using BEPUphysics.PositionUpdating;
 using BEPUphysics.DataStructures;
 using System.Diagnostics;
+using BEPUphysics.CollisionShapes.ConvexShapes;
+using BEPUphysics.Collidables;
+using Microsoft.Xna.Framework.Input;
 
 namespace BEPUphysicsDemos
 {
-    public class CharacterController : Updateable, IBeforePositionUpdateUpdateable, IDuringForcesUpdateable, IEndOfTimeStepUpdateable
+    public class CharacterController : Updateable, IBeforeNarrowPhaseUpdateable, IEndOfTimeStepUpdateable
     {
         public Capsule Body { get; private set; }
 
+
+        public float StepHeight { get; set; }
+
         public Vector2 MovementDirection;
-        public float Speed = 20;
+        public float Speed = 8;
+        public float SlidingSpeed = 6;
+        public float AirSpeed = 4;
+        public float Acceleration = 50;
+        public float SlidingAcceleration = 0;
+        public float AirAcceleration = 5;
+        public float Deceleration = 80;
+        public float SlidingDeceleration = 1;
+        public float JumpSpeed = 6;
+        public float SlidingJumpSpeed = 4;
         float cosMaximumTractionSlope = (float)Math.Cos(MathHelper.PiOver4);
         /// <summary>
         /// Gets or sets the maximum slope on which the character will have traction.
@@ -44,13 +59,51 @@ namespace BEPUphysicsDemos
         /// </summary>
         public float GlueSpeed { get; set; }
 
+        bool hasTraction;
+        /// <summary>
+        /// Gets whether or not the character currently has traction on the ground.
+        /// </summary>
+        public bool HasTraction
+        {
+            get
+            {
+                return hasTraction;
+            }
+        }
+
+        /// <summary>
+        /// Gets whether or not the character currently has something supporting it.
+        /// </summary>
+        public bool IsSupported
+        {
+            get
+            {
+                return support != null;
+            }
+        }
+
+
+        BoundingBox convexCastUpVolume;
+        BoundingBox convexCastDownVolume;
+        CylinderShape castShape;
+        float supportMargin = .01f;
+        float sweepLength;
+        Collidable support;
+        RayHit supportData;
+        Vector3 sweep;
+
         public CharacterController()
         {
             Body = new Capsule(Vector3.Zero, 1.7f, .3f, 10);
+            //Making the character a continuous object prevents it from flying through walls which would be pretty jarring from a player's perspective.
             Body.PositionUpdateMode = PositionUpdateMode.Continuous;
             Body.LocalInertiaTensorInverse = new Matrix3X3();
             Body.CollisionInformation.Events.CreatingPair += RemoveFriction;
             GlueSpeed = 20;
+            StepHeight = 1;
+            //construct the casting shape.  It should be a little smaller than the character's radius.
+            castShape = new CylinderShape(0, Body.Radius * .8f);
+            castShape.CollisionMargin = 0;
         }
 
         void RemoveFriction(EntityCollidable sender, BroadPhaseEntry other, INarrowPhasePair pair)
@@ -64,130 +117,268 @@ namespace BEPUphysicsDemos
             }
         }
 
-        void IDuringForcesUpdateable.Update(float dt)
+        void ExpandBoundingBox()
         {
-            Body.LinearVelocity = new Vector3(Speed * MovementDirection.X, Body.LinearVelocity.Y, Speed * MovementDirection.Y);
+            //This runs after the bounding box updater is run, but before the broad phase.
+            //Expanding the character's bounding box ensures that minor variations in velocity will not cause
+            //any missed information.
+            //For a character which is not bound to Vector3.Up (such as a character that needs to run around a spherical planet),
+            //the bounding box expansion needs to be changed such that it includes the full convex cast at the bottom and top of the character under any orientation.
+            float radius = Body.CollisionInformation.Shape.Radius;
+            Vector3 offset;
+            offset.X = radius;
+            offset.Y = StepHeight;
+            offset.Z = radius;
+            BoundingBox box = Body.CollisionInformation.BoundingBox;
+            Vector3.Add(ref box.Max, ref offset, out box.Max);
+            offset.Y += StepHeight + supportMargin; //Bottom is expanded by 2x step height for down stepping support.
+            Vector3.Subtract(ref box.Min, ref offset, out box.Min);
+            Body.CollisionInformation.BoundingBox = box;
+
+            //Compute the individual bounding boxes for the upper convex cast and lower convex cast.
+            //TODO: Update for non-pure capsule shape center offset.
+            //TODO: Could use swept shape bounding boxes to make this a bit easier, especially for 6DOF character controllers.
+            convexCastDownVolume = new BoundingBox()
+                {
+                    Min = Body.Position + new Vector3(-radius, -Body.Length * .5f - radius - StepHeight * 2 - supportMargin, -radius),
+                    Max = Body.Position + new Vector3(radius, -Body.Length * .5f, radius)
+                };
+            convexCastUpVolume = new BoundingBox()
+            {
+                Min = Body.Position + new Vector3(-radius, Body.Length * .5f, -radius),
+                Max = Body.Position + new Vector3(radius, Body.Length * .5f + radius + StepHeight, radius)
+            };
         }
 
-        RawList<ContactInformation> supportingContacts = new RawList<ContactInformation>();
-        RawList<ContactInformation> tractionContacts = new RawList<ContactInformation>();
-
-        void IBeforePositionUpdateUpdateable.Update(float dt)
+        void IBeforeNarrowPhaseUpdateable.Update(float dt)
         {
-            //The solver has run.  Sanitize its output to ensure that the character has the velocities we want before allowing the position updater to run.
-            //Scan the traction contacts.  Check their relative velocities along the contact normal.  Compute the minimum velocity change necessary
-            //to ensure that the contact does not separate.  If it's less than the 'glue speed,' apply the velocity change.
-            //Technically, 'glue' impulses could de-glue other contacts.  Iterating could help a bit.
+            //Cast down to find the support.
 
-            //First, collect and classify the contacts the body has with its environment.
-            supportingContacts.Clear();
-            tractionContacts.Clear();
-            Vector3 down = Body.OrientationMatrix.Down;
-            Vector3 bodyPosition = Body.Position;
-            float halfLength = Body.Length * .5f;
-            foreach (var pair in Body.CollisionInformation.Pairs)
+            //In a 6DOF character, the starting transform will vary.
+            //For now, just assume it's locked to Up.
+            RigidTransform startingTransform = new RigidTransform();
+            startingTransform.Position = Body.Position;
+            startingTransform.Position.Y -= Body.Length * .5f;
+            startingTransform.Orientation = Quaternion.Identity;
+
+            //Compute the sweep direction.  This too will change in a 6DOF character (Body.OrientationMatrix.Down instead of Vector3.Down).
+            //If the body had traction last frame, then do a full-length sweep; this will detect step-downs.
+            //If it didn't have traction, just cast down by one step height to try and find a support.
+            //The reason why Body.Radius is added is that the starting transform is embedded in the capsule.
+            sweepLength = hasTraction ? StepHeight * 2 + Body.Radius : StepHeight + Body.Radius + supportMargin;
+            sweep = new Vector3(0, -sweepLength, 0);
+
+            //Cycle through every collidable and find the first time of impact for the convex cast.
+
+            support = null;
+            supportData = new RayHit() { T = float.MaxValue }; //Set the T value to an extremely high value to start with so that any result will be lower.
+            if (!jumping) //If we're jumping, then don't bother casting.  We should leave the ground.
             {
-                for (int i = 0; i < pair.Contacts.Count; i++)
+                foreach (var collidable in Body.CollisionInformation.OverlappedCollidables)
                 {
-                    var contactData = pair.Contacts[i];
-                    Vector3 offsetToContact;
-                    Vector3.Subtract(ref contactData.Contact.Position, ref bodyPosition, out offsetToContact);
-                    float dot;
-                    Vector3.Dot(ref offsetToContact, ref down, out dot);
-                    if (dot > halfLength)
+                    if (convexCastDownVolume.Intersects(collidable.BoundingBox))
                     {
-                        //The contact is on the bottom cap of the capsule.  It's a 'supporting' contact!
-                        supportingContacts.Add(contactData);
-                        //Now, check to see if it's also a traction contact.
-                        Vector3 calibratedNormal;
-                        Vector3.Dot(ref offsetToContact, ref contactData.Contact.Normal, out dot);
-                        if (dot < 0)
-                            Vector3.Negate(ref contactData.Contact.Normal, out calibratedNormal);
-                        else
-                            calibratedNormal = contactData.Contact.Normal;
-                        //The normal is facing out of the capsule.  Find the angle of the slope relative to the down vector.
-                        Vector3.Dot(ref calibratedNormal, ref down, out dot);
-                        //Instead of taking Math.Acos(dot) to find an angle, we can just compare the dot product directly to the cosine of the maximum slope.
-                        if (dot > cosMaximumTractionSlope)
-                            tractionContacts.Add(contactData);
+                        RayHit hit;
+                        if (collidable.ConvexCast(castShape, ref startingTransform, ref sweep, out hit) && hit.T < supportData.T)
+                        {
+                            supportData = hit;
+                            support = collidable;
+                        }
+
                     }
                 }
             }
+            else
+                jumping = false; //Hopefully we've cleared the ground; the next frame will behave normally.
 
-            //Look at all the traction contacts.  Find the shallowest one.
-            //We have to find the shallowest one because performing glue procedures on all of the contacts would result in the character being sucked through geometry as they walked 
-            //across intersecting geometry.
+            //If there's any support, analyze it.
+            //Check the slope of the hit against the maximum.
+            //This is a dot product of the normal against the body up vector (in this implementation, always {0, 1, 0}).
+            //For a fixed up vector of {0,1,0}, the dot product result is just the Y component of the normal.
+            //The following slope test is equivalent to MaximumTractionSlope > Math.Acos(Vector3.Dot(-firstHitData.Normal, Vector3.Up))
+            hasTraction = support != null & cosMaximumTractionSlope < -supportData.Normal.Y;
 
-            if (tractionContacts.Count > 0)
+            //Compute the relative velocity between the capsule and its support, if any.
+            //The relative velocity will be updated as impulses are applied.
+            Vector3 relativeVelocity = Body.LinearVelocity;
+            if (IsSupported)
             {
-                int shallowestIndex = 0;
-                for (int i = 1; i < tractionContacts.Count; i++)
+                //Only entities has velocity.
+                var entityCollidable = support as EntityCollidable;
+                if (entityCollidable != null)
                 {
-                    if (tractionContacts.Elements[i].Contact.PenetrationDepth < tractionContacts.Elements[shallowestIndex].Contact.PenetrationDepth)
-                        shallowestIndex = i;
+                    Vector3 entityVelocity = Toolbox.GetVelocityOfPoint(supportData.Location, entityCollidable.Entity);
+                    Vector3.Subtract(ref relativeVelocity, ref entityVelocity, out relativeVelocity);
+                    //TODO: Multithreaded safety.  If characters are running in parallel, ensure that this operation will not corrupt anything.
+                    if (entityCollidable.Entity.IsDynamic)
+                        entityCollidable.Entity.IsActive = true;
                 }
+            }
 
-                //Analyze their velocities to see if they are separating along the normal.  If they are, apply a linear velocity to the character to prevent the
-                //objects from separating, if possible.
-
-                var shallowestTraction = tractionContacts.Elements[shallowestIndex];
-                //Compute the normal velocity.
-                float normalVelocity;
-                Vector3.Dot(ref shallowestTraction.Contact.Normal, ref shallowestTraction.RelativeVelocity, out normalVelocity);
-                normalVelocity *= -1;
-                if (normalVelocity > 0 && normalVelocity < GlueSpeed)
+            //Update the vertical motion of the character.
+            if (hasTraction)
+            {
+                //Remove all velocity, penetrating or separating, along the contact normal if it is below a threshold.
+                float dot = -Vector3.Dot(relativeVelocity, supportData.Normal);
+                if (dot < GlueSpeed)
                 {
-                    //The normal velocity is correctable, and at least superficially separating.
-                    //Check the penetration at the contact.  We don't want to remove all the penetration recovery speed, just enough to ensure that the character isn't going to pop out of the surface in a single frame.
-                    //Bias the separation up a bit; we'd like to keep the objects just barely in contact.
-                    float excessSeparation = normalVelocity * dt - shallowestTraction.Contact.PenetrationDepth + .001f;
-
-                    if (excessSeparation > 0)
-                    {
-                        //Get rid of the excess!
-                        float velocityChange = excessSeparation / dt;
-                        //Calibrated normal could be cached from the previous stage to eliminate this part.
-                        Vector3 calibratedNormal;
-                        Vector3 offsetToContact;
-                        Vector3.Subtract(ref shallowestTraction.Contact.Position, ref bodyPosition, out offsetToContact);
-                        float dot;
-                        Vector3.Dot(ref offsetToContact, ref shallowestTraction.Contact.Normal, out dot);
-                        if (dot < 0)
-                            Vector3.Negate(ref shallowestTraction.Contact.Normal, out calibratedNormal);
-                        else
-                            calibratedNormal = shallowestTraction.Contact.Normal;
-                        //Normal now faces out of the capsule.
-                        //Apply the velocity change!
-                        Body.LinearVelocity += calibratedNormal * velocityChange;
-
-                    }
+                    ChangeVelocity(supportData.Normal * dot, ref relativeVelocity);
                 }
+                else
+                    hasTraction = false;
 
             }
+            else if (IsSupported)
+            {
+                //The character has no traction, so just stop penetrating velocity.
+                float dot = -Vector3.Dot(relativeVelocity, supportData.Normal);
+                if (dot < 0)
+                    ChangeVelocity(supportData.Normal * dot, ref relativeVelocity);
+
+            }
+
+            //Update the horizontal motion of the character.
+            if (IsSupported)
+            {
+                //If the object has traction, it has a lot more control over its motion.  If it is sliding, then use the sliding coefficients.
+                float accelerationToUse = hasTraction ? Acceleration : SlidingAcceleration;
+                float decelerationToUse = hasTraction ? Deceleration : SlidingDeceleration;
+                Vector3 velocityDirection;
+                Vector3 violatingVelocity;
+                if (MovementDirection.LengthSquared() > 0)
+                {
+                    //Project the movement direction onto the support plane defined by the support normal.
+                    //This projection is NOT along the support normal to the plane; that would cause the character to veer off course when moving on slopes.
+                    //Instead, project along the sweep direction to the plane.
+                    //For a 6DOF character controller, the lineStart would be different; it must be perpendicular to the local up.
+                    Vector3 lineStart = new Vector3(MovementDirection.X, 0, MovementDirection.Y);
+                    Vector3 lineEnd;
+                    Vector3.Add(ref lineStart, ref sweep, out lineEnd);
+                    Plane plane = new Plane(supportData.Normal, 0);
+                    float t;
+                    //This method can return false when the line is parallel to the plane, but previous tests and the slope limit guarantee that it won't happen.
+                    Toolbox.GetLinePlaneIntersection(ref lineStart, ref lineEnd, ref plane, out t, out velocityDirection);
+
+                    //The origin->intersection line direction defines the horizontal velocity direction in 3d space.
+                    velocityDirection.Normalize();
+
+                    //Compare the current velocity to the goal velocity.
+                    float currentVelocity;
+                    Vector3.Dot(ref velocityDirection, ref relativeVelocity, out currentVelocity);
+
+                    //Violating velocity is velocity which is not in the direction of the goal direction.
+                    violatingVelocity = relativeVelocity - velocityDirection * currentVelocity;
+
+                    //Compute the acceleration component.
+                    float speedUpNecessary = Speed - currentVelocity;
+                    float velocityChange = Math.Min(accelerationToUse * dt, speedUpNecessary);
+
+                    //Apply the change.
+                    ChangeVelocity(velocityDirection * velocityChange, ref relativeVelocity);
+                }
+                else
+                {
+                    velocityDirection = new Vector3();
+                    violatingVelocity = relativeVelocity;
+                }
+
+                //Compute the deceleration component.
+                float lengthSquared = violatingVelocity.LengthSquared();
+                if (lengthSquared > 0)
+                {
+                    Vector3 violatingVelocityDirection;
+                    float violatingVelocityMagnitude = (float)Math.Sqrt(lengthSquared);
+                    Vector3.Divide(ref violatingVelocity, violatingVelocityMagnitude, out violatingVelocityDirection);
+
+                    //We need to get rid of the violating velocity magnitude, but don't go under zero (that would cause nasty oscillations).
+                    float velocityChange = -Math.Min(decelerationToUse * dt, violatingVelocityMagnitude);
+                    //Apply the change.
+                    ChangeVelocity(violatingVelocityDirection * velocityChange, ref relativeVelocity);
+                }
+
+
+            }
+            else
+            {
+                //The character is in the air.  Still allow a little air control!
+                //6DOF character controllers will likely completely replace this; if it doesn't,
+                //use an oriented velocity direction instead of 2d movement direction.
+                var velocityDirection = new Vector3(MovementDirection.X, 0, MovementDirection.Y);
+
+                //Compare the current velocity to the goal velocity.
+                float currentVelocity;
+                Vector3.Dot(ref velocityDirection, ref relativeVelocity, out currentVelocity);
+
+                //Compute the acceleration component.
+                float speedUpNecessary = AirSpeed - currentVelocity;
+                float velocityChange = Math.Min(AirAcceleration * dt, speedUpNecessary);
+
+                //Apply the change.
+                ChangeVelocity(velocityDirection * velocityChange, ref relativeVelocity);
+            }
+
         }
+
+        void ChangeVelocity(Vector3 velocityChange, ref Vector3 relativeVelocity)
+        {
+            Body.LinearVelocity += velocityChange;
+            //Update the relative velocity as well.  It's a ref parameter, so this update will be reflected in the calling scope.
+            Vector3.Add(ref relativeVelocity, ref velocityChange, out relativeVelocity);
+
+        }
+
+
+
 
         void IEndOfTimeStepUpdateable.Update(float dt)
         {
-            //throw new NotImplementedException();
+            //Teleport the object to the first hit surface.
+            //This has to be done after the position update to ensure that no other systems get a chance to make an invalid state visible to the user, which would be corrected
+            //jerkily in a subsequent frame.
+            //Consider using forces instead.
+            if (IsSupported)
+                Body.Position += -((Body.Radius + StepHeight) / sweepLength - supportData.T) * sweep;
         }
 
-        bool stop;
-
+        bool jumping = false;
+        /// <summary>
+        /// Jumps the character off of whatever it's currently standing on.  If it has traction, it will go straight up.
+        /// If it doesn't have traction, but is still supported by something, it will jump in the direction of the surface normal.
+        /// </summary>
         public void Jump()
         {
-            stop = true;
-            Body.LinearVelocity = Body.OrientationMatrix.Up * 5;
+            if (hasTraction)
+            {
+                //The character is standing on something comfortably.  Allow them to jump straight up with regular height.
+                Body.LinearVelocity += Body.OrientationMatrix.Up * JumpSpeed;
+                jumping = true;
+            }
+            else if (IsSupported)
+            {
+                //The character is standing on something, but it doesn't have traction- allow it to jump, but send it away from the surface
+                Body.LinearVelocity += supportData.Normal * -SlidingJumpSpeed;
+                jumping = true;
+            }
         }
 
         public override void OnAdditionToSpace(ISpace newSpace)
         {
             //Add any supplements to the space too.
             newSpace.Add(Body);
+            //This character controller requires the standard implementation of Space.
+            ((Space)newSpace).BoundingBoxUpdater.Finishing += ExpandBoundingBox;
         }
         public override void OnRemovalFromSpace(ISpace oldSpace)
         {
             //Remove any supplements from the space too.
             oldSpace.Remove(Body);
+            //This character controller requires the standard implementation of Space.
+            ((Space)oldSpace).BoundingBoxUpdater.Finishing -= ExpandBoundingBox;
+            support = null;
+            supportData = new RayHit();
+            hasTraction = false;
+            Body.AngularVelocity = new Vector3();
+            Body.LinearVelocity = new Vector3();
         }
 
     }

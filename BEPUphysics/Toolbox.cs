@@ -189,7 +189,7 @@ namespace BEPUphysics
         /// Finds the intersection between the given segment and the given plane defined by three points.
         /// </summary>
         /// <param name="a">First endpoint of segment.</param>
-        /// <param name="b">Second enpoint of segment.</param>
+        /// <param name="b">Second endpoint of segment.</param>
         /// <param name="d">First vertex of a triangle which lies on the plane.</param>
         /// <param name="e">Second vertex of a triangle which lies on the plane.</param>
         /// <param name="f">Third vertex of a triangle which lies on the plane.</param>
@@ -215,29 +215,52 @@ namespace BEPUphysics
         public static bool GetSegmentPlaneIntersection(Vector3 a, Vector3 b, Plane p, out Vector3 q)
         {
             float t;
-            return GetSegmentPlaneIntersection(a, b, p, out t, out q);
+            return GetLinePlaneIntersection(ref a, ref b, ref p, out t, out q) && t >= 0 && t <= 1;
         }
 
         /// <summary>
         /// Finds the intersection between the given segment and the given plane.
         /// </summary>
         /// <param name="a">First endpoint of segment.</param>
-        /// <param name="b">Second enpoint of segment.</param>
+        /// <param name="b">Second endpoint of segment.</param>
         /// <param name="p">Plane for comparison.</param>
         /// <param name="t">Interval along segment to intersection.</param>
         /// <param name="q">Intersection point.</param>
         /// <returns>Whether or not the segment intersects the plane.</returns>
         public static bool GetSegmentPlaneIntersection(Vector3 a, Vector3 b, Plane p, out float t, out Vector3 q)
         {
-            q = NoVector;
-            Vector3 ab = b - a;
-            t = (p.D - Vector3.Dot(p.Normal, a)) / Vector3.Dot(p.Normal, ab);
-            if (t >= 0 && t <= 1.0f)
+            return GetLinePlaneIntersection(ref a, ref b, ref p, out t, out q) && t >= 0 && t <= 1;
+        }
+
+        /// <summary>
+        /// Finds the intersection between the given line and the given plane.
+        /// </summary>
+        /// <param name="a">First endpoint of segment defining the line.</param>
+        /// <param name="b">Second endpoint of segment defining the line.</param>
+        /// <param name="p">Plane for comparison.</param>
+        /// <param name="t">Interval along line to intersection (A + t * AB).</param>
+        /// <param name="q">Intersection point.</param>
+        /// <returns>Whether or not the line intersects the plane.  If false, the line is parallel to the plane's surface.</returns>
+        public static bool GetLinePlaneIntersection(ref Vector3 a, ref Vector3 b, ref Plane p, out float t, out Vector3 q)
+        {
+            Vector3 ab;
+            Vector3.Subtract(ref b, ref a, out ab);
+            float denominator;
+            Vector3.Dot(ref p.Normal, ref ab, out denominator);
+            if (denominator < Epsilon && denominator > -Epsilon)
             {
-                q = a + t * ab;
-                return true;
+                //Surface of plane and line are parallel (or very close to it).
+                q = new Vector3();
+                t = float.MaxValue;
+                return false;
             }
-            return false;
+            float numerator;
+            Vector3.Dot(ref p.Normal, ref a, out numerator);
+            t = (p.D - numerator) / denominator;
+            //Compute the intersection position.
+            Vector3.Multiply(ref ab, t, out q);
+            Vector3.Add(ref a, ref q, out q);
+            return true;
         }
 
         #endregion

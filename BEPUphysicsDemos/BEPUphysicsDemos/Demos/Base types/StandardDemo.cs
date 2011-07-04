@@ -85,6 +85,9 @@ namespace BEPUphysicsDemos.Demos
 
         public override void Update(float dt)
         {
+            if (Keyboard.GetState().IsKeyDown(Keys.O))
+                Debug.WriteLine("Break.");
+
             #region Kapow-Shooter Input
 
             //Update kapow-shooter

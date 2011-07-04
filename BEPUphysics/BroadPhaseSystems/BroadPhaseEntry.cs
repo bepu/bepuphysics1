@@ -35,11 +35,15 @@ namespace BEPUphysics.BroadPhaseSystems
 
         protected internal BoundingBox boundingBox;
         /// <summary>
-        /// Gets the bounding box of the entry.
+        /// Gets or sets the bounding box of the entry.
         /// </summary>
         public BoundingBox BoundingBox
         {
             get { return boundingBox; }
+            set
+            {
+                boundingBox = value;
+            }
         }
 
         protected internal abstract bool IsActive { get; }

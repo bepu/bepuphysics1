@@ -54,8 +54,12 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
             }
             set
             {
-                maximumForce = value >= 0 ? value : 0;
-                WakeUpEntities();
+                value = value >= 0 ? value : 0;
+                if (value != maximumForce)
+                {
+                    maximumForce = value;
+                    WakeUpEntities();
+                }
             }
         }
 
@@ -70,8 +74,11 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
             get { return mode; }
             set
             {
-                mode = value;
-                WakeUpEntities();
+                if (mode != value)
+                {
+                    mode = value;
+                    WakeUpEntities();
+                }
             }
         }
 
@@ -227,8 +234,12 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
             get { return baseCorrectiveSpeed; }
             set
             {
-                baseCorrectiveSpeed = value < 0 ? 0 : value;
-                motorSettings.WakeUpEntities();
+                value = value < 0 ? 0 : value;
+                if (value != baseCorrectiveSpeed)
+                {
+                    baseCorrectiveSpeed = value;
+                    motorSettings.WakeUpEntities();
+                }
             }
         }
 
@@ -240,16 +251,22 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
             get { return maxCorrectiveVelocity; }
             set
             {
-                maxCorrectiveVelocity = Math.Max(0, value);
-                if (maxCorrectiveVelocity >= float.MaxValue)
+                value = Math.Max(0, value);
+                if (maxCorrectiveVelocity != value)
                 {
-                    maxCorrectiveVelocitySquared = float.MaxValue;
+                    maxCorrectiveVelocity = value;
+                    if (maxCorrectiveVelocity >= float.MaxValue)
+                    {
+                        maxCorrectiveVelocitySquared = float.MaxValue;
+                    }
+                    else
+                    {
+                        maxCorrectiveVelocitySquared = maxCorrectiveVelocity * maxCorrectiveVelocity;
+                    }
+                    motorSettings.WakeUpEntities();
                 }
-                else
-                {
-                    maxCorrectiveVelocitySquared = maxCorrectiveVelocity * maxCorrectiveVelocity;
-                }
-                motorSettings.WakeUpEntities();
+
+               
             }
         }
 
@@ -288,8 +305,11 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
             get { return goal; }
             set
             {
-                goal = value;
-                motorSettings.WakeUpEntities();
+                if (goal != value)
+                {
+                    goal = value;
+                    motorSettings.WakeUpEntities();
+                }
             }
         }
 
@@ -317,8 +337,11 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
             get { return goal; }
             set
             {
-                goal = value;
-                motorSettings.WakeUpEntities();
+                if (goal != value)
+                {
+                    goal = value;
+                    motorSettings.WakeUpEntities();
+                }
             }
         }
     }
@@ -344,8 +367,11 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
             get { return goal; }
             set
             {
-                goal = value;
-                motorSettings.WakeUpEntities();
+                if (goal != value)
+                {
+                    goal = value;
+                    motorSettings.WakeUpEntities();
+                }
             }
         }
     }
@@ -383,8 +409,12 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
             get { return softness; }
             set
             {
-                softness = value < 0 ? 0 : value;
-                motorSettings.WakeUpEntities();
+                value = value < 0 ? 0 : value;
+                if (softness != value)
+                {
+                    softness = value;
+                    motorSettings.WakeUpEntities();
+                }
             }
         }
     }
