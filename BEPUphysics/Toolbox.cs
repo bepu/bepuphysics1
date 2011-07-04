@@ -2833,10 +2833,45 @@ namespace BEPUphysics
             float d12;
             Vector3.Dot(ref e1, ref e2, out d12);
             //Find barycoords
-            float denom = 1 / (d00 * d11 - d01 * d01);
-            v3Weight = (d11 * d02 - d01 * d12) * denom;
-            v2Weight = (d00 * d12 - d01 * d02) * denom;
-            v1Weight = 1 - v3Weight - v2Weight;
+            float denom = (d00 * d11 - d01 * d01);
+            if (denom < 1e-9f && denom > -1e-9f)
+            {
+                //It seems to be a degenerate triangle.
+                //In that case, pick one of the closest vertices.
+                //MOST of the time, this will happen when the vertices
+                //are all very close together (all three points form a single point).
+                //Sometimes, though, it could be that it's more of a line.
+                //If it's a little inefficient, don't worry- this is a corner case anyway.
+
+                float distance1, distance2, distance3;
+                Vector3.DistanceSquared(ref point, ref v1, out distance1);
+                Vector3.DistanceSquared(ref point, ref v2, out distance2);
+                Vector3.DistanceSquared(ref point, ref v3, out distance3);
+                if (distance1 < distance2 && distance1 < distance3)
+                {
+                    v1Weight = 1;
+                    v2Weight = 0;
+                    v3Weight = 0;
+                }
+                else if (distance2 < distance3)
+                {
+                    v1Weight = 0;
+                    v2Weight = 1;
+                    v3Weight = 0;
+                }
+                else
+                {
+                    v1Weight = 0;
+                    v2Weight = 0;
+                    v3Weight = 1;
+                }
+            }
+            else
+            {
+                v3Weight = (d11 * d02 - d01 * d12) * denom;
+                v2Weight = (d00 * d12 - d01 * d02) * denom;
+                v1Weight = 1 - v3Weight - v2Weight;
+            }
 
 
 

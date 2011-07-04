@@ -172,24 +172,20 @@ namespace BEPUphysicsDemos
 
             support = null;
             supportData = new RayHit() { T = float.MaxValue }; //Set the T value to an extremely high value to start with so that any result will be lower.
-            if (!jumping) //If we're jumping, then don't bother casting.  We should leave the ground.
+            foreach (var collidable in Body.CollisionInformation.OverlappedCollidables)
             {
-                foreach (var collidable in Body.CollisionInformation.OverlappedCollidables)
+                if (convexCastDownVolume.Intersects(collidable.BoundingBox))
                 {
-                    if (convexCastDownVolume.Intersects(collidable.BoundingBox))
+                    RayHit hit;
+                    if (collidable.ConvexCast(castShape, ref startingTransform, ref sweep, out hit) && hit.T < supportData.T)
                     {
-                        RayHit hit;
-                        if (collidable.ConvexCast(castShape, ref startingTransform, ref sweep, out hit) && hit.T < supportData.T)
-                        {
-                            supportData = hit;
-                            support = collidable;
-                        }
-
+                        supportData = hit;
+                        support = collidable;
                     }
+
                 }
             }
-            else
-                jumping = false; //Hopefully we've cleared the ground; the next frame will behave normally.
+
 
             //If there's any support, analyze it.
             //Check the slope of the hit against the maximum.
@@ -197,6 +193,7 @@ namespace BEPUphysicsDemos
             //For a fixed up vector of {0,1,0}, the dot product result is just the Y component of the normal.
             //The following slope test is equivalent to MaximumTractionSlope > Math.Acos(Vector3.Dot(-firstHitData.Normal, Vector3.Up))
             hasTraction = support != null & cosMaximumTractionSlope < -supportData.Normal.Y;
+
 
             //Compute the relative velocity between the capsule and its support, if any.
             //The relative velocity will be updated as impulses are applied.
@@ -213,6 +210,30 @@ namespace BEPUphysicsDemos
                     if (entityCollidable.Entity.IsDynamic)
                         entityCollidable.Entity.IsActive = true;
                 }
+            }
+
+            //Attempt to jump.
+            if (tryToJump)
+            {
+                if (hasTraction)
+                {
+                    //The character has traction, so jump straight up.
+                    float currentUpVelocity = Vector3.Dot(Body.OrientationMatrix.Up, relativeVelocity);
+                    //Target velocity is JumpSpeed.
+                    float velocityChange = JumpSpeed - currentUpVelocity;
+                    Body.LinearVelocity += Body.OrientationMatrix.Up * velocityChange;
+                }
+                else if (IsSupported)
+                {
+                    //The character does not have traction, so jump along the surface normal instead.
+                    float currentNormalVelocity = Vector3.Dot(supportData.Normal, relativeVelocity);
+                    //Target velocity is JumpSpeed.
+                    float velocityChange = SlidingJumpSpeed - currentNormalVelocity;
+                    Body.LinearVelocity += supportData.Normal * velocityChange;
+                }
+                hasTraction = false;
+                support = null;
+                tryToJump = false;
             }
 
             //Update the vertical motion of the character.
@@ -271,10 +292,12 @@ namespace BEPUphysicsDemos
 
                     //Compute the acceleration component.
                     float speedUpNecessary = Speed - currentVelocity;
-                    float velocityChange = Math.Min(accelerationToUse * dt, speedUpNecessary);
+                    float velocityChange = MathHelper.Clamp(speedUpNecessary, 0, accelerationToUse * dt);
 
                     //Apply the change.
+
                     ChangeVelocity(velocityDirection * velocityChange, ref relativeVelocity);
+
                 }
                 else
                 {
@@ -296,7 +319,6 @@ namespace BEPUphysicsDemos
                     ChangeVelocity(violatingVelocityDirection * velocityChange, ref relativeVelocity);
                 }
 
-
             }
             else
             {
@@ -311,11 +333,12 @@ namespace BEPUphysicsDemos
 
                 //Compute the acceleration component.
                 float speedUpNecessary = AirSpeed - currentVelocity;
-                float velocityChange = Math.Min(AirAcceleration * dt, speedUpNecessary);
+                float velocityChange = MathHelper.Clamp(speedUpNecessary, 0, AirAcceleration * dt);
 
                 //Apply the change.
                 ChangeVelocity(velocityDirection * velocityChange, ref relativeVelocity);
             }
+
 
         }
 
@@ -336,29 +359,21 @@ namespace BEPUphysicsDemos
             //This has to be done after the position update to ensure that no other systems get a chance to make an invalid state visible to the user, which would be corrected
             //jerkily in a subsequent frame.
             //Consider using forces instead.
+
             if (IsSupported)
                 Body.Position += -((Body.Radius + StepHeight) / sweepLength - supportData.T) * sweep;
         }
 
-        bool jumping = false;
+        bool tryToJump = false;
         /// <summary>
         /// Jumps the character off of whatever it's currently standing on.  If it has traction, it will go straight up.
         /// If it doesn't have traction, but is still supported by something, it will jump in the direction of the surface normal.
         /// </summary>
         public void Jump()
         {
-            if (hasTraction)
-            {
-                //The character is standing on something comfortably.  Allow them to jump straight up with regular height.
-                Body.LinearVelocity += Body.OrientationMatrix.Up * JumpSpeed;
-                jumping = true;
-            }
-            else if (IsSupported)
-            {
-                //The character is standing on something, but it doesn't have traction- allow it to jump, but send it away from the surface
-                Body.LinearVelocity += supportData.Normal * -SlidingJumpSpeed;
-                jumping = true;
-            }
+            //The actual jump velocities are applied next frame.  This ensures that gravity doesn't pre-emptively slow the jump, and uses more
+            //up-to-date support data.
+            tryToJump = true;
         }
 
         public override void OnAdditionToSpace(ISpace newSpace)
