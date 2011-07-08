@@ -76,6 +76,7 @@
     <Compile Include="Models\Display types\DisplayEntityModel.cs" />
     <Compile Include="Models\Display types\DisplayFluid.cs" />
     <Compile Include="Models\Display types\DisplayModel.cs" />
+    <Compile Include="Models\Display types\DisplayStaticMesh.cs" />
     <Compile Include="Models\Display types\DisplayTerrain.cs" />
     <Compile Include="Models\Display types\DisplayTriangleMesh.cs" />
     <Compile Include="Models\Display types\Entity types\DisplayEntity.cs" />

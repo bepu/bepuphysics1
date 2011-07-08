@@ -60,7 +60,7 @@ namespace BEPUphysicsDemos.Demos
 
 
 
-            game.ModelDrawer.Add(staticMesh.Mesh);
+            game.ModelDrawer.Add(staticMesh);
             game.Camera.Position = new Vector3(0, 10, 40);
 
 

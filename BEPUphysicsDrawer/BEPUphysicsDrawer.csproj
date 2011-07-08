@@ -91,6 +91,7 @@
     <Compile Include="Models\BatchInformation.cs" />
     <Compile Include="Models\BruteModelDrawer.cs" />
     <Compile Include="Models\Display types\BruteDisplayObjectEntry.cs" />
+    <Compile Include="Models\Display types\DisplayStaticMesh.cs" />
     <Compile Include="Models\Display types\DisplayInstancedMesh.cs" />
     <Compile Include="Models\Display types\DisplayEntityModel.cs" />
     <Compile Include="Models\Display types\DisplayFluid.cs" />

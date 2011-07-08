@@ -52,6 +52,7 @@ namespace BEPUphysicsDrawer.Models
             displayTypes.Add(typeof(FluidVolume), typeof(DisplayFluid));
             displayTypes.Add(typeof(Terrain), typeof(DisplayTerrain));
             displayTypes.Add(typeof(TriangleMesh), typeof(DisplayTriangleMesh));
+            displayTypes.Add(typeof(StaticMesh), typeof(DisplayStaticMesh));
             displayTypes.Add(typeof(InstancedMesh), typeof(DisplayInstancedMesh));
 
 

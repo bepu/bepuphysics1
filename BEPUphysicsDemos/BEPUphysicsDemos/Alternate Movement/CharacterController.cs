@@ -88,6 +88,7 @@ namespace BEPUphysicsDemos
         CylinderShape castShape;
         float supportMargin = .01f;
         float sweepLength;
+        float goalSupportT;
         Collidable support;
         RayHit supportData;
         Vector3 sweep;
@@ -186,6 +187,8 @@ namespace BEPUphysicsDemos
                 }
             }
 
+            goalSupportT = (Body.Radius + StepHeight) / sweepLength;
+
 
             //If there's any support, analyze it.
             //Check the slope of the hit against the maximum.
@@ -215,13 +218,16 @@ namespace BEPUphysicsDemos
             //Attempt to jump.
             if (tryToJump)
             {
+                //In the following, note that the jumping velocity changes are computed such that the separating velocity is specifically achieved,
+                //rather than just adding some speed along an arbitrary direction.  This avoids some cases where the character could otherwise increase
+                //the jump speed, which may not be desired.
                 if (hasTraction)
                 {
                     //The character has traction, so jump straight up.
                     float currentUpVelocity = Vector3.Dot(Body.OrientationMatrix.Up, relativeVelocity);
                     //Target velocity is JumpSpeed.
                     float velocityChange = JumpSpeed - currentUpVelocity;
-                    Body.LinearVelocity += Body.OrientationMatrix.Up * velocityChange;
+                    ChangeVelocity(Body.OrientationMatrix.Up * velocityChange, ref relativeVelocity);
                 }
                 else if (IsSupported)
                 {
@@ -229,24 +235,26 @@ namespace BEPUphysicsDemos
                     float currentNormalVelocity = Vector3.Dot(supportData.Normal, relativeVelocity);
                     //Target velocity is JumpSpeed.
                     float velocityChange = SlidingJumpSpeed - currentNormalVelocity;
-                    Body.LinearVelocity += supportData.Normal * velocityChange;
+                    ChangeVelocity(supportData.Normal * -velocityChange, ref relativeVelocity);
                 }
                 hasTraction = false;
                 support = null;
                 tryToJump = false;
             }
 
+
             //Update the vertical motion of the character.
             if (hasTraction)
             {
                 //Remove all velocity, penetrating or separating, along the contact normal if it is below a threshold.
-                float dot = -Vector3.Dot(relativeVelocity, supportData.Normal);
-                if (dot < GlueSpeed)
+                float separatingVelocity = -Vector3.Dot(relativeVelocity, supportData.Normal);
+                if (separatingVelocity < GlueSpeed)
                 {
-                    ChangeVelocity(supportData.Normal * dot, ref relativeVelocity);
+                    ChangeVelocity(supportData.Normal * separatingVelocity, ref relativeVelocity);
                 }
                 else
                     hasTraction = false;
+
 
             }
             else if (IsSupported)
@@ -347,7 +355,7 @@ namespace BEPUphysicsDemos
             Body.LinearVelocity += velocityChange;
             //Update the relative velocity as well.  It's a ref parameter, so this update will be reflected in the calling scope.
             Vector3.Add(ref relativeVelocity, ref velocityChange, out relativeVelocity);
-
+            
         }
 
 
@@ -361,7 +369,7 @@ namespace BEPUphysicsDemos
             //Consider using forces instead.
 
             if (IsSupported)
-                Body.Position += -((Body.Radius + StepHeight) / sweepLength - supportData.T) * sweep;
+                Body.Position += -(goalSupportT - supportData.T) * sweep;
         }
 
         bool tryToJump = false;

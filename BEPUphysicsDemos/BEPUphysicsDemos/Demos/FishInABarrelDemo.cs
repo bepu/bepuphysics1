@@ -52,7 +52,7 @@ namespace BEPUphysicsDemos.Demos
             var fishDepositoryGroup = new StaticMesh(staticTriangleVertices, staticTriangleIndices);
             CollisionRules.AddRule(fishDepositoryGroup, detector, CollisionRule.NoBroadPhase);
             Space.Add(fishDepositoryGroup);
-            game.ModelDrawer.Add(fishDepositoryGroup.Mesh);
+            game.ModelDrawer.Add(fishDepositoryGroup);
 
 
             movedBox = new Box(new Vector3(-4, 5, 0), 1, 1, 1, 1);

@@ -79,7 +79,7 @@ namespace BEPUphysicsDemos.Demos.Tests
             TriangleMesh.GetVerticesAndIndicesFromModel(Game.Content.Load<Model>("playground"), out vertices, out indices);
             var mesh = new StaticMesh(vertices, indices, new AffineTransform(new Vector3(50, -20, 0)));
             Space.Add(mesh);
-            game.ModelDrawer.Add(mesh.Mesh);
+            game.ModelDrawer.Add(mesh);
 
             for (int i = 0; i < 100; i++)
             {

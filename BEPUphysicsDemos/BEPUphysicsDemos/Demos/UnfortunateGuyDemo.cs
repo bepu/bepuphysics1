@@ -110,8 +110,6 @@ namespace BEPUphysicsDemos.Demos
             CollisionRules.AddRule(lowerArm, upperArm, CollisionRule.NoBroadPhase);
             CollisionRules.AddRule(lowerArm, hand, CollisionRule.NoBroadPhase);
 
-
-
             game.Camera.Position = new Vector3(0, 4, 20);
         }
 

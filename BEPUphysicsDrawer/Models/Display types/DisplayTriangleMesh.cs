@@ -25,19 +25,19 @@ namespace BEPUphysicsDrawer.Models
             return DisplayedObject.Data.Indices.Length / 3;
         }
 
-        public override void GetMeshData(List<VertexPositionNormalTexture> vertices, List<ushort> indices)
+        public static void GetMeshData(TriangleMesh mesh, List<VertexPositionNormalTexture> vertices, List<ushort> indices)
         {
-            var tempVertices = new VertexPositionNormalTexture[DisplayedObject.Data.Vertices.Length];
-            for (int i = 0; i < DisplayedObject.Data.Vertices.Length; i++)
+            var tempVertices = new VertexPositionNormalTexture[mesh.Data.Vertices.Length];
+            for (int i = 0; i < mesh.Data.Vertices.Length; i++)
             {
                 Vector3 v;
-                DisplayedObject.Data.GetVertexPosition(i, out v);
+                mesh.Data.GetVertexPosition(i, out v);
                 tempVertices[i] = new VertexPositionNormalTexture(v, Vector3.Zero, Vector2.Zero);
             }
 
-            for (int i = 0; i < DisplayedObject.Data.Indices.Length; i++)
+            for (int i = 0; i < mesh.Data.Indices.Length; i++)
             {
-                indices.Add((ushort)DisplayedObject.Data.Indices[i]);
+                indices.Add((ushort)mesh.Data.Indices[i]);
             }
             for (int i = 0; i < indices.Count; i += 3)
             {
@@ -57,6 +57,11 @@ namespace BEPUphysicsDrawer.Models
                 tempVertices[i].Normal.Normalize();
                 vertices.Add(tempVertices[i]);
             }
+        }
+
+        public override void GetMeshData(List<VertexPositionNormalTexture> vertices, List<ushort> indices)
+        {
+            GetMeshData(DisplayedObject, vertices, indices);
         }
 
         public override void Update()

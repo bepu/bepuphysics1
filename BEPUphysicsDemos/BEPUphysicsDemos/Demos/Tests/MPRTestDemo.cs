@@ -117,7 +117,7 @@ namespace BEPUphysicsDemos.Demos.Tests
             //Space.Add(mesh);
             //mesh.ImproveBoundaryBehavior = true;
             //mesh.Sidedness = TriangleSidedness.Counterclockwise;
-            //game.ModelDrawer.Add(mesh.Mesh);
+            //game.ModelDrawer.Add(mesh);
             //mesh.CollisionRules.Personal = CollisionRule.NoSolver;
         }
 
