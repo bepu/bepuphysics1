@@ -67,10 +67,12 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
 
                     //The trees are now fully refit (and revalidated, if the refit process found it to be necessary).
                     //The overlap traversal is conceptually similar to the multithreaded refit, but is a bit easier since there's no need to go back up the stack.
-
-                    root.GetMultithreadedOverlaps(root, splitDepth, 1, this, multithreadingSourceOverlaps);
-                    ThreadManager.ForLoop(0, multithreadingSourceOverlaps.count, multithreadedOverlap);
-                    multithreadingSourceOverlaps.Clear();
+                    if (!root.IsLeaf) //If the root is a leaf, it's alone- nothing to collide against! This test is required by the assumptions of the leaf-leaf test.
+                    {
+                        root.GetMultithreadedOverlaps(root, splitDepth, 1, this, multithreadingSourceOverlaps);
+                        ThreadManager.ForLoop(0, multithreadingSourceOverlaps.count, multithreadedOverlap);
+                        multithreadingSourceOverlaps.Clear();
+                    }
                 }
             }
 
@@ -94,6 +96,7 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
         void MultithreadedOverlap(int i)
         {
             var overlap = multithreadingSourceOverlaps.Elements[i];
+            //Note: It's okay not to check to see if a and b are equal and leaf nodes, because the systems which added nodes to the list already did it.
             overlap.a.GetOverlaps(overlap.b, this);
         }
 
@@ -108,7 +111,8 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
                 {
                     root.Refit();
 
-                    root.GetOverlaps(root, this);
+                    if (!root.IsLeaf) //If the root is a leaf, it's alone- nothing to collide against! This test is required by the assumptions of the leaf-leaf test.
+                        root.GetOverlaps(root, this);
                 }
             }
         }
