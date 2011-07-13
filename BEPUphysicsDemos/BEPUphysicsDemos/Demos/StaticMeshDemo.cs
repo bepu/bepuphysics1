@@ -40,34 +40,6 @@ namespace BEPUphysicsDemos.Demos
             Space.Add(staticMesh);
             game.ModelDrawer.Add(staticMesh);
 
-            staticMesh = new StaticMesh(staticTriangleVertices, staticTriangleIndices, new AffineTransform(Matrix3X3.CreateFromAxisAngle(Vector3.Up, MathHelper.Pi), new Vector3(0, 50, 0)));
-            staticMesh.Sidedness = TriangleSidedness.Counterclockwise;
-
-            Space.Add(staticMesh);
-            game.ModelDrawer.Add(staticMesh);
-
-            staticMesh = new StaticMesh(staticTriangleVertices, staticTriangleIndices, new AffineTransform(Matrix3X3.CreateFromAxisAngle(Vector3.Up, MathHelper.Pi), new Vector3(0, 20, 0)));
-            staticMesh.Sidedness = TriangleSidedness.Counterclockwise;
-
-            Space.Add(staticMesh);
-            game.ModelDrawer.Add(staticMesh);
-            
-            var mobileModel = game.Content.Load<Model>("tube");
-            TriangleMesh.GetVerticesAndIndicesFromModel(mobileModel, out staticTriangleVertices, out staticTriangleIndices);
-            var mobileMesh = new MobileMesh(staticTriangleVertices, staticTriangleIndices, AffineTransform.Identity, BEPUphysics.CollisionShapes.MobileMeshSolidity.Counterclockwise, 10);
-            mobileMesh.Position = new Vector3(10, 10, 10);
-            mobileMesh.PositionUpdateMode = BEPUphysics.PositionUpdating.PositionUpdateMode.Continuous;
-            Space.Add(mobileMesh);
-
-            mobileMesh = new MobileMesh(staticTriangleVertices, staticTriangleIndices, AffineTransform.Identity, BEPUphysics.CollisionShapes.MobileMeshSolidity.Solid);
-            mobileMesh.Position = new Vector3(20, 10, 10);
-            mobileMesh.PositionUpdateMode = BEPUphysics.PositionUpdating.PositionUpdateMode.Continuous;
-            Space.Add(mobileMesh);
-
-            mobileMesh = new MobileMesh(staticTriangleVertices, staticTriangleIndices, AffineTransform.Identity, BEPUphysics.CollisionShapes.MobileMeshSolidity.Solid, 10);
-            mobileMesh.Position = new Vector3(30, 10, 10);
-            mobileMesh.PositionUpdateMode = BEPUphysics.PositionUpdating.PositionUpdateMode.Continuous;
-            Space.Add(mobileMesh);
 
             //Dump some boxes on top of it for fun.
             int numColumns = 10;

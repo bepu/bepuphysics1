@@ -17,13 +17,13 @@ namespace BEPUphysicsDemos.SampleCode
         /// <param name="shape">Shape representing the volume of the force field.</param>
         /// <param name="origin">Location that entities will be pushed toward.</param>
         /// <param name="multiplier">Represents the gravitational constant of the field times the effective mass at the center of the field.</param>
-        /// <param name="maxForce">Maximum force the field can apply.</param>
-        public GravitationalField(ForceFieldShape shape, Vector3 origin, float multiplier, float maxForce, IQueryAccelerator accelerator)
+        /// <param name="maxAcceleration">Maximum acceleration the field can apply.</param>
+        public GravitationalField(ForceFieldShape shape, Vector3 origin, float multiplier, float maxAcceleration, IQueryAccelerator accelerator)
             : base(shape, accelerator)
         {
             this.Multiplier = multiplier;
             this.Origin = origin;
-            this.MaxForce = maxForce;
+            this.MaxAcceleration = maxAcceleration;
         }
 
         /// <summary>
@@ -32,9 +32,9 @@ namespace BEPUphysicsDemos.SampleCode
         public float Multiplier { get; set; }
 
         /// <summary>
-        /// Gets or sets the maximum force that can be applied by the field.
+        /// Gets or sets the maximum acceleration that can be applied by the field.
         /// </summary>
-        public float MaxForce { get; set; }
+        public float MaxAcceleration { get; set; }
 
         /// <summary>
         /// Gets or sets the center of the field that entities will be pushed toward.
@@ -52,14 +52,15 @@ namespace BEPUphysicsDemos.SampleCode
         {
             Vector3 r = e.Position - Origin;
             float length = r.Length();
-            float force = dt * Math.Min(MaxForce, Multiplier * e.Mass / (length * length * length));
-            impulse = -force * r;
+            float force = dt * e.Mass * Math.Min(MaxAcceleration, Multiplier / (length * length));
+            impulse = -(force / length) * r; //Extra division by length normalizes the direction.
 
 
-            //Could use a linear dropoff for a slightly faster calculation (divide by length^2 instead of length^3).
+            ////Could use a linear dropoff for a slightly faster calculation (divide by length^2 instead of length^3).
             //Vector3 r = e.Position - Origin;
-            //float force = dt * Math.Min(MaxForce, Multiplier * e.Mass / (r.LengthSquared()));
-            //impulse = -force * r;
+            //float length = r.Length();
+            //float force = dt * e.Mass * Math.Min(MaxAcceleration, Multiplier / length);
+            //impulse = -(force / length) * r; //Extra division by length normalizes the direction.
         }
     }
 }

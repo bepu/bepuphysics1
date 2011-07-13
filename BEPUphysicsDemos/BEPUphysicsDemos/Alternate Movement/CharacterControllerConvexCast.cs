@@ -20,7 +20,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace BEPUphysicsDemos
 {
-    public class CharacterController : Updateable, IBeforeNarrowPhaseUpdateable, IEndOfTimeStepUpdateable
+    public class CharacterControllerConvexCast : Updateable, IBeforeNarrowPhaseUpdateable, IEndOfTimeStepUpdateable
     {
         public Capsule Body { get; private set; }
 
@@ -93,7 +93,7 @@ namespace BEPUphysicsDemos
         RayHit supportData;
         Vector3 sweep;
 
-        public CharacterController()
+        public CharacterControllerConvexCast()
         {
             Body = new Capsule(Vector3.Zero, 1.7f, .3f, 10);
             //Making the character a continuous object prevents it from flying through walls which would be pretty jarring from a player's perspective.

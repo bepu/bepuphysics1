@@ -24,7 +24,7 @@ namespace BEPUphysicsDemos.Demos
             var planet = new Sphere(new Vector3(0, 0, 0), 30);
             Space.Add(planet);
 
-            var field = new GravitationalField(new InfiniteForceFieldShape(), planet.Position, 66730 / 2f, 10000, Space.BroadPhase.QueryAccelerator);
+            var field = new GravitationalField(new InfiniteForceFieldShape(), planet.Position, 66730 / 2f, 100, Space.BroadPhase.QueryAccelerator);
             Space.Add(field);
 
             //Drop the "meteorites" on the planet.

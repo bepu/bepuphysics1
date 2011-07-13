@@ -59,10 +59,13 @@
   </PropertyGroup>
   <ItemGroup />
   <ItemGroup>
-    <Compile Include="Alternate Movement\CharacterController.cs" />
-    <Compile Include="Alternate Movement\CharacterControllerInput.cs" />
+    <Compile Include="Alternate Movement\CharacterControllerConvexCast.cs" />
+    <Compile Include="Alternate Movement\CharacterControllerConvexCastInput.cs" />
     <Compile Include="Alternate Movement\CharacterControllerInputOld.cs" />
     <Compile Include="Alternate Movement\CharacterControllerOld.cs" />
+    <Compile Include="Alternate Movement\New Character\CharacterController.cs" />
+    <Compile Include="Alternate Movement\New Character\CharacterControllerInput.cs" />
+    <Compile Include="Alternate Movement\New Character\SupportFinder.cs" />
     <Compile Include="Alternate Movement\SimpleCharacterController.cs" />
     <Compile Include="Alternate Movement\SimpleCharacterControllerInput.cs" />
     <Compile Include="Alternate Movement\TankInput.cs" />
