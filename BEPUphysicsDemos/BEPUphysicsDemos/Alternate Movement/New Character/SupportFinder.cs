@@ -18,6 +18,120 @@ namespace BEPUphysicsDemos
         RawList<SupportContact> supports = new RawList<SupportContact>();
 
         /// <summary>
+        /// Computes a combined support contact from all available supports (contacts or ray).
+        /// </summary>
+        public SupportData? SupportData
+        {
+            get
+            {
+                if (supports.Count > 0)
+                {
+                    SupportData toReturn = new SupportData()
+                    {
+                        Position = supports.Elements[0].Contact.Position,
+                        Normal = supports.Elements[0].Contact.Normal
+                    };
+                    for (int i = 1; i < supports.Count; i++)
+                    {
+                        Vector3.Add(ref toReturn.Position, ref supports.Elements[i].Contact.Position, out toReturn.Position);
+                        Vector3.Add(ref toReturn.Normal, ref supports.Elements[i].Contact.Normal, out toReturn.Normal);
+                    }
+                    if (supports.Count > 1)
+                    {
+                        float factor = 1f / supports.Count;
+                        Vector3.Multiply(ref toReturn.Position, factor, out toReturn.Position);
+                        float length = toReturn.Normal.LengthSquared();
+                        if (length < Toolbox.BigEpsilon)
+                        {
+                            //It's possible that the normals have cancelled each other out- that would be bad!
+                            //Just use an arbitrary support's normal in that case.
+                            toReturn.Normal = supports.Elements[0].Contact.Normal;
+                        }
+                        else
+                        {
+                            Vector3.Multiply(ref toReturn.Normal, factor / (float)Math.Sqrt(length), out toReturn.Normal);
+                        }
+                    }
+                    return toReturn;
+                }
+                else
+                {
+                    //No support contacts; fall back to the raycast result...
+                    if (SupportRayData != null)
+                    {
+                        return new SupportData()
+                        {
+                            Position = SupportRayData.Value.HitData.Location,
+                            Normal = SupportRayData.Value.HitData.Normal,
+                            HasTraction = SupportRayData.Value.HasTraction
+                        };
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Computes a combined traction contact from all available supports with traction (contacts or ray).
+        /// </summary>
+        public SupportData? TractionData
+        {
+            get
+            {
+                if (supports.Count > 0)
+                {
+                    SupportData toReturn = new SupportData();
+                    int withTraction = 0;
+                    for (int i = 0; i < supports.Count; i++)
+                    {
+                        if (supports.Elements[i].HasTraction)
+                        {
+                            withTraction++;
+                            Vector3.Add(ref toReturn.Position, ref supports.Elements[i].Contact.Position, out toReturn.Position);
+                            Vector3.Add(ref toReturn.Normal, ref supports.Elements[i].Contact.Normal, out toReturn.Normal);
+                        }
+                    }
+                    if (withTraction > 1)
+                    {
+                        float factor = 1f / withTraction;
+                        Vector3.Multiply(ref toReturn.Position, factor, out toReturn.Position);
+                        float length = toReturn.Normal.LengthSquared();
+                        if (length < Toolbox.BigEpsilon)
+                        {
+                            //It's possible that the normals have cancelled each other out- that would be bad!
+                            //Just use an arbitrary support's normal in that case.
+                            toReturn.Normal = supports.Elements[0].Contact.Normal;
+                        }
+                        else
+                        {
+                            Vector3.Multiply(ref toReturn.Normal, factor / (float)Math.Sqrt(length), out toReturn.Normal);
+                        }
+                    }
+                    if (withTraction > 0)
+                        return toReturn;
+                }
+                //No support contacts; fall back to the raycast result...
+                if (SupportRayData != null && SupportRayData.Value.HasTraction)
+                {
+                    return new SupportData()
+                    {
+                        Position = SupportRayData.Value.HitData.Location,
+                        Normal = SupportRayData.Value.HitData.Normal,
+                        HasTraction = SupportRayData.Value.HasTraction
+                    };
+                }
+                else
+                {
+                    return null;
+                }
+
+            }
+        }
+
+        /// <summary>
         /// Gets whether or not at least one of the character's body's contacts provide support to the character.
         /// </summary>
         public bool HasSupport { get; private set; }
@@ -42,7 +156,7 @@ namespace BEPUphysicsDemos
                 return new ReadOnlyList<SupportContact>(supports);
             }
         }
-        
+
         /// <summary>
         /// Gets a collection of the character's supports that provide traction.
         /// Traction means that the surface's slope is flat enough to stand on normally.
@@ -88,12 +202,17 @@ namespace BEPUphysicsDemos
         public void UpdateSupports()
         {
 
+
             //First, raycast down to find the ground.
             //Start the ray halfway between the center of the shape and the bottom of the shape.  That extra margin prevents it from getting stuck in the ground and returning t = 0 unhelpfully.
             var body = character.Body;
             float length = HasTraction ? body.Height * .25f + body.CollisionInformation.Shape.CollisionMargin + character.StepHeight : body.Height * .25f + body.CollisionInformation.Shape.CollisionMargin;
             Vector3 downDirection = character.Body.OrientationMatrix.Down; //For a cylinder orientation-locked to the Up axis, this is always {0, -1, 0}.  Keeping it generic doesn't cost much.
             Ray ray = new Ray(body.Position + downDirection * body.Height * .25f, downDirection);
+
+            //Reset traction/support.
+            HasTraction = false;
+            HasSupport = false;
 
             BoundingBox boundingBox = body.CollisionInformation.BoundingBox;
             RayHit earliestHit = new RayHit() { T = float.MaxValue };
@@ -117,6 +236,7 @@ namespace BEPUphysicsDemos
             if (earliestHit.T != float.MaxValue)
             {
                 //A collidable was hit!  It's a support, but does it provide traction?
+                HasSupport = true;
                 earliestHit.Normal.Normalize();
                 float dot;
                 Vector3.Dot(ref downDirection, ref earliestHit.Normal, out dot);
@@ -138,8 +258,7 @@ namespace BEPUphysicsDemos
             //Anything that can be a support will have a normal that's off horizontal.
             //That could be at the top or bottom, so only consider points on the bottom half of the shape.
             Vector3 position = character.Body.Position;
-            HasTraction = false;
-            HasSupport = false;
+
             foreach (var pair in character.Body.CollisionInformation.Pairs)
             {
                 foreach (var c in pair.Contacts)
@@ -184,6 +303,8 @@ namespace BEPUphysicsDemos
                                 supportContact.HasTraction = true;
                                 HasTraction = true;
                             }
+
+                            supports.Add(supportContact);
                         }
                     }
                 }
@@ -321,6 +442,25 @@ namespace BEPUphysicsDemos
         public Collidable HitObject;
         /// <summary>
         /// Whether or not the support has traction.
+        /// </summary>
+        public bool HasTraction;
+    }
+
+    /// <summary>
+    /// Contact which acts as a support for the character controller.
+    /// </summary>
+    public struct SupportData
+    {
+        /// <summary>
+        /// Position of the support.
+        /// </summary>
+        public Vector3 Position;
+        /// <summary>
+        /// Normal of the support.
+        /// </summary>
+        public Vector3 Normal;
+        /// <summary>
+        /// Whether or not the contact was found to have traction.
         /// </summary>
         public bool HasTraction;
     }

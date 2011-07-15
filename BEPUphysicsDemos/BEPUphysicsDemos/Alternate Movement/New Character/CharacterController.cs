@@ -106,11 +106,75 @@ namespace BEPUphysicsDemos
             SupportFinder.UpdateSupports();
 
 
-            if (SupportFinder.HasTraction)
+            if (SupportFinder.HasSupport)
             {
                 //If the character has support then it can move around.
                 //Apply horizontal velocities.
-                
+                Vector3 downDirection = Body.OrientationMatrix.Down;
+                //If the object has traction, it has a lot more control over its motion.  If it is sliding, then use the sliding coefficients.
+                float accelerationToUse = SupportFinder.HasTraction ? Acceleration : SlidingAcceleration;
+                float decelerationToUse = SupportFinder.HasTraction ? Deceleration : SlidingDeceleration;
+                Vector3 velocityDirection;
+                Vector3 violatingVelocity;
+                if (MovementDirection.LengthSquared() > 0)
+                {
+                    //Project the movement direction onto the support plane defined by the support normal.
+                    //This projection is NOT along the support normal to the plane; that would cause the character to veer off course when moving on slopes.
+                    //Instead, project along the sweep direction to the plane.
+                    //For a 6DOF character controller, the lineStart would be different; it must be perpendicular to the local up.
+                    Vector3 lineStart = new Vector3(MovementDirection.X, 0, MovementDirection.Y);
+                    Vector3 lineEnd;
+                    Vector3.Add(ref lineStart, ref downDirection, out lineEnd);
+                    Plane plane = new Plane(SupportFinder.HasTraction ? SupportFinder.TractionData.Value.Normal : SupportFinder.SupportData.Value.Normal, 0);
+                    if (float.IsNaN(plane.Normal.X) || float.IsInfinity(plane.Normal.X))
+                        Debug.WriteLine("Break.");
+                    float t;
+                    //This method can return false when the line is parallel to the plane, but previous tests and the slope limit guarantee that it won't happen.
+                    Toolbox.GetLinePlaneIntersection(ref lineStart, ref lineEnd, ref plane, out t, out velocityDirection);
+
+                    //The origin->intersection line direction defines the horizontal velocity direction in 3d space.
+                    velocityDirection.Normalize();
+                    if(float.IsNaN(velocityDirection.X))
+                        Debug.WriteLine("Breka.");
+
+                    //Compare the current velocity to the goal velocity.
+                    float currentVelocity;
+                    Vector3 relativeVelocity = Body.LinearVelocity;
+                    Vector3.Dot(ref velocityDirection, ref relativeVelocity, out currentVelocity);
+
+                    //Violating velocity is velocity which is not in the direction of the goal direction.
+                    violatingVelocity = relativeVelocity - velocityDirection * currentVelocity;
+
+                    //Compute the acceleration component.
+                    float speedUpNecessary = Speed - currentVelocity;
+                    float velocityChange = MathHelper.Clamp(speedUpNecessary, 0, accelerationToUse * dt);
+
+                    //Apply the change.
+
+                    ChangeVelocity(velocityDirection * velocityChange, ref relativeVelocity);
+
+                }
+                else
+                {
+                    velocityDirection = new Vector3();
+                    violatingVelocity = Body.LinearVelocity;
+                }
+
+                //Compute the deceleration component.
+                float lengthSquared = violatingVelocity.LengthSquared();
+                if (lengthSquared > 0)
+                {
+                    Vector3 violatingVelocityDirection;
+                    float violatingVelocityMagnitude = (float)Math.Sqrt(lengthSquared);
+                    Vector3.Divide(ref violatingVelocity, violatingVelocityMagnitude, out violatingVelocityDirection);
+
+                    //We need to get rid of the violating velocity magnitude, but don't go under zero (that would cause nasty oscillations).
+                    float velocityChange = -Math.Min(decelerationToUse * dt, violatingVelocityMagnitude);
+                    //Apply the change.
+                    Vector3 relativeVelocity = Body.LinearVelocity;
+                    ChangeVelocity(violatingVelocityDirection * velocityChange, ref relativeVelocity);
+                }
+
                 //Also manage the vertical velocity of the character;
                 //don't let it separate from the ground.
             }
@@ -226,7 +290,7 @@ namespace BEPUphysicsDemos
 
             //}
 
-            
+
 
             ////Update the horizontal motion of the character.
             //if (IsSupported)
@@ -317,7 +381,7 @@ namespace BEPUphysicsDemos
             Body.LinearVelocity += velocityChange;
             //Update the relative velocity as well.  It's a ref parameter, so this update will be reflected in the calling scope.
             Vector3.Add(ref relativeVelocity, ref velocityChange, out relativeVelocity);
-            
+
         }
 
 
