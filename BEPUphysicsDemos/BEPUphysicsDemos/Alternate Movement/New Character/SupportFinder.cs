@@ -201,7 +201,7 @@ namespace BEPUphysicsDemos
         /// </summary>
         public void UpdateSupports()
         {
-
+            //TODO: Calibrate all normals.
 
             //First, raycast down to find the ground.
             //Start the ray halfway between the center of the shape and the bottom of the shape.  That extra margin prevents it from getting stuck in the ground and returning t = 0 unhelpfully.

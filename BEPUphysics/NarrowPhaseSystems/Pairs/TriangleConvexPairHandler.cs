@@ -40,7 +40,10 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         {
             get { return triangle.entity; }
         }
-        protected override ContactManifold ContactManifold
+        /// <summary>
+        /// Gets the contact manifold used by the pair handler.
+        /// </summary>
+        public override ContactManifold ContactManifold
         {
             get { return contactManifold; }
         }
@@ -67,6 +70,9 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                     throw new Exception("Inappropriate types used to initialize pair.");
             }
 
+            //Contact normal goes from A to B.
+            broadPhaseOverlap.entryA = convex;
+            broadPhaseOverlap.entryB = triangle;
 
             base.Initialize(entryA, entryB);
 

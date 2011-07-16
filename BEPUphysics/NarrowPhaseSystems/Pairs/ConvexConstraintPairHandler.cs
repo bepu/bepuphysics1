@@ -28,8 +28,10 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         //    base.Initialize(entryA, entryB);
         //}
 
-
-        protected override ContactManifoldConstraint ContactConstraint
+        /// <summary>
+        /// Gets the contact constraint used by the pair handler.
+        /// </summary>
+        public override ContactManifoldConstraint ContactConstraint
         {
             get { return contactConstraint; }
         }

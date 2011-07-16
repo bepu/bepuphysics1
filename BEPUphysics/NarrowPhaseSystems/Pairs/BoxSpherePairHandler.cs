@@ -36,15 +36,20 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             get { return sphere; }
         }
 
-        protected override ContactManifoldConstraint ContactConstraint
+        /// <summary>
+        /// Gets the contact constraint used by the pair handler.
+        /// </summary>
+        public override ContactManifoldConstraint ContactConstraint
         {
             get
             {
                 return contactConstraint;
             }
         }
-
-        protected override ContactManifold ContactManifold
+        /// <summary>
+        /// Gets the contact manifold used by the pair handler.
+        /// </summary>
+        public override ContactManifold ContactManifold
         {
             get { return contactManifold; }
         }
@@ -81,12 +86,12 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                 }
             }
 
-
-            base.Initialize(entryA, entryB);
-
             //Reorder the entries so that the guarantee that the normal points from A to B is satisfied.
             broadPhaseOverlap.entryA = box;
             broadPhaseOverlap.entryB = sphere;
+            
+            base.Initialize(entryA, entryB);
+
 
         }
 

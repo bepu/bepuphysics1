@@ -42,8 +42,10 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         {
             get { return boxB.entity; }
         }
-
-        protected override ContactManifold ContactManifold
+        /// <summary>
+        /// Gets the contact manifold used by the pair handler.
+        /// </summary>
+        public override ContactManifold ContactManifold
         {
             get { return contactManifold; }
         }

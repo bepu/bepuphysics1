@@ -41,11 +41,17 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         {
             get { return null; }
         }
-        protected override ContactManifoldConstraint ContactConstraint
+        /// <summary>
+        /// Gets the contact constraint used by the pair handler.
+        /// </summary>
+        public override ContactManifoldConstraint ContactConstraint
         {
             get { return contactConstraint; }
         }
-        protected override ContactManifold ContactManifold
+        /// <summary>
+        /// Gets the contact manifold used by the pair handler.
+        /// </summary>
+        public override ContactManifold ContactManifold
         {
             get { return MeshManifold; }
         }
@@ -72,15 +78,17 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                     throw new Exception("Inappropriate types used to initialize pair.");
             }
 
-            base.Initialize(entryA, entryB);
-
-            UpdateMaterialProperties(convex.entity.material, mesh.material);
-
-
-
             //Contact normal goes from A to B.
             broadPhaseOverlap.entryA = convex;
             broadPhaseOverlap.entryB = mesh;
+
+            UpdateMaterialProperties(convex.entity.material, mesh.material);
+
+            base.Initialize(entryA, entryB);
+
+
+
+
         }
 
 

@@ -30,8 +30,11 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         protected override Collidable CollidableB
         {
             get { return convexB; }
-        }
-        protected override ContactManifold ContactManifold
+        }    
+        /// <summary>
+        /// Gets the contact manifold used by the pair handler.
+        /// </summary>
+        public override ContactManifold ContactManifold
         {
             get { return contactManifold; }
         }

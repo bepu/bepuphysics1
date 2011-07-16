@@ -23,8 +23,14 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
     public abstract class StandardPairHandler : CollidablePairHandler
     {
 
-        protected abstract ContactManifold ContactManifold { get; }
-        protected abstract ContactManifoldConstraint ContactConstraint { get; }
+        /// <summary>
+        /// Gets the contact manifold used by the pair handler.
+        /// </summary>
+        public abstract ContactManifold ContactManifold { get; }
+        /// <summary>
+        /// Gets the contact constraint usd by the pair handler.
+        /// </summary>
+        public abstract ContactManifoldConstraint ContactConstraint { get; }
 
         ///<summary>
         /// Constructs a pair handler.

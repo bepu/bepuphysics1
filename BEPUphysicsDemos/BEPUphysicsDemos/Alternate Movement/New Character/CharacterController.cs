@@ -28,8 +28,8 @@ namespace BEPUphysicsDemos
         public float StepHeight { get; set; }
 
         public Vector2 MovementDirection;
-        public float Speed = 8;
-        public float SlidingSpeed = 6;
+        public float Speed = 40;
+        public float SlidingSpeed = 0;
         public float AirSpeed = 4;
         public float Acceleration = 50;
         public float SlidingAcceleration = 0;
@@ -60,6 +60,7 @@ namespace BEPUphysicsDemos
         public CharacterController()
         {
             Body = new Cylinder(Vector3.Zero, 1.7f, .3f, 10);
+            Body.CollisionInformation.Shape.CollisionMargin = .1f;
             //Making the character a continuous object prevents it from flying through walls which would be pretty jarring from a player's perspective.
             Body.PositionUpdateMode = PositionUpdateMode.Continuous;
             Body.LocalInertiaTensorInverse = new Matrix3X3();
@@ -102,12 +103,34 @@ namespace BEPUphysicsDemos
 
         void IBeforeNarrowPhaseUpdateable.Update(float dt)
         {
+            foreach (var pair in Body.CollisionInformation.Pairs)
+            {
+                var constraintPair = pair as StandardPairHandler;
+                if (constraintPair != null)
+                {
+                    if (constraintPair.ContactConstraint.MaterialInteraction.KineticFriction != 0)
+                        Debug.WriteLine("break.");
+                }
+            }
             //Identify supports.
             SupportFinder.UpdateSupports();
 
 
+            Vector3 relativeVelocity = Body.LinearVelocity;
             if (SupportFinder.HasSupport)
             {
+                SupportData supportData;
+                if (SupportFinder.HasTraction)
+                {
+                    supportData = SupportFinder.TractionData.Value;
+                }
+                else
+                {
+                    supportData = SupportFinder.SupportData.Value;
+                }
+
+                float verticalVelocity = Vector3.Dot(supportData.Normal, relativeVelocity);
+                Vector3 horizontalVelocity = relativeVelocity - supportData.Normal * verticalVelocity;
                 //If the character has support then it can move around.
                 //Apply horizontal velocities.
                 Vector3 downDirection = Body.OrientationMatrix.Down;
@@ -135,11 +158,10 @@ namespace BEPUphysicsDemos
 
                     //Compare the current velocity to the goal velocity.
                     float currentVelocity;
-                    Vector3 relativeVelocity = Body.LinearVelocity;
-                    Vector3.Dot(ref velocityDirection, ref relativeVelocity, out currentVelocity);
+                    Vector3.Dot(ref velocityDirection, ref horizontalVelocity, out currentVelocity);
 
                     //Violating velocity is velocity which is not in the direction of the goal direction.
-                    violatingVelocity = relativeVelocity - velocityDirection * currentVelocity;
+                    violatingVelocity = horizontalVelocity - velocityDirection * currentVelocity;
 
                     //Compute the acceleration component.
                     float speedUpNecessary = Speed - currentVelocity;
@@ -153,7 +175,7 @@ namespace BEPUphysicsDemos
                 else
                 {
                     velocityDirection = new Vector3();
-                    violatingVelocity = Body.LinearVelocity;
+                    violatingVelocity = horizontalVelocity;
                 }
 
                 //Compute the deceleration component.
@@ -167,12 +189,19 @@ namespace BEPUphysicsDemos
                     //We need to get rid of the violating velocity magnitude, but don't go under zero (that would cause nasty oscillations).
                     float velocityChange = -Math.Min(decelerationToUse * dt, violatingVelocityMagnitude);
                     //Apply the change.
-                    Vector3 relativeVelocity = Body.LinearVelocity;
                     ChangeVelocity(violatingVelocityDirection * velocityChange, ref relativeVelocity);
                 }
 
                 //Also manage the vertical velocity of the character;
                 //don't let it separate from the ground.
+                if (SupportFinder.HasTraction)
+                {
+                    if (verticalVelocity < GlueSpeed)
+                    {
+                        ChangeVelocity(-supportData.Normal * verticalVelocity, ref relativeVelocity);
+                    }
+
+                }
             }
 
 

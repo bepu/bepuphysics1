@@ -42,14 +42,20 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         {
             get { return sphereB.entity; }
         }
-        protected override ContactManifoldConstraint ContactConstraint
+        /// <summary>
+        /// Gets the contact constraint used by the pair handler.
+        /// </summary>
+        public override ContactManifoldConstraint ContactConstraint
         {
             get
             {
                 return contactConstraint;
             }
         }
-        protected override ContactManifold ContactManifold
+        /// <summary>
+        /// Gets the contact manifold used by the pair handler.
+        /// </summary>
+        public override ContactManifold ContactManifold
         {
             get { return contactManifold; }
         }

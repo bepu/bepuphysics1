@@ -44,11 +44,17 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         {
             get { return mobileMesh.entity; }
         }
-        protected override ContactManifold ContactManifold
+        /// <summary>
+        /// Gets the contact manifold used by the pair handler.
+        /// </summary>
+        public override ContactManifold ContactManifold
         {
             get { return MeshManifold; }
         }
-        protected override ContactManifoldConstraint ContactConstraint
+        /// <summary>
+        /// Gets the contact constraint used by the pair handler.
+        /// </summary>
+        public override ContactManifoldConstraint ContactConstraint
         {
             get { return contactConstraint; }
         }
@@ -74,14 +80,17 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                     throw new Exception("Inappropriate types used to initialize pair.");
             }
 
-            base.Initialize(entryA, entryB);
-            //It's possible that the convex does not have an entity if it is a proxy for a non-entity collidable.
-            UpdateMaterialProperties(convex.entity != null ? convex.entity.material : null, mobileMesh.entity.material);
-
 
             //Contact normal goes from A to B.
             broadPhaseOverlap.entryA = convex;
             broadPhaseOverlap.entryB = mobileMesh;
+
+            //It's possible that the convex does not have an entity if it is a proxy for a non-entity collidable.
+            UpdateMaterialProperties(convex.entity != null ? convex.entity.material : null, mobileMesh.entity.material);
+
+
+            base.Initialize(entryA, entryB);
+
         }
 
 
