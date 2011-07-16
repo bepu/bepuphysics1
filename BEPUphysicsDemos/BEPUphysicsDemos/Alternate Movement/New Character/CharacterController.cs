@@ -126,16 +126,12 @@ namespace BEPUphysicsDemos
                     Vector3 lineEnd;
                     Vector3.Add(ref lineStart, ref downDirection, out lineEnd);
                     Plane plane = new Plane(SupportFinder.HasTraction ? SupportFinder.TractionData.Value.Normal : SupportFinder.SupportData.Value.Normal, 0);
-                    if (float.IsNaN(plane.Normal.X) || float.IsInfinity(plane.Normal.X))
-                        Debug.WriteLine("Break.");
                     float t;
                     //This method can return false when the line is parallel to the plane, but previous tests and the slope limit guarantee that it won't happen.
                     Toolbox.GetLinePlaneIntersection(ref lineStart, ref lineEnd, ref plane, out t, out velocityDirection);
 
                     //The origin->intersection line direction defines the horizontal velocity direction in 3d space.
                     velocityDirection.Normalize();
-                    if(float.IsNaN(velocityDirection.X))
-                        Debug.WriteLine("Breka.");
 
                     //Compare the current velocity to the goal velocity.
                     float currentVelocity;

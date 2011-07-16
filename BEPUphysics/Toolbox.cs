@@ -2868,6 +2868,7 @@ namespace BEPUphysics
             }
             else
             {
+                denom = 1 / denom;
                 v3Weight = (d11 * d02 - d01 * d12) * denom;
                 v2Weight = (d00 * d12 - d01 * d02) * denom;
                 v1Weight = 1 - v3Weight - v2Weight;
