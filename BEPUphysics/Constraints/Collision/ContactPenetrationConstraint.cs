@@ -107,54 +107,6 @@ namespace BEPUphysics.Constraints.Collision
 
 
 
-        /// <summary>
-        /// Computes and applies an impulse to keep the colliders from penetrating.
-        /// </summary>
-        /// <returns>Impulse applied.</returns>
-        public override float SolveIteration()
-        {
-
-            //Compute relative velocity
-            float lambda = (RelativeVelocity - bias) * velocityToImpulse; //convert to impulse
-
-
-            //Clamp accumulated impulse
-            float previousAccumulatedImpulse = accumulatedImpulse;
-            accumulatedImpulse = MathHelper.Max(0, accumulatedImpulse + lambda);
-            lambda = accumulatedImpulse - previousAccumulatedImpulse;
-
-            //Apply the impulse
-#if !WINDOWS
-            Vector3 linear = new Vector3();
-            Vector3 angular = new Vector3();
-#else
-            Vector3 linear, angular;
-#endif
-            linear.X = lambda * linearAX;
-            linear.Y = lambda * linearAY;
-            linear.Z = lambda * linearAZ;
-            if (entityADynamic)
-            {
-                angular.X = lambda * angularAX;
-                angular.Y = lambda * angularAY;
-                angular.Z = lambda * angularAZ;
-                entityA.ApplyLinearImpulse(ref linear);
-                entityA.ApplyAngularImpulse(ref angular);
-            }
-            if (entityBDynamic)
-            {
-                linear.X = -linear.X;
-                linear.Y = -linear.Y;
-                linear.Z = -linear.Z;
-                angular.X = lambda * angularBX;
-                angular.Y = lambda * angularBY;
-                angular.Z = lambda * angularBZ;
-                entityB.ApplyLinearImpulse(ref linear);
-                entityB.ApplyAngularImpulse(ref angular);
-            }
-
-            return Math.Abs(lambda);
-        }
 
         ///<summary>
         /// Performs the frame's configuration step.
@@ -162,19 +114,23 @@ namespace BEPUphysics.Constraints.Collision
         ///<param name="dt">Timestep duration.</param>
         public override void Update(float dt)
         {
-            if (contact.PenetrationDepth < 0)
-            {
-                //The contact is currently in a limbo state.
-                //It is too far away to be used for penetration solving, but isn't far enough away
-                //to remove.  Keeping slightly-too-far contacts around helps with stability.
-                //Note that this contact can still be used for friction!
-                //That's a bit odd, considering we aren't applying any impulses with this constraint.
-                //But, in practice, it doesn't really cause any problems.
-                //Considering the contact was most likely beginning to separate, the normal force is
-                //*probably* low, and the difference is negligible.
-                isActiveInSolver = false;
-                return;
-            }
+            ////TODO: Instead of deactivating a contact which is in 'negative depth,'
+            ////a better approach would be to modify the target velocity.
+            ////Instead of targeting 0 always, it would target the velocity that allows
+            ////the objects to come into contact.
+            //if (contact.PenetrationDepth < 0)
+            //{
+            //    //The contact is currently in a limbo state.
+            //    //It is too far away to be used for penetration solving, but isn't far enough away
+            //    //to remove.  Keeping slightly-too-far contacts around helps with stability.
+            //    //Note that this contact can still be used for friction!
+            //    //That's a bit odd, considering we aren't applying any impulses with this constraint.
+            //    //But, in practice, it doesn't really cause any problems.
+            //    //Considering the contact was most likely beginning to separate, the normal force is
+            //    //*probably* low, and the difference is negligible.
+            //    isActiveInSolver = false;
+            //    return;
+            //}
             //Set up the jacobians.
             linearAX = -contact.Normal.X;
             linearAY = -contact.Normal.Y;
@@ -228,18 +184,43 @@ namespace BEPUphysics.Constraints.Collision
 
             velocityToImpulse = -1 / (entryA + entryB); //Softness?
 
-            //Bounciness
-            bias = MathHelper.Min(
-                MathHelper.Max(0, contact.PenetrationDepth - CollisionDetectionSettings.AllowedPenetration) *
-                CollisionResponseSettings.PenetrationRecoveryStiffness / dt,
-                CollisionResponseSettings.MaximumPositionCorrectionSpeed);
-            if (contactManifoldConstraint.materialInteraction.Bounciness > 0)
+            //Bounciness and bias (penetration correction)
+            if (contact.PenetrationDepth >= 0)
             {
-                //Compute relative velocity
-                float relativeVelocity = -RelativeVelocity;
-                if (relativeVelocity > CollisionResponseSettings.BouncinessVelocityThreshold)
-                    bias = MathHelper.Max(relativeVelocity * contactManifoldConstraint.materialInteraction.Bounciness, bias);
+                bias = MathHelper.Min(
+                    MathHelper.Max(0, contact.PenetrationDepth - CollisionDetectionSettings.AllowedPenetration) *
+                    CollisionResponseSettings.PenetrationRecoveryStiffness / dt,
+                    CollisionResponseSettings.MaximumPositionCorrectionSpeed);
+
+                if (contactManifoldConstraint.materialInteraction.Bounciness > 0)
+                {
+                    //Target a velocity which includes a portion of the incident velocity.
+                    float relativeVelocity = -RelativeVelocity;
+                    if (relativeVelocity > CollisionResponseSettings.BouncinessVelocityThreshold)
+                        bias = MathHelper.Max(relativeVelocity * contactManifoldConstraint.materialInteraction.Bounciness, bias);
+                }
             }
+            else
+            {
+                //The contact is actually separated right now.  Allow the solver to target a position that is just barely in collision.
+                //If the solver finds that an accumulated negative impulse is required to hit this target, then no work will be done.
+                bias = contact.PenetrationDepth / dt;
+
+                //This implementation is going to ignore bounciness for now.
+                //Since it's not being used for CCD, these negative-depth contacts
+                //only really occur in situations where no bounce should occur.
+                
+                //if (contactManifoldConstraint.materialInteraction.Bounciness > 0)
+                //{
+                //    //Target a velocity which includes a portion of the incident velocity.
+                //    //The contact isn't colliding currently, but go ahead and target the post-bounce velocity.
+                //    //The bias is added to the bounce velocity to simulate the object continuing to the surface and then bouncing off.
+                //    float relativeVelocity = -RelativeVelocity;
+                //    if (relativeVelocity > CollisionResponseSettings.BouncinessVelocityThreshold)
+                //        bias = relativeVelocity * contactManifoldConstraint.materialInteraction.Bounciness + bias;
+                //}
+            }
+ 
 
         }
 
@@ -279,6 +260,58 @@ namespace BEPUphysics.Constraints.Collision
                 entityB.ApplyLinearImpulse(ref linear);
                 entityB.ApplyAngularImpulse(ref angular);
             }
+        }
+
+
+        /// <summary>
+        /// Computes and applies an impulse to keep the colliders from penetrating.
+        /// </summary>
+        /// <returns>Impulse applied.</returns>
+        public override float SolveIteration()
+        {
+
+            //Compute relative velocity
+            float lambda = (RelativeVelocity - bias) * velocityToImpulse; //convert to impulse
+
+
+            //Clamp accumulated impulse
+            float previousAccumulatedImpulse = accumulatedImpulse;
+            accumulatedImpulse = MathHelper.Max(0, accumulatedImpulse + lambda);
+            lambda = accumulatedImpulse - previousAccumulatedImpulse;
+
+ 
+
+            //Apply the impulse
+#if !WINDOWS
+            Vector3 linear = new Vector3();
+            Vector3 angular = new Vector3();
+#else
+            Vector3 linear, angular;
+#endif
+            linear.X = lambda * linearAX;
+            linear.Y = lambda * linearAY;
+            linear.Z = lambda * linearAZ;
+            if (entityADynamic)
+            {
+                angular.X = lambda * angularAX;
+                angular.Y = lambda * angularAY;
+                angular.Z = lambda * angularAZ;
+                entityA.ApplyLinearImpulse(ref linear);
+                entityA.ApplyAngularImpulse(ref angular);
+            }
+            if (entityBDynamic)
+            {
+                linear.X = -linear.X;
+                linear.Y = -linear.Y;
+                linear.Z = -linear.Z;
+                angular.X = lambda * angularBX;
+                angular.Y = lambda * angularBY;
+                angular.Z = lambda * angularBZ;
+                entityB.ApplyLinearImpulse(ref linear);
+                entityB.ApplyAngularImpulse(ref angular);
+            }
+
+            return Math.Abs(lambda);
         }
 
         protected internal override void CollectInvolvedEntities(DataStructures.RawList<Entity> outputInvolvedEntities)

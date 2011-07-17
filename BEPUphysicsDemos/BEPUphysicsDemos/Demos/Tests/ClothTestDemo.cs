@@ -131,19 +131,16 @@ namespace BEPUphysicsDemos.Demos.Tests
                         joint.SpringSettings.DampingConstant = starchDamping; joint.SpringSettings.StiffnessConstant = starchStiffness;
                         joint.SolverSettings.MaximumIterations = clothIterations;
                         Space.Add(joint);
-                        CollisionRules.AddRule(lattice[i, j], lattice[i + 2, j], CollisionRule.NoBroadPhase);
 
                         joint = new BallSocketJoint(lattice[i, j], lattice[i, j + 2], lattice[i, j].Position + new Vector3(xSpacing, 0, zSpacing));
                         joint.SpringSettings.DampingConstant = starchDamping; joint.SpringSettings.StiffnessConstant = starchStiffness;
                         joint.SolverSettings.MaximumIterations = clothIterations;
                         Space.Add(joint);
-                        CollisionRules.AddRule(lattice[i, j], lattice[i, j + 2], CollisionRule.NoBroadPhase);
 
                         joint = new BallSocketJoint(lattice[i, j], lattice[i + 2, j + 2], lattice[i, j].Position + new Vector3(xSpacing, 0, zSpacing));
                         joint.SpringSettings.DampingConstant = starchDamping; joint.SpringSettings.StiffnessConstant = starchStiffness;
                         joint.SolverSettings.MaximumIterations = clothIterations;
                         Space.Add(joint);
-                        CollisionRules.AddRule(lattice[i, j], lattice[i + 2, j + 2], CollisionRule.NoBroadPhase);
                     }
                 }
 

@@ -20,7 +20,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace BEPUphysicsDemos
 {
-    public class CharacterController : Updateable, IBeforeNarrowPhaseUpdateable, IEndOfTimeStepUpdateable
+    public class CharacterController : Updateable, IBeforeNarrowPhaseUpdateable, IBeforePositionUpdateUpdateable, IEndOfTimeStepUpdateable
     {
         public Cylinder Body { get; private set; }
 
@@ -28,8 +28,8 @@ namespace BEPUphysicsDemos
         public float StepHeight { get; set; }
 
         public Vector2 MovementDirection;
-        public float Speed = 40;
-        public float SlidingSpeed = 0;
+        public float Speed = 8;
+        public float SlidingSpeed = 6;
         public float AirSpeed = 4;
         public float Acceleration = 50;
         public float SlidingAcceleration = 0;
@@ -116,7 +116,9 @@ namespace BEPUphysicsDemos
             SupportFinder.UpdateSupports();
 
 
-            Vector3 relativeVelocity = Body.LinearVelocity;
+            Vector3 relativeVelocity;
+            ComputeRelativeVelocity(out relativeVelocity);
+
             if (SupportFinder.HasSupport)
             {
                 SupportData supportData;
@@ -196,7 +198,7 @@ namespace BEPUphysicsDemos
                 //don't let it separate from the ground.
                 if (SupportFinder.HasTraction)
                 {
-                    if (verticalVelocity < GlueSpeed)
+                    if (verticalVelocity > 0 && verticalVelocity < GlueSpeed)
                     {
                         ChangeVelocity(-supportData.Normal * verticalVelocity, ref relativeVelocity);
                     }
@@ -401,6 +403,13 @@ namespace BEPUphysicsDemos
 
         }
 
+        void ComputeRelativeVelocity(out Vector3 relativeVelocity)
+        {
+            relativeVelocity = Body.LinearVelocity;
+            //Find the velocity of the supporting object.
+            //Pick the object and position based on traction.
+        }
+
         void ChangeVelocity(Vector3 velocityChange, ref Vector3 relativeVelocity)
         {
             Body.LinearVelocity += velocityChange;
@@ -410,6 +419,23 @@ namespace BEPUphysicsDemos
         }
 
 
+        void IBeforePositionUpdateUpdateable.Update(float dt)
+        {
+            //Also manage the vertical velocity of the character;
+            //don't let it separate from the ground.
+            //if (SupportFinder.HasTraction)
+            //{
+            //    Vector3 relativeVelocity;
+            //    ComputeRelativeVelocity(out relativeVelocity);
+            //    SupportData supportData = SupportFinder.TractionData.Value;
+            //    float verticalVelocity = Vector3.Dot(supportData.Normal, relativeVelocity);
+            //    if (verticalVelocity < GlueSpeed)
+            //    {
+            //        ChangeVelocity(-supportData.Normal * verticalVelocity, ref relativeVelocity);
+            //    }
+
+            //}
+        }
 
 
         void IEndOfTimeStepUpdateable.Update(float dt)

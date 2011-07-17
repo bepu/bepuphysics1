@@ -54,10 +54,10 @@ namespace BEPUphysics.Settings
         /// </summary>
         public static float DefaultMargin = .04f;
 
-        internal static float maximumContactDistance = .005f;
+        internal static float maximumContactDistance = .01f;
         /// <summary>
         /// Maximum distance between the surfaces defining a contact point allowed before removing the contact.
-        /// Defaults to .005f.
+        /// Defaults to .01f.
         /// </summary>
         public static float MaximumContactDistance
         {

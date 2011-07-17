@@ -35,8 +35,7 @@ namespace BEPUphysicsDemos.Demos
             //staticTriangleIndices = new int[] { 0, 2, 1, 0, 3, 2 };
             //staticTriangleVertices = new Vector3[] { new Vector3(-20, 0, -20), new Vector3(20, 0, -20), new Vector3(20, 0, 20), new Vector3(-20, -4, 20) };
             var staticMesh = new StaticMesh(staticTriangleVertices, staticTriangleIndices, new AffineTransform(Matrix3X3.CreateFromAxisAngle(Vector3.Up, MathHelper.Pi), new Vector3(0, -10, 0)));
-            staticMesh.Sidedness = TriangleSidedness.DoubleSided;
-            staticMesh.ImproveBoundaryBehavior = false;
+            staticMesh.Sidedness = TriangleSidedness.Counterclockwise;
 
             Space.Add(staticMesh);
             game.ModelDrawer.Add(staticMesh);
