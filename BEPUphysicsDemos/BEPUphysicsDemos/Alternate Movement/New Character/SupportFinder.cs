@@ -16,6 +16,7 @@ namespace BEPUphysicsDemos
     public class SupportFinder
     {
         RawList<SupportContact> supports = new RawList<SupportContact>();
+        float bottomHeight;
 
         /// <summary>
         /// Computes a combined support contact from all available supports (contacts or ray).
@@ -52,6 +53,17 @@ namespace BEPUphysicsDemos
                             Vector3.Multiply(ref toReturn.Normal, factor / (float)Math.Sqrt(length), out toReturn.Normal);
                         }
                     }
+                    //Now that we have the normal, cycle through all the contacts again and find the deepest projected depth.
+                    float depth = -float.MaxValue;
+                    for (int i = 0; i < supports.Count; i++)
+                    {
+                        float dot;
+                        Vector3.Dot(ref supports.Elements[i].Contact.Normal, ref toReturn.Normal, out dot);
+                        dot = dot * supports.Elements[i].Contact.PenetrationDepth;
+                        if (dot > depth)
+                            depth = dot;
+                    }
+                    toReturn.Depth = depth;
                     return toReturn;
                 }
                 else
@@ -63,7 +75,8 @@ namespace BEPUphysicsDemos
                         {
                             Position = SupportRayData.Value.HitData.Location,
                             Normal = SupportRayData.Value.HitData.Normal,
-                            HasTraction = SupportRayData.Value.HasTraction
+                            HasTraction = SupportRayData.Value.HasTraction,
+                            Depth = bottomHeight - SupportRayData.Value.HitData.T
                         };
                     }
                     else
@@ -111,7 +124,23 @@ namespace BEPUphysicsDemos
                         }
                     }
                     if (withTraction > 0)
+                    {
+                        //Now that we have the normal, cycle through all the contacts again and find the deepest projected depth.
+                        float depth = -float.MaxValue;
+                        for (int i = 0; i < supports.Count; i++)
+                        {
+                            if (supports.Elements[i].HasTraction)
+                            {
+                                float dot;
+                                Vector3.Dot(ref supports.Elements[i].Contact.Normal, ref toReturn.Normal, out dot);
+                                dot = dot * supports.Elements[i].Contact.PenetrationDepth;
+                                if (dot > depth)
+                                    depth = dot;
+                            }
+                        }
+                        toReturn.Depth = depth;
                         return toReturn;
+                    }
                 }
                 //No support contacts; fall back to the raycast result...
                 if (SupportRayData != null && SupportRayData.Value.HasTraction)
@@ -120,7 +149,8 @@ namespace BEPUphysicsDemos
                     {
                         Position = SupportRayData.Value.HitData.Location,
                         Normal = SupportRayData.Value.HitData.Normal,
-                        HasTraction = SupportRayData.Value.HasTraction
+                        HasTraction = true,
+                        Depth = bottomHeight - SupportRayData.Value.HitData.T
                     };
                 }
                 else
@@ -201,18 +231,21 @@ namespace BEPUphysicsDemos
         /// </summary>
         public void UpdateSupports()
         {
-            //TODO: Calibrate all normals.
-
-            //First, raycast down to find the ground.
-            //Start the ray halfway between the center of the shape and the bottom of the shape.  That extra margin prevents it from getting stuck in the ground and returning t = 0 unhelpfully.
-            var body = character.Body;
-            float length = HasTraction ? body.Height * .25f + body.CollisionInformation.Shape.CollisionMargin + character.StepHeight : body.Height * .25f + body.CollisionInformation.Shape.CollisionMargin;
-            Vector3 downDirection = character.Body.OrientationMatrix.Down; //For a cylinder orientation-locked to the Up axis, this is always {0, -1, 0}.  Keeping it generic doesn't cost much.
-            Ray ray = new Ray(body.Position + downDirection * body.Height * .25f, downDirection);
+            bool hadTraction = HasTraction;
 
             //Reset traction/support.
             HasTraction = false;
             HasSupport = false;
+
+            //First, raycast down to find the ground.
+            //Start the ray halfway between the center of the shape and the bottom of the shape.  That extra margin prevents it from getting stuck in the ground and returning t = 0 unhelpfully.
+            var body = character.Body;
+            bottomHeight = body.Height * .25f + body.CollisionInformation.Shape.CollisionMargin;
+            float length = hadTraction ? bottomHeight + character.StepHeight : bottomHeight;
+            Vector3 downDirection = character.Body.OrientationMatrix.Down; //For a cylinder orientation-locked to the Up axis, this is always {0, -1, 0}.  Keeping it generic doesn't cost much.
+            Ray ray = new Ray(body.Position + downDirection * body.Height * .25f, downDirection);
+
+
 
             BoundingBox boundingBox = body.CollisionInformation.BoundingBox;
             RayHit earliestHit = new RayHit() { T = float.MaxValue };
@@ -240,7 +273,13 @@ namespace BEPUphysicsDemos
                 earliestHit.Normal.Normalize();
                 float dot;
                 Vector3.Dot(ref downDirection, ref earliestHit.Normal, out dot);
-                if (dot > cosMaximumSlope || dot < -cosMaximumSlope)
+                if (dot < 0)
+                {
+                    //Calibrate the normal so it always faces the same direction relative to the body.
+                    Vector3.Negate(ref earliestHit.Normal, out earliestHit.Normal);
+                    dot = -dot;
+                }
+                if (dot > cosMaximumSlope)
                 {
                     //It has traction!
                     HasTraction = true;
@@ -273,8 +312,17 @@ namespace BEPUphysicsDemos
                     {
                         //This contact is on the bottom half!  Check to see if its normal is suitable for a 'support' contact.
                         //Support contacts are all contacts on the feet of the character- a set that include contacts that support traction and those which do not.
-                        Vector3.Dot(ref c.Contact.Normal, ref downDirection, out dot);
-                        if (dot < -.01f || dot > .01f) //Check both signs; the normal could point either direction since it hasn't been calibrated.
+
+                        Vector3 normal = c.Contact.Normal;
+                        Vector3.Dot(ref normal, ref downDirection, out dot);
+
+                        if (dot < 0)
+                        {
+                            //Calibrate the normal.
+                            Vector3.Negate(ref normal, out normal);
+                            dot = -dot;
+                        }
+                        if (dot > .01f)
                         {
                             HasSupport = true;
 
@@ -286,7 +334,7 @@ namespace BEPUphysicsDemos
                                     Contact = new ContactData()
                                     {
                                         Position = c.Contact.Position,
-                                        Normal = c.Contact.Normal,
+                                        Normal = normal,
                                         PenetrationDepth = c.Contact.PenetrationDepth,
                                         Id = c.Contact.Id
                                     },
@@ -297,7 +345,7 @@ namespace BEPUphysicsDemos
                             //Traction contacts are contacts where the surface normal is flat enough to stand on.
                             //We want to check if slope < maxslope so:
                             //Acos(normal dot down direction) < maxSlope => normal dot down direction > cos(maxSlope)
-                            if (dot > cosMaximumSlope || dot < -cosMaximumSlope)
+                            if (dot > cosMaximumSlope)
                             {
                                 //The slope is shallow enought hat 
                                 supportContact.HasTraction = true;
@@ -309,13 +357,14 @@ namespace BEPUphysicsDemos
                     }
                 }
             }
+
         }
 
 
         /// <summary>
-        /// Cleans up the support finder, preparing it for inactivity.
+        /// Cleans up the support finder.
         /// </summary>
-        internal void CleanUp()
+        internal void ClearSupportData()
         {
             HasSupport = false;
             HasTraction = false;
@@ -463,5 +512,10 @@ namespace BEPUphysicsDemos
         /// Whether or not the contact was found to have traction.
         /// </summary>
         public bool HasTraction;
+        /// <summary>
+        /// Depth of the supporting location.
+        /// Can be negative in the case of raycast supports.
+        /// </summary>
+        public float Depth;
     }
 }
