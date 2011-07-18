@@ -36,7 +36,7 @@ namespace BEPUphysicsDemos.Demos
             {
                 for (int i = 0; i < Environment.ProcessorCount; i++)
                 {
-                    //Space.ThreadManager.AddThread();
+                    Space.ThreadManager.AddThread();
                 }
             }
 #endif

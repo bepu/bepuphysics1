@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework;
 using BEPUphysics;
 using BEPUphysics.Collidables;
 
-namespace BEPUphysicsDemos
+namespace BEPUphysicsDemos.AlternateMovement.Testing.New
 {
     /// <summary>
     /// Analyzes the contacts on the character's body to find supports.

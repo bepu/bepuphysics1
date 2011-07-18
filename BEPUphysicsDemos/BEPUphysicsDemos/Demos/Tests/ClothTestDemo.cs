@@ -29,12 +29,12 @@ namespace BEPUphysicsDemos.Demos.Tests
 
             NarrowPhaseHelper.Factories.BoxBox.Count = 10000;
             NarrowPhaseHelper.Factories.BoxSphere.Count = 5000;
-
+            
             int numColumns = 70;
             int numRows = 70;
             float xSpacing = .5f;
             float zSpacing = .5f;
-            var lattice = new Entity[numRows,numColumns];
+            var lattice = new Entity[numRows, numColumns];
             for (int i = 0; i < numRows; i++)
                 for (int j = 0; j < numColumns; j++)
                 {
@@ -60,7 +60,7 @@ namespace BEPUphysicsDemos.Demos.Tests
             Space.Solver.IterationLimit = 10;
 
             float damping = 5000, stiffness = 5000;
-            float starchDamping = 5000, starchStiffness= 500;
+            float starchDamping = 5000, starchStiffness = 500;
 
             //Loop through the grid and set up the joints.
             for (int i = 0; i < numRows; i++)
@@ -81,7 +81,6 @@ namespace BEPUphysicsDemos.Demos.Tests
                         joint.SpringSettings.DampingConstant = damping; joint.SpringSettings.StiffnessConstant = stiffness;
                         joint.SolverSettings.MaximumIterations = clothIterations;
                         Space.Add(joint);
-                        CollisionRules.AddRule(lattice[numRows - 1, j], lattice[numRows - 1, j + 1], CollisionRule.NoBroadPhase);
                     }
                     if (i + 1 < numRows && j == 0)
                     {
@@ -99,8 +98,8 @@ namespace BEPUphysicsDemos.Demos.Tests
                         joint.SolverSettings.MaximumIterations = clothIterations;
                         Space.Add(joint);
 
-                        CollisionRules.AddRule(lattice[i, numColumns - 1], lattice[i + 1, numColumns - 1], CollisionRule.NoBroadPhase);
                     }
+
 
                     if (i + 1 < numRows && j + 1 < numColumns)
                     {
@@ -109,19 +108,16 @@ namespace BEPUphysicsDemos.Demos.Tests
                         joint.SpringSettings.DampingConstant = damping; joint.SpringSettings.StiffnessConstant = stiffness;
                         joint.SolverSettings.MaximumIterations = clothIterations;
                         Space.Add(joint);
-                        CollisionRules.AddRule(lattice[i, j], lattice[i + 1, j], CollisionRule.NoBroadPhase);
 
                         joint = new BallSocketJoint(lattice[i, j], lattice[i, j + 1], lattice[i, j].Position + new Vector3(xSpacing / 2, 0, zSpacing / 2));
                         joint.SpringSettings.DampingConstant = damping; joint.SpringSettings.StiffnessConstant = stiffness;
                         joint.SolverSettings.MaximumIterations = clothIterations;
                         Space.Add(joint);
-                        CollisionRules.AddRule(lattice[i, j], lattice[i, j + 1], CollisionRule.NoBroadPhase);
 
                         joint = new BallSocketJoint(lattice[i, j], lattice[i + 1, j + 1], lattice[i, j].Position + new Vector3(xSpacing / 2, 0, zSpacing / 2));
                         joint.SpringSettings.DampingConstant = damping; joint.SpringSettings.StiffnessConstant = stiffness;
                         joint.SolverSettings.MaximumIterations = clothIterations;
                         Space.Add(joint);
-                        CollisionRules.AddRule(lattice[i, j], lattice[i + 1, j + 1], CollisionRule.NoBroadPhase);
                     }
 
                     if (i + 2 < numRows && j + 2 < numColumns)
@@ -142,9 +138,19 @@ namespace BEPUphysicsDemos.Demos.Tests
                         joint.SolverSettings.MaximumIterations = clothIterations;
                         Space.Add(joint);
                     }
+
+                    //Add in collision rules.
+                    if (j - 1 >= 0)
+                    {
+                        if (i - 1 >= 0) CollisionRules.AddRule(lattice[i, j], lattice[i - 1, j - 1], CollisionRule.NoBroadPhase);
+                        CollisionRules.AddRule(lattice[i, j], lattice[i, j - 1], CollisionRule.NoBroadPhase);
+                        if (i + 1 < numRows) CollisionRules.AddRule(lattice[i, j], lattice[i + 1, j - 1], CollisionRule.NoBroadPhase);
+                    }
+
+                    if (i + 1 < numRows) CollisionRules.AddRule(lattice[i, j], lattice[i + 1, j], CollisionRule.NoBroadPhase);
                 }
 
-      
+
 
 
             //Add some ground.

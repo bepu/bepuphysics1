@@ -2,13 +2,13 @@ using BEPUphysics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
-namespace BEPUphysicsDemos
+namespace BEPUphysicsDemos.AlternateMovement.Testing.New
 {
     /// <summary>
     /// Handles input and movement of a character in the game.
     /// Acts as a simple 'front end' for the bookkeeping and math of the character controller.
     /// </summary>
-    public class CharacterControllerInputOld
+    public class CharacterControllerInput
     {
         /// <summary>
         /// Camera to use for input.
@@ -23,7 +23,7 @@ namespace BEPUphysicsDemos
         /// <summary>
         /// Physics representation of the character.
         /// </summary>
-        public CharacterControllerOld CharacterController;
+        public CharacterController CharacterController;
 
         /// <summary>
         /// Whether or not to use the character controller's input.
@@ -41,9 +41,9 @@ namespace BEPUphysicsDemos
         /// </summary>
         /// <param name="owningSpace">Space to add the character to.</param>
         /// <param name="CameraToUse">Camera to attach to the character.</param>
-        public CharacterControllerInputOld(Space owningSpace, Camera CameraToUse)
+        public CharacterControllerInput(Space owningSpace, Camera CameraToUse)
         {
-            CharacterController = new CharacterControllerOld(Vector3.Zero, 2, .4f, 30f, 1.1f);
+            CharacterController = new CharacterController();
 
             Space = owningSpace;
             Space.Add(CharacterController);
@@ -62,7 +62,7 @@ namespace BEPUphysicsDemos
             {
                 IsActive = true;
                 Camera.UseMovementControls = false;
-                CharacterController.Activate();
+                Space.Add(CharacterController);
                 CharacterController.Body.Position = (Camera.Position);
             }
         }
@@ -76,7 +76,7 @@ namespace BEPUphysicsDemos
             {
                 IsActive = false;
                 Camera.UseMovementControls = true;
-                CharacterController.Deactivate();
+                Space.Remove(CharacterController);
             }
         }
 
@@ -99,21 +99,6 @@ namespace BEPUphysicsDemos
                 //Puts the Camera at eye level.
                 Camera.Position = CharacterController.Body.Position + CameraOffset;
                 Vector2 totalMovement = Vector2.Zero;
-#if !WINDOWS
-                Vector3 forward = Camera.WorldMatrix.Forward;
-                forward.Y = 0;
-                forward.Normalize();
-                Vector3 right = Camera.WorldMatrix.Right;
-                totalMovement += gamePadInput.ThumbSticks.Left.Y * new Vector2(forward.X, forward.Z);
-                totalMovement += gamePadInput.ThumbSticks.Left.X * new Vector2(right.X, right.Z);
-                CharacterController.MovementDirection = totalMovement;
-
-                //Jumping
-                if (previousGamePadInput.IsButtonUp(Buttons.LeftStick) && gamePadInput.IsButtonDown(Buttons.LeftStick))
-                {
-                    CharacterController.Jump();
-                }
-#else
 
 
                 //Collect the movement impulses.
@@ -151,8 +136,6 @@ namespace BEPUphysicsDemos
                     CharacterController.Jump();
                 }
 
-
-#endif
             }
         }
     }

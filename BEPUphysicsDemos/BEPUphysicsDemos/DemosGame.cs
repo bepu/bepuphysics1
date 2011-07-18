@@ -110,8 +110,7 @@ namespace BEPUphysicsDemos
                                                     typeof (PlanetDemo),
                                                     typeof (PathFollowingDemo),
                                                     typeof (FishInABarrelDemo),
-                                                    typeof (DetectorVolumeDemo),
-                                                    typeof (ClothTestDemo)
+                                                    typeof (DetectorVolumeDemo)
                                                 };
 
 

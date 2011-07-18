@@ -12,7 +12,7 @@ using BEPUphysics.CollisionTests.CollisionAlgorithms.GJK;
 using BEPUphysics.Collidables;
 using BEPUphysics.Collidables.MobileCollidables;
 
-namespace BEPUphysicsDemos
+namespace BEPUphysicsDemos.AlternateMovement.Testing.Old
 {
     public class CharacterControllerOld : Updateable, IEndOfTimeStepUpdateable
     {
