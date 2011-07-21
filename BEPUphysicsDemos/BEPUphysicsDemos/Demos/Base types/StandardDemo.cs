@@ -12,6 +12,7 @@ using BEPUphysics.CollisionRuleManagement;
 using System;
 using System.Diagnostics;
 using BEPUphysics.Settings;
+using BEPUphysicsDemos.AlternateMovement.Testing.New;
 
 namespace BEPUphysicsDemos.Demos
 {
@@ -22,7 +23,7 @@ namespace BEPUphysicsDemos.Demos
     /// </summary>
     public abstract class StandardDemo : Demo
     {
-        protected SimpleCharacterControllerInput character;
+        protected CharacterControllerInput character;
         protected float grabDistance;
         protected MotorizedGrabSpring grabber;
         protected LineDisplayObjectBase grabberGraphic;
@@ -36,7 +37,7 @@ namespace BEPUphysicsDemos.Demos
             : base(game)
         {
             //Creates the player character (C).
-            character = new SimpleCharacterControllerInput(Space, game.Camera);
+            character = new CharacterControllerInput(Space, game.Camera);
             //Creates the drivable vehicle (V).
             var wheelModel = game.Content.Load<Model>("carWheel");
             var wheelTexture = game.Content.Load<Texture2D>("wheel");
@@ -85,6 +86,9 @@ namespace BEPUphysicsDemos.Demos
 
         public override void Update(float dt)
         {
+
+            if (Game.WasKeyPressed(Keys.P))
+                Debug.WriteLine("Breka.:");
 
             #region Kapow-Shooter Input
 

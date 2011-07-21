@@ -54,16 +54,22 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                         }
                     }
                     //Now that we have the normal, cycle through all the contacts again and find the deepest projected depth.
+                    //Use that object as our support too.
                     float depth = -float.MaxValue;
+                    Collidable supportObject = null;
                     for (int i = 0; i < supports.Count; i++)
                     {
                         float dot;
                         Vector3.Dot(ref supports.Elements[i].Contact.Normal, ref toReturn.Normal, out dot);
                         dot = dot * supports.Elements[i].Contact.PenetrationDepth;
                         if (dot > depth)
+                        {
                             depth = dot;
+                            supportObject = supports.Elements[i].Support;
+                        }
                     }
                     toReturn.Depth = depth;
+                    toReturn.SupportObject = supportObject;
                     return toReturn;
                 }
                 else
@@ -76,7 +82,8 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                             Position = SupportRayData.Value.HitData.Location,
                             Normal = SupportRayData.Value.HitData.Normal,
                             HasTraction = SupportRayData.Value.HasTraction,
-                            Depth = bottomHeight - SupportRayData.Value.HitData.T
+                            Depth = bottomHeight - SupportRayData.Value.HitData.T,
+                            SupportObject = SupportRayData.Value.HitObject
                         };
                     }
                     else
@@ -127,6 +134,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                     {
                         //Now that we have the normal, cycle through all the contacts again and find the deepest projected depth.
                         float depth = -float.MaxValue;
+                        Collidable supportObject = null;
                         for (int i = 0; i < supports.Count; i++)
                         {
                             if (supports.Elements[i].HasTraction)
@@ -135,10 +143,14 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                                 Vector3.Dot(ref supports.Elements[i].Contact.Normal, ref toReturn.Normal, out dot);
                                 dot = dot * supports.Elements[i].Contact.PenetrationDepth;
                                 if (dot > depth)
+                                {
                                     depth = dot;
+                                    supportObject = supports.Elements[i].Support;
+                                }
                             }
                         }
                         toReturn.Depth = depth;
+                        toReturn.SupportObject = supportObject;
                         return toReturn;
                     }
                 }
@@ -150,7 +162,8 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                         Position = SupportRayData.Value.HitData.Location,
                         Normal = SupportRayData.Value.HitData.Normal,
                         HasTraction = true,
-                        Depth = bottomHeight - SupportRayData.Value.HitData.T
+                        Depth = bottomHeight - SupportRayData.Value.HitData.T,
+                        SupportObject = SupportRayData.Value.HitObject
                     };
                 }
                 else
@@ -241,6 +254,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
             //Start the ray halfway between the center of the shape and the bottom of the shape.  That extra margin prevents it from getting stuck in the ground and returning t = 0 unhelpfully.
             var body = character.Body;
             bottomHeight = body.Height * .25f + body.CollisionInformation.Shape.CollisionMargin;
+            //TODO: could also require that the character has a nonzero movement direction in order to use a ray cast.  Questionable- would complicate the behavior on edges.
             float length = hadTraction ? bottomHeight + character.StepHeight : bottomHeight;
             Vector3 downDirection = character.Body.OrientationMatrix.Down; //For a cylinder orientation-locked to the Up axis, this is always {0, -1, 0}.  Keeping it generic doesn't cost much.
             Ray ray = new Ray(body.Position + downDirection * body.Height * .25f, downDirection);
@@ -517,5 +531,9 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
         /// Can be negative in the case of raycast supports.
         /// </summary>
         public float Depth;
+        /// <summary>
+        /// The object which the character is standing on.
+        /// </summary>
+        public Collidable SupportObject;
     }
 }

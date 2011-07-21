@@ -943,7 +943,14 @@ namespace BEPUphysics.Entities
         }
 
         //These methods are very direct and quick.  They don't activate the object or anything.
-        internal void ApplyLinearImpulse(ref Vector3 impulse)
+        /// <summary>
+        /// Applies a linear velocity change to the entity using the given impulse.
+        /// This method does not wake up the object or perform any other nonessential operation;
+        /// it is meant to be used for performance-sensitive constraint solving.
+        /// Consider equivalently adding to the LinearMomentum property for convenience instead.
+        /// </summary>
+        /// <param name="impulse">Impulse to apply.</param>
+        public void ApplyLinearImpulse(ref Vector3 impulse)
         {
             linearMomentum.X += impulse.X;
             linearMomentum.Y += impulse.Y;
@@ -953,8 +960,14 @@ namespace BEPUphysics.Entities
             linearVelocity.Y = linearMomentum.Y * invMass;
             linearVelocity.Z = linearMomentum.Z * invMass;
         }
-
-        internal void ApplyAngularImpulse(ref Vector3 impulse)
+        /// <summary>
+        /// Applies an angular velocity change to the entity using the given impulse.
+        /// This method does not wake up the object or perform any other nonessential operation;
+        /// it is meant to be used for performance-sensitive constraint solving.
+        /// Consider equivalently adding to the AngularMomentum property for convenience instead.
+        /// </summary>
+        /// <param name="impulse">Impulse to apply.</param>
+        public void ApplyAngularImpulse(ref Vector3 impulse)
         {
 
             angularMomentum.X += impulse.X;

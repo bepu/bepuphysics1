@@ -126,9 +126,9 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                     totalMovement += Vector2.Normalize(new Vector2(movementDir.X, movementDir.Z));
                 }
                 if (totalMovement == Vector2.Zero)
-                    CharacterController.MovementDirection = Vector2.Zero;
+                    CharacterController.HorizontalMotionConstraint.MovementDirection = Vector2.Zero;
                 else
-                    CharacterController.MovementDirection = Vector2.Normalize(totalMovement);
+                    CharacterController.HorizontalMotionConstraint.MovementDirection = Vector2.Normalize(totalMovement);
 
                 //Jumping
                 if (previousKeyboardInput.IsKeyUp(Keys.A) && keyboardInput.IsKeyDown(Keys.A))

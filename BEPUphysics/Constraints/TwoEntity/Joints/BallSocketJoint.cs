@@ -200,65 +200,6 @@ namespace BEPUphysics.Constraints.TwoEntity.Joints
 
         #endregion
 
-        /// <summary>
-        /// Calculates and applies corrective impulses.
-        /// Called automatically by space.
-        /// </summary>
-        public override float SolveIteration()
-        {
-#if !WINDOWS
-            Vector3 lambda = new Vector3();
-#else
-            Vector3 lambda;
-#endif
-
-            //Velocity along the length.
-            Vector3 cross;
-            Vector3 aVel, bVel;
-            Vector3.Cross(ref connectionA.angularVelocity, ref worldOffsetA, out cross);
-            Vector3.Add(ref connectionA.linearVelocity, ref cross, out aVel);
-            Vector3.Cross(ref connectionB.angularVelocity, ref worldOffsetB, out cross);
-            Vector3.Add(ref connectionB.linearVelocity, ref cross, out bVel);
-
-            lambda.X = aVel.X - bVel.X + biasVelocity.X - softness * accumulatedImpulse.X;
-            lambda.Y = aVel.Y - bVel.Y + biasVelocity.Y - softness * accumulatedImpulse.Y;
-            lambda.Z = aVel.Z - bVel.Z + biasVelocity.Z - softness * accumulatedImpulse.Z;
-
-            //Turn the velocity into an impulse.
-            Matrix3X3.Transform(ref lambda, ref massMatrix, out lambda);
-
-            //ACcumulate the impulse
-            Vector3.Add(ref accumulatedImpulse, ref lambda, out accumulatedImpulse);
-
-            //Apply the impulse
-            //Constraint.applyImpulse(myConnectionA, myConnectionB, ref rA, ref rB, ref impulse);
-#if !WINDOWS
-            Vector3 linear = new Vector3();
-#else
-            Vector3 linear;
-#endif
-            if (connectionA.isDynamic)
-            {
-                linear.X = -lambda.X;
-                linear.Y = -lambda.Y;
-                linear.Z = -lambda.Z;
-                connectionA.ApplyLinearImpulse(ref linear);
-                Vector3 taImpulse;
-                Vector3.Cross(ref worldOffsetA, ref linear, out taImpulse);
-                connectionA.ApplyAngularImpulse(ref taImpulse);
-            }
-            if (connectionB.isDynamic)
-            {
-                connectionB.ApplyLinearImpulse(ref lambda);
-                Vector3 tbImpulse;
-                Vector3.Cross(ref worldOffsetB, ref lambda, out tbImpulse);
-                connectionB.ApplyAngularImpulse(ref tbImpulse);
-            }
-
-            return (Math.Abs(lambda.X) +
-                    Math.Abs(lambda.Y) +
-                    Math.Abs(lambda.Z));
-        }
 
         /// <summary>
         /// Calculates necessary information for velocity solving.
@@ -366,6 +307,67 @@ namespace BEPUphysics.Constraints.TwoEntity.Joints
                 Vector3.Cross(ref worldOffsetB, ref accumulatedImpulse, out tbImpulse);
                 connectionB.ApplyAngularImpulse(ref tbImpulse);
             }
+        }
+
+
+        /// <summary>
+        /// Calculates and applies corrective impulses.
+        /// Called automatically by space.
+        /// </summary>
+        public override float SolveIteration()
+        {
+#if !WINDOWS
+            Vector3 lambda = new Vector3();
+#else
+            Vector3 lambda;
+#endif
+
+            //Velocity along the length.
+            Vector3 cross;
+            Vector3 aVel, bVel;
+            Vector3.Cross(ref connectionA.angularVelocity, ref worldOffsetA, out cross);
+            Vector3.Add(ref connectionA.linearVelocity, ref cross, out aVel);
+            Vector3.Cross(ref connectionB.angularVelocity, ref worldOffsetB, out cross);
+            Vector3.Add(ref connectionB.linearVelocity, ref cross, out bVel);
+
+            lambda.X = aVel.X - bVel.X + biasVelocity.X - softness * accumulatedImpulse.X;
+            lambda.Y = aVel.Y - bVel.Y + biasVelocity.Y - softness * accumulatedImpulse.Y;
+            lambda.Z = aVel.Z - bVel.Z + biasVelocity.Z - softness * accumulatedImpulse.Z;
+
+            //Turn the velocity into an impulse.
+            Matrix3X3.Transform(ref lambda, ref massMatrix, out lambda);
+
+            //ACcumulate the impulse
+            Vector3.Add(ref accumulatedImpulse, ref lambda, out accumulatedImpulse);
+
+            //Apply the impulse
+            //Constraint.applyImpulse(myConnectionA, myConnectionB, ref rA, ref rB, ref impulse);
+#if !WINDOWS
+            Vector3 linear = new Vector3();
+#else
+            Vector3 linear;
+#endif
+            if (connectionA.isDynamic)
+            {
+                linear.X = -lambda.X;
+                linear.Y = -lambda.Y;
+                linear.Z = -lambda.Z;
+                connectionA.ApplyLinearImpulse(ref linear);
+                Vector3 taImpulse;
+                Vector3.Cross(ref worldOffsetA, ref linear, out taImpulse);
+                connectionA.ApplyAngularImpulse(ref taImpulse);
+            }
+            if (connectionB.isDynamic)
+            {
+                connectionB.ApplyLinearImpulse(ref lambda);
+                Vector3 tbImpulse;
+                Vector3.Cross(ref worldOffsetB, ref lambda, out tbImpulse);
+                connectionB.ApplyAngularImpulse(ref tbImpulse);
+            }
+
+            return (Math.Abs(lambda.X) +
+                    Math.Abs(lambda.Y) +
+                    Math.Abs(lambda.Z));
         }
     }
 }
