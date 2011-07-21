@@ -210,8 +210,8 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                     Vector3 supportToContact = supportData.Position - supportEntity.Position;
                     //Since we treat the character to have infinite inertia, we're only concerned with the support's angular jacobians.
                     //Note the order of the cross product- it is reversed to negate the result.
-                    Vector3.Cross(ref supportToContact, ref linearJacobianA1, out angularJacobianB1);
-                    Vector3.Cross(ref supportToContact, ref linearJacobianA2, out angularJacobianB2);
+                    Vector3.Cross(ref linearJacobianA1, ref supportToContact, out angularJacobianB1);
+                    Vector3.Cross(ref linearJacobianA2, ref supportToContact, out angularJacobianB2);
                 }
                 else
                 {
@@ -273,10 +273,39 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
 
         public override void ExclusiveUpdate()
         {
-            //This constraint does not use warm starting.
-            accumulatedImpulse = new Vector2();
-            accumulatedDeceleration = new Vector2();
-            accumulatedAcceleration = 0;
+            ////This constraint does not use warm starting.
+            //accumulatedImpulse = new Vector2();
+            //accumulatedDeceleration = new Vector2();
+            //accumulatedAcceleration = 0;
+
+#if !WINDOWS
+            Vector3 impulse = new Vector3();
+            Vector3 torque= new Vector3();
+#else
+            Vector3 impulse;
+            Vector3 torque;
+#endif
+            float x = accumulatedImpulse.X;
+            float y = accumulatedImpulse.Y;
+            impulse.X = linearJacobianA1.X * x + linearJacobianA2.X * y;
+            impulse.Y = linearJacobianA1.Y * x + linearJacobianA2.Y * y;
+            impulse.Z = linearJacobianA1.Z * x + linearJacobianA2.Z * y;
+
+            character.Body.ApplyLinearImpulse(ref impulse);
+
+            if (supportEntity != null && supportEntity.IsDynamic)
+            {
+                impulse.X = -impulse.X;
+                impulse.Y = -impulse.Y;
+                impulse.Z = -impulse.Z;
+
+                torque.X = x * angularJacobianB1.X + y * angularJacobianB2.X;
+                torque.Y = x * angularJacobianB1.Y + y * angularJacobianB2.Y;
+                torque.Z = x * angularJacobianB1.Z + y * angularJacobianB2.Z;
+
+                supportEntity.ApplyLinearImpulse(ref impulse);
+                supportEntity.ApplyAngularImpulse(ref torque);
+            }
         }
 
 
@@ -316,7 +345,6 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
             //Those rules cover every case, because the coefficients for acceleration/deceleration/maxSpeed
             //have all been configured according to what state the character is in.
 
-            //So first, compute the change that would be necessary to jump directly to the goal.
             Vector2 decelerationComponent;
             //The goal of decelerating the off-velocity is simple.
             decelerationComponent.Y = -relativeVelocity.Y;
@@ -354,7 +382,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
             lambda.X = decelerationComponent.X + accelerationComponent;
             lambda.Y = decelerationComponent.Y;
 
-            Matrix2X2.Transform(ref lambda, ref massMatrix, out lambda);
+            Vector2.Add(ref lambda, ref accumulatedImpulse, out accumulatedImpulse);
 
             //Use the jacobians to put the impulse into world space.
 
@@ -391,16 +419,36 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
 
         }
 
-        void ComputeRelativeVelocity(out Vector3 relativeVelocity)
-        {
-            //Compute the relative velocity between the body and its support, if any.
-            relativeVelocity = character.Body.LinearVelocity;
-            if (supportEntity != null)
-            {
-                Vector3 entityVelocity = Toolbox.GetVelocityOfPoint(supportData.Position, supportEntity);
-                Vector3.Subtract(ref relativeVelocity, ref entityVelocity, out relativeVelocity);
-            }
 
+        Vector2 RelativeVelocity
+        {
+            get
+            {
+                Vector2 relativeVelocity;
+
+                Vector3 bodyVelocity = character.Body.LinearVelocity;
+                Vector3.Dot(ref linearJacobianA1, ref bodyVelocity, out relativeVelocity.X);
+                Vector3.Dot(ref linearJacobianA2, ref bodyVelocity, out relativeVelocity.Y);
+
+                float x, y;
+                if (supportEntity != null)
+                {
+                    Vector3 supportLinearVelocity = supportEntity.LinearVelocity;
+                    Vector3 supportAngularVelocity = supportEntity.AngularVelocity;
+
+
+                    Vector3.Dot(ref linearJacobianB1, ref supportLinearVelocity, out x);
+                    Vector3.Dot(ref linearJacobianB2, ref supportLinearVelocity, out y);
+                    relativeVelocity.X += x;
+                    relativeVelocity.Y += y;
+                    Vector3.Dot(ref angularJacobianB1, ref supportAngularVelocity, out x);
+                    Vector3.Dot(ref angularJacobianB2, ref supportAngularVelocity, out y);
+                    relativeVelocity.X += x;
+                    relativeVelocity.Y += y;
+
+                }
+                return relativeVelocity;
+            }
         }
 
 

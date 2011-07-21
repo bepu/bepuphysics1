@@ -50,9 +50,6 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
         public float HorizontalForceFactor { get; set; }
 
 
-        float supportMargin = .01f;
-        float sweepLength;
-        float goalSupportT;
         SupportData supportData;
 
         public CharacterController()
@@ -77,7 +74,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
             {
                 //The default values for InteractionProperties is all zeroes- zero friction, zero bounciness.
                 //That's exactly how we want the character to behave when hitting objects.
-                collidablePair.UpdateMaterialProperties(new InteractionProperties());
+                collidablePair.UpdateMaterialProperties(new InteractionProperties() );
             }
         }
 
@@ -361,18 +358,18 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
         {
             //Also manage the vertical velocity of the character;
             //don't let it separate from the ground.
-            if (SupportFinder.HasTraction)
-            {
-                Vector3 relativeVelocity;
-                ComputeRelativeVelocity(out relativeVelocity);
-                float verticalVelocity = Vector3.Dot(supportData.Normal, relativeVelocity);
-                verticalVelocity += Math.Max(supportData.Depth / dt, 0);
-                if (verticalVelocity < 0 && verticalVelocity > -GlueSpeed)
-                {
-                    ChangeVelocityUnilaterally(-supportData.Normal * verticalVelocity, ref relativeVelocity);
-                }
+            //if (SupportFinder.HasTraction)
+            //{
+            //    Vector3 relativeVelocity;
+            //    ComputeRelativeVelocity(out relativeVelocity);
+            //    float verticalVelocity = Vector3.Dot(supportData.Normal, relativeVelocity);
+            //    verticalVelocity += Math.Max(supportData.Depth / dt, 0);
+            //    if (verticalVelocity < 0 && verticalVelocity > -GlueSpeed)
+            //    {
+            //        ChangeVelocityUnilaterally(-supportData.Normal * verticalVelocity, ref relativeVelocity);
+            //    }
 
-            }
+            //}
         }
 
 
@@ -406,6 +403,9 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
             newSpace.Add(HorizontalMotionConstraint);
             //This character controller requires the standard implementation of Space.
             ((Space)newSpace).BoundingBoxUpdater.Finishing += ExpandBoundingBox;
+
+            Body.AngularVelocity = new Vector3();
+            Body.LinearVelocity = new Vector3();
         }
         public override void OnRemovalFromSpace(ISpace oldSpace)
         {
