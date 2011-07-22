@@ -129,7 +129,7 @@ namespace BEPUphysics.Constraints.Collision
                 tX = angularX * entityA.inertiaTensorInverse.M11 + angularY * entityA.inertiaTensorInverse.M21 + angularZ * entityA.inertiaTensorInverse.M31;
                 tY = angularX * entityA.inertiaTensorInverse.M12 + angularY * entityA.inertiaTensorInverse.M22 + angularZ * entityA.inertiaTensorInverse.M32;
                 tZ = angularX * entityA.inertiaTensorInverse.M13 + angularY * entityA.inertiaTensorInverse.M23 + angularZ * entityA.inertiaTensorInverse.M33;
-                entryA = tX * angularX + tY * angularY + tZ * angularZ + 1 / entityA.mass;
+                entryA = tX * angularX + tY * angularY + tZ * angularZ + entityA.inverseMass;
             }
             else
                 entryA = 0;
@@ -139,7 +139,7 @@ namespace BEPUphysics.Constraints.Collision
                 tX = angularX * entityB.inertiaTensorInverse.M11 + angularY * entityB.inertiaTensorInverse.M21 + angularZ * entityB.inertiaTensorInverse.M31;
                 tY = angularX * entityB.inertiaTensorInverse.M12 + angularY * entityB.inertiaTensorInverse.M22 + angularZ * entityB.inertiaTensorInverse.M32;
                 tZ = angularX * entityB.inertiaTensorInverse.M13 + angularY * entityB.inertiaTensorInverse.M23 + angularZ * entityB.inertiaTensorInverse.M33;
-                entryB = tX * angularX + tY * angularY + tZ * angularZ + 1 / entityB.mass;
+                entryB = tX * angularX + tY * angularY + tZ * angularZ + entityB.inverseMass;
             }
             else
                 entryB = 0;

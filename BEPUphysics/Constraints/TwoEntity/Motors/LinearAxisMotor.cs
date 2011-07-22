@@ -374,7 +374,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
             {
                 Matrix3X3.Transform(ref jAngularA, ref connectionA.inertiaTensorInverse, out intermediate);
                 Vector3.Dot(ref intermediate, ref jAngularA, out entryA);
-                entryA += 1 / connectionA.mass;
+                entryA += connectionA.inverseMass;
             }
             else
                 entryA = 0;
@@ -382,7 +382,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
             {
                 Matrix3X3.Transform(ref jAngularB, ref connectionB.inertiaTensorInverse, out intermediate);
                 Vector3.Dot(ref intermediate, ref jAngularB, out entryB);
-                entryB += 1 / connectionB.mass;
+                entryB += connectionB.inverseMass;
             }
             else
                 entryB = 0;

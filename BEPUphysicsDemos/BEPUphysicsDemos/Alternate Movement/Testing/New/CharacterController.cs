@@ -28,9 +28,26 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
         public float StepHeight { get; set; }
 
         public HorizontalMotionConstraint HorizontalMotionConstraint { get; private set; }
-        
+
         public float JumpSpeed = 4.5f;
         public float SlidingJumpSpeed = 3;
+        float jumpForceFactor = 1f;
+        /// <summary>
+        /// Gets or sets the amount of force to apply to supporting dynamic entities as a fraction of the force used to reach the jump speed.
+        /// </summary>
+        public float JumpForceFactor
+        {
+            get
+            {
+                return jumpForceFactor;
+            }
+            set
+            {
+                if (value < 0)
+                    throw new Exception("Value must be nonnegative.");
+                jumpForceFactor = value;
+            }
+        }
 
         /// <summary>
         /// Gets the support finder used by the character.
@@ -74,7 +91,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
             {
                 //The default values for InteractionProperties is all zeroes- zero friction, zero bounciness.
                 //That's exactly how we want the character to behave when hitting objects.
-                collidablePair.UpdateMaterialProperties(new InteractionProperties() );
+                collidablePair.UpdateMaterialProperties(new InteractionProperties());
             }
         }
 
@@ -146,117 +163,6 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                 HorizontalMotionConstraint.SupportData = new SupportData();
             }
 
-            ////The effective mass matrix describes how velocities are applied to supporting objects.
-            //if (SupportFinder.HasSupport)
-            //{
-            //    ComputeEffectiveMassMatrix();
-            //}
-
-
-            ////Apply velocity control.
-            //if (SupportFinder.HasSupport)
-            //{
-            //    //If the character has support then it can move around.
-            //    //Apply horizontal velocities.
-            //    Vector3 downDirection = Body.OrientationMatrix.Down;
-            //    //If the object has traction, it has a lot more control over its motion.  If it is sliding, then use the sliding coefficients.
-            //    float accelerationToUse = SupportFinder.HasTraction ? Acceleration : SlidingAcceleration;
-            //    float decelerationToUse = SupportFinder.HasTraction ? Deceleration : SlidingDeceleration;
-            //    Vector3 velocityDirection;
-            //    Vector3 violatingVelocity;
-            //    if (MovementDirection.LengthSquared() > 0)
-            //    {
-            //        //Project the movement direction onto the support plane defined by the support normal.
-            //        //This projection is NOT along the support normal to the plane; that would cause the character to veer off course when moving on slopes.
-            //        //Instead, project along the sweep direction to the plane.
-            //        //For a 6DOF character controller, the lineStart would be different; it must be perpendicular to the local up.
-            //        Vector3 lineStart = new Vector3(MovementDirection.X, 0, MovementDirection.Y);
-            //        Vector3 lineEnd;
-            //        Vector3.Add(ref lineStart, ref downDirection, out lineEnd);
-            //        Plane plane = new Plane(SupportFinder.HasTraction ? SupportFinder.TractionData.Value.Normal : SupportFinder.SupportData.Value.Normal, 0);
-            //        float t;
-            //        //This method can return false when the line is parallel to the plane, but previous tests and the slope limit guarantee that it won't happen.
-            //        Toolbox.GetLinePlaneIntersection(ref lineStart, ref lineEnd, ref plane, out t, out velocityDirection);
-
-            //        //The origin->intersection line direction defines the horizontal velocity direction in 3d space.
-            //        velocityDirection.Normalize();
-
-            //        //Compare the current velocity to the goal velocity.
-            //        float currentVelocity;
-            //        Vector3.Dot(ref velocityDirection, ref horizontalVelocity, out currentVelocity);
-
-            //        //Violating velocity is velocity which is not in the direction of the goal direction.
-            //        //Also, it includes any velocity beyond the max speed or below zero.
-            //        float violatingMagnitude;
-            //        if (SupportFinder.HasTraction && currentVelocity > Speed)
-            //            violatingMagnitude = currentVelocity - Speed;
-            //        else if (SupportFinder.HasSupport && currentVelocity > SlidingSpeed)
-            //            violatingMagnitude = currentVelocity - SlidingSpeed;
-            //        else if (currentVelocity < 0)
-            //            violatingMagnitude = currentVelocity;
-            //        else
-            //            violatingMagnitude = 0;
-            //        violatingVelocity = horizontalVelocity - velocityDirection * (currentVelocity - violatingMagnitude);
-
-            //        //Compute the acceleration component.
-            //        float speedUpNecessary = Speed - currentVelocity;
-            //        float velocityChange = MathHelper.Clamp(speedUpNecessary, 0, accelerationToUse * dt);
-
-            //        //Apply the change.
-
-            //        ChangeVelocity(velocityDirection * velocityChange, ref relativeVelocity);
-
-            //    }
-            //    else
-            //    {
-            //        velocityDirection = new Vector3();
-            //        violatingVelocity = horizontalVelocity;
-            //    }
-
-            //    //Compute the deceleration component.
-            //    float lengthSquared = violatingVelocity.LengthSquared();
-            //    if (lengthSquared > 0)
-            //    {
-            //        Vector3 violatingVelocityDirection;
-            //        float violatingVelocityMagnitude = (float)Math.Sqrt(lengthSquared);
-            //        Vector3.Divide(ref violatingVelocity, violatingVelocityMagnitude, out violatingVelocityDirection);
-
-            //        //We need to get rid of the violating velocity magnitude, but don't go under zero (that would cause nasty oscillations).
-            //        float velocityChange = -Math.Min(decelerationToUse * dt, violatingVelocityMagnitude);
-            //        //Apply the change.
-            //        ChangeVelocity(violatingVelocityDirection * velocityChange, ref relativeVelocity);
-            //    }
-
-            //    //Also manage the vertical velocity of the character;
-            //    //don't let it separate from the ground.
-            //    if (SupportFinder.HasTraction)
-            //    {
-            //        verticalVelocity += Math.Max(supportData.Depth / dt, 0);
-            //        if (verticalVelocity < 0 && verticalVelocity > -GlueSpeed)
-            //        {
-            //            ChangeVelocityUnilaterally(-supportData.Normal * verticalVelocity, ref relativeVelocity);
-            //        }
-
-            //    }
-            //}
-            //else
-            //{
-            //    //The character is in the air.  Still allow a little air control!
-            //    //6DOF character controllers will likely completely replace this; if it doesn't,
-            //    //use an oriented velocity direction instead of 2d movement direction.
-            //    var velocityDirection = new Vector3(MovementDirection.X, 0, MovementDirection.Y);
-
-            //    //Compare the current velocity to the goal velocity.
-            //    float currentVelocity;
-            //    Vector3.Dot(ref velocityDirection, ref relativeVelocity, out currentVelocity);
-
-            //    //Compute the acceleration component.
-            //    float speedUpNecessary = AirSpeed - currentVelocity;
-            //    float velocityChange = MathHelper.Clamp(speedUpNecessary, 0, AirAcceleration * dt);
-
-            //    //Apply the change.
-            //    ChangeVelocityUnilaterally(velocityDirection * velocityChange, ref relativeVelocity);
-            //}
 
             //Also manage the vertical velocity of the character;
             //don't let it separate from the ground.
@@ -282,7 +188,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                     float currentUpVelocity = Vector3.Dot(Body.OrientationMatrix.Up, relativeVelocity);
                     //Target velocity is JumpSpeed.
                     float velocityChange = JumpSpeed - currentUpVelocity;
-                    ChangeVelocityUnilaterally(Body.OrientationMatrix.Up * velocityChange, ref relativeVelocity);
+                    ApplyJumpVelocity(Body.OrientationMatrix.Up * velocityChange, ref relativeVelocity);
                 }
                 else if (SupportFinder.HasSupport)
                 {
@@ -290,7 +196,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                     float currentNormalVelocity = Vector3.Dot(supportData.Normal, relativeVelocity);
                     //Target velocity is JumpSpeed.
                     float velocityChange = SlidingJumpSpeed - currentNormalVelocity;
-                    ChangeVelocityUnilaterally(supportData.Normal * -velocityChange, ref relativeVelocity);
+                    ApplyJumpVelocity(supportData.Normal * -velocityChange, ref relativeVelocity);
                 }
                 SupportFinder.ClearSupportData();
                 tryToJump = false;
@@ -327,26 +233,19 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
         /// </summary>
         /// <param name="velocityChange">Change to apply to the character and support relative velocity.</param>
         /// <param name="relativeVelocity">Relative velocity to update.</param>
-        void ChangeVelocity(Vector3 velocityChange, ref Vector3 relativeVelocity)
+        void ApplyJumpVelocity(Vector3 velocityChange, ref Vector3 relativeVelocity)
         {
-            ////Instead of only applying the velocity to the character, see if we can apply any force to our support.
-            ////The effective mass matrix defines how much impulse to apply to the support, and technically, to the character as well.
-            ////However, we will ignore the suggestion it provides in favor of having more direct control over the character velocity.
-            ////This isn't strictly correct, but this approach isn't entirely physical anyway.
 
-            ////Only do the fancy calculations if we're standing on a dynamic entity.  Other types of supports just result in a unilateral velocity change.
-            //var entityCollidable = supportData.SupportObject as EntityCollidable;
-            //if (entityCollidable != null && entityCollidable.Entity.IsDynamic)
-            //{
-            //    Vector3 impulse;
-            //    Matrix3X3.Transform(ref velocityChange, ref massMatrix, out impulse);
-            //    //Body.LinearMomentum += impulse;
-            //    Body.LinearVelocity += velocityChange;
-            //    //entityCollidable.Entity.ApplyImpulse(supportData.Position, -(impulse * HorizontalForceFactor));
-            //}
-            //else
+            Body.LinearVelocity += velocityChange;
+            var entityCollidable = supportData.SupportObject as EntityCollidable;
+            if (entityCollidable != null)
             {
-                Body.LinearVelocity += velocityChange;
+                if (entityCollidable.Entity.IsDynamic)
+                {
+                    Vector3 change = velocityChange * jumpForceFactor;
+                    entityCollidable.Entity.LinearMomentum += change * -Body.Mass;
+                    velocityChange += change;
+                }
             }
 
             //Update the relative velocity as well.  It's a ref parameter, so this update will be reflected in the calling scope.

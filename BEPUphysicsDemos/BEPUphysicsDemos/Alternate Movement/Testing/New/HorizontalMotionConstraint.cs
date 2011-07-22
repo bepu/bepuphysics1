@@ -63,12 +63,12 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
         public float AirSpeed = 4;
         public float Acceleration = 50;
         public float SlidingAcceleration = 0;
-        public float AirAcceleration = 5;
+        public float AirAcceleration = 15;
         public float Deceleration = 80;
         public float SlidingDeceleration = 1;
         public float MaximumForce = 1000;
         public float MaximumSlidingForce = 50;
-        public float MaximumAirForce = 50;
+        public float MaximumAirForce = 150;
 
         float supportForceFactor = .3f;
         /// <summary>

@@ -338,7 +338,7 @@ namespace BEPUphysics.Vehicle
                 tX = angularAX * vehicleEntity.inertiaTensorInverse.M11 + angularAY * vehicleEntity.inertiaTensorInverse.M21 + angularAZ * vehicleEntity.inertiaTensorInverse.M31;
                 tY = angularAX * vehicleEntity.inertiaTensorInverse.M12 + angularAY * vehicleEntity.inertiaTensorInverse.M22 + angularAZ * vehicleEntity.inertiaTensorInverse.M32;
                 tZ = angularAX * vehicleEntity.inertiaTensorInverse.M13 + angularAY * vehicleEntity.inertiaTensorInverse.M23 + angularAZ * vehicleEntity.inertiaTensorInverse.M33;
-                entryA = tX * angularAX + tY * angularAY + tZ * angularAZ + 1 / vehicleEntity.mass;
+                entryA = tX * angularAX + tY * angularAY + tZ * angularAZ + vehicleEntity.inverseMass;
             }
             else
                 entryA = 0;
@@ -348,7 +348,7 @@ namespace BEPUphysics.Vehicle
                 tX = angularBX * supportEntity.inertiaTensorInverse.M11 + angularBY * supportEntity.inertiaTensorInverse.M21 + angularBZ * supportEntity.inertiaTensorInverse.M31;
                 tY = angularBX * supportEntity.inertiaTensorInverse.M12 + angularBY * supportEntity.inertiaTensorInverse.M22 + angularBZ * supportEntity.inertiaTensorInverse.M32;
                 tZ = angularBX * supportEntity.inertiaTensorInverse.M13 + angularBY * supportEntity.inertiaTensorInverse.M23 + angularBZ * supportEntity.inertiaTensorInverse.M33;
-                entryB = tX * angularBX + tY * angularBY + tZ * angularBZ + 1 / supportEntity.mass;
+                entryB = tX * angularBX + tY * angularBY + tZ * angularBZ + supportEntity.inverseMass;
             }
             else
                 entryB = 0;

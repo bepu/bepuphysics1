@@ -404,9 +404,8 @@ namespace BEPUphysics.Constraints.Collision
                 Matrix2X3.Multiply(ref angularA, ref entityA.inertiaTensorInverse, out transform);
                 Matrix2X3.Transpose(ref angularA, out transpose);
                 Matrix2X2.Multiply(ref transform, ref transpose, out entryA);
-                float inverseMass = 1 / entityA.mass;
-                entryA.M11 += inverseMass;
-                entryA.M22 += inverseMass;
+                entryA.M11 += entityA.inverseMass;
+                entryA.M22 += entityA.inverseMass;
             }
             else
             {
@@ -418,9 +417,8 @@ namespace BEPUphysics.Constraints.Collision
                 Matrix2X3.Multiply(ref angularB, ref entityB.inertiaTensorInverse, out transform);
                 Matrix2X3.Transpose(ref angularB, out transpose);
                 Matrix2X2.Multiply(ref transform, ref transpose, out entryB);
-                float inverseMass = 1 / entityB.mass;
-                entryB.M11 += inverseMass;
-                entryB.M22 += inverseMass;
+                entryB.M11 += entityB.inverseMass;
+                entryB.M22 += entityB.inverseMass;
             }
             else
             {

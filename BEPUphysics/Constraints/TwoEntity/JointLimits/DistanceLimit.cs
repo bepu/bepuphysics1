@@ -372,7 +372,7 @@ namespace BEPUphysics.Constraints.TwoEntity.JointLimits
                 Vector3.Cross(ref bAngular, ref offsetB, out bAngular);
                 Vector3.Add(ref aAngular, ref bAngular, out aAngular);
                 Vector3.Dot(ref aAngular, ref jLinearB, out velocityToImpulse);
-                velocityToImpulse += 1 / connectionA.mass + 1 / connectionB.mass;
+                velocityToImpulse += connectionA.inverseMass + connectionB.inverseMass;
             }
             else if (connectionA.isDynamic)
             {
@@ -380,7 +380,7 @@ namespace BEPUphysics.Constraints.TwoEntity.JointLimits
                 Matrix3X3.Transform(ref jAngularA, ref connectionA.localInertiaTensorInverse, out aAngular);
                 Vector3.Cross(ref aAngular, ref offsetA, out aAngular);
                 Vector3.Dot(ref aAngular, ref jLinearB, out velocityToImpulse);
-                velocityToImpulse += 1 / connectionA.mass;
+                velocityToImpulse += connectionA.inverseMass;
             }
             else if (connectionB.isDynamic)
             {
@@ -388,7 +388,7 @@ namespace BEPUphysics.Constraints.TwoEntity.JointLimits
                 Matrix3X3.Transform(ref jAngularB, ref connectionB.localInertiaTensorInverse, out bAngular);
                 Vector3.Cross(ref bAngular, ref offsetB, out bAngular);
                 Vector3.Dot(ref bAngular, ref jLinearB, out velocityToImpulse);
-                velocityToImpulse += 1 / connectionB.mass;
+                velocityToImpulse += connectionB.inverseMass;
             }
             else
             {

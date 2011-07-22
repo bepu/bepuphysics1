@@ -167,7 +167,7 @@ namespace BEPUphysics.Constraints.SingleEntity
         {
             usedSoftness = softness / dt;
 
-            effectiveMassMatrix = 1 / (1 / entity.mass + usedSoftness);
+            effectiveMassMatrix = 1 / (entity.inverseMass + usedSoftness);
 
             //Determine maximum force
             if (maximumForce < float.MaxValue)

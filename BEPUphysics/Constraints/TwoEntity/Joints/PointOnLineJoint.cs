@@ -453,7 +453,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Joints
             //Compute the effective mass matrix.
             if (connectionA.isDynamic)
             {
-                inverseMass = 1 / connectionA.mass;
+                inverseMass = connectionA.inverseMass;
                 Matrix3X3.Transform(ref angularA1, ref connectionA.inertiaTensorInverse, out intermediate);
                 Vector3.Dot(ref intermediate, ref angularA1, out m11);
                 m11 += inverseMass;
@@ -468,7 +468,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Joints
             if (connectionB.isDynamic)
             {
                 float extra;
-                inverseMass = 1 / connectionB.mass;
+                inverseMass = connectionB.inverseMass;
                 Matrix3X3.Transform(ref angularB1, ref connectionB.inertiaTensorInverse, out intermediate);
                 Vector3.Dot(ref intermediate, ref angularB1, out extra);
                 m11 += inverseMass + extra;

@@ -222,7 +222,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Joints
             Matrix3X3.CreateCrossProduct(ref worldOffsetB, out rBCrossProduct);
             if (connectionA.isDynamic && connectionB.isDynamic)
             {
-                Matrix3X3.CreateScale(1 / connectionA.mass + 1 / connectionB.mass, out linearComponent);
+                Matrix3X3.CreateScale(connectionA.inverseMass + connectionB.inverseMass, out linearComponent);
                 Matrix3X3 angularComponentA, angularComponentB;
                 Matrix3X3.Multiply(ref rACrossProduct, ref connectionA.inertiaTensorInverse, out angularComponentA);
                 Matrix3X3.Multiply(ref rBCrossProduct, ref connectionB.inertiaTensorInverse, out angularComponentB);
@@ -233,7 +233,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Joints
             }
             else if (connectionA.isDynamic && !connectionB.isDynamic)
             {
-                Matrix3X3.CreateScale(1 / connectionA.mass, out linearComponent);
+                Matrix3X3.CreateScale(connectionA.inverseMass, out linearComponent);
                 Matrix3X3 angularComponentA;
                 Matrix3X3.Multiply(ref rACrossProduct, ref connectionA.inertiaTensorInverse, out angularComponentA);
                 Matrix3X3.Multiply(ref angularComponentA, ref rACrossProduct, out angularComponentA);
@@ -241,7 +241,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Joints
             }
             else if (!connectionA.isDynamic && connectionB.isDynamic)
             {
-                Matrix3X3.CreateScale(1 / connectionB.mass, out linearComponent);
+                Matrix3X3.CreateScale(connectionB.inverseMass, out linearComponent);
                 Matrix3X3 angularComponentB;
                 Matrix3X3.Multiply(ref rBCrossProduct, ref connectionB.inertiaTensorInverse, out angularComponentB);
                 Matrix3X3.Multiply(ref angularComponentB, ref rBCrossProduct, out angularComponentB);

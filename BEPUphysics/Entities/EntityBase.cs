@@ -192,7 +192,7 @@ namespace BEPUphysics.Entities
             set
             {
                 linearMomentum = value;
-                Vector3.Divide(ref linearMomentum, mass, out linearVelocity);
+                Vector3.Multiply(ref linearMomentum, inverseMass, out linearVelocity);
                 IsActive = true;
             }
         }
@@ -381,7 +381,9 @@ namespace BEPUphysics.Entities
 
         internal float mass;
         ///<summary>
-        /// Gets or sets the mass of the entity.
+        /// Gets or sets the mass of the entity.  Setting this to an invalid value, such as a non-positive number, NaN, or infinity, makes the entity kinematic.
+        /// Setting it to a valid positive number will also scale the inertia tensor if it was already dynamic, or force the calculation of a new inertia tensor
+        /// if it was previously kinematic.
         ///</summary>
         public float Mass
         {
@@ -400,7 +402,7 @@ namespace BEPUphysics.Entities
                         //If it's already dynamic, then we don't need to recompute the inertia tensor.
                         //Instead, scale the one we have already.
                         Matrix3X3 newInertia;
-                        Matrix3X3.Multiply(ref localInertiaTensor, value / mass, out newInertia);
+                        Matrix3X3.Multiply(ref localInertiaTensor, value * inverseMass, out newInertia);
                         BecomeDynamic(value, newInertia);
                     }
                     else
@@ -408,6 +410,25 @@ namespace BEPUphysics.Entities
                         BecomeDynamic(value);
                     }
                 }
+            }
+        }
+
+        internal float inverseMass;
+        /// <summary>
+        /// Gets or sets the inverse mass of the entity.
+        /// </summary>
+        public float InverseMass
+        {
+            get
+            {
+                return inverseMass;
+            }
+            set
+            {
+                if (value > 0)
+                    Mass = 1 / value;
+                else
+                    Mass = 0;
             }
         }
 
@@ -952,13 +973,21 @@ namespace BEPUphysics.Entities
         /// <param name="impulse">Impulse to apply.</param>
         public void ApplyLinearImpulse(ref Vector3 impulse)
         {
+#if WINDOWS_PHONE
+            //Some XNA math methods support SIMD on the phone.
+            //This would most likely be inlined on the PC anyway, but the XBOX360 is a questionmark.
+            //Just inline those platforms manually.
+            Vector3.Add(ref linearMomentum, ref impulse, out linearMomentum);
+            Vector3.Multiply(ref linearMomentum, inverseMass, out linearVelocity);
+#else
             linearMomentum.X += impulse.X;
             linearMomentum.Y += impulse.Y;
             linearMomentum.Z += impulse.Z;
-            float invMass = 1 / mass;
-            linearVelocity.X = linearMomentum.X * invMass;
-            linearVelocity.Y = linearMomentum.Y * invMass;
-            linearVelocity.Z = linearMomentum.Z * invMass;
+            linearVelocity.X = linearMomentum.X * inverseMass;
+            linearVelocity.Y = linearMomentum.Y * inverseMass;
+            linearVelocity.Z = linearMomentum.Z * inverseMass;
+#endif
+
         }
         /// <summary>
         /// Applies an angular velocity change to the entity using the given impulse.
@@ -969,7 +998,7 @@ namespace BEPUphysics.Entities
         /// <param name="impulse">Impulse to apply.</param>
         public void ApplyAngularImpulse(ref Vector3 impulse)
         {
-
+            //There's some room here for SIMD-friendliness.  However, since the phone doesn't accelerate non-XNA types, the matrix3x3 operations don't gain much.
             angularMomentum.X += impulse.X;
             angularMomentum.Y += impulse.Y;
             angularMomentum.Z += impulse.Z;
@@ -1023,6 +1052,7 @@ namespace BEPUphysics.Entities
             isDynamic = false;
             LocalInertiaTensorInverse = new Matrix3X3();
             mass = float.MaxValue;
+            inverseMass = 0;
 
             //Notify simulation island of the change.
             if (previousState)
@@ -1070,6 +1100,7 @@ namespace BEPUphysics.Entities
             isDynamic = true;
             LocalInertiaTensor = localInertiaTensor;
             this.mass = mass;
+            this.inverseMass = 1 / mass;
 
             //Notify simulation island system of the change.
             if (!previousState)

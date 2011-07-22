@@ -247,7 +247,7 @@ namespace BEPUphysics.Constraints.SingleEntity
             //COMPUTE EFFECTIVE MASS MATRIX
             //Transforms a change in velocity to a change in momentum when multiplied.
             Matrix3X3 linearComponent;
-            Matrix3X3.CreateScale(1 / entity.mass, out linearComponent);
+            Matrix3X3.CreateScale(entity.inverseMass, out linearComponent);
             Matrix3X3 rACrossProduct;
             Matrix3X3.CreateCrossProduct(ref r, out rACrossProduct);
             Matrix3X3 angularComponentA;
