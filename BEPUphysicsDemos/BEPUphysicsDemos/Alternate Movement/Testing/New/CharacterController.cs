@@ -29,8 +29,8 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
 
         public HorizontalMotionConstraint HorizontalMotionConstraint { get; private set; }
         
-        public float JumpSpeed = 6;
-        public float SlidingJumpSpeed = 4;
+        public float JumpSpeed = 4.5f;
+        public float SlidingJumpSpeed = 3;
 
         /// <summary>
         /// Gets the support finder used by the character.
@@ -44,10 +44,10 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
         /// </summary>
         public float GlueSpeed { get; set; }
 
-        /// <summary>
-        /// Gets or sets the multiplier of horizontal force to apply to support objects when standing on top of dynamic entities.
-        /// </summary>
-        public float HorizontalForceFactor { get; set; }
+        ///// <summary>
+        ///// Gets or sets the multiplier of horizontal force to apply to support objects when standing on top of dynamic entities.
+        ///// </summary>
+        //public float HorizontalForceFactor { get; set; }
 
 
         SupportData supportData;
@@ -62,7 +62,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
             Body.CollisionInformation.Events.CreatingPair += RemoveFriction;
             GlueSpeed = 20;
             StepHeight = 1;
-            HorizontalForceFactor = 0;
+            //HorizontalForceFactor = 0;
             SupportFinder = new SupportFinder(this);
             HorizontalMotionConstraint = new HorizontalMotionConstraint(this);
         }
@@ -80,24 +80,27 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
 
         void ExpandBoundingBox()
         {
-            //This runs after the bounding box updater is run, but before the broad phase.
-            //Expanding the character's bounding box ensures that minor variations in velocity will not cause
-            //any missed information.
-            //For a character which is not bound to Vector3.Up (such as a character that needs to run around a spherical planet),
-            //the bounding box expansion needs to be changed such that it includes the full convex cast at the bottom and top of the character under any orientation.
-            float radius = Body.CollisionInformation.Shape.Radius;
+            if (Body.IsActive)
+            {
+                //This runs after the bounding box updater is run, but before the broad phase.
+                //Expanding the character's bounding box ensures that minor variations in velocity will not cause
+                //any missed information.
+                //For a character which is not bound to Vector3.Up (such as a character that needs to run around a spherical planet),
+                //the bounding box expansion needs to be changed such that it includes the full convex cast at the bottom and top of the character under any orientation.
+                float radius = Body.CollisionInformation.Shape.Radius;
 #if WINDOWS
-            Vector3 offset;
+                Vector3 offset;
 #else
             Vector3 offset = new Vector3();
 #endif
-            offset.X = radius;
-            offset.Y = StepHeight;
-            offset.Z = radius;
-            BoundingBox box = Body.CollisionInformation.BoundingBox;
-            Vector3.Add(ref box.Max, ref offset, out box.Max);
-            Vector3.Subtract(ref box.Min, ref offset, out box.Min);
-            Body.CollisionInformation.BoundingBox = box;
+                offset.X = radius;
+                offset.Y = StepHeight;
+                offset.Z = radius;
+                BoundingBox box = Body.CollisionInformation.BoundingBox;
+                Vector3.Add(ref box.Max, ref offset, out box.Max);
+                Vector3.Subtract(ref box.Min, ref offset, out box.Min);
+                Body.CollisionInformation.BoundingBox = box;
+            }
 
 
         }
@@ -140,6 +143,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
             if (SupportFinder.HasTraction && !hadTraction && verticalVelocity < 0)
             {
                 SupportFinder.ClearSupportData();
+                HorizontalMotionConstraint.SupportData = new SupportData();
             }
 
             ////The effective mass matrix describes how velocities are applied to supporting objects.
@@ -254,6 +258,17 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
             //    ChangeVelocityUnilaterally(velocityDirection * velocityChange, ref relativeVelocity);
             //}
 
+            //Also manage the vertical velocity of the character;
+            //don't let it separate from the ground.
+            if (SupportFinder.HasTraction)
+            {
+                verticalVelocity += Math.Max(supportData.Depth / dt, 0);
+                if (verticalVelocity < 0 && verticalVelocity > -GlueSpeed)
+                {
+                    ChangeVelocityUnilaterally(-supportData.Normal * verticalVelocity, ref relativeVelocity);
+                }
+
+            }
 
             //Attempt to jump.
             if (tryToJump)
@@ -279,6 +294,11 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                 }
                 SupportFinder.ClearSupportData();
                 tryToJump = false;
+                HorizontalMotionConstraint.SupportData = new SupportData();
+
+                //TODO: Apply an opposite force to the support if it's dynamic.
+                //Don't bother using a solver-based, correct 'jump' with effective mass matrix...
+                //Guaranteeing the unilateral speed while applying a reasonable jump force will be fine.
             }
 
         }
@@ -297,9 +317,6 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                 {
                     Vector3 entityVelocity = Toolbox.GetVelocityOfPoint(supportData.Position, entityCollidable.Entity);
                     Vector3.Subtract(ref relativeVelocity, ref entityVelocity, out relativeVelocity);
-                    //TODO: Multithreaded safety.  If characters are running in parallel, ensure that this operation will not corrupt anything.
-                    if (entityCollidable.Entity.IsDynamic)
-                        entityCollidable.Entity.IsActive = true;
                 }
             }
 
@@ -358,18 +375,18 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
         {
             //Also manage the vertical velocity of the character;
             //don't let it separate from the ground.
-            //if (SupportFinder.HasTraction)
-            //{
-            //    Vector3 relativeVelocity;
-            //    ComputeRelativeVelocity(out relativeVelocity);
-            //    float verticalVelocity = Vector3.Dot(supportData.Normal, relativeVelocity);
-            //    verticalVelocity += Math.Max(supportData.Depth / dt, 0);
-            //    if (verticalVelocity < 0 && verticalVelocity > -GlueSpeed)
-            //    {
-            //        ChangeVelocityUnilaterally(-supportData.Normal * verticalVelocity, ref relativeVelocity);
-            //    }
+            if (SupportFinder.HasTraction)
+            {
+                Vector3 relativeVelocity;
+                ComputeRelativeVelocity(out relativeVelocity);
+                float verticalVelocity = Vector3.Dot(supportData.Normal, relativeVelocity);
+                verticalVelocity += Math.Max(supportData.Depth / dt, 0);
+                if (verticalVelocity < 0 && verticalVelocity > -GlueSpeed)
+                {
+                    ChangeVelocityUnilaterally(-supportData.Normal * verticalVelocity, ref relativeVelocity);
+                }
 
-            //}
+            }
         }
 
 

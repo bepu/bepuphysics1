@@ -33,9 +33,12 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
             set
             {
                 //If the support changes, perform the necessary bookkeeping to keep the connections up to date.
-                if (supportData.SupportObject != value.SupportObject)
-                    OnInvolvedEntitiesChanged();
+                var oldSupport = supportData.SupportObject;
                 supportData = value;
+                if (oldSupport!= supportData.SupportObject)
+                {
+                    OnInvolvedEntitiesChanged();
+                }
             }
         }
 
@@ -43,7 +46,16 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
         /// <summary>
         /// Gets or sets the goal movement direction.
         /// </summary>
-        public Vector2 MovementDirection { get { return movementDirection; } set { movementDirection = value; } }
+        public Vector2 MovementDirection
+        {
+            get { return movementDirection; }
+            set
+            {
+                movementDirection = value;
+                if (value.LengthSquared() > 0)
+                    character.Body.IsActive = true;
+            }
+        }
 
 
         public float Speed = 8;
@@ -54,10 +66,29 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
         public float AirAcceleration = 5;
         public float Deceleration = 80;
         public float SlidingDeceleration = 1;
-        public float MaximumForce = float.MaxValue;
-        public float MaximumSlidingForce = float.MaxValue;
-        public float MaximumAirForce = float.MaxValue;
+        public float MaximumForce = 1000;
+        public float MaximumSlidingForce = 50;
+        public float MaximumAirForce = 50;
 
+        float supportForceFactor = .3f;
+        /// <summary>
+        /// Gets or sets the scaling factor of forces applied to the supporting object if it is a dynamic entity.
+        /// Low values (below 1) reduce the amount of motion imparted to the support object; it acts 'heavier' as far as horizontal motion is concerned.
+        /// High values (above 1) increase the force applied to support objects, making them appear lighter.
+        /// </summary>
+        public float SupportForceFactor
+        {
+            get
+            {
+                return supportForceFactor;
+            }
+            set
+            {
+                if (value < 0)
+                    throw new Exception("Value must be nonnegative.");
+                supportForceFactor = value;
+            }
+        }
 
 
         float maxSpeed;
@@ -77,9 +108,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
         public MovementMode MovementMode;
 
         Vector2 accumulatedImpulse;
-        float accumulatedAcceleration;
-        Vector2 accumulatedDeceleration;
-        Vector2 maxVelocityChange;
+        Vector2 targetVelocity;
 
         public HorizontalMotionConstraint(CharacterController characterController)
         {
@@ -144,8 +173,9 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
             if (!isTryingToMove)
                 maxSpeed = 0;
 
-            acceleration = acceleration * dt;
-            deceleration = deceleration * dt;
+            acceleration *= dt;
+            deceleration *= dt;
+            maxForce *= dt;
 
 
             //Compute the jacobians.  This is basically a PointOnLineJoint with motorized degrees of freedom.
@@ -187,12 +217,22 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                 {
                     //If the character isn't trying to move, then the velocity directions are not well defined.
                     //Instead, pick two arbitrary vectors on the support plane.
-                    Vector3.Cross(ref Toolbox.UpVector, ref supportData.Normal, out linearJacobianA1);
+                    //First guess will be based on the previous jacobian.
+                    Vector3.Cross(ref linearJacobianA2, ref supportData.Normal, out linearJacobianA1);
                     float length = linearJacobianA1.LengthSquared();
                     if (length < Toolbox.Epsilon)
                     {
+                        //First guess failed.  Try the right vector.
                         Vector3.Cross(ref Toolbox.RightVector, ref supportData.Normal, out linearJacobianA1);
                         length = linearJacobianA1.LengthSquared();
+                        if (length < Toolbox.Epsilon)
+                        {
+                            //Okay that failed too! try the forward vector.
+                            Vector3.Cross(ref Toolbox.ForwardVector, ref supportData.Normal, out linearJacobianA1);
+                            length = linearJacobianA1.LengthSquared();
+                            //Unless something really weird is happening, we do not need to test any more axes.
+                        }
+
                     }
                     Vector3.Divide(ref linearJacobianA1, (float)Math.Sqrt(length), out linearJacobianA1);
                     //Pick another perpendicular vector.  Don't need to normalize it since the normal and A1 are already normalized and perpendicular.
@@ -230,6 +270,45 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                 linearJacobianA2 = new Vector3(movementDirection.Y, 0, -movementDirection.X);
             }
 
+
+
+
+            //Compute the target velocity (in constraint space) for this frame.
+            //The goals are:
+            // relativeVelocity.X should be accelerated to maxSpeed using acceleration.
+            // relativeVelocity.X should be decelerated if it is < 0 or > maxSpeed.
+            // relativeVelocity.Y should be decelerated.
+            //Those rules cover every case, because the coefficients for acceleration/deceleration/maxSpeed
+            //have all been configured according to what state the character is in.
+            Vector2 relativeVelocity = RelativeVelocity;
+            //Compute the contribution from deceleration first.
+            //Target the final goal first, then clamp it.
+            if (relativeVelocity.X < 0)
+                targetVelocity.X = 0;
+            else if (relativeVelocity.X > maxSpeed)
+                targetVelocity.X = maxSpeed;
+            else
+                targetVelocity.X = relativeVelocity.X;
+            if (relativeVelocity.Y > 0)
+                targetVelocity.Y = 0;
+            else
+                targetVelocity.Y = 0;
+            //Clamp it!
+            float velocityChangeMagnitude;
+            Vector2 change;
+            Vector2.Subtract(ref targetVelocity, ref relativeVelocity, out change);
+            velocityChangeMagnitude = change.Length();
+            if (velocityChangeMagnitude > Toolbox.Epsilon)
+            {
+                float newLength = Math.Min(velocityChangeMagnitude, deceleration);
+                Vector2.Multiply(ref change, newLength / velocityChangeMagnitude, out change);
+                Vector2.Add(ref relativeVelocity, ref change, out targetVelocity);
+            }
+            //Now add in the acceleration component along the X axis.
+            float newX = Math.Min(targetVelocity.X + acceleration, maxSpeed);
+            if (newX > targetVelocity.X)
+                targetVelocity.X = newX;
+
             //Compute the effective mass matrix.
             if (supportEntity != null)
             {
@@ -243,9 +322,12 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
 
                 if (supportEntity.IsDynamic)
                 {
+
+                    //Scale the inertia and mass of the support.  This will make the solver view the object as 'heavier' with respect to horizontal motion.
                     Matrix3X3 inertiaInverse = supportEntity.InertiaTensorInverse;
+                    Matrix3X3.Multiply(ref inertiaInverse, supportForceFactor, out inertiaInverse);
                     float extra;
-                    inverseMass = 1 / supportEntity.Mass;
+                    inverseMass = supportForceFactor / (supportEntity.Mass);
                     Matrix3X3.Transform(ref angularJacobianB1, ref inertiaInverse, out intermediate);
                     Vector3.Dot(ref intermediate, ref angularJacobianB1, out extra);
                     m11 += inverseMass + extra;
@@ -273,11 +355,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
 
         public override void ExclusiveUpdate()
         {
-            ////This constraint does not use warm starting.
-            //accumulatedImpulse = new Vector2();
-            //accumulatedDeceleration = new Vector2();
-            //accumulatedAcceleration = 0;
-
+            //Warm start the constraint using the previous impulses and the new jacobians!
 #if !WINDOWS
             Vector3 impulse = new Vector3();
             Vector3 torque= new Vector3();
@@ -295,13 +373,14 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
 
             if (supportEntity != null && supportEntity.IsDynamic)
             {
-                impulse.X = -impulse.X;
-                impulse.Y = -impulse.Y;
-                impulse.Z = -impulse.Z;
+                Vector3.Multiply(ref impulse, -supportForceFactor, out impulse);
 
+                x *= supportForceFactor;
+                y *= supportForceFactor;
                 torque.X = x * angularJacobianB1.X + y * angularJacobianB2.X;
                 torque.Y = x * angularJacobianB1.Y + y * angularJacobianB2.Y;
                 torque.Z = x * angularJacobianB1.Z + y * angularJacobianB2.Z;
+                
 
                 supportEntity.ApplyLinearImpulse(ref impulse);
                 supportEntity.ApplyAngularImpulse(ref torque);
@@ -337,52 +416,23 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
 
             }
 
-            //Now that we have the relative velocities, compare them against our desired movement.
-            //The goals are:
-            // relativeVelocity.X should be accelerated to maxSpeed using acceleration.
-            // relativeVelocity.X should be decelerated if it is < 0 or > maxSpeed.
-            // relativeVelocity.Y should be decelerated.
-            //Those rules cover every case, because the coefficients for acceleration/deceleration/maxSpeed
-            //have all been configured according to what state the character is in.
-
-            Vector2 decelerationComponent;
-            //The goal of decelerating the off-velocity is simple.
-            decelerationComponent.Y = -relativeVelocity.Y;
-            //The goal along the movement direction is a little trickier.
-            //If it's below zero, the velocity change desired is to get to zero.
-            if (relativeVelocity.X < 0)
-                decelerationComponent.X = -relativeVelocity.X;
-            //If it's above the max speed, decelerate to the max speed.
-            else if (relativeVelocity.X > maxSpeed)
-                decelerationComponent.X = maxSpeed - relativeVelocity.X;
-            else
-                decelerationComponent.X = 0;
-            ////Clamp the deceleration.
-            //Vector2 previousAccumulatedDeceleration = accumulatedDeceleration;
-            //Vector2.Add(ref accumulatedDeceleration, ref decelerationComponent, out accumulatedDeceleration);
-            //float length = accumulatedDeceleration.LengthSquared();
-            //if (length > deceleration * deceleration)
-            //{
-            //    Vector2.Multiply(ref accumulatedDeceleration, deceleration / (float)Math.Sqrt(length), out accumulatedDeceleration);
-            //}
-            //Vector2.Subtract(ref accumulatedDeceleration, ref previousAccumulatedDeceleration, out decelerationComponent);
-
-            //We now have the decelerated velocity.
-            float deceleratedVelocity;
-            deceleratedVelocity = relativeVelocity.X + decelerationComponent.X;
-            //Now let's try to accelerate to the goal velocity from this decelerated velocity.
-            //Clamp the acceleration, too.  It shouldn't be greater than the acceleration we computed in the update, and it shouldn't be less than zero.
-            float accelerationComponent = maxSpeed - deceleratedVelocity;
-            //float previousAccumulatedAcceleration = accumulatedAcceleration;
-            //accumulatedAcceleration = MathHelper.Clamp(accumulatedAcceleration + accelerationComponent, 0, acceleration);
-            //accelerationComponent = accumulatedAcceleration - previousAccumulatedAcceleration;
 
             //Create the full velocity change, and convert it to an impulse in constraint space.
             Vector2 lambda;
-            lambda.X = decelerationComponent.X + accelerationComponent;
-            lambda.Y = decelerationComponent.Y;
+            Vector2.Subtract(ref targetVelocity, ref relativeVelocity, out lambda);
+            Matrix2X2.Transform(ref lambda, ref massMatrix, out lambda);
 
+            //Add and clamp the impulse.
+            Vector2 previousAccumulatedImpulse = accumulatedImpulse;
             Vector2.Add(ref lambda, ref accumulatedImpulse, out accumulatedImpulse);
+            float length = accumulatedImpulse.LengthSquared();
+            if (length > maxForce * maxForce)
+            {
+                Vector2.Multiply(ref accumulatedImpulse, maxForce / (float)Math.Sqrt(length), out accumulatedImpulse);
+            }
+            Vector2.Subtract(ref accumulatedImpulse, ref previousAccumulatedImpulse, out lambda);
+
+            
 
             //Use the jacobians to put the impulse into world space.
 
@@ -403,10 +453,10 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
 
             if (supportEntity != null && supportEntity.IsDynamic)
             {
-                impulse.X = -impulse.X;
-                impulse.Y = -impulse.Y;
-                impulse.Z = -impulse.Z;
+                Vector3.Multiply(ref impulse, -supportForceFactor, out impulse);
 
+                x *= supportForceFactor;
+                y *= supportForceFactor;
                 torque.X = x * angularJacobianB1.X + y * angularJacobianB2.X;
                 torque.Y = x * angularJacobianB1.Y + y * angularJacobianB2.Y;
                 torque.Z = x * angularJacobianB1.Z + y * angularJacobianB2.Z;

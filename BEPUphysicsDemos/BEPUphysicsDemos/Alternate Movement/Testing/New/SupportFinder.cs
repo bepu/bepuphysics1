@@ -151,6 +151,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                         }
                         toReturn.Depth = depth;
                         toReturn.SupportObject = supportObject;
+                        toReturn.HasTraction = true;
                         return toReturn;
                     }
                 }
