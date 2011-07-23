@@ -20,7 +20,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace BEPUphysicsDemos.AlternateMovement.Testing.New
 {
-    public class CharacterController : Updateable, IBeforeNarrowPhaseUpdateable, IBeforePositionUpdateUpdateable, IEndOfTimeStepUpdateable
+    public class CharacterController : Updateable, IBeforeSolverUpdateable, IBeforePositionUpdateUpdateable, IEndOfTimeStepUpdateable
     {
         public Cylinder Body { get; private set; }
 
@@ -122,7 +122,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
 
         }
 
-        void IBeforeNarrowPhaseUpdateable.Update(float dt)
+        void IBeforeSolverUpdateable.Update(float dt)
         {
 
             bool hadTraction = SupportFinder.HasTraction;
@@ -130,6 +130,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
             SupportFinder.UpdateSupports();
 
             //Collect the support data from the support, if any.
+
             if (SupportFinder.HasSupport)
             {
                 if (SupportFinder.HasTraction)
@@ -146,6 +147,8 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                 supportData = new SupportData();
             }
 
+            //Warning:
+            //Changing a constraint's support data is not thread safe; it modifies simulation islands!
             HorizontalMotionConstraint.SupportData = supportData;
 
             //Compute the initial velocities relative to the support.
@@ -202,9 +205,24 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                 tryToJump = false;
                 HorizontalMotionConstraint.SupportData = new SupportData();
 
-                //TODO: Apply an opposite force to the support if it's dynamic.
-                //Don't bother using a solver-based, correct 'jump' with effective mass matrix...
-                //Guaranteeing the unilateral speed while applying a reasonable jump force will be fine.
+            }
+
+            if (SupportFinder.HasTraction && SupportFinder.Supports.Count == 0)
+            {
+                //We are being supported by a ray cast, but we're floating.
+                //Let's try to get to the ground faster.
+                //How fast?  Try picking an arbitrary velocity and setting our relative vertical velocity to that value.
+                //Don't go farther than the maximum distance, though.
+                float maxVelocity = (SupportFinder.SupportRayData.Value.HitData.T - SupportFinder.RayLengthToBottom);
+                if (maxVelocity > 0)
+                {
+                    maxVelocity = (maxVelocity + .01f) / dt;
+
+                    float targetVerticalVelocity = -100;
+                    verticalVelocity = Vector3.Dot(Body.OrientationMatrix.Up, relativeVelocity);
+                    float change = MathHelper.Clamp(targetVerticalVelocity - verticalVelocity, -maxVelocity, 0);
+                    ChangeVelocityUnilaterally(Body.OrientationMatrix.Up * change, ref relativeVelocity);
+                }
             }
 
         }

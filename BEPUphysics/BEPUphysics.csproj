@@ -286,6 +286,7 @@
     <Compile Include="PositionUpdating\ContinuousPositionUpdater.cs" />
     <Compile Include="PositionUpdating\DiscretePositionUpdater.cs" />
     <Compile Include="MathExtensions\AffineTransform.cs" />
+    <Compile Include="UpdateableSystems\IBeforeSolverUpdateable.cs" />
     <Compile Include="UpdateableSystems\IBeforePositionUpdateUpdateable.cs" />
     <Compile Include="UpdateableSystems\FluidVolume.cs" />
     <Compile Include="Collidables\Events\ContactEventManager.cs" />

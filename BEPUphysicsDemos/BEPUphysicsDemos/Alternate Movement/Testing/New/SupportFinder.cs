@@ -17,6 +17,16 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
     {
         RawList<SupportContact> supports = new RawList<SupportContact>();
         float bottomHeight;
+        /// <summary>
+        /// Gets the length from the ray start to the bottom of the character.
+        /// </summary>
+        public float RayLengthToBottom
+        {
+            get
+            {
+                return bottomHeight;
+            }
+        }
 
         /// <summary>
         /// Computes a combined support contact from all available supports (contacts or ray).

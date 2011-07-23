@@ -168,6 +168,10 @@ namespace BEPUphysics
         ///</summary>
         public BeforeNarrowPhaseUpdateableManager BeforeNarrowPhaseUpdateables { get; set; }
         ///<summary>
+        /// Gets or sets the updateable manager that handles updateables that update before the solver
+        ///</summary>
+        public BeforeSolverUpdateableManager BeforeSolverUpdateables { get; set; }
+        ///<summary>
         /// Gets or sets the updateable manager that handles updateables that update right before the position update phase.
         ///</summary>
         public BeforePositionUpdateUpdateableManager BeforePositionUpdateUpdateables { get; set; }
@@ -219,6 +223,7 @@ namespace BEPUphysics
 
             DuringForcesUpdateables = new DuringForcesUpdateableManager(timeStepSettings, ThreadManager);
             BeforeNarrowPhaseUpdateables = new BeforeNarrowPhaseUpdateableManager(timeStepSettings, ThreadManager);
+            BeforeSolverUpdateables = new BeforeSolverUpdateableManager(timeStepSettings, ThreadManager);
             BeforePositionUpdateUpdateables = new BeforePositionUpdateUpdateableManager(timeStepSettings, ThreadManager);
             EndOfTimeStepUpdateables = new EndOfTimeStepUpdateableManager(timeStepSettings, ThreadManager);
             EndOfFrameUpdateables = new EndOfFrameUpdateableManager(timeStepSettings, ThreadManager);
@@ -314,6 +319,12 @@ namespace BEPUphysics
             if (beforeNarrowPhaseUpdateable != null)
             {
                 BeforeNarrowPhaseUpdateables.Add(beforeNarrowPhaseUpdateable);
+            }
+
+            IBeforeSolverUpdateable beforeSolverUpdateable = spaceObject as IBeforeSolverUpdateable;
+            if (beforeSolverUpdateable != null)
+            {
+                BeforeSolverUpdateables.Add(beforeSolverUpdateable);
             }
 
             IBeforePositionUpdateUpdateable beforePositionUpdateUpdateable = spaceObject as IBeforePositionUpdateUpdateable;
@@ -426,6 +437,13 @@ namespace BEPUphysics
                 BeforeNarrowPhaseUpdateables.Remove(beforeNarrowPhaseUpdateable);
             }
 
+            IBeforeSolverUpdateable beforeSolverUpdateable = spaceObject as IBeforeSolverUpdateable;
+            if (beforeSolverUpdateable != null)
+            {
+                BeforeSolverUpdateables.Remove(beforeSolverUpdateable);
+            }
+
+
             IBeforePositionUpdateUpdateable beforePositionUpdateUpdateable = spaceObject as IBeforePositionUpdateUpdateable;
             if (beforePositionUpdateUpdateable != null)
             {
@@ -460,6 +478,7 @@ namespace BEPUphysics
             BeforeNarrowPhaseUpdateables.Update();
             NarrowPhase.Update();
             NarrowPhase.FlushGeneratedSolverUpdateables(Solver);
+            BeforeSolverUpdateables.Update();
             Solver.Update();
             BeforePositionUpdateUpdateables.Update();
             PositionUpdater.Update();

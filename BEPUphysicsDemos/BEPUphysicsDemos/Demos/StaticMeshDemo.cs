@@ -9,6 +9,7 @@ using BEPUphysics.CollisionShapes.ConvexShapes;
 using System.Diagnostics;
 using BEPUphysics.Settings;
 using BEPUphysics.Materials;
+using BEPUphysics.Constraints.SingleEntity;
 
 namespace BEPUphysicsDemos.Demos
 {
