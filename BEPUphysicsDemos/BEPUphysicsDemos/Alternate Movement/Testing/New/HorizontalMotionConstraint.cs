@@ -58,7 +58,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
         }
 
 
-        public float Speed = 8;
+        public float Speed = 8f;
         public float SlidingSpeed = 6;
         public float AirSpeed = 4;
         public float Acceleration = 50;

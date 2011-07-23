@@ -264,7 +264,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
             //First, raycast down to find the ground.
             //Start the ray halfway between the center of the shape and the bottom of the shape.  That extra margin prevents it from getting stuck in the ground and returning t = 0 unhelpfully.
             var body = character.Body;
-            bottomHeight = body.Height * .25f + body.CollisionInformation.Shape.CollisionMargin;
+            bottomHeight = body.Height * .25f;
             //TODO: could also require that the character has a nonzero movement direction in order to use a ray cast.  Questionable- would complicate the behavior on edges.
             float length = hadTraction ? bottomHeight + character.StepHeight : bottomHeight;
             Vector3 downDirection = character.Body.OrientationMatrix.Down; //For a cylinder orientation-locked to the Up axis, this is always {0, -1, 0}.  Keeping it generic doesn't cost much.

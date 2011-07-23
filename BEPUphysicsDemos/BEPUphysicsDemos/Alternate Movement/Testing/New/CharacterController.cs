@@ -218,7 +218,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                 {
                     maxVelocity = (maxVelocity + .01f) / dt;
 
-                    float targetVerticalVelocity = -100;
+                    float targetVerticalVelocity = -3;
                     verticalVelocity = Vector3.Dot(Body.OrientationMatrix.Up, relativeVelocity);
                     float change = MathHelper.Clamp(targetVerticalVelocity - verticalVelocity, -maxVelocity, 0);
                     ChangeVelocityUnilaterally(Body.OrientationMatrix.Up * change, ref relativeVelocity);
