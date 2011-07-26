@@ -163,29 +163,6 @@ namespace BEPUphysics
         }
 
         /// <summary>
-        /// Finds the intersection between the plane and the ray.
-        /// </summary>
-        /// <param name="origin">Location of the start of the ray.</param>
-        /// <param name="direction">Direction of the ray.</param>
-        /// <param name="maximumLength">Maximum length to test in units of the direction's length.</param>
-        /// <param name="planePosition">Position of a point on the plane.</param>
-        /// <param name="planeNormal">Normal of the plane to be intersected.</param>
-        /// <param name="hitLocation">Intersection point.</param>
-        /// <param name="t">Distance, in units of the direction's length, to the hit location.</param>
-        /// <returns>Whether or not the ray intersects the plane.</returns>
-        public static bool GetRayPlaneIntersection(Vector3 origin, Vector3 direction, float maximumLength, Vector3 planePosition, Vector3 planeNormal, out Vector3 hitLocation, out float t)
-        {
-            t = Vector3.Dot(planePosition, planeNormal) - Vector3.Dot(origin, planeNormal) / Vector3.Dot(planeNormal, direction);
-            if (t >= 0 && t < maximumLength)
-            {
-                hitLocation = origin + t * direction;
-                return true;
-            }
-            hitLocation = NoVector;
-            return false;
-        }
-
-        /// <summary>
         /// Finds the intersection between the given segment and the given plane defined by three points.
         /// </summary>
         /// <param name="a">First endpoint of segment.</param>
@@ -261,6 +238,35 @@ namespace BEPUphysics
             Vector3.Multiply(ref ab, t, out q);
             Vector3.Add(ref a, ref q, out q);
             return true;
+        }
+
+        /// <summary>
+        /// Finds the intersection between the given ray and the given plane.
+        /// </summary>
+        /// <param name="a">First endpoint of segment defining the line.</param>
+        /// <param name="b">Second endpoint of segment defining the line.</param>
+        /// <param name="p">Plane for comparison.</param>
+        /// <param name="t">Interval along line to intersection (A + t * AB).</param>
+        /// <param name="q">Intersection point.</param>
+        /// <returns>Whether or not the line intersects the plane.  If false, the line is parallel to the plane's surface.</returns>
+        public static bool GetRayPlaneIntersection(ref Ray ray, ref Plane p, out float t, out Vector3 q)
+        {
+            float denominator;
+            Vector3.Dot(ref p.Normal, ref ray.Direction, out denominator);
+            if (denominator < Epsilon && denominator > -Epsilon)
+            {
+                //Surface of plane and line are parallel (or very close to it).
+                q = new Vector3();
+                t = float.MaxValue;
+                return false;
+            }
+            float numerator;
+            Vector3.Dot(ref p.Normal, ref ray.Position, out numerator);
+            t = (p.D - numerator) / denominator;
+            //Compute the intersection position.
+            Vector3.Multiply(ref ray.Direction, t, out q);
+            Vector3.Add(ref ray.Position, ref q, out q);
+            return t >= 0;
         }
 
         #endregion

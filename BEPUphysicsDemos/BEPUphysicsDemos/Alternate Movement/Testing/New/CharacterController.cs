@@ -24,6 +24,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
     {
         public Cylinder Body { get; private set; }
 
+        public Stepper Stepper { get; private set; }
 
         public float StepHeight { get; set; }
 
@@ -82,6 +83,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
             //HorizontalForceFactor = 0;
             SupportFinder = new SupportFinder(this);
             HorizontalMotionConstraint = new HorizontalMotionConstraint(this);
+            Stepper = new Stepper(this);
         }
 
         void RemoveFriction(EntityCollidable sender, BroadPhaseEntry other, INarrowPhasePair pair)
@@ -223,6 +225,18 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                     float change = MathHelper.Clamp(targetVerticalVelocity - verticalVelocity, -maxVelocity, 0);
                     ChangeVelocityUnilaterally(Body.OrientationMatrix.Up * change, ref relativeVelocity);
                 }
+
+                ////Try to step down!
+                //Vector3 newPosition;
+                //if (Stepper.TryToStepDown(out newPosition))
+                //{
+                //    Body.Position = newPosition;
+                //    //Refresh all the narrow phase collisions.
+                //    foreach (var pair in Body.CollisionInformation.Pairs)
+                //    {
+                //        pair.UpdateCollision(dt);
+                //    }
+                //}
             }
 
         }

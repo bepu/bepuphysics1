@@ -15,7 +15,14 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
     /// </summary>
     public class SupportFinder
     {
-        RawList<SupportContact> supports = new RawList<SupportContact>();
+        internal static float SideContactThreshold = .01f;
+
+        internal RawList<SupportContact> supports = new RawList<SupportContact>();
+
+        internal RawList<OtherContact> sideContacts = new RawList<OtherContact>();
+
+        internal RawList<OtherContact> headContacts = new RawList<OtherContact>();
+
         float bottomHeight;
         /// <summary>
         /// Gets the length from the ray start to the bottom of the character.
@@ -212,6 +219,28 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
         }
 
         /// <summary>
+        /// Gets the contacts on the side of the character.
+        /// </summary>
+        public ReadOnlyList<OtherContact> SideContacts
+        {
+            get
+            {
+                return new ReadOnlyList<OtherContact>(sideContacts);
+            }
+        }
+
+        /// <summary>
+        /// Gets the contacts on the top of the character.
+        /// </summary>
+        public ReadOnlyList<OtherContact> HeadContacts
+        {
+            get
+            {
+                return new ReadOnlyList<OtherContact>(headContacts);
+            }
+        }
+
+        /// <summary>
         /// Gets a collection of the character's supports that provide traction.
         /// Traction means that the surface's slope is flat enough to stand on normally.
         /// </summary>
@@ -271,7 +300,8 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
             Ray ray = new Ray(body.Position + downDirection * body.Height * .25f, downDirection);
 
 
-
+            //TODO: Should it really perform a ray cast if it has found any traction contacts?
+            //If the character had a 'teleport out of ground feature,' maybe- but that doesn't seem to be necessary.
             BoundingBox boundingBox = body.CollisionInformation.BoundingBox;
             RayHit earliestHit = new RayHit() { T = float.MaxValue };
             Collidable earliestHitObject = null;
@@ -318,6 +348,8 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
 
 
             supports.Clear();
+            sideContacts.Clear();
+            headContacts.Clear();
             //Analyze the cylinder's contacts to see if we're supported.
             //Anything that can be a support will have a normal that's off horizontal.
             //That could be at the top or bottom, so only consider points on the bottom half of the shape.
@@ -347,7 +379,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                             Vector3.Negate(ref normal, out normal);
                             dot = -dot;
                         }
-                        if (dot > .01f)
+                        if (dot > SideContactThreshold)
                         {
                             HasSupport = true;
 
@@ -378,6 +410,28 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                             }
 
                             supports.Add(supportContact);
+                        }
+                        else if (dot < SideContactThreshold)
+                        {
+                            //Head contact
+                            OtherContact otherContact;
+                            otherContact.Collidable = pair.BroadPhaseOverlap.EntryA != body.CollisionInformation ? (Collidable)pair.BroadPhaseOverlap.EntryA : (Collidable)pair.BroadPhaseOverlap.EntryB;
+                            otherContact.Contact.Position = c.Contact.Position;
+                            otherContact.Contact.Normal = c.Contact.Normal;
+                            otherContact.Contact.PenetrationDepth = c.Contact.PenetrationDepth;
+                            otherContact.Contact.Id = c.Contact.Id;
+                            headContacts.Add(otherContact);
+                        }
+                        else
+                        {
+                            //Side contact 
+                            OtherContact otherContact;
+                            otherContact.Collidable = pair.BroadPhaseOverlap.EntryA != body.CollisionInformation ? (Collidable)pair.BroadPhaseOverlap.EntryA : (Collidable)pair.BroadPhaseOverlap.EntryB;
+                            otherContact.Contact.Position = c.Contact.Position;
+                            otherContact.Contact.Normal = c.Contact.Normal;
+                            otherContact.Contact.PenetrationDepth = c.Contact.PenetrationDepth;
+                            otherContact.Contact.Id = c.Contact.Id;
+                            sideContacts.Add(otherContact);
                         }
                     }
                 }
@@ -499,6 +553,20 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
         /// Whether or not the contact was found to have traction.
         /// </summary>
         public bool HasTraction;
+    }
+    /// <summary>
+    /// Contact associated with the character that isn't a support.
+    /// </summary>
+    public struct OtherContact
+    {
+        /// <summary>
+        /// Core information about the contact.
+        /// </summary>
+        public ContactData Contact;
+        /// <summary>
+        /// Object that created this contact with the character.
+        /// </summary>
+        public Collidable Collidable;
     }
 
     /// <summary>

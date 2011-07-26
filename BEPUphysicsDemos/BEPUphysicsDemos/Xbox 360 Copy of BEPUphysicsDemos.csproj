@@ -67,6 +67,7 @@
     <Compile Include="Alternate Movement\Testing\New\CharacterController.cs" />
     <Compile Include="Alternate Movement\Testing\New\CharacterControllerInput.cs" />
     <Compile Include="Alternate Movement\Testing\New\HorizontalMotionConstraint.cs" />
+    <Compile Include="Alternate Movement\Testing\New\Stepper.cs" />
     <Compile Include="Alternate Movement\Testing\New\SupportFinder.cs" />
     <Compile Include="Alternate Movement\Testing\Old\CharacterControllerInputOld.cs" />
     <Compile Include="Alternate Movement\Testing\Old\CharacterControllerOld.cs" />

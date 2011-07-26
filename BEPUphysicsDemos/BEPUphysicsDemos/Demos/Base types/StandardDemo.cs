@@ -86,7 +86,6 @@ namespace BEPUphysicsDemos.Demos
 
         public override void Update(float dt)
         {
-
             if (Game.WasKeyPressed(Keys.P))
                 Debug.WriteLine("Breka.:");
 

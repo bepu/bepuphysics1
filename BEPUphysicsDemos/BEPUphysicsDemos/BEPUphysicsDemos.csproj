@@ -83,6 +83,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Alternate Movement\Testing\New\HorizontalMotionConstraint.cs" />
+    <Compile Include="Alternate Movement\Testing\New\Stepper.cs" />
     <Compile Include="Alternate Movement\Testing\Old\CharacterControllerOld.cs" />
     <Compile Include="Alternate Movement\Testing\Old\CharacterControllerInputOld.cs" />
     <Compile Include="Alternate Movement\Testing\ConvexCast\CharacterControllerConvexCast.cs" />
