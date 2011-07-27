@@ -34,8 +34,10 @@ namespace BEPUphysicsDrawer.Models
             viewParameter = instancingEffect.Parameters["View"];
             projectionParameter = instancingEffect.Parameters["Projection"];
 
-            instancingEffect.Parameters["LightDirection"].SetValue(Vector3.Normalize(new Vector3(1, -1, -1)));
-            instancingEffect.Parameters["DiffuseColor"].SetValue(new Vector3(.66f, .66f, .66f));
+            instancingEffect.Parameters["LightDirection1"].SetValue(Vector3.Normalize(new Vector3(1, -1.5f, -1)));
+            instancingEffect.Parameters["DiffuseColor1"].SetValue(new Vector3(.66f, .66f, .66f));
+            instancingEffect.Parameters["LightDirection2"].SetValue(Vector3.Normalize(new Vector3(-1, 1.5f, 1)));
+            instancingEffect.Parameters["DiffuseColor2"].SetValue(new Vector3(.3f, .3f, .5f));
             instancingEffect.Parameters["AmbientAmount"].SetValue(.5f);
 
             instancingEffect.Parameters["Texture0"].SetValue(textures[0]);

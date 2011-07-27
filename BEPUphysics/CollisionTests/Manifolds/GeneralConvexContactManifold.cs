@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework;
 using BEPUphysics.DataStructures;
 using BEPUphysics.Settings;
 using BEPUphysics.ResourceManagement;
+using System.Diagnostics;
 
 namespace BEPUphysics.CollisionTests.Manifolds
 {
@@ -108,6 +109,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     Remove(i);
                 }
             }
+
 
         }
 

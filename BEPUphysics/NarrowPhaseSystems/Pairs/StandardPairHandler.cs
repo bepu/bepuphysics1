@@ -14,6 +14,7 @@ using BEPUphysics.MathExtensions;
 using BEPUphysics.ResourceManagement;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.Materials;
+using BEPUphysics.Entities;
 
 namespace BEPUphysics.NarrowPhaseSystems.Pairs
 {
@@ -117,7 +118,12 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                     NarrowPhase.EnqueueRemovedSolverUpdateable(ContactConstraint);
             }
             else
+            {
                 ContactConstraint.CleanUpReferences();//The constraint isn't in the solver, so we can safely clean it up directly.
+                //Even though it's not in the solver, we still may need to notify the parent to remove it.
+                if (Parent != null && ContactConstraint.SolverGroup != null)
+                    Parent.RemoveSolverUpdateable(ContactConstraint);
+            }
 
             ContactConstraint.CleanUp();
 

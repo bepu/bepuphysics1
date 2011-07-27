@@ -60,15 +60,24 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                 info.FrictionForce = 0;
             //Compute relative velocity
             Vector3 velocity;
-            Vector3.Subtract(ref info.Contact.Position, ref EntityA.position, out velocity);
-            Vector3.Cross(ref EntityA.angularVelocity, ref velocity, out velocity);
-            Vector3.Add(ref velocity, ref EntityA.linearVelocity, out info.RelativeVelocity);
+            //If the pair is handling some type of query and does not actually have supporting entities, then consider the velocity contribution to be zero.
+            if (EntityA != null)
+            {
+                Vector3.Subtract(ref info.Contact.Position, ref EntityA.position, out velocity);
+                Vector3.Cross(ref EntityA.angularVelocity, ref velocity, out velocity);
+                Vector3.Add(ref velocity, ref EntityA.linearVelocity, out info.RelativeVelocity);
+            }
+            else
+                info.RelativeVelocity = new Vector3();
 
-            Vector3.Subtract(ref info.Contact.Position, ref EntityB.position, out velocity);
-            Vector3.Cross(ref EntityB.angularVelocity, ref velocity, out velocity);
-            Vector3.Add(ref velocity, ref EntityB.linearVelocity, out velocity);
+            if (EntityB != null)
+            {
+                Vector3.Subtract(ref info.Contact.Position, ref EntityB.position, out velocity);
+                Vector3.Cross(ref EntityB.angularVelocity, ref velocity, out velocity);
+                Vector3.Add(ref velocity, ref EntityB.linearVelocity, out velocity);
+                Vector3.Subtract(ref info.RelativeVelocity, ref velocity, out info.RelativeVelocity);
+            }
 
-            Vector3.Subtract(ref info.RelativeVelocity, ref velocity, out info.RelativeVelocity);
         }
 
     }

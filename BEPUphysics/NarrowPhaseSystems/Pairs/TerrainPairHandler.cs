@@ -85,7 +85,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             broadPhaseOverlap.entryA = convex;
             broadPhaseOverlap.entryB = terrain;
 
-            UpdateMaterialProperties(convex.entity.material, terrain.material);
+            UpdateMaterialProperties(convex.entity != null ? convex.entity.material : null, terrain.material);
 
             base.Initialize(entryA, entryB);
 
@@ -196,10 +196,15 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             }
 
             //Compute relative velocity
-            Vector3 velocity;
-            Vector3.Subtract(ref info.Contact.Position, ref convex.entity.position, out velocity);
-            Vector3.Cross(ref convex.entity.angularVelocity, ref velocity, out velocity);
-            Vector3.Add(ref velocity, ref convex.entity.linearVelocity, out info.RelativeVelocity);
+            if (convex.entity != null)
+            {
+                Vector3 velocity;
+                Vector3.Subtract(ref info.Contact.Position, ref convex.entity.position, out velocity);
+                Vector3.Cross(ref convex.entity.angularVelocity, ref velocity, out velocity);
+                Vector3.Add(ref velocity, ref convex.entity.linearVelocity, out info.RelativeVelocity);
+            }
+            else
+                info.RelativeVelocity = new Vector3();
         }
 
     }

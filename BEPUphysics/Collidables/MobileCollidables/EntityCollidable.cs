@@ -139,6 +139,20 @@ namespace BEPUphysics.Collidables.MobileCollidables
             worldTransform.Orientation = orientation;
         }
 
+        /// <summary>
+        /// Updates the collidable's world transform and bounding box.
+        /// This is a convenience method for external modification of the collidable's data.
+        /// </summary>
+        /// <param name="transform">Transform to use for the collidable.</param>
+        /// <param name="dt">Duration of the simulation time step.  Used to expand the
+        /// bounding box using the owning entity's velocity.  If the collidable
+        /// does not have an owning entity, this must be zero.</param>
+        public void UpdateBoundingBoxForTransform(ref RigidTransform transform, float dt)
+        {
+            worldTransform = transform;
+            UpdateBoundingBoxInternal(dt);
+        }
+
 
 
 

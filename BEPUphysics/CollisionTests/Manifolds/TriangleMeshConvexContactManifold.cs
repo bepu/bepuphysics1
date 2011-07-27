@@ -254,7 +254,15 @@ namespace BEPUphysics.CollisionTests.Manifolds
             }
 
 
-
+            foreach (var contact in contacts)
+            {
+                if (float.IsNaN(contact.Position.X) || float.IsInfinity(contact.Position.X) ||
+                    float.IsNaN(contact.Normal.X) || float.IsInfinity(contact.Normal.X) ||
+                    float.IsNaN(contact.PenetrationDepth) || float.IsInfinity(contact.PenetrationDepth))
+                {
+                    Debug.WriteLine("Break.");
+                }
+            }
 
             candidatesToAdd.Clear();
 

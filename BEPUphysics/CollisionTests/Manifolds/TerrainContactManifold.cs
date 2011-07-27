@@ -33,27 +33,32 @@ namespace BEPUphysics.CollisionTests.Manifolds
         {
             BoundingBox boundingBox;
             convex.Shape.GetLocalBoundingBox(ref convex.worldTransform, ref terrain.worldTransform, out boundingBox);
-            Vector3 transformedVelocity;
-            Matrix3X3 inverse;
-            Matrix3X3.Invert(ref terrain.worldTransform.LinearTransform, out inverse);
+            
 
-            Matrix3X3.Transform(ref convex.entity.linearVelocity, ref inverse, out transformedVelocity);
-            Vector3.Multiply(ref transformedVelocity, dt, out transformedVelocity);
+            if (convex.entity != null)
+            {
+                Vector3 transformedVelocity;
+                Matrix3X3 inverse;
+                Matrix3X3.Invert(ref terrain.worldTransform.LinearTransform, out inverse);
+                Matrix3X3.Transform(ref convex.entity.linearVelocity, ref inverse, out transformedVelocity);
+                Vector3.Multiply(ref transformedVelocity, dt, out transformedVelocity);
 
-            if (transformedVelocity.X > 0)
-                boundingBox.Max.X += transformedVelocity.X;
-            else
-                boundingBox.Min.X += transformedVelocity.X;
 
-            if (transformedVelocity.Y > 0)
-                boundingBox.Max.Y += transformedVelocity.Y;
-            else
-                boundingBox.Min.Y += transformedVelocity.Y;
+                if (transformedVelocity.X > 0)
+                    boundingBox.Max.X += transformedVelocity.X;
+                else
+                    boundingBox.Min.X += transformedVelocity.X;
 
-            if (transformedVelocity.Z > 0)
-                boundingBox.Max.Z += transformedVelocity.Z;
-            else
-                boundingBox.Min.Z += transformedVelocity.Z;
+                if (transformedVelocity.Y > 0)
+                    boundingBox.Max.Y += transformedVelocity.Y;
+                else
+                    boundingBox.Min.Y += transformedVelocity.Y;
+
+                if (transformedVelocity.Z > 0)
+                    boundingBox.Max.Z += transformedVelocity.Z;
+                else
+                    boundingBox.Min.Z += transformedVelocity.Z;
+            }
 
 
             terrain.Shape.GetOverlaps(boundingBox, overlappedTriangles);

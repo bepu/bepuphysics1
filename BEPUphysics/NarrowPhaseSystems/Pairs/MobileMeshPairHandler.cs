@@ -86,7 +86,8 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             broadPhaseOverlap.entryB = mobileMesh;
 
             //It's possible that the convex does not have an entity if it is a proxy for a non-entity collidable.
-            UpdateMaterialProperties(convex.entity != null ? convex.entity.material : null, mobileMesh.entity.material);
+            //Similarly, the mesh could be a query object.
+            UpdateMaterialProperties(convex.entity != null ? convex.entity.material : null, mobileMesh.entity != null ? mobileMesh.entity.material : null);
 
 
             base.Initialize(entryA, entryB);
@@ -230,24 +231,23 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
 
             //Compute relative velocity
             Vector3 velocity;
-            if (convex.entity == null)
-            {
-                Vector3.Subtract(ref info.Contact.Position, ref mobileMesh.entity.position, out velocity);
-                Vector3.Cross(ref mobileMesh.entity.angularVelocity, ref velocity, out velocity);
-                Vector3.Add(ref velocity, ref mobileMesh.entity.linearVelocity, out info.RelativeVelocity);
-                Vector3.Negate(ref info.RelativeVelocity, out info.RelativeVelocity);
-            }
-            else
+            if (convex.entity != null)
             {
                 Vector3.Subtract(ref info.Contact.Position, ref convex.entity.position, out velocity);
                 Vector3.Cross(ref convex.entity.angularVelocity, ref velocity, out velocity);
                 Vector3.Add(ref velocity, ref convex.entity.linearVelocity, out info.RelativeVelocity);
+            }
+            else
+                info.RelativeVelocity = new Vector3();
 
+            if (mobileMesh.entity != null)
+            {
                 Vector3.Subtract(ref info.Contact.Position, ref mobileMesh.entity.position, out velocity);
                 Vector3.Cross(ref mobileMesh.entity.angularVelocity, ref velocity, out velocity);
                 Vector3.Add(ref velocity, ref mobileMesh.entity.linearVelocity, out velocity);
                 Vector3.Subtract(ref info.RelativeVelocity, ref velocity, out info.RelativeVelocity);
             }
+
         }
 
 

@@ -14,8 +14,10 @@ texture Texture5;
 texture Texture6;
 texture Texture7;
 
-float3 LightDirection;
-float3 DiffuseColor;
+float3 LightDirection1;
+float3 DiffuseColor1;
+float3 LightDirection2;
+float3 DiffuseColor2;
 float AmbientAmount;
 
 
@@ -176,10 +178,11 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 		surfaceColor = tex2D(TextureSamplers[7], input.TextureCoordinates);
 		
 	float3 normal = normalize(input.Normal);
-    float diffuseAmount = saturate(-dot(normal, LightDirection));
+    float diffuseAmount1 = saturate(-dot(normal, LightDirection1));
+    float diffuseAmount2 = saturate(-dot(normal, LightDirection2));
   
     
-	surfaceColor =  float4(AmbientAmount * surfaceColor + surfaceColor * diffuseAmount * DiffuseColor, 1);
+	surfaceColor =  float4(AmbientAmount * surfaceColor + surfaceColor * (diffuseAmount1 * DiffuseColor1 + diffuseAmount2 * DiffuseColor2), 1);
     return surfaceColor;
 }
 

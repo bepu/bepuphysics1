@@ -17,6 +17,7 @@ using System.Diagnostics;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.Collidables;
 using Microsoft.Xna.Framework.Input;
+using BEPUphysics.Entities;
 
 namespace BEPUphysicsDemos.AlternateMovement.Testing.New
 {
@@ -26,7 +27,6 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
 
         public Stepper Stepper { get; private set; }
 
-        public float StepHeight { get; set; }
 
         public HorizontalMotionConstraint HorizontalMotionConstraint { get; private set; }
 
@@ -72,18 +72,20 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
 
         public CharacterController()
         {
-            Body = new Cylinder(Vector3.Zero, 1.7f, .3f, 10);
+            Body = new Cylinder(Vector3.Zero, 1.7f, .6f, 10);
             Body.CollisionInformation.Shape.CollisionMargin = .1f;
             //Making the character a continuous object prevents it from flying through walls which would be pretty jarring from a player's perspective.
             Body.PositionUpdateMode = PositionUpdateMode.Continuous;
             Body.LocalInertiaTensorInverse = new Matrix3X3();
             Body.CollisionInformation.Events.CreatingPair += RemoveFriction;
             GlueSpeed = 20;
-            StepHeight = 1;
             //HorizontalForceFactor = 0;
             SupportFinder = new SupportFinder(this);
             HorizontalMotionConstraint = new HorizontalMotionConstraint(this);
             Stepper = new Stepper(this);
+
+
+            Entity = Body;
         }
 
         void RemoveFriction(EntityCollidable sender, BroadPhaseEntry other, INarrowPhasePair pair)
@@ -113,7 +115,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
             Vector3 offset = new Vector3();
 #endif
                 offset.X = radius;
-                offset.Y = StepHeight;
+                offset.Y = Stepper.MaximumStepHeight;
                 offset.Z = radius;
                 BoundingBox box = Body.CollisionInformation.BoundingBox;
                 Vector3.Add(ref box.Max, ref offset, out box.Max);
@@ -123,6 +125,8 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
 
 
         }
+
+        public static Entity Entity;
 
         void IBeforeSolverUpdateable.Update(float dt)
         {
@@ -211,32 +215,43 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
 
             if (SupportFinder.HasTraction && SupportFinder.Supports.Count == 0)
             {
-                //We are being supported by a ray cast, but we're floating.
-                //Let's try to get to the ground faster.
-                //How fast?  Try picking an arbitrary velocity and setting our relative vertical velocity to that value.
-                //Don't go farther than the maximum distance, though.
-                float maxVelocity = (SupportFinder.SupportRayData.Value.HitData.T - SupportFinder.RayLengthToBottom);
-                if (maxVelocity > 0)
-                {
-                    maxVelocity = (maxVelocity + .01f) / dt;
 
-                    float targetVerticalVelocity = -3;
-                    verticalVelocity = Vector3.Dot(Body.OrientationMatrix.Up, relativeVelocity);
-                    float change = MathHelper.Clamp(targetVerticalVelocity - verticalVelocity, -maxVelocity, 0);
-                    ChangeVelocityUnilaterally(Body.OrientationMatrix.Up * change, ref relativeVelocity);
+                //Try to step down!
+                if (Keyboard.GetState().IsKeyDown(Keys.O))
+                    Debug.WriteLine("Breka.");
+                Vector3 newPosition;
+                if (Stepper.TryToStepDown(out newPosition))
+                {
+                    Body.Position = newPosition;
+                    //Refresh all the narrow phase collisions.
+                    foreach (var pair in Body.CollisionInformation.Pairs)
+                    {
+                        pair.UpdateCollision(dt);
+                    }
                 }
 
-                ////Try to step down!
-                //Vector3 newPosition;
-                //if (Stepper.TryToStepDown(out newPosition))
+                //There's another way to step down that is a lot cheaper, but less robust.
+                //This modifies the velocity of the character to make it fall faster.
+                //Impacts with the ground will be harder, so it will apply superfluous force to supports.
+                //Additionally, it will not be consistent with instant up-stepping.
+                //However, because it does not do any expensive queries, it is very fast!
+                
+                ////We are being supported by a ray cast, but we're floating.
+                ////Let's try to get to the ground faster.
+                ////How fast?  Try picking an arbitrary velocity and setting our relative vertical velocity to that value.
+                ////Don't go farther than the maximum distance, though.
+                //float maxVelocity = (SupportFinder.SupportRayData.Value.HitData.T - SupportFinder.RayLengthToBottom);
+                //if (maxVelocity > 0)
                 //{
-                //    Body.Position = newPosition;
-                //    //Refresh all the narrow phase collisions.
-                //    foreach (var pair in Body.CollisionInformation.Pairs)
-                //    {
-                //        pair.UpdateCollision(dt);
-                //    }
+                //    maxVelocity = (maxVelocity + .01f) / dt;
+
+                //    float targetVerticalVelocity = -3;
+                //    verticalVelocity = Vector3.Dot(Body.OrientationMatrix.Up, relativeVelocity);
+                //    float change = MathHelper.Clamp(targetVerticalVelocity - verticalVelocity, -maxVelocity, 0);
+                //    ChangeVelocityUnilaterally(Body.OrientationMatrix.Up * change, ref relativeVelocity);
                 //}
+
+          
             }
 
         }

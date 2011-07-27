@@ -270,14 +270,10 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             //If this is the first child solver item to be added, we need to add ourselves to our parent too.
             if (manifoldConstraintGroup.SolverUpdateables.Count == 1)
             {
-                if (Parent == null)
-                {
-                    NarrowPhase.EnqueueGeneratedSolverUpdateable(manifoldConstraintGroup);
-                }
-                else
-                {
+                if (Parent != null)
                     Parent.AddSolverUpdateable(manifoldConstraintGroup);
-                }
+                else if (NarrowPhase != null)
+                    NarrowPhase.EnqueueGeneratedSolverUpdateable(manifoldConstraintGroup);
             }
 
         }
@@ -290,14 +286,10 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             //If this is the last child solver item, we need to remove ourselves from our parent too.
             if (manifoldConstraintGroup.SolverUpdateables.Count == 0)
             {
-                if (Parent == null)
-                {
-                    NarrowPhase.EnqueueRemovedSolverUpdateable(manifoldConstraintGroup);
-                }
-                else
-                {
+                if (Parent != null)
                     Parent.RemoveSolverUpdateable(manifoldConstraintGroup);
-                }
+                else if (NarrowPhase != null)
+                    NarrowPhase.EnqueueRemovedSolverUpdateable(manifoldConstraintGroup);
             }
 
 

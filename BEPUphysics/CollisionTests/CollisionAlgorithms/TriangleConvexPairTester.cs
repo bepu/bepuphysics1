@@ -443,122 +443,171 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 Vector3.Subtract(ref triangle.vC, ref triangle.vB, out BC);
                 Vector3.Subtract(ref triangle.vA, ref triangle.vC, out CA);
 
+
+                //Don't forget to protect against possible divisions by zero due to degenerate triangles.
                 Vector3 ABnormal, BCnormal, CAnormal;
-                //Project the center onto the edge to find the direction from the center to the edge AB.
-                Vector3.Dot(ref AO, ref AB, out dot);
-                Vector3.Multiply(ref AB, dot / AB.LengthSquared(), out ABnormal);
-                Vector3.Subtract(ref AO, ref ABnormal, out ABnormal);
-
-                //Project the center onto the edge to find the direction from the center to the edge BC.
-                Vector3.Dot(ref BO, ref BC, out dot);
-                Vector3.Multiply(ref BC, dot / BC.LengthSquared(), out BCnormal);
-                Vector3.Subtract(ref BO, ref BCnormal, out BCnormal);
-
-                //Project the center onto the edge to find the direction from the center to the edge BC.
-                Vector3.Dot(ref CO, ref CA, out dot);
-                Vector3.Multiply(ref CA, dot / CA.LengthSquared(), out CAnormal);
-                Vector3.Subtract(ref CO, ref CAnormal, out CAnormal);
-
-
-                ABnormal.Normalize();
-                BCnormal.Normalize();
-                CAnormal.Normalize();
-
-
-                MPRToolbox.LocalSurfaceCast(convex, triangle, ref Toolbox.RigidIdentity, ref ABnormal, out contact.PenetrationDepth, out contact.Normal);
-                //Check to see if the normal is facing in the proper direction, considering that this may not be a two-sided triangle.
-                Vector3.Dot(ref triangleNormal, ref contact.Normal, out dot);
-                if ((triangle.sidedness == TriangleSidedness.Clockwise && dot > 0) || (triangle.sidedness == TriangleSidedness.Counterclockwise && dot < 0))
+                float lengthSquared = ab.LengthSquared();
+                bool allowAB;
+                if (allowAB = lengthSquared > Toolbox.Epsilon)
                 {
-                    //Normal was facing the wrong way.
-                    //Instead of ignoring it entirely, correct the direction to as close as it can get by removing any component parallel to the triangle normal.
-                    Vector3 previousNormal = contact.Normal;
-                    Vector3.Dot(ref contact.Normal, ref triangleNormal, out dot);
-
-                    Vector3 p;
-                    Vector3.Multiply(ref contact.Normal, dot, out p);
-                    Vector3.Subtract(ref contact.Normal, ref p, out contact.Normal);
-                    float length = contact.Normal.LengthSquared();
-                    if (length > Toolbox.Epsilon)
-                    {
-                        //Renormalize the corrected normal.
-                        Vector3.Divide(ref contact.Normal, (float)Math.Sqrt(length), out contact.Normal);
-                        Vector3.Dot(ref contact.Normal, ref previousNormal, out dot);
-                        contact.PenetrationDepth *= dot;
-                    }
+                    //Project the center onto the edge to find the direction from the center to the edge AB.
+                    Vector3.Dot(ref AO, ref AB, out dot);
+                    Vector3.Multiply(ref AB, dot / lengthSquared, out ABnormal);
+                    Vector3.Subtract(ref AO, ref ABnormal, out ABnormal);
+                    lengthSquared = ABnormal.LengthSquared();
+                    if (lengthSquared > Toolbox.Epsilon)
+                        Vector3.Divide(ref ABnormal, (float)Math.Sqrt(lengthSquared), out ABnormal);
                     else
+                        allowAB = false;
+                }
+                else
+                    ABnormal = new Vector3();
+
+                lengthSquared = BC.LengthSquared();
+                bool allowBC;
+                if (allowBC = lengthSquared > Toolbox.Epsilon)
+                {
+                    //Project the center onto the edge to find the direction from the center to the edge BC.
+                    Vector3.Dot(ref BO, ref BC, out dot);
+                    Vector3.Multiply(ref BC, dot / lengthSquared, out BCnormal);
+                    Vector3.Subtract(ref BO, ref BCnormal, out BCnormal);
+                    lengthSquared = BCnormal.LengthSquared();
+                    if (lengthSquared > Toolbox.Epsilon)
+                        Vector3.Divide(ref BCnormal, (float)Math.Sqrt(lengthSquared), out BCnormal);
+                    else
+                        allowBC = false;
+                }
+                else
+                    BCnormal = new Vector3();
+
+                lengthSquared = CA.LengthSquared();
+                bool allowCA;
+                if (allowCA = lengthSquared > Toolbox.Epsilon)
+                {
+                    //Project the center onto the edge to find the direction from the center to the edge BC.
+                    Vector3.Dot(ref CO, ref CA, out dot);
+                    Vector3.Multiply(ref CA, dot / lengthSquared, out CAnormal);
+                    Vector3.Subtract(ref CO, ref CAnormal, out CAnormal);
+                    lengthSquared = CAnormal.LengthSquared();
+                    if (lengthSquared > Toolbox.Epsilon)
+                        Vector3.Divide(ref CAnormal, (float)Math.Sqrt(lengthSquared), out CAnormal);
+                    else
+                        allowCA = false;
+                }
+                else
+                    CAnormal = new Vector3();
+
+
+
+                if (allowAB)
+                {
+                    MPRToolbox.LocalSurfaceCast(convex, triangle, ref Toolbox.RigidIdentity, ref ABnormal, out contact.PenetrationDepth, out contact.Normal);
+                    //Check to see if the normal is facing in the proper direction, considering that this may not be a two-sided triangle.
+                    Vector3.Dot(ref triangleNormal, ref contact.Normal, out dot);
+                    if ((triangle.sidedness == TriangleSidedness.Clockwise && dot > 0) || (triangle.sidedness == TriangleSidedness.Counterclockwise && dot < 0))
                     {
-                        contact.PenetrationDepth = float.MaxValue;
-                        contact.Normal = new Vector3();
+                        //Normal was facing the wrong way.
+                        //Instead of ignoring it entirely, correct the direction to as close as it can get by removing any component parallel to the triangle normal.
+                        Vector3 previousNormal = contact.Normal;
+                        Vector3.Dot(ref contact.Normal, ref triangleNormal, out dot);
+
+                        Vector3 p;
+                        Vector3.Multiply(ref contact.Normal, dot, out p);
+                        Vector3.Subtract(ref contact.Normal, ref p, out contact.Normal);
+                        float length = contact.Normal.LengthSquared();
+                        if (length > Toolbox.Epsilon)
+                        {
+                            //Renormalize the corrected normal.
+                            Vector3.Divide(ref contact.Normal, (float)Math.Sqrt(length), out contact.Normal);
+                            Vector3.Dot(ref contact.Normal, ref previousNormal, out dot);
+                            contact.PenetrationDepth *= dot;
+                        }
+                        else
+                        {
+                            contact.PenetrationDepth = float.MaxValue;
+                            contact.Normal = new Vector3();
+                        }
                     }
                 }
+                else
+                {
+                    contact.PenetrationDepth = float.MaxValue;
+                    contact.Normal = new Vector3();
+                }
+
 
                 Vector3 candidateNormal;
                 float candidateDepth;
-                MPRToolbox.LocalSurfaceCast(convex, triangle, ref Toolbox.RigidIdentity, ref BCnormal, out candidateDepth, out candidateNormal);
-                //Check to see if the normal is facing in the proper direction, considering that this may not be a two-sided triangle.
-                Vector3.Dot(ref triangleNormal, ref candidateNormal, out dot);
-                if ((triangle.sidedness == TriangleSidedness.Clockwise && dot > 0) || (triangle.sidedness == TriangleSidedness.Counterclockwise && dot < 0))
+                if (allowBC)
                 {
-                    //Normal was facing the wrong way.
-                    //Instead of ignoring it entirely, correct the direction to as close as it can get by removing any component parallel to the triangle normal.
-                    Vector3 previousNormal = candidateNormal;
-                    Vector3.Dot(ref candidateNormal, ref triangleNormal, out dot);
+                    MPRToolbox.LocalSurfaceCast(convex, triangle, ref Toolbox.RigidIdentity, ref BCnormal, out candidateDepth, out candidateNormal);
+                    //Check to see if the normal is facing in the proper direction, considering that this may not be a two-sided triangle.
+                    Vector3.Dot(ref triangleNormal, ref candidateNormal, out dot);
+                    if ((triangle.sidedness == TriangleSidedness.Clockwise && dot > 0) || (triangle.sidedness == TriangleSidedness.Counterclockwise && dot < 0))
+                    {
+                        //Normal was facing the wrong way.
+                        //Instead of ignoring it entirely, correct the direction to as close as it can get by removing any component parallel to the triangle normal.
+                        Vector3 previousNormal = candidateNormal;
+                        Vector3.Dot(ref candidateNormal, ref triangleNormal, out dot);
 
-                    Vector3 p;
-                    Vector3.Multiply(ref candidateNormal, dot, out p);
-                    Vector3.Subtract(ref candidateNormal, ref p, out candidateNormal);
-                    float length = candidateNormal.LengthSquared();
-                    if (length > Toolbox.Epsilon)
-                    {
-                        //Renormalize the corrected normal.
-                        Vector3.Divide(ref candidateNormal, (float)Math.Sqrt(length), out candidateNormal);
-                        Vector3.Dot(ref candidateNormal, ref previousNormal, out dot);
-                        candidateDepth *= dot;
+                        Vector3 p;
+                        Vector3.Multiply(ref candidateNormal, dot, out p);
+                        Vector3.Subtract(ref candidateNormal, ref p, out candidateNormal);
+                        float length = candidateNormal.LengthSquared();
+                        if (length > Toolbox.Epsilon)
+                        {
+                            //Renormalize the corrected normal.
+                            Vector3.Divide(ref candidateNormal, (float)Math.Sqrt(length), out candidateNormal);
+                            Vector3.Dot(ref candidateNormal, ref previousNormal, out dot);
+                            candidateDepth *= dot;
+                        }
+                        else
+                        {
+                            contact.PenetrationDepth = float.MaxValue;
+                            contact.Normal = new Vector3();
+                        }
                     }
-                    else
+                    if (candidateDepth < contact.PenetrationDepth)
                     {
-                        contact.PenetrationDepth = float.MaxValue;
-                        contact.Normal = new Vector3();
+                        contact.Normal = candidateNormal;
+                        contact.PenetrationDepth = candidateDepth;
                     }
                 }
-                if (candidateDepth < contact.PenetrationDepth)
-                {
-                    contact.Normal = candidateNormal;
-                    contact.PenetrationDepth = candidateDepth;
-                }
 
-                MPRToolbox.LocalSurfaceCast(convex, triangle, ref Toolbox.RigidIdentity, ref CAnormal, out candidateDepth, out candidateNormal);
-                //Check to see if the normal is facing in the proper direction, considering that this may not be a two-sided triangle.
-                Vector3.Dot(ref triangleNormal, ref candidateNormal, out dot);
-                if ((triangle.sidedness == TriangleSidedness.Clockwise && dot > 0) || (triangle.sidedness == TriangleSidedness.Counterclockwise && dot < 0))
+                if (allowCA)
                 {
-                    //Normal was facing the wrong way.
-                    //Instead of ignoring it entirely, correct the direction to as close as it can get by removing any component parallel to the triangle normal.
-                    Vector3 previousNormal = candidateNormal;
-                    Vector3.Dot(ref candidateNormal, ref triangleNormal, out dot);
+                    MPRToolbox.LocalSurfaceCast(convex, triangle, ref Toolbox.RigidIdentity, ref CAnormal, out candidateDepth, out candidateNormal);
+                    //Check to see if the normal is facing in the proper direction, considering that this may not be a two-sided triangle.
+                    Vector3.Dot(ref triangleNormal, ref candidateNormal, out dot);
+                    if ((triangle.sidedness == TriangleSidedness.Clockwise && dot > 0) || (triangle.sidedness == TriangleSidedness.Counterclockwise && dot < 0))
+                    {
+                        //Normal was facing the wrong way.
+                        //Instead of ignoring it entirely, correct the direction to as close as it can get by removing any component parallel to the triangle normal.
+                        Vector3 previousNormal = candidateNormal;
+                        Vector3.Dot(ref candidateNormal, ref triangleNormal, out dot);
 
-                    Vector3 p;
-                    Vector3.Multiply(ref candidateNormal, dot, out p);
-                    Vector3.Subtract(ref candidateNormal, ref p, out candidateNormal);
-                    float length = candidateNormal.LengthSquared();
-                    if (length > Toolbox.Epsilon)
-                    {
-                        //Renormalize the corrected normal.
-                        Vector3.Divide(ref candidateNormal, (float)Math.Sqrt(length), out candidateNormal);
-                        Vector3.Dot(ref candidateNormal, ref previousNormal, out dot);
-                        candidateDepth *= dot;
+                        Vector3 p;
+                        Vector3.Multiply(ref candidateNormal, dot, out p);
+                        Vector3.Subtract(ref candidateNormal, ref p, out candidateNormal);
+                        float length = candidateNormal.LengthSquared();
+                        if (length > Toolbox.Epsilon)
+                        {
+                            //Renormalize the corrected normal.
+                            Vector3.Divide(ref candidateNormal, (float)Math.Sqrt(length), out candidateNormal);
+                            Vector3.Dot(ref candidateNormal, ref previousNormal, out dot);
+                            candidateDepth *= dot;
+                        }
+                        else
+                        {
+                            contact.PenetrationDepth = float.MaxValue;
+                            contact.Normal = new Vector3();
+                        }
                     }
-                    else
+                    if (candidateDepth < contact.PenetrationDepth)
                     {
-                        contact.PenetrationDepth = float.MaxValue;
-                        contact.Normal = new Vector3();
+                        contact.Normal = candidateNormal;
+                        contact.PenetrationDepth = candidateDepth;
                     }
-                }
-                if (candidateDepth < contact.PenetrationDepth)
-                {
-                    contact.Normal = candidateNormal;
-                    contact.PenetrationDepth = candidateDepth;
                 }
 
 

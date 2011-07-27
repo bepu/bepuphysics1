@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework;
 using BEPUphysics.Collidables.MobileCollidables;
 using BEPUphysics.MathExtensions;
 using BEPUphysics;
+using System.Diagnostics;
 
 namespace BEPUphysicsDemos.AlternateMovement.Testing.New
 {
@@ -35,7 +36,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                 //If the support changes, perform the necessary bookkeeping to keep the connections up to date.
                 var oldSupport = supportData.SupportObject;
                 supportData = value;
-                if (oldSupport!= supportData.SupportObject)
+                if (oldSupport != supportData.SupportObject)
                 {
                     OnInvolvedEntitiesChanged();
                 }
@@ -62,7 +63,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
         public float SlidingSpeed = 6;
         public float AirSpeed = 4;
         public float Acceleration = 50;
-        public float SlidingAcceleration = 0;
+        public float SlidingAcceleration = 5;
         public float AirAcceleration = 15;
         public float Deceleration = 80;
         public float SlidingDeceleration = 1;
@@ -203,6 +204,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                     //The origin->intersection line direction defines the horizontal velocity direction in 3d space.
                     velocityDirection.Normalize();
 
+
                     //The normal and velocity direction are perpendicular and normal, so the off velocity direction doesn't need to be normalized.
                     Vector3.Cross(ref supportData.Normal, ref velocityDirection, out offVelocityDirection);
 
@@ -242,6 +244,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                     linearJacobianB1 = -linearJacobianA1;
                     linearJacobianB2 = -linearJacobianA2;
 
+
                 }
 
                 if (supportEntity != null)
@@ -252,6 +255,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                     //Note the order of the cross product- it is reversed to negate the result.
                     Vector3.Cross(ref linearJacobianA1, ref supportToContact, out angularJacobianB1);
                     Vector3.Cross(ref linearJacobianA2, ref supportToContact, out angularJacobianB2);
+
                 }
                 else
                 {
@@ -269,7 +273,6 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                 linearJacobianA1 = new Vector3(movementDirection.X, 0, movementDirection.Y);
                 linearJacobianA2 = new Vector3(movementDirection.Y, 0, -movementDirection.X);
             }
-
 
 
 
@@ -351,6 +354,8 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                 //If we're not standing on a dynamic entity, then the mass matrix is defined entirely by the character.
                 Matrix2X2.CreateScale(character.Body.Mass, out massMatrix);
             }
+
+
         }
 
         public override void ExclusiveUpdate()
@@ -380,7 +385,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                 torque.X = x * angularJacobianB1.X + y * angularJacobianB2.X;
                 torque.Y = x * angularJacobianB1.Y + y * angularJacobianB2.Y;
                 torque.Z = x * angularJacobianB1.Z + y * angularJacobianB2.Z;
-                
+
 
                 supportEntity.ApplyLinearImpulse(ref impulse);
                 supportEntity.ApplyAngularImpulse(ref torque);
@@ -432,7 +437,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
             }
             Vector2.Subtract(ref accumulatedImpulse, ref previousAccumulatedImpulse, out lambda);
 
-            
+
 
             //Use the jacobians to put the impulse into world space.
 
