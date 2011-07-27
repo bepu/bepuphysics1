@@ -397,7 +397,11 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
         {
             //The relative velocity's x component is in the movement direction.
             //y is the perpendicular direction.
+#if !WINDOWS
+            Vector2 relativeVelocity = new Vector2();
+#else
             Vector2 relativeVelocity;
+#endif
 
             Vector3 bodyVelocity = character.Body.LinearVelocity;
             Vector3.Dot(ref linearJacobianA1, ref bodyVelocity, out relativeVelocity.X);
@@ -479,7 +483,11 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
         {
             get
             {
+#if !WINDOWS
+                Vector2 relativeVelocity = new Vector2();
+#else
                 Vector2 relativeVelocity;
+#endif
 
                 Vector3 bodyVelocity = character.Body.LinearVelocity;
                 Vector3.Dot(ref linearJacobianA1, ref bodyVelocity, out relativeVelocity.X);

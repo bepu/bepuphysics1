@@ -21,8 +21,11 @@ namespace BEPUphysicsDrawer.Models
             effect.PreferPerPixelLighting = true;
             effect.LightingEnabled = true;
             effect.DirectionalLight0.Enabled = true;
-            effect.DirectionalLight0.Direction = Vector3.Normalize(new Vector3(1, -1, -1));
+            effect.DirectionalLight0.Direction = Vector3.Normalize(new Vector3(.8f, -1.5f, -1.2f));
             effect.DirectionalLight0.DiffuseColor = new Vector3(.66f, .66f, .66f);
+            effect.DirectionalLight1.Enabled = true;
+            effect.DirectionalLight1.Direction = Vector3.Normalize(new Vector3(-.8f, 1.5f, 1.2f));
+            effect.DirectionalLight1.DiffuseColor = new Vector3(.3f, .3f, .5f);
             effect.AmbientLightColor = new Vector3(.5f, .5f, .5f);
 
             effect.TextureEnabled = true;

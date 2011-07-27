@@ -128,34 +128,30 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
 
         public static Entity Entity;
 
-        void IBeforeSolverUpdateable.Update(float dt)
-        {
-
-            bool hadTraction = SupportFinder.HasTraction;
+        void CollectSupportData()
+        {           
             //Identify supports.
             SupportFinder.UpdateSupports();
 
             //Collect the support data from the support, if any.
-
             if (SupportFinder.HasSupport)
             {
                 if (SupportFinder.HasTraction)
-                {
                     supportData = SupportFinder.TractionData.Value;
-                }
                 else
-                {
                     supportData = SupportFinder.SupportData.Value;
-                }
             }
             else
-            {
                 supportData = new SupportData();
-            }
+        }
 
-            //Warning:
-            //Changing a constraint's support data is not thread safe; it modifies simulation islands!
-            HorizontalMotionConstraint.SupportData = supportData;
+        void IBeforeSolverUpdateable.Update(float dt)
+        {
+
+            bool hadTraction = SupportFinder.HasTraction;
+
+            CollectSupportData();
+
 
             //Compute the initial velocities relative to the support.
             Vector3 relativeVelocity;
@@ -170,19 +166,6 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
             {
                 SupportFinder.ClearSupportData();
                 HorizontalMotionConstraint.SupportData = new SupportData();
-            }
-
-
-            //Also manage the vertical velocity of the character;
-            //don't let it separate from the ground.
-            if (SupportFinder.HasTraction)
-            {
-                verticalVelocity += Math.Max(supportData.Depth / dt, 0);
-                if (verticalVelocity < 0 && verticalVelocity > -GlueSpeed)
-                {
-                    ChangeVelocityUnilaterally(-supportData.Normal * verticalVelocity, ref relativeVelocity);
-                }
-
             }
 
             //Attempt to jump.
@@ -213,6 +196,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
 
             }
 
+
             //Try to step!
             if (Keyboard.GetState().IsKeyDown(Keys.O))
                 Debug.WriteLine("Breka.");
@@ -221,11 +205,21 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                 Stepper.TryToStepUp(out newPosition))
             {
                 Body.Position = newPosition;
+                var orientation = Body.Orientation;
+                //The re-do of contacts won't do anything unless we update the collidable's world transform.
+                Body.CollisionInformation.UpdateWorldTransform(ref newPosition, ref orientation);
                 //Refresh all the narrow phase collisions.
                 foreach (var pair in Body.CollisionInformation.Pairs)
                 {
                     pair.UpdateCollision(dt);
                 }
+                //Also re-collect supports.
+                //This will ensure the constraint and other velocity affectors have the most recent information available.
+                CollectSupportData();
+                ComputeRelativeVelocity(out relativeVelocity);
+                verticalVelocity = Vector3.Dot(supportData.Normal, relativeVelocity);
+                horizontalVelocity = relativeVelocity - supportData.Normal * verticalVelocity;
+
             }
 
             //if (SupportFinder.HasTraction && SupportFinder.Supports.Count == 0)
@@ -251,6 +245,24 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
             //    ChangeVelocityUnilaterally(Body.OrientationMatrix.Up * change, ref relativeVelocity);
             //}
             //}
+
+
+            //Also manage the vertical velocity of the character;
+            //don't let it separate from the ground.
+            if (SupportFinder.HasTraction)
+            {
+                verticalVelocity += Math.Max(supportData.Depth / dt, 0);
+                if (verticalVelocity < 0 && verticalVelocity > -GlueSpeed)
+                {
+                    ChangeVelocityUnilaterally(-supportData.Normal * verticalVelocity, ref relativeVelocity);
+                }
+
+            }
+
+
+            //Warning:
+            //Changing a constraint's support data is not thread safe; it modifies simulation islands!
+            HorizontalMotionConstraint.SupportData = supportData;
 
 
  

@@ -309,79 +309,78 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                     //Compute the offset from the position of the character's body to the contact.
                     Vector3 contactOffset;
                     Vector3.Subtract(ref c.Contact.Position, ref position, out contactOffset);
-                    //Compare that offset with the down vector.  If the dot product is positive, the offset points in the same direction as the down direction, which means it's on the bottom half of the shape.
+
+
+                    //Calibrate the normal of the contact away from the center of the object.
                     float dot;
-                    Vector3.Dot(ref contactOffset, ref downDirection, out dot);
-                    if (dot > 0)
+                    Vector3 normal;
+                    Vector3.Dot(ref contactOffset, ref c.Contact.Normal, out dot);
+                    normal = c.Contact.Normal;
+                    if (dot < 0)
                     {
-                        //This contact is on the bottom half!  Check to see if its normal is suitable for a 'support' contact.
-                        //Support contacts are all contacts on the feet of the character- a set that include contacts that support traction and those which do not.
+                        Vector3.Negate(ref normal, out normal);
+                        dot = -dot;
+                    }
 
-                        Vector3 normal = c.Contact.Normal;
-                        Vector3.Dot(ref normal, ref downDirection, out dot);
+                    //Support contacts are all contacts on the feet of the character- a set that include contacts that support traction and those which do not.
 
-                        if (dot < 0)
-                        {
-                            //Calibrate the normal.
-                            Vector3.Negate(ref normal, out normal);
-                            dot = -dot;
-                        }
-                        if (dot > SideContactThreshold)
-                        {
-                            HasSupport = true;
+                    Vector3.Dot(ref normal, ref downDirection, out dot);
+                    if (dot > SideContactThreshold)
+                    {
+                        HasSupport = true;
 
-                            //It is a support contact!
-                            //Don't include a reference to the actual contact object.
-                            //It's safer to return copies of a contact data struct.
-                            var supportContact = new SupportContact()
-                                {
-                                    Contact = new ContactData()
-                                    {
-                                        Position = c.Contact.Position,
-                                        Normal = normal,
-                                        PenetrationDepth = c.Contact.PenetrationDepth,
-                                        Id = c.Contact.Id
-                                    },
-                                    Support = pair.BroadPhaseOverlap.EntryA != body.CollisionInformation ? (Collidable)pair.BroadPhaseOverlap.EntryA : (Collidable)pair.BroadPhaseOverlap.EntryB
-                                };
-
-                            //But is it a traction contact?
-                            //Traction contacts are contacts where the surface normal is flat enough to stand on.
-                            //We want to check if slope < maxslope so:
-                            //Acos(normal dot down direction) < maxSlope => normal dot down direction > cos(maxSlope)
-                            if (dot > cosMaximumSlope)
+                        //It is a support contact!
+                        //Don't include a reference to the actual contact object.
+                        //It's safer to return copies of a contact data struct.
+                        var supportContact = new SupportContact()
                             {
-                                //The slope is shallow enought hat 
-                                supportContact.HasTraction = true;
-                                HasTraction = true;
-                            }
+                                Contact = new ContactData()
+                                {
+                                    Position = c.Contact.Position,
+                                    Normal = normal,
+                                    PenetrationDepth = c.Contact.PenetrationDepth,
+                                    Id = c.Contact.Id
+                                },
+                                Support = pair.BroadPhaseOverlap.EntryA != body.CollisionInformation ? (Collidable)pair.BroadPhaseOverlap.EntryA : (Collidable)pair.BroadPhaseOverlap.EntryB
+                            };
 
-                            supports.Add(supportContact);
-                        }
-                        else if (dot < SideContactThreshold)
+                        //But is it a traction contact?
+                        //Traction contacts are contacts where the surface normal is flat enough to stand on.
+                        //We want to check if slope < maxslope so:
+                        //Acos(normal dot down direction) < maxSlope => normal dot down direction > cos(maxSlope)
+                        if (dot > cosMaximumSlope)
                         {
-                            //Head contact
-                            OtherContact otherContact;
-                            otherContact.Collidable = pair.BroadPhaseOverlap.EntryA != body.CollisionInformation ? (Collidable)pair.BroadPhaseOverlap.EntryA : (Collidable)pair.BroadPhaseOverlap.EntryB;
-                            otherContact.Contact.Position = c.Contact.Position;
-                            otherContact.Contact.Normal = c.Contact.Normal;
-                            otherContact.Contact.PenetrationDepth = c.Contact.PenetrationDepth;
-                            otherContact.Contact.Id = c.Contact.Id;
-                            headContacts.Add(otherContact);
+                            //The slope is shallow enought hat 
+                            supportContact.HasTraction = true;
+                            HasTraction = true;
                         }
-                        else
-                        {
-                            //Side contact 
-                            OtherContact otherContact;
-                            otherContact.Collidable = pair.BroadPhaseOverlap.EntryA != body.CollisionInformation ? (Collidable)pair.BroadPhaseOverlap.EntryA : (Collidable)pair.BroadPhaseOverlap.EntryB;
-                            otherContact.Contact.Position = c.Contact.Position;
-                            otherContact.Contact.Normal = c.Contact.Normal;
-                            otherContact.Contact.PenetrationDepth = c.Contact.PenetrationDepth;
-                            otherContact.Contact.Id = c.Contact.Id;
-                            sideContacts.Add(otherContact);
-                        }
+
+                        supports.Add(supportContact);
+                    }
+                    else if (dot < -SideContactThreshold)
+                    {
+                        //Head contact
+                        OtherContact otherContact;
+                        otherContact.Collidable = pair.BroadPhaseOverlap.EntryA != body.CollisionInformation ? (Collidable)pair.BroadPhaseOverlap.EntryA : (Collidable)pair.BroadPhaseOverlap.EntryB;
+                        otherContact.Contact.Position = c.Contact.Position;
+                        otherContact.Contact.Normal = normal;
+                        otherContact.Contact.PenetrationDepth = c.Contact.PenetrationDepth;
+                        otherContact.Contact.Id = c.Contact.Id;
+                        headContacts.Add(otherContact);
+                    }
+                    else
+                    {
+                        //Side contact 
+                        OtherContact otherContact;
+                        otherContact.Collidable = pair.BroadPhaseOverlap.EntryA != body.CollisionInformation ? (Collidable)pair.BroadPhaseOverlap.EntryA : (Collidable)pair.BroadPhaseOverlap.EntryB;
+                        otherContact.Contact.Position = c.Contact.Position;
+                        otherContact.Contact.Normal = normal;
+                        otherContact.Contact.PenetrationDepth = c.Contact.PenetrationDepth;
+                        otherContact.Contact.Id = c.Contact.Id;
+                        sideContacts.Add(otherContact);
                     }
                 }
+
             }
 
 

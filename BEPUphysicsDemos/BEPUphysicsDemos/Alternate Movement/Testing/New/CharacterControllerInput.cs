@@ -100,6 +100,21 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                 Camera.Position = CharacterController.Body.Position + CameraOffset;
                 Vector2 totalMovement = Vector2.Zero;
 
+#if XBOX360
+                Vector3 forward = Camera.WorldMatrix.Forward;
+                forward.Y = 0;
+                forward.Normalize();
+                Vector3 right = Camera.WorldMatrix.Right;
+                totalMovement += gamePadInput.ThumbSticks.Left.Y * new Vector2(forward.X, forward.Z);
+                totalMovement += gamePadInput.ThumbSticks.Left.X * new Vector2(right.X, right.Z);
+                CharacterController.HorizontalMotionConstraint.MovementDirection = totalMovement;
+
+                //Jumping
+                if (previousGamePadInput.IsButtonUp(Buttons.LeftStick) && gamePadInput.IsButtonDown(Buttons.LeftStick))
+                {
+                    CharacterController.Jump();
+                }
+#else
 
                 //Collect the movement impulses.
 
@@ -135,6 +150,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                 {
                     CharacterController.Jump();
                 }
+#endif
 
             }
         }
