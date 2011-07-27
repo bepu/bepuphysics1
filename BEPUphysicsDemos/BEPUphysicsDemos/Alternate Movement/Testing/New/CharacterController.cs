@@ -213,46 +213,51 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
 
             }
 
-            if (SupportFinder.HasTraction && SupportFinder.Supports.Count == 0)
+            //Try to step!
+            if (Keyboard.GetState().IsKeyDown(Keys.O))
+                Debug.WriteLine("Breka.");
+            Vector3 newPosition;
+            if (Stepper.TryToStepDown(out newPosition) ||
+                Stepper.TryToStepUp(out newPosition))
             {
-
-                //Try to step down!
-                if (Keyboard.GetState().IsKeyDown(Keys.O))
-                    Debug.WriteLine("Breka.");
-                Vector3 newPosition;
-                if (Stepper.TryToStepDown(out newPosition))
+                Body.Position = newPosition;
+                //Refresh all the narrow phase collisions.
+                foreach (var pair in Body.CollisionInformation.Pairs)
                 {
-                    Body.Position = newPosition;
-                    //Refresh all the narrow phase collisions.
-                    foreach (var pair in Body.CollisionInformation.Pairs)
-                    {
-                        pair.UpdateCollision(dt);
-                    }
+                    pair.UpdateCollision(dt);
                 }
-
-                //There's another way to step down that is a lot cheaper, but less robust.
-                //This modifies the velocity of the character to make it fall faster.
-                //Impacts with the ground will be harder, so it will apply superfluous force to supports.
-                //Additionally, it will not be consistent with instant up-stepping.
-                //However, because it does not do any expensive queries, it is very fast!
-                
-                ////We are being supported by a ray cast, but we're floating.
-                ////Let's try to get to the ground faster.
-                ////How fast?  Try picking an arbitrary velocity and setting our relative vertical velocity to that value.
-                ////Don't go farther than the maximum distance, though.
-                //float maxVelocity = (SupportFinder.SupportRayData.Value.HitData.T - SupportFinder.RayLengthToBottom);
-                //if (maxVelocity > 0)
-                //{
-                //    maxVelocity = (maxVelocity + .01f) / dt;
-
-                //    float targetVerticalVelocity = -3;
-                //    verticalVelocity = Vector3.Dot(Body.OrientationMatrix.Up, relativeVelocity);
-                //    float change = MathHelper.Clamp(targetVerticalVelocity - verticalVelocity, -maxVelocity, 0);
-                //    ChangeVelocityUnilaterally(Body.OrientationMatrix.Up * change, ref relativeVelocity);
-                //}
-
-          
             }
+
+            //if (SupportFinder.HasTraction && SupportFinder.Supports.Count == 0)
+            //{
+            //There's another way to step down that is a lot cheaper, but less robust.
+            //This modifies the velocity of the character to make it fall faster.
+            //Impacts with the ground will be harder, so it will apply superfluous force to supports.
+            //Additionally, it will not be consistent with instant up-stepping.
+            //However, because it does not do any expensive queries, it is very fast!
+
+            ////We are being supported by a ray cast, but we're floating.
+            ////Let's try to get to the ground faster.
+            ////How fast?  Try picking an arbitrary velocity and setting our relative vertical velocity to that value.
+            ////Don't go farther than the maximum distance, though.
+            //float maxVelocity = (SupportFinder.SupportRayData.Value.HitData.T - SupportFinder.RayLengthToBottom);
+            //if (maxVelocity > 0)
+            //{
+            //    maxVelocity = (maxVelocity + .01f) / dt;
+
+            //    float targetVerticalVelocity = -3;
+            //    verticalVelocity = Vector3.Dot(Body.OrientationMatrix.Up, relativeVelocity);
+            //    float change = MathHelper.Clamp(targetVerticalVelocity - verticalVelocity, -maxVelocity, 0);
+            //    ChangeVelocityUnilaterally(Body.OrientationMatrix.Up * change, ref relativeVelocity);
+            //}
+            //}
+
+
+ 
+
+
+
+
 
         }
 

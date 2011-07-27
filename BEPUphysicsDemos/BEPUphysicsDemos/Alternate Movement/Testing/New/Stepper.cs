@@ -107,18 +107,18 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
             }
         }
 
-        public bool IsObstructed(RawList<ContactData> outputSideContacts)
+        public bool IsDownStepObstructed(RawList<ContactData> outputSideContacts)
         {
             //A contact is considered obstructive if its projected depth is deeper than any existing contact along the existing contacts' normals.
             for (int i = 0; i < outputSideContacts.Count; i++)
             {
-                if (IsObstructive(ref outputSideContacts.Elements[i]))
+                if (IsObstructiveToDownStepping(ref outputSideContacts.Elements[i]))
                     return true;
             }
             return false;
         }
 
-        bool IsObstructive(ref ContactData contact)
+        bool IsObstructiveToDownStepping(ref ContactData contact)
         {
             //If there weren't any contacts before, and the new contact is too deep, then it's obstructive.
             //If it is barely touching then it's not really an issue.
@@ -213,6 +213,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
         RawList<ContactData> tractionContacts = new RawList<ContactData>();
         RawList<ContactData> sideContacts = new RawList<ContactData>();
         RawList<ContactData> headContacts = new RawList<ContactData>();
+        RawList<ContactData> stepContacts = new RawList<ContactData>();
 
         public bool TryToStepDown(out Vector3 newPosition)
         {
@@ -251,12 +252,8 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                 //This guess may either win immediately, or at least give us a better idea of where to search.
                 if (Toolbox.GetRayPlaneIntersection(ref ray, ref plane, out currentOffset, out intersection))
                 {
-                    if (currentOffset > lowestBound)
-                    {
-                        Debug.WriteLine("Breka.");
-                    }
                     candidatePosition = character.Body.Position + down * currentOffset;
-                    switch (TryPosition(ref candidatePosition, out hintOffset))
+                    switch (TryDownStepPosition(ref candidatePosition, out hintOffset))
                     {
                         case PositionState.Accepted:
                             currentOffset += hintOffset;
@@ -302,7 +299,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                 while (attempts++ < 5 && lowestBound - highestBound > Toolbox.BigEpsilon)
                 {
                     candidatePosition = character.Body.Position + currentOffset * down;
-                    switch (TryPosition(ref candidatePosition, out hintOffset))
+                    switch (TryDownStepPosition(ref candidatePosition, out hintOffset))
                     {
                         case PositionState.Accepted:
                             currentOffset += hintOffset;
@@ -344,7 +341,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
             }
         }
 
-        PositionState TryPosition(ref Vector3 position, out float hintOffset)
+        PositionState TryDownStepPosition(ref Vector3 position, out float hintOffset)
         {
             hintOffset = 0;
             ClearContacts();
@@ -353,7 +350,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
             bool hasTraction;
             PositionState supportState;
             ContactData supportContact;
-            bool obstructed = IsObstructed(sideContacts);
+            bool obstructed = IsDownStepObstructed(sideContacts);
             if (HasSupports(supportContacts, tractionContacts, out hasTraction, out supportState, out supportContact) && !obstructed)
             {
                 if (supportState == PositionState.Accepted)
@@ -387,6 +384,133 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
             {
                 return PositionState.NoHit;
             }
+        }
+
+        public bool TryToStepUp(out Vector3 newPosition)
+        {
+            //Can't step up if we don't have traction to begin with.
+            if (character.SupportFinder.HasTraction)
+            {
+                //Further, we must test to see if the character has a side contact which is suitable for climbing.
+                stepContacts.Clear();
+                FindUpStepCandidates(stepContacts);
+                //We must test every such contact until we find a step up or we run out of candidates.
+                for (int i = 0; i < stepContacts.Count; i++)
+                {
+                    if(TryToStepUsingContact(ref stepContacts.Elements[i], out newPosition))
+                    {
+                        return true;
+                    }
+                }
+
+            }
+            newPosition = new Vector3();
+            return false;
+        }
+
+        void FindUpStepCandidates(RawList<ContactData> outputStepCandidates)
+        {
+            foreach (var c in character.SupportFinder.sideContacts)
+            {
+                //A 6DOF character will need to have a 3d movement direction.  It will replace this graduation of a 2d vector.
+                Vector3 movementDirection = new Vector3()
+                {
+                    X = character.HorizontalMotionConstraint.MovementDirection.X,
+                    Z = character.HorizontalMotionConstraint.MovementDirection.Y
+                };
+                //Check to see if the contact is sufficiently aligned with the movement direction to be considered for stepping.
+                //TODO: This could behave a bit odd when encountering steps or slopes near the base of rounded collision margin.
+                if (Vector3.Dot(c.Contact.Normal, movementDirection) > 0)
+                {
+                    //It is! But is it low enough?
+                    float dot = Vector3.Dot(character.Body.OrientationMatrix.Down, c.Contact.Position - character.Body.Position);
+                    //It must be between the bottom of the character and the maximum step height.
+                    if (dot < character.Body.Height * .5f && dot > character.Body.Height * .5f - MaximumStepHeight)
+                    {
+                        //It's a candidate!
+                        outputStepCandidates.Add(c.Contact);
+                    }
+                }
+            }
+
+        }
+
+        bool TryToStepUsingContact(ref ContactData contact, out Vector3 newPosition)
+        {
+            Vector3 down = character.Body.OrientationMatrix.Down;
+            //The normal of the contact may not be facing perfectly out to the side.
+            //The detection process allows a bit of slop.
+            //Correct it by removing any component of the normal along the local up vector.
+            Vector3 normal = contact.Normal;
+            float dot;
+            Vector3.Dot(ref normal, ref down, out dot);
+            Vector3 error;
+            Vector3.Multiply(ref down, dot, out error);
+            Vector3.Subtract(ref normal, ref error, out normal);
+            normal.Normalize();
+
+            //Now we need to ray cast out from the center of the character in the direction of this normal to check for obstructions.
+            //Compute the ray origin location.
+            Ray ray;
+            Vector3.Multiply(ref down, character.Body.Height * .5f - MaximumStepHeight, out ray.Position);
+            ray.Direction = normal;
+            //Include a little margin in the length.
+            float length = character.Body.Radius + .01f - contact.PenetrationDepth;
+
+            foreach (var collidable in character.Body.CollisionInformation.OverlappedCollidables)
+            {
+                //Check to see if the collidable is hit by the ray.
+                float? t = ray.Intersects(collidable.BoundingBox);
+                if (t != null && t < length)
+                {
+                    RayHit hit;
+                    if (collidable.RayCast(ray, length, out hit))
+                    {
+                        //The step is obstructed!
+                        newPosition = new Vector3();
+                        return false;
+                    }
+                }
+            }
+            
+            //The down-cast ray origin has been verified by the previous ray cast.
+            //Let's look for a support!
+            Vector3 horizontalOffset;
+            Vector3.Multiply(ref normal, length, out horizontalOffset);
+            Vector3.Add(ref ray.Position, ref horizontalOffset, out ray.Position);
+            ray.Direction = down;
+
+            //Find the earliest hit, if any.
+            RayHit earliestHit = new RayHit();
+            earliestHit.T = float.MaxValue;
+            foreach (var collidable in character.Body.CollisionInformation.OverlappedCollidables)
+            {
+                //Check to see if the collidable is hit by the ray.
+                float? t = ray.Intersects(collidable.BoundingBox);
+                if (t != null && t < MaximumStepHeight)
+                {
+                    //Is it an earlier hit than the current earliest?
+                    RayHit hit;
+                    if (collidable.RayCast(ray, MaximumStepHeight, out hit) && hit.T < earliestHit.T)
+                    {
+                        earliestHit = hit;
+                    }
+                }
+            }
+            if (earliestHit.T <= 0 || earliestHit.T == float.MaxValue)
+            {
+                //No valid hit was detected.
+                newPosition = new Vector3();
+                return false;
+            }
+
+            //By now, a valid ray hit has been found.  Now we need to validate it using contact queries.
+            //This process is very similar in concept to the down step verification, but it has some extra
+            //requirements.
+
+            newPosition = new Vector3();
+            return false;
+
         }
 
         private void ClearContacts()

@@ -395,15 +395,13 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                 Ray ray = new Ray(body.Position + downDirection * body.Height * .25f, downDirection);
 
 
-                BoundingBox boundingBox = body.CollisionInformation.BoundingBox;
                 RayHit earliestHit = new RayHit() { T = float.MaxValue };
                 Collidable earliestHitObject = null;
                 foreach (var collidable in body.CollisionInformation.OverlappedCollidables)
                 {
                     //Check to see if the collidable is hit by the ray.
-                    bool intersects;
-                    collidable.BoundingBox.Intersects(ref boundingBox, out intersects);
-                    if (intersects)
+                    float? t = ray.Intersects(collidable.BoundingBox);
+                    if (t != null && t < length)
                     {
                         //Is it an earlier hit than the current earliest?
                         RayHit hit;
