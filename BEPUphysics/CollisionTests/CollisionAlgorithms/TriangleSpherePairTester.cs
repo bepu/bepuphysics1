@@ -36,6 +36,18 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             Vector3.Subtract(ref triangle.vC, ref triangle.vA, out ac);
             Vector3 triangleNormal;
             Vector3.Cross(ref ab, ref ac, out triangleNormal);
+            if (triangleNormal.LengthSquared() < Toolbox.Epsilon * .01f)
+            {
+                //If the triangle is degenerate, use the offset between its center and the sphere.
+                Vector3.Add(ref triangle.vA, ref triangle.vB, out triangleNormal);
+                Vector3.Add(ref triangleNormal, ref triangle.vC, out triangleNormal);
+                Vector3.Multiply(ref triangleNormal, 1 / 3f, out triangleNormal);
+                if (triangleNormal.LengthSquared() < Toolbox.Epsilon * .01f)
+                    triangleNormal = Toolbox.UpVector; //Alrighty then! Pick a random direction.
+                    
+            }
+
+            
             float dot;
             Vector3.Dot(ref triangleNormal, ref triangle.vA, out dot);
             switch (triangle.sidedness)
@@ -60,13 +72,13 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             //Could optimize this process a bit.  The 'point' being compared is always zero.  Additionally, since the triangle normal is available,
             //there is a little extra possible optimization.
             lastRegion = Toolbox.GetClosestPointOnTriangleToPoint(ref triangle.vA, ref triangle.vB, ref triangle.vC, ref Toolbox.ZeroVector, out closestPoint);
-            float length = closestPoint.LengthSquared();
+            float lengthSquared = closestPoint.LengthSquared();
             float marginSum = triangle.collisionMargin + sphere.collisionMargin;
 
-            if (length <= marginSum * marginSum)
+            if (lengthSquared <= marginSum * marginSum)
             {
                 var contact = new ContactData();
-                if (length < Toolbox.Epsilon)
+                if (lengthSquared < Toolbox.Epsilon)
                 {
                     //Super close to the triangle.  Normalizing would be dangerous.
 
@@ -77,9 +89,9 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                     return true;
                 }
 
-                length = (float)Math.Sqrt(length);
-                Vector3.Divide(ref closestPoint, length, out contact.Normal);
-                contact.PenetrationDepth = marginSum - length;
+                lengthSquared = (float)Math.Sqrt(lengthSquared);
+                Vector3.Divide(ref closestPoint, lengthSquared, out contact.Normal);
+                contact.PenetrationDepth = marginSum - lengthSquared;
                 contact.Position = closestPoint;
                 contactList.Add(ref contact);
                 return true;

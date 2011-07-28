@@ -15,6 +15,12 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         public Contact Contact;
 
         /// <summary>
+        /// Pair that most directly generated the contact.
+        /// The pair may have parents, accessible through the pair's Parent property.
+        /// </summary>
+        public CollidablePairHandler Pair;
+
+        /// <summary>
         /// Normal force applied between the objects at the contact point.
         /// </summary>
         public float NormalForce;

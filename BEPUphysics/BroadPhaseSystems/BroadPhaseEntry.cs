@@ -79,6 +79,26 @@ namespace BEPUphysics.BroadPhaseSystems
         public abstract bool RayCast(Ray ray, float maximumLength, out RayHit rayHit);
 
         /// <summary>
+        /// Tests a ray against the entry.
+        /// </summary>
+        /// <param name="ray">Ray to test.</param>
+        /// <param name="maximumLength">Maximum length, in units of the ray's direction's length, to test.</param>
+        /// <param name="filter">Test to apply to try on the entry.  If a collidable hierarchy is present
+        /// in the entry, this filter will be passed into inner ray casts.</param>
+        /// <param name="rayHit">Hit location of the ray on the entry, if any.</param>
+        /// <returns>Whether or not the ray hit the entry.</returns>
+        public virtual bool RayCast(Ray ray, float maximumLength, Func<BroadPhaseEntry, bool> filter, out RayHit rayHit)
+        {
+            if (filter(this))
+                return RayCast(ray, maximumLength, out rayHit);
+            else
+            {
+                rayHit = new RayHit();
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Sweeps a convex shape against the entry.
         /// </summary>
         /// <param name="castShape">Swept shape.</param>

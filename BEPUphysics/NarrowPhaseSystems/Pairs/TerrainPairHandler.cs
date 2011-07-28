@@ -205,6 +205,9 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             }
             else
                 info.RelativeVelocity = new Vector3();
+
+
+            info.Pair = this;
         }
 
     }

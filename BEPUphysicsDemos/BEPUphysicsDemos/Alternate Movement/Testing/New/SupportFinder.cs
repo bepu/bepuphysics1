@@ -7,6 +7,8 @@ using BEPUphysics.DataStructures;
 using Microsoft.Xna.Framework;
 using BEPUphysics;
 using BEPUphysics.Collidables;
+using BEPUphysics.CollisionRuleManagement;
+using BEPUphysics.BroadPhaseSystems;
 
 namespace BEPUphysicsDemos.AlternateMovement.Testing.New
 {
@@ -254,6 +256,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
 
         CharacterController character;
 
+        internal float sinMaximumSlope = (float)Math.Sin(MathHelper.PiOver4);
         internal float cosMaximumSlope = (float)Math.Cos(MathHelper.PiOver4);
         /// <summary>
         /// Gets or sets the maximum slope on which the character will have traction.
@@ -267,6 +270,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
             set
             {
                 cosMaximumSlope = (float)Math.Cos(value);
+                sinMaximumSlope = (float)Math.Sin(value);
             }
         }
 
@@ -277,6 +281,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
         public SupportFinder(CharacterController character)
         {
             this.character = character;
+            SupportRayFilter = SupportRayFilterFunction;
         }
 
         /// <summary>
@@ -304,8 +309,14 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
 
             foreach (var pair in character.Body.CollisionInformation.Pairs)
             {
+                //Don't stand on things that aren't really colliding fully.
+                if (pair.CollisionRule != CollisionRule.Normal)
+                    continue;
                 foreach (var c in pair.Contacts)
                 {
+                    //It's possible that a subpair has a non-normal collision rule, even if the parent pair is normal.
+                    if (c.Pair.CollisionRule != CollisionRule.Normal)
+                        continue;
                     //Compute the offset from the position of the character's body to the contact.
                     Vector3 contactOffset;
                     Vector3.Subtract(ref c.Contact.Position, ref position, out contactOffset);
@@ -404,7 +415,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                     {
                         //Is it an earlier hit than the current earliest?
                         RayHit hit;
-                        if (collidable.RayCast(ray, length, out hit) && hit.T < earliestHit.T)
+                        if (collidable.RayCast(ray, length, SupportRayFilter, out hit) && hit.T < earliestHit.T)
                         {
                             earliestHit = hit;
                             earliestHitObject = collidable;
@@ -449,6 +460,13 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
 
         }
 
+        public Func<BroadPhaseEntry, bool> SupportRayFilter;
+        bool SupportRayFilterFunction(BroadPhaseEntry entry)
+        {
+            //Only permit an object to be used as a support if it fully collides with the character.
+            return CollisionRules.CollisionRuleCalculator(entry.CollisionRules, character.Body.CollisionInformation.CollisionRules) == CollisionRule.Normal;
+        }
+
 
         /// <summary>
         /// Cleans up the support finder.
@@ -461,6 +479,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
             SupportRayData = null;
 
         }
+
     }
 
     /// <summary>

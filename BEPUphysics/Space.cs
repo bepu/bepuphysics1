@@ -638,7 +638,7 @@ namespace BEPUphysics
                 {
                     RayHit rayHit;
                     BroadPhaseEntry candidate = outputIntersections.Elements[i];
-                    if (filter(candidate) && candidate.RayCast(ray, maximumLength, out rayHit))
+                    if (candidate.RayCast(ray, maximumLength, filter, out rayHit))
                     {
                         outputRayCastResults.Add(new RayCastResult(rayHit, candidate));
                     }

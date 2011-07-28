@@ -144,6 +144,8 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                 Vector3.Subtract(ref info.RelativeVelocity, ref velocity, out info.RelativeVelocity);
             }
 
+            info.Pair = this;
+
         }
     }
 

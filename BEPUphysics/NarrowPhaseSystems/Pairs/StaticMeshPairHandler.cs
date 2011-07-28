@@ -201,6 +201,8 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                 Vector3.Add(ref velocity, ref convex.entity.linearVelocity, out info.RelativeVelocity);
             }
             else info.RelativeVelocity = new Vector3();
+
+            info.Pair = this;
         }
     }
 

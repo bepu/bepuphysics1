@@ -9,6 +9,7 @@ using BEPUphysics.DataStructures;
 using BEPUphysics.Materials;
 using System.Collections.ObjectModel;
 using BEPUphysics.CollisionRuleManagement;
+using System;
 
 namespace BEPUphysics.Collidables.MobileCollidables
 {
@@ -192,9 +193,8 @@ namespace BEPUphysics.Collidables.MobileCollidables
                 rayHit.T = float.MaxValue;
                 for (int i = 0; i < hitElements.count; i++)
                 {
-                    EntityCollidable candidate = hitElements.Elements[i].CollisionInformation;
                     RayHit tempHit;
-                    if (candidate.RayCast(ray, maximumLength, out tempHit) && tempHit.T < rayHit.T)
+                    if (hitElements.Elements[i].CollisionInformation.RayCast(ray, maximumLength, out tempHit) && tempHit.T < rayHit.T)
                     {
                         rayHit = tempHit;
                     }
@@ -203,6 +203,40 @@ namespace BEPUphysics.Collidables.MobileCollidables
                 return rayHit.T != float.MaxValue;
             }
             Resources.GiveBack(hitElements);
+            return false;
+        }
+        
+        //TODO: Substantial redundancy here.  If a change is ever needed, compress them down.
+
+        /// <summary>
+        /// Tests a ray against the collidable.
+        /// </summary>
+        /// <param name="ray">Ray to test.</param>
+        /// <param name="maximumLength">Maximum length, in units of the ray's direction's length, to test.</param>
+        /// <param name="rayHit">Hit location of the ray on the collidable, if any.</param>
+        /// <returns>Whether or not the ray hit the collidable.</returns>
+        public override bool RayCast(Ray ray, float maximumLength, Func<BroadPhaseEntry, bool> filter, out RayHit rayHit)
+        {
+            rayHit = new RayHit();
+            if (filter(this))
+            {
+                var hitElements = Resources.GetCompoundChildList();
+                if (hierarchy.Tree.GetOverlaps(ray, maximumLength, hitElements))
+                {
+                    rayHit.T = float.MaxValue;
+                    for (int i = 0; i < hitElements.count; i++)
+                    {
+                        RayHit tempHit;
+                        if (hitElements.Elements[i].CollisionInformation.RayCast(ray, maximumLength, filter, out tempHit) && tempHit.T < rayHit.T)
+                        {
+                            rayHit = tempHit;
+                        }
+                    }
+                    Resources.GiveBack(hitElements);
+                    return rayHit.T != float.MaxValue;
+                }
+                Resources.GiveBack(hitElements);
+            }
             return false;
         }
 
@@ -270,6 +304,7 @@ namespace BEPUphysics.Collidables.MobileCollidables
             Resources.GiveBack(hitElements);
             return false;
         }
+
 
         /// <summary>
         /// Casts a convex shape against the collidable.

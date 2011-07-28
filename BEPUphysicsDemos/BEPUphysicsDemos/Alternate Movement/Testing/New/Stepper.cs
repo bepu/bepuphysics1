@@ -14,6 +14,7 @@ using BEPUphysics.NarrowPhaseSystems.Pairs;
 using BEPUphysics.Settings;
 using BEPUphysics;
 using System.Diagnostics;
+using BEPUphysics.CollisionRuleManagement;
 
 namespace BEPUphysicsDemos.AlternateMovement.Testing.New
 {
@@ -48,15 +49,23 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                 {
                     var pair = new CollidablePair(collidable, queryObject);
                     var pairHandler = NarrowPhaseHelper.GetPairHandler(ref pair);
-                    pairHandler.UpdateCollision(0);
-                    foreach (var contact in pairHandler.Contacts)
+                    if (pairHandler.CollisionRule == CollisionRule.Normal)
                     {
-                        ContactData contactData;
-                        contactData.Position = contact.Contact.Position;
-                        contactData.Normal = contact.Contact.Normal;
-                        contactData.Id = contact.Contact.Id;
-                        contactData.PenetrationDepth = contact.Contact.PenetrationDepth;
-                        contacts.Add(contactData);
+                        pairHandler.UpdateCollision(0);
+                        foreach (var contact in pairHandler.Contacts)
+                        {
+                            //Must check per-contact collision rules, just in case
+                            //the pair was actually a 'parent pair.'
+                            if (contact.Pair.CollisionRule == CollisionRule.Normal)
+                            {
+                                ContactData contactData;
+                                contactData.Position = contact.Contact.Position;
+                                contactData.Normal = contact.Contact.Normal;
+                                contactData.Id = contact.Contact.Id;
+                                contactData.PenetrationDepth = contact.Contact.PenetrationDepth;
+                                contacts.Add(contactData);
+                            }
+                        }
                     }
                     pairHandler.CleanUp();
                     (pairHandler as INarrowPhasePair).Factory.GiveBack(pairHandler);
@@ -65,10 +74,9 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
 
         }
 
-        public void CategorizeContacts(RawList<ContactData> contacts, RawList<ContactData> outputSupports, RawList<ContactData> outputTraction, RawList<ContactData> outputHeadContacts, RawList<ContactData> outputSideContacts)
+        public void CategorizeContacts(ref Vector3 position, RawList<ContactData> contacts, RawList<ContactData> outputSupports, RawList<ContactData> outputTraction, RawList<ContactData> outputHeadContacts, RawList<ContactData> outputSideContacts)
         {
             Vector3 downDirection = character.Body.OrientationMatrix.Down;
-            Vector3 position = character.Body.Position;
             for (int i = 0; i < contacts.Count; i++)
             {
                 float dot;
@@ -348,7 +356,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
             hintOffset = 0;
             ClearContacts();
             QueryContacts(position, contacts);
-            CategorizeContacts(contacts, supportContacts, tractionContacts, headContacts, sideContacts);
+            CategorizeContacts(ref position, contacts, supportContacts, tractionContacts, headContacts, sideContacts);
             bool hasTraction;
             PositionState supportState;
             ContactData supportContact;
@@ -366,7 +374,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                 else if (supportState == PositionState.TooDeep)
                 {
                     //Looks like we have to keep trying, but at least we found a good hint.
-                    hintOffset = -.001f - Vector3.Dot(supportContact.Normal, character.Body.OrientationMatrix.Down) * supportContact.PenetrationDepth;
+                    hintOffset = Math.Min(0, .001f - Vector3.Dot(supportContact.Normal, character.Body.OrientationMatrix.Down) * supportContact.PenetrationDepth);
                     return PositionState.TooDeep;
                 }
                 else //if (supportState == SupportState.Separated)
@@ -410,6 +418,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
             return false;
         }
 
+        float upStepMargin = .02f; //Up step margin is the extra space above the maximum step height to start the obstruction and downcast test rays.  Helps when a step is very close to the max step height.
         void FindUpStepCandidates(RawList<ContactData> outputStepCandidates)
         {
             foreach (var c in character.SupportFinder.sideContacts)
@@ -427,7 +436,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                     //It is! But is it low enough?
                     float dot = Vector3.Dot(character.Body.OrientationMatrix.Down, c.Contact.Position - character.Body.Position);
                     //It must be between the bottom of the character and the maximum step height.
-                    if (dot < character.Body.Height * .5f && dot > character.Body.Height * .5f - MaximumStepHeight)
+                    if (dot < character.Body.Height * .5f && dot > character.Body.Height * .5f - MaximumStepHeight - upStepMargin)
                     {
                         //It's a candidate!
                         outputStepCandidates.Add(c.Contact);
@@ -455,11 +464,13 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
             //Now we need to ray cast out from the center of the character in the direction of this normal to check for obstructions.
             //Compute the ray origin location.
             Ray ray;
-            Vector3.Multiply(ref down, character.Body.Height * .5f - MaximumStepHeight, out ray.Position);
+            float downRayLength = MaximumStepHeight + upStepMargin;
+            Vector3.Multiply(ref down, character.Body.Height * .5f - downRayLength, out ray.Position);
             Vector3.Add(ref ray.Position, ref position, out ray.Position);
             ray.Direction = normal;
             //Include a little margin in the length.
-            float length = character.Body.Radius + .01f - contact.PenetrationDepth;
+            float horizontalOffsetAmount = (float)((1 - character.SupportFinder.sinMaximumSlope) * character.Body.CollisionInformation.Shape.CollisionMargin + .03);
+            float length = character.Body.Radius + horizontalOffsetAmount - contact.PenetrationDepth;
 
             foreach (var collidable in character.Body.CollisionInformation.OverlappedCollidables)
             {
@@ -468,7 +479,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                 if (t != null && t < length)
                 {
                     RayHit hit;
-                    if (collidable.RayCast(ray, length, out hit))
+                    if (collidable.RayCast(ray, length, character.SupportFinder.SupportRayFilter, out hit))
                     {
                         //The step is obstructed!
                         newPosition = new Vector3();
@@ -491,11 +502,11 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
             {
                 //Check to see if the collidable is hit by the ray.
                 float? t = ray.Intersects(collidable.BoundingBox);
-                if (t != null && t < MaximumStepHeight)
+                if (t != null && t < downRayLength)
                 {
                     //Is it an earlier hit than the current earliest?
                     RayHit hit;
-                    if (collidable.RayCast(ray, MaximumStepHeight, out hit) && hit.T < earliestHit.T)
+                    if (collidable.RayCast(ray, downRayLength, character.SupportFinder.SupportRayFilter, out hit) && hit.T < earliestHit.T)
                     {
                         earliestHit = hit;
                     }
@@ -533,12 +544,12 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
 
 
             RigidTransform transform = character.Body.CollisionInformation.WorldTransform;
-            //TODO: Should be able to use a smaller horizontal offset with success.
-            //The transform must be modified to position the query body 
-            Vector3.Multiply(ref normal, character.Body.CollisionInformation.Shape.CollisionMargin * 2, out horizontalOffset);
+            //The transform must be modified to position the query body at the right location.
+            //The horizontal offset of the queries ensures that a tractionable part of the character will be put onto the new support.
+            Vector3.Multiply(ref normal, horizontalOffsetAmount, out horizontalOffset);
             Vector3.Add(ref transform.Position, ref horizontalOffset, out transform.Position);
             Vector3 verticalOffset;
-            Vector3.Multiply(ref down, -MaximumStepHeight, out verticalOffset);
+            Vector3.Multiply(ref down, -downRayLength, out verticalOffset);
             Vector3.Add(ref transform.Position, ref verticalOffset, out transform.Position);
 
             //We know that the closest point to the plane will be the extreme point in the plane's direction.
@@ -568,16 +579,18 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
             float hitT;
             if (Toolbox.GetRayPlaneIntersection(ref downRay, ref plane, out hitT, out intersection))
             {
-                currentOffset = -MaximumStepHeight + hitT;
+                currentOffset = -downRayLength + hitT;
                 candidatePosition = character.Body.Position + down * currentOffset + horizontalOffset;
                 switch (TryUpStepPosition(ref normal, ref candidatePosition, out hintOffset))
                 {
                     case PositionState.Accepted:
                         currentOffset += hintOffset;
                         //Only use the new position location if the movement distance was the right size.
-                        if (currentOffset < 0 && currentOffset > -MaximumStepHeight)
+                        if (currentOffset < 0 && currentOffset > -MaximumStepHeight - CollisionDetectionSettings.AllowedPenetration)
                         {
-                            newPosition = character.Body.Position + currentOffset * down + horizontalOffset;
+                            //It's possible that we let a just-barely-too-high step occur, limited by the allowed penetration.
+                            //Just clamp the overall motion and let it penetrate a bit.
+                            newPosition = character.Body.Position + Math.Max(-MaximumStepHeight, currentOffset) * down + horizontalOffset;
                             return true;
                         }
                         else
@@ -621,9 +634,11 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                     case PositionState.Accepted:
                         currentOffset += hintOffset;
                         //Only use the new position location if the movement distance was the right size.
-                        if (currentOffset < 0 && currentOffset > -MaximumStepHeight)
-                        {
-                            newPosition = character.Body.Position + currentOffset * down + horizontalOffset;
+                        if (currentOffset < 0 && currentOffset > -MaximumStepHeight - CollisionDetectionSettings.AllowedPenetration)
+                        {                   
+                            //It's possible that we let a just-barely-too-high step occur, limited by the allowed penetration.
+                            //Just clamp the overall motion and let it penetrate a bit.
+                            newPosition = character.Body.Position + Math.Max(-MaximumStepHeight, currentOffset) * down + horizontalOffset;
                             return true;
                         }
                         else
@@ -659,7 +674,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
             hintOffset = 0;
             ClearContacts();
             QueryContacts(position, contacts);
-            CategorizeContacts(contacts, supportContacts, tractionContacts, headContacts, sideContacts);
+            CategorizeContacts(ref position, contacts, supportContacts, tractionContacts, headContacts, sideContacts);
             bool hasTraction;
             PositionState supportState;
             ContactData supportContact;
@@ -677,7 +692,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                 else if (supportState == PositionState.TooDeep)
                 {
                     //Looks like we have to keep trying, but at least we found a good hint.
-                    hintOffset = -.001f - Vector3.Dot(supportContact.Normal, character.Body.OrientationMatrix.Down) * supportContact.PenetrationDepth;
+                    hintOffset = Math.Min(0, .001f - Vector3.Dot(supportContact.Normal, character.Body.OrientationMatrix.Down) * supportContact.PenetrationDepth);
                     return PositionState.TooDeep;
                 }
                 else //if (supportState == SupportState.Separated)
