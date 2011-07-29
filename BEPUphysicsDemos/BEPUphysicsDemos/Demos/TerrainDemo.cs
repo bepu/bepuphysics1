@@ -79,13 +79,7 @@ namespace BEPUphysicsDemos.Demos
 
         }
 
-        public override void Update(float dt)
-        {
-            if (Game.KeyboardInput.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.P))
-                Debug.WriteLine("Break.");
-            base.Update(dt);
 
-        }
 
 
 

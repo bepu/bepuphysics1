@@ -23,6 +23,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
         CharacterController character;
         public float MaximumStepHeight = 1;
         public float MinimumDownStepHeight = .1f;
+        public float MinimumUpStepHeight = .1f;
 
         EntityCollidable queryObject;
 
@@ -100,6 +101,8 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                         //It's a traction contact.
                         outputTraction.Add(processed);
                     }
+                    else
+                        sideContacts.Add(processed); //Considering the side contacts to be supports can help with upstepping.
                 }
                 else if (dot < -SupportFinder.SideContactThreshold)
                 {
@@ -469,7 +472,11 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
             Vector3.Add(ref ray.Position, ref position, out ray.Position);
             ray.Direction = normal;
             //Include a little margin in the length.
-            float horizontalOffsetAmount = (float)((1 - character.SupportFinder.sinMaximumSlope) * character.Body.CollisionInformation.Shape.CollisionMargin + .03);
+            //Technically, the character only needs to teleport horizontally by the complicated commented expression.
+            //That puts it just far enough to have traction on the new surface.
+            //In practice, the current contact refreshing approach used for many pair types causes contacts to persist horizontally a bit,
+            //which can cause side effects for the character.
+            float horizontalOffsetAmount = character.Body.CollisionInformation.Shape.CollisionMargin;// (float)((1 - character.SupportFinder.sinMaximumSlope) * character.Body.CollisionInformation.Shape.CollisionMargin + 0);
             float length = character.Body.Radius + horizontalOffsetAmount - contact.PenetrationDepth;
 
             foreach (var collidable in character.Body.CollisionInformation.OverlappedCollidables)
@@ -512,7 +519,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                     }
                 }
             }
-            if (earliestHit.T <= 0 || earliestHit.T == float.MaxValue)
+            if (earliestHit.T <= 0 || earliestHit.T == float.MaxValue || earliestHit.T - downRayLength > -MinimumUpStepHeight)
             {
                 //No valid hit was detected.
                 newPosition = new Vector3();
@@ -569,7 +576,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
             //The words 'highest' and 'lowest' here refer to the position relative to the character's body.
             //The ray cast points downward relative to the character's body.
             float highestBound = -MaximumStepHeight;
-            float lowestBound = CollisionDetectionSettings.AllowedPenetration + highestBound + earliestHit.T;
+            float lowestBound = CollisionDetectionSettings.AllowedPenetration - downRayLength + earliestHit.T;
             float currentOffset = lowestBound;
             float hintOffset;
 
@@ -606,6 +613,10 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                         lowestBound = currentOffset;
                         currentOffset = (highestBound + currentOffset) * .5f;
                         break;
+                    case PositionState.HeadObstructed:
+                        highestBound = currentOffset + hintOffset;
+                        currentOffset = (lowestBound + currentOffset) * .5f;
+                        break;
                     case PositionState.TooDeep:
                         currentOffset += hintOffset;
                         lowestBound = currentOffset;
@@ -635,7 +646,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                         currentOffset += hintOffset;
                         //Only use the new position location if the movement distance was the right size.
                         if (currentOffset < 0 && currentOffset > -MaximumStepHeight - CollisionDetectionSettings.AllowedPenetration)
-                        {                   
+                        {
                             //It's possible that we let a just-barely-too-high step occur, limited by the allowed penetration.
                             //Just clamp the overall motion and let it penetrate a bit.
                             newPosition = character.Body.Position + Math.Max(-MaximumStepHeight, currentOffset) * down + horizontalOffset;
@@ -653,6 +664,10 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                     case PositionState.Obstructed:
                         lowestBound = currentOffset;
                         currentOffset = (highestBound + lowestBound) * .5f;
+                        break;
+                    case PositionState.HeadObstructed:
+                        highestBound = currentOffset + hintOffset;
+                        currentOffset = (lowestBound + currentOffset) * .5f;
                         break;
                     case PositionState.TooDeep:
                         currentOffset += hintOffset;
@@ -678,6 +693,25 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
             bool hasTraction;
             PositionState supportState;
             ContactData supportContact;
+            if (headContacts.Count > 0)
+            {
+                //The head is obstructed.  This will define a maximum bound.
+                //Find the deepest contact on the head and use it to provide a hint.
+                Vector3 up = character.Body.OrientationMatrix.Up;
+                float dot;
+                Vector3.Dot(ref up, ref headContacts.Elements[0].Normal, out dot);
+                hintOffset = dot * headContacts.Elements[0].PenetrationDepth;
+                for (int i = 1; i < headContacts.Count; i++)
+                {
+                    Vector3.Dot(ref up, ref headContacts.Elements[i].Normal, out dot);
+                    dot *= headContacts.Elements[i].PenetrationDepth;
+                    if (dot > hintOffset)
+                    {
+                        hintOffset = dot;
+                    }
+                }
+                return PositionState.HeadObstructed;
+            }
             bool obstructed = IsUpStepObstructed(ref sideNormal, sideContacts, headContacts);
             if (HasSupports(supportContacts, tractionContacts, out hasTraction, out supportState, out supportContact) && !obstructed)
             {
@@ -716,8 +750,6 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
 
         public bool IsUpStepObstructed(ref Vector3 sideNormal, RawList<ContactData> sideContacts, RawList<ContactData> headContacts)
         {
-            if (headContacts.Count > 0)
-                return true;
             //A contact is considered obstructive if its projected depth is deeper than any existing contact along the existing contacts' normals.
             for (int i = 0; i < sideContacts.Count; i++)
             {
@@ -740,7 +772,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                 //It's too deep! Can't step.
                 return true;
             }
-   
+
             //Go through side-facing contact and check to see if the new contact is deeper than any existing contact in the direction of the existing contact.
             //This is equivalent to considering the existing contacts to define planes and then comparing the new contact against those planes.
             //Since we already have the penetration depths, we don't need to use the positions of the contacts.
@@ -769,6 +801,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
             Accepted,
             TooDeep,
             Obstructed,
+            HeadObstructed,
             NoHit
         }
 

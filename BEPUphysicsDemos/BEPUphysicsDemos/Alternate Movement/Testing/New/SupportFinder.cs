@@ -365,6 +365,8 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                             supportContact.HasTraction = true;
                             HasTraction = true;
                         }
+                        else
+                            sideContacts.Add(new OtherContact() { Collidable = supportContact.Support, Contact = supportContact.Contact });  //Considering the side contacts to be supports can help with upstepping.
 
                         supports.Add(supportContact);
                     }

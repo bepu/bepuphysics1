@@ -41,24 +41,24 @@ namespace BEPUphysicsDemos.Demos
 
 
 
-            //Dump some boxes on top of it for fun.
-            int numColumns = 10;
-            int numRows = 10;
-            int numHigh = 1;
-            float separation = 8;
-            Entity toAdd;
-            for (int i = 0; i < numRows; i++)
-                for (int j = 0; j < numColumns; j++)
-                    for (int k = 0; k < numHigh; k++)
-                    {
-                        toAdd = new Box(
-                            new Vector3(
-                            separation * i - numRows * separation / 2,
-                            30f + k * separation,
-                            separation * j - numColumns * separation / 2),
-                            .5f, .5f, .5f, 15);
-                        Space.Add(toAdd);
-                    }
+            ////Dump some boxes on top of it for fun.
+            //int numColumns = 10;
+            //int numRows = 10;
+            //int numHigh = 1;
+            //float separation = 8;
+            //Entity toAdd;
+            //for (int i = 0; i < numRows; i++)
+            //    for (int j = 0; j < numColumns; j++)
+            //        for (int k = 0; k < numHigh; k++)
+            //        {
+            //            toAdd = new Box(
+            //                new Vector3(
+            //                separation * i - numRows * separation / 2,
+            //                30f + k * separation,
+            //                separation * j - numColumns * separation / 2),
+            //                .5f, .5f, .5f, 15);
+            //            Space.Add(toAdd);
+            //        }
 
 
 

@@ -20,7 +20,7 @@ namespace BEPUphysicsDemos.Demos
         {
             Game = game;
             Space = new Space();
-
+            Space.TimeStepSettings.TimeStepDuration = 1 / 240f;
             //This section lets the engine know that it can make use of multithreaded systems
             //by adding threads to its thread pool.
 #if XBOX360
@@ -36,7 +36,7 @@ namespace BEPUphysicsDemos.Demos
             {
                 for (int i = 0; i < Environment.ProcessorCount; i++)
                 {
-                    Space.ThreadManager.AddThread();
+                    //Space.ThreadManager.AddThread();
                 }
             }
 #endif
@@ -73,7 +73,13 @@ namespace BEPUphysicsDemos.Demos
             long startTime = Stopwatch.GetTimestamp();
 
             //Update the simulation.
-            Space.Update(); //pass in dt to the function to use internal timestepping, if desired.
+            //Pass in dt to the function to use internal timestepping, if desired.
+            //Using internal time stepping usually works best when the interpolation is also used.
+            //Check out the asynchronous updating documentation for an example (though you don't have to use a separate thread to use interpolation).
+            Space.Update();
+            Space.Update();
+            Space.Update();
+            Space.Update(); 
 
             long endTime = Stopwatch.GetTimestamp();
             accumulatedPhysicsTime += (endTime - startTime) / (double)Stopwatch.Frequency;
