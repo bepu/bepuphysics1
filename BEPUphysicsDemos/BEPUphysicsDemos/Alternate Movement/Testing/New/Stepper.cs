@@ -264,7 +264,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                 float hitT;
                 if (Toolbox.GetRayPlaneIntersection(ref ray, ref plane, out hitT, out intersection))
                 {
-                    currentOffset = hitT;
+                    currentOffset = hitT + CollisionDetectionSettings.AllowedPenetration;
                     candidatePosition = character.Body.Position + down * currentOffset;
                     switch (TryDownStepPosition(ref candidatePosition, out hintOffset))
                     {
@@ -421,7 +421,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
             return false;
         }
 
-        float upStepMargin = .02f; //Up step margin is the extra space above the maximum step height to start the obstruction and downcast test rays.  Helps when a step is very close to the max step height.
+        float upStepMargin = .1f;  //There's a little extra space above the maximum step height to start the obstruction and downcast test rays.  Helps when a step is very close to the max step height.
         void FindUpStepCandidates(RawList<ContactData> outputStepCandidates)
         {
             foreach (var c in character.SupportFinder.sideContacts)
@@ -480,9 +480,10 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
             normal.Normalize();
 
             //Now we need to ray cast out from the center of the character in the direction of this normal to check for obstructions.
-            //Compute the ray origin location.
+            //Compute the ray origin location.  Fire it out of the top of the character; if we're stepping, this must be a valid location.
+            //Putting it as high as possible helps to reject more invalid step geometry.
             Ray ray;
-            float downRayLength = MaximumStepHeight + upStepMargin;
+            float downRayLength = character.Body.Height;// MaximumStepHeight + upStepMargin;
             Vector3.Multiply(ref down, character.Body.Height * .5f - downRayLength, out ray.Position);
             Vector3.Add(ref ray.Position, ref position, out ray.Position);
             ray.Direction = normal;
@@ -534,9 +535,41 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                     }
                 }
             }
-            if (earliestHit.T <= 0 || earliestHit.T == float.MaxValue || earliestHit.T - downRayLength > -MinimumUpStepHeight)
+            if (earliestHit.T <= 0 || //Can't do anything if the hit was invalid.
+                earliestHit.T == float.MaxValue || //Can't do anything if nothing was hit.
+                earliestHit.T - downRayLength > -MinimumUpStepHeight || //Don't bother doing anything if the step is too small.
+                earliestHit.T - downRayLength < -MaximumStepHeight - upStepMargin) //Can't do anything if the step is too tall.
             {
                 //No valid hit was detected.
+                newPosition = new Vector3();
+                return false;
+            }
+
+            //Since contact queries are frequently expensive compared to ray cast tests,
+            //do one more ray cast test.  This time, starting from the same position, cast upwards.
+            //In order to step up, the previous down-ray hit must be at least a character height away from the result of the up-ray.
+            Vector3.Negate(ref down, out ray.Direction);
+            //Find the earliest hit, if any.
+            RayHit earliestHitUp = new RayHit();
+            earliestHitUp.T = float.MaxValue;
+            float upLength = character.Body.Height - earliestHit.T;
+            foreach (var collidable in character.Body.CollisionInformation.OverlappedCollidables)
+            {
+                //Check to see if the collidable is hit by the ray.
+                float? t = ray.Intersects(collidable.BoundingBox);
+                if (t != null && t < upLength)
+                {
+                    //Is it an earlier hit than the current earliest?
+                    RayHit hit;
+                    if (collidable.RayCast(ray, upLength, character.SupportFinder.SupportRayFilter, out hit) && hit.T < earliestHitUp.T)
+                    {
+                        earliestHitUp = hit;
+                    }
+                }
+            }
+            //If the sum of the up and down distances is less than the height, the character can't fit.
+            if (earliestHitUp.T != float.MaxValue && earliestHitUp.T + earliestHit.T < character.Body.Height)
+            {
                 newPosition = new Vector3();
                 return false;
             }
@@ -601,7 +634,15 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
             float hitT;
             if (Toolbox.GetRayPlaneIntersection(ref downRay, ref plane, out hitT, out intersection))
             {
-                currentOffset = -downRayLength + hitT;
+                hitT = -downRayLength + hitT + CollisionDetectionSettings.AllowedPenetration;
+                if (hitT < highestBound)
+                {
+                    //Don't try a location known to be too high.
+                    hitT = highestBound;
+                }
+                currentOffset = hitT;
+                if (currentOffset > lowestBound)
+                    lowestBound = currentOffset;
                 candidatePosition = character.Body.Position + down * currentOffset + horizontalOffset;
                 switch (TryUpStepPosition(ref normal, ref candidatePosition, out hintOffset))
                 {
@@ -636,9 +677,10 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                         currentOffset += hintOffset;
                         lowestBound = currentOffset;
                         break;
+
                 }
 
-            }
+            }//TODO: If the ray cast doesn't hit, that could be used to early out...  Then again, it pretty much can't happen.
 
             //Our guesses failed.
             //Begin the regular process.  Start at the time of impact of the ray itself.
