@@ -477,8 +477,8 @@ namespace BEPUphysics
             BroadPhase.Update();
             BeforeNarrowPhaseUpdateables.Update();
             NarrowPhase.Update();
-            NarrowPhase.FlushGeneratedSolverUpdateables(Solver);
             BeforeSolverUpdateables.Update();
+            NarrowPhase.FlushGeneratedSolverUpdateables(Solver);
             Solver.Update();
             BeforePositionUpdateUpdateables.Update();
             PositionUpdater.Update();

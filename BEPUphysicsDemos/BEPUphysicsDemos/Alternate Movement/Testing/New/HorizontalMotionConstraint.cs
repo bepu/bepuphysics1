@@ -313,7 +313,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                 targetVelocity.X = newX;
 
             //Compute the effective mass matrix.
-            if (supportEntity != null)
+            if (supportEntity != null && supportEntity.IsDynamic)
             {
                 float m11, m22, m1221 = 0;
                 float inverseMass;
@@ -323,23 +323,21 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                 m11 = inverseMass;
                 m22 = inverseMass;
 
-                if (supportEntity.IsDynamic)
-                {
 
-                    //Scale the inertia and mass of the support.  This will make the solver view the object as 'heavier' with respect to horizontal motion.
-                    Matrix3X3 inertiaInverse = supportEntity.InertiaTensorInverse;
-                    Matrix3X3.Multiply(ref inertiaInverse, supportForceFactor, out inertiaInverse);
-                    float extra;
-                    inverseMass = supportForceFactor / (supportEntity.Mass);
-                    Matrix3X3.Transform(ref angularJacobianB1, ref inertiaInverse, out intermediate);
-                    Vector3.Dot(ref intermediate, ref angularJacobianB1, out extra);
-                    m11 += inverseMass + extra;
-                    Vector3.Dot(ref intermediate, ref angularJacobianB2, out extra);
-                    m1221 += extra;
-                    Matrix3X3.Transform(ref angularJacobianB2, ref inertiaInverse, out intermediate);
-                    Vector3.Dot(ref intermediate, ref angularJacobianB2, out extra);
-                    m22 += inverseMass + extra;
-                }
+                //Scale the inertia and mass of the support.  This will make the solver view the object as 'heavier' with respect to horizontal motion.
+                Matrix3X3 inertiaInverse = supportEntity.InertiaTensorInverse;
+                Matrix3X3.Multiply(ref inertiaInverse, supportForceFactor, out inertiaInverse);
+                float extra;
+                inverseMass = supportForceFactor / (supportEntity.Mass);
+                Matrix3X3.Transform(ref angularJacobianB1, ref inertiaInverse, out intermediate);
+                Vector3.Dot(ref intermediate, ref angularJacobianB1, out extra);
+                m11 += inverseMass + extra;
+                Vector3.Dot(ref intermediate, ref angularJacobianB2, out extra);
+                m1221 += extra;
+                Matrix3X3.Transform(ref angularJacobianB2, ref inertiaInverse, out intermediate);
+                Vector3.Dot(ref intermediate, ref angularJacobianB2, out extra);
+                m22 += inverseMass + extra;
+
 
                 massMatrix.M11 = m11;
                 massMatrix.M12 = m1221;

@@ -102,11 +102,11 @@ namespace BEPUphysics.Paths
         public abstract float GetSpeedAtCurveTime(float time);
 
         /// <summary>
-        /// Computes the value of the curve at a given time.
+        /// Gets the time at which the internal curve would be evaluated at the given time.
         /// </summary>
-        /// <param name="time">Time to evaluate the curve at.</param>
-        /// <param name="value">Value of the curve at the given time.</param>
-        public override void Evaluate(double time, out TValue value)
+        /// <param name="time">Time to evaluate the speed-controlled curve.</param>
+        /// <returns>Time at which the internal curve would be evaluated.</returns>
+        public double GetInnerTime(double time)
         {
             if (Curve == null)
                 throw new InvalidOperationException("SpeedControlledCurve's internal curve is null; ensure that its curve property is set prior to evaluation.");
@@ -118,8 +118,7 @@ namespace BEPUphysics.Paths
             int indexMax = samples.Count;
             if (indexMax == 0)
             {
-                value = default(TValue);
-                return;
+                return 0;
             }
             //If time < controlpoints.mintime, should be... 0 or -1?
             while (indexMax - indexMin > 1) //if time belongs to min
@@ -146,7 +145,28 @@ namespace BEPUphysics.Paths
                 indexMin -= 1;
 
             double curveTime = (time - samples[indexMin].X) / (samples[indexMin + 1].X - samples[indexMin].X);
-            Curve.Evaluate((1 - curveTime) * samples[indexMin].Y + (curveTime) * samples[indexMin + 1].Y, out value);
+            return (1 - curveTime) * samples[indexMin].Y + (curveTime) * samples[indexMin + 1].Y;
+        }
+
+        /// <summary>
+        /// Computes the value of the curve at a given time.
+        /// </summary>
+        /// <param name="time">Time to evaluate the curve at.</param>
+        /// <param name="value">Value of the curve at the given time.</param>
+        /// <param name="innerTime">Time at which the internal curve was evaluated to get the value.</returns>
+        public void Evaluate(double time, out TValue value, out double innerTime)
+        {
+            Curve.Evaluate(innerTime = GetInnerTime(time), out value);
+        }
+
+        /// <summary>
+        /// Computes the value of the curve at a given time.
+        /// </summary>
+        /// <param name="time">Time to evaluate the curve at.</param>
+        /// <param name="value">Value of the curve at the given time.</param>
+        public override void Evaluate(double time, out TValue value)
+        {
+            Curve.Evaluate(GetInnerTime(time), out value);
         }
 
         /// <summary>
