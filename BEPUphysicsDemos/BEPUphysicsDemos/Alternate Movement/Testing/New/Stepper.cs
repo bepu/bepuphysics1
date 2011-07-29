@@ -434,15 +434,30 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                 };
                 //Check to see if the contact is sufficiently aligned with the movement direction to be considered for stepping.
                 //TODO: This could behave a bit odd when encountering steps or slopes near the base of rounded collision margin.
-                if (Vector3.Dot(c.Contact.Normal, movementDirection) > 0)
+                var contact = c.Contact;
+                float dot;
+                Vector3.Dot(ref contact.Normal, ref movementDirection, out dot);
+                if (dot > 0)
                 {
                     //It is! But is it low enough?
-                    float dot = Vector3.Dot(character.Body.OrientationMatrix.Down, c.Contact.Position - character.Body.Position);
+                    dot = Vector3.Dot(character.Body.OrientationMatrix.Down, c.Contact.Position - character.Body.Position);
                     //It must be between the bottom of the character and the maximum step height.
                     if (dot < character.Body.Height * .5f && dot > character.Body.Height * .5f - MaximumStepHeight - upStepMargin)
                     {
                         //It's a candidate!
-                        outputStepCandidates.Add(c.Contact);
+                        //But wait, there's more! Do we already have a candidate that covers this direction?
+                        bool shouldAdd = true;
+                        for (int i = 0; i < outputStepCandidates.Count; i++)
+                        {
+                            Vector3.Dot(ref outputStepCandidates.Elements[i].Normal, ref contact.Normal, out dot);
+                            if (dot > .99f)
+                            {
+                                shouldAdd = false; //Woops! This direction is already covered.  Don't bother.
+                                break;
+                            }
+                        }
+                        if (shouldAdd)
+                            outputStepCandidates.Add(contact);
                     }
                 }
             }

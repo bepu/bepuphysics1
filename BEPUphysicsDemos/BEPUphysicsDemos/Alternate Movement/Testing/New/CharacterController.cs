@@ -79,7 +79,6 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
             Body.LocalInertiaTensorInverse = new Matrix3X3();
             Body.CollisionInformation.Events.CreatingPair += RemoveFriction;
             GlueSpeed = 20;
-            //HorizontalForceFactor = 0;
             SupportFinder = new SupportFinder(this);
             HorizontalMotionConstraint = new HorizontalMotionConstraint(this);
             Stepper = new Stepper(this);
@@ -107,8 +106,8 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                 //Expanding the character's bounding box ensures that minor variations in velocity will not cause
                 //any missed information.
                 //For a character which is not bound to Vector3.Up (such as a character that needs to run around a spherical planet),
-                //the bounding box expansion needs to be changed such that it includes the full convex cast at the bottom and top of the character under any orientation.
-                float radius = Body.CollisionInformation.Shape.Radius;
+                //the bounding box expansion needs to be changed such that it includes the full motion of the character.
+                float radius = Body.CollisionInformation.Shape.CollisionMargin * 1.1f; //The character can teleport by its collision margin when stepping up.
 #if WINDOWS
                 Vector3 offset;
 #else
