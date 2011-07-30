@@ -126,6 +126,10 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             CollisionRule rule;
             if ((rule = CollisionRules.collisionRuleCalculator(a.collisionRules, b.collisionRules)) < CollisionRule.NoNarrowPhasePair)
             {
+                //Clamp the rule to the parent's rule.  Always use the more restrictive option.
+                //Don't have to test for NoNarrowPhasePair rule on the parent's rule because then the parent wouldn't exist!
+                if (rule < CollisionRule)
+                    rule = CollisionRule;
                 var pair = new CollidablePair(a, b);
                 if (!subPairs.ContainsKey(pair))
                 {
