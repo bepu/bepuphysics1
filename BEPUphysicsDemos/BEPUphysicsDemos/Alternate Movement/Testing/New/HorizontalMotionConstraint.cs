@@ -319,7 +319,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                 float inverseMass;
                 Vector3 intermediate;
 
-                inverseMass = 1 / character.Body.Mass;
+                inverseMass = character.Body.InverseMass;
                 m11 = inverseMass;
                 m22 = inverseMass;
 
@@ -328,7 +328,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                 Matrix3X3 inertiaInverse = supportEntity.InertiaTensorInverse;
                 Matrix3X3.Multiply(ref inertiaInverse, supportForceFactor, out inertiaInverse);
                 float extra;
-                inverseMass = supportForceFactor / (supportEntity.Mass);
+                inverseMass = supportForceFactor * supportEntity.InverseMass;
                 Matrix3X3.Transform(ref angularJacobianB1, ref inertiaInverse, out intermediate);
                 Vector3.Dot(ref intermediate, ref angularJacobianB1, out extra);
                 m11 += inverseMass + extra;
