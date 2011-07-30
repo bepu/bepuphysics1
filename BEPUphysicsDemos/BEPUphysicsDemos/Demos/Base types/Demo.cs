@@ -75,7 +75,7 @@ namespace BEPUphysicsDemos.Demos
             //Pass in dt to the function to use internal timestepping, if desired.
             //Using internal time stepping usually works best when the interpolation is also used.
             //Check out the asynchronous updating documentation for an example (though you don't have to use a separate thread to use interpolation).
-            Space.Update();
+            Space.Update(dt);
 
             long endTime = Stopwatch.GetTimestamp();
             accumulatedPhysicsTime += (endTime - startTime) / (double)Stopwatch.Frequency;

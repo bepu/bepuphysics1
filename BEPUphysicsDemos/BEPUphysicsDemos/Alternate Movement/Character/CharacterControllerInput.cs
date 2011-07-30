@@ -130,12 +130,12 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     //Clamp the vertical component of the camera position within the bounding cylinder.
                     if (verticalError > CharacterController.Stepper.MaximumStepHeight)
                     {
-                        Camera.Position += up * (CharacterController.Stepper.MaximumStepHeight - verticalError);
+                        Camera.Position -= up * (CharacterController.Stepper.MaximumStepHeight - verticalError);
                         verticalError = CharacterController.Stepper.MaximumStepHeight;
                     }
                     else if (verticalError < -CharacterController.Stepper.MaximumStepHeight)
                     {
-                        Camera.Position += up * (-CharacterController.Stepper.MaximumStepHeight - verticalError);
+                        Camera.Position -= up * (-CharacterController.Stepper.MaximumStepHeight - verticalError);
                         verticalError = -CharacterController.Stepper.MaximumStepHeight;
                     }
                     //Clamp the horizontal distance too.
@@ -143,18 +143,23 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     float margin = CharacterController.Body.CollisionInformation.Shape.CollisionMargin;
                     if (horizontalErrorLength > margin * margin)
                     {
-                        horizontalErrorLength = margin * margin;
                         Vector3 previousHorizontalError = horizontalError;
                         Vector3.Multiply(ref horizontalError, margin / (float)Math.Sqrt(horizontalErrorLength), out horizontalError);
-                        Camera.Position += horizontalError - previousHorizontalError;
+                        Camera.Position -= horizontalError - previousHorizontalError;
+                        horizontalErrorLength = margin * margin;
                     }
                     //Now that the error/camera position is known to lie within the constraining cylinder, we can perform a smooth correction.
+
                     //This removes a portion of the error each frame.
                     //Note that this is not framerate independent.  If fixed time step is not enabled,
                     //a different smoothing method should be applied to the final error values.
-                    float errorCorrectionFactor = .3f;
+                    //float errorCorrectionFactor = .3f;
+
+                    //This version is framerate independent, although it is more expensive.
+                    float errorCorrectionFactor = (float)(1 - Math.Pow(.000000001, dt)); 
                     Camera.Position += up * (verticalError * errorCorrectionFactor);
                     Camera.Position += horizontalError * errorCorrectionFactor;
+
 
                 }
                 else
