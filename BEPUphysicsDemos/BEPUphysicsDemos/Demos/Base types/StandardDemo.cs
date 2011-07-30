@@ -12,7 +12,8 @@ using BEPUphysics.CollisionRuleManagement;
 using System;
 using System.Diagnostics;
 using BEPUphysics.Settings;
-using BEPUphysicsDemos.AlternateMovement.Testing.New;
+using BEPUphysicsDemos.AlternateMovement.Character;
+using BEPUphysicsDemos.AlternateMovement;
 
 namespace BEPUphysicsDemos.Demos
 {

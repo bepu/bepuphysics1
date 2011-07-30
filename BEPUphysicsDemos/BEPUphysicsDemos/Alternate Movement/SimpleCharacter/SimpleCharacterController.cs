@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.MathExtensions;
 
-namespace BEPUphysicsDemos
+namespace BEPUphysicsDemos.AlternateMovement.SimpleCharacter
 {
     public class SimpleCharacterController : Updateable, IEndOfTimeStepUpdateable
     {

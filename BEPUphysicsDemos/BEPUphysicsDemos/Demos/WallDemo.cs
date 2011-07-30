@@ -18,7 +18,7 @@ namespace BEPUphysicsDemos.Demos
             int width = 10;
             int height = 10;
             float blockWidth = 2f;
-            float blockHeight = .5f;
+            float blockHeight = 1f;
             float blockLength = 1f;
 
             for (int i = 0; i < width; i++)
@@ -28,7 +28,7 @@ namespace BEPUphysicsDemos.Demos
                     var toAdd =
                         new Box(
                             new Vector3(
-                                i * .1f + i * blockWidth + .5f * blockWidth * (j % 2) - width * blockWidth * .5f,
+                                i * blockWidth + .5f * blockWidth * (j % 2) - width * blockWidth * .5f,
                                 blockHeight * .5f + j * (blockHeight),
                                 0),
                             blockWidth, blockHeight, blockLength, 10);

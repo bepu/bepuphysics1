@@ -29,9 +29,6 @@ namespace BEPUphysicsDemos.Demos
             Vector3[] staticTriangleVertices;
             int[] staticTriangleIndices;
 
-            MaterialManager.DefaultStaticFriction = 10000;
-            MaterialManager.DefaultKineticFriction = 10000;
-
             var playgroundModel = game.Content.Load<Model>("playground");
             //This load method wraps the TriangleMesh.GetVerticesAndIndicesFromModel method 
             //to output vertices of type StaticTriangleGroupVertex instead of TriangleMeshVertex or simply Vector3.

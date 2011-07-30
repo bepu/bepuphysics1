@@ -19,7 +19,7 @@ using BEPUphysics.Collidables;
 using Microsoft.Xna.Framework.Input;
 using BEPUphysics.Entities;
 
-namespace BEPUphysicsDemos.AlternateMovement.Testing.New
+namespace BEPUphysicsDemos.AlternateMovement.Character
 {
     public class CharacterController : Updateable, IBeforeSolverUpdateable, IBeforePositionUpdateUpdateable, IEndOfTimeStepUpdateable
     {
@@ -78,6 +78,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
             Body.PositionUpdateMode = PositionUpdateMode.Continuous;
             Body.LocalInertiaTensorInverse = new Matrix3X3();
             Body.CollisionInformation.Events.CreatingPair += RemoveFriction;
+            Body.LinearDamping = 0;
             GlueSpeed = 20;
             SupportFinder = new SupportFinder(this);
             HorizontalMotionConstraint = new HorizontalMotionConstraint(this);

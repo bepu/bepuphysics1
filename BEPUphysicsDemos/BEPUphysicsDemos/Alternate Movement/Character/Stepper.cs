@@ -16,14 +16,14 @@ using BEPUphysics;
 using System.Diagnostics;
 using BEPUphysics.CollisionRuleManagement;
 
-namespace BEPUphysicsDemos.AlternateMovement.Testing.New
+namespace BEPUphysicsDemos.AlternateMovement.Character
 {
     public class Stepper
     {
         CharacterController character;
         public float MaximumStepHeight = 1;
         public float MinimumDownStepHeight = .1f;
-        public float MinimumUpStepHeight = .1f;
+        public float MinimumUpStepHeight;
 
         EntityCollidable queryObject;
 
@@ -32,7 +32,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
             this.character = character;
             queryObject = new ConvexCollidable<CylinderShape>(character.Body.CollisionInformation.Shape);
             queryObject.CollisionRules.Personal = BEPUphysics.CollisionRuleManagement.CollisionRule.NoSolver;
-
+            MinimumUpStepHeight = character.Body.CollisionInformation.Shape.CollisionMargin * (1 - character.SupportFinder.sinMaximumSlope);
 
         }
 

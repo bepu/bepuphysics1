@@ -10,7 +10,7 @@ using Microsoft.Xna.Framework.Input;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.CollisionShapes;
 
-namespace BEPUphysicsDemos
+namespace BEPUphysicsDemos.AlternateMovement
 {
     /// <summary>
     /// Handles input and movement of a Vehicle in the game.

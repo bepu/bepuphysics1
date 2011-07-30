@@ -11,7 +11,7 @@ using BEPUphysics.MathExtensions;
 using BEPUphysics;
 using System.Diagnostics;
 
-namespace BEPUphysicsDemos.AlternateMovement.Testing.New
+namespace BEPUphysicsDemos.AlternateMovement.Character
 {
     /// <summary>
     /// Manages the horizontal movement of a character.

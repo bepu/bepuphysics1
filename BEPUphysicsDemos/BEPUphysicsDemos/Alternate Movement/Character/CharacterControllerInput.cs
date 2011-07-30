@@ -1,8 +1,10 @@
 using BEPUphysics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using System;
+using System.Diagnostics;
 
-namespace BEPUphysicsDemos.AlternateMovement.Testing.New
+namespace BEPUphysicsDemos.AlternateMovement.Character
 {
     /// <summary>
     /// Handles input and movement of a character in the game.
@@ -18,7 +20,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
         /// <summary>
         /// Current offset from the position of the character to the 'eyes.'
         /// </summary>
-        public Vector3 CameraOffset = new Vector3(0, .7f, 0);
+        public float CameraOffset = .7f;
 
         /// <summary>
         /// Physics representation of the character.
@@ -29,6 +31,11 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
         /// Whether or not to use the character controller's input.
         /// </summary>
         public bool IsActive = true;
+
+        /// <summary>
+        /// Whether or not to smooth out character steps and other discontinuous motion.
+        /// </summary>
+        public bool UseCameraSmoothing = true;
 
         /// <summary>
         /// Owning space of the character.
@@ -63,7 +70,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                 IsActive = true;
                 Camera.UseMovementControls = false;
                 Space.Add(CharacterController);
-                CharacterController.Body.Position = (Camera.Position);
+                CharacterController.Body.Position = (Camera.Position - new Vector3(0, CameraOffset, 0));
             }
         }
 
@@ -96,8 +103,65 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.New
                 //Note that the character controller's update method is not called here; this is because it is handled within its owning space.
                 //This method's job is simply to tell the character to move around based on the Camera and input.
 
-                //Puts the Camera at eye level.
-                Camera.Position = CharacterController.Body.Position + CameraOffset;
+                if (UseCameraSmoothing)
+                {
+                    //First, find where the camera is expected to be based on the last position and the current velocity.
+                    //Note: if the character were a free-floating 6DOF character, this would need to include an angular velocity contribution.
+                    //And of course, the camera orientation would be based on the character's orientation.
+                    Camera.Position = Camera.Position + CharacterController.Body.LinearVelocity * dt;
+                    //Now compute where it should be according the physical body of the character.
+                    Vector3 up = CharacterController.Body.OrientationMatrix.Up;
+                    Vector3 bodyPosition = CharacterController.Body.Position;
+                    Vector3 goalPosition = bodyPosition + up * CameraOffset;
+
+                    //Usually, the camera position and the goal will be very close, if not matching completely.
+                    //However, if the character steps or has its position otherwise modified, then they will not match.
+                    //In this case, we need to correct the camera position.
+
+                    //To do this, first note that we can't correct infinite errors.  We need to define a bounding region that is relative to the character
+                    //in which the camera can interpolate around.  The most common discontinuous motions are those of upstepping and downstepping.
+                    //In downstepping, the character can teleport up to the character's MaximumStepHeight downwards.
+                    //In upstepping, the character can teleport up to the character's MaximumStepHeight upwards, and the body's CollisionMargin horizontally.
+                    //Picking those as bounds creates a constraining cylinder.
+
+                    Vector3 error = goalPosition - Camera.Position;
+                    float verticalError = Vector3.Dot(error, up);
+                    Vector3 horizontalError = error - verticalError * up;
+                    //Clamp the vertical component of the camera position within the bounding cylinder.
+                    if (verticalError > CharacterController.Stepper.MaximumStepHeight)
+                    {
+                        Camera.Position += up * (CharacterController.Stepper.MaximumStepHeight - verticalError);
+                        verticalError = CharacterController.Stepper.MaximumStepHeight;
+                    }
+                    else if (verticalError < -CharacterController.Stepper.MaximumStepHeight)
+                    {
+                        Camera.Position += up * (-CharacterController.Stepper.MaximumStepHeight - verticalError);
+                        verticalError = -CharacterController.Stepper.MaximumStepHeight;
+                    }
+                    //Clamp the horizontal distance too.
+                    float horizontalErrorLength = horizontalError.LengthSquared();
+                    float margin = CharacterController.Body.CollisionInformation.Shape.CollisionMargin;
+                    if (horizontalErrorLength > margin * margin)
+                    {
+                        horizontalErrorLength = margin * margin;
+                        Vector3 previousHorizontalError = horizontalError;
+                        Vector3.Multiply(ref horizontalError, margin / (float)Math.Sqrt(horizontalErrorLength), out horizontalError);
+                        Camera.Position += horizontalError - previousHorizontalError;
+                    }
+                    //Now that the error/camera position is known to lie within the constraining cylinder, we can perform a smooth correction.
+                    //This removes a portion of the error each frame.
+                    //Note that this is not framerate independent.  If fixed time step is not enabled,
+                    //a different smoothing method should be applied to the final error values.
+                    float errorCorrectionFactor = .3f;
+                    Camera.Position += up * (verticalError * errorCorrectionFactor);
+                    Camera.Position += horizontalError * errorCorrectionFactor;
+
+                }
+                else
+                {
+                    Camera.Position = CharacterController.Body.Position + CameraOffset * CharacterController.Body.OrientationMatrix.Up;
+                }
+
                 Vector2 totalMovement = Vector2.Zero;
 
 #if XBOX360

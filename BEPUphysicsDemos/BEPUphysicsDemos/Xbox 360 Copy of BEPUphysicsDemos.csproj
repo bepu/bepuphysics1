@@ -59,16 +59,16 @@
   </PropertyGroup>
   <ItemGroup />
   <ItemGroup>
-    <Compile Include="Alternate Movement\SimpleCharacterController.cs" />
-    <Compile Include="Alternate Movement\SimpleCharacterControllerInput.cs" />
+    <Compile Include="Alternate Movement\Character\CharacterController.cs" />
+    <Compile Include="Alternate Movement\Character\CharacterControllerInput.cs" />
+    <Compile Include="Alternate Movement\Character\HorizontalMotionConstraint.cs" />
+    <Compile Include="Alternate Movement\Character\Stepper.cs" />
+    <Compile Include="Alternate Movement\Character\SupportFinder.cs" />
+    <Compile Include="Alternate Movement\SimpleCharacter\SimpleCharacterController.cs" />
+    <Compile Include="Alternate Movement\SimpleCharacter\SimpleCharacterControllerInput.cs" />
     <Compile Include="Alternate Movement\TankInput.cs" />
     <Compile Include="Alternate Movement\Testing\ConvexCast\CharacterControllerConvexCast.cs" />
     <Compile Include="Alternate Movement\Testing\ConvexCast\CharacterControllerConvexCastInput.cs" />
-    <Compile Include="Alternate Movement\Testing\New\CharacterController.cs" />
-    <Compile Include="Alternate Movement\Testing\New\CharacterControllerInput.cs" />
-    <Compile Include="Alternate Movement\Testing\New\HorizontalMotionConstraint.cs" />
-    <Compile Include="Alternate Movement\Testing\New\Stepper.cs" />
-    <Compile Include="Alternate Movement\Testing\New\SupportFinder.cs" />
     <Compile Include="Alternate Movement\Testing\Old\CharacterControllerInputOld.cs" />
     <Compile Include="Alternate Movement\Testing\Old\CharacterControllerOld.cs" />
     <Compile Include="Alternate Movement\VehicleInput.cs" />
@@ -81,6 +81,7 @@
     <Compile Include="Demos\BridgeDemo.cs" />
     <Compile Include="Demos\BroadPhaseDemo.cs" />
     <Compile Include="Demos\BuoyancyDemo.cs" />
+    <Compile Include="Demos\CharacterPlaygroundDemo.cs" />
     <Compile Include="Demos\ClothDemo.cs" />
     <Compile Include="Demos\CoefficientsDemo.cs" />
     <Compile Include="Demos\CollisionFilteringDemo.cs" />
@@ -110,7 +111,6 @@
     <Compile Include="Demos\SpaceshipDemo.cs" />
     <Compile Include="Demos\TerrainDemo.cs" />
     <Compile Include="Demos\Tests\BroadPhasesTestDemo.cs" />
-    <Compile Include="Demos\Tests\CharacterTestDemo.cs" />
     <Compile Include="Demos\Tests\ClothTestDemo.cs" />
     <Compile Include="Demos\Tests\DeterminismTestDemo.cs" />
     <Compile Include="Demos\Tests\MPRCastingDemo.cs" />

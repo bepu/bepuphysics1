@@ -3,7 +3,7 @@ using BEPUphysics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
-namespace BEPUphysicsDemos
+namespace BEPUphysicsDemos.AlternateMovement.SimpleCharacter
 {
     /// <summary>
     /// Handles input and movement of a character in the game.

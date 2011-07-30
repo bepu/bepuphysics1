@@ -111,7 +111,7 @@ namespace BEPUphysicsDemos
                                                     typeof (PathFollowingDemo),
                                                     typeof (FishInABarrelDemo),
                                                     typeof (DetectorVolumeDemo),
-                                                    typeof (CharacterTestDemo)
+                                                    typeof (CharacterPlaygroundDemo)
                                                 };
 
 
@@ -120,9 +120,9 @@ namespace BEPUphysicsDemos
             Graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
 
-            Graphics.PreferredBackBufferWidth = 1200;
+            Graphics.PreferredBackBufferWidth = 800;
             Graphics.PreferredBackBufferHeight = 600;
-            Camera = new Camera(Vector3.Zero, 10, 0, 0, Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, Graphics.PreferredBackBufferWidth / Graphics.PreferredBackBufferHeight, .1f, 10000));
+            Camera = new Camera(Vector3.Zero, 10, 0, 0, Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, (float)Graphics.PreferredBackBufferWidth / Graphics.PreferredBackBufferHeight, .1f, 10000));
 
 
             Exiting += DemosGameExiting;

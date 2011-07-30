@@ -10,7 +10,7 @@ using BEPUphysics.Collidables;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.BroadPhaseSystems;
 
-namespace BEPUphysicsDemos.AlternateMovement.Testing.New
+namespace BEPUphysicsDemos.AlternateMovement.Character
 {
     /// <summary>
     /// Analyzes the contacts on the character's body to find supports.
