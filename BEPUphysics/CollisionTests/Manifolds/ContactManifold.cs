@@ -41,7 +41,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
         protected virtual void Remove(int contactIndex)
         {
             Contact removing = contacts.Elements[contactIndex];
-            contacts.RemoveAt(contactIndex);
+            contacts.FastRemoveAt(contactIndex);
             OnRemoved(removing);
             unusedContacts.GiveBack(removing);
         }

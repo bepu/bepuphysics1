@@ -77,10 +77,13 @@ namespace BEPUphysics.CollisionTests.Manifolds
         ///<param name="dt">Timestep duration.</param>
         public override void Update(float dt)
         {
+
             //First, refresh all existing contacts.  This is an incremental manifold.
             var transform = MeshTransform;
             ContactRefresher.ContactRefresh(contacts, supplementData, ref convex.worldTransform, ref transform, contactIndicesToRemove);
+
             RemoveQueuedContacts();
+
 
             CleanUpOverlappingTriangles();
             //Get all the overlapped triangle indices.
@@ -123,6 +126,8 @@ namespace BEPUphysics.CollisionTests.Manifolds
                         {
                             contactList.Get(j, out contact);
 
+
+
                             if (UseImprovedBoundaryHandling)
                             {
                                 if (AnalyzeCandidate(ref indices, pairTester, ref contact))
@@ -134,6 +139,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                             {
                                 AddLocalContact(ref contact, ref orientation);
                             }
+
                         }
                     }
 
@@ -146,6 +152,8 @@ namespace BEPUphysics.CollisionTests.Manifolds
                 }
 
             }
+
+
 
 
             if (UseImprovedBoundaryHandling)
@@ -174,6 +182,9 @@ namespace BEPUphysics.CollisionTests.Manifolds
 
                     }
                     //If it's blocked AND it doesn't allow correction, ignore its existence.
+
+
+    
                 }
                 for (int i = 0; i < vertexContacts.count; i++)
                 {
@@ -194,14 +205,19 @@ namespace BEPUphysics.CollisionTests.Manifolds
                         AddLocalContact(ref vertexContacts.Elements[i].ContactData, ref orientation);
                     }
                     //If it's blocked AND it doesn't allow correction, ignore its existence.
+
+ 
                 }
                 blockedEdgeRegions.Clear();
                 blockedVertexRegions.Clear();
                 vertexContacts.Clear();
                 edgeContacts.Clear();
+
+  
             }
 
 
+     
 
             //Remove stale pair testers.
             //This will only remove 8 stale ones per frame, but it doesn't really matter.
@@ -229,8 +245,13 @@ namespace BEPUphysics.CollisionTests.Manifolds
             }
 
 
+
+
             //Some child types will want to do some extra post processing on the manifold.        
             ProcessCandidates(candidatesToAdd);
+
+
+     
 
             //Check if adding the new contacts would overflow the manifold.
             if (contacts.count + candidatesToAdd.count > 4)
@@ -252,6 +273,9 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     Add(ref candidatesToAdd.Elements[i]);
                 }
             }
+
+
+        
 
             candidatesToAdd.Clear();
 
