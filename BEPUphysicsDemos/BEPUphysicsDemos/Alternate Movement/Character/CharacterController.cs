@@ -211,13 +211,10 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 //Refresh all the narrow phase collisions.
                 foreach (var pair in Body.CollisionInformation.Pairs)
                 {
-                    //We must first clear out contacts from the pairs which are not support contacts.
-                    //How about just clear them all?
-                    (Space as Space).NarrowPhase.FlushGeneratedSolverUpdateables((Space as Space).Solver);
+                    //Clear out the old contacts.  This prevents contacts in persistent manifolds from surviving the step
+                    //Such old contacts might still have old normals which blocked the character's forward motion.
                     pair.ClearContacts();
-                    (Space as Space).NarrowPhase.FlushGeneratedSolverUpdateables((Space as Space).Solver);
                     pair.UpdateCollision(dt);
-                    (Space as Space).NarrowPhase.FlushGeneratedSolverUpdateables((Space as Space).Solver);
                 }
                 //Also re-collect supports.
                 //This will ensure the constraint and other velocity affectors have the most recent information available.

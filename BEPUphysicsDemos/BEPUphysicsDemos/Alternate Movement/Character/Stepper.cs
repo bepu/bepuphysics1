@@ -32,7 +32,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             this.character = character;
             queryObject = new ConvexCollidable<CylinderShape>(character.Body.CollisionInformation.Shape);
             queryObject.CollisionRules.Personal = BEPUphysics.CollisionRuleManagement.CollisionRule.NoSolver;
-            MinimumUpStepHeight = Math.Max(0, -.1f + character.Body.CollisionInformation.Shape.CollisionMargin * (1 - character.SupportFinder.sinMaximumSlope));
+            MinimumUpStepHeight = Math.Max(0, -.01f + character.Body.CollisionInformation.Shape.CollisionMargin * (1 - character.SupportFinder.sinMaximumSlope));
 
         }
 
