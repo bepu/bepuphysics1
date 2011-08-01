@@ -460,19 +460,19 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
                     //Project the center onto the edge to find the direction from the center to the edge AB.
                     Vector3.Dot(ref AO, ref AB, out dot);
-                    Vector3.Multiply(ref AB, dot / lengthSquared, out ABnormal);
+                    Vector3.Multiply(ref AB, dot / AB.LengthSquared(), out ABnormal);
                     Vector3.Subtract(ref AO, ref ABnormal, out ABnormal);
                     ABnormal.Normalize();
 
                     //Project the center onto the edge to find the direction from the center to the edge BC.
                     Vector3.Dot(ref BO, ref BC, out dot);
-                    Vector3.Multiply(ref BC, dot / lengthSquared, out BCnormal);
+                    Vector3.Multiply(ref BC, dot / BC.LengthSquared(), out BCnormal);
                     Vector3.Subtract(ref BO, ref BCnormal, out BCnormal);
                     BCnormal.Normalize();
 
                     //Project the center onto the edge to find the direction from the center to the edge BC.
                     Vector3.Dot(ref CO, ref CA, out dot);
-                    Vector3.Multiply(ref CA, dot / lengthSquared, out CAnormal);
+                    Vector3.Multiply(ref CA, dot / CA.LengthSquared(), out CAnormal);
                     Vector3.Subtract(ref CO, ref CAnormal, out CAnormal);
                     CAnormal.Normalize();
 

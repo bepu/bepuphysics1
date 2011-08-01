@@ -127,7 +127,6 @@ namespace BEPUphysics.CollisionTests.Manifolds
                             contactList.Get(j, out contact);
 
 
-
                             if (UseImprovedBoundaryHandling)
                             {
                                 if (AnalyzeCandidate(ref indices, pairTester, ref contact))
