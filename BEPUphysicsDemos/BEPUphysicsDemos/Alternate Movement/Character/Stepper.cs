@@ -32,7 +32,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             this.character = character;
             queryObject = new ConvexCollidable<CylinderShape>(character.Body.CollisionInformation.Shape);
             queryObject.CollisionRules.Personal = BEPUphysics.CollisionRuleManagement.CollisionRule.NoSolver;
-            MinimumUpStepHeight = character.Body.CollisionInformation.Shape.CollisionMargin * (1 - character.SupportFinder.sinMaximumSlope);
+            MinimumUpStepHeight = Math.Max(0, -.1f + character.Body.CollisionInformation.Shape.CollisionMargin * (1 - character.SupportFinder.sinMaximumSlope));
 
         }
 
@@ -214,7 +214,6 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 //It's fully supported.
                 state = PositionState.Accepted;
             }
-            hasTraction = true;
             return true;
 
         }
@@ -545,6 +544,24 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 return false;
             }
 
+            //Ensure the candidate surface supports traction.
+            Vector3 supportNormal;
+            Vector3.Normalize(ref earliestHit.Normal, out supportNormal);
+            //Calibrate the normal to face in the same direction as the down vector for consistency.
+            Vector3.Dot(ref supportNormal, ref down, out dot);
+            if (dot < 0)
+            {
+                Vector3.Negate(ref supportNormal, out supportNormal);
+                dot = -dot;
+            }
+
+            //If the new surface does not have traction, do not attempt to step up.
+            if (dot < character.SupportFinder.cosMaximumSlope)
+            {
+                newPosition = new Vector3();
+                return false;
+            }
+
             //Since contact queries are frequently expensive compared to ray cast tests,
             //do one more ray cast test.  This time, starting from the same position, cast upwards.
             //In order to step up, the previous down-ray hit must be at least a character height away from the result of the up-ray.
@@ -580,22 +597,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
             //Predict a hit location based on the time of impact and the normal at the intersection.
             //Take into account the radius of the character (don't forget the collision margin!)
-            Vector3 supportNormal;
-            Vector3.Normalize(ref earliestHit.Normal, out supportNormal);
-            //Calibrate the normal to face in the same direction as the down vector for consistency.
-            Vector3.Dot(ref supportNormal, ref down, out dot);
-            if (dot < 0)
-            {
-                Vector3.Negate(ref supportNormal, out supportNormal);
-                dot = -dot;
-            }
-
-            //If the new surface does not have traction, do not attempt to step up.
-            if (dot < character.SupportFinder.cosMaximumSlope)
-            {
-                newPosition = new Vector3();
-                return false;
-            }
+            
 
 
             RigidTransform transform = character.Body.CollisionInformation.WorldTransform;
@@ -661,6 +663,9 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                             newPosition = new Vector3();
                             return false;
                         }
+                    case PositionState.Rejected:
+                        newPosition = new Vector3();
+                        return false;
                     case PositionState.NoHit:
                         highestBound = currentOffset + hintOffset;
                         currentOffset = (lowestBound + currentOffset) * .5f;
@@ -714,6 +719,9 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                             newPosition = new Vector3();
                             return false;
                         }
+                    case PositionState.Rejected:
+                        newPosition = new Vector3();
+                        return false;
                     case PositionState.NoHit:
                         highestBound = currentOffset + hintOffset;
                         currentOffset = (lowestBound + highestBound) * .5f;
@@ -774,11 +782,19 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             {
                 if (supportState == PositionState.Accepted)
                 {
-                    //We're done! The guess found a good spot to stand on.
-                    //The final state doesn't need to actually create contacts, so shove it up 
-                    //just barely to the surface.
-                    hintOffset = -Vector3.Dot(supportContact.Normal, character.Body.OrientationMatrix.Down) * supportContact.PenetrationDepth;
-                    return PositionState.Accepted;
+                    if (hasTraction)
+                    {
+                        //We're done! The guess found a good spot to stand on.
+                        //The final state doesn't need to actually create contacts, so shove it up 
+                        //just barely to the surface.
+                        hintOffset = -Vector3.Dot(supportContact.Normal, character.Body.OrientationMatrix.Down) * supportContact.PenetrationDepth;
+                        return PositionState.Accepted;
+                    }
+                    else
+                    {
+                        //If it didn't have traction, and this was the most valid location we could find, then there is no support.
+                        return PositionState.Rejected;
+                    }
                 }
                 else if (supportState == PositionState.TooDeep)
                 {
@@ -856,6 +872,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         enum PositionState
         {
             Accepted,
+            Rejected,
             TooDeep,
             Obstructed,
             HeadObstructed,

@@ -281,5 +281,13 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         /// Gets a list of the contacts in the pair and their associated constraint information.
         ///</summary>
         public ContactCollection Contacts { get; private set; }
+
+        /// <summary>
+        /// Forces the pair handler to clean out its contacts.
+        /// </summary>
+        public virtual void ClearContacts()
+        {
+            previousContactCount = 0;
+        }
     }
 }

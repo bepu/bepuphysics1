@@ -379,5 +379,17 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         {
             get { return contactCount; }
         }
+
+        /// <summary>
+        /// Clears the pair's contacts.
+        /// </summary>
+        public override void ClearContacts()
+        {
+            foreach (var pair in subPairs.Values)
+            {
+                pair.ClearContacts();
+            }
+            base.ClearContacts();
+        }
     }
 }

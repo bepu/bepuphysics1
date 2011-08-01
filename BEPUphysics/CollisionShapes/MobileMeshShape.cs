@@ -853,34 +853,14 @@ namespace BEPUphysics.CollisionShapes
             Toolbox.ExpandBoundingBox(ref boundingBox, ref expansion);
         }
 
-        public override float ComputeVolume()
-        {
-            throw new System.NotImplementedException();
-        }
 
-        public override Matrix3X3 ComputeVolumeDistribution(out float volume)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override Matrix3X3 ComputeVolumeDistribution()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override Vector3 ComputeCenter()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override Vector3 ComputeCenter(out float volume)
-        {
-            throw new System.NotImplementedException();
-        }
-
+        /// <summary>
+        /// Computes the volume, center of mass, and volume distribution of the shape.
+        /// </summary>
+        /// <param name="shapeInfo">Data about the shape.</param>
         public override void ComputeDistributionInformation(out ShapeDistributionInformation shapeInfo)
         {
-            throw new System.NotImplementedException();
+            ComputeShapeInformation(this.TriangleMesh.Data as TransformableMeshData, out shapeInfo);
         }
 
         public override Collidables.MobileCollidables.EntityCollidable GetCollidableInstance()

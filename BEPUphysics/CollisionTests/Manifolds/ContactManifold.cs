@@ -96,6 +96,17 @@ namespace BEPUphysics.CollisionTests.Manifolds
         ///</summary>
         ///<param name="dt">Timestep duration.</param>
         public abstract void Update(float dt);
+
+        /// <summary>
+        /// Clears the contacts associated with this manifold.
+        /// </summary>
+        public void ClearContacts()
+        {
+            for (int i = contacts.count - 1; i >= 0; i--)
+            {
+                Remove(i);
+            }
+        }
     }
 
 }

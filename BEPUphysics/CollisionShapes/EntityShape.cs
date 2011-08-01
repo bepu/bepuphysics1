@@ -14,7 +14,12 @@ namespace BEPUphysics.CollisionShapes
         /// Computes the volume of the shape.
         /// </summary>
         /// <returns>Volume of the shape.</returns>
-        public abstract float ComputeVolume();
+        public virtual float ComputeVolume()
+        {
+            ShapeDistributionInformation shapeInfo;
+            ComputeDistributionInformation(out shapeInfo);
+            return shapeInfo.Volume;
+        }
         /// <summary>
         /// Computes the volume distribution of the shape as well as its volume.
         /// The volume distribution can be used to compute inertia tensors when
@@ -22,20 +27,36 @@ namespace BEPUphysics.CollisionShapes
         /// </summary>
         /// <param name="volume">Volume of the shape.</param>
         /// <returns>Volume distribution of the shape.</returns>
-        public abstract Matrix3X3 ComputeVolumeDistribution(out float volume);
+        public virtual Matrix3X3 ComputeVolumeDistribution(out float volume)
+        {
+            ShapeDistributionInformation shapeInfo;
+            ComputeDistributionInformation(out shapeInfo);
+            volume = shapeInfo.Volume;
+            return shapeInfo.VolumeDistribution;
+        }
         /// <summary>
         /// Computes the volume distribution of the shape.
         /// The volume distribution can be used to compute inertia tensors when
         /// paired with mass and other tuning factors.
         /// </summary>
         /// <returns>Volume distribution of the shape.</returns>
-        public abstract Matrix3X3 ComputeVolumeDistribution();
+        public virtual Matrix3X3 ComputeVolumeDistribution()
+        {
+            ShapeDistributionInformation shapeInfo;
+            ComputeDistributionInformation(out shapeInfo);
+            return shapeInfo.VolumeDistribution;
+        }
         /// <summary>
         /// Computes the center of the shape.  This can be considered its 
         /// center of mass.
         /// </summary>
         /// <returns>Center of the shape.</returns>
-        public abstract Vector3 ComputeCenter();
+        public virtual Vector3 ComputeCenter()
+        {
+            ShapeDistributionInformation shapeInfo;
+            ComputeDistributionInformation(out shapeInfo);
+            return shapeInfo.Center;
+        }
         /// <summary>
         /// Computes the center of the shape.  This can be considered its 
         /// center of mass.  This calculation is often associated with the 
@@ -43,7 +64,13 @@ namespace BEPUphysics.CollisionShapes
         /// </summary>
         /// <param name="volume">Volume of the shape.</param>
         /// <returns>Center of the shape.</returns>
-        public abstract Vector3 ComputeCenter(out float volume);
+        public virtual Vector3 ComputeCenter(out float volume)
+        {
+            ShapeDistributionInformation shapeInfo;
+            ComputeDistributionInformation(out shapeInfo);
+            volume = shapeInfo.Volume;
+            return shapeInfo.Center;
+        }
 
         /// <summary>
         /// Computes a variety of shape information all at once.

@@ -205,10 +205,39 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         }
 
 
-
+        /// <summary>
+        /// Gets the number of contacts associated with this pair handler.
+        /// </summary>
         public override int ContactCount
         {
             get { return ContactManifold.contacts.count; }
+        }
+
+        /// <summary>
+        /// Clears the contacts associated with this pair handler.
+        /// </summary>
+        public override void ClearContacts()
+        {
+             if (previousContactCount > 0)
+            {
+                //Just exited collision.
+
+                //Remove the solver item.
+                if (Parent != null)
+                    Parent.RemoveSolverUpdateable(ContactConstraint);
+                else if (NarrowPhase != null)
+                    NarrowPhase.EnqueueRemovedSolverUpdateable(ContactConstraint);
+
+                if (!suppressEvents)
+                {
+                    var a = CollidableA;
+                    var b = CollidableB;
+                    a.EventTriggerer.OnCollisionEnded(b, this);
+                    b.EventTriggerer.OnCollisionEnded(a, this);
+                }
+            }
+            ContactManifold.ClearContacts();
+            base.ClearContacts();
         }
 
     }
