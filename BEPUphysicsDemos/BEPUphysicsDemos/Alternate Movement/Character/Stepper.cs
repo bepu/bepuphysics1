@@ -492,22 +492,14 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             //In practice, the current contact refreshing approach used for many pair types causes contacts to persist horizontally a bit,
             //which can cause side effects for the character.
             float horizontalOffsetAmount = character.Body.CollisionInformation.Shape.CollisionMargin;// (float)((1 - character.SupportFinder.sinMaximumSlope) * character.Body.CollisionInformation.Shape.CollisionMargin + 0);
-            float length = character.Body.Radius + horizontalOffsetAmount - contact.PenetrationDepth;
+            float length = character.Body.Radius + horizontalOffsetAmount;// -contact.PenetrationDepth;
 
-            foreach (var collidable in character.Body.CollisionInformation.OverlappedCollidables)
+
+            if (RayCastHitAnything(ray, length))
             {
-                //Check to see if the collidable is hit by the ray.
-                float? t = ray.Intersects(collidable.BoundingBox);
-                if (t != null && t < length)
-                {
-                    RayHit hit;
-                    if (collidable.RayCast(ray, length, character.SupportFinder.SupportRayFilter, out hit))
-                    {
-                        //The step is obstructed!
-                        newPosition = new Vector3();
-                        return false;
-                    }
-                }
+                //The step is obstructed!
+                newPosition = new Vector3();
+                return false;
             }
 
             //The down-cast ray origin has been verified by the previous ray cast.
@@ -519,23 +511,8 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
             //Find the earliest hit, if any.
             RayHit earliestHit = new RayHit();
-            earliestHit.T = float.MaxValue;
-            foreach (var collidable in character.Body.CollisionInformation.OverlappedCollidables)
-            {
-                //Check to see if the collidable is hit by the ray.
-                float? t = ray.Intersects(collidable.BoundingBox);
-                if (t != null && t < downRayLength)
-                {
-                    //Is it an earlier hit than the current earliest?
-                    RayHit hit;
-                    if (collidable.RayCast(ray, downRayLength, character.SupportFinder.SupportRayFilter, out hit) && hit.T < earliestHit.T)
-                    {
-                        earliestHit = hit;
-                    }
-                }
-            }
-            if (earliestHit.T <= 0 || //Can't do anything if the hit was invalid.
-                earliestHit.T == float.MaxValue || //Can't do anything if nothing was hit.
+            if (!RayCast(ray, downRayLength, out earliestHit) || //Can't do anything if it didn't hit.
+                earliestHit.T <= 0 || //Can't do anything if the hit was invalid.
                 earliestHit.T - downRayLength > -MinimumUpStepHeight || //Don't bother doing anything if the step is too small.
                 earliestHit.T - downRayLength < -MaximumStepHeight - upStepMargin) //Can't do anything if the step is too tall.
             {
@@ -567,25 +544,12 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             //In order to step up, the previous down-ray hit must be at least a character height away from the result of the up-ray.
             Vector3.Negate(ref down, out ray.Direction);
             //Find the earliest hit, if any.
-            RayHit earliestHitUp = new RayHit();
-            earliestHitUp.T = float.MaxValue;
+            //RayHit earliestHitUp = new RayHit();
+            //earliestHitUp.T = float.MaxValue;
             float upLength = character.Body.Height - earliestHit.T;
-            foreach (var collidable in character.Body.CollisionInformation.OverlappedCollidables)
-            {
-                //Check to see if the collidable is hit by the ray.
-                float? t = ray.Intersects(collidable.BoundingBox);
-                if (t != null && t < upLength)
-                {
-                    //Is it an earlier hit than the current earliest?
-                    RayHit hit;
-                    if (collidable.RayCast(ray, upLength, character.SupportFinder.SupportRayFilter, out hit) && hit.T < earliestHitUp.T)
-                    {
-                        earliestHitUp = hit;
-                    }
-                }
-            }
+
             //If the sum of the up and down distances is less than the height, the character can't fit.
-            if (earliestHitUp.T != float.MaxValue && earliestHitUp.T + earliestHit.T < character.Body.Height)
+            if (RayCastHitAnything(ray, upLength))
             {
                 newPosition = new Vector3();
                 return false;
@@ -597,7 +561,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
             //Predict a hit location based on the time of impact and the normal at the intersection.
             //Take into account the radius of the character (don't forget the collision margin!)
-            
+
 
 
             RigidTransform transform = character.Body.CollisionInformation.WorldTransform;
@@ -785,13 +749,75 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     if (hasTraction)
                     {
                         //We're done! The guess found a good spot to stand on.
-                        //The final state doesn't need to actually create contacts, so shove it up 
-                        //just barely to the surface.
-                        hintOffset = -Vector3.Dot(supportContact.Normal, character.Body.OrientationMatrix.Down) * supportContact.PenetrationDepth;
+                        //Unlike down stepping, upstepping DOES need good contacts in the final state.
+                        //Push it up if necessary, but don't push it too far.
+                        //Putting it into the middle of the allowed penetration makes it very likely that it will properly generate contacts.
+                        //Choosing something smaller than allowed penetration ensures that the search makes meaningful progress forward when the sizes get really tiny;
+                        //we wouldn't want it edging every closer to AllowedPenetration and then exit because too many queries were made.
+                        hintOffset = Math.Min(0, Vector3.Dot(supportContact.Normal, character.Body.OrientationMatrix.Down) * (CollisionDetectionSettings.AllowedPenetration * .5f - supportContact.PenetrationDepth));
                         return PositionState.Accepted;
                     }
                     else
                     {
+                        //No traction... Before we give up and reject the step altogether, let's try one last thing.  It's possible that the character is trying to step up onto the side of a ramp or something.
+                        //In this scenario, the top-down ray cast detects a perfectly walkable slope.  However, the contact queries will find a contact with a normal necessarily
+                        //steeper than the one found by the ray cast because it is an edge contact.  Not being able to step up in this scenario doesn't feel natural to the player
+                        //even if it is technically consistent.
+
+                        //So, let's try to ray cast down to the a point just barely beyond the contact (to ensure we don't land right on the edge, which would invite numerical issues).
+                        //Note that this is NOT equivalent to the ray cast we performed earlier to test for an initial step height and surface normal.
+                        //This one is based on the QUERY state and the QUERY's contact position.
+
+                        //Find the down test ray's position.
+                        Vector3 down = character.Body.OrientationMatrix.Down;
+                        Ray downRay;
+                        downRay.Position = supportContact.Position + sideNormal * .001f;
+                        float verticalOffset = Vector3.Dot(downRay.Position - position, down);
+                        verticalOffset = character.Body.Height * .5f + verticalOffset;
+                        downRay.Position -= verticalOffset * down;
+                        downRay.Direction = down;
+
+                        //First, we must ensure that the ray cast test origin is not obstructed.  Starting very close to the very top of the character is safe because the process has already validated
+                        //this location as accepted, just without traction.
+                        Ray obstructionTestRay;
+                        obstructionTestRay.Position = position + character.Body.OrientationMatrix.Up * (character.Body.Height * .5f);
+                        obstructionTestRay.Direction = downRay.Position - obstructionTestRay.Position;
+
+                        if (!RayCastHitAnything(obstructionTestRay, 1))
+                        {
+                            //Okay! it's safe to cast down, then.
+                            RayHit hit;
+                            if (RayCast(downRay, character.Body.Height, out hit))
+                            {
+                                //Got a hit!
+                                if (character.Body.Height - MaximumStepHeight < hit.T)
+                                {
+                                    //It's in range!                   
+                                    float dot;
+                                    hit.Normal.Normalize();
+                                    Vector3.Dot(ref hit.Normal, ref down, out dot);
+                                    if (Math.Abs(dot) > character.SupportFinder.cosMaximumSlope)
+                                    {
+                                        //Slope is shallow enough to stand on!
+                                        hintOffset = Math.Min(0, Vector3.Dot(supportContact.Normal, character.Body.OrientationMatrix.Down) * (CollisionDetectionSettings.AllowedPenetration * .5f - supportContact.PenetrationDepth));
+                                        //ONE MORE thing to check.  The new position of the center ray must be able to touch the ground!
+                                        downRay.Position = position;
+                                        if (RayCast(downRay, character.Body.Height * .5f + MaximumStepHeight, out hit))
+                                        {
+                                            //It hit.. almost there!
+                                            hit.Normal.Normalize();
+                                            Vector3.Dot(ref hit.Normal, ref down, out dot);
+                                            if (Math.Abs(dot) > character.SupportFinder.cosMaximumSlope)
+                                            {
+                                                //It has traction! We can step!
+                                                return PositionState.Accepted;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
                         //If it didn't have traction, and this was the most valid location we could find, then there is no support.
                         return PositionState.Rejected;
                     }
@@ -799,7 +825,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 else if (supportState == PositionState.TooDeep)
                 {
                     //Looks like we have to keep trying, but at least we found a good hint.
-                    hintOffset = Math.Min(0, .001f - Vector3.Dot(supportContact.Normal, character.Body.OrientationMatrix.Down) * supportContact.PenetrationDepth);
+                    hintOffset = Math.Min(0, Vector3.Dot(supportContact.Normal, character.Body.OrientationMatrix.Down) * (CollisionDetectionSettings.AllowedPenetration * .5f - supportContact.PenetrationDepth));
                     return PositionState.TooDeep;
                 }
                 else //if (supportState == SupportState.Separated)
@@ -853,7 +879,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             {
                 dot = Vector3.Dot(contact.Normal, c.Contact.Normal);
                 float depth = dot * c.Contact.PenetrationDepth;
-                if (depth > c.Contact.PenetrationDepth)
+                if (depth > Math.Max(c.Contact.PenetrationDepth, CollisionDetectionSettings.AllowedPenetration))
                     return true;
 
             }
@@ -867,6 +893,49 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             tractionContacts.Clear();
             sideContacts.Clear();
             headContacts.Clear();
+        }
+
+        public bool RayCast(Ray ray, float length, out RayHit earliestHit)
+        {
+            earliestHit = new RayHit();
+            earliestHit.T = float.MaxValue;
+            foreach (var collidable in character.Body.CollisionInformation.OverlappedCollidables)
+            {
+                //Check to see if the collidable is hit by the ray.
+                float? t = ray.Intersects(collidable.BoundingBox);
+                if (t != null && t < length)
+                {
+                    //Is it an earlier hit than the current earliest?
+                    RayHit hit;
+                    if (collidable.RayCast(ray, length, character.SupportFinder.SupportRayFilter, out hit) && hit.T < earliestHit.T)
+                    {
+                        earliestHit = hit;
+                    }
+                }
+            }
+            if (earliestHit.T == float.MaxValue)
+                return false;
+            return true;
+
+        }
+
+        public bool RayCastHitAnything(Ray ray, float length)
+        {
+            foreach (var collidable in character.Body.CollisionInformation.OverlappedCollidables)
+            {
+                //Check to see if the collidable is hit by the ray.
+                float? t = ray.Intersects(collidable.BoundingBox);
+                if (t != null && t < length)
+                {
+                    RayHit hit;
+                    if (collidable.RayCast(ray, length, character.SupportFinder.SupportRayFilter, out hit))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+
         }
 
         enum PositionState
