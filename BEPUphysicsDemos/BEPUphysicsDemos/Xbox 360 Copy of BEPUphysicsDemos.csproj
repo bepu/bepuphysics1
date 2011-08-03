@@ -64,6 +64,7 @@
     <Compile Include="Alternate Movement\Character\HorizontalMotionConstraint.cs" />
     <Compile Include="Alternate Movement\Character\Stepper.cs" />
     <Compile Include="Alternate Movement\Character\SupportFinder.cs" />
+    <Compile Include="Alternate Movement\Character\VerticalMotionConstraint.cs" />
     <Compile Include="Alternate Movement\SimpleCharacter\SimpleCharacterController.cs" />
     <Compile Include="Alternate Movement\SimpleCharacter\SimpleCharacterControllerInput.cs" />
     <Compile Include="Alternate Movement\TankInput.cs" />

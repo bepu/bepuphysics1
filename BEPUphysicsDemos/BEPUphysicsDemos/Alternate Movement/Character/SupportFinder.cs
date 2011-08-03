@@ -194,6 +194,56 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             }
         }
 
+        public bool GetTractionInDirection(ref Vector3 movementDirection, out SupportData supportData)
+        {
+
+            if (HasTraction)
+            {
+                int greatestIndex = -1;
+                float greatestDot = -float.MaxValue;
+                for (int i = 0; i < supports.Count; i++)
+                {
+                    if (supports.Elements[i].HasTraction)
+                    {
+                        float dot;
+                        Vector3.Dot(ref movementDirection, ref supports.Elements[i].Contact.Normal, out dot);
+                        if (dot < greatestDot)
+                        {
+                            greatestDot = dot;
+                            greatestIndex = i;
+                        }
+                    }
+                }
+                if (greatestIndex != -1)
+                {
+                    supportData.Position = supports.Elements[greatestIndex].Contact.Position;
+                    supportData.Normal = supports.Elements[greatestIndex].Contact.Normal;
+                    supportData.Depth = supports.Elements[greatestIndex].Contact.PenetrationDepth;
+                    supportData.SupportObject = supports.Elements[greatestIndex].Support;
+                    supportData.HasTraction = true;
+                    return true;
+                }
+                //Okay, try the ray cast result then.
+                if (SupportRayData != null && SupportRayData.Value.HasTraction)
+                {
+                    supportData.Position = SupportRayData.Value.HitData.Location;
+                    supportData.Normal = SupportRayData.Value.HitData.Normal;
+                    supportData.Depth = bottomHeight - SupportRayData.Value.HitData.T;
+                    supportData.SupportObject = SupportRayData.Value.HitObject;
+                    supportData.HasTraction = true;
+                    return true;
+                }
+                //Well that's strange!
+                supportData = new SupportData();
+                return false;
+            }
+            else
+            {
+                supportData = new SupportData();
+                return false;
+            }
+        }
+
         /// <summary>
         /// Gets whether or not at least one of the character's body's contacts provide support to the character.
         /// </summary>

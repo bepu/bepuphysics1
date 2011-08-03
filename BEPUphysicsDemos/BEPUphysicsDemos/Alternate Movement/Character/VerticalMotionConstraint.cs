@@ -1,0 +1,252 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using BEPUphysics.Constraints;
+using BEPUphysics.DataStructures;
+using BEPUphysics.Entities;
+using Microsoft.Xna.Framework;
+using BEPUphysics.Collidables.MobileCollidables;
+using BEPUphysics.MathExtensions;
+using BEPUphysics;
+using System.Diagnostics;
+
+namespace BEPUphysicsDemos.AlternateMovement.Character
+{
+    /// <summary>
+    /// Manages the horizontal movement of a character.
+    /// </summary>
+    public class VerticalMotionConstraint : EntitySolverUpdateable
+    {
+        CharacterController character;
+
+
+        SupportData supportData;
+        /// <summary>
+        /// Gets or sets the support data used by the constraint.
+        /// </summary>
+        public SupportData SupportData
+        {
+            get
+            {
+                return supportData;
+            }
+            set
+            {
+                //If the support changes, perform the necessary bookkeeping to keep the connections up to date.
+                var oldSupport = supportData.SupportObject;
+                supportData = value;
+                if (oldSupport != supportData.SupportObject)
+                {
+                    OnInvolvedEntitiesChanged();
+                }
+            }
+        }
+
+
+        public float MaximumGlueForce = 150000;
+
+        float supportForceFactor = 1;
+        /// <summary>
+        /// Gets or sets the scaling factor of forces applied to the supporting object if it is a dynamic entity.
+        /// Low values (below 1) reduce the amount of motion imparted to the support object; it acts 'heavier' as far as horizontal motion is concerned.
+        /// High values (above 1) increase the force applied to support objects, making them appear lighter.
+        /// </summary>
+        public float SupportForceFactor
+        {
+            get
+            {
+                return supportForceFactor;
+            }
+            set
+            {
+                if (value < 0)
+                    throw new Exception("Value must be nonnegative.");
+                supportForceFactor = value;
+            }
+        }
+
+        float effectiveMass;
+        Entity supportEntity;
+        Vector3 linearJacobianA;
+        Vector3 linearJacobianB;
+        Vector3 angularJacobianB;
+
+        float accumulatedImpulse;
+
+        public VerticalMotionConstraint(CharacterController characterController)
+        {
+            this.character = characterController;
+        }
+
+
+        protected override void CollectInvolvedEntities(RawList<Entity> outputInvolvedEntities)
+        {
+            var entityCollidable = supportData.SupportObject as EntityCollidable;
+            if (entityCollidable != null)
+                outputInvolvedEntities.Add(entityCollidable.Entity);
+            outputInvolvedEntities.Add(character.Body);
+
+        }
+
+        public override void UpdateSolverActivity()
+        {
+            if (supportData.HasTraction)
+                base.UpdateSolverActivity();
+            else
+                isActiveInSolver = false;
+        }
+
+
+        public override void Update(float dt)
+        {
+            //Collect references, pick the mode, and configure the coefficients to be used by the solver.
+            if (supportData.SupportObject != null)
+            {
+                //Get an easy reference to the support.
+                var support = supportData.SupportObject as EntityCollidable;
+                if (support != null)
+                {
+                    supportEntity = support.Entity;
+
+                }
+                else
+                {
+                    supportEntity = null;
+
+                }
+
+            }
+            else
+            {
+                supportEntity = null;
+            }
+
+
+
+            //Compute the jacobians and effective mass matrix.  This constraint works along a single degree of freedom, so the mass matrix boils down to a scalar.
+            Vector3 downDirection = character.Body.OrientationMatrix.Down;
+
+            linearJacobianA = supportData.Normal;
+            Vector3.Negate(ref linearJacobianA, out linearJacobianB);
+            effectiveMass = supportForceFactor * character.Body.InverseMass;
+            if (supportEntity != null)
+            {
+                Vector3 offsetB = supportData.Position - supportEntity.Position;
+                Vector3.Cross(ref offsetB, ref linearJacobianB, out angularJacobianB);
+                if (supportEntity.IsDynamic)
+                {
+                    //Only dynamic entities can actually contribute anything to the effective mass.
+                    //Kinematic entities have infinite mass and inertia, so this would all zero out.
+                    Vector3 angularComponentB;
+                    Matrix3X3 inertiaInverse = supportEntity.LocalInertiaTensorInverse;
+                    Matrix3X3.Multiply(ref inertiaInverse, supportForceFactor, out inertiaInverse);
+                    Matrix3X3.Transform(ref angularJacobianB, ref inertiaInverse, out angularComponentB);
+                    Vector3.Cross(ref angularComponentB, ref offsetB, out angularComponentB);
+                    Vector3.Dot(ref angularComponentB, ref angularJacobianB, out effectiveMass);
+                    effectiveMass += supportForceFactor * supportEntity.InverseMass;
+                }
+            }
+            effectiveMass = 1 / effectiveMass;
+
+            //So much nicer and shorter than the horizontal constraint!
+
+        }
+
+        public override void ExclusiveUpdate()
+        {
+            //Warm start the constraint using the previous impulses and the new jacobians!
+#if !WINDOWS
+            Vector3 impulse = new Vector3();
+            Vector3 torque= new Vector3();
+#else
+            Vector3 impulse;
+            Vector3 torque;
+#endif
+            Vector3.Multiply(ref linearJacobianA, accumulatedImpulse, out impulse);
+
+            character.Body.ApplyLinearImpulse(ref impulse);
+
+            if (supportEntity != null && supportEntity.IsDynamic)
+            {
+                Vector3.Multiply(ref impulse, -supportForceFactor, out impulse);
+                Vector3.Multiply(ref angularJacobianB, accumulatedImpulse * supportForceFactor, out torque);
+
+                supportEntity.ApplyLinearImpulse(ref impulse);
+                supportEntity.ApplyAngularImpulse(ref torque);
+            }
+        }
+
+
+        public override float SolveIteration()
+        {
+            //The relative velocity's x component is in the movement direction.
+            //y is the perpendicular direction.
+
+            float relativeVelocity = RelativeVelocity;
+
+
+            //Create the full velocity change, and convert it to an impulse in constraint space.
+            float lambda = -relativeVelocity * effectiveMass;
+
+            //Add and clamp the impulse.
+            float previousAccumulatedImpulse = accumulatedImpulse;
+            accumulatedImpulse = MathHelper.Clamp(accumulatedImpulse + lambda, 0, MaximumGlueForce);
+            lambda = accumulatedImpulse - previousAccumulatedImpulse;
+            //Use the jacobians to put the impulse into world space.
+
+#if !WINDOWS
+            Vector3 impulse = new Vector3();
+            Vector3 torque= new Vector3();
+#else
+            Vector3 impulse;
+            Vector3 torque;
+#endif
+            Vector3.Multiply(ref linearJacobianA, lambda, out impulse); 
+
+            character.Body.ApplyLinearImpulse(ref impulse);
+
+            if (supportEntity != null && supportEntity.IsDynamic)
+            {
+                Vector3.Multiply(ref impulse, -supportForceFactor, out impulse);
+
+                Vector3.Multiply(ref angularJacobianB, lambda * supportForceFactor, out torque);
+
+                supportEntity.ApplyLinearImpulse(ref impulse);
+                supportEntity.ApplyAngularImpulse(ref torque);
+            }
+            return Math.Abs(lambda);
+
+
+        }
+
+
+        float RelativeVelocity
+        {
+            get
+            {
+                float relativeVelocity;
+
+                Vector3 bodyVelocity = character.Body.LinearVelocity;
+                Vector3.Dot(ref linearJacobianA, ref bodyVelocity, out relativeVelocity);
+
+                if (supportEntity != null)
+                {
+                    Vector3 supportLinearVelocity = supportEntity.LinearVelocity;
+                    Vector3 supportAngularVelocity = supportEntity.AngularVelocity;
+
+
+                    float supportVelocity;
+                    Vector3.Dot(ref linearJacobianB, ref supportLinearVelocity, out supportVelocity);
+                    relativeVelocity += supportVelocity;
+                    Vector3.Dot(ref angularJacobianB, ref supportAngularVelocity, out supportVelocity);
+                    relativeVelocity += supportVelocity;
+
+                }
+                return relativeVelocity;
+            }
+        }
+
+
+    }
+}

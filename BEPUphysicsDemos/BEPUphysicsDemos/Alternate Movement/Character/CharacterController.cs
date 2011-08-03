@@ -21,7 +21,7 @@ using BEPUphysics.Entities;
 
 namespace BEPUphysicsDemos.AlternateMovement.Character
 {
-    public class CharacterController : Updateable, IBeforeSolverUpdateable, IBeforePositionUpdateUpdateable, IEndOfTimeStepUpdateable
+    public class CharacterController : Updateable, IBeforeSolverUpdateable
     {
         public Cylinder Body { get; private set; }
 
@@ -29,6 +29,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
 
         public HorizontalMotionConstraint HorizontalMotionConstraint { get; private set; }
+        public VerticalMotionConstraint VerticalMotionConstraint { get; private set; }
 
         public float JumpSpeed = 4.5f;
         public float SlidingJumpSpeed = 3;
@@ -82,6 +83,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             GlueSpeed = 20;
             SupportFinder = new SupportFinder(this);
             HorizontalMotionConstraint = new HorizontalMotionConstraint(this);
+            VerticalMotionConstraint = new VerticalMotionConstraint(this);
             Stepper = new Stepper(this);
 
 
@@ -250,22 +252,17 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             //}
 
 
-            //Also manage the vertical velocity of the character;
-            //don't let it separate from the ground.
-            if (SupportFinder.HasTraction)
-            {
-                verticalVelocity += Math.Max(supportData.Depth / dt, 0);
-                if (verticalVelocity < 0 && verticalVelocity > -GlueSpeed)
-                {
-                    ChangeVelocityUnilaterally(-supportData.Normal * verticalVelocity, ref relativeVelocity);
-                }
-
-            }
 
 
             //Warning:
             //Changing a constraint's support data is not thread safe; it modifies simulation islands!
             HorizontalMotionConstraint.SupportData = supportData;
+            //Vertical support data is different because it has the capacity to stop the character from moving unless
+            //contacts are pruned appropriately.
+            SupportData verticalSupportData;
+            Vector3 movement3d = new Vector3(HorizontalMotionConstraint.MovementDirection.X, 0, HorizontalMotionConstraint.MovementDirection.Y);
+            SupportFinder.GetTractionInDirection(ref movement3d, out verticalSupportData);
+            VerticalMotionConstraint.SupportData = verticalSupportData;
 
 
 
@@ -336,35 +333,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
 
 
-        void IBeforePositionUpdateUpdateable.Update(float dt)
-        {
-            //Also manage the vertical velocity of the character;
-            //don't let it separate from the ground.
-            if (SupportFinder.HasTraction)
-            {
-                Vector3 relativeVelocity;
-                ComputeRelativeVelocity(out relativeVelocity);
-                float verticalVelocity = Vector3.Dot(supportData.Normal, relativeVelocity);
-                verticalVelocity += Math.Max(supportData.Depth / dt, 0);
-                if (verticalVelocity < 0 && verticalVelocity > -GlueSpeed)
-                {
-                    ChangeVelocityUnilaterally(-supportData.Normal * verticalVelocity, ref relativeVelocity);
-                }
 
-            }
-        }
-
-
-        void IEndOfTimeStepUpdateable.Update(float dt)
-        {
-            //Teleport the object to the first hit surface.
-            //This has to be done after the position update to ensure that no other systems get a chance to make an invalid state visible to the user, which would be corrected
-            //jerkily in a subsequent frame.
-            //Consider using forces instead.
-
-            //if (IsSupported)
-            //    Body.Position += -(goalSupportT - supportData.T) * sweep;
-        }
 
         bool tryToJump = false;
         /// <summary>
@@ -383,6 +352,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             //Add any supplements to the space too.
             newSpace.Add(Body);
             newSpace.Add(HorizontalMotionConstraint);
+            newSpace.Add(VerticalMotionConstraint);
             //This character controller requires the standard implementation of Space.
             ((Space)newSpace).BoundingBoxUpdater.Finishing += ExpandBoundingBox;
 
@@ -394,6 +364,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             //Remove any supplements from the space too.
             oldSpace.Remove(Body);
             oldSpace.Remove(HorizontalMotionConstraint);
+            oldSpace.Remove(VerticalMotionConstraint);
             //This character controller requires the standard implementation of Space.
             ((Space)oldSpace).BoundingBoxUpdater.Finishing -= ExpandBoundingBox;
             SupportFinder.ClearSupportData();
