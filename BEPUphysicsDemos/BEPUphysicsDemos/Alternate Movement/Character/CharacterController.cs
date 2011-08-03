@@ -338,7 +338,74 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         }
 
 
+        public bool RayCast(Ray ray, float length, out RayHit earliestHit)
+        {
+            earliestHit = new RayHit();
+            earliestHit.T = float.MaxValue;
+            foreach (var collidable in Body.CollisionInformation.OverlappedCollidables)
+            {
+                //Check to see if the collidable is hit by the ray.
+                float? t = ray.Intersects(collidable.BoundingBox);
+                if (t != null && t < length)
+                {
+                    //Is it an earlier hit than the current earliest?
+                    RayHit hit;
+                    if (collidable.RayCast(ray, length, SupportFinder.SupportRayFilter, out hit) && hit.T < earliestHit.T)
+                    {
+                        earliestHit = hit;
+                    }
+                }
+            }
+            if (earliestHit.T == float.MaxValue)
+                return false;
+            return true;
 
+        }
+
+        public bool RayCast(Ray ray, float length, out RayHit earliestHit, out Collidable hitObject)
+        {
+            earliestHit = new RayHit();
+            earliestHit.T = float.MaxValue;
+            hitObject = null;
+            foreach (var collidable in Body.CollisionInformation.OverlappedCollidables)
+            {
+                //Check to see if the collidable is hit by the ray.
+                float? t = ray.Intersects(collidable.BoundingBox);
+                if (t != null && t < length)
+                {
+                    //Is it an earlier hit than the current earliest?
+                    RayHit hit;
+                    if (collidable.RayCast(ray, length, SupportFinder.SupportRayFilter, out hit) && hit.T < earliestHit.T)
+                    {
+                        earliestHit = hit;
+                        hitObject = collidable;
+                    }
+                }
+            }
+            if (earliestHit.T == float.MaxValue)
+                return false;
+            return true;
+
+        }
+
+        public bool RayCastHitAnything(Ray ray, float length)
+        {
+            foreach (var collidable in Body.CollisionInformation.OverlappedCollidables)
+            {
+                //Check to see if the collidable is hit by the ray.
+                float? t = ray.Intersects(collidable.BoundingBox);
+                if (t != null && t < length)
+                {
+                    RayHit hit;
+                    if (collidable.RayCast(ray, length, SupportFinder.SupportRayFilter, out hit))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+
+        }
 
 
 
