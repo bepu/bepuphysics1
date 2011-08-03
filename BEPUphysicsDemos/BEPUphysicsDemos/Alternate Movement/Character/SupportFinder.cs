@@ -461,11 +461,13 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
             }
 
+            bool hasTractionDueToContacts = HasTraction;
+
             //Start the ray halfway between the center of the shape and the bottom of the shape.  That extra margin prevents it from getting stuck in the ground and returning t = 0 unhelpfully.
             SupportRayData = null;
             bottomHeight = body.Height * .25f;
             //If the contacts aren't available to support the character, raycast down to find the ground.
-            if (!HasTraction && hadTraction)
+            if (!hasTractionDueToContacts && hadTraction)
             {
 
                 //TODO: could also require that the character has a nonzero movement direction in order to use a ray cast.  Questionable- would complicate the behavior on edges.
@@ -483,7 +485,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
             //If contacts and the center ray cast failed, try a ray offset in the movement direction.
             bool tryingToMove = character.HorizontalMotionConstraint.MovementDirection.LengthSquared() > 0;
-            if (!HasTraction && hadTraction && tryingToMove)
+            if (!hasTractionDueToContacts && hadTraction && tryingToMove)
             {
 
                 Ray ray = new Ray(body.Position +
@@ -502,20 +504,24 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     SupportRayData data;
                     if (TryDownCast(ref ray, length, out hasTraction, out data))
                     {
-                        //Only replace the previous support ray if we now have traction or we didn't have a support ray at all before.
-                        if (hasTraction)
+                        if (SupportRayData == null || data.HitData.T < SupportRayData.Value.HitData.T)
                         {
-                            SupportRayData = data;
-                            HasTraction = true;
+                            //Only replace the previous support ray if we now have traction or we didn't have a support ray at all before,
+                            //or this hit is a better (sooner) hit.
+                            if (hasTraction)
+                            {
+                                SupportRayData = data;
+                                HasTraction = true;
+                            }
+                            else if (SupportRayData == null)
+                                SupportRayData = data;
                         }
-                        else if (SupportRayData == null)
-                            SupportRayData = data;
                     }
                 }
             }
 
             //If contacts, center ray, AND forward ray failed to find traction, try a side ray created from down x forward.
-            if (!HasTraction && hadTraction && tryingToMove)
+            if (!hasTractionDueToContacts && hadTraction && tryingToMove)
             {
                 //Compute the horizontal offset direction.  Down direction and the movement direction are normalized and perpendicular, so the result is too.
                 Vector3 horizontalOffset = new Vector3(character.HorizontalMotionConstraint.MovementDirection.X, 0, character.HorizontalMotionConstraint.MovementDirection.Y);
@@ -535,20 +541,24 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     SupportRayData data;
                     if (TryDownCast(ref ray, length, out hasTraction, out data))
                     {
-                        //Only replace the previous support ray if we now have traction or we didn't have a support ray at all before.
-                        if (hasTraction)
-                        {
-                            SupportRayData = data;
-                            HasTraction = true;
+                        if (SupportRayData == null || data.HitData.T < SupportRayData.Value.HitData.T)
+                        {                            
+                            //Only replace the previous support ray if we now have traction or we didn't have a support ray at all before,
+                            //or this hit is a better (sooner) hit.
+                            if (hasTraction)
+                            {
+                                SupportRayData = data;
+                                HasTraction = true;
+                            }
+                            else if (SupportRayData == null)
+                                SupportRayData = data;
                         }
-                        else if (SupportRayData == null)
-                            SupportRayData = data;
                     }
                 }
             }
 
             //If contacts, center ray, forward ray, AND the first side ray failed to find traction, try a side ray created from forward x down.
-            if (!HasTraction && hadTraction && tryingToMove)
+            if (!hasTractionDueToContacts && hadTraction && tryingToMove)
             {
                 //Compute the horizontal offset direction.  Down direction and the movement direction are normalized and perpendicular, so the result is too.
                 Vector3 horizontalOffset = new Vector3(character.HorizontalMotionConstraint.MovementDirection.X, 0, character.HorizontalMotionConstraint.MovementDirection.Y);
@@ -568,14 +578,18 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     SupportRayData data;
                     if (TryDownCast(ref ray, length, out hasTraction, out data))
                     {
-                        //Only replace the previous support ray if we now have traction or we didn't have a support ray at all before.
-                        if (hasTraction)
+                        if (SupportRayData == null || data.HitData.T < SupportRayData.Value.HitData.T)
                         {
-                            SupportRayData = data;
-                            HasTraction = true;
+                            //Only replace the previous support ray if we now have traction or we didn't have a support ray at all before,
+                            //or this hit is a better (sooner) hit.
+                            if (hasTraction)
+                            {
+                                SupportRayData = data;
+                                HasTraction = true;
+                            }
+                            else if (SupportRayData == null)
+                                SupportRayData = data;
                         }
-                        else if (SupportRayData == null)
-                            SupportRayData = data;
                     }
                 }
             }
