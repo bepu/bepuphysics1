@@ -170,6 +170,13 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 HorizontalMotionConstraint.SupportData = new SupportData();
             }
 
+            //If we can compute that we're separating faster than we can handle, take off.
+            if (SupportFinder.HasTraction && verticalVelocity < -VerticalMotionConstraint.MaximumGlueForce * dt / VerticalMotionConstraint.EffectiveMass)
+            {
+                SupportFinder.ClearSupportData();
+                supportData = new SupportData();
+            }
+
             //Attempt to jump.
             if (tryToJump)
             {
@@ -181,7 +188,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     //The character has traction, so jump straight up.
                     float currentUpVelocity = Vector3.Dot(Body.OrientationMatrix.Up, relativeVelocity);
                     //Target velocity is JumpSpeed.
-                    float velocityChange = JumpSpeed - currentUpVelocity;
+                    float velocityChange = Math.Max(JumpSpeed - currentUpVelocity, 0);
                     ApplyJumpVelocity(Body.OrientationMatrix.Up * velocityChange, ref relativeVelocity);
                 }
                 else if (SupportFinder.HasSupport)
@@ -189,12 +196,12 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     //The character does not have traction, so jump along the surface normal instead.
                     float currentNormalVelocity = Vector3.Dot(supportData.Normal, relativeVelocity);
                     //Target velocity is JumpSpeed.
-                    float velocityChange = SlidingJumpSpeed - currentNormalVelocity;
+                    float velocityChange = Math.Max(SlidingJumpSpeed - currentNormalVelocity, 0);
                     ApplyJumpVelocity(supportData.Normal * -velocityChange, ref relativeVelocity);
                 }
                 SupportFinder.ClearSupportData();
                 tryToJump = false;
-                HorizontalMotionConstraint.SupportData = new SupportData();
+                supportData = new SupportData();
 
             }
 

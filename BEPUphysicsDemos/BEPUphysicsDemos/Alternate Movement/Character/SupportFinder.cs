@@ -58,10 +58,9 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     }
                     if (supports.Count > 1)
                     {
-                        float factor = 1f / supports.Count;
-                        Vector3.Multiply(ref toReturn.Position, factor, out toReturn.Position);
+                        Vector3.Multiply(ref toReturn.Position, 1f / supports.Count, out toReturn.Position);
                         float length = toReturn.Normal.LengthSquared();
-                        if (length < Toolbox.BigEpsilon)
+                        if (length < Toolbox.Epsilon)
                         {
                             //It's possible that the normals have cancelled each other out- that would be bad!
                             //Just use an arbitrary support's normal in that case.
@@ -69,7 +68,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                         }
                         else
                         {
-                            Vector3.Multiply(ref toReturn.Normal, factor / (float)Math.Sqrt(length), out toReturn.Normal);
+                            Vector3.Multiply(ref toReturn.Normal, 1 / (float)Math.Sqrt(length), out toReturn.Normal);
                         }
                     }
                     //Now that we have the normal, cycle through all the contacts again and find the deepest projected depth.
@@ -101,7 +100,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                             Position = SupportRayData.Value.HitData.Location,
                             Normal = SupportRayData.Value.HitData.Normal,
                             HasTraction = SupportRayData.Value.HasTraction,
-                            Depth = bottomHeight - SupportRayData.Value.HitData.T,
+                            Depth = Vector3.Dot(character.Body.OrientationMatrix.Down, SupportRayData.Value.HitData.Normal) * (bottomHeight - SupportRayData.Value.HitData.T),
                             SupportObject = SupportRayData.Value.HitObject
                         };
                     }
@@ -135,8 +134,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     }
                     if (withTraction > 1)
                     {
-                        float factor = 1f / withTraction;
-                        Vector3.Multiply(ref toReturn.Position, factor, out toReturn.Position);
+                        Vector3.Multiply(ref toReturn.Position, 1f / withTraction, out toReturn.Position);
                         float length = toReturn.Normal.LengthSquared();
                         if (length < Toolbox.BigEpsilon)
                         {
@@ -146,7 +144,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                         }
                         else
                         {
-                            Vector3.Multiply(ref toReturn.Normal, factor / (float)Math.Sqrt(length), out toReturn.Normal);
+                            Vector3.Multiply(ref toReturn.Normal, 1 / (float)Math.Sqrt(length), out toReturn.Normal);
                         }
                     }
                     if (withTraction > 0)
@@ -182,7 +180,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                         Position = SupportRayData.Value.HitData.Location,
                         Normal = SupportRayData.Value.HitData.Normal,
                         HasTraction = true,
-                        Depth = bottomHeight - SupportRayData.Value.HitData.T,
+                        Depth = Vector3.Dot(character.Body.OrientationMatrix.Down, SupportRayData.Value.HitData.Normal) * (bottomHeight - SupportRayData.Value.HitData.T),
                         SupportObject = SupportRayData.Value.HitObject
                     };
                 }
@@ -207,7 +205,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     {
                         float dot;
                         Vector3.Dot(ref movementDirection, ref supports.Elements[i].Contact.Normal, out dot);
-                        if (dot < greatestDot)
+                        if (dot > greatestDot)
                         {
                             greatestDot = dot;
                             greatestIndex = i;
@@ -218,9 +216,25 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 {
                     supportData.Position = supports.Elements[greatestIndex].Contact.Position;
                     supportData.Normal = supports.Elements[greatestIndex].Contact.Normal;
-                    supportData.Depth = supports.Elements[greatestIndex].Contact.PenetrationDepth;
                     supportData.SupportObject = supports.Elements[greatestIndex].Support;
                     supportData.HasTraction = true;
+
+                    float depth = -float.MaxValue;
+                    for (int i = 0; i < supports.Count; i++)
+                    {
+                        if (supports.Elements[i].HasTraction)
+                        {
+                            float dot;
+                            Vector3.Dot(ref supports.Elements[i].Contact.Normal, ref supportData.Normal, out dot);
+                            dot = dot * supports.Elements[i].Contact.PenetrationDepth;
+                            if (dot > depth)
+                            {
+                                depth = dot;
+                            }
+                        }
+                    }
+                    supportData.Depth = depth;
+
                     return true;
                 }
                 //Okay, try the ray cast result then.
@@ -228,7 +242,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 {
                     supportData.Position = SupportRayData.Value.HitData.Location;
                     supportData.Normal = SupportRayData.Value.HitData.Normal;
-                    supportData.Depth = bottomHeight - SupportRayData.Value.HitData.T;
+                    supportData.Depth = Vector3.Dot(character.Body.OrientationMatrix.Down, SupportRayData.Value.HitData.Normal) * (bottomHeight - SupportRayData.Value.HitData.T);
                     supportData.SupportObject = SupportRayData.Value.HitObject;
                     supportData.HasTraction = true;
                     return true;

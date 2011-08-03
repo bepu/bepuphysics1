@@ -10,6 +10,7 @@ using BEPUphysics.Collidables.MobileCollidables;
 using BEPUphysics.MathExtensions;
 using BEPUphysics;
 using System.Diagnostics;
+using BEPUphysics.Settings;
 
 namespace BEPUphysicsDemos.AlternateMovement.Character
 {
@@ -44,7 +45,8 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         }
 
 
-        public float MaximumGlueForce = 150000;
+        public float MaximumGlueForce = 5000f;
+        float maximumForce;
 
         float supportForceFactor = 1;
         /// <summary>
@@ -66,6 +68,16 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             }
         }
 
+        /// <summary>
+        /// Gets the effective mass felt by the constraint.
+        /// </summary>
+        public float EffectiveMass
+        {
+            get
+            {
+                return effectiveMass;
+            }
+        }
         float effectiveMass;
         Entity supportEntity;
         Vector3 linearJacobianA;
@@ -73,6 +85,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         Vector3 angularJacobianB;
 
         float accumulatedImpulse;
+        float permittedVelocity;
 
         public VerticalMotionConstraint(CharacterController characterController)
         {
@@ -122,14 +135,21 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 supportEntity = null;
             }
 
+            maximumForce = MaximumGlueForce * dt;
 
+            //If we don't allow the character to get out of the ground, it could apply some significant forces to a dynamic support object.
+            //Technically, there exists a better estimate of the necessary speed, but choosing the maximum position correction speed is a nice catch-all.
+            //If you change that correction speed, watch out!!! It could significantly change the way the character behaves when trying to glue to surfaces.
+            if (supportData.Depth > 0)
+                permittedVelocity = CollisionResponseSettings.MaximumPositionCorrectionSpeed;
+            else
+                permittedVelocity = 0;
 
             //Compute the jacobians and effective mass matrix.  This constraint works along a single degree of freedom, so the mass matrix boils down to a scalar.
-            Vector3 downDirection = character.Body.OrientationMatrix.Down;
 
             linearJacobianA = supportData.Normal;
             Vector3.Negate(ref linearJacobianA, out linearJacobianB);
-            effectiveMass = supportForceFactor * character.Body.InverseMass;
+            effectiveMass = character.Body.InverseMass;
             if (supportEntity != null)
             {
                 Vector3 offsetB = supportData.Position - supportEntity.Position;
@@ -143,8 +163,9 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     Matrix3X3.Multiply(ref inertiaInverse, supportForceFactor, out inertiaInverse);
                     Matrix3X3.Transform(ref angularJacobianB, ref inertiaInverse, out angularComponentB);
                     Vector3.Cross(ref angularComponentB, ref offsetB, out angularComponentB);
-                    Vector3.Dot(ref angularComponentB, ref angularJacobianB, out effectiveMass);
-                    effectiveMass += supportForceFactor * supportEntity.InverseMass;
+                    float effectiveMassContribution;
+                    Vector3.Dot(ref angularComponentB, ref angularJacobianB, out effectiveMassContribution);
+                    effectiveMass += effectiveMassContribution + supportForceFactor * supportEntity.InverseMass;
                 }
             }
             effectiveMass = 1 / effectiveMass;
@@ -183,7 +204,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             //The relative velocity's x component is in the movement direction.
             //y is the perpendicular direction.
 
-            float relativeVelocity = RelativeVelocity;
+            float relativeVelocity =RelativeVelocity + permittedVelocity;
 
 
             //Create the full velocity change, and convert it to an impulse in constraint space.
@@ -191,7 +212,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
             //Add and clamp the impulse.
             float previousAccumulatedImpulse = accumulatedImpulse;
-            accumulatedImpulse = MathHelper.Clamp(accumulatedImpulse + lambda, 0, MaximumGlueForce);
+            accumulatedImpulse = MathHelper.Clamp(accumulatedImpulse + lambda, 0, maximumForce);
             lambda = accumulatedImpulse - previousAccumulatedImpulse;
             //Use the jacobians to put the impulse into world space.
 
