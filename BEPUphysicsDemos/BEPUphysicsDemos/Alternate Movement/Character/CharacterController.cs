@@ -147,8 +147,12 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 supportData = new SupportData();
         }
 
+
         void IBeforeSolverUpdateable.Update(float dt)
         {
+            if (Keyboard.GetState().IsKeyDown(Keys.O))
+                Debug.WriteLine("Breka.");
+            CorrectContacts();
 
             bool hadTraction = SupportFinder.HasTraction;
 
@@ -207,8 +211,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
 
             //Try to step!
-            if (Keyboard.GetState().IsKeyDown(Keys.O))
-                Debug.WriteLine("Breka.");
+
             Vector3 newPosition;
             if (Stepper.TryToStepDown(out newPosition) ||
                 Stepper.TryToStepUp(out newPosition))
@@ -276,6 +279,99 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
 
 
+
+        }
+
+        private void CorrectContacts()
+        {
+            //Go through the contacts associated with the character.
+            //If the contact is at the bottom of the character, regardless of its normal, take a closer look.
+            //If the direction from the closest point on the inner cylinder to the contact position has traction
+            //and the contact's normal does not, then replace the contact normal with the offset direction.
+           
+            //This is necessary because various convex pair manifolds use persistent manifolds.
+            //Contacts in these persistent manifolds can live too long for the character to behave perfectly
+            //when going over (usually tiny) steps.
+
+            Vector3 downDirection = Body.OrientationMatrix.Down;
+            Vector3 position = Body.Position;
+            float margin = Body.CollisionInformation.Shape.CollisionMargin;
+            float minimumHeight = Body.Height * .5f - margin;
+            float coreRadius = Body.Radius - margin;
+            float coreRadiusSquared = coreRadius * coreRadius;
+            foreach (var pair in Body.CollisionInformation.Pairs)
+            {
+                foreach (var contactData in pair.Contacts)
+                {
+                    var contact = contactData.Contact;
+                    float dot;
+                    //Vector3.Dot(ref contact.Normal, ref downDirection, out dot);
+                    //if (Math.Abs(dot) > SupportFinder.cosMaximumSlope)
+                    //{
+                    //    //This contact will already be considered to have traction.
+                    //    //Don't bother doing the somewhat expensive correction process on it.
+                    //    //TODO: Test this; see how much benefit there is.
+                    //    continue;
+                    //}
+                    //Check to see if the contact position is at the bottom of the character.
+                    Vector3 offset = contact.Position - Body.Position;
+                    Vector3.Dot(ref offset, ref downDirection, out dot);
+                    if (dot > minimumHeight)
+                    {
+
+                        //It is a 'bottom' contact!
+                        //So, compute the offset from the inner cylinder to the contact.
+                        //To do this, compute the closest point on the inner cylinder.
+                        //Since we know it's on the bottom, all we need is to compute the horizontal offset.
+                        Vector3.Dot(ref offset, ref downDirection, out dot);
+                        Vector3 horizontalOffset;
+                        Vector3.Multiply(ref downDirection, dot, out horizontalOffset);
+                        Vector3.Subtract(ref offset, ref horizontalOffset, out horizontalOffset);
+                        float length = horizontalOffset.LengthSquared();
+                        if (length > coreRadiusSquared)
+                        {
+                            //It's beyond the edge of the cylinder; clamp it.
+                            Vector3.Multiply(ref horizontalOffset, coreRadius / (float)Math.Sqrt(length), out horizontalOffset);
+                        }
+                        //It's on the bottom, so add the bottom height.
+                        Vector3 closestPointOnCylinder;
+                        Vector3.Multiply(ref downDirection, minimumHeight, out closestPointOnCylinder);
+                        Vector3.Add(ref closestPointOnCylinder, ref horizontalOffset, out closestPointOnCylinder);
+                        Vector3.Add(ref closestPointOnCylinder, ref position, out closestPointOnCylinder);
+
+                        //Compute the offset from the cylinder to the offset.
+                        Vector3 offsetDirection;
+                        Vector3.Subtract(ref contact.Position, ref closestPointOnCylinder, out offsetDirection);
+                        length = offsetDirection.LengthSquared();
+                        if (length > Toolbox.Epsilon)
+                        {
+                            //Normalize the offset.
+                            Vector3.Divide(ref offsetDirection, (float)Math.Sqrt(length), out offsetDirection);
+                        }
+                        else
+                            continue; //If there's no offset, it's really deep and correcting this contact might be a bad idea.
+
+                        Vector3.Dot(ref offsetDirection, ref downDirection, out dot);
+                        float dotOriginal;
+                        Vector3.Dot(ref contact.Normal, ref downDirection, out dotOriginal);
+                        if (Math.Abs(dot) > Math.Abs(dotOriginal)) //if the new offsetDirection normal is less steep than the original slope...
+                        {
+                            //Then use it!
+                            Vector3.Dot(ref offsetDirection, ref contact.Normal, out dot);
+                            if (dot < 0)
+                            {
+                                //Don't flip the normal relative to the contact normal.  That would be bad!
+                                Vector3.Negate(ref offsetDirection, out offsetDirection);
+                                dot = -dot;
+                            }
+                            //Update the contact data using the corrected information.
+                            //The penetration depth is conservatively updated; it will be less than or equal to the 'true' depth in this direction.
+                            contact.PenetrationDepth *= dot;
+                            contact.Normal = offsetDirection;
+                        }
+                    }
+                }
+            }
 
         }
 

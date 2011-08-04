@@ -189,6 +189,8 @@ namespace BEPUphysicsDemos.Demos
 
             game.Camera.Position = new Vector3(-10, 7, 5);
             game.Camera.Yaw = MathHelper.Pi;
+
+            
         }
 
         EntityMover elevatorMover;
