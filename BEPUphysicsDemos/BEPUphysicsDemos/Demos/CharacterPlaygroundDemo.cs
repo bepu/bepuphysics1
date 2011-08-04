@@ -36,8 +36,6 @@ namespace BEPUphysicsDemos.Demos
             //This load method wraps the TriangleMesh.GetVerticesAndIndicesFromModel method 
             //to output vertices of type StaticTriangleGroupVertex instead of TriangleMeshVertex or simply Vector3.
             TriangleMesh.GetVerticesAndIndicesFromModel(playgroundModel, out staticTriangleVertices, out staticTriangleIndices);
-            //staticTriangleIndices = new int[] { 0, 2, 1, 0, 3, 2 };
-            //staticTriangleVertices = new Vector3[] { new Vector3(-20, 0, -20), new Vector3(20, 0, -20), new Vector3(20, 0, 20), new Vector3(-20, -4, 20) };
             var staticMesh = new StaticMesh(staticTriangleVertices, staticTriangleIndices, new AffineTransform(new Vector3(.01f, .01f, .01f), Quaternion.Identity, new Vector3(0, 0, 0)));
             staticMesh.Sidedness = TriangleSidedness.Counterclockwise;
 
@@ -46,8 +44,8 @@ namespace BEPUphysicsDemos.Demos
 
 
             //Add a spinning blade for the character to ram itself into.
-            var fanBase = new Cylinder(new Vector3(-9, .5f, 50), 1, 1);
-            var fanBlade = new Box(fanBase.Position + new Vector3(0, .7f, 0), 5, .1f, 1f, 5);
+            var fanBase = new Cylinder(new Vector3(-9, .5f, 50), 1.1f, 1);
+            var fanBlade = new Box(fanBase.Position + new Vector3(0, .8f, 0), 5, .1f, 1f, 5);
             var fanJoint = new RevoluteJoint(fanBase, fanBlade, (fanBase.Position + fanBlade.Position) * .5f, Vector3.Up);
             fanJoint.Motor.IsActive = true;
             fanJoint.Motor.Settings.VelocityMotor.GoalVelocity = 30;

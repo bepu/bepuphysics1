@@ -60,6 +60,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
 
         public float Speed = 8f;
+        public float CrouchingSpeed = 3f;
         public float SlidingSpeed = 6;
         public float AirSpeed = 4;
         public float Acceleration = 50;
@@ -71,11 +72,13 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         public float MaximumSlidingForce = 50;
         public float MaximumAirForce = 150;
 
-        float supportForceFactor = .3f;
+        float supportForceFactor = 1;
         /// <summary>
         /// Gets or sets the scaling factor of forces applied to the supporting object if it is a dynamic entity.
         /// Low values (below 1) reduce the amount of motion imparted to the support object; it acts 'heavier' as far as horizontal motion is concerned.
         /// High values (above 1) increase the force applied to support objects, making them appear lighter.
+        /// Be careful when changing this- it can create impossible situations! Imagine the character standing on a compound object.  If the support force
+        /// factor is less than 1, then the character can push the compound around while standing on it!
         /// </summary>
         public float SupportForceFactor
         {
@@ -148,7 +151,10 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 if (supportData.HasTraction)
                 {
                     MovementMode = MovementMode.Traction;
-                    maxSpeed = Speed;
+                    if (character.StanceManager.CurrentStance == Stance.Standing)
+                        maxSpeed = Speed;
+                    else
+                        maxSpeed = CrouchingSpeed;
                     acceleration = Acceleration;
                     deceleration = Deceleration;
                     maxForce = MaximumForce;

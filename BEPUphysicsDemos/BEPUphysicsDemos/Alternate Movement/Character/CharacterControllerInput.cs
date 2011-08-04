@@ -18,9 +18,14 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         public Camera Camera;
 
         /// <summary>
-        /// Current offset from the position of the character to the 'eyes.'
+        /// Offset from the position of the character to the 'eyes' while the character is standing.
         /// </summary>
-        public float CameraOffset = .7f;
+        public float StandingCameraOffset = .7f;
+
+        /// <summary>
+        /// Offset from the position of the character to the 'eyes' while the character is crouching.
+        /// </summary>
+        public float CrouchingCameraOffset = .4f;
 
         /// <summary>
         /// Physics representation of the character.
@@ -70,7 +75,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 IsActive = true;
                 Camera.UseMovementControls = false;
                 Space.Add(CharacterController);
-                CharacterController.Body.Position = (Camera.Position - new Vector3(0, CameraOffset, 0));
+                CharacterController.Body.Position = (Camera.Position - new Vector3(0, StandingCameraOffset, 0));
             }
         }
 
@@ -112,7 +117,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     //Now compute where it should be according the physical body of the character.
                     Vector3 up = CharacterController.Body.OrientationMatrix.Up;
                     Vector3 bodyPosition = CharacterController.Body.Position;
-                    Vector3 goalPosition = bodyPosition + up * CameraOffset;
+                    Vector3 goalPosition = bodyPosition + up * (CharacterController.StanceManager.CurrentStance == Stance.Standing ? StandingCameraOffset : CrouchingCameraOffset);
 
                     //Usually, the camera position and the goal will be very close, if not matching completely.
                     //However, if the character steps or has its position otherwise modified, then they will not match.
@@ -164,7 +169,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 }
                 else
                 {
-                    Camera.Position = CharacterController.Body.Position + CameraOffset * CharacterController.Body.OrientationMatrix.Up;
+                    Camera.Position = CharacterController.Body.Position + (CharacterController.StanceManager.CurrentStance == Stance.Standing ? StandingCameraOffset : CrouchingCameraOffset) * CharacterController.Body.OrientationMatrix.Up;
                 }
 
                 Vector2 totalMovement = Vector2.Zero;
@@ -177,6 +182,8 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 totalMovement += gamePadInput.ThumbSticks.Left.Y * new Vector2(forward.X, forward.Z);
                 totalMovement += gamePadInput.ThumbSticks.Left.X * new Vector2(right.X, right.Z);
                 CharacterController.HorizontalMotionConstraint.MovementDirection = Vector2.Normalize(totalMovement);
+                
+                CharacterController.StanceManager.DesiredStance = gamePadInput.IsButtonDown(Buttons.RightStick) ? Stance.Crouching : Stance.Standing;
 
                 //Jumping
                 if (previousGamePadInput.IsButtonUp(Buttons.LeftStick) && gamePadInput.IsButtonDown(Buttons.LeftStick))
@@ -213,6 +220,8 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     CharacterController.HorizontalMotionConstraint.MovementDirection = Vector2.Zero;
                 else
                     CharacterController.HorizontalMotionConstraint.MovementDirection = Vector2.Normalize(totalMovement);
+
+                CharacterController.StanceManager.DesiredStance = keyboardInput.IsKeyDown(Keys.Z) ? Stance.Crouching : Stance.Standing;
 
                 //Jumping
                 if (previousKeyboardInput.IsKeyUp(Keys.A) && keyboardInput.IsKeyDown(Keys.A))

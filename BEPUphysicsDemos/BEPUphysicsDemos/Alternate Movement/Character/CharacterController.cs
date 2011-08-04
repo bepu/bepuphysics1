@@ -27,6 +27,9 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
         public Stepper Stepper { get; private set; }
 
+        public StanceManager StanceManager { get; private set; }
+
+        public QueryManager QueryManager { get; private set; }
 
         public HorizontalMotionConstraint HorizontalMotionConstraint { get; private set; }
         public VerticalMotionConstraint VerticalMotionConstraint { get; private set; }
@@ -74,6 +77,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         public CharacterController()
         {
             Body = new Cylinder(Vector3.Zero, 1.7f, .6f, 10);
+            Body.IgnoreShapeChanges = true; //Wouldn't want inertia tensor recomputations to occur when crouching and such.
             Body.CollisionInformation.Shape.CollisionMargin = .1f;
             //Making the character a continuous object prevents it from flying through walls which would be pretty jarring from a player's perspective.
             Body.PositionUpdateMode = PositionUpdateMode.Continuous;
@@ -85,6 +89,9 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             HorizontalMotionConstraint = new HorizontalMotionConstraint(this);
             VerticalMotionConstraint = new VerticalMotionConstraint(this);
             Stepper = new Stepper(this);
+            StanceManager = new StanceManager(this);
+            QueryManager = new QueryManager(this);
+
 
 
             Entity = Body;
@@ -131,7 +138,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         public static Entity Entity;
 
         void CollectSupportData()
-        {           
+        {
             //Identify supports.
             SupportFinder.UpdateSupports();
 
@@ -182,7 +189,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             }
 
             //Attempt to jump.
-            if (tryToJump)
+            if (tryToJump && StanceManager.CurrentStance != Stance.Crouching) //Jumping while crouching would be a bit silly.
             {
                 //In the following, note that the jumping velocity changes are computed such that the separating velocity is specifically achieved,
                 //rather than just adding some speed along an arbitrary direction.  This avoids some cases where the character could otherwise increase
@@ -211,30 +218,16 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
 
             //Try to step!
-
             Vector3 newPosition;
             if (Stepper.TryToStepDown(out newPosition) ||
                 Stepper.TryToStepUp(out newPosition))
             {
-                Body.Position = newPosition;
-                var orientation = Body.Orientation;
-                //The re-do of contacts won't do anything unless we update the collidable's world transform.
-                Body.CollisionInformation.UpdateWorldTransform(ref newPosition, ref orientation);
-                //Refresh all the narrow phase collisions.
-                foreach (var pair in Body.CollisionInformation.Pairs)
-                {
-                    //Clear out the old contacts.  This prevents contacts in persistent manifolds from surviving the step
-                    //Such old contacts might still have old normals which blocked the character's forward motion.
-                    pair.ClearContacts();
-                    pair.UpdateCollision(dt);
-                }
-                //Also re-collect supports.
-                //This will ensure the constraint and other velocity affectors have the most recent information available.
-                CollectSupportData();
-                ComputeRelativeVelocity(out relativeVelocity);
-                verticalVelocity = Vector3.Dot(supportData.Normal, relativeVelocity);
-                horizontalVelocity = relativeVelocity - supportData.Normal * verticalVelocity;
+                TeleportToPosition(newPosition, dt);
+            }
 
+            if (StanceManager.UpdateStance(out newPosition))
+            {
+                TeleportToPosition(newPosition, dt);
             }
 
             //if (SupportFinder.HasTraction && SupportFinder.Supports.Count == 0)
@@ -282,13 +275,32 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
         }
 
+        void TeleportToPosition(Vector3 newPosition, float dt)
+        {
+            Body.Position = newPosition;
+            var orientation = Body.Orientation;
+            //The re-do of contacts won't do anything unless we update the collidable's world transform.
+            Body.CollisionInformation.UpdateWorldTransform(ref newPosition, ref orientation);
+            //Refresh all the narrow phase collisions.
+            foreach (var pair in Body.CollisionInformation.Pairs)
+            {
+                //Clear out the old contacts.  This prevents contacts in persistent manifolds from surviving the step
+                //Such old contacts might still have old normals which blocked the character's forward motion.
+                pair.ClearContacts();
+                pair.UpdateCollision(dt);
+            }
+            //Also re-collect supports.
+            //This will ensure the constraint and other velocity affectors have the most recent information available.
+            CollectSupportData();
+        }
+
         private void CorrectContacts()
         {
             //Go through the contacts associated with the character.
             //If the contact is at the bottom of the character, regardless of its normal, take a closer look.
             //If the direction from the closest point on the inner cylinder to the contact position has traction
             //and the contact's normal does not, then replace the contact normal with the offset direction.
-           
+
             //This is necessary because various convex pair manifolds use persistent manifolds.
             //Contacts in these persistent manifolds can live too long for the character to behave perfectly
             //when going over (usually tiny) steps.

@@ -25,98 +25,16 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         public float MinimumDownStepHeight = .1f;
         public float MinimumUpStepHeight;
 
-        EntityCollidable queryObject;
 
         public Stepper(CharacterController character)
         {
             this.character = character;
-            queryObject = new ConvexCollidable<CylinderShape>(character.Body.CollisionInformation.Shape);
-            queryObject.CollisionRules.Personal = BEPUphysics.CollisionRuleManagement.CollisionRule.NoSolver;
+            //The minimum step height is just barely above where the character would generally find the ground.
+            //This helps avoid excess tests.
             MinimumUpStepHeight = CollisionDetectionSettings.AllowedPenetration * 1.1f;// Math.Max(0, -.01f + character.Body.CollisionInformation.Shape.CollisionMargin * (1 - character.SupportFinder.sinMaximumSlope));
 
         }
-
-        public void QueryContacts(Vector3 position, RawList<ContactData> contacts)
-        {
-            //Update the position and orientation of the query object.
-            RigidTransform transform;
-            transform.Position = position;
-            transform.Orientation = character.Body.Orientation;
-            queryObject.UpdateBoundingBoxForTransform(ref transform, 0);
-
-            foreach (var collidable in character.Body.CollisionInformation.OverlappedCollidables)
-            {
-                if (collidable.BoundingBox.Intersects(queryObject.BoundingBox))
-                {
-                    var pair = new CollidablePair(collidable, queryObject);
-                    var pairHandler = NarrowPhaseHelper.GetPairHandler(ref pair);
-                    if (pairHandler.CollisionRule == CollisionRule.Normal)
-                    {
-                        pairHandler.UpdateCollision(0);
-                        foreach (var contact in pairHandler.Contacts)
-                        {
-                            //Must check per-contact collision rules, just in case
-                            //the pair was actually a 'parent pair.'
-                            if (contact.Pair.CollisionRule == CollisionRule.Normal)
-                            {
-                                ContactData contactData;
-                                contactData.Position = contact.Contact.Position;
-                                contactData.Normal = contact.Contact.Normal;
-                                contactData.Id = contact.Contact.Id;
-                                contactData.PenetrationDepth = contact.Contact.PenetrationDepth;
-                                contacts.Add(contactData);
-                            }
-                        }
-                    }
-                    pairHandler.CleanUp();
-                    (pairHandler as INarrowPhasePair).Factory.GiveBack(pairHandler);
-                }
-            }
-
-        }
-
-        public void CategorizeContacts(ref Vector3 position, RawList<ContactData> contacts, RawList<ContactData> outputSupports, RawList<ContactData> outputTraction, RawList<ContactData> outputHeadContacts, RawList<ContactData> outputSideContacts)
-        {
-            Vector3 downDirection = character.Body.OrientationMatrix.Down;
-            for (int i = 0; i < contacts.Count; i++)
-            {
-                float dot;
-                Vector3 offset;
-                Vector3.Subtract(ref contacts.Elements[i].Position, ref position, out offset);
-                Vector3.Dot(ref contacts.Elements[i].Normal, ref offset, out dot);
-                ContactData processed = contacts.Elements[i];
-                if (dot < 0)
-                {
-                    //The normal should face outward.
-                    dot = -dot;
-                    Vector3.Negate(ref processed.Normal, out processed.Normal);
-                }
-                Vector3.Dot(ref processed.Normal, ref downDirection, out dot);
-                if (dot > SupportFinder.SideContactThreshold)
-                {
-                    //It's a support.
-                    outputSupports.Add(processed);
-                    if (dot > character.SupportFinder.cosMaximumSlope)
-                    {
-                        //It's a traction contact.
-                        outputTraction.Add(processed);
-                    }
-                    else
-                        sideContacts.Add(processed); //Considering the side contacts to be supports can help with upstepping.
-                }
-                else if (dot < -SupportFinder.SideContactThreshold)
-                {
-                    //It's a head contact.
-                    outputHeadContacts.Add(processed);
-                }
-                else
-                {
-                    //It's a side contact.  These could obstruct the stepping.
-                    outputSideContacts.Add(processed);
-                }
-
-            }
-        }
+        
 
         public bool IsDownStepObstructed(RawList<ContactData> sideContacts)
         {
@@ -151,78 +69,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             return false;
         }
 
-        bool HasSupports(RawList<ContactData> supportContacts, RawList<ContactData> tractionContacts, out bool hasTraction, out PositionState state, out ContactData supportContact)
-        {
-            float maxDepth = -float.MaxValue;
-            int deepestIndex = -1;
-            if (tractionContacts.Count > 0)
-            {
-                //It has traction!
-                //But is it too deep?
-                //Find the deepest contact.
-                for (int i = 0; i < tractionContacts.Count; i++)
-                {
-                    if (tractionContacts.Elements[i].PenetrationDepth > maxDepth)
-                    {
-                        maxDepth = tractionContacts.Elements[i].PenetrationDepth;
-                        deepestIndex = i;
-                    }
-                }
-                hasTraction = true;
-                supportContact = tractionContacts.Elements[deepestIndex];
-            }
-            else if (supportContacts.Count > 0)
-            {
-                //It has support!
-                //But is it too deep?
-                //Find the deepest contact.
-
-                for (int i = 0; i < supportContacts.Count; i++)
-                {
-                    if (supportContacts.Elements[i].PenetrationDepth > maxDepth)
-                    {
-                        maxDepth = supportContacts.Elements[i].PenetrationDepth;
-                        deepestIndex = i;
-                    }
-                }
-                hasTraction = false;
-                supportContact = supportContacts.Elements[deepestIndex];
-            }
-            else
-            {
-                hasTraction = false;
-                state = PositionState.NoHit;
-                supportContact = new ContactData();
-                return false;
-            }
-            //Check the depth.
-            if (maxDepth > CollisionDetectionSettings.AllowedPenetration)
-            {
-                //It's too deep.
-                state = PositionState.TooDeep;
-            }
-            else if (maxDepth < 0)
-            {
-                //The depth is negative, meaning it's separated.  This shouldn't happen with the initial implementation of the character controller,
-                //but this case could conceivably occur in other usages of a system like this (or in a future version of the character),
-                //so go ahead and handle it.
-                state = PositionState.NoHit;
-            }
-            else
-            {
-                //The deepest contact appears to be very nicely aligned with the ground!
-                //It's fully supported.
-                state = PositionState.Accepted;
-            }
-            return true;
-
-        }
-
-        RawList<ContactData> contacts = new RawList<ContactData>();
-        RawList<ContactData> supportContacts = new RawList<ContactData>();
-        RawList<ContactData> tractionContacts = new RawList<ContactData>();
-        RawList<ContactData> sideContacts = new RawList<ContactData>();
-        RawList<ContactData> headContacts = new RawList<ContactData>();
+        
         RawList<ContactData> stepContacts = new RawList<ContactData>();
 
         public bool TryToStepDown(out Vector3 newPosition)
@@ -255,7 +102,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 //The words 'highest' and 'lowest' here refer to the position relative to the character's body.
                 //The ray cast points downward relative to the character's body.
                 float highestBound = 0;
-                float lowestBound = CollisionDetectionSettings.AllowedPenetration + character.SupportFinder.SupportRayData.Value.HitData.T - character.SupportFinder.RayLengthToBottom;
+                float lowestBound = character.Body.CollisionInformation.Shape.CollisionMargin  + character.SupportFinder.SupportRayData.Value.HitData.T - character.SupportFinder.RayLengthToBottom;
                 float currentOffset = lowestBound;
                 float hintOffset;
 
@@ -356,14 +203,12 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         PositionState TryDownStepPosition(ref Vector3 position, out float hintOffset)
         {
             hintOffset = 0;
-            ClearContacts();
-            QueryContacts(position, contacts);
-            CategorizeContacts(ref position, contacts, supportContacts, tractionContacts, headContacts, sideContacts);
+            character.QueryManager.QueryContacts(position);
             bool hasTraction;
             PositionState supportState;
             ContactData supportContact;
-            bool obstructed = IsDownStepObstructed(sideContacts);
-            if (HasSupports(supportContacts, tractionContacts, out hasTraction, out supportState, out supportContact) && !obstructed)
+            bool obstructed = IsDownStepObstructed(character.QueryManager.SideContacts);
+            if (character.QueryManager.HasSupports(out hasTraction, out supportState, out supportContact) && !obstructed)
             {
                 if (supportState == PositionState.Accepted)
                 {
@@ -590,7 +435,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             //The words 'highest' and 'lowest' here refer to the position relative to the character's body.
             //The ray cast points downward relative to the character's body.
             float highestBound = -MaximumStepHeight;
-            float lowestBound = CollisionDetectionSettings.AllowedPenetration - downRayLength + earliestHit.T;
+            float lowestBound = character.Body.CollisionInformation.Shape.CollisionMargin - downRayLength + earliestHit.T;
             float currentOffset = lowestBound;
             float hintOffset;
 
@@ -716,24 +561,22 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         PositionState TryUpStepPosition(ref Vector3 sideNormal, ref Vector3 position, out float hintOffset)
         {
             hintOffset = 0;
-            ClearContacts();
-            QueryContacts(position, contacts);
-            CategorizeContacts(ref position, contacts, supportContacts, tractionContacts, headContacts, sideContacts);
+            character.QueryManager.QueryContacts(position);
             bool hasTraction;
             PositionState supportState;
             ContactData supportContact;
-            if (headContacts.Count > 0)
+            if (character.QueryManager.HeadContacts.Count > 0)
             {
                 //The head is obstructed.  This will define a maximum bound.
                 //Find the deepest contact on the head and use it to provide a hint.
                 Vector3 up = character.Body.OrientationMatrix.Up;
                 float dot;
-                Vector3.Dot(ref up, ref headContacts.Elements[0].Normal, out dot);
-                hintOffset = dot * headContacts.Elements[0].PenetrationDepth;
-                for (int i = 1; i < headContacts.Count; i++)
+                Vector3.Dot(ref up, ref character.QueryManager.HeadContacts.Elements[0].Normal, out dot);
+                hintOffset = dot * character.QueryManager.HeadContacts.Elements[0].PenetrationDepth;
+                for (int i = 1; i < character.QueryManager.HeadContacts.Count; i++)
                 {
-                    Vector3.Dot(ref up, ref headContacts.Elements[i].Normal, out dot);
-                    dot *= headContacts.Elements[i].PenetrationDepth;
+                    Vector3.Dot(ref up, ref character.QueryManager.HeadContacts.Elements[i].Normal, out dot);
+                    dot *= character.QueryManager.HeadContacts.Elements[i].PenetrationDepth;
                     if (dot > hintOffset)
                     {
                         hintOffset = dot;
@@ -741,8 +584,8 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 }
                 return PositionState.HeadObstructed;
             }
-            bool obstructed = IsUpStepObstructed(ref sideNormal, sideContacts, headContacts);
-            if (HasSupports(supportContacts, tractionContacts, out hasTraction, out supportState, out supportContact) && !obstructed)
+            bool obstructed = IsUpStepObstructed(ref sideNormal, character.QueryManager.SideContacts, character.QueryManager.HeadContacts);
+            if (character.QueryManager.HasSupports(out hasTraction, out supportState, out supportContact) && !obstructed)
             {
                 if (supportState == PositionState.Accepted)
                 {
@@ -886,26 +729,8 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             return false;
         }
 
-        private void ClearContacts()
-        {
-            contacts.Clear();
-            supportContacts.Clear();
-            tractionContacts.Clear();
-            sideContacts.Clear();
-            headContacts.Clear();
-        }
 
-  
-
-        enum PositionState
-        {
-            Accepted,
-            Rejected,
-            TooDeep,
-            Obstructed,
-            HeadObstructed,
-            NoHit
-        }
+ 
 
     }
 }

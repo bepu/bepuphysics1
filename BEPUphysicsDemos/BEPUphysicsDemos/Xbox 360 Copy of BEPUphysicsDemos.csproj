@@ -62,6 +62,8 @@
     <Compile Include="Alternate Movement\Character\CharacterController.cs" />
     <Compile Include="Alternate Movement\Character\CharacterControllerInput.cs" />
     <Compile Include="Alternate Movement\Character\HorizontalMotionConstraint.cs" />
+    <Compile Include="Alternate Movement\Character\QueryManager.cs" />
+    <Compile Include="Alternate Movement\Character\StanceManager.cs" />
     <Compile Include="Alternate Movement\Character\Stepper.cs" />
     <Compile Include="Alternate Movement\Character\SupportFinder.cs" />
     <Compile Include="Alternate Movement\Character\VerticalMotionConstraint.cs" />

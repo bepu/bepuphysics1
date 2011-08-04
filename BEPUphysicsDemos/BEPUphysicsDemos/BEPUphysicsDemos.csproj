@@ -82,6 +82,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Alternate Movement\Character\QueryManager.cs" />
+    <Compile Include="Alternate Movement\Character\StanceManager.cs" />
     <Compile Include="Alternate Movement\Character\VerticalMotionConstraint.cs" />
     <Compile Include="Alternate Movement\Character\HorizontalMotionConstraint.cs" />
     <Compile Include="Alternate Movement\Character\Stepper.cs" />

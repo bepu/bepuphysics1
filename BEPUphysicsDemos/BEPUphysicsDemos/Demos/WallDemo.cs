@@ -1,5 +1,10 @@
 ﻿using BEPUphysics.Entities.Prefabs;
 using Microsoft.Xna.Framework;
+using System.Collections.Generic;
+using BEPUphysics.CollisionShapes;
+using BEPUphysics.Constraints.SolverGroups;
+using BEPUphysics.CollisionShapes.ConvexShapes;
+using BEPUphysics.Constraints.TwoEntity.Motors;
 
 namespace BEPUphysicsDemos.Demos
 {
@@ -36,6 +41,23 @@ namespace BEPUphysicsDemos.Demos
                 }
             }
 
+            Box tankBody = new Box(new Vector3(0, 5, 10), 3.5f, 2, 6, 30);
+            CompoundBody turret = new CompoundBody(
+                new List<CompoundShapeEntry>() 
+                {
+                    new CompoundShapeEntry(new BoxShape(.5f, .5f, 4), tankBody.Position + new Vector3(0, 1.5f, 2), 5),
+                    new CompoundShapeEntry(new BoxShape(1.5f, .7f, 2f), tankBody.Position + new Vector3(0, 1.5f, -1), 5)
+                }, 10);
+            RevoluteJoint axisJoint = new RevoluteJoint(tankBody, turret, tankBody.Position + new Vector3(0, 1, -1), Vector3.Up);
+            axisJoint.Motor.IsActive = true;
+            axisJoint.Motor.Settings.VelocityMotor.GoalVelocity = 1;
+
+            axisJoint.Motor.Settings.Mode = MotorMode.Servomechanism;
+            axisJoint.Motor.Settings.Servo.Goal = MathHelper.PiOver4;
+
+            Space.Add(tankBody);
+            Space.Add(turret);
+            Space.Add(axisJoint);
 
             Box ground = new Box(new Vector3(0, -.5f, 0), 50, 1, 50);
             Space.Add(ground);

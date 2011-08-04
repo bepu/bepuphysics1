@@ -426,7 +426,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                         //Acos(normal dot down direction) < maxSlope => normal dot down direction > cos(maxSlope)
                         if (dot > cosMaximumSlope)
                         {
-                            //The slope is shallow enought hat 
+                            //The slope is shallow enough that there is traction.
                             supportContact.HasTraction = true;
                             HasTraction = true;
                         }
