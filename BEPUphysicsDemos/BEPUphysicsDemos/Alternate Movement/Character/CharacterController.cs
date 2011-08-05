@@ -201,6 +201,9 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     //Target velocity is JumpSpeed.
                     float velocityChange = Math.Max(JumpSpeed - currentUpVelocity, 0);
                     ApplyJumpVelocity(Body.OrientationMatrix.Up * velocityChange, ref relativeVelocity);
+
+                    SupportFinder.ClearSupportData();
+                    supportData = new SupportData();
                 }
                 else if (SupportFinder.HasSupport)
                 {
@@ -209,12 +212,12 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     //Target velocity is JumpSpeed.
                     float velocityChange = Math.Max(SlidingJumpSpeed - currentNormalVelocity, 0);
                     ApplyJumpVelocity(supportData.Normal * -velocityChange, ref relativeVelocity);
-                }
-                SupportFinder.ClearSupportData();
-                tryToJump = false;
-                supportData = new SupportData();
 
+                    SupportFinder.ClearSupportData();
+                    supportData = new SupportData();
+                }
             }
+            tryToJump = false;
 
 
             //Try to step!

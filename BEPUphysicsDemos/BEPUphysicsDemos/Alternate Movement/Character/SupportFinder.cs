@@ -480,6 +480,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 {
                     SupportRayData = data;
                     HasTraction = data.HasTraction;
+                    HasSupport = true;
                 }
             }
 
@@ -515,6 +516,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                             }
                             else if (SupportRayData == null)
                                 SupportRayData = data;
+                            HasSupport = true;
                         }
                     }
                 }
@@ -552,6 +554,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                             }
                             else if (SupportRayData == null)
                                 SupportRayData = data;
+                            HasSupport = true;
                         }
                     }
                 }
@@ -589,6 +592,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                             }
                             else if (SupportRayData == null)
                                 SupportRayData = data;
+                            HasSupport = true;
                         }
                     }
                 }

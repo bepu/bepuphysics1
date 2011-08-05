@@ -11,6 +11,7 @@ using BEPUphysics.Constraints.SolverGroups;
 using BEPUphysics.Paths;
 using BEPUphysics.Paths.PathFollowing;
 using BEPUphysics.Constraints.TwoEntity.Motors;
+using BEPUphysics.Constraints;
 
 namespace BEPUphysicsDemos.Demos
 {
@@ -41,6 +42,7 @@ namespace BEPUphysicsDemos.Demos
 
             Space.Add(staticMesh);
             game.ModelDrawer.Add(staticMesh);
+
 
 
             //Add a spinning blade for the character to ram itself into.

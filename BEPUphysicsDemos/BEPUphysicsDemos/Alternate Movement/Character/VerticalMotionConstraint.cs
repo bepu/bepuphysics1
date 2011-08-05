@@ -163,25 +163,11 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     Matrix3X3.Transform(ref angularJacobianB, ref inertiaInverse, out angularComponentB);
                     float effectiveMassContribution;
                     Vector3.Dot(ref angularComponentB, ref angularJacobianB, out effectiveMassContribution);
-                    //tX = angularBX * inertiaInverse.M11 + angularBY * inertiaInverse.M21 + angularBZ * inertiaInverse.M31;
-                    //tY = angularBX * inertiaInverse.M12 + angularBY * inertiaInverse.M22 + angularBZ * inertiaInverse.M32;
-                    //tZ = angularBX * inertiaInverse.M13 + angularBY * inertiaInverse.M23 + angularBZ * inertiaInverse.M33;
-                    //entryB = tX * angularBX + tY * angularBY + tZ * angularBZ + entityB.inverseMass;
 
-                    //Vector3 angularComponentB;
-                    //Matrix3X3 inertiaInverse = supportEntity.LocalInertiaTensorInverse;
-                    //Matrix3X3.Multiply(ref inertiaInverse, supportForceFactor, out inertiaInverse);
-                    //Matrix3X3.Transform(ref angularJacobianB, ref inertiaInverse, out angularComponentB);
-                    //Vector3.Cross(ref angularComponentB, ref offsetB, out angularComponentB);
-                    //float effectiveMassContribution;
-                    //Vector3.Dot(ref angularComponentB, ref angularJacobianB, out effectiveMassContribution);
                     effectiveMass += supportForceFactor * (effectiveMassContribution + supportEntity.InverseMass);
                 }
             }
             effectiveMass = 1 / effectiveMass;
-            if (effectiveMass < 0)
-                Debug.WriteLine("waa");
-
             //So much nicer and shorter than the horizontal constraint!
 
         }

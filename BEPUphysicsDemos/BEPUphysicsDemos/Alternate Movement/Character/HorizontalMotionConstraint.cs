@@ -63,11 +63,6 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         public float CrouchingSpeed = 3f;
         public float SlidingSpeed = 6;
         public float AirSpeed = 4;
-        public float Acceleration = 50;
-        public float SlidingAcceleration = 5;
-        public float AirAcceleration = 15;
-        public float Deceleration = 80;
-        public float SlidingDeceleration = 1;
         public float MaximumForce = 1000;
         public float MaximumSlidingForce = 50;
         public float MaximumAirForce = 150;
@@ -96,8 +91,6 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
 
         float maxSpeed;
-        float acceleration;
-        float deceleration;
         float maxForce;
 
 
@@ -129,9 +122,14 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
         }
 
+        bool wasMoving = false;
 
         public override void Update(float dt)
         {
+            if (supportData.SupportObject == null && (
+                (character.SupportFinder.SupportData != null && character.SupportFinder.SupportData.Value.SupportObject != null) ||
+                (character.SupportFinder.TractionData != null && character.SupportFinder.TractionData.Value.SupportObject != null)))
+                Debug.WriteLine("break.");
             //Collect references, pick the mode, and configure the coefficients to be used by the solver.
             bool isTryingToMove = movementDirection.LengthSquared() > 0;
             if (supportData.SupportObject != null)
@@ -155,16 +153,12 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                         maxSpeed = Speed;
                     else
                         maxSpeed = CrouchingSpeed;
-                    acceleration = Acceleration;
-                    deceleration = Deceleration;
                     maxForce = MaximumForce;
                 }
                 else
                 {
                     MovementMode = MovementMode.Sliding;
                     maxSpeed = SlidingSpeed;
-                    acceleration = SlidingAcceleration;
-                    deceleration = SlidingDeceleration;
                     maxForce = MaximumSlidingForce;
                 }
             }
@@ -172,16 +166,12 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             {
                 MovementMode = MovementMode.Floating;
                 maxSpeed = AirSpeed;
-                acceleration = AirAcceleration;
-                deceleration = 0;
                 maxForce = MaximumAirForce;
                 supportEntity = null;
             }
             if (!isTryingToMove)
                 maxSpeed = 0;
 
-            acceleration *= dt;
-            deceleration *= dt;
             maxForce *= dt;
 
 
@@ -212,7 +202,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
 
                     //The normal and velocity direction are perpendicular and normal, so the off velocity direction doesn't need to be normalized.
-                    Vector3.Cross(ref supportData.Normal, ref velocityDirection, out offVelocityDirection);
+                    Vector3.Cross(ref velocityDirection, ref supportData.Normal, out offVelocityDirection);
 
                     linearJacobianA1 = velocityDirection;
                     linearJacobianA2 = offVelocityDirection;
@@ -220,13 +210,28 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     linearJacobianB2 = -offVelocityDirection;
 
 
+                    //Vector3 calibratingLinearJacobianA1 = new Vector3(movementDirection.X, 0, movementDirection.Y);
+                    //Vector3 calibratingLinearJacobianA2 = new Vector3(movementDirection.Y, 0, -movementDirection.X);
+
+
+                    //if (Vector3.Dot(calibratingLinearJacobianA1, linearJacobianA1) < 0 || Vector3.Dot(calibratingLinearJacobianA2, linearJacobianA2) < 0)
+                    //    Debug.WriteLine("Breka.");
                 }
                 else
                 {
+                    Vector3 previousLinearJacobianA1 = linearJacobianA1;
+                    Vector3 previousLinearJacobianA2 = linearJacobianA2;
                     //If the character isn't trying to move, then the velocity directions are not well defined.
                     //Instead, pick two arbitrary vectors on the support plane.
                     //First guess will be based on the previous jacobian.
-                    Vector3.Cross(ref linearJacobianA2, ref supportData.Normal, out linearJacobianA1);
+                    //Project the old linear jacobian onto the support normal plane.
+                    float dot;
+                    Vector3.Dot(ref linearJacobianA1, ref supportData.Normal, out dot);
+                    Vector3 toRemove;
+                    Vector3.Multiply(ref supportData.Normal, dot, out toRemove);
+                    Vector3.Subtract(ref linearJacobianA1, ref toRemove, out linearJacobianA1);
+
+                    //Vector3.Cross(ref linearJacobianA2, ref supportData.Normal, out linearJacobianA1);
                     float length = linearJacobianA1.LengthSquared();
                     if (length < Toolbox.Epsilon)
                     {
@@ -251,6 +256,10 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     linearJacobianB2 = -linearJacobianA2;
 
 
+                    //if (Vector3.Dot(previousLinearJacobianA1, linearJacobianA1) < 0 || Vector3.Dot(previousLinearJacobianA2, linearJacobianA2) < 0)
+                    //    Debug.WriteLine("Breka.");
+
+
                 }
 
                 if (supportEntity != null)
@@ -272,14 +281,21 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             }
             else
             {
+                Vector3 previousLinearJacobianA1 = linearJacobianA1;
+                Vector3 previousLinearJacobianA2 = linearJacobianA2;
+
                 //If the character is floating, then the jacobians are simply the movement direction.
                 //Note that in a 6DOF character, this will change- but it will still be trivial.
                 //In that case, the movement direction will be a 3d vector, and the A2 jacobian will just be
                 //linearJacobianA1 x downDirection.
                 linearJacobianA1 = new Vector3(movementDirection.X, 0, movementDirection.Y);
                 linearJacobianA2 = new Vector3(movementDirection.Y, 0, -movementDirection.X);
-            }
 
+
+                //if (Vector3.Dot(previousLinearJacobianA1, linearJacobianA1) < 0 || Vector3.Dot(previousLinearJacobianA2, linearJacobianA2) < 0)
+                //    Debug.WriteLine("Breka.");
+            }
+            wasMoving = isTryingToMove;
 
 
             //Compute the target velocity (in constraint space) for this frame.
@@ -302,21 +318,23 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 targetVelocity.Y = 0;
             else
                 targetVelocity.Y = 0;
-            //Clamp it!
-            float velocityChangeMagnitude;
-            Vector2 change;
-            Vector2.Subtract(ref targetVelocity, ref relativeVelocity, out change);
-            velocityChangeMagnitude = change.Length();
-            if (velocityChangeMagnitude > Toolbox.Epsilon)
-            {
-                float newLength = Math.Min(velocityChangeMagnitude, deceleration);
-                Vector2.Multiply(ref change, newLength / velocityChangeMagnitude, out change);
-                Vector2.Add(ref relativeVelocity, ref change, out targetVelocity);
-            }
+            ////Clamp it!
+            //float velocityChangeMagnitude;
+            //Vector2 change;
+            //Vector2.Subtract(ref targetVelocity, ref relativeVelocity, out change);
+            //velocityChangeMagnitude = change.Length();
+            //if (velocityChangeMagnitude > Toolbox.Epsilon)
+            //{
+            //    float newLength = Math.Min(velocityChangeMagnitude, deceleration);
+            //    Vector2.Multiply(ref change, newLength / velocityChangeMagnitude, out change);
+            //    Vector2.Add(ref relativeVelocity, ref change, out targetVelocity);
+            //}
             //Now add in the acceleration component along the X axis.
-            float newX = Math.Min(targetVelocity.X + acceleration, maxSpeed);
-            if (newX > targetVelocity.X)
-                targetVelocity.X = newX;
+            //float newX = Math.Min(targetVelocity.X + acceleration, maxSpeed);
+            //float newX = Math.Min(relativeVelocity.X + acceleration, maxSpeed);
+            //if (newX > targetVelocity.X)
+            //    targetVelocity.X = newX;
+            targetVelocity.X = maxSpeed;
 
             //Compute the effective mass matrix.
             if (supportEntity != null && supportEntity.IsDynamic)
@@ -436,15 +454,27 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             Matrix2X2.Transform(ref lambda, ref massMatrix, out lambda);
 
             //Add and clamp the impulse.
+
             Vector2 previousAccumulatedImpulse = accumulatedImpulse;
-            Vector2.Add(ref lambda, ref accumulatedImpulse, out accumulatedImpulse);
-            float length = accumulatedImpulse.LengthSquared();
-            if (length > maxForce * maxForce)
+            if (MovementMode == MovementMode.Floating)
+            {                
+                //If it's floating, clamping rules are different.
+                //The constraint is not permitted to slow down the character; only speed it up.
+                //This offers a hole for an exploit; by jumping and curving just right,
+                //the character can accelerate beyond its maximum speed.  A bit like an HL2 speed run.
+                accumulatedImpulse.X = MathHelper.Clamp(accumulatedImpulse.X + lambda.X, 0, maxForce);
+                accumulatedImpulse.Y = 0;
+            }
+            else
             {
-                Vector2.Multiply(ref accumulatedImpulse, maxForce / (float)Math.Sqrt(length), out accumulatedImpulse);
+                Vector2.Add(ref lambda, ref accumulatedImpulse, out accumulatedImpulse);
+                float length = accumulatedImpulse.LengthSquared();
+                if (length > maxForce * maxForce)
+                {
+                    Vector2.Multiply(ref accumulatedImpulse, maxForce / (float)Math.Sqrt(length), out accumulatedImpulse);
+                }
             }
             Vector2.Subtract(ref accumulatedImpulse, ref previousAccumulatedImpulse, out lambda);
-
 
 
             //Use the jacobians to put the impulse into world space.
@@ -517,6 +547,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 return relativeVelocity;
             }
         }
+
 
 
     }
