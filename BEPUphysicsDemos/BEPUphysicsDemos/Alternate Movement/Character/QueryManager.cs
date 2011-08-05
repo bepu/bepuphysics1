@@ -13,6 +13,8 @@ using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.Settings;
+using BEPUphysics;
+using BEPUphysics.BroadPhaseSystems;
 
 namespace BEPUphysicsDemos.AlternateMovement.Character
 {
@@ -47,6 +49,86 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             currentQueryObject.CollisionRules = character.Body.CollisionInformation.CollisionRules;
             standingQueryObject.CollisionRules = character.Body.CollisionInformation.CollisionRules;
             crouchingQueryObject.CollisionRules = character.Body.CollisionInformation.CollisionRules;
+
+
+            SupportRayFilter = SupportRayFilterFunction;
+        }
+
+
+        public Func<BroadPhaseEntry, bool> SupportRayFilter;
+        bool SupportRayFilterFunction(BroadPhaseEntry entry)
+        {
+            //Only permit an object to be used as a support if it fully collides with the character.
+            return CollisionRules.CollisionRuleCalculator(entry.CollisionRules, character.Body.CollisionInformation.CollisionRules) == CollisionRule.Normal;
+        }
+
+        public bool RayCast(Ray ray, float length, out RayHit earliestHit)
+        {
+            earliestHit = new RayHit();
+            earliestHit.T = float.MaxValue;
+            foreach (var collidable in character.Body.CollisionInformation.OverlappedCollidables)
+            {
+                //Check to see if the collidable is hit by the ray.
+                float? t = ray.Intersects(collidable.BoundingBox);
+                if (t != null && t < length)
+                {
+                    //Is it an earlier hit than the current earliest?
+                    RayHit hit;
+                    if (collidable.RayCast(ray, length, SupportRayFilter, out hit) && hit.T < earliestHit.T)
+                    {
+                        earliestHit = hit;
+                    }
+                }
+            }
+            if (earliestHit.T == float.MaxValue)
+                return false;
+            return true;
+
+        }
+
+        public bool RayCast(Ray ray, float length, out RayHit earliestHit, out Collidable hitObject)
+        {
+            earliestHit = new RayHit();
+            earliestHit.T = float.MaxValue;
+            hitObject = null;
+            foreach (var collidable in character.Body.CollisionInformation.OverlappedCollidables)
+            {
+                //Check to see if the collidable is hit by the ray.
+                float? t = ray.Intersects(collidable.BoundingBox);
+                if (t != null && t < length)
+                {
+                    //Is it an earlier hit than the current earliest?
+                    RayHit hit;
+                    if (collidable.RayCast(ray, length, SupportRayFilter, out hit) && hit.T < earliestHit.T)
+                    {
+                        earliestHit = hit;
+                        hitObject = collidable;
+                    }
+                }
+            }
+            if (earliestHit.T == float.MaxValue)
+                return false;
+            return true;
+
+        }
+
+        public bool RayCastHitAnything(Ray ray, float length)
+        {
+            foreach (var collidable in character.Body.CollisionInformation.OverlappedCollidables)
+            {
+                //Check to see if the collidable is hit by the ray.
+                float? t = ray.Intersects(collidable.BoundingBox);
+                if (t != null && t < length)
+                {
+                    RayHit hit;
+                    if (collidable.RayCast(ray, length, SupportRayFilter, out hit))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+
         }
 
         private void ClearContacts()

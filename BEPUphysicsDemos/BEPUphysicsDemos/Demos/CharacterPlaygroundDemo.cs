@@ -12,6 +12,8 @@ using BEPUphysics.Paths;
 using BEPUphysics.Paths.PathFollowing;
 using BEPUphysics.Constraints.TwoEntity.Motors;
 using BEPUphysics.Constraints;
+using BEPUphysics.CollisionShapes;
+using System.Collections.Generic;
 
 namespace BEPUphysicsDemos.Demos
 {
@@ -190,7 +192,27 @@ namespace BEPUphysicsDemos.Demos
             game.Camera.Position = new Vector3(-10, 7, 5);
             game.Camera.Yaw = MathHelper.Pi;
 
-            
+            //Add a log to roll!
+            //Make it a compound so some boxes can be added to let the player know it's actually spinning.
+            CompoundBody log = new CompoundBody(new List<CompoundShapeEntry>()
+            {
+                new CompoundShapeEntry(new CylinderShape(4, 1.8f), Quaternion.CreateFromAxisAngle(Vector3.Forward, MathHelper.PiOver2), 20),
+                new CompoundShapeEntry(new BoxShape(.5f, .5f, 3.7f),  new Vector3(1.75f, 0,0), 0),
+                new CompoundShapeEntry(new BoxShape(.5f, 3.7f, .5f), new Vector3(1.75f, 0,0), 0),
+                new CompoundShapeEntry(new BoxShape(.5f, .5f, 3.7f),  new Vector3(-1.75f, 0,0), 0),
+                new CompoundShapeEntry(new BoxShape(.5f, 3.7f, .5f), new Vector3(-1.75f, 0,0), 0)
+            }, 50);
+            log.Position = new Vector3(-14.5f, 10, 41);
+            log.AngularDamping = 0;
+
+
+            RevoluteJoint logJointA = new RevoluteJoint(divingBoardBase, log, log.Position + new Vector3(2.5f, 0, 0), Vector3.Right);
+            RevoluteJoint logJointB = new RevoluteJoint(endPlatform, log, log.Position + new Vector3(-2.5f, 0, 0), Vector3.Right);
+            Space.Add(logJointA);
+            Space.Add(logJointB);
+
+            Space.Add(log);
+
         }
 
         EntityMover elevatorMover;

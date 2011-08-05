@@ -346,7 +346,6 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         public SupportFinder(CharacterController character)
         {
             this.character = character;
-            SupportRayFilter = SupportRayFilterFunction;
         }
 
         /// <summary>
@@ -497,7 +496,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 Ray obstructionRay;
                 obstructionRay.Position = body.Position + downDirection * body.Height * .25f;
                 obstructionRay.Direction = ray.Position - obstructionRay.Position;
-                if (!character.RayCastHitAnything(obstructionRay, 1))
+                if (!character.QueryManager.RayCastHitAnything(obstructionRay, 1))
                 {
                     //The origin isn't obstructed, so now ray cast down.
                     float length = hadTraction ? bottomHeight + character.Stepper.MaximumStepHeight : bottomHeight;
@@ -535,7 +534,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 Ray obstructionRay;
                 obstructionRay.Position = body.Position + downDirection * body.Height * .25f;
                 obstructionRay.Direction = ray.Position - obstructionRay.Position;
-                if (!character.RayCastHitAnything(obstructionRay, 1))
+                if (!character.QueryManager.RayCastHitAnything(obstructionRay, 1))
                 {
                     //The origin isn't obstructed, so now ray cast down.
                     float length = hadTraction ? bottomHeight + character.Stepper.MaximumStepHeight : bottomHeight;
@@ -573,7 +572,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 Ray obstructionRay;
                 obstructionRay.Position = body.Position + downDirection * body.Height * .25f;
                 obstructionRay.Direction = ray.Position - obstructionRay.Position;
-                if (!character.RayCastHitAnything(obstructionRay, 1))
+                if (!character.QueryManager.RayCastHitAnything(obstructionRay, 1))
                 {
                     //The origin isn't obstructed, so now ray cast down.
                     float length = hadTraction ? bottomHeight + character.Stepper.MaximumStepHeight : bottomHeight;
@@ -606,7 +605,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             Collidable earliestHitObject;
             supportRayData = new SupportRayData();
             hasTraction = false;
-            if (character.RayCast(ray, length, out earliestHit, out earliestHitObject))
+            if (character.QueryManager.RayCast(ray, length, out earliestHit, out earliestHitObject))
             {
                 float lengthSquared = earliestHit.Normal.LengthSquared();
                 if (lengthSquared < Toolbox.Epsilon)
@@ -638,12 +637,6 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             return false;
         }
 
-        public Func<BroadPhaseEntry, bool> SupportRayFilter;
-        bool SupportRayFilterFunction(BroadPhaseEntry entry)
-        {
-            //Only permit an object to be used as a support if it fully collides with the character.
-            return CollisionRules.CollisionRuleCalculator(entry.CollisionRules, character.Body.CollisionInformation.CollisionRules) == CollisionRule.Normal;
-        }
 
 
         /// <summary>

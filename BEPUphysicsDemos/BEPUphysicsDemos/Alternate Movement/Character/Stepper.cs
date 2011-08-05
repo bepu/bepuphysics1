@@ -340,7 +340,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             float length = character.Body.Radius + horizontalOffsetAmount;// -contact.PenetrationDepth;
 
 
-            if (character.RayCastHitAnything(ray, length))
+            if (character.QueryManager.RayCastHitAnything(ray, length))
             {
                 //The step is obstructed!
                 newPosition = new Vector3();
@@ -356,7 +356,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
             //Find the earliest hit, if any.
             RayHit earliestHit = new RayHit();
-            if (!character.RayCast(ray, downRayLength, out earliestHit) || //Can't do anything if it didn't hit.
+            if (!character.QueryManager.RayCast(ray, downRayLength, out earliestHit) || //Can't do anything if it didn't hit.
                 earliestHit.T <= 0 || //Can't do anything if the hit was invalid.
                 earliestHit.T - downRayLength > -MinimumUpStepHeight || //Don't bother doing anything if the step is too small.
                 earliestHit.T - downRayLength < -MaximumStepHeight - upStepMargin) //Can't do anything if the step is too tall.
@@ -394,7 +394,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             float upLength = character.Body.Height - earliestHit.T;
 
             //If the sum of the up and down distances is less than the height, the character can't fit.
-            if (character.RayCastHitAnything(ray, upLength))
+            if (character.QueryManager.RayCastHitAnything(ray, upLength))
             {
                 newPosition = new Vector3();
                 return false;
@@ -626,11 +626,11 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                         obstructionTestRay.Position = position + character.Body.OrientationMatrix.Up * (character.Body.Height * .5f);
                         obstructionTestRay.Direction = downRay.Position - obstructionTestRay.Position;
 
-                        if (!character.RayCastHitAnything(obstructionTestRay, 1))
+                        if (!character.QueryManager.RayCastHitAnything(obstructionTestRay, 1))
                         {
                             //Okay! it's safe to cast down, then.
                             RayHit hit;
-                            if (character.RayCast(downRay, character.Body.Height, out hit))
+                            if (character.QueryManager.RayCast(downRay, character.Body.Height, out hit))
                             {
                                 //Got a hit!
                                 if (character.Body.Height - MaximumStepHeight < hit.T)
@@ -645,7 +645,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                                         hintOffset = Math.Min(0, Vector3.Dot(supportContact.Normal, character.Body.OrientationMatrix.Down) * (CollisionDetectionSettings.AllowedPenetration * .5f - supportContact.PenetrationDepth));
                                         //ONE MORE thing to check.  The new position of the center ray must be able to touch the ground!
                                         downRay.Position = position;
-                                        if (character.RayCast(downRay, character.Body.Height * .5f + MaximumStepHeight, out hit))
+                                        if (character.QueryManager.RayCast(downRay, character.Body.Height * .5f + MaximumStepHeight, out hit))
                                         {
                                             //It hit.. almost there!
                                             hit.Normal.Normalize();

@@ -61,15 +61,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         public SupportFinder SupportFinder { get; private set; }
 
 
-        /// <summary>
-        /// Gets or sets the maximum change in speed that the character will apply in order to stay connected to the ground.
-        /// </summary>
-        public float GlueSpeed { get; set; }
 
-        ///// <summary>
-        ///// Gets or sets the multiplier of horizontal force to apply to support objects when standing on top of dynamic entities.
-        ///// </summary>
-        //public float HorizontalForceFactor { get; set; }
 
 
         SupportData supportData;
@@ -82,9 +74,10 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             //Making the character a continuous object prevents it from flying through walls which would be pretty jarring from a player's perspective.
             Body.PositionUpdateMode = PositionUpdateMode.Continuous;
             Body.LocalInertiaTensorInverse = new Matrix3X3();
-            Body.CollisionInformation.Events.CreatingPair += RemoveFriction;
+            //TODO: In v0.16.2, compound bodies would override the material properties that get set in the CreatingPair event handler.
+            //In a future version where this is changed, change this to conceptually minimally required CreatingPair.
+            Body.CollisionInformation.Events.DetectingInitialCollision += RemoveFriction;
             Body.LinearDamping = 0;
-            GlueSpeed = 20;
             SupportFinder = new SupportFinder(this);
             HorizontalMotionConstraint = new HorizontalMotionConstraint(this);
             VerticalMotionConstraint = new VerticalMotionConstraint(this);
@@ -449,74 +442,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         }
 
 
-        public bool RayCast(Ray ray, float length, out RayHit earliestHit)
-        {
-            earliestHit = new RayHit();
-            earliestHit.T = float.MaxValue;
-            foreach (var collidable in Body.CollisionInformation.OverlappedCollidables)
-            {
-                //Check to see if the collidable is hit by the ray.
-                float? t = ray.Intersects(collidable.BoundingBox);
-                if (t != null && t < length)
-                {
-                    //Is it an earlier hit than the current earliest?
-                    RayHit hit;
-                    if (collidable.RayCast(ray, length, SupportFinder.SupportRayFilter, out hit) && hit.T < earliestHit.T)
-                    {
-                        earliestHit = hit;
-                    }
-                }
-            }
-            if (earliestHit.T == float.MaxValue)
-                return false;
-            return true;
 
-        }
-
-        public bool RayCast(Ray ray, float length, out RayHit earliestHit, out Collidable hitObject)
-        {
-            earliestHit = new RayHit();
-            earliestHit.T = float.MaxValue;
-            hitObject = null;
-            foreach (var collidable in Body.CollisionInformation.OverlappedCollidables)
-            {
-                //Check to see if the collidable is hit by the ray.
-                float? t = ray.Intersects(collidable.BoundingBox);
-                if (t != null && t < length)
-                {
-                    //Is it an earlier hit than the current earliest?
-                    RayHit hit;
-                    if (collidable.RayCast(ray, length, SupportFinder.SupportRayFilter, out hit) && hit.T < earliestHit.T)
-                    {
-                        earliestHit = hit;
-                        hitObject = collidable;
-                    }
-                }
-            }
-            if (earliestHit.T == float.MaxValue)
-                return false;
-            return true;
-
-        }
-
-        public bool RayCastHitAnything(Ray ray, float length)
-        {
-            foreach (var collidable in Body.CollisionInformation.OverlappedCollidables)
-            {
-                //Check to see if the collidable is hit by the ray.
-                float? t = ray.Intersects(collidable.BoundingBox);
-                if (t != null && t < length)
-                {
-                    RayHit hit;
-                    if (collidable.RayCast(ray, length, SupportFinder.SupportRayFilter, out hit))
-                    {
-                        return true;
-                    }
-                }
-            }
-            return false;
-
-        }
 
 
 
