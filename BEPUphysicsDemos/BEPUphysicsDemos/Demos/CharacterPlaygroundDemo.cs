@@ -48,7 +48,7 @@ namespace BEPUphysicsDemos.Demos
 
 
             //Add a spinning blade for the character to ram itself into.
-            var fanBase = new Cylinder(new Vector3(-9, .5f, 50), 1.1f, 1);
+            var fanBase = new Cylinder(new Vector3(-13, .5f, 50), 1.1f, 1);
             var fanBlade = new Box(fanBase.Position + new Vector3(0, .8f, 0), 5, .1f, 1f, 5);
             var fanJoint = new RevoluteJoint(fanBase, fanBlade, (fanBase.Position + fanBlade.Position) * .5f, Vector3.Up);
             fanJoint.Motor.IsActive = true;
@@ -171,7 +171,7 @@ namespace BEPUphysicsDemos.Demos
             Space.Add(divingBoardJoint2);
 
 
-            //Add in some spheres to bump and jump on.
+            //Add in some boxes to bump and jump on.
             int numColumns = 3;
             int numRows = 3;
             int numHigh = 3;
@@ -182,11 +182,11 @@ namespace BEPUphysicsDemos.Demos
                 for (int j = 0; j < numColumns; j++)
                     for (int k = 0; k < numHigh; k++)
                     {
-                        Space.Add(new Sphere(new Vector3(
+                        Space.Add(new Box(new Vector3(
                                                  5 + xSpacing * i - (numRows - 1) * xSpacing / 2f,
                                                  1.58f + k * (ySpacing),
                                                  45 + zSpacing * j - (numColumns - 1) * zSpacing / 2f),
-                                             .5f, 5));
+                                             .5f, .5f, .5f, 5));
                     }
 
             game.Camera.Position = new Vector3(-10, 7, 5);
@@ -212,6 +212,14 @@ namespace BEPUphysicsDemos.Demos
             Space.Add(logJointB);
 
             Space.Add(log);
+
+            //Add a seesaw for people to jump on.
+            Box seesawBase = new Box(new Vector3(-7, .45f, 52), 1, .9f, .3f);
+            Box seesawPlank = new Box(seesawBase.Position + new Vector3(0, .65f, 0), 1.2f, .2f, 6, 3);
+            RevoluteJoint seesawJoint = new RevoluteJoint(seesawBase, seesawPlank, seesawPlank.Position, Vector3.Right);
+            Space.Add(seesawJoint);
+            Space.Add(seesawBase);
+            Space.Add(seesawPlank);
 
         }
 

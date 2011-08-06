@@ -110,6 +110,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         public HorizontalMotionConstraint(CharacterController characterController)
         {
             this.character = characterController;
+            CollectInvolvedEntities();
         }
 
 
@@ -122,14 +123,9 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
         }
 
-        bool wasMoving = false;
 
         public override void Update(float dt)
         {
-            if (supportData.SupportObject == null && (
-                (character.SupportFinder.SupportData != null && character.SupportFinder.SupportData.Value.SupportObject != null) ||
-                (character.SupportFinder.TractionData != null && character.SupportFinder.TractionData.Value.SupportObject != null)))
-                Debug.WriteLine("break.");
             //Collect references, pick the mode, and configure the coefficients to be used by the solver.
             bool isTryingToMove = movementDirection.LengthSquared() > 0;
             if (supportData.SupportObject != null)
@@ -209,13 +205,6 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     linearJacobianB1 = -velocityDirection;
                     linearJacobianB2 = -offVelocityDirection;
 
-
-                    //Vector3 calibratingLinearJacobianA1 = new Vector3(movementDirection.X, 0, movementDirection.Y);
-                    //Vector3 calibratingLinearJacobianA2 = new Vector3(movementDirection.Y, 0, -movementDirection.X);
-
-
-                    //if (Vector3.Dot(calibratingLinearJacobianA1, linearJacobianA1) < 0 || Vector3.Dot(calibratingLinearJacobianA2, linearJacobianA2) < 0)
-                    //    Debug.WriteLine("Breka.");
                 }
                 else
                 {
@@ -255,11 +244,6 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     linearJacobianB1 = -linearJacobianA1;
                     linearJacobianB2 = -linearJacobianA2;
 
-
-                    //if (Vector3.Dot(previousLinearJacobianA1, linearJacobianA1) < 0 || Vector3.Dot(previousLinearJacobianA2, linearJacobianA2) < 0)
-                    //    Debug.WriteLine("Breka.");
-
-
                 }
 
                 if (supportEntity != null)
@@ -292,49 +276,12 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 linearJacobianA2 = new Vector3(movementDirection.Y, 0, -movementDirection.X);
 
 
-                //if (Vector3.Dot(previousLinearJacobianA1, linearJacobianA1) < 0 || Vector3.Dot(previousLinearJacobianA2, linearJacobianA2) < 0)
-                //    Debug.WriteLine("Breka.");
             }
-            wasMoving = isTryingToMove;
 
 
-            //Compute the target velocity (in constraint space) for this frame.
-            //The goals are:
-            // relativeVelocity.X should be accelerated to maxSpeed using acceleration.
-            // relativeVelocity.X should be decelerated if it is < 0 or > maxSpeed.
-            // relativeVelocity.Y should be decelerated.
-            //Those rules cover every case, because the coefficients for acceleration/deceleration/maxSpeed
-            //have all been configured according to what state the character is in.
-            Vector2 relativeVelocity = RelativeVelocity;
-            //Compute the contribution from deceleration first.
-            //Target the final goal first, then clamp it.
-            if (relativeVelocity.X < 0)
-                targetVelocity.X = 0;
-            else if (relativeVelocity.X > maxSpeed)
-                targetVelocity.X = maxSpeed;
-            else
-                targetVelocity.X = relativeVelocity.X;
-            if (relativeVelocity.Y > 0)
-                targetVelocity.Y = 0;
-            else
-                targetVelocity.Y = 0;
-            ////Clamp it!
-            //float velocityChangeMagnitude;
-            //Vector2 change;
-            //Vector2.Subtract(ref targetVelocity, ref relativeVelocity, out change);
-            //velocityChangeMagnitude = change.Length();
-            //if (velocityChangeMagnitude > Toolbox.Epsilon)
-            //{
-            //    float newLength = Math.Min(velocityChangeMagnitude, deceleration);
-            //    Vector2.Multiply(ref change, newLength / velocityChangeMagnitude, out change);
-            //    Vector2.Add(ref relativeVelocity, ref change, out targetVelocity);
-            //}
-            //Now add in the acceleration component along the X axis.
-            //float newX = Math.Min(targetVelocity.X + acceleration, maxSpeed);
-            //float newX = Math.Min(relativeVelocity.X + acceleration, maxSpeed);
-            //if (newX > targetVelocity.X)
-            //    targetVelocity.X = newX;
+            //Compute the target velocity (in constraint space) for this frame.  The hard work has already been done.
             targetVelocity.X = maxSpeed;
+            targetVelocity.Y = 0;
 
             //Compute the effective mass matrix.
             if (supportEntity != null && supportEntity.IsDynamic)
