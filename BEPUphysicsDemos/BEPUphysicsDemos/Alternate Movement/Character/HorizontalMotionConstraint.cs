@@ -53,19 +53,138 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             set
             {
                 movementDirection = value;
-                if (value.LengthSquared() > 0)
+                float lengthSquared = value.LengthSquared();
+                if (lengthSquared > 0)
+                {
                     character.Body.IsActive = true;
+                    Vector2.Divide(ref movementDirection, (float)Math.Sqrt(lengthSquared), out movementDirection);
+                }
             }
         }
 
-
-        public float Speed = 8f;
-        public float CrouchingSpeed = 3f;
-        public float SlidingSpeed = 6;
-        public float AirSpeed = 4;
-        public float MaximumForce = 1000;
-        public float MaximumSlidingForce = 50;
-        public float MaximumAirForce = 150;
+        float speed = 8f;
+        /// <summary>
+        /// Gets or sets the maximum speed at which the character can move while standing with a support that provides traction.
+        /// Relative velocities with a greater magnitude will be decelerated.
+        /// </summary>
+        public float Speed
+        {
+            get
+            {
+                return speed;
+            }
+            set
+            {
+                if (value < 0)
+                    throw new Exception("Value must be nonnegative.");
+                    speed = value;
+            }
+        }
+        float crouchingSpeed = 3f;
+        /// <summary>
+        /// Gets or sets the maximum speed at which the character can move while crouching with a support that provides traction.
+        /// Relative velocities with a greater magnitude will be decelerated.
+        /// </summary>
+        public float CrouchingSpeed
+        {
+            get
+            {
+                return crouchingSpeed;
+            }
+            set
+            {
+                if (value < 0)
+                    throw new Exception("Value must be nonnegative.");
+                    crouchingSpeed = value;
+            }
+        }
+        float slidingSpeed = 6;
+        /// <summary>
+        /// Gets or sets the maximum speed at which the character can move while on a support that does not provide traction.
+        /// Relative velocities with a greater magnitude will be decelerated.
+        /// </summary>
+        public float SlidingSpeed
+        {
+            get
+            {
+                return slidingSpeed;
+            }
+            set
+            {
+                if (value < 0)
+                    throw new Exception("Value must be nonnegative.");
+                    slidingSpeed = value;
+            }
+        }
+        float airSpeed = 4;
+        /// <summary>
+        /// Gets or sets the maximum speed at which the character can move with no support.
+        /// The character will not be decelerated while airborne.
+        /// </summary>
+        public float AirSpeed
+        {
+            get
+            {
+                return airSpeed;
+            }
+            set
+            {
+                if (value < 0)
+                    throw new Exception("Value must be nonnegative.");
+                    airSpeed = value;
+            }
+        }
+        float maximumForce = 1000;
+        /// <summary>
+        /// Gets or sets the maximum force that the character can apply while on a support which provides traction.
+        /// </summary>
+        public float MaximumForce
+        {
+            get
+            {
+                return maximumForce;
+            }
+            set
+            {
+                if (value < 0)
+                    throw new Exception("Value must be nonnegative.");
+                    maximumForce = value;
+            }
+        }
+        float maximumSlidingForce = 50;
+        /// <summary>
+        /// Gets or sets the maximum force that the character can apply while on a support which does not provide traction.
+        /// </summary>
+        public float MaximumSlidingForce
+        {
+            get
+            {
+                return maximumSlidingForce;
+            }
+            set
+            {
+                if (value < 0)
+                    throw new Exception("Value must be nonnegative.");
+                    maximumSlidingForce = value;
+            }
+        }
+        float maximumAirForce = 150;
+        /// <summary>
+        /// Gets or sets the maximum force that the character can apply with no support.
+        /// </summary>
+        public float MaximumAirForce
+        {
+            get
+            {
+                return maximumAirForce;
+            }
+            set
+            {
+                if (value < 0)
+                    throw new Exception("Value must be nonnegative.");
+                    maximumAirForce = value;
+            }
+        }
 
         float supportForceFactor = 1;
         /// <summary>
@@ -89,6 +208,10 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             }
         }
 
+        /// <summary>
+        /// Gets the movement mode that the character is currently in.
+        /// </summary>
+        public MovementMode MovementMode { get; private set; }
 
         float maxSpeed;
         float maxForce;
@@ -102,11 +225,14 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         Vector3 linearJacobianB2;
         Vector3 angularJacobianB1;
         Vector3 angularJacobianB2;
-        public MovementMode MovementMode;
 
         Vector2 accumulatedImpulse;
         Vector2 targetVelocity;
 
+        /// <summary>
+        /// Constructs a new horizontal motion constraint.
+        /// </summary>
+        /// <param name="characterController">Character to be governed by this constraint.</param>
         public HorizontalMotionConstraint(CharacterController characterController)
         {
             this.character = characterController;
@@ -123,7 +249,10 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
         }
 
-
+        /// <summary>
+        /// Computes per-frame information necessary for the constraint.
+        /// </summary>
+        /// <param name="dt">Time step duration.</param>
         public override void Update(float dt)
         {
             //Collect references, pick the mode, and configure the coefficients to be used by the solver.
@@ -146,23 +275,23 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 {
                     MovementMode = MovementMode.Traction;
                     if (character.StanceManager.CurrentStance == Stance.Standing)
-                        maxSpeed = Speed;
+                        maxSpeed = speed;
                     else
-                        maxSpeed = CrouchingSpeed;
-                    maxForce = MaximumForce;
+                        maxSpeed = crouchingSpeed;
+                    maxForce = maximumForce;
                 }
                 else
                 {
                     MovementMode = MovementMode.Sliding;
-                    maxSpeed = SlidingSpeed;
-                    maxForce = MaximumSlidingForce;
+                    maxSpeed = slidingSpeed;
+                    maxForce = maximumSlidingForce;
                 }
             }
             else
             {
                 MovementMode = MovementMode.Floating;
-                maxSpeed = AirSpeed;
-                maxForce = MaximumAirForce;
+                maxSpeed = airSpeed;
+                maxForce = maximumAirForce;
                 supportEntity = null;
             }
             if (!isTryingToMove)
@@ -327,6 +456,10 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
         }
 
+        /// <summary>
+        /// Performs any per-frame initialization needed by the constraint that must be done with exclusive access
+        /// to the connected objects.
+        /// </summary>
         public override void ExclusiveUpdate()
         {
             //Warm start the constraint using the previous impulses and the new jacobians!
@@ -361,7 +494,10 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             }
         }
 
-
+        /// <summary>
+        /// Computes a solution to the constraint.
+        /// </summary>
+        /// <returns>Impulse magnitude computed by the iteration.</returns>
         public override float SolveIteration()
         {
             //The relative velocity's x component is in the movement direction.
@@ -404,7 +540,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
             Vector2 previousAccumulatedImpulse = accumulatedImpulse;
             if (MovementMode == MovementMode.Floating)
-            {                
+            {
                 //If it's floating, clamping rules are different.
                 //The constraint is not permitted to slow down the character; only speed it up.
                 //This offers a hole for an exploit; by jumping and curving just right,
@@ -460,7 +596,12 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         }
 
 
-        Vector2 RelativeVelocity
+        /// <summary>
+        /// Gets the current velocity between the character and its support in constraint space.
+        /// The X component corresponds to velocity along the movement direction.
+        /// The Y component corresponds to velocity perpendicular to the movement direction and support normal.
+        /// </summary>
+        public Vector2 RelativeVelocity
         {
             get
             {
@@ -492,6 +633,21 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
                 }
                 return relativeVelocity;
+            }
+        }
+
+        /// <summary>
+        /// Gets the current velocity between the character and its support.
+        /// </summary>
+        public Vector3 RelativeWorldVelocity
+        {
+            get
+            {
+                Vector3 bodyVelocity = character.Body.LinearVelocity;
+                if (supportEntity != null)
+                    return bodyVelocity - Toolbox.GetVelocityOfPoint(supportData.Position, supportEntity);
+                else
+                    return bodyVelocity;
             }
         }
 

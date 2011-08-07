@@ -221,6 +221,21 @@ namespace BEPUphysicsDemos.Demos
             Space.Add(seesawBase);
             Space.Add(seesawPlank);
 
+
+            //TEST DEBUG
+            int numPads = 10;
+            for (int i = 0; i < numPads; i++)
+            {
+                offset = new Vector3(0, 0, 4);
+                Box a = new Box(new Vector3(i * 1.5f + 2, 10, 24), 1.5f, 1, 4);
+                Box b = new Box(new Vector3(i * 1.5f + 2, 10, 24), 1.5f, 1, 4);
+                float angle = -i * MathHelper.PiOver2 / numPads;
+                b.Orientation = Quaternion.CreateFromAxisAngle(Vector3.Right, angle);
+                b.Position += offset * .5f + Vector3.Transform(offset * .5f, b.Orientation);
+
+                Space.Add(a);
+                Space.Add(b);
+            }
         }
 
         EntityMover elevatorMover;

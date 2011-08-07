@@ -21,21 +21,71 @@ using BEPUphysics.Entities;
 
 namespace BEPUphysicsDemos.AlternateMovement.Character
 {
+    /// <summary>
+    /// Gives a physical object FPS-like control, including stepping and jumping.
+    /// This is more robust/expensive than the SimpleCharacterController.
+    /// </summary>
     public class CharacterController : Updateable, IBeforeSolverUpdateable
     {
+        /// <summary>
+        /// Gets the physical body of the character.
+        /// </summary>
         public Cylinder Body { get; private set; }
 
-        public Stepper Stepper { get; private set; }
-
+        /// <summary>
+        /// Gets the manager responsible for finding places for the character to step up and down to.
+        /// </summary>
+        public StepManager StepManager { get; private set; }
+        
+        /// <summary>
+        /// Gets the manager responsible for crouching, standing, and the verification involved in changing states.
+        /// </summary>
         public StanceManager StanceManager { get; private set; }
 
+        /// <summary>
+        /// Gets the support system which other systems use to perform local ray casts and contact queries.
+        /// </summary>
         public QueryManager QueryManager { get; private set; }
 
+        /// <summary>
+        /// Gets the constraint used by the character to handle horizontal motion.  This includes acceleration due to player input and deceleration when the relative velocity
+        /// between the support and the character exceeds specified maximums.
+        /// </summary>
         public HorizontalMotionConstraint HorizontalMotionConstraint { get; private set; }
-        public VerticalMotionConstraint VerticalMotionConstraint { get; private set; }
 
-        public float JumpSpeed = 4.5f;
-        public float SlidingJumpSpeed = 3;
+        /// <summary>
+        /// Gets the constraint used by the character to stay glued to surfaces it stands on.
+        /// </summary>
+        public VerticalMotionConstraint VerticalMotionConstraint { get; private set; }
+        
+        private float jumpSpeed = 4.5f;
+        public float JumpSpeed
+        {
+            get
+            {
+                return jumpSpeed;
+            }
+            set
+            {
+                if (value < 0)
+                    throw new Exception("Value must be nonnegative.");
+                jumpSpeed = value;
+            }
+        }
+        float slidingJumpSpeed = 3;
+        public float SlidingJumpSpeed
+        {
+            get
+            {
+                return slidingJumpSpeed;
+            }
+            set
+            {
+                if (value < 0)
+                    throw new Exception("Value must be nonnegative.");
+                slidingJumpSpeed = value;
+            }
+        }
         float jumpForceFactor = 1f;
         /// <summary>
         /// Gets or sets the amount of force to apply to supporting dynamic entities as a fraction of the force used to reach the jump speed.
@@ -62,10 +112,9 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
 
 
-
-
-        SupportData supportData;
-
+        /// <summary>
+        /// Constructs a new character controller with the default configuration.
+        /// </summary>
         public CharacterController()
         {
             Body = new Cylinder(Vector3.Zero, 1.7f, .6f, 10);
@@ -81,13 +130,11 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             SupportFinder = new SupportFinder(this);
             HorizontalMotionConstraint = new HorizontalMotionConstraint(this);
             VerticalMotionConstraint = new VerticalMotionConstraint(this);
-            Stepper = new Stepper(this);
+            StepManager = new StepManager(this);
             StanceManager = new StanceManager(this);
             QueryManager = new QueryManager(this);
 
 
-
-            Entity = Body;
         }
 
         void RemoveFriction(EntityCollidable sender, BroadPhaseEntry other, INarrowPhasePair pair)
@@ -117,7 +164,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             Vector3 offset = new Vector3();
 #endif
                 offset.X = radius;
-                offset.Y = Stepper.MaximumStepHeight;
+                offset.Y = StepManager.MaximumStepHeight;
                 offset.Z = radius;
                 BoundingBox box = Body.CollisionInformation.BoundingBox;
                 Vector3.Add(ref box.Max, ref offset, out box.Max);
@@ -128,9 +175,8 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
         }
 
-        public static Entity Entity;
 
-        void CollectSupportData()
+        SupportData CollectSupportData()
         {
             //Identify supports.
             SupportFinder.UpdateSupports();
@@ -139,12 +185,12 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             if (SupportFinder.HasSupport)
             {
                 if (SupportFinder.HasTraction)
-                    supportData = SupportFinder.TractionData.Value;
+                    return SupportFinder.TractionData.Value;
                 else
-                    supportData = SupportFinder.SupportData.Value;
+                    return SupportFinder.SupportData.Value;
             }
             else
-                supportData = new SupportData();
+                return new SupportData();
         }
 
 
@@ -156,12 +202,12 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
             bool hadTraction = SupportFinder.HasTraction;
 
-            CollectSupportData();
+            var supportData = CollectSupportData();
 
 
             //Compute the initial velocities relative to the support.
             Vector3 relativeVelocity;
-            ComputeRelativeVelocity(out relativeVelocity);
+            ComputeRelativeVelocity(ref supportData, out relativeVelocity);
             float verticalVelocity = Vector3.Dot(supportData.Normal, relativeVelocity);
             Vector3 horizontalVelocity = relativeVelocity - supportData.Normal * verticalVelocity;
 
@@ -192,8 +238,8 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     //The character has traction, so jump straight up.
                     float currentUpVelocity = Vector3.Dot(Body.OrientationMatrix.Up, relativeVelocity);
                     //Target velocity is JumpSpeed.
-                    float velocityChange = Math.Max(JumpSpeed - currentUpVelocity, 0);
-                    ApplyJumpVelocity(Body.OrientationMatrix.Up * velocityChange, ref relativeVelocity);
+                    float velocityChange = Math.Max(jumpSpeed - currentUpVelocity, 0);
+                    ApplyJumpVelocity(ref supportData, Body.OrientationMatrix.Up * velocityChange, ref relativeVelocity);
 
                     SupportFinder.ClearSupportData();
                     supportData = new SupportData();
@@ -203,8 +249,8 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     //The character does not have traction, so jump along the surface normal instead.
                     float currentNormalVelocity = Vector3.Dot(supportData.Normal, relativeVelocity);
                     //Target velocity is JumpSpeed.
-                    float velocityChange = Math.Max(SlidingJumpSpeed - currentNormalVelocity, 0);
-                    ApplyJumpVelocity(supportData.Normal * -velocityChange, ref relativeVelocity);
+                    float velocityChange = Math.Max(slidingJumpSpeed - currentNormalVelocity, 0);
+                    ApplyJumpVelocity(ref supportData, supportData.Normal * -velocityChange, ref relativeVelocity);
 
                     SupportFinder.ClearSupportData();
                     supportData = new SupportData();
@@ -215,8 +261,8 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
             //Try to step!
             Vector3 newPosition;
-            if (Stepper.TryToStepDown(out newPosition) ||
-                Stepper.TryToStepUp(out newPosition))
+            if (StepManager.TryToStepDown(out newPosition) ||
+                StepManager.TryToStepUp(out newPosition))
             {
                 TeleportToPosition(newPosition, dt);
             }
@@ -255,6 +301,11 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
             //Warning:
             //Changing a constraint's support data is not thread safe; it modifies simulation islands!
+            //If your game can guarantee that character controllers will be the only ones performing such shared modifications
+            //while this updateable stage runs, then addressing this is fairly simple.  Wrap this section (minimally, the SupportData property sets)
+            //in a critical section.  A single contended resource isn't great, but then again, the lock will be fairly brief compared to the stepping
+            //and support queries performed above.  Implementing such parallelization is probably only it worth when the number of characters gets fairly high.
+            //These characters seem to cost about 50-400 microseconds a piece on a single core of a Q6600@2.4ghz, with 400 microseconds being a temporary worst case.
             HorizontalMotionConstraint.SupportData = supportData;
             //Vertical support data is different because it has the capacity to stop the character from moving unless
             //contacts are pruned appropriately.
@@ -290,7 +341,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             CollectSupportData();
         }
 
-        private void CorrectContacts()
+        void CorrectContacts()
         {
             //Go through the contacts associated with the character.
             //If the contact is at the bottom of the character, regardless of its normal, take a closer look.
@@ -383,7 +434,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
         }
 
-        void ComputeRelativeVelocity(out Vector3 relativeVelocity)
+        void ComputeRelativeVelocity(ref SupportData supportData, out Vector3 relativeVelocity)
         {
 
             //Compute the relative velocity between the body and its support, if any.
@@ -405,9 +456,10 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         /// <summary>
         /// Changes the relative velocity between the character and its support.
         /// </summary>
+        /// <param name="supportData">Support data to use to jump.</param>
         /// <param name="velocityChange">Change to apply to the character and support relative velocity.</param>
         /// <param name="relativeVelocity">Relative velocity to update.</param>
-        void ApplyJumpVelocity(Vector3 velocityChange, ref Vector3 relativeVelocity)
+        void ApplyJumpVelocity(ref SupportData supportData, Vector3 velocityChange, ref Vector3 relativeVelocity)
         {
 
             Body.LinearVelocity += velocityChange;

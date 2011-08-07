@@ -136,7 +136,6 @@ namespace BEPUphysicsDemos.AlternateMovement.SimpleCharacter
                 }
                 else
                     supportLocationVelocity = new Vector3();
-                //linear velocity of point on body relative to center
 
                 Support(supportLocationVelocity, supportNormal, supportDistance);
                 HasTraction = IsSupportSlopeWalkable(supportNormal);

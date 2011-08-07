@@ -18,6 +18,9 @@ using BEPUphysics.BroadPhaseSystems;
 
 namespace BEPUphysicsDemos.AlternateMovement.Character
 {
+    /// <summary>
+    /// Helps a character identify supports by finding contacts and ray cast intersections with its immediate surroundings.
+    /// </summary>
     public class QueryManager
     {
         //This QueryManager is not thread safe in any way, but it's only ever used by a single character at a time, so this isn't an issue.
@@ -38,6 +41,10 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         EntityCollidable currentQueryObject;
         CharacterController character;
 
+        /// <summary>
+        /// Constructs the query manager for a character.
+        /// </summary>
+        /// <param name="character">Character to manage queries for.</param>
         public QueryManager(CharacterController character)
         {
             this.character = character;
@@ -55,13 +62,20 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         }
 
 
-        public Func<BroadPhaseEntry, bool> SupportRayFilter;
+        Func<BroadPhaseEntry, bool> SupportRayFilter;
         bool SupportRayFilterFunction(BroadPhaseEntry entry)
         {
             //Only permit an object to be used as a support if it fully collides with the character.
             return CollisionRules.CollisionRuleCalculator(entry.CollisionRules, character.Body.CollisionInformation.CollisionRules) == CollisionRule.Normal;
         }
 
+        /// <summary>
+        /// Computes the intersection, if any, between a ray and the objects in the character's bounding box.
+        /// </summary>
+        /// <param name="ray">Ray to test.</param>
+        /// <param name="length">Length of the ray to use in units of the ray's length.</param>
+        /// <param name="earliestHit">Earliest intersection location and information.</param>
+        /// <returns>Whether or not the ray hit anything.</returns>
         public bool RayCast(Ray ray, float length, out RayHit earliestHit)
         {
             earliestHit = new RayHit();
@@ -86,6 +100,14 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
         }
 
+        /// <summary>
+        /// Computes the intersection, if any, between a ray and the objects in the character's bounding box.
+        /// </summary>
+        /// <param name="ray">Ray to test.</param>
+        /// <param name="length">Length of the ray to use in units of the ray's length.</param>
+        /// <param name="earliestHit">Earliest intersection location and information.</param>
+        /// <param name="hitObject">Collidable intersected by the ray, if any.</param>
+        /// <returns>Whether or not the ray hit anything.</returns>
         public bool RayCast(Ray ray, float length, out RayHit earliestHit, out Collidable hitObject)
         {
             earliestHit = new RayHit();
@@ -112,6 +134,12 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
         }
 
+        /// <summary>
+        /// Determines if a ray intersects any object in the character's bounding box.
+        /// </summary>
+        /// <param name="ray">Ray to test.</param>
+        /// <param name="length">Length of the ray to use in units of the ray's length.</param>
+        /// <returns>Whether or not the ray hit anything.</returns>
         public bool RayCastHitAnything(Ray ray, float length)
         {
             foreach (var collidable in character.Body.CollisionInformation.OverlappedCollidables)
@@ -140,11 +168,22 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             headContacts.Clear();
         }
 
+        /// <summary>
+        /// Tests a collision object with the same shape as the current character at the given position for contacts.
+        /// Output data is stored in the query manager's supporting lists.
+        /// </summary>
+        /// <param name="position">Position to use for the query.</param>
         public void QueryContacts(Vector3 position)
         {
             QueryContacts(position, currentQueryObject);
         }
 
+        /// <summary>
+        /// Tests a collision object with the dimensions matching the desired stance shape at the given position for contacts.
+        /// Output data is stored in the query manager's supporting lists.
+        /// </summary>
+        /// <param name="stance">Character stance to use in the query.</param>
+        /// <param name="position">Position to use for the query.</param>
         public void QueryContacts(Vector3 position, Stance stance)
         {
             QueryContacts(position, stance == Stance.Standing ? standingQueryObject : crouchingQueryObject);

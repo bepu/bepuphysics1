@@ -18,25 +18,64 @@ using BEPUphysics.CollisionRuleManagement;
 
 namespace BEPUphysicsDemos.AlternateMovement.Character
 {
-    public class Stepper
+    /// <summary>
+    /// Checks to see if a character is capable of stepping up or down onto a new support object.
+    /// </summary>
+    public class StepManager
     {
         CharacterController character;
-        public float MaximumStepHeight = 1;
-        public float MinimumDownStepHeight = .1f;
-        public float MinimumUpStepHeight;
+        float maximumStepHeight = 1;
+        /// <summary>
+        /// Gets or sets the maximum height which the character is capable of stepping up or down onto.
+        /// </summary>
+        public float MaximumStepHeight
+        {
+            get
+            {
+                return maximumStepHeight;
+            }
+            set
+            {
+                if (maximumStepHeight < 0)
+                    throw new Exception("Value must be nonnegative.");
+                maximumStepHeight = value;
+            }
+        }
+        float minimumDownStepHeight = .1f;
+        /// <summary>
+        /// Gets or sets the minimum down step height.  Down steps which are smaller than this are simply ignored by the step system; instead, the character falls.
+        /// If the new step location has traction, the intermediate falling will not remove traction from the character.  The only difference is that the character isn't
+        /// teleported down when the step is too small.
+        /// </summary>
+        public float MinimumDownStepHeight
+        {
+            get
+            {
+                return maximumStepHeight;
+            }
+            set
+            {
+                if (maximumStepHeight < 0)
+                    throw new Exception("Value must be nonnegative.");
+                maximumStepHeight = value;
+            }
+        }
+        float minimumUpStepHeight;
 
-
-        public Stepper(CharacterController character)
+        /// <summary>
+        /// Constructs a new step manager for a character.
+        /// </summary>
+        /// <param name="character">Character governed by the manager.</param>
+        public StepManager(CharacterController character)
         {
             this.character = character;
             //The minimum step height is just barely above where the character would generally find the ground.
             //This helps avoid excess tests.
-            MinimumUpStepHeight = CollisionDetectionSettings.AllowedPenetration * 1.1f;// Math.Max(0, -.01f + character.Body.CollisionInformation.Shape.CollisionMargin * (1 - character.SupportFinder.sinMaximumSlope));
+            minimumUpStepHeight = CollisionDetectionSettings.AllowedPenetration * 1.1f;// Math.Max(0, -.01f + character.Body.CollisionInformation.Shape.CollisionMargin * (1 - character.SupportFinder.sinMaximumSlope));
 
         }
         
-
-        public bool IsDownStepObstructed(RawList<ContactData> sideContacts)
+        bool IsDownStepObstructed(RawList<ContactData> sideContacts)
         {
             //A contact is considered obstructive if its projected depth is deeper than any existing contact along the existing contacts' normals.
             for (int i = 0; i < sideContacts.Count; i++)
@@ -72,11 +111,16 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         
         RawList<ContactData> stepContacts = new RawList<ContactData>();
 
+        /// <summary>
+        /// Determines if a down step is possible, and if so, computes the location to which the character should teleport.
+        /// </summary>
+        /// <param name="newPosition">New position the character should teleport to if the down step is accepted.</param>
+        /// <returns>Whether or not the character should attempt to step down.</returns>
         public bool TryToStepDown(out Vector3 newPosition)
         {
             //Don't bother trying to step down if we already have a support contact or if the support ray doesn't have traction.
             if (character.SupportFinder.supports.Count == 0 && character.SupportFinder.SupportRayData != null && character.SupportFinder.SupportRayData.Value.HasTraction &&
-                character.SupportFinder.SupportRayData.Value.HitData.T - character.SupportFinder.RayLengthToBottom > MinimumDownStepHeight) //Don't do expensive stuff if it's, at most, a super tiny step that gravity will take care of.
+                character.SupportFinder.SupportRayData.Value.HitData.T - character.SupportFinder.RayLengthToBottom > minimumDownStepHeight) //Don't do expensive stuff if it's, at most, a super tiny step that gravity will take care of.
             {
                 //Predict a hit location based on the time of impact and the normal at the intersection.
                 //Take into account the radius of the character (don't forget the collision margin!)
@@ -117,7 +161,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                         case PositionState.Accepted:
                             currentOffset += hintOffset;
                             //Only use the new position location if the movement distance was the right size.
-                            if (currentOffset > MinimumDownStepHeight && currentOffset < MaximumStepHeight)
+                            if (currentOffset > minimumDownStepHeight && currentOffset < maximumStepHeight)
                             {
                                 newPosition = character.Body.Position + currentOffset * down;
                                 return true;
@@ -163,7 +207,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                         case PositionState.Accepted:
                             currentOffset += hintOffset;
                             //Only use the new position location if the movement distance was the right size.
-                            if (currentOffset > MinimumDownStepHeight && currentOffset < MaximumStepHeight)
+                            if (currentOffset > minimumDownStepHeight && currentOffset < maximumStepHeight)
                             {
                                 newPosition = character.Body.Position + currentOffset * down;
                                 return true;
@@ -243,6 +287,11 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             }
         }
 
+        /// <summary>
+        /// Determines if an up step is possible, and if so, computes the location to which the character should teleport.
+        /// </summary>
+        /// <param name="newPosition">New position the character should teleport to if the up step is accepted.</param>
+        /// <returns>Whether or not the character should attempt to step up.</returns>
         public bool TryToStepUp(out Vector3 newPosition)
         {
             //Can't step up if we don't have traction to begin with.
@@ -286,7 +335,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     //It is! But is it low enough?
                     dot = Vector3.Dot(character.Body.OrientationMatrix.Down, c.Contact.Position - character.Body.Position);
                     //It must be between the bottom of the character and the maximum step height.
-                    if (dot < character.Body.Height * .5f && dot > character.Body.Height * .5f - MaximumStepHeight - upStepMargin)
+                    if (dot < character.Body.Height * .5f && dot > character.Body.Height * .5f - maximumStepHeight - upStepMargin)
                     {
                         //It's a candidate!
                         //But wait, there's more! Do we already have a candidate that covers this direction?
@@ -358,8 +407,8 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             RayHit earliestHit = new RayHit();
             if (!character.QueryManager.RayCast(ray, downRayLength, out earliestHit) || //Can't do anything if it didn't hit.
                 earliestHit.T <= 0 || //Can't do anything if the hit was invalid.
-                earliestHit.T - downRayLength > -MinimumUpStepHeight || //Don't bother doing anything if the step is too small.
-                earliestHit.T - downRayLength < -MaximumStepHeight - upStepMargin) //Can't do anything if the step is too tall.
+                earliestHit.T - downRayLength > -minimumUpStepHeight || //Don't bother doing anything if the step is too small.
+                earliestHit.T - downRayLength < -maximumStepHeight - upStepMargin) //Can't do anything if the step is too tall.
             {
                 //No valid hit was detected.
                 newPosition = new Vector3();
@@ -434,7 +483,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
             //The words 'highest' and 'lowest' here refer to the position relative to the character's body.
             //The ray cast points downward relative to the character's body.
-            float highestBound = -MaximumStepHeight;
+            float highestBound = -maximumStepHeight;
             float lowestBound = character.Body.CollisionInformation.Shape.CollisionMargin - downRayLength + earliestHit.T;
             float currentOffset = lowestBound;
             float hintOffset;
@@ -460,11 +509,11 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     case PositionState.Accepted:
                         currentOffset += hintOffset;
                         //Only use the new position location if the movement distance was the right size.
-                        if (currentOffset < 0 && currentOffset > -MaximumStepHeight - CollisionDetectionSettings.AllowedPenetration)
+                        if (currentOffset < 0 && currentOffset > -maximumStepHeight - CollisionDetectionSettings.AllowedPenetration)
                         {
                             //It's possible that we let a just-barely-too-high step occur, limited by the allowed penetration.
                             //Just clamp the overall motion and let it penetrate a bit.
-                            newPosition = character.Body.Position + Math.Max(-MaximumStepHeight, currentOffset) * down + horizontalOffset;
+                            newPosition = character.Body.Position + Math.Max(-maximumStepHeight, currentOffset) * down + horizontalOffset;
                             return true;
                         }
                         else
@@ -516,11 +565,11 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     case PositionState.Accepted:
                         currentOffset += hintOffset;
                         //Only use the new position location if the movement distance was the right size.
-                        if (currentOffset < 0 && currentOffset > -MaximumStepHeight - CollisionDetectionSettings.AllowedPenetration)
+                        if (currentOffset < 0 && currentOffset > -maximumStepHeight - CollisionDetectionSettings.AllowedPenetration)
                         {
                             //It's possible that we let a just-barely-too-high step occur, limited by the allowed penetration.
                             //Just clamp the overall motion and let it penetrate a bit.
-                            newPosition = character.Body.Position + Math.Max(-MaximumStepHeight, currentOffset) * down + horizontalOffset;
+                            newPosition = character.Body.Position + Math.Max(-maximumStepHeight, currentOffset) * down + horizontalOffset;
                             return true;
                         }
                         else
@@ -633,7 +682,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                             if (character.QueryManager.RayCast(downRay, character.Body.Height, out hit))
                             {
                                 //Got a hit!
-                                if (character.Body.Height - MaximumStepHeight < hit.T)
+                                if (character.Body.Height - maximumStepHeight < hit.T)
                                 {
                                     //It's in range!                   
                                     float dot;
@@ -645,7 +694,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                                         hintOffset = Math.Min(0, Vector3.Dot(supportContact.Normal, character.Body.OrientationMatrix.Down) * (CollisionDetectionSettings.AllowedPenetration * .5f - supportContact.PenetrationDepth));
                                         //ONE MORE thing to check.  The new position of the center ray must be able to touch the ground!
                                         downRay.Position = position;
-                                        if (character.QueryManager.RayCast(downRay, character.Body.Height * .5f + MaximumStepHeight, out hit))
+                                        if (character.QueryManager.RayCast(downRay, character.Body.Height * .5f + maximumStepHeight, out hit))
                                         {
                                             //It hit.. almost there!
                                             hit.Normal.Normalize();
@@ -690,7 +739,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             }
         }
 
-        public bool IsUpStepObstructed(ref Vector3 sideNormal, RawList<ContactData> sideContacts, RawList<ContactData> headContacts)
+        bool IsUpStepObstructed(ref Vector3 sideNormal, RawList<ContactData> sideContacts, RawList<ContactData> headContacts)
         {
             //A contact is considered obstructive if its projected depth is deeper than any existing contact along the existing contacts' normals.
             for (int i = 0; i < sideContacts.Count; i++)

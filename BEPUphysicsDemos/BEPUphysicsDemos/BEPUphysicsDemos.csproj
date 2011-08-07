@@ -86,7 +86,7 @@
     <Compile Include="Alternate Movement\Character\StanceManager.cs" />
     <Compile Include="Alternate Movement\Character\VerticalMotionConstraint.cs" />
     <Compile Include="Alternate Movement\Character\HorizontalMotionConstraint.cs" />
-    <Compile Include="Alternate Movement\Character\Stepper.cs" />
+    <Compile Include="Alternate Movement\Character\StepManager.cs" />
     <Compile Include="Alternate Movement\Testing\Old\CharacterControllerOld.cs" />
     <Compile Include="Alternate Movement\Testing\Old\CharacterControllerInputOld.cs" />
     <Compile Include="Alternate Movement\Testing\ConvexCast\CharacterControllerConvexCast.cs" />

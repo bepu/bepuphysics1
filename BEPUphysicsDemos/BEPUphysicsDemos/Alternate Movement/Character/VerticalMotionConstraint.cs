@@ -15,7 +15,7 @@ using BEPUphysics.Settings;
 namespace BEPUphysicsDemos.AlternateMovement.Character
 {
     /// <summary>
-    /// Manages the horizontal movement of a character.
+    /// Keeps a character glued to the ground, if possible.
     /// </summary>
     public class VerticalMotionConstraint : EntitySolverUpdateable
     {
@@ -45,7 +45,23 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         }
 
 
-        public float MaximumGlueForce = 5000f;
+        float maximumGlueForce = 5000f;
+        /// <summary>
+        /// Gets or sets the maximum force that the constraint will apply in attempting to keep the character stuck to the ground.
+        /// </summary>
+        public float MaximumGlueForce
+        {
+            get
+            {
+                return maximumGlueForce;
+            }
+            set
+            {
+                if (maximumGlueForce < 0)
+                    throw new Exception("Value must be nonnegative.");
+                maximumGlueForce = value;
+            }
+        }
         float maximumForce;
 
         float supportForceFactor = 1;
@@ -87,6 +103,10 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         float accumulatedImpulse;
         float permittedVelocity;
 
+        /// <summary>
+        /// Constructs a new vertical motion constraint.
+        /// </summary>
+        /// <param name="characterController">Character governed by the constraint.</param>
         public VerticalMotionConstraint(CharacterController characterController)
         {
             this.character = characterController;
@@ -102,6 +122,10 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
         }
 
+        /// <summary>
+        /// Updates the activity state of the constraint.
+        /// Called automatically by the solver.
+        /// </summary>
         public override void UpdateSolverActivity()
         {
             if (supportData.HasTraction)
@@ -110,7 +134,10 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 isActiveInSolver = false;
         }
 
-
+        /// <summary>
+        /// Performs any per-frame computation needed by the constraint.
+        /// </summary>
+        /// <param name="dt">Time step duration.</param>
         public override void Update(float dt)
         {
             //Collect references, pick the mode, and configure the coefficients to be used by the solver.
@@ -135,7 +162,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 supportEntity = null;
             }
 
-            maximumForce = MaximumGlueForce * dt;
+            maximumForce = maximumGlueForce * dt;
 
             //If we don't allow the character to get out of the ground, it could apply some significant forces to a dynamic support object.
             //Technically, there exists a better estimate of the necessary speed, but choosing the maximum position correction speed is a nice catch-all.
@@ -172,6 +199,9 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
         }
 
+        /// <summary>
+        /// Performs any per-frame computations needed by the constraint that require exclusive access to the involved entities.
+        /// </summary>
         public override void ExclusiveUpdate()
         {
             //Warm start the constraint using the previous impulses and the new jacobians!
@@ -196,7 +226,10 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             }
         }
 
-
+        /// <summary>
+        /// Computes a solution to the constraint.
+        /// </summary>
+        /// <returns>Magnitude of the applied impulse.</returns>
         public override float SolveIteration()
         {
             //The relative velocity's x component is in the movement direction.
@@ -239,8 +272,10 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
         }
 
-
-        float RelativeVelocity
+        /// <summary>
+        /// Gets the relative velocity between the character and its support along the support normal.
+        /// </summary>
+        public float RelativeVelocity
         {
             get
             {

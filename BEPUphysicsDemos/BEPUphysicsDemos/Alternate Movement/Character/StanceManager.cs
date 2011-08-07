@@ -10,14 +10,23 @@ using BEPUphysics;
 
 namespace BEPUphysicsDemos.AlternateMovement.Character
 {
+    /// <summary>
+    /// Handles a character's stances, like standing or crouching, and their transitions.
+    /// </summary>
     public class StanceManager
     {
+        /// <summary>
+        /// Gets the height of the character while standing.
+        /// </summary>
         public float StandingHeight
         {
             get;
             private set;
         }
 
+        /// <summary>
+        /// Gets the height of the character while crouching.
+        /// </summary>
         public float CrouchingHeight
         {
             get;
@@ -43,6 +52,10 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         }
 
         CharacterController character;
+        /// <summary>
+        /// Constructs a stance manager for a character.
+        /// </summary>
+        /// <param name="character">Character governed by the manager.</param>
         public StanceManager(CharacterController character)
         {
             this.character = character;

@@ -1,10 +1,5 @@
 ﻿using BEPUphysics.Entities.Prefabs;
 using Microsoft.Xna.Framework;
-using System.Collections.Generic;
-using BEPUphysics.CollisionShapes;
-using BEPUphysics.Constraints.SolverGroups;
-using BEPUphysics.CollisionShapes.ConvexShapes;
-using BEPUphysics.Constraints.TwoEntity.Motors;
 
 namespace BEPUphysicsDemos.Demos
 {

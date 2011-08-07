@@ -45,7 +45,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         /// <summary>
         /// Owning space of the character.
         /// </summary>
-        public Space Space;
+        public Space Space { get; private set; }
 
 
         /// <summary>
@@ -133,15 +133,15 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     float verticalError = Vector3.Dot(error, up);
                     Vector3 horizontalError = error - verticalError * up;
                     //Clamp the vertical component of the camera position within the bounding cylinder.
-                    if (verticalError > CharacterController.Stepper.MaximumStepHeight)
+                    if (verticalError > CharacterController.StepManager.MaximumStepHeight)
                     {
-                        Camera.Position -= up * (CharacterController.Stepper.MaximumStepHeight - verticalError);
-                        verticalError = CharacterController.Stepper.MaximumStepHeight;
+                        Camera.Position -= up * (CharacterController.StepManager.MaximumStepHeight - verticalError);
+                        verticalError = CharacterController.StepManager.MaximumStepHeight;
                     }
-                    else if (verticalError < -CharacterController.Stepper.MaximumStepHeight)
+                    else if (verticalError < -CharacterController.StepManager.MaximumStepHeight)
                     {
-                        Camera.Position -= up * (-CharacterController.Stepper.MaximumStepHeight - verticalError);
-                        verticalError = -CharacterController.Stepper.MaximumStepHeight;
+                        Camera.Position -= up * (-CharacterController.StepManager.MaximumStepHeight - verticalError);
+                        verticalError = -CharacterController.StepManager.MaximumStepHeight;
                     }
                     //Clamp the horizontal distance too.
                     float horizontalErrorLength = horizontalError.LengthSquared();
@@ -161,7 +161,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     //float errorCorrectionFactor = .3f;
 
                     //This version is framerate independent, although it is more expensive.
-                    float errorCorrectionFactor = (float)(1 - Math.Pow(.000000001, dt)); 
+                    float errorCorrectionFactor = (float)(1 - Math.Pow(.000000001, dt));
                     Camera.Position += up * (verticalError * errorCorrectionFactor);
                     Camera.Position += horizontalError * errorCorrectionFactor;
 
