@@ -24,7 +24,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
     public class StepManager
     {
         CharacterController character;
-        float maximumStepHeight = 1;
+        float maximumStepHeight = 1f;
         /// <summary>
         /// Gets or sets the maximum height which the character is capable of stepping up or down onto.
         /// </summary>

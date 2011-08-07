@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Diagnostics;
+using BEPUphysics.Collidables.MobileCollidables;
 
 namespace BEPUphysicsDemos.AlternateMovement.Character
 {
@@ -107,6 +108,23 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             {
                 //Note that the character controller's update method is not called here; this is because it is handled within its owning space.
                 //This method's job is simply to tell the character to move around based on the Camera and input.
+
+                ////Rotate the camera of the character based on the support velocity, if a support with velocity exists.
+                ////This can be very disorienting in some cases; that's why it is off by default!
+                //if (CharacterController.SupportFinder.HasSupport)
+                //{
+                //    SupportData? data;
+                //    if (CharacterController.SupportFinder.HasTraction)
+                //        data = CharacterController.SupportFinder.TractionData;
+                //    else
+                //        data = CharacterController.SupportFinder.SupportData;
+                //    EntityCollidable support = data.Value.SupportObject as EntityCollidable;
+                //    if (support != null && !support.Entity.IsDynamic) //Having the view turned by dynamic entities is extremely confusing for the most part.
+                //    {
+                //        float dot = Vector3.Dot(support.Entity.AngularVelocity, CharacterController.Body.OrientationMatrix.Up);
+                //        Camera.Yaw += dot * dt;
+                //    }
+                //}
 
                 if (UseCameraSmoothing)
                 {

@@ -196,8 +196,6 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
         void IBeforeSolverUpdateable.Update(float dt)
         {
-            if (Keyboard.GetState().IsKeyDown(Keys.O))
-                Debug.WriteLine("Breka.");
             CorrectContacts();
 
             bool hadTraction = SupportFinder.HasTraction;

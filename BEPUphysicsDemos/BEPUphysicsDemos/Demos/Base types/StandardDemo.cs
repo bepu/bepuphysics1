@@ -87,9 +87,6 @@ namespace BEPUphysicsDemos.Demos
 
         public override void Update(float dt)
         {
-            if (Game.WasKeyPressed(Keys.P))
-                Debug.WriteLine("Breka.:");
-
             #region Kapow-Shooter Input
 
             //Update kapow-shooter

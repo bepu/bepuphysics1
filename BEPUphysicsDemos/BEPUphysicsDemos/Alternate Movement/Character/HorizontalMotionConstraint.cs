@@ -134,7 +134,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     airSpeed = value;
             }
         }
-        float maximumForce = 1000;
+        float maximumForce = 10000000;
         /// <summary>
         /// Gets or sets the maximum force that the character can apply while on a support which provides traction.
         /// </summary>

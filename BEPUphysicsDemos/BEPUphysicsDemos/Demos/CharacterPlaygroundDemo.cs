@@ -29,6 +29,12 @@ namespace BEPUphysicsDemos.Demos
         public CharacterPlaygroundDemo(DemosGame game)
             : base(game)
         {
+            game.Camera.Position = new Vector3(-10, 7, 5);
+            game.Camera.Yaw = MathHelper.Pi;
+            //Since this is the character playground, turn on the character by default.
+            character.Activate();
+            //Having the character body visible would be a bit distracting.
+            character.CharacterController.Body.Tag = "noDisplayObject";
 
             //Load in mesh data for the environment.
             Vector3[] staticTriangleVertices;
@@ -189,8 +195,7 @@ namespace BEPUphysicsDemos.Demos
                                              .5f, .5f, .5f, 5));
                     }
 
-            game.Camera.Position = new Vector3(-10, 7, 5);
-            game.Camera.Yaw = MathHelper.Pi;
+
 
             //Add a log to roll!
             //Make it a compound so some boxes can be added to let the player know it's actually spinning.
@@ -222,7 +227,7 @@ namespace BEPUphysicsDemos.Demos
             Space.Add(seesawPlank);
 
 
-            //TEST DEBUG
+            //Put some planks to stand on that show various slopes.
             int numPads = 10;
             for (int i = 0; i < numPads; i++)
             {
@@ -261,6 +266,11 @@ namespace BEPUphysicsDemos.Demos
             platformMover.TargetPosition = platformPath.Evaluate(pathTime);
             platformRotator.TargetOrientation = platformOrientationPath.Evaluate(pathTime);
             base.Update(dt);
+        }
+
+        public override void DrawUI()
+        {
+            Game.DataTextDrawer.Draw("Press \"C\" to toggle the character.", new Vector2(50, 50));
         }
 
         /// <summary>

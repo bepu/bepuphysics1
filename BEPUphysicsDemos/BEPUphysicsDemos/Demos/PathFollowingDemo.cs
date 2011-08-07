@@ -25,7 +25,7 @@ namespace BEPUphysicsDemos.Demos
         /// <summary>
         /// Defines target positions over time.
         /// </summary>
-        private readonly SpeedControlledCurve<Vector3> positionPath;
+        private readonly Path<Vector3> positionPath;
 
         /// <summary>
         /// Rotates the entity.
@@ -77,7 +77,7 @@ namespace BEPUphysicsDemos.Demos
                                                               (float) random.NextDouble() * 20 - 10));
             }
 
-            positionPath = new ConstantLinearSpeedCurve(1, wrappedPositionCurve);
+            positionPath = wrappedPositionCurve;
 
             //There's also a constant speed and variable speed curve type that can be used.
             //Try the following instead to move the entity at a constant rate:
@@ -146,13 +146,9 @@ namespace BEPUphysicsDemos.Demos
             //If the engine is using internal time stepping,
             //the passed in dt should be used instead (or put this logic into
             //an updateable that runs with space updates).
-            double speedFactor = 5;
-            pathTime += Space.TimeStepSettings.TimeStepDuration * speedFactor;
-            double innerTime;
-            Vector3 targetPosition;
-            positionPath.Evaluate(pathTime, out targetPosition, out innerTime);
-            mover.TargetPosition = targetPosition;
-            rotator.TargetOrientation = orientationPath.Evaluate(innerTime);
+            pathTime += Space.TimeStepSettings.TimeStepDuration;
+            mover.TargetPosition = positionPath.Evaluate(pathTime);
+            rotator.TargetOrientation = orientationPath.Evaluate(pathTime);
 
             base.Update(dt);
         }

@@ -77,6 +77,7 @@ namespace BEPUphysicsDemos
 
         private readonly Type[] demoTypes = new[]
                                                 {
+                                                    typeof (CharacterPlaygroundDemo),
                                                     typeof (WallDemo),
                                                     typeof (PyramidDemo),
                                                     typeof (ColosseumDemo),
@@ -110,8 +111,7 @@ namespace BEPUphysicsDemos
                                                     typeof (PlanetDemo),
                                                     typeof (PathFollowingDemo),
                                                     typeof (FishInABarrelDemo),
-                                                    typeof (DetectorVolumeDemo),
-                                                    typeof (CharacterPlaygroundDemo)
+                                                    typeof (DetectorVolumeDemo)
                                                 };
 
 
@@ -120,8 +120,8 @@ namespace BEPUphysicsDemos
             Graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
 
-            Graphics.PreferredBackBufferWidth = 800;
-            Graphics.PreferredBackBufferHeight = 600;
+            Graphics.PreferredBackBufferWidth = 1280;
+            Graphics.PreferredBackBufferHeight = 720;
             Camera = new Camera(Vector3.Zero, 10, 0, 0, Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, (float)Graphics.PreferredBackBufferWidth / Graphics.PreferredBackBufferHeight, .1f, 10000));
 
 
@@ -424,6 +424,8 @@ namespace BEPUphysicsDemos
             #region UI Drawing
 
             UIDrawer.Begin();
+            int bottom = GraphicsDevice.Viewport.Bounds.Height;
+            int right = GraphicsDevice.Viewport.Bounds.Width;
             if (displayUI)
             {
                 FPStotalSinceLast += gameTime.ElapsedGameTime.TotalSeconds;
@@ -438,9 +440,9 @@ namespace BEPUphysicsDemos
                     FPStotalFramesSinceLast = 0;
                 }
 
-                DataTextDrawer.Draw("FPS: ", FPStoDisplay, new Vector2(50, 450));
-                DataTextDrawer.Draw("Physics Time (ms): ", averagePhysicsTime, new Vector2(50, 467));
-                DataTextDrawer.Draw("Collision Pairs: ", currentSimulation.Space.NarrowPhase.Pairs.Count, new Vector2(50, 484));
+                DataTextDrawer.Draw("FPS: ", FPStoDisplay, new Vector2(50, bottom - 150));
+                DataTextDrawer.Draw("Physics Time (ms): ", averagePhysicsTime, new Vector2(50, bottom - 133));
+                DataTextDrawer.Draw("Collision Pairs: ", currentSimulation.Space.NarrowPhase.Pairs.Count, new Vector2(50, bottom - 116));
                 int countActive = 0;
 
                 for (int i = 0; i < currentSimulation.Space.Entities.Count; i++)
@@ -448,21 +450,21 @@ namespace BEPUphysicsDemos
                     if (currentSimulation.Space.Entities[i].IsActive)
                         countActive++;
                 }
-                DataTextDrawer.Draw("Active Objects: ", countActive, new Vector2(50, 501));
+                DataTextDrawer.Draw("Active Objects: ", countActive, new Vector2(50, bottom - 99));
 #if !WINDOWS
-                DataTextDrawer.Draw("Press Start for Controls", new Vector2(50, 518));
+                DataTextDrawer.Draw("Press Start for Controls", new Vector2(50, bottom - 82));
 #else
-                DataTextDrawer.Draw("Press F1 for Controls", new Vector2(50, 518));
+                DataTextDrawer.Draw("Press F1 for Controls", new Vector2(50, bottom - 82));
 #endif
 
-                TinyTextDrawer.Draw("Current Simulation: ", currentSimulationIndex, new Vector2(600, 500));
-                TinyTextDrawer.Draw(currentSimulation.Name, new Vector2(620, 514));
+                TinyTextDrawer.Draw("Current Simulation: ", currentSimulationIndex, new Vector2(right - 200, bottom - 100));
+                TinyTextDrawer.Draw(currentSimulation.Name, new Vector2(right - 180, bottom - 86));
 
                 currentSimulation.DrawUI();
             }
             if (displayMenu)
             {
-                UIDrawer.Draw(controlsMenu, new Rectangle(0, 0, 800, 600), Color.White);
+                UIDrawer.Draw(controlsMenu, new Rectangle(right / 2 - 400, bottom / 2 - 300, 800, 600), Color.White);
             }
             UIDrawer.End();
 
