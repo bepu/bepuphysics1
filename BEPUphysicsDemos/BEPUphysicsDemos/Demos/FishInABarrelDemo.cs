@@ -100,7 +100,8 @@ namespace BEPUphysicsDemos.Demos
 
         public override void DrawUI()
         {
-            Game.DataTextDrawer.Draw("Put the fish in the barrel!", new Vector2(500, 50));
+            Game.DataTextDrawer.Draw("Put the fish in the barrel!", new Vector2(50, 50));
+            base.DrawUI();
         }
     }
 }

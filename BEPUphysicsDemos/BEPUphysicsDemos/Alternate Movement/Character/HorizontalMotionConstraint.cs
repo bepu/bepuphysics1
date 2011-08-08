@@ -10,6 +10,7 @@ using BEPUphysics.Collidables.MobileCollidables;
 using BEPUphysics.MathExtensions;
 using BEPUphysics;
 using System.Diagnostics;
+using Microsoft.Xna.Framework.Input;
 
 namespace BEPUphysicsDemos.AlternateMovement.Character
 {
@@ -77,7 +78,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             {
                 if (value < 0)
                     throw new Exception("Value must be nonnegative.");
-                    speed = value;
+                speed = value;
             }
         }
         float crouchingSpeed = 3f;
@@ -95,7 +96,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             {
                 if (value < 0)
                     throw new Exception("Value must be nonnegative.");
-                    crouchingSpeed = value;
+                crouchingSpeed = value;
             }
         }
         float slidingSpeed = 6;
@@ -113,10 +114,10 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             {
                 if (value < 0)
                     throw new Exception("Value must be nonnegative.");
-                    slidingSpeed = value;
+                slidingSpeed = value;
             }
         }
-        float airSpeed = 4;
+        float airSpeed = 1;
         /// <summary>
         /// Gets or sets the maximum speed at which the character can move with no support.
         /// The character will not be decelerated while airborne.
@@ -131,10 +132,10 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             {
                 if (value < 0)
                     throw new Exception("Value must be nonnegative.");
-                    airSpeed = value;
+                airSpeed = value;
             }
         }
-        float maximumForce = 10000000;
+        float maximumForce = 1000;
         /// <summary>
         /// Gets or sets the maximum force that the character can apply while on a support which provides traction.
         /// </summary>
@@ -148,7 +149,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             {
                 if (value < 0)
                     throw new Exception("Value must be nonnegative.");
-                    maximumForce = value;
+                maximumForce = value;
             }
         }
         float maximumSlidingForce = 50;
@@ -165,10 +166,10 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             {
                 if (value < 0)
                     throw new Exception("Value must be nonnegative.");
-                    maximumSlidingForce = value;
+                maximumSlidingForce = value;
             }
         }
-        float maximumAirForce = 150;
+        float maximumAirForce = 250;
         /// <summary>
         /// Gets or sets the maximum force that the character can apply with no support.
         /// </summary>
@@ -182,7 +183,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             {
                 if (value < 0)
                     throw new Exception("Value must be nonnegative.");
-                    maximumAirForce = value;
+                maximumAirForce = value;
             }
         }
 
@@ -229,6 +230,15 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         Vector2 accumulatedImpulse;
         Vector2 targetVelocity;
 
+        Vector2 positionCorrectionBias;
+
+        Vector3 positionLocalOffset;
+        bool wasTryingToMove = false;
+        bool hadTraction = false;
+        Entity previousSupportEntity;
+        float tractionDecelerationTime;
+        float timeSinceTransition;
+
         /// <summary>
         /// Constructs a new horizontal motion constraint.
         /// </summary>
@@ -237,6 +247,8 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         {
             this.character = characterController;
             CollectInvolvedEntities();
+            //Compute the time it usually takes for the character to slow down while it has traction.
+            tractionDecelerationTime = speed / (maximumForce * character.Body.InverseMass);
         }
 
 
@@ -298,6 +310,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 maxSpeed = 0;
 
             maxForce *= dt;
+
 
 
             //Compute the jacobians.  This is basically a PointOnLineJoint with motorized degrees of freedom.
@@ -453,8 +466,70 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 Matrix2X2.CreateScale(character.Body.Mass, out massMatrix);
             }
 
+            //If we're trying to stand still on an object that's moving, use a position correction term to keep the character
+            //from drifting due to accelerations. 
+            //First thing to do is to check to see if we're moving into a traction/trying to stand still state from a 
+            //non-traction || trying to move state.  Either that, or we've switched supports and need to update the offset.
+            if (supportEntity != null && ((wasTryingToMove && !isTryingToMove) || (!hadTraction && supportData.HasTraction) || supportEntity != previousSupportEntity))
+            {
+                //We're transitioning into a new 'use position correction' state.
+                //Force a recomputation of the local offset.
+                //The time since transition is used as a flag.
+                timeSinceTransition = 0;
+            }
+
+            //The state is now up to date.  Compute an error and velocity bias, if needed.
+            if (!isTryingToMove && supportData.HasTraction && supportEntity != null)
+            {
+                if (timeSinceTransition >= 0 && timeSinceTransition < tractionDecelerationTime)
+                    timeSinceTransition += dt;
+                if (timeSinceTransition >= tractionDecelerationTime)
+                {
+                    Vector3.Multiply(ref downDirection, character.Body.Height * .5f, out positionLocalOffset);
+                    positionLocalOffset = (positionLocalOffset + character.Body.Position) - supportEntity.Position;
+                    positionLocalOffset = Matrix3X3.TransformTranspose(positionLocalOffset, supportEntity.OrientationMatrix);
+                    timeSinceTransition = -1; //Negative 1 means that the offset has been computed.
+                }
+                if (timeSinceTransition < 0)
+                {
+                    Vector3 targetPosition;
+                    Vector3.Multiply(ref downDirection, character.Body.Height * .5f, out targetPosition);
+                    targetPosition += character.Body.Position;
+                    Vector3 worldSupportLocation = Matrix3X3.Transform(positionLocalOffset, supportEntity.OrientationMatrix) + supportEntity.Position;
+                    Vector3 error;
+                    Vector3.Subtract(ref targetPosition, ref worldSupportLocation, out error);
+                    //If the error is too large, then recompute the offset.  We don't want the character rubber banding around.
+                    if (error.LengthSquared() > .15f * .15f)
+                    {
+                        Vector3.Multiply(ref downDirection, character.Body.Height * .5f, out positionLocalOffset);
+                        positionLocalOffset = (positionLocalOffset + character.Body.Position) - supportEntity.Position;
+                        positionLocalOffset = Matrix3X3.TransformTranspose(positionLocalOffset, supportEntity.OrientationMatrix);
+                        positionCorrectionBias = new Vector2();
+                    }
+                    else
+                    {
+                        //The error in world space is now available.  We can't use this error to directly create a velocity bias, though.
+                        //It needs to be transformed into constraint space where the constraint operates.
+                        //Use the jacobians!
+                        Vector3.Dot(ref error, ref linearJacobianA1, out positionCorrectionBias.X);
+                        Vector3.Dot(ref error, ref linearJacobianA2, out positionCorrectionBias.Y);
+                        //Scale the error so that a portion of the error is resolved each frame.
+                        Vector2.Multiply(ref positionCorrectionBias, .2f / dt, out positionCorrectionBias);
+                    }
+                }
+            }
+            else
+            {
+                timeSinceTransition = 0;
+                positionCorrectionBias = new Vector2();
+            }
+
+            wasTryingToMove = isTryingToMove;
+            hadTraction = supportData.HasTraction;
+            previousSupportEntity = supportEntity;
 
         }
+
 
         /// <summary>
         /// Performs any per-frame initialization needed by the constraint that must be done with exclusive access
@@ -529,6 +604,8 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 relativeVelocity.Y += y;
 
             }
+
+            Vector2.Add(ref relativeVelocity, ref positionCorrectionBias, out relativeVelocity);
 
 
             //Create the full velocity change, and convert it to an impulse in constraint space.

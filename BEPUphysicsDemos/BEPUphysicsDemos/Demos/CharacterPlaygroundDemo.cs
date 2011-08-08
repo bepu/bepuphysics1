@@ -163,6 +163,7 @@ namespace BEPUphysicsDemos.Demos
             Space.Add(divingBoard);
             Space.Add(divingBoardJoint);
 
+
             //Add a second diving board for comparison.
 
             Box divingBoard2 = new Box(divingBoardBase.Position + new Vector3(2, 0, 5f), 1, .3f, 6, 5);
@@ -175,6 +176,16 @@ namespace BEPUphysicsDemos.Demos
 
             Space.Add(divingBoard2);
             Space.Add(divingBoardJoint2);
+
+            //Add a seesaw for people to jump on.
+            Box seesawBase = new Box(new Vector3(-7, .45f, 52), 1, .9f, .3f);
+            Box seesawPlank = new Box(seesawBase.Position + new Vector3(0, .65f, 0), 1.2f, .2f, 6, 3);
+            RevoluteJoint seesawJoint = new RevoluteJoint(seesawBase, seesawPlank, seesawPlank.Position, Vector3.Right);
+            Space.Add(seesawJoint);
+            Space.Add(seesawBase);
+            Space.Add(seesawPlank);
+
+            Space.Add(new Box(seesawPlank.Position + new Vector3(0, 1.3f, 2), 1, 1, 1, 5));
 
 
             //Add in some boxes to bump and jump on.
@@ -217,14 +228,6 @@ namespace BEPUphysicsDemos.Demos
             Space.Add(logJointB);
 
             Space.Add(log);
-
-            //Add a seesaw for people to jump on.
-            Box seesawBase = new Box(new Vector3(-7, .45f, 52), 1, .9f, .3f);
-            Box seesawPlank = new Box(seesawBase.Position + new Vector3(0, .65f, 0), 1.2f, .2f, 6, 3);
-            RevoluteJoint seesawJoint = new RevoluteJoint(seesawBase, seesawPlank, seesawPlank.Position, Vector3.Right);
-            Space.Add(seesawJoint);
-            Space.Add(seesawBase);
-            Space.Add(seesawPlank);
 
 
             //Put some planks to stand on that show various slopes.
@@ -271,6 +274,7 @@ namespace BEPUphysicsDemos.Demos
         public override void DrawUI()
         {
             Game.DataTextDrawer.Draw("Press \"C\" to toggle the character.", new Vector2(50, 50));
+            base.DrawUI();
         }
 
         /// <summary>

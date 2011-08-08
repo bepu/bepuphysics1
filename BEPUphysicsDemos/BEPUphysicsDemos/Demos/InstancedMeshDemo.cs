@@ -57,7 +57,7 @@ namespace BEPUphysicsDemos.Demos
                 for (int j = 0; j < 5; j++)
                 {
                     //Drop a box on the mesh.
-                    Space.Add(new Box(new Vector3((i + 1) * 4, 10, (j + 1) * 4), 1, 1, 1, 1));
+                    Space.Add(new Box(new Vector3((i + 1) * 4, 10, (j + 1) * 4), 1, 1, 1, 10));
                 }
             }
 
