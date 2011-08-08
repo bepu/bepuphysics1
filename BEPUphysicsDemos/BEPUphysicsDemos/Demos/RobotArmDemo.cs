@@ -241,11 +241,11 @@ namespace BEPUphysicsDemos.Demos
             base.DrawUI();
             Game.DataTextDrawer.Draw("Arm controls:", new Vector2(50, 20));
 #if !WINDOWS
-            Game.TinyTextDrawer.Draw("Spin base: Left/Right Shoulder", new Vector2(500, 38));
-            Game.TinyTextDrawer.Draw("Bend shoulder: A B", new Vector2(500, 53));
-            Game.TinyTextDrawer.Draw("Bend elbow: X Y", new Vector2(500, 68));
-            Game.TinyTextDrawer.Draw("Spin forearm: Up/Down Dpad", new Vector2(500, 83));
-            Game.TinyTextDrawer.Draw("Open/close claw: Left/Right Trigger", new Vector2(500, 98));
+            Game.TinyTextDrawer.Draw("Spin base: Left/Right Shoulder", new Vector2(50, 38));
+            Game.TinyTextDrawer.Draw("Bend shoulder: A B", new Vector2(50, 53));
+            Game.TinyTextDrawer.Draw("Bend elbow: X Y", new Vector2(50, 68));
+            Game.TinyTextDrawer.Draw("Spin forearm: Up/Down Dpad", new Vector2(50, 83));
+            Game.TinyTextDrawer.Draw("Open/close claw: Left/Right Trigger", new Vector2(50, 98));
 #else
             Game.TinyTextDrawer.Draw("Spin base: N M", new Vector2(50, 38));
             Game.TinyTextDrawer.Draw("Bend shoulder: Q W", new Vector2(50, 53));

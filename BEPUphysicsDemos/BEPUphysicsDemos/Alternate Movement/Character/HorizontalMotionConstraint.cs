@@ -53,12 +53,16 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             get { return movementDirection; }
             set
             {
-                movementDirection = value;
                 float lengthSquared = value.LengthSquared();
-                if (lengthSquared > 0)
+                if (lengthSquared > Toolbox.Epsilon)
                 {
                     character.Body.IsActive = true;
-                    Vector2.Divide(ref movementDirection, (float)Math.Sqrt(lengthSquared), out movementDirection);
+                    Vector2.Divide(ref value, (float)Math.Sqrt(lengthSquared), out movementDirection);
+                }
+                else
+                {
+                    character.Body.IsActive = true;
+                    movementDirection = new Vector2();
                 }
             }
         }
@@ -667,6 +671,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 supportEntity.ApplyLinearImpulse(ref impulse);
                 supportEntity.ApplyAngularImpulse(ref torque);
             }
+
             return (Math.Abs(lambda.X) + Math.Abs(lambda.Y));
 
 
