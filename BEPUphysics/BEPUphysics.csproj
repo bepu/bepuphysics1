@@ -173,7 +173,7 @@
     <Compile Include="CollisionShapes\InstancedMeshShape.cs" />
     <Compile Include="CollisionShapes\ShapeDistributionInformation.cs" />
     <Compile Include="CollisionShapes\ConvexShapes\InertiaHelper.cs" />
-    <None Include="CollisionShapes\OldCAStuff.cs" />
+    <None Include="CollisionTests\CollisionAlgorithms\Testing\OldCAStuff.cs" />
     <None Include="CollisionTests\CollisionAlgorithms\GJK\SimplexBackup.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\BoxBoxCollider.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\BoxBoxColliderOld.cs" />

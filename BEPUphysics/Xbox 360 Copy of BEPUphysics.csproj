@@ -104,7 +104,6 @@
     <Compile Include="CollisionShapes\ConvexShapes\CylinderShape.cs" />
     <Compile Include="CollisionShapes\EntityShape.cs" />
     <Compile Include="CollisionShapes\InstancedMeshShape.cs" />
-    <None Include="CollisionShapes\OldCAStuff.cs" />
     <Compile Include="CollisionShapes\MobileMeshShape.cs" />
     <Compile Include="CollisionShapes\ShapeDistributionInformation.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\BoxBoxCollider.cs" />
@@ -118,6 +117,7 @@
     <Compile Include="CollisionTests\CollisionAlgorithms\GJK\Simplex.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\MPRToolbox.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\Testing\MPRToolboxOld.cs" />
+    <None Include="CollisionTests\CollisionAlgorithms\Testing\OldCAStuff.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\Testing\TriangleTrianglePairTester2.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\TriangleConvexPairTester.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\SphereTester.cs" />
