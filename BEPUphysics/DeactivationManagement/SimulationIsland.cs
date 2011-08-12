@@ -11,6 +11,8 @@ namespace BEPUphysics.DeactivationManagement
     ///</summary>
     public class SimulationIsland
     {
+
+        internal bool allowDeactivation = true;
         internal bool isActive = true;
         ///<summary>
         /// Gets whether or not the island is currently active.
@@ -21,18 +23,22 @@ namespace BEPUphysics.DeactivationManagement
             {
                 return isActive;
             }
+            set
+            {
+                isActive = value;
+            }
         }
-        internal RawList<ISimulationIslandMember> members = new RawList<ISimulationIslandMember>();
+        internal RawList<SimulationIslandMember> members = new RawList<SimulationIslandMember>();
         internal int deactivationCandidateCount;
 
         ///<summary>
         /// Gets the list of members in the island.
         ///</summary>
-        public ReadOnlyList<ISimulationIslandMember> Members
+        public ReadOnlyList<SimulationIslandMember> Members
         {
             get
             {
-                return new ReadOnlyList<ISimulationIslandMember>(members);
+                return new ReadOnlyList<SimulationIslandMember>(members);
             }
         }
 
@@ -50,21 +56,21 @@ namespace BEPUphysics.DeactivationManagement
             becameNonDeactivationCandidateDelegate = BecameNonDeactivationCandidate;
         }
 
-        Action<ISimulationIslandMember> memberActivatedDelegate;
-        void MemberActivated(ISimulationIslandMember member)
+        Action<SimulationIslandMember> memberActivatedDelegate;
+        void MemberActivated(SimulationIslandMember member)
         {
             Activate();
         }
 
-        Action<ISimulationIslandMember> becameDeactivationCandidateDelegate;
-        void BecameDeactivationCandidate(ISimulationIslandMember member)
+        Action<SimulationIslandMember> becameDeactivationCandidateDelegate;
+        void BecameDeactivationCandidate(SimulationIslandMember member)
         {
             Interlocked.Increment(ref deactivationCandidateCount);
             //The reason why this does not deactivate when count == members.count is that deactivation candidate count will go up and down in parallel.
             //The actual deactivation process is not designed to be thread safe.  Perhaps doable, but perhaps not worth the effort.
         }
-        Action<ISimulationIslandMember> becameNonDeactivationCandidateDelegate;
-        void BecameNonDeactivationCandidate(ISimulationIslandMember member)
+        Action<SimulationIslandMember> becameNonDeactivationCandidateDelegate;
+        void BecameNonDeactivationCandidate(SimulationIslandMember member)
         {
             Interlocked.Decrement(ref deactivationCandidateCount);
         }
@@ -92,20 +98,29 @@ namespace BEPUphysics.DeactivationManagement
         ///<returns>Whether or not the simulation island was successfully deactivated.</returns>
         public bool TryToDeactivate()
         {
-            //TODO: Check the deactivation count.  If it's a fully deactivated simulation island, then try to deactivate !:)
-            //DO NOT WORRY ABOUT THREAD SAFETY HERE.
-            //TryToDeactivate will be called sequentially in a 'limited work per frame' scheme.
-            //Avoids load balancing problems and makes implementation easier.
-            if (isActive && deactivationCandidateCount == members.Count)
+            if (allowDeactivation)
             {
-                isActive = false;
-                for (int i = 0; i < members.count; i++)
+                //TODO: Check the deactivation count.  If it's a fully deactivated simulation island, then try to deactivate !:)
+                //DO NOT WORRY ABOUT THREAD SAFETY HERE.
+                //TryToDeactivate will be called sequentially in a 'limited work per frame' scheme.
+                //Avoids load balancing problems and makes implementation easier.
+                if (isActive && deactivationCandidateCount == members.Count)
                 {
-                    members.Elements[i].IsActive = false;
+                    isActive = false;
+                    for (int i = 0; i < members.count; i++)
+                    {
+                        members.Elements[i].IsActive = false;
+                    }
+                    return true;
                 }
-                return true;
+                return false;
             }
-            return false;
+            else
+            {
+                //Reset the allow deactivation flag so we don't stay inactive forever.
+                allowDeactivation = true;
+                return false;
+            }
 
         }
 
@@ -114,7 +129,7 @@ namespace BEPUphysics.DeactivationManagement
         ///</summary>
         ///<param name="member">Member to add.</param>
         ///<exception cref="Exception">Thrown when the member being added is either non-dynamic or already has a simulation island.</exception>
-        public void Add(ISimulationIslandMember member)
+        public void Add(SimulationIslandMember member)
         {
             //This method is not thread safe.
             //TODO: Should it wake the island up?
@@ -139,7 +154,7 @@ namespace BEPUphysics.DeactivationManagement
         ///</summary>
         ///<param name="member">Member to remove.</param>
         ///<exception cref="Exception">Thrown when the member does not belong to this simulation island.</exception>
-        public void Remove(ISimulationIslandMember member)
+        public void Remove(SimulationIslandMember member)
         {
             //Is this method ever used?  What if old islands are simply cleared and a new one is repopulated instead?
             //More amenable to UFBRPC approach, probably quicker/simpler overall than removing even with lists
@@ -166,10 +181,11 @@ namespace BEPUphysics.DeactivationManagement
         }
 
 
+
         internal void RemoveAt(int i)
         {
             //TODO: If this becomes a hash-based system, this method is pointless.
-            ISimulationIslandMember member = members.Elements[i];
+            SimulationIslandMember member = members.Elements[i];
             members.FastRemoveAt(i);
             member.SimulationIsland = null;
             member.Activated -= memberActivatedDelegate;
@@ -187,5 +203,6 @@ namespace BEPUphysics.DeactivationManagement
             deactivationCandidateCount = 0;
             members.Clear();
         }
+
     }
 }

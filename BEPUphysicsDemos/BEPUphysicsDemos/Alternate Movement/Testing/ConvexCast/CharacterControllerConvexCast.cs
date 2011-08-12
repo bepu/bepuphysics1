@@ -211,7 +211,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.ConvexCast
                     Vector3.Subtract(ref relativeVelocity, ref entityVelocity, out relativeVelocity);
                     //TODO: Multithreaded safety.  If characters are running in parallel, ensure that this operation will not corrupt anything.
                     if (entityCollidable.Entity.IsDynamic)
-                        entityCollidable.Entity.IsActive = true;
+                        entityCollidable.Entity.ActivityInformation.IsActive = true;
                 }
             }
 

@@ -86,7 +86,7 @@ namespace BEPUphysicsDemos.Demos.Tests
                 Entity e = new Box(new Vector3(.1f * i, 1 * i + 1, 0), 1, 1, 1, 1);
                 //Entity e = new Capsule(new Vector3(.1f * i, 1 * i + 1, 0), .5f, .5f, 1);
                 //Entity e = new Sphere(new Vector3(.1f * i, 1 * i + 1, 0), .5f, 1);
-                e.IsAlwaysActive = true;
+                e.ActivityInformation.IsAlwaysActive = true;
                 entities.Add(e);
                 e.CollisionInformation.Tag = i;
                 Space.Add(e);
@@ -96,7 +96,7 @@ namespace BEPUphysicsDemos.Demos.Tests
                 //Entity e = new Box(new Vector3(.1f * i, 1 * i + 1, 2), 1, 1, 1, 1);
                 Entity e = new Capsule(new Vector3(.1f * i, 1 * i + 1, 2), .5f, .5f, 1);
                 //Entity e = new Sphere(new Vector3(.1f * i, 1 * i + 1, 2), .5f, 1);
-                e.IsAlwaysActive = true;
+                e.ActivityInformation.IsAlwaysActive = true;
                 entities.Add(e);
                 e.CollisionInformation.Tag = i;
                 Space.Add(e);
@@ -106,7 +106,7 @@ namespace BEPUphysicsDemos.Demos.Tests
                 //Entity e = new Box(new Vector3(.1f * i, 1 * i + 1, 4), 1, 1, 1, 1);
                 //Entity e = new Capsule(new Vector3(.1f * i, 1 * i + 1, 4), .5f, .5f, 1);
                 Entity e = new Sphere(new Vector3(.1f * i, 1 * i + 1, 4), .5f, 1);
-                e.IsAlwaysActive = true;
+                e.ActivityInformation.IsAlwaysActive = true;
                 entities.Add(e);
                 e.CollisionInformation.Tag = i;
                 Space.Add(e);

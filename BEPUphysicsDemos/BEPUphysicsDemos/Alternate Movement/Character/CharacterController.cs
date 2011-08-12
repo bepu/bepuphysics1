@@ -150,7 +150,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
         void ExpandBoundingBox()
         {
-            if (Body.IsActive)
+            if (Body.ActivityInformation.IsActive)
             {
                 //This runs after the bounding box updater is run, but before the broad phase.
                 //Expanding the character's bounding box ensures that minor variations in velocity will not cause

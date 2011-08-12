@@ -123,7 +123,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             var convexMode = convex.entity == null ? PositionUpdateMode.Discrete : convex.entity.PositionUpdateMode;
 
             if (
-                    (mobileMesh.IsActive || (convex.entity == null ? false : convex.entity.isActive)) && //At least one has to be active.
+                    (mobileMesh.IsActive || (convex.entity == null ? false : convex.entity.activityInformation.IsActive)) && //At least one has to be active.
                     (
                         (
                             convexMode == PositionUpdateMode.Continuous &&   //If both are continuous, only do the process for A.

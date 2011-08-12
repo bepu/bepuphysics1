@@ -137,8 +137,8 @@ namespace BEPUphysics.Constraints.Collision
         {
             isActiveInSolver = isActive &&
                                pair.BroadPhaseOverlap.collisionRule < CollisionRule.NoSolver &&
-                               ((entityA != null && entityA.isActive) ||
-                               (entityB != null && entityB.isActive));
+                               ((entityA != null && entityA.activityInformation.IsActive) ||
+                               (entityB != null && entityB.activityInformation.IsActive));
             for (int i = 0; i < solverUpdateables.count; i++)
             {
                 solverUpdateables.Elements[i].isActiveInSolver = solverUpdateables.Elements[i].isActive && isActiveInSolver;

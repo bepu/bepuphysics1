@@ -46,13 +46,5 @@ namespace BEPUphysics.Constraints.SingleEntity
                 outputInvolvedEntities.Add(entity);
         }
 
-        /// <summary>
-        /// Updates the activity state of the constraint.
-        /// </summary>
-        public override void UpdateSolverActivity()
-        {
-            isActiveInSolver = isActive && entity.isActive;
-        }
-
     }
 }

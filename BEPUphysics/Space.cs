@@ -241,10 +241,16 @@ namespace BEPUphysics
                 throw new ArgumentException("The object belongs to some Space already; cannot add it again.");
             spaceObject.Space = this;
 
-            ISimulationIslandMember simulationIslandMember = spaceObject as ISimulationIslandMember;
+            SimulationIslandMember simulationIslandMember = spaceObject as SimulationIslandMember;
             if (simulationIslandMember != null)
             {
                 DeactivationManager.Add(simulationIslandMember);
+            }
+
+            ISimulationIslandMemberOwner simulationIslandMemberOwner = spaceObject as ISimulationIslandMemberOwner;
+            if (simulationIslandMemberOwner != null)
+            {
+                DeactivationManager.Add(simulationIslandMemberOwner.ActivityInformation);
             }
 
             //Go through each stage, adding the space object to it if necessary.
@@ -357,10 +363,16 @@ namespace BEPUphysics
             if (spaceObject.Space != this)
                 throw new ArgumentException("The object does not belong to this space; cannot remove it.");
 
-            ISimulationIslandMember simulationIslandMember = spaceObject as ISimulationIslandMember;
+            SimulationIslandMember simulationIslandMember = spaceObject as SimulationIslandMember;
             if (simulationIslandMember != null)
             {
                 DeactivationManager.Remove(simulationIslandMember);
+            }
+
+            ISimulationIslandMemberOwner simulationIslandMemberOwner = spaceObject as ISimulationIslandMemberOwner;
+            if (simulationIslandMemberOwner != null)
+            {
+                DeactivationManager.Remove(simulationIslandMemberOwner.ActivityInformation);
             }
 
             //Go through each stage, removing the space object from it if necessary.

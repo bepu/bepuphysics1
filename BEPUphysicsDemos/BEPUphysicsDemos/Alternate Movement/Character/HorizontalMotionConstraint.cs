@@ -56,12 +56,12 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 float lengthSquared = value.LengthSquared();
                 if (lengthSquared > Toolbox.Epsilon)
                 {
-                    character.Body.IsActive = true;
+                    character.Body.ActivityInformation.IsActive = true;
                     Vector2.Divide(ref value, (float)Math.Sqrt(lengthSquared), out movementDirection);
                 }
                 else
                 {
-                    character.Body.IsActive = true;
+                    character.Body.ActivityInformation.IsActive = true;
                     movementDirection = new Vector2();
                 }
             }

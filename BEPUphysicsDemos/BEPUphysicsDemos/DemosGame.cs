@@ -180,6 +180,7 @@ namespace BEPUphysicsDemos
 
 #else
             currentSimulation = (Demo)Activator.CreateInstance(demoType, new object[] { this });
+            //currentSimulation = new SimulationIslandStressTestDemo(this);
 #endif
             #region DisplayObject creation
 
@@ -447,7 +448,7 @@ namespace BEPUphysicsDemos
 
                 for (int i = 0; i < currentSimulation.Space.Entities.Count; i++)
                 {
-                    if (currentSimulation.Space.Entities[i].IsActive)
+                    if (currentSimulation.Space.Entities[i].ActivityInformation.IsActive)
                         countActive++;
                 }
                 DataTextDrawer.Draw("Active Objects: ", countActive, new Vector2(50, bottom - 99));

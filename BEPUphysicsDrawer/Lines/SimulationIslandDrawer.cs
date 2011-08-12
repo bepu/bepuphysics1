@@ -38,10 +38,10 @@ namespace BEPUphysicsDrawer.Lines
                                           new Vector3(-float.MaxValue, -float.MaxValue, -float.MaxValue));
                     for (int j = 0; j < s.Members.Count; j++)
                     {
-                        var e = s.Members[j] as Entity;
-                        if (e != null)
+                        var member = s.Members[j];
+                        if (member != null)
                         {
-                            box = BoundingBox.CreateMerged(box, e.CollisionInformation.BoundingBox);
+                            box = BoundingBox.CreateMerged(box, member.Owner.CollisionInformation.BoundingBox);
                         }
                     }
 

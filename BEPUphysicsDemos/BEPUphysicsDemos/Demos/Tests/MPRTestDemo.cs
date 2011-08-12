@@ -106,7 +106,7 @@ namespace BEPUphysicsDemos.Demos.Tests
             //b = new Capsule(new Vector3(0, 2, 0), 1, .5f, 1);
             b.LocalInertiaTensorInverse = new Matrix3X3();
             CollisionRules.AddRule(b, a, CollisionRule.NoSolver);
-            b.IsAlwaysActive = true;
+            b.ActivityInformation.IsAlwaysActive = true;
             Space.Add(b);
             //Space.Add(new TransformableEntity(new Vector3(0, 4, 0), new BoxShape(1, 1, 1), Matrix3X3.Identity, 1));
             //Space.Add( new TransformableEntity(new Vector3(0, 6, 0), new BoxShape(1, 1, 1), Matrix3X3.Identity, 1));

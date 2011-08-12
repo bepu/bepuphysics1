@@ -130,7 +130,7 @@ namespace BEPUphysics.Constraints
             connectedMembers.Clear();
             for (int i = 0; i < involvedEntities.count; i++)
             {
-                connectedMembers.Add(involvedEntities.Elements[i]);
+                connectedMembers.Add(involvedEntities.Elements[i].activityInformation);
             }
         }
 
@@ -175,8 +175,8 @@ namespace BEPUphysics.Constraints
                 for (int i = 0; i < involvedEntities.count; i++)
                 {
                     Entity e = involvedEntities.Elements[i];
-                    if (e.isDynamic && !e.isActive)
-                        e.IsActive = true;
+                    if (e.isDynamic)
+                        e.activityInformation.IsActive = true;
                 }
 
 
@@ -225,8 +225,8 @@ namespace BEPUphysics.Constraints
                 for (int i = 0; i < involvedEntities.count; i++)
                 {
                     Entity e = involvedEntities.Elements[i];
-                    if (e.isDynamic && !e.isActive)
-                        e.IsActive = true;
+                    if (e.isDynamic)
+                        e.activityInformation.IsActive = true;
                 }
             }
             Resources.GiveBack(newInvolvedEntities);
@@ -284,26 +284,6 @@ namespace BEPUphysics.Constraints
 
         //ReadOnlyCollection<ISimulationIslandMember> ISolverBatchUpdateable.ConnectedMembers { get { return (this as ISimulationIslandConnection).ConnectedMembers; } }
 
-
-        /// <summary>
-        /// Sets the activity state of the constraint based on the activity state of its connections.
-        /// Called automatically by the space owning a constaint.  If a constraint is a sub-constraint that hasn't been directly added to the space,
-        /// this may need to be called alongside the preStep from within the parent constraint.
-        /// </summary>
-        public override void UpdateSolverActivity()
-        {
-            if (isActive)
-            {
-                for (int i = 0; i < involvedEntities.Count && !isActiveInSolver; i++)
-                {
-                    isActiveInSolver |= involvedEntities[i].isActive;
-                }
-            }
-            else
-            {
-                isActiveInSolver = false;
-            }
-        }
 
   
 

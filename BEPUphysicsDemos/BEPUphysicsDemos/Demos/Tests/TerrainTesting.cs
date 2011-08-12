@@ -72,8 +72,7 @@ namespace BEPUphysicsDemos.Demos.Tests
                         Space.Add(new Sphere(new Vector3(0 + i * 3, 20 + j * 3, 0 + k * 3), 0.5f, 1)
                         {
                             //LocalInertiaTensorInverse = new Matrix3X3()
-                            //Tag = "noDisplayObject",
-                            IsAlwaysActive = true
+                            //Tag = "noDisplayObject"
                         });
                         //Space.Add(new Box(
                         //    new Vector3(0 + i * 4, 1000 + -j * 10, 0 + k * 4),

@@ -132,7 +132,7 @@ namespace BEPUphysicsDemos.AlternateMovement.SimpleCharacter
                 {
                     supportLocationVelocity = supportEntity.LinearVelocity + //linear component
                                               Vector3.Cross(supportEntity.AngularVelocity, supportLocation - supportEntity.Position);
-                    supportEntity.IsActive = true;
+                    supportEntity.ActivityInformation.IsActive = true;
                 }
                 else
                     supportLocationVelocity = new Vector3();

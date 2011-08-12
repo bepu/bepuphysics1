@@ -27,7 +27,7 @@ namespace BEPUphysics.Vehicle
         {
             IsUpdatedSequentially = false;
             Body = shape;
-            Body.IsAlwaysActive = true;
+            Body.activityInformation.IsAlwaysActive = true;
         }
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace BEPUphysics.Vehicle
         {
             IsUpdatedSequentially = false;
             Body = shape;
-            Body.IsAlwaysActive = true;
+            Body.activityInformation.IsAlwaysActive = true;
             foreach (Wheel wheel in wheelList)
             {
                 AddWheel(wheel);
@@ -266,7 +266,7 @@ namespace BEPUphysics.Vehicle
             if (isActive)
             {
                 isActiveInSolver = false;
-                if (body.isActive)
+                if (body.activityInformation.IsActive)
                 {
                     foreach (Wheel wheel in Wheels)
                     {

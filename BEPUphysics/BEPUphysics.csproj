@@ -32,7 +32,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <DebugType>none</DebugType>
+    <DebugType>full</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\x86\Release</OutputPath>
     <DefineConstants>WINDOWS;ALLOWUNSAFE</DefineConstants>
@@ -44,7 +44,7 @@
     <XnaCompressContent>true</XnaCompressContent>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DocumentationFile>bin\x86\Release\BEPUphysics.XML</DocumentationFile>
-    <DebugSymbols>false</DebugSymbols>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
@@ -245,6 +245,8 @@
     <Compile Include="Constraints\TwoEntity\Motors\RevoluteMotor.cs" />
     <Compile Include="Constraints\TwoEntity\Motors\TwistMotor.cs" />
     <Compile Include="Constraints\TwoEntity\TwoEntityConstraint.cs" />
+    <Compile Include="DeactivationManagement\ISimulationIslandMemberOwner.cs" />
+    <Compile Include="DeactivationManagement\SimulationIslandMember.cs" />
     <Compile Include="Entities\EntitySolverUpdateableCollection.cs" />
     <Compile Include="Entities\EntityConstraintCollection.cs" />
     <Compile Include="Entities\Prefabs\Box.cs" />
@@ -375,7 +377,6 @@
     <Compile Include="MultithreadedProcessingStage.cs" />
     <Compile Include="MathExtensions\RigidTransform.cs" />
     <Compile Include="DeactivationManagement\ISimulationIslandConnection.cs" />
-    <Compile Include="DeactivationManagement\ISimulationIslandMember.cs" />
     <Compile Include="Materials\Material.cs" />
     <Compile Include="Materials\MaterialManager.cs" />
     <Compile Include="Materials\MaterialPair.cs" />

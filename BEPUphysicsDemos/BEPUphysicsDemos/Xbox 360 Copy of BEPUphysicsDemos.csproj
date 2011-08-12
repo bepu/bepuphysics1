@@ -118,6 +118,7 @@
     <Compile Include="Demos\Tests\DeterminismTestDemo.cs" />
     <Compile Include="Demos\Tests\MPRCastingDemo.cs" />
     <Compile Include="Demos\Tests\MPRTestDemo.cs" />
+    <Compile Include="Demos\Tests\SimulationIslandStressTestDemo.cs" />
     <Compile Include="Demos\Tests\TerrainTesting.cs" />
     <Compile Include="Demos\Tests\ThreadingTestDemo.cs" />
     <Compile Include="Demos\Tests\ThreadManagerTestDemo.cs" />

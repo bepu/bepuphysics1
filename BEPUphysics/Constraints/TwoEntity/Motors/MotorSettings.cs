@@ -88,8 +88,9 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
             {
                 if (motor.involvedEntities[i].isDynamic)
                 {
-                    if (!motor.involvedEntities[i].isActive)
-                        motor.involvedEntities[i].IsActive = true;
+                    //Only need to wake up one dynamic entity.  That will wake up the rest.
+                    //Wouldn't want to pointlessly force-wake a kinematic object.
+                    motor.involvedEntities[i].activityInformation.IsActive = true;
                     break;
                 }
             }
@@ -266,7 +267,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
                     motorSettings.WakeUpEntities();
                 }
 
-               
+
             }
         }
 

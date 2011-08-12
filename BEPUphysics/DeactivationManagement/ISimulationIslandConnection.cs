@@ -16,7 +16,7 @@ namespace BEPUphysics.DeactivationManagement
         ///<summary>
         /// Gets the simulation island members associated with this connection.
         ///</summary>
-        ReadOnlyList<ISimulationIslandMember> ConnectedMembers { get; }
+        ReadOnlyList<SimulationIslandMember> ConnectedMembers { get; }
 
         ///<summary>
         /// Adds references to the connection to all connected members.

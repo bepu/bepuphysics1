@@ -88,7 +88,7 @@ namespace BEPUphysicsDemos.Demos.Tests
                                 blockHeight * .5f + j * (blockHeight),
                                 0),
                             blockWidth, blockHeight, blockLength, 10);
-                    toAdd.IsAlwaysActive = true;
+                    toAdd.ActivityInformation.IsAlwaysActive = true;
                     Space.Add(toAdd);
                 }
             }

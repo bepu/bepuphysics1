@@ -77,8 +77,8 @@ namespace BEPUphysics.DeactivationManagement
 
 
         //TryToSplit is NOT THREAD SAFE.  Only one TryToSplit should ever be run.
-        Queue<ISimulationIslandMember> member1Friends = new Queue<ISimulationIslandMember>(), member2Friends = new Queue<ISimulationIslandMember>();
-        List<ISimulationIslandMember> searchedMembers1 = new List<ISimulationIslandMember>(), searchedMembers2 = new List<ISimulationIslandMember>();
+        Queue<SimulationIslandMember> member1Friends = new Queue<SimulationIslandMember>(), member2Friends = new Queue<SimulationIslandMember>();
+        List<SimulationIslandMember> searchedMembers1 = new List<SimulationIslandMember>(), searchedMembers2 = new List<SimulationIslandMember>();
 
         ///<summary>
         /// Gets or sets the maximum number of objects to attempt to deactivate each frame.
@@ -131,7 +131,7 @@ namespace BEPUphysics.DeactivationManagement
         //-Simulation islands of different sizes won't load-balance well on the xbox360; it would be fine on the pc though.
         //TODO: Simulation Island Deactivation
 
-        RawList<ISimulationIslandMember> simulationIslandMembers = new RawList<ISimulationIslandMember>();
+        RawList<SimulationIslandMember> simulationIslandMembers = new RawList<SimulationIslandMember>();
         RawList<SimulationIsland> simulationIslands = new RawList<SimulationIsland>();
 
         ///<summary>
@@ -158,7 +158,7 @@ namespace BEPUphysics.DeactivationManagement
         ///</summary>
         ///<param name="simulationIslandMember">Member to add.</param>
         ///<exception cref="Exception">Thrown if the member already belongs to a manager.</exception>
-        public void Add(ISimulationIslandMember simulationIslandMember)
+        public void Add(SimulationIslandMember simulationIslandMember)
         {
             if (simulationIslandMember.DeactivationManager == null)
             {
@@ -182,7 +182,7 @@ namespace BEPUphysics.DeactivationManagement
         /// Removes the member from this island.
         /// </summary>
         /// <param name="simulationIslandMember">Removes the member from the manager.</param>
-        public void Remove(ISimulationIslandMember simulationIslandMember)
+        public void Remove(SimulationIslandMember simulationIslandMember)
         {
             if (simulationIslandMember.DeactivationManager == this)
             {
@@ -199,7 +199,6 @@ namespace BEPUphysics.DeactivationManagement
         Action<int> multithreadedCandidacyLoopDelegate;
         void MultithreadedCandidacyLoop(int i)
         {
-            if (simulationIslandMembers.Elements[i].IsActive)
                 simulationIslandMembers.Elements[i].UpdateDeactivationCandidacy(timeStepSettings.TimeStepDuration);
         }
 
@@ -214,7 +213,6 @@ namespace BEPUphysics.DeactivationManagement
         protected override void UpdateSingleThreaded()
         {
             for (int i = 0; i < simulationIslandMembers.count; i++)
-                if (simulationIslandMembers.Elements[i].IsActive)
                     simulationIslandMembers.Elements[i].UpdateDeactivationCandidacy(timeStepSettings.TimeStepDuration);
 
             DeactivateObjects();
@@ -316,7 +314,7 @@ namespace BEPUphysics.DeactivationManagement
             //Move s2's members to s1.
             for (int i = s2.members.count - 1; i >= 0; i--)
             {
-                ISimulationIslandMember member = s2.members.Elements[i];
+                var member = s2.members.Elements[i];
                 s2.RemoveAt(i); //This is done instead of a clear because removing also modifies event hooks.
                 s1.Add(member);
             }
@@ -369,7 +367,7 @@ namespace BEPUphysics.DeactivationManagement
 
 
 
-        private void TryToSplit(ISimulationIslandMember member1, ISimulationIslandMember member2)
+        private void TryToSplit(SimulationIslandMember member1, SimulationIslandMember member2)
         {
             //Can't split if they aren't even in the same island.
             //This also covers the case where the connection involves a kinematic entity that has no 
@@ -387,28 +385,28 @@ namespace BEPUphysics.DeactivationManagement
             member2Friends.Enqueue(member2);
             searchedMembers1.Add(member1);
             searchedMembers2.Add(member2);
-            member1.SearchState = SimulationIslandSearchState.OwnedByFirst;
-            member2.SearchState = SimulationIslandSearchState.OwnedBySecond;
+            member1.searchState = SimulationIslandSearchState.OwnedByFirst;
+            member2.searchState = SimulationIslandSearchState.OwnedBySecond;
 
             while (member1Friends.Count > 0 && member2Friends.Count > 0)
             {
 
 
-                ISimulationIslandMember currentNode = member1Friends.Dequeue();
+                SimulationIslandMember currentNode = member1Friends.Dequeue();
                 for (int i = 0; i < currentNode.Connections.Count; i++)
                 {
                     for (int j = 0; j < currentNode.Connections[i].ConnectedMembers.Count; j++)
                     {
-                        ISimulationIslandMember connectedNode;
+                        SimulationIslandMember connectedNode;
                         if ((connectedNode = currentNode.Connections[i].ConnectedMembers[j]) != currentNode &&
                             connectedNode.SimulationIsland != null) //The connection could be connected to something that isn't in the Space and has no island, or it's not dynamic.
                         {
-                            switch (connectedNode.SearchState)
+                            switch (connectedNode.searchState)
                             {
                                 case SimulationIslandSearchState.Unclaimed:
                                     //Found a new friend :)
                                     member1Friends.Enqueue(connectedNode);
-                                    connectedNode.SearchState = SimulationIslandSearchState.OwnedByFirst;
+                                    connectedNode.searchState = SimulationIslandSearchState.OwnedByFirst;
                                     searchedMembers1.Add(connectedNode);
                                     break;
                                 case SimulationIslandSearchState.OwnedBySecond:
@@ -427,16 +425,16 @@ namespace BEPUphysics.DeactivationManagement
                 {
                     for (int j = 0; j < currentNode.Connections[i].ConnectedMembers.Count; j++)
                     {
-                        ISimulationIslandMember connectedNode;
+                        SimulationIslandMember connectedNode;
                         if ((connectedNode = currentNode.Connections[i].ConnectedMembers[j]) != currentNode &&
                             connectedNode.SimulationIsland != null) //The connection could be connected to something that isn't in the Space and has no island, or it's not dynamic.
                         {
-                            switch (connectedNode.SearchState)
+                            switch (connectedNode.searchState)
                             {
                                 case SimulationIslandSearchState.Unclaimed:
                                     //Found a new friend :)
                                     member2Friends.Enqueue(connectedNode);
-                                    connectedNode.SearchState = SimulationIslandSearchState.OwnedBySecond;
+                                    connectedNode.searchState = SimulationIslandSearchState.OwnedBySecond;
                                     searchedMembers2.Add(connectedNode);
                                     break;
                                 case SimulationIslandSearchState.OwnedByFirst:
@@ -452,6 +450,7 @@ namespace BEPUphysics.DeactivationManagement
             }
             //If one of the queues empties out without finding anything, it means it's isolated.  The other one will never find it.
             //Now we can do a split.  Grab a new Island, fill it with the isolated search stuff.  Remove the isolated search stuff from the old Island.
+
 
             SimulationIsland newIsland = islandPool.Take();
             simulationIslands.Add(newIsland);
@@ -478,14 +477,59 @@ namespace BEPUphysics.DeactivationManagement
                 member1Friends.Clear();
             }
 
+            //TODO: Instead of going through and remove-adding simulation islands like this:
+            //1) Go through the list of members that are switching ownership to a new island and set their island to the new island.
+            //2) Go through the list of all members in the original island and, if their island is different now, remove them from the old island's list with a FastRemoveAt.
+            //This is a good idea in theory, but it doesn't really help in practice.  Most splits are a single object.  The array.IndexOf has a lower constant factor than the 
+            //removal loop below for a single object.
+
+            //A better optimization is to not have a member list in the first place.
+
+            //SimulationIsland newIsland = islandPool.Take();
+            //simulationIslands.Add(newIsland);
+
+            //var oldIslandMembers = member1.SimulationIsland.members;
+            //if (member1Friends.Count == 0)
+            //{
+            //    //Member 1 is isolated, give it its own simulation island!
+            //    for (int i = 0; i < searchedMembers1.Count; i++)
+            //    {
+            //        member2.SimulationIsland.PartialRemove(searchedMembers1[i]);
+            //        newIsland.Add(searchedMembers1[i]);
+            //    }
+            //    member2Friends.Clear();
+            //}
+            //else if (member2Friends.Count == 0)
+            //{
+
+            //    //Member 2 is isolated, give it its own simulation island!
+            //    for (int i = 0; i < searchedMembers2.Count; i++)
+            //    {
+            //        member1.SimulationIsland.PartialRemove(searchedMembers2[i]);
+            //        newIsland.Add(searchedMembers2[i]);
+            //    }
+            //    member1Friends.Clear();
+            //}
+            //for (int i = oldIslandMembers.count - 1; i >= 0; i--)
+            //{
+            //    if (oldIslandMembers[i].SimulationIsland == newIsland)
+            //    {                    
+            //        //Quickly remove the node from its old island list.
+            //        //By deferring the removal until now, we can do a single scan.
+            //        //The alternative would be a bunch of IndexOf searches- O(n^2) instead of O(n)!
+            //        var oldMember = oldIslandMembers[i];
+            //        oldIslandMembers.FastRemoveAt(i);
+            //    }
+            //}
+
         ResetSearchStates:
             for (int i = 0; i < searchedMembers1.Count; i++)
             {
-                searchedMembers1[i].SearchState = SimulationIslandSearchState.Unclaimed;
+                searchedMembers1[i].searchState = SimulationIslandSearchState.Unclaimed;
             }
             for (int i = 0; i < searchedMembers2.Count; i++)
             {
-                searchedMembers2[i].SearchState = SimulationIslandSearchState.Unclaimed;
+                searchedMembers2[i].searchState = SimulationIslandSearchState.Unclaimed;
             }
             searchedMembers1.Clear();
             searchedMembers2.Clear();
@@ -500,7 +544,7 @@ namespace BEPUphysics.DeactivationManagement
         /// Strips a member of its simulation island.
         ///</summary>
         ///<param name="member">Member to be stripped.</param>
-        public void RemoveSimulationIslandFromMember(ISimulationIslandMember member)
+        public void RemoveSimulationIslandFromMember(SimulationIslandMember member)
         {
 
             //Becoming kinematic eliminates the member as a possible path.
@@ -526,7 +570,7 @@ namespace BEPUphysics.DeactivationManagement
                 for (int i = 0; i < member.Connections.Count; i++)
                 {
                     //Find a member with a non-null island to represent connection i.
-                    ISimulationIslandMember representativeA = null;
+                    SimulationIslandMember representativeA = null;
                     for (int j = 0; j < member.Connections[i].ConnectedMembers.Count; j++)
                     {
                         if (member.Connections[i].ConnectedMembers[j].SimulationIsland != null)
@@ -548,7 +592,7 @@ namespace BEPUphysics.DeactivationManagement
                     for (int j = i + 1; j < member.Connections.Count; j++)
                     {
                         //Find a representative for another connection.
-                        ISimulationIslandMember representativeB = null;
+                        SimulationIslandMember representativeB = null;
                         for (int k = 0; k < member.Connections[j].ConnectedMembers.Count; k++)
                         {
                             if (member.Connections[j].ConnectedMembers[k].SimulationIsland != null)
@@ -581,7 +625,7 @@ namespace BEPUphysics.DeactivationManagement
         ///</summary>
         ///<param name="member">Member to gain a simulation island.</param>
         ///<exception cref="Exception">Thrown if the member already has a simulation island.</exception>
-        public void AddSimulationIslandToMember(ISimulationIslandMember member)
+        public void AddSimulationIslandToMember(SimulationIslandMember member)
         {
             if (member.SimulationIsland != null)
             {

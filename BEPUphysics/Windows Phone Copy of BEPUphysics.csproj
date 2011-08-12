@@ -178,8 +178,9 @@
     <Compile Include="DataStructures\TreeOverlapPair.cs" />
     <Compile Include="DeactivationManagement\DeactivationManager.cs" />
     <Compile Include="DeactivationManagement\ISimulationIslandConnection.cs" />
-    <Compile Include="DeactivationManagement\ISimulationIslandMember.cs" />
+    <Compile Include="DeactivationManagement\ISimulationIslandMemberOwner.cs" />
     <Compile Include="DeactivationManagement\SimulationIsland.cs" />
+    <Compile Include="DeactivationManagement\SimulationIslandMember.cs" />
     <Compile Include="Entities\EntityConstraintCollection.cs" />
     <Compile Include="Entities\EntitySolverUpdateableCollection.cs" />
     <Compile Include="Entities\Prefabs\MobileMesh.cs" />
