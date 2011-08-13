@@ -213,6 +213,11 @@
     <Compile Include="DeactivationManagement\ISimulationIslandMemberOwner.cs" />
     <Compile Include="DeactivationManagement\SimulationIsland.cs" />
     <Compile Include="DeactivationManagement\SimulationIslandMember.cs" />
+    <None Include="DeactivationManagement\Testing\DeactivationManager.cs" />
+    <None Include="DeactivationManagement\Testing\ISimulationIslandConnection.cs" />
+    <None Include="DeactivationManagement\Testing\ISimulationIslandMemberOwner.cs" />
+    <None Include="DeactivationManagement\Testing\SimulationIsland.cs" />
+    <None Include="DeactivationManagement\Testing\SimulationIslandMember.cs" />
     <Compile Include="Entities\EntityConstraintCollection.cs" />
     <Compile Include="Entities\EntitySolverUpdateableCollection.cs" />
     <Compile Include="Entities\Prefabs\Box.cs" />
