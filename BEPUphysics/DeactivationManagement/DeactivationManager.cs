@@ -464,50 +464,15 @@ namespace BEPUphysics.DeactivationManagement
                 member1Friends.Clear();
             }
 
-            //TODO: Instead of going through and remove-adding simulation islands like this:
-            //1) Go through the list of members that are switching ownership to a new island and set their island to the new island.
-            //2) Go through the list of all members in the original island and, if their island is different now, remove them from the old island's list with a FastRemoveAt.
-            //This is a good idea in theory, but it doesn't really help in practice.  Most splits are a single object.  The array.IndexOf has a lower constant factor than the 
-            //removal loop below for a single object.
+            //Force the system awake.
+            //Technically, the members should already be awake.
+            //However, calling Activate on them resets the members'
+            //deactivation candidacy timers.  This prevents the island
+            //from instantly going back to sleep, which could leave
+            //objects hanging in mid-air.
+            member1.Activate();
+            member2.Activate();
 
-            //A better optimization is to not have a member list in the first place.
-
-            //SimulationIsland newIsland = islandPool.Take();
-            //simulationIslands.Add(newIsland);
-
-            //var oldIslandMembers = member1.SimulationIsland.members;
-            //if (member1Friends.Count == 0)
-            //{
-            //    //Member 1 is isolated, give it its own simulation island!
-            //    for (int i = 0; i < searchedMembers1.Count; i++)
-            //    {
-            //        member2.SimulationIsland.PartialRemove(searchedMembers1[i]);
-            //        newIsland.Add(searchedMembers1[i]);
-            //    }
-            //    member2Friends.Clear();
-            //}
-            //else if (member2Friends.Count == 0)
-            //{
-
-            //    //Member 2 is isolated, give it its own simulation island!
-            //    for (int i = 0; i < searchedMembers2.Count; i++)
-            //    {
-            //        member1.SimulationIsland.PartialRemove(searchedMembers2[i]);
-            //        newIsland.Add(searchedMembers2[i]);
-            //    }
-            //    member1Friends.Clear();
-            //}
-            //for (int i = oldIslandMembers.count - 1; i >= 0; i--)
-            //{
-            //    if (oldIslandMembers[i].SimulationIsland == newIsland)
-            //    {                    
-            //        //Quickly remove the node from its old island list.
-            //        //By deferring the removal until now, we can do a single scan.
-            //        //The alternative would be a bunch of IndexOf searches- O(n^2) instead of O(n)!
-            //        var oldMember = oldIslandMembers[i];
-            //        oldIslandMembers.FastRemoveAt(i);
-            //    }
-            //}
 
         ResetSearchStates:
             for (int i = 0; i < searchedMembers1.Count; i++)
