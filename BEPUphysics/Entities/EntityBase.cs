@@ -59,7 +59,7 @@ namespace BEPUphysics.Entities
             set
             {
                 position = value;
-                activityInformation.IsActive = true;
+                activityInformation.Activate();
             }
         }
         ///<summary>
@@ -81,7 +81,7 @@ namespace BEPUphysics.Entities
                 Matrix3X3.Multiply(ref multiplied, ref orientationMatrix, out inertiaTensorInverse);
                 Matrix3X3.MultiplyTransposed(ref orientationMatrix, ref localInertiaTensor, out multiplied);
                 Matrix3X3.Multiply(ref multiplied, ref orientationMatrix, out inertiaTensor);
-                activityInformation.IsActive = true;
+                activityInformation.Activate();
             }
         }
         /// <summary>
@@ -119,7 +119,7 @@ namespace BEPUphysics.Entities
                 Quaternion.CreateFromRotationMatrix(ref value, out orientation);
                 Orientation = orientation; //normalizes and sets.
                 position = value.Translation;
-                activityInformation.IsActive = true;
+                activityInformation.Activate();
             }
 
         }
@@ -137,7 +137,7 @@ namespace BEPUphysics.Entities
                 angularVelocity = value;
                 //TODO: infinite inertia tensor will cause annoyances.
                 Matrix3X3.Transform(ref value, ref inertiaTensor, out angularMomentum);
-                activityInformation.IsActive = true;
+                activityInformation.Activate();
             }
         }
         /// <summary>
@@ -160,7 +160,7 @@ namespace BEPUphysics.Entities
             {
                 angularMomentum = value;
                 Matrix3X3.Transform(ref value, ref inertiaTensorInverse, out angularVelocity);
-                activityInformation.IsActive = true;
+                activityInformation.Activate();
             }
         }
         /// <summary>
@@ -176,7 +176,7 @@ namespace BEPUphysics.Entities
             {
                 linearVelocity = value;
                 Vector3.Multiply(ref linearVelocity, mass, out linearMomentum);
-                activityInformation.IsActive = true;
+                activityInformation.Activate();
             }
         }
         /// <summary>
@@ -192,7 +192,7 @@ namespace BEPUphysics.Entities
             {
                 linearMomentum = value;
                 Vector3.Multiply(ref linearMomentum, inverseMass, out linearVelocity);
-                activityInformation.IsActive = true;
+                activityInformation.Activate();
             }
         }
         /// <summary>
@@ -1002,7 +1002,7 @@ namespace BEPUphysics.Entities
                 Vector3.Cross(ref positionDifference, ref impulse, out cross);
                 ApplyAngularImpulse(ref cross);
 
-                activityInformation.IsActive = true;
+                activityInformation.Activate();
             }
         }
 
@@ -1111,7 +1111,7 @@ namespace BEPUphysics.Entities
                 collisionInformation.CollisionRules.Group == null)
                 collisionInformation.CollisionRules.Group = CollisionRules.DefaultKinematicCollisionGroup;
 
-            activityInformation.IsActive = true;
+            activityInformation.Activate();
 
             //Preserve velocity and reinitialize momentum for new state.
             LinearVelocity = linearVelocity;
@@ -1159,7 +1159,7 @@ namespace BEPUphysics.Entities
                 collisionInformation.CollisionRules.Group == null)
                 collisionInformation.CollisionRules.Group = CollisionRules.DefaultDynamicCollisionGroup;
 
-            activityInformation.IsActive = true;
+            activityInformation.Activate();
 
 
             //Preserve velocity and reinitialize momentum for new state.

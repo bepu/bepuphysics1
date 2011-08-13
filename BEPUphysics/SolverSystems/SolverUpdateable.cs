@@ -115,11 +115,14 @@ namespace BEPUphysics.SolverSystems
                 //This is a simulation island connection.  We already know that all connected objects share the
                 //same simulation island (or don't have one, in the case of kinematics).  All we have to do is test to see if that island is active!
                 for (int i = 0; i < connectedMembers.count; i++)
-                    if (connectedMembers.Elements[i].SimulationIsland != null && connectedMembers.Elements[i].SimulationIsland.isActive)
+                {
+                    var island = connectedMembers.Elements[i].SimulationIsland;
+                    if (island != null && island.isActive)
                     {
                         isActiveInSolver = true;
                         return;
                     }
+                }
             }
             isActiveInSolver = false;
         }

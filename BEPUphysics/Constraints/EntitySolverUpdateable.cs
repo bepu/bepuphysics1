@@ -176,7 +176,7 @@ namespace BEPUphysics.Constraints
                 {
                     Entity e = involvedEntities.Elements[i];
                     if (e.isDynamic)
-                        e.activityInformation.IsActive = true;
+                        e.activityInformation.Activate();
                 }
 
 
@@ -226,7 +226,7 @@ namespace BEPUphysics.Constraints
                 {
                     Entity e = involvedEntities.Elements[i];
                     if (e.isDynamic)
-                        e.activityInformation.IsActive = true;
+                        e.activityInformation.Activate();
                 }
             }
             Resources.GiveBack(newInvolvedEntities);

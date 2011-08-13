@@ -162,7 +162,7 @@ namespace BEPUphysics.DeactivationManagement
         {
             if (simulationIslandMember.DeactivationManager == null)
             {
-                simulationIslandMember.Activate();
+                simulationIslandMember.IsActive = true;
                 simulationIslandMember.DeactivationManager = this;
                 simulationIslandMembers.Add(simulationIslandMember);
                 if (simulationIslandMember.IsDynamic)
@@ -186,7 +186,7 @@ namespace BEPUphysics.DeactivationManagement
         {
             if (simulationIslandMember.DeactivationManager == this)
             {
-                simulationIslandMember.Activate();
+                simulationIslandMember.IsActive = true;
                 simulationIslandMember.DeactivationManager = null;
                 simulationIslandMembers.Remove(simulationIslandMember);
                 RemoveSimulationIslandFromMember(simulationIslandMember);
@@ -227,7 +227,7 @@ namespace BEPUphysics.DeactivationManagement
             {
                 deactivationIslandIndex = (deactivationIslandIndex + 1) % simulationIslands.count;
                 var island = simulationIslands.Elements[deactivationIslandIndex];
-                if (island.memberCount == 0)
+                if (island.members.count == 0)
                 {
                     //Found an orphan island left over from merge procedures or removal procedures.
                     //Shoo it on out.
@@ -237,7 +237,7 @@ namespace BEPUphysics.DeactivationManagement
                 else
                 {
                     island.TryToDeactivate();
-                    numberOfEntitiesDeactivated += island.memberCount;
+                    numberOfEntitiesDeactivated += island.members.count;
                 }
             }
         }
@@ -297,22 +297,35 @@ namespace BEPUphysics.DeactivationManagement
             }
 
             //Swap if needed so s1 is the bigger island
-            if (s1.memberCount < s2.memberCount)
+            if (s1.members.count < s2.members.count)
             {
-                var biggerIsland = s2;
+                SimulationIsland biggerIsland;
+                biggerIsland = s2;
                 s2 = s1;
                 s1 = biggerIsland;
             }
-            
-            s1.Activate();
-            s2.immediateParent = s1;
 
-            //This is a bit like a 'union by rank.'
-            //But don't get confused- simulation islands are not a union find structure.
-            //This parenting simply avoids the need for maintaining a list of members in each simulation island.
-            //In the subsequent frame, the deactivation candidacy update will go through the parents and eat away
-            //at the child simulation island.  Then, in a later TryToDeactivate phase, the then-empty simulation island
-            //will be removed.
+            //If either island is active, activate the other.
+            if (s2.isActive && !s1.isActive)
+                s1.Activate();
+            if (s1.isActive && !s2.isActive)
+                s2.Activate();
+
+            //Move s2's members to s1.
+            for (int i = s2.members.count - 1; i >= 0; i--)
+            {
+                var member = s2.members.Elements[i];
+                s2.RemoveAt(i); //This is done instead of a clear because removing also modifies event hooks.
+                s1.Add(member);
+            }
+
+            //By now, s2 is empty.  But we will not remove it!
+            //Removing it here would require that we perform an O(n) index lookup on the whole simulationIslands list.
+            //Instead, leave it floating in the list as an orphan.  The deactivation attempt loop will catch it eventually and
+            //remove it using an extremely fast FastRemoveAt.
+            //It sounds like a micro-optimization, but this code is running singlethreadedly- it needs to be as fast as possible because
+            //we're wasting time that could be spent working all cores!
+
 
             //The larger one survives.
             return s1;
@@ -447,7 +460,7 @@ namespace BEPUphysics.DeactivationManagement
                 //Member 1 is isolated, give it its own simulation island!
                 for (int i = 0; i < searchedMembers1.Count; i++)
                 {
-                    searchedMembers1[i].simulationIsland.Remove(searchedMembers1[i]);
+                    member2.SimulationIsland.Remove(searchedMembers1[i]);
                     newIsland.Add(searchedMembers1[i]);
                 }
                 member2Friends.Clear();
@@ -458,7 +471,7 @@ namespace BEPUphysics.DeactivationManagement
                 //Member 2 is isolated, give it its own simulation island!
                 for (int i = 0; i < searchedMembers2.Count; i++)
                 {
-                    searchedMembers2[i].simulationIsland.Remove(searchedMembers2[i]);
+                    member1.SimulationIsland.Remove(searchedMembers2[i]);
                     newIsland.Add(searchedMembers2[i]);
                 }
                 member1Friends.Clear();
@@ -541,7 +554,7 @@ namespace BEPUphysics.DeactivationManagement
             {
                 SimulationIsland island = member.SimulationIsland;
                 island.Remove(member);
-                if (island.memberCount == 0)
+                if (island.members.count == 0)
                 {
                     simulationIslands.Remove(island);
                     GiveBackIsland(island);

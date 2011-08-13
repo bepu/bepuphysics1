@@ -150,7 +150,7 @@
     <Compile Include="DataStructures\StaticMeshData.cs" />
     <Compile Include="DataStructures\TransformableMeshData.cs" />
     <Compile Include="DataStructures\TreeOverlapPair.cs" />
-    <Compile Include="DeactivationManagement\DeactivationManager.cs" />
+    <None Include="DeactivationManagement\Testing\DeactivationManager.cs" />
     <Compile Include="Collidables\CollidableCollection.cs" />
     <Compile Include="Collidables\CollidablePair.cs" />
     <Compile Include="Collidables\EntityCollidableCollection.cs" />
@@ -245,7 +245,12 @@
     <Compile Include="Constraints\TwoEntity\Motors\RevoluteMotor.cs" />
     <Compile Include="Constraints\TwoEntity\Motors\TwistMotor.cs" />
     <Compile Include="Constraints\TwoEntity\TwoEntityConstraint.cs" />
+    <None Include="DeactivationManagement\Testing\ISimulationIslandMemberOwner.cs" />
+    <None Include="DeactivationManagement\Testing\SimulationIslandMember.cs" />
+    <Compile Include="DeactivationManagement\DeactivationManager.cs" />
+    <Compile Include="DeactivationManagement\ISimulationIslandConnection.cs" />
     <Compile Include="DeactivationManagement\ISimulationIslandMemberOwner.cs" />
+    <Compile Include="DeactivationManagement\SimulationIsland.cs" />
     <Compile Include="DeactivationManagement\SimulationIslandMember.cs" />
     <Compile Include="Entities\EntitySolverUpdateableCollection.cs" />
     <Compile Include="Entities\EntityConstraintCollection.cs" />
@@ -376,7 +381,7 @@
     <Compile Include="EntityStateManagement\InterpolatedStatesManager.cs" />
     <Compile Include="MultithreadedProcessingStage.cs" />
     <Compile Include="MathExtensions\RigidTransform.cs" />
-    <Compile Include="DeactivationManagement\ISimulationIslandConnection.cs" />
+    <None Include="DeactivationManagement\Testing\ISimulationIslandConnection.cs" />
     <Compile Include="Materials\Material.cs" />
     <Compile Include="Materials\MaterialManager.cs" />
     <Compile Include="Materials\MaterialPair.cs" />
@@ -425,7 +430,7 @@
     <Compile Include="ResourceManagement\ResourcePool.cs" />
     <Compile Include="ResourceManagement\Resources.cs" />
     <Compile Include="ResourceManagement\UnsafeResourcePool.cs" />
-    <Compile Include="DeactivationManagement\SimulationIsland.cs" />
+    <None Include="DeactivationManagement\Testing\SimulationIsland.cs" />
     <Compile Include="SolverSystems\Solver.cs" />
     <Compile Include="SolverSystems\SolverBatch.cs" />
     <Compile Include="SolverSystems\SolverUpdateableChange.cs" />

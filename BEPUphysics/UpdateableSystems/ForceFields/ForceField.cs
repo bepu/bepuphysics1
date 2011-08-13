@@ -129,7 +129,7 @@ namespace BEPUphysics.UpdateableSystems.ForceFields
             if (e.isDynamic && (e.activityInformation.IsActive || ForceWakeUp) && Shape.IsEntityAffected(e))
             {
                 if (ForceWakeUp)
-                    e.activityInformation.IsActive = true;
+                    e.activityInformation.Activate();
                 Vector3 impulse;
                 CalculateImpulse(e, currentTimestep, out impulse);
                 e.ApplyLinearImpulse(ref impulse);

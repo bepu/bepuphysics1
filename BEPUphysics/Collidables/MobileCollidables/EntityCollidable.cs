@@ -228,7 +228,7 @@ namespace BEPUphysics.Collidables.MobileCollidables
             //Try to activate the entity since our collision rules just changed; broadphase might need to update some stuff.
             //Beware, though; if this collidable is still being constructed, then the entity won't be available.
             if (entity != null)
-                entity.activityInformation.IsActive = true;
+                entity.activityInformation.Activate();
         }
 
 

@@ -57,17 +57,38 @@ namespace BEPUphysicsDemos.Demos.Tests
             Random rand = new Random();
 
 
-            float width = 30;
-            float height = 200;
-            float length = 30; 
-            for (int i = 0; i < 3000; i++)
+            //float width = 30;
+            //float height = 200;
+            //float length = 30;
+            //for (int i = 0; i < 3000; i++)
+            //{
+            //    Vector3 position =
+            //        new Vector3((float)rand.NextDouble() * width - width * .5f,
+            //            (float)rand.NextDouble() * height + 20,
+            //            (float)rand.NextDouble() * length - length * .5f);
+            //    var sphere = new Sphere(position, 1, 1) { Tag = "noDisplayObject" };
+            //    sphere.ActivityInformation.IsAlwaysActive = true;
+            //    Space.Add(sphere);
+            //}
+
+            float width = 10;
+            float height = 30;
+            float length = 10;
+            for (int i = 0; i < width; i++)
             {
-                Vector3 position =
-                    new Vector3((float)rand.NextDouble() * width - width * .5f,
-                        (float)rand.NextDouble() * height + 20,
-                        (float)rand.NextDouble() * length - length * .5f);
-                Space.Add(new Sphere(position, 1, 1) { Tag = "noDisplayObject" }
-                );
+                for (int j = 0; j < height; j++)
+                {
+                    for (int k = 0; k < length; k++)
+                    {
+                        Vector3 position =
+                            new Vector3(i * 3 + j * .2f,
+                                20 + j * 3f,
+                                k * 3 + j * .2f);
+                        var sphere = new Sphere(position, 1, 1) { Tag = "noDisplayObject" };
+                        sphere.ActivityInformation.IsAlwaysActive = true;
+                        Space.Add(sphere);
+                    }
+                }
             }
 
 
@@ -76,38 +97,31 @@ namespace BEPUphysicsDemos.Demos.Tests
 
             game.Camera.Position = new Vector3(0, 30, 20);
 
-            ////Pre-simulate.
-            //for (int i = 0; i < 150; i++)
-            //{
-            //    Space.Update();
-            //}
+            //Pre-simulate.
+            for (int i = 0; i < 30; i++)
+            {
+                Space.Update();
+            }
 
-            //int numRuns = 10;
-            ////Space.BeforeNarrowPhaseUpdateables.Enabled = false;
-            ////Space.DuringForcesUpdateables.Enabled = false;
-            ////Space.EndOfTimeStepUpdateables.Enabled = false;
-            ////Space.EndOfFrameUpdateables.Enabled = false;
+            int numRuns = 500;
 
-            ////Space.EntityStateWriteBuffer.Enabled = false;
-            ////Space.BufferedStates.Enabled = false;
-            ////Space.DeactivationManager.Enabled = false;
-            ////Space.SpaceObjectBuffer.Enabled = false;
-            ////Space.DeferredEventDispatcher.Enabled = false;
-            ////Space.BoundingBoxUpdater.Enabled = false;
+            double startTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
+            for (int i = 0; i < numRuns; i++)
+            {
+                Space.Update();
+            }
 
-            ////Space.BroadPhase.Enabled = false;
-            ////Space.NarrowPhase.Enabled = false;
-            ////Space.ForceUpdater.Enabled = false;
-            //////Space.Solver.Enabled = false;
-            ////Space.PositionUpdater.Enabled = false;
-            //for (int i = 0; i < numRuns; i++)
-            //{
-            //    Space.Update();
-            //}
-
+            double endTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
+            time = endTime - startTime;
         }
 
+        double time;
 
+        public override void DrawUI()
+        {
+            Game.DataTextDrawer.Draw("Simulation time: ", time, 5, new Vector2(50, 50)); 
+            base.DrawUI();
+        }
 
 
         /// <summary>

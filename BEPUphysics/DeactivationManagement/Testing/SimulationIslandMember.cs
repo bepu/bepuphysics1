@@ -61,7 +61,7 @@ namespace BEPUphysics.DeactivationManagement
             bool isActive = IsActive;
             if (isActive)
             {
-                TryToCompressIslandHierarchy();
+                //TryToCompressIslandHierarchy();
                 isSlowing = velocity <= previousVelocity;
                 if (IsDynamic)
                 {
@@ -179,41 +179,39 @@ namespace BEPUphysics.DeactivationManagement
             }
         }
 
-        void TryToCompressIslandHierarchy()
-        {
+        //void TryToCompressIslandHierarchy()
+        //{
 
-            var currentSimulationIsland = simulationIsland;
-            if (currentSimulationIsland != null)
-            {
-                if (currentSimulationIsland.immediateParent != currentSimulationIsland)
-                {
-                    //Only remove ourselves from the owning simulation island, not all the way up the chain.
-                    lock (currentSimulationIsland)
-                        currentSimulationIsland.Remove(this);
-                    currentSimulationIsland = currentSimulationIsland.Parent;
-                    //Add ourselves to the new owner.
-                    lock (currentSimulationIsland)
-                        currentSimulationIsland.Add(this);
-                    //TODO: Should it activate the new island?  This might avoid a possible corner case.
-                    //It could interfere with the activated event meaningfulness, since that is triggered
-                    //at the end of the update candidacy loop..
-                    //currentSimulationIsland.isActive = true;
-                }
-            }
-        }
+        //    var currentSimulationIsland = simulationIsland;
+        //    while (currentSimulationIsland.immediateParent != currentSimulationIsland)
+        //    {
+        //        //If our island isn't the root island, then it's a child island fated to die.  Remove ourselves from it.
+        //        //Called from a multithreaded context. Have to synchronize.
+        //        lock (currentSimulationIsland)
+        //            currentSimulationIsland.Remove(this);
+        //        //The deactivation candidate count of the child island is irrelevant.
+        //        //It is no longer used for activation, and its fate is to be eaten before the end of this deactivation manager stage.
+        //        currentSimulationIsland = currentSimulationIsland.immediateParent;
+        //    }
+        //    if (currentSimulationIsland != simulationIsland)
+        //    {
+        //        lock (currentSimulationIsland)
+        //            currentSimulationIsland.Add(this);
+        //    }
+        //}
 
         bool previouslyActive = true;
         ///<summary>
-        /// Gets whether or not the member is active.
+        /// Gets or sets whether or not the member is active.
+        /// Setting this 
         ///</summary>
         public bool IsActive
         {
             get
             {
-                var currentSimulationIsland = SimulationIsland;
-                if (currentSimulationIsland != null)
+                if (SimulationIsland != null)
                 {
-                    return currentSimulationIsland.isActive;
+                    return SimulationIsland.isActive;
                 }
                 else
                 {
@@ -224,28 +222,41 @@ namespace BEPUphysics.DeactivationManagement
                     return previousVelocity > 0;
                 }
             }
-
-        }
-
-        /// <summary>
-        /// Attempts to activate the entity.
-        /// </summary>
-        public void Activate()
-        {
-            //If we're trying to activate, always set the deactivation candidacy to false.  This resets the timer if necessary.
-            IsDeactivationCandidate = false;
-            var currentSimulationIsland = SimulationIsland;
-            if (currentSimulationIsland != null)
+            set
             {
-                //We can force-activate an island.
-                //Note that this does nothing for objects not in a space
-                //or kinematic objects that don't have an island.
-                //"Activating" a kinematic object is meaningless- their activity state
-                //is entirely defined by their velocity.
-                currentSimulationIsland.IsActive = true;
+                if (value != IsActive)
+                {
+                    //We can force-activate an island.
+                    //Note that this does nothing for objects not in a space
+                    //or kinematic objects that don't have an island.
+                    //"Activating" a kinematic object is meaningless- their activity state
+                    //is entirely defined by their velocity.
+                    if (SimulationIsland != null)
+                    {
+                        if (value)
+                        {
+                            IsDeactivationCandidate = false;
+                            SimulationIsland.IsActive = true;
+                        }
+                        else
+                            SimulationIsland.TryToDeactivate();
 
+                    }
+                    else
+                    {
+                        if (!IsDynamic && !value)
+                        {
+                            //A moving kinematic entity cannot be frozen using activity states.  If a user attempted this and it silently failed, the result would NOT match their expectations.
+                            //Instead of letting them get confused as to why nothing happened, fail fast and notify.
+                            throw new NotSupportedException("Cannot force-deactivate a moving kinematic entity.  If you wish to freeze the kinematic, consider instead altering the entity's velocities.");
+                        }
+                        //Two other cases:
+                        //1) It's possible that they were trying to force-activate a kinematic.  Since using IsActive = true without verification is a pretty common use case, and 'activating'
+                        //a stationary kinematic isn't expected to change the simulation in any way, just let it silently pass.
+                        //2) It's possible that it is a dynamic object that isn't in a simulation yet.  Silently do nothing.
+                    }
+                }
             }
-
         }
 
         /// <summary>
@@ -297,22 +308,26 @@ namespace BEPUphysics.DeactivationManagement
                 Deactivated(this);
         }
 
-
-        internal SimulationIsland simulationIsland;
         ///<summary>
         /// Gets the simulation island that owns this member.
         ///</summary>
-        public SimulationIsland SimulationIsland
-        {
-            get
-            {
-                return simulationIsland != null ? simulationIsland.Parent : null;
-            }
-            internal set
-            {
-                simulationIsland = value;
-            }
-        }
+        public SimulationIsland SimulationIsland { get; internal set; }
+
+        //SimulationIsland simulationIsland;
+        /////<summary>
+        ///// Gets the simulation island that owns this member.
+        /////</summary>
+        //public SimulationIsland SimulationIsland
+        //{
+        //    get
+        //    {
+        //        return simulationIsland != null ? simulationIsland.OwningIsland : null;
+        //    }
+        //    internal set
+        //    {
+        //        simulationIsland = value;
+        //    }
+        //}
 
         /// <summary>
         /// Gets the deactivation manager that is managing this member.

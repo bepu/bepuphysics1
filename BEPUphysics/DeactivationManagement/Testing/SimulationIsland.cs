@@ -11,15 +11,6 @@ namespace BEPUphysics.DeactivationManagement
     ///</summary>
     public class SimulationIsland
     {
-        internal SimulationIsland immediateParent;
-
-        internal SimulationIsland Parent
-        {
-            get
-            {
-                return immediateParent == this ? this : immediateParent.Parent;
-            }
-        }
 
         internal bool allowDeactivation = true;
         internal bool isActive = true;
@@ -37,8 +28,23 @@ namespace BEPUphysics.DeactivationManagement
                 isActive = value;
             }
         }
-        internal int memberCount;
+        internal RawList<SimulationIslandMember> members = new RawList<SimulationIslandMember>();
         internal int deactivationCandidateCount;
+
+        ///<summary>
+        /// Gets the list of members in the island.
+        ///</summary>
+        public ReadOnlyList<SimulationIslandMember> Members
+        {
+            get
+            {
+                return new ReadOnlyList<SimulationIslandMember>(members);
+            }
+        }
+
+        //TODO: Readonly accessible members list?
+        //TODO: Should members list be hash-based collections?
+        //TODO: Should members list be sorted list?
 
         ///<summary>
         /// Constructs a simulation island.
@@ -48,7 +54,6 @@ namespace BEPUphysics.DeactivationManagement
             memberActivatedDelegate = MemberActivated;
             becameDeactivationCandidateDelegate = BecameDeactivationCandidate;
             becameNonDeactivationCandidateDelegate = BecameNonDeactivationCandidate;
-            CleanUp();
         }
 
         Action<SimulationIslandMember> memberActivatedDelegate;
@@ -95,7 +100,7 @@ namespace BEPUphysics.DeactivationManagement
                 //DO NOT WORRY ABOUT THREAD SAFETY HERE.
                 //TryToDeactivate will be called sequentially in a 'limited work per frame' scheme.
                 //Avoids load balancing problems and makes implementation easier.
-                if (isActive && deactivationCandidateCount == memberCount)
+                if (isActive && deactivationCandidateCount == members.Count)
                 {
                     isActive = false;
                     return true;
@@ -120,10 +125,10 @@ namespace BEPUphysics.DeactivationManagement
         {
             //This method is not thread safe.
             //TODO: Should it wake the island up?
-            if (member.IsDynamic && member.simulationIsland == null)
+            if (member.IsDynamic && member.SimulationIsland == null)
             {
-                member.simulationIsland = this;
-                memberCount++;
+                member.SimulationIsland = this;
+                members.Add(member);
                 member.Activated += memberActivatedDelegate;
                 member.BecameDeactivationCandidate += becameDeactivationCandidateDelegate;
                 member.BecameNonDeactivationCandidate += becameNonDeactivationCandidateDelegate;
@@ -151,10 +156,10 @@ namespace BEPUphysics.DeactivationManagement
 
             //This method is not thread safe.
             //TODO: Should it wake the island up?
-            if (member.simulationIsland == this)
+            if (member.SimulationIsland == this)
             {
-                memberCount--;
-                member.simulationIsland = null;
+                members.FastRemove(member);
+                member.SimulationIsland = null;
                 member.Activated -= memberActivatedDelegate;
                 member.BecameDeactivationCandidate -= becameDeactivationCandidateDelegate;
                 member.BecameNonDeactivationCandidate -= becameNonDeactivationCandidateDelegate;
@@ -169,12 +174,26 @@ namespace BEPUphysics.DeactivationManagement
 
 
 
+        internal void RemoveAt(int i)
+        {
+            //TODO: If this becomes a hash-based system, this method is pointless.
+            SimulationIslandMember member = members.Elements[i];
+            members.FastRemoveAt(i);
+            member.SimulationIsland = null;
+            member.Activated -= memberActivatedDelegate;
+            member.BecameDeactivationCandidate -= becameDeactivationCandidateDelegate;
+            member.BecameNonDeactivationCandidate -= becameNonDeactivationCandidateDelegate;
+            if (member.IsDeactivationCandidate)
+            {
+                deactivationCandidateCount--;
+            }
+        }
+
         internal void CleanUp()
         {
             isActive = true;
             deactivationCandidateCount = 0;
-            memberCount = 0;
-            immediateParent = this;
+            members.Clear();
         }
 
     }

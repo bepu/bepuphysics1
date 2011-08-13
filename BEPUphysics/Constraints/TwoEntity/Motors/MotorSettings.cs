@@ -90,7 +90,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
                 {
                     //Only need to wake up one dynamic entity.  That will wake up the rest.
                     //Wouldn't want to pointlessly force-wake a kinematic object.
-                    motor.involvedEntities[i].activityInformation.IsActive = true;
+                    motor.involvedEntities[i].activityInformation.Activate();
                     break;
                 }
             }
