@@ -110,7 +110,7 @@ namespace BEPUphysics.Vehicle
 
             for (int i = 0; i < detector.CollisionInformation.pairs.Count; i++)
             {
-                INarrowPhasePair pair = detector.CollisionInformation.pairs[i];
+                NarrowPhasePair pair = detector.CollisionInformation.pairs[i];
                 testCollider = (pair.BroadPhaseOverlap.entryA == detector.CollisionInformation ? pair.BroadPhaseOverlap.entryB : pair.BroadPhaseOverlap.entryA) as Collidable;
                 if (testCollider != null)
                 {

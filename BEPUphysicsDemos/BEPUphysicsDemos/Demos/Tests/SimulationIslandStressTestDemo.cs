@@ -27,10 +27,10 @@ namespace BEPUphysicsDemos.Demos.Tests
             : base(game)
         {
 
-            Space.Add(new Box(new Vector3(0, 0, 0), 500, 10, 500));
+            Space.Add(new Box(new Vector3(0, 0, 0), 1000, 10,1000));
             //MotionSettings.DefaultPositionUpdateMode = BEPUphysics.PositionUpdating.PositionUpdateMode.Continuous;
 
-            NarrowPhaseHelper.Factories.SphereSphere.EnsureCount(10000);
+            NarrowPhaseHelper.Factories.SphereSphere.EnsureCount(50000);
             NarrowPhaseHelper.Factories.BoxSphere.EnsureCount(3000);
             //Space.BroadPhase = new Grid2DSortAndSweep(Space.ThreadManager);
 
@@ -57,39 +57,39 @@ namespace BEPUphysicsDemos.Demos.Tests
             Random rand = new Random();
 
 
-            //float width = 30;
-            //float height = 200;
-            //float length = 30;
-            //for (int i = 0; i < 3000; i++)
-            //{
-            //    Vector3 position =
-            //        new Vector3((float)rand.NextDouble() * width - width * .5f,
-            //            (float)rand.NextDouble() * height + 20,
-            //            (float)rand.NextDouble() * length - length * .5f);
-            //    var sphere = new Sphere(position, 1, 1) { Tag = "noDisplayObject" };
-            //    sphere.ActivityInformation.IsAlwaysActive = true;
-            //    Space.Add(sphere);
-            //}
-
-            float width = 10;
-            float height = 30;
-            float length = 10;
-            for (int i = 0; i < width; i++)
+            float width = 20;
+            float height = 200;
+            float length = 20;
+            for (int i = 0; i < 2000; i++)
             {
-                for (int j = 0; j < height; j++)
-                {
-                    for (int k = 0; k < length; k++)
-                    {
-                        Vector3 position =
-                            new Vector3(i * 3 + j * .2f,
-                                20 + j * 3f,
-                                k * 3 + j * .2f);
-                        var sphere = new Sphere(position, 1, 1) { Tag = "noDisplayObject" };
-                        sphere.ActivityInformation.IsAlwaysActive = true;
-                        Space.Add(sphere);
-                    }
-                }
+                Vector3 position =
+                    new Vector3((float)rand.NextDouble() * width - width * .5f,
+                        (float)rand.NextDouble() * height + 20,
+                        (float)rand.NextDouble() * length - length * .5f);
+                var sphere = new Sphere(position, 1, 1);// { Tag = "noDisplayObject" };
+                sphere.ActivityInformation.IsAlwaysActive = true;
+                Space.Add(sphere);
             }
+
+            //float width = 10;
+            //float height = 30;
+            //float length = 10;
+            //for (int i = 0; i < width; i++)
+            //{
+            //    for (int j = 0; j < height; j++)
+            //    {
+            //        for (int k = 0; k < length; k++)
+            //        {
+            //            Vector3 position =
+            //                new Vector3(i * 3 + j * .2f,
+            //                    20 + j * 3f,
+            //                    k * 3 + j * .2f);
+            //            var sphere = new Sphere(position, 1, 1) { Tag = "noDisplayObject" };
+            //            sphere.ActivityInformation.IsAlwaysActive = true;
+            //            Space.Add(sphere);
+            //        }
+            //    }
+            //}
 
 
 
@@ -100,7 +100,7 @@ namespace BEPUphysicsDemos.Demos.Tests
             //Pre-simulate.
             for (int i = 0; i < 30; i++)
             {
-                Space.Update();
+                //Space.Update();
             }
 
             int numRuns = 500;
@@ -108,7 +108,7 @@ namespace BEPUphysicsDemos.Demos.Tests
             double startTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
             for (int i = 0; i < numRuns; i++)
             {
-                Space.Update();
+                //Space.Update();
             }
 
             double endTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;

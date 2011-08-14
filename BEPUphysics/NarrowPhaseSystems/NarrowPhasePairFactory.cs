@@ -14,13 +14,13 @@ namespace BEPUphysics.NarrowPhaseSystems
         /// Manufactures and returns a narrow phase pair for the given overlap.
         ///</summary>
         ///<returns>Narrow phase pair.</returns>
-        public abstract INarrowPhasePair GetNarrowPhasePair();
+        public abstract NarrowPhasePair GetNarrowPhasePair();
 
         /// <summary>
         /// Returns a pair to the factory for re-use.
         /// </summary>
         /// <param name="pair">Pair to return.</param>
-        public abstract void GiveBack(INarrowPhasePair pair);
+        public abstract void GiveBack(NarrowPhasePair pair);
         /// <summary>
         /// Gets or sets the number of elements in the pair factory that are ready to take.
         /// If the factory runs out, it will construct new instances to give away (unless AllowOnDemandConstruction is set to false).
@@ -73,14 +73,14 @@ namespace BEPUphysics.NarrowPhaseSystems
     /// Manufactures a given type of narrow phase pairs.
     ///</summary>
     /// <typeparam name="T">Type of the pair to manufacture.</typeparam>
-    public class NarrowPhasePairFactory<T> : NarrowPhasePairFactory where T : class, INarrowPhasePair, new()
+    public class NarrowPhasePairFactory<T> : NarrowPhasePairFactory where T : NarrowPhasePair, new()
     {
         LockingResourcePool<T> pool = new LockingResourcePool<T>();
         /// <summary>
         /// Get a resource from the factory.
         /// </summary>
         /// <returns>A pair from the factory.</returns>
-        public override INarrowPhasePair GetNarrowPhasePair()
+        public override NarrowPhasePair GetNarrowPhasePair()
         {
             if (!allowOnDemandConstruction && pool.Count == 0)
                 throw new Exception("Cannot request additional resources from this factory; it is exhausted.  Consider specifying a greater number of initial resources or setting AllowOnDemandConstruction to true.");
@@ -92,7 +92,7 @@ namespace BEPUphysics.NarrowPhaseSystems
         /// Give a resource back to the factory.
         /// </summary>
         /// <param name="pair">Pair to return.</param>
-        public override void GiveBack(INarrowPhasePair pair)
+        public override void GiveBack(NarrowPhasePair pair)
         {
             pool.GiveBack((T)pair);
         }

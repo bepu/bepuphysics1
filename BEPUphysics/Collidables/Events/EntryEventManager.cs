@@ -180,7 +180,7 @@ namespace BEPUphysics.Collidables.Events
         }
 
 
-        public void OnPairCreated(BroadPhaseEntry other, INarrowPhasePair collisionPair)
+        public void OnPairCreated(BroadPhaseEntry other, NarrowPhasePair collisionPair)
         {
             if (InternalPairCreated != null)
                 eventStoragePairCreated.Enqueue(new EventStoragePairCreated(other, collisionPair));
@@ -200,7 +200,7 @@ namespace BEPUphysics.Collidables.Events
             }
         }
 
-        public void OnPairUpdated(BroadPhaseEntry other, INarrowPhasePair collisionPair)
+        public void OnPairUpdated(BroadPhaseEntry other, NarrowPhasePair collisionPair)
         {
             if (InternalPairUpdated != null)
                 eventStoragePairUpdated.Enqueue(new EventStoragePairUpdated(other, collisionPair));

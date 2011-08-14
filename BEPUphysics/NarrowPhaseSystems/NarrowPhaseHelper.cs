@@ -281,12 +281,12 @@ namespace BEPUphysics.NarrowPhaseSystems
         ///</summary>
         ///<param name="pair">Overlap to use to create the pair.</param>
         ///<returns>A INarrowPhasePair for the overlap.</returns>
-        public static INarrowPhasePair GetPair(ref BroadPhaseOverlap pair)
+        public static NarrowPhasePair GetPair(ref BroadPhaseOverlap pair)
         {
             NarrowPhasePairFactory factory;
             if (collisionManagers.TryGetValue(new TypePair(pair.entryA.GetType(), pair.entryB.GetType()), out factory))
             {
-                INarrowPhasePair toReturn = factory.GetNarrowPhasePair();
+                NarrowPhasePair toReturn = factory.GetNarrowPhasePair();
                 toReturn.BroadPhaseOverlap = pair;
                 toReturn.Factory = factory;
                 return toReturn;
@@ -296,7 +296,7 @@ namespace BEPUphysics.NarrowPhaseSystems
             var b = pair.entryB as ConvexCollidable;
             if (a != null && b != null)
             {
-                INarrowPhasePair toReturn = Factories.ConvexConvex.GetNarrowPhasePair();
+                NarrowPhasePair toReturn = Factories.ConvexConvex.GetNarrowPhasePair();
                 toReturn.BroadPhaseOverlap = pair;
                 toReturn.Factory = Factories.ConvexConvex;
                 return toReturn;
@@ -311,7 +311,7 @@ namespace BEPUphysics.NarrowPhaseSystems
         /// <param name="entryB">Second entry in the pair.</param>
         /// <param name="rule">Collision rule governing the pair.</param>
         ///<returns>A INarrowPhasePair for the overlap.</returns>
-        public static INarrowPhasePair GetPair(BroadPhaseEntry entryA, BroadPhaseEntry entryB, CollisionRule rule)
+        public static NarrowPhasePair GetPair(BroadPhaseEntry entryA, BroadPhaseEntry entryB, CollisionRule rule)
         {
             BroadPhaseOverlap overlap = new BroadPhaseOverlap(entryA, entryB, rule);
             return GetPair(ref overlap);
@@ -323,7 +323,7 @@ namespace BEPUphysics.NarrowPhaseSystems
         ///<param name="entryA">First entry in the pair.</param>
         /// <param name="entryB">Second entry in the pair.</param>
         ///<returns>A INarrowPhasePair for the overlap.</returns>
-        public static INarrowPhasePair GetPair(BroadPhaseEntry entryA, BroadPhaseEntry entryB)
+        public static NarrowPhasePair GetPair(BroadPhaseEntry entryA, BroadPhaseEntry entryB)
         {
             BroadPhaseOverlap overlap = new BroadPhaseOverlap(entryA, entryB);
             return GetPair(ref overlap);
@@ -365,7 +365,7 @@ namespace BEPUphysics.NarrowPhaseSystems
             bool toReturn = pairHandler.ContactCount > 0;
             pairHandler.SuppressEvents = false;
             pairHandler.CleanUp();
-            (pairHandler as INarrowPhasePair).Factory.GiveBack(pairHandler);
+            (pairHandler as NarrowPhasePair).Factory.GiveBack(pairHandler);
             return toReturn;
         }
     }

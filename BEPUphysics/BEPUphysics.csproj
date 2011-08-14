@@ -266,6 +266,7 @@
     <Compile Include="Entities\Prefabs\TransformableEntity.cs" />
     <Compile Include="Entities\Prefabs\Triangle.cs" />
     <Compile Include="Entities\Prefabs\WrappedBody.cs" />
+    <Compile Include="NarrowPhaseSystems\NarrowPhasePairConstraint.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\CompoundMobileMeshPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\ContactCollection.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\ContactInformation.cs" />
@@ -401,7 +402,7 @@
     <Compile Include="MathExtensions\Matrix3x3.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\Testing\MPRToolboxOld.cs" />
     <Compile Include="Collidables\Collidable.cs" />
-    <Compile Include="NarrowPhaseSystems\Pairs\INarrowPhasePair.cs" />
+    <Compile Include="NarrowPhaseSystems\Pairs\NarrowPhasePair.cs" />
     <Compile Include="NarrowPhaseSystems\NarrowPhase.cs" />
     <Compile Include="NarrowPhaseSystems\NarrowPhasePairFactory.cs" />
     <Compile Include="Paths\CardinalSpline3D.cs" />

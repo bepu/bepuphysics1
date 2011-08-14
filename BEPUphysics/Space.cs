@@ -217,6 +217,7 @@ namespace BEPUphysics
             BroadPhase = new DynamicHierarchy(ThreadManager);
             NarrowPhase = new NarrowPhase(TimeStepSettings, BroadPhase.Overlaps, ThreadManager);
             Solver = new Solver(TimeStepSettings, DeactivationManager, ThreadManager);
+            NarrowPhase.Solver = Solver;
             PositionUpdater = new ContinuousPositionUpdater(TimeStepSettings, ThreadManager);
             BufferedStates = new BufferedStatesManager(ThreadManager);
             DeferredEventDispatcher = new DeferredEventDispatcher();
@@ -490,7 +491,7 @@ namespace BEPUphysics
             BeforeNarrowPhaseUpdateables.Update();
             NarrowPhase.Update();
             BeforeSolverUpdateables.Update();
-            NarrowPhase.FlushGeneratedSolverUpdateables(Solver);
+            NarrowPhase.FlushGeneratedSolverUpdateables();
             Solver.Update();
             BeforePositionUpdateUpdateables.Update();
             PositionUpdater.Update();

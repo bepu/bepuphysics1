@@ -44,6 +44,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         public GroupPairHandler()
         {
             manifoldConstraintGroup = new ContactManifoldConstraintGroup();
+            constraint = new NarrowPhasePairConstraint(manifoldConstraintGroup);
         }
 
 
@@ -167,7 +168,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                 CollidablePairHandler toReturn = subPairs[pairsToRemove.Elements[i]];
                 subPairs.Remove(pairsToRemove.Elements[i]);
                 toReturn.CleanUp();
-                ((INarrowPhasePair)toReturn).Factory.GiveBack(toReturn);
+                ((NarrowPhasePair)toReturn).Factory.GiveBack(toReturn);
 
             }
             containedPairs.Clear();
@@ -277,7 +278,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                 if (Parent != null)
                     Parent.AddSolverUpdateable(manifoldConstraintGroup);
                 else if (NarrowPhase != null)
-                    NarrowPhase.EnqueueGeneratedSolverUpdateable(manifoldConstraintGroup);
+                    NarrowPhase.NotifyUpdateableAdded(this);
             }
 
         }
@@ -293,7 +294,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                 if (Parent != null)
                     Parent.RemoveSolverUpdateable(manifoldConstraintGroup);
                 else if (NarrowPhase != null)
-                    NarrowPhase.EnqueueRemovedSolverUpdateable(manifoldConstraintGroup);
+                    NarrowPhase.NotifyUpdateableRemoved(Constraint);
             }
 
 
