@@ -137,7 +137,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
         }
 
-        void RemoveFriction(EntityCollidable sender, BroadPhaseEntry other, INarrowPhasePair pair)
+        void RemoveFriction(EntityCollidable sender, BroadPhaseEntry other, NarrowPhasePair pair)
         {
             var collidablePair = pair as CollidablePairHandler;
             if (collidablePair != null)

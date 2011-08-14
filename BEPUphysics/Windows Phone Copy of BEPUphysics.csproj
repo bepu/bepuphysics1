@@ -201,6 +201,7 @@
     <Compile Include="ISpace.cs" />
     <Compile Include="ISpaceObject.cs" />
     <Compile Include="MultithreadedProcessingStage.cs" />
+    <Compile Include="NarrowPhaseSystems\NarrowPhasePairConstraint.cs" />
     <Compile Include="NarrowPhaseSystems\NarrowPhasePairFactory.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\CompoundGroupPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\CompoundMobileMeshPairHandler.cs" />
@@ -221,6 +222,7 @@
     <Compile Include="NarrowPhaseSystems\Pairs\MobileMeshStaticMeshPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\MobileMeshTerrainPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\MobileMeshTrianglePairHandler.cs" />
+    <Compile Include="NarrowPhaseSystems\Pairs\NarrowPhasePair.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\StandardPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\StaticMeshPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\StaticMeshSpherePairHandler.cs" />
@@ -401,7 +403,6 @@
     <Compile Include="MathExtensions\Matrix2x3.cs" />
     <Compile Include="MathExtensions\Matrix3x2.cs" />
     <Compile Include="MathExtensions\Matrix3x3.cs" />
-    <Compile Include="NarrowPhaseSystems\Pairs\INarrowPhasePair.cs" />
     <Compile Include="NarrowPhaseSystems\NarrowPhase.cs" />
     <Compile Include="Paths\CardinalSpline3D.cs" />
     <Compile Include="Paths\ConstantAngularSpeedCurve.cs" />

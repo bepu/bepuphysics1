@@ -135,14 +135,37 @@ namespace BEPUphysics.Constraints.Collision
         /// </summary>
         public override void UpdateSolverActivity()
         {
-            isActiveInSolver = isActive &&
-                               pair.BroadPhaseOverlap.collisionRule < CollisionRule.NoSolver &&
-                               ((entityA != null && entityA.activityInformation.IsActive) ||
-                               (entityB != null && entityB.activityInformation.IsActive));
-            for (int i = 0; i < solverUpdateables.count; i++)
+
+            //Thanks to the new flux updateable approach, there are strong guarantees about activity and state.
+            //This means, if this constraint is in the solver (and thus this method is being called),
+            //we already know one of the involved objects is active!
+            //So!
+            //New:
+            isActiveInSolver = isActive && pair.broadPhaseOverlap.collisionRule < CollisionRule.NoSolver;
+            if (isActiveInSolver)
             {
-                solverUpdateables.Elements[i].isActiveInSolver = solverUpdateables.Elements[i].isActive && isActiveInSolver;
+                int numberOfActiveChildren = 0;
+                for (int i = 0; i < solverUpdateables.count; i++)
+                {
+                    if (solverUpdateables.Elements[i].isActive)
+                    {
+                        solverUpdateables.Elements[i].isActiveInSolver = true;
+                        numberOfActiveChildren++;
+                    }
+                }
+                if (numberOfActiveChildren == 0)
+                    isActiveInSolver = false;
             }
+
+            //Old:
+            //isActiveInSolver = isActive &&
+            //                   pair.BroadPhaseOverlap.collisionRule < CollisionRule.NoSolver &&
+            //                   ((entityA != null && entityA.activityInformation.IsActive) ||
+            //                   (entityB != null && entityB.activityInformation.IsActive));
+            //for (int i = 0; i < solverUpdateables.count; i++)
+            //{
+            //    solverUpdateables.Elements[i].isActiveInSolver = solverUpdateables.Elements[i].isActive && isActiveInSolver;
+            //}
         }
 
         ///<summary>

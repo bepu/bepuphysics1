@@ -17,7 +17,7 @@ namespace BEPUphysics.Collidables.Events
         /// </summary>
         /// <param name="other">Other entry involved in the pair.</param>
         /// <param name="collisionPair">Narrow phase pair governing the two objects.</param>
-        void OnPairCreated(BroadPhaseEntry other, INarrowPhasePair collisionPair);
+        void OnPairCreated(BroadPhaseEntry other, NarrowPhasePair collisionPair);
 
         /// <summary>
         /// Fires the event manager's pair removal events.
@@ -31,6 +31,6 @@ namespace BEPUphysics.Collidables.Events
         /// </summary>
         /// <param name="other">Other entry involved in the pair.</param>
         /// <param name="collisionPair">Narrow phase pair governing the two objects.</param>
-        void OnPairUpdated(BroadPhaseEntry other, INarrowPhasePair collisionPair);
+        void OnPairUpdated(BroadPhaseEntry other, NarrowPhasePair collisionPair);
     }
 }

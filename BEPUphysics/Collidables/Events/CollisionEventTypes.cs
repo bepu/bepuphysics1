@@ -13,7 +13,7 @@ namespace BEPUphysics.Collidables.Events
     /// <param name="other">Other entry within the pair opposing the monitored entry.</param>
     /// <param name="pair">Pair presiding over the interaction of the two involved bodies.
     /// This reference cannot be safely kept outside of the scope of the handler; pairs can quickly return to the resource pool.</param>
-    public delegate void PairCreatedEventHandler<T>(T sender, BroadPhaseEntry other, INarrowPhasePair pair);
+    public delegate void PairCreatedEventHandler<T>(T sender, BroadPhaseEntry other, NarrowPhasePair pair);
 
     /// <summary>
     /// Handles any special logic when two objects' bounding boxes overlap as determined by the broadphase system.
@@ -24,7 +24,7 @@ namespace BEPUphysics.Collidables.Events
     /// <param name="other">Other entry within the pair opposing the monitored entry.</param>
     /// <param name="pair">Pair presiding over the interaction of the two involved bodies.
     /// This reference cannot be safely kept outside of the scope of the handler; pairs can quickly return to the resource pool.</param>
-    public delegate void CreatingPairEventHandler<T>(T sender, BroadPhaseEntry other, INarrowPhasePair pair);
+    public delegate void CreatingPairEventHandler<T>(T sender, BroadPhaseEntry other, NarrowPhasePair pair);
 
     /// <summary>
     /// Handles any special logic when two objects' bounding boxes cease to overlap as determined by the broadphase system.
@@ -134,7 +134,7 @@ namespace BEPUphysics.Collidables.Events
     /// <param name="sender">Entry involved in the pair monitored for events.</param>
     /// <param name="other">Other entry within the pair opposing the monitored entry.</param>
     /// <param name="pair">Pair that was updated.</param>
-    public delegate void PairUpdatedEventHandler<T>(T sender, BroadPhaseEntry other, INarrowPhasePair pair);
+    public delegate void PairUpdatedEventHandler<T>(T sender, BroadPhaseEntry other, NarrowPhasePair pair);
 
     /// <summary>
     /// Handles any special logic to perform at the end of a pair's UpdateContactManifold method.
@@ -145,7 +145,7 @@ namespace BEPUphysics.Collidables.Events
     /// <param name="sender">Entry involved in the pair monitored for events.</param>
     /// <param name="other">Other entry within the pair opposing the monitored entry.</param>
     /// <param name="pair">Pair that was updated.</param>
-    public delegate void PairUpdatingEventHandler<T>(T sender, BroadPhaseEntry other, INarrowPhasePair pair);
+    public delegate void PairUpdatingEventHandler<T>(T sender, BroadPhaseEntry other, NarrowPhasePair pair);
 
     /// <summary>
     /// Handles any special logic to perform at the end of a pair's UpdateContactManifold method if the two objects are colliding.
@@ -170,10 +170,10 @@ namespace BEPUphysics.Collidables.Events
     //Storage for deferred event dispatching
     internal struct EventStoragePairCreated
     {
-        internal INarrowPhasePair pair;
+        internal NarrowPhasePair pair;
         internal BroadPhaseEntry other;
 
-        internal EventStoragePairCreated(BroadPhaseEntry other, INarrowPhasePair pair)
+        internal EventStoragePairCreated(BroadPhaseEntry other, NarrowPhasePair pair)
         {
             this.other = other;
             this.pair = pair;
@@ -245,10 +245,10 @@ namespace BEPUphysics.Collidables.Events
 
     internal struct EventStoragePairUpdated
     {
-        internal INarrowPhasePair pair;
+        internal NarrowPhasePair pair;
         internal BroadPhaseEntry other;
 
-        internal EventStoragePairUpdated(BroadPhaseEntry other, INarrowPhasePair pair)
+        internal EventStoragePairUpdated(BroadPhaseEntry other, NarrowPhasePair pair)
         {
             this.other = other;
             this.pair = pair;

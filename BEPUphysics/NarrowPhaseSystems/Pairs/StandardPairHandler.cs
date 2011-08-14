@@ -38,9 +38,10 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         ///</summary>
         protected StandardPairHandler()
         {
-            //Child type constructors construct manifold first.
+            //Child type constructors construct manifold and constraint first.
             ContactManifold.ContactAdded += OnContactAdded;
             ContactManifold.ContactRemoved += OnContactRemoved;
+            constraint = new NarrowPhasePairConstraint(ContactConstraint);
         }
 
         protected override void OnContactAdded(Contact contact)
@@ -115,7 +116,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                 if (Parent != null)
                     Parent.RemoveSolverUpdateable(ContactConstraint);
                 else if (NarrowPhase != null)
-                    NarrowPhase.EnqueueRemovedSolverUpdateable(ContactConstraint);
+                    NarrowPhase.NotifyUpdateableRemoved(Constraint);
             }
             else
             {
@@ -174,7 +175,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                     if (Parent != null)
                         Parent.AddSolverUpdateable(ContactConstraint);
                     else if (NarrowPhase != null)
-                        NarrowPhase.EnqueueGeneratedSolverUpdateable(ContactConstraint);
+                        NarrowPhase.NotifyUpdateableAdded(this);
 
                     //And notify the pair members.
                     if (!suppressEvents)
@@ -192,7 +193,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                 if (Parent != null)
                     Parent.RemoveSolverUpdateable(ContactConstraint);
                 else if (NarrowPhase != null)
-                    NarrowPhase.EnqueueRemovedSolverUpdateable(ContactConstraint);
+                    NarrowPhase.NotifyUpdateableRemoved(Constraint);
 
                 if (!suppressEvents)
                 {
@@ -226,7 +227,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                 if (Parent != null)
                     Parent.RemoveSolverUpdateable(ContactConstraint);
                 else if (NarrowPhase != null)
-                    NarrowPhase.EnqueueRemovedSolverUpdateable(ContactConstraint);
+                    NarrowPhase.NotifyUpdateableRemoved(Constraint);
 
                 if (!suppressEvents)
                 {

@@ -323,8 +323,9 @@ namespace BEPUphysics.DeactivationManagement
         /// Removes a simulation island connection from the manager.
         ///</summary>
         ///<param name="connection">Connection to remove from the manager.</param>
+        ///<returns>Whether or not a split process was attempted for the connection.</returns>
         ///<exception cref="ArgumentException">Thrown if the connection does not belong to this manager.</exception>
-        public void Remove(ISimulationIslandConnection connection)
+        public bool Remove(ISimulationIslandConnection connection)
         {
             if (connection.DeactivationManager == this)
             {
@@ -335,13 +336,15 @@ namespace BEPUphysics.DeactivationManagement
 
                 //For two members which have the same simulation island (they will initially), try to split.
                 connection.RemoveReferencesFromConnectedMembers();
+                bool splitSuccessful = false;
                 for (int i = 0; i < connection.ConnectedMembers.Count; i++)
                 {
                     for (int j = i + 1; j < connection.ConnectedMembers.Count; j++)
                     {
-                        TryToSplit(connection.ConnectedMembers[i], connection.ConnectedMembers[j]);
+                        splitSuccessful |= TryToSplit(connection.ConnectedMembers[i], connection.ConnectedMembers[j]);
                     }
                 }
+                return splitSuccessful;
             }
             else
             {
@@ -353,8 +356,14 @@ namespace BEPUphysics.DeactivationManagement
         }
 
 
-
-        private void TryToSplit(SimulationIslandMember member1, SimulationIslandMember member2)
+        /// <summary>
+        /// Tries to split connections between the two island members.
+        /// </summary>
+        /// <param name="member1">First island member.</param>
+        /// <param name="member2">Second island member.</param>
+        /// <returns>Whether a split operation was run.  This does not mean a split was
+        /// successful, just that the expensive test was performed.</returns>
+        private bool TryToSplit(SimulationIslandMember member1, SimulationIslandMember member2)
         {
             //Can't split if they aren't even in the same island.
             //This also covers the case where the connection involves a kinematic entity that has no 
@@ -362,7 +371,8 @@ namespace BEPUphysics.DeactivationManagement
             if (member1.SimulationIsland != member2.SimulationIsland ||
                 member1.SimulationIsland == null ||
                 member2.SimulationIsland == null)
-                return;
+                return false;
+
 
             //By now, we know the members belong to the same island and are not null.
             //Start a BFS starting from each member.
@@ -485,7 +495,7 @@ namespace BEPUphysics.DeactivationManagement
             }
             searchedMembers1.Clear();
             searchedMembers2.Clear();
-
+            return true;
 
         }
 

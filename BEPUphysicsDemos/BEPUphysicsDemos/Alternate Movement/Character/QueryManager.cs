@@ -224,11 +224,11 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                         }
                     }
                     //TODO: It would be nice if this was a bit easier.
-                    //Having to remember to clean up AND give it back is a bit weird, especially with the casting and property-diving.
+                    //Having to remember to clean up AND give it back is a bit weird, especially with the property-diving.
                     //No one would ever just guess this correctly.
                     //At least hide it behind a NarrowPhaseHelper function.
                     pairHandler.CleanUp();
-                    (pairHandler as INarrowPhasePair).Factory.GiveBack(pairHandler);
+                    pairHandler.Factory.GiveBack(pairHandler);
                 }
             }
 
