@@ -8,6 +8,7 @@ using BEPUphysics.Threading;
 using BEPUphysics.CollisionRuleManagement;
 using System.Collections.ObjectModel;
 using BEPUphysics.DataStructures;
+using System.Diagnostics;
 
 namespace BEPUphysics.NarrowPhaseSystems
 {
@@ -167,7 +168,6 @@ namespace BEPUphysics.NarrowPhaseSystems
                     if (narrowPhaseObject.BroadPhaseOverlap.collisionRule < CollisionRule.NoNarrowPhaseUpdate)
                     {
                         narrowPhaseObject.UpdateCollision(TimeStepSettings.TimeStepDuration);
-                        TryToAddFluxConstraint(narrowPhaseObject);
                     }
                     narrowPhaseObject.NeedsUpdate = false;
                 }
@@ -180,9 +180,6 @@ namespace BEPUphysics.NarrowPhaseSystems
 
         protected override void UpdateMultithreaded()
         {
-            if (Solver != null)
-                Solver.FluxUpdateables.Clear();
-
             ThreadManager.ForLoop(0, broadPhaseOverlaps.Count, updateBroadPhaseOverlapDelegate);
 
             //Remove stale objects.
@@ -210,8 +207,6 @@ namespace BEPUphysics.NarrowPhaseSystems
 
         protected override void UpdateSingleThreaded()
         {
-            if (Solver != null)
-                Solver.FluxUpdateables.Clear();
 
             int count = broadPhaseOverlaps.Count;
             for (int i = 0; i < count; i++)
@@ -232,10 +227,26 @@ namespace BEPUphysics.NarrowPhaseSystems
         }
 
         int staleLoopIndex;
-        static float MaximumTraversedPairs = .1f;
-        static float MaximumAttemptedSplits = .02f;
-        int maximumAttemptedSplits;
-        int maximumTraversedPairs;
+        static float maximumTraversedPairs = .1f;
+        /// <summary>
+        /// Gets or sets the fraction of all narrow phase pairs traversed by the "remove stale pairs" loop.
+        /// A fraction closer to 1 clears out more pairs, but takes more time.
+        /// Defaults to .1f.
+        /// </summary>
+        public static float MaximumTraversedPairsFraction
+        {
+            get
+            {
+                return maximumTraversedPairs;
+            }
+            set
+            {
+                if (value < 0 || value > 1)
+                    throw new Exception("Value must be from zero to one.");
+                maximumTraversedPairs = value;
+            }
+        }
+        int maxTraversedPairs;
 
         void RemoveStaleOverlaps()
         {
@@ -249,49 +260,27 @@ namespace BEPUphysics.NarrowPhaseSystems
             //Additionally, in highly chaotic situations where collisions are constantly being created/destroyed, spreading out the computations
             //smooths the work out a bit.
 
-            maximumAttemptedSplits = Math.Max(1, (int)(narrowPhasePairs.count * MaximumAttemptedSplits));
-            maximumTraversedPairs = Math.Max(1, (int)(narrowPhasePairs.count * MaximumTraversedPairs));
+            maxTraversedPairs = Math.Max(1, (int)(narrowPhasePairs.count * maximumTraversedPairs));
 
-            int attemptedSplits = 0;
             int traversedPairs = 0;
-            while (attemptedSplits < maximumAttemptedSplits && traversedPairs < maximumTraversedPairs && narrowPhasePairs.count > 0)
+            while (traversedPairs++ < maxTraversedPairs && narrowPhasePairs.count > 0)
             {
                 if (--staleLoopIndex < 0 || staleLoopIndex >= narrowPhasePairs.count)
                     staleLoopIndex = narrowPhasePairs.count - 1; //Rather adding back upwards, just restart at the top.  The length can change.
 
                 var pair = narrowPhasePairs.Elements[staleLoopIndex];
-                //Overlap will not be refreshed if entries are inactive, but shouldn't remove narrow phase pair.
-                if (pair.BroadPhaseOverlap.entryA.IsActive || pair.BroadPhaseOverlap.entryB.IsActive)
+                if (pair.NeedsUpdate &&
+                    //Overlap will not be refreshed if entries are inactive, but shouldn't remove narrow phase pair.
+                    (pair.BroadPhaseOverlap.entryA.IsActive || pair.BroadPhaseOverlap.entryB.IsActive))
                 {
-                    if (pair.NeedsUpdate)
-                    {
-                        //The pair is stale!
-                        narrowPhasePairs.FastRemoveAt(staleLoopIndex);
-                        //Is the constraint is in the solver, we have to get rid of it.
-                        //TODO: This may simplify some things in the cleanup of pairs.  They didn't previously have guarantees
-                        //that it was not in the solver.
-                        if (pair.constraint.SolverUpdateable.solver != null)
-                        {
-                            if (pair.constraint.SolverUpdateable.solver.FluxRemove(pair.constraint.SolverUpdateable))
-                                attemptedSplits++;
-                        }
-                        OnRemovePair(pair);
-                    }
-                    else
-                    {
-                        //The pair isn't stale... but is the constraint?
-                        //Check to make sure it hasn't already been removed before attempting to remove it.
-                        if (pair.constraint.ShouldRemove && pair.constraint.SolverUpdateable.solver != null)
-                        {
-                            if (pair.constraint.SolverUpdateable.solver.FluxRemove(pair.constraint.SolverUpdateable))
-                                attemptedSplits++;
-                        }
-                    }
+                    narrowPhasePairs.FastRemoveAt(staleLoopIndex);
+                    OnRemovePair(pair);
                 }
-                traversedPairs++;
-                pair.NeedsUpdate = true;
+                else
+                    pair.NeedsUpdate = true;
 
             }
+
 
             //for (int i = narrowPhasePairs.count - 1; i >= 0; i--)
             //{
@@ -371,34 +360,27 @@ namespace BEPUphysics.NarrowPhaseSystems
         ///</summary>
         public event Action<NarrowPhasePair> RemovingPair;
 
-        ConcurrentDeque<SolverUpdateable> newSolverUpdateables = new ConcurrentDeque<SolverUpdateable>();
+        ConcurrentDeque<SolverUpdateableChange> solverUpdateableChanges = new ConcurrentDeque<SolverUpdateableChange>();
         ///<summary>
         /// Enqueues a solver updateable created by some pair for flushing into the solver later.
         ///</summary>
-        ///<param name="pair">Pair owning the updateable..</param>
-        public void NotifyUpdateableAdded(NarrowPhasePair pair)
+        ///<param name="addedItem">Updateable to add.</param>
+        public void NotifyUpdateableAdded(SolverUpdateable addedItem)
         {
-            var addedItem = pair.constraint;
-            //Only enqueue the constraint for addition if it isn't already added.
-            if (addedItem.SolverUpdateable.solver == null && Solver != null)
-                newSolverUpdateables.Enqueue(addedItem.SolverUpdateable);
-            //The updateable was added, so ensure that nothing tries to remove it!
-            addedItem.ShouldRemove = false;
-            //This does not add the added item to the flux updateables list.
-            //That would needlessly lock- we already synchronized to enqueue to the 
-            //new solver updateables, that's good enough.  The flux updateable will be
-            //added during the flush.
+            solverUpdateableChanges.Enqueue(new SolverUpdateableChange(true, addedItem));
+            //pair.constraint.SolverUpdateable.IsActive = true;
         }
         ///<summary>
         /// Enqueues a solver updateable removed by some pair for flushing into the solver later.
         ///</summary>
-        ///<param name="removedItem">Solver updateable to add.</param>
-        public void NotifyUpdateableRemoved(NarrowPhasePairConstraint removedItem)
+        ///<param name="removedItem">Solver updateable to remove.</param>
+        public void NotifyUpdateableRemoved(SolverUpdateable removedItem)
         {
-            //Next time the narrow phase gets around to it, remove this object.
-            //It may get added back in between now and then.  If it does, then ShouldRemove will be set to false, preventing it from being removed.
-            removedItem.ShouldRemove = true;
+            //removedItem.SolverUpdateable.IsActive = false;
+            solverUpdateableChanges.Enqueue(new SolverUpdateableChange(false, removedItem));
         }
+
+        //Dictionary<SolverUpdateable, bool> testRemoves = new Dictionary<SolverUpdateable, bool>();
 
         /// <summary>
         /// Flushes the new solver updateables into the solver.
@@ -406,38 +388,56 @@ namespace BEPUphysics.NarrowPhaseSystems
         /// </summary>
         public void FlushGeneratedSolverUpdateables()
         {
+            //testRemoves.Clear();
+
             //This method is only called when the constraint was not previously in the solver.
             //Further, the adder will also ensure that the new constraint's ShouldRemove was set to 
             //FALSE before it gets here.
             //So all this method has to do is flux add the new constraints.
             //Why do it here instead of in the main update?  Because this must be done sequentially; it modifies simulation islands.
-            SolverUpdateable newConstraint;
-            while (newSolverUpdateables.TryUnsafeDequeueFirst(out newConstraint))
+            SolverUpdateableChange change;
+            while (solverUpdateableChanges.TryUnsafeDequeueFirst(out change))
             {
-                //It is technically possible for a constraint to be added twice, if certain systems interfere.
-                //The character controller is one such system.
-                //We have to check the new constraint's solver status before adding it here.
-                if (newConstraint.solver == null)
+                if (change.ShouldAdd)
                 {
-                    Solver.FluxAdd(newConstraint);
-                    //Have to add it to the flux updateables list too;
-                    //the main update method only adds to the flux updateables list
-                    //if the pair was already in the solver.  This avoids locking, too!
-                    Solver.FluxUpdateables.Add(newConstraint);
+                    //It is technically possible for a constraint to be added twice, if certain systems interfere.
+                    //The character controller is one such system.
+                    //We should check the new constraint's solver status before adding it here.
+                    if (change.Item.solver == null)
+                    {
+                        //bool value;
+                        //if (testRemoves.TryGetValue(change.Item, out value))
+                        //{
+                        //    if (!value)
+                        //    {
+                        //        //Already attempted a split for this pair previously.  There's a good chance
+                        //        //that the pair is stuck in a forever split manner!
+                        //        Debug.WriteLine("INVALID ORDER!");
+                        //    }
+                        //}
+                        //else
+                        //    testRemoves.Add(change.Item, true);
+                        Solver.Add(change.Item);
+                    }
                 }
-                //Note: we guaranteed the solver wasn't null before enqueuing.
+                else
+                {
+                    if (change.Item.solver != null)
+                    {
+                        //if (!testRemoves.ContainsKey(change.Item))
+                        //{
+                        //    testRemoves.Add(change.Item, false);
+                        //}
+                        Solver.Remove(change.Item);
+                    }
+                }
             }
-        }
 
-        private SpinLock fluxLocker = new SpinLock();
-        private void TryToAddFluxConstraint(NarrowPhasePair pair)
-        {
-            if (Solver != null && pair.constraint.SolverUpdateable.solver != null)// && pair.BroadPhaseOverlap.collisionRule < CollisionRule.NoSolver)
-            {
-                fluxLocker.Enter();
-                Solver.FluxUpdateables.Add(pair.constraint.SolverUpdateable);
-                fluxLocker.Exit();
-            }
+            //foreach (var pair in narrowPhasePairs)
+            //{
+            //    if (pair.constraint.SolverUpdateable.solver != null && (pair as CollidablePairHandler).ContactCount == 0)
+            //        Debug.WriteLine("break.");
+            //}
         }
 
 

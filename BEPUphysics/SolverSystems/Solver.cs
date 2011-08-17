@@ -89,8 +89,9 @@ namespace BEPUphysics.SolverSystems
             if (item.Solver == null)
             {
                 item.Solver = this;
+                item.solverIndex = solverUpdateables.count;
                 solverUpdateables.Add(item);
-                DeactivationManager.Add(item);
+                DeactivationManager.Add(item.simulationIslandConnection);
                 item.OnAdditionToSolver(this);
             }
             else
@@ -106,85 +107,29 @@ namespace BEPUphysics.SolverSystems
             if (item.Solver == this)
             {
                 item.Solver = null;
-                solverUpdateables.FastRemove(item);
-                DeactivationManager.Remove(item);
+                solverUpdateables.count--;
+                if (item.solverIndex < solverUpdateables.count)
+                {
+                    //The solver updateable isn't the last element, so put the last element in its place.
+                    solverUpdateables.Elements[item.solverIndex] = solverUpdateables.Elements[solverUpdateables.count];
+                    //Update the replacement's solver index to its new location.
+                    solverUpdateables.Elements[item.solverIndex].solverIndex = item.solverIndex;
+                }
+                solverUpdateables.Elements[solverUpdateables.count] = null;
+                DeactivationManager.Remove(item.simulationIslandConnection);
                 item.OnRemovalFromSolver(this);
             }
             else
                 throw new ArgumentException("Solver updateable doesn't belong to this solver; it can't be removed.", "item");
         }
 
-        ///<summary>
-        /// Adds a solver updateable to the solver.
-        /// "Flux" addition means that the solver updateable being added will be contained in the flux list if active,
-        /// and so should not be added to the main updateables list.
-        ///</summary>
-        ///<param name="item">Updateable to add.</param>
-        ///<exception cref="ArgumentException">Thrown when the item already belongs to a solver.</exception>
-        public void FluxAdd(SolverUpdateable item)
-        {
-            if (item.Solver == null)
-            {
-                item.Solver = this;
-                DeactivationManager.Add(item);
-                item.OnAdditionToSolver(this);
-            }
-            else
-                throw new ArgumentException("Solver updateable already belongs to something; it can't be added.", "item");
-        }
-        ///<summary>
-        /// Removes a solver updateable from the solver.
-        /// "Flux" removal means that the solver updateable being removed will be contained in the flux list if active,
-        /// and so should not be removed from the main updateables list (it would not be present).
-        ///</summary>
-        ///<param name="item">Updateable to remove.</param>
-        ///<returns>Whether or not a split occurred during the removal process.</returns>
-        ///<exception cref="ArgumentException">Thrown when the item does not belong to the solver.</exception>
-        public bool FluxRemove(SolverUpdateable item)
-        {
-            if (item.Solver == this)
-            {
-                item.Solver = null;
-                bool split = DeactivationManager.Remove(item);
-                item.OnRemovalFromSolver(this);
-                return split;
-            }
-            else
-                throw new ArgumentException("Solver updateable doesn't belong to this solver; it can't be removed.", "item");
-        }
 
-        RawList<SolverUpdateable> fluxUpdateables = new RawList<SolverUpdateable>();
-        /// <summary>
-        /// Gets or sets the list of 'flux' updateables.  Flux updateables are those with sufficiently short life spans such that
-        /// adding them to and removing them from the primary updateables list would be expensive.  Instead, a list of flux updateables
-        /// is recreated each frame and updated alongside the normal updateables.
-        /// </summary>
-        public RawList<SolverUpdateable> FluxUpdateables
-        {
-            get
-            {
-                return fluxUpdateables;
-            }
-            set
-            {
-                fluxUpdateables = value;
-            }
-        }
 
-        /// <summary>
-        /// Gets the updateable at the given index.
-        /// </summary>
-        /// <param name="i">Index to use.</param>
-        /// <returns>Solver updateable at the index.</returns>
-        SolverUpdateable GetUpdateable(long i)
-        {
-            return i >= fluxUpdateables.count ? solverUpdateables.Elements[i - fluxUpdateables.count] : fluxUpdateables.Elements[i];
-        }
 
         Action<int> multithreadedPrestepDelegate;
         void MultithreadedPrestep(int i)
         {
-            var updateable = GetUpdateable(i);
+            var updateable = solverUpdateables.Elements[i];
             updateable.UpdateSolverActivity();
             if (updateable.isActiveInSolver)
             {
@@ -260,7 +205,7 @@ namespace BEPUphysics.SolverSystems
             //'i' is currently an index into an implicit array of solver updateables that goes from 0 to solverUpdateables.count * iterationLimit.
             //It includes iterationLimit copies of each updateable.
             //Permute the entire set with duplicates.
-            var updateable = GetUpdateable((i * prime) % totalUpdateableCount);
+            var updateable = solverUpdateables.Elements[(i * prime) % solverUpdateables.count];
 
 
             SolverSettings solverSettings = updateable.solverSettings;
@@ -302,29 +247,27 @@ namespace BEPUphysics.SolverSystems
 
         }
 
-        int totalUpdateableCount;
         protected override void UpdateMultithreaded()
         {
-            totalUpdateableCount = fluxUpdateables.count + solverUpdateables.count;
-            ThreadManager.ForLoop(0, totalUpdateableCount, multithreadedPrestepDelegate);
+            ThreadManager.ForLoop(0, solverUpdateables.count, multithreadedPrestepDelegate);
             ComputeIterationCoefficient();
-            ThreadManager.ForLoop(0, iterationLimit * totalUpdateableCount, multithreadedIterationDelegate);
+            ThreadManager.ForLoop(0, iterationLimit * solverUpdateables.count, multithreadedIterationDelegate);
         }
 
         protected override void UpdateSingleThreaded()
         {
 
-            totalUpdateableCount = fluxUpdateables.count + solverUpdateables.count;
+            int totalUpdateableCount = solverUpdateables.count;
             for (int i = 0; i < totalUpdateableCount; i++)
             {
-                UnsafePrestep(GetUpdateable(i));
+                UnsafePrestep(solverUpdateables.Elements[i]);
             }
 
             int totalCount = iterationLimit * totalUpdateableCount;
             ComputeIterationCoefficient();
             for (int i = 0; i < totalCount; i++)
             {
-                UnsafeSolveIteration(GetUpdateable((i * prime) % totalUpdateableCount));
+                UnsafeSolveIteration(solverUpdateables.Elements[(i * prime) % totalUpdateableCount]);
             }
 
 

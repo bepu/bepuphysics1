@@ -210,8 +210,10 @@
     <Compile Include="DataStructures\TreeOverlapPair.cs" />
     <Compile Include="DeactivationManagement\DeactivationManager.cs" />
     <Compile Include="DeactivationManagement\ISimulationIslandConnection.cs" />
+    <Compile Include="DeactivationManagement\ISimulationIslandConnectionOwner.cs" />
     <Compile Include="DeactivationManagement\ISimulationIslandMemberOwner.cs" />
     <Compile Include="DeactivationManagement\SimulationIsland.cs" />
+    <Compile Include="DeactivationManagement\SimulationIslandConnection.cs" />
     <Compile Include="DeactivationManagement\SimulationIslandMember.cs" />
     <None Include="DeactivationManagement\Testing\DeactivationManager.cs" />
     <None Include="DeactivationManagement\Testing\ISimulationIslandConnection.cs" />
@@ -245,7 +247,6 @@
     <Compile Include="MathExtensions\AffineTransform.cs" />
     <Compile Include="MultithreadedProcessingStage.cs" />
     <Compile Include="NarrowPhaseSystems\NarrowPhaseHelper.cs" />
-    <Compile Include="NarrowPhaseSystems\NarrowPhasePairConstraint.cs" />
     <Compile Include="NarrowPhaseSystems\NarrowPhasePairFactory.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\CollidablePairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\CompoundConvexPairHandler.cs" />

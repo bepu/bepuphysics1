@@ -6,6 +6,7 @@ using BEPUphysics.Entities;
 using Microsoft.Xna.Framework;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.DataStructures;
+using BEPUphysics.DeactivationManagement;
 
 namespace BEPUphysics.ResourceManagement
 {
@@ -32,6 +33,7 @@ namespace BEPUphysics.ResourceManagement
             SubPoolTriangleShape = new LockingResourcePool<TriangleShape>();
             SubPoolTriangleCollidables = new LockingResourcePool<TriangleCollidable>();
             SubPoolTriangleIndicesList = new LockingResourcePool<RawList<BEPUphysics.CollisionTests.Manifolds.TriangleMeshConvexContactManifold.TriangleIndices>>();
+            SimulationIslandConnections = new LockingResourcePool<SimulationIslandConnection>();
         }
 
         //#if WINDOWS
@@ -147,6 +149,7 @@ namespace BEPUphysics.ResourceManagement
         static ResourcePool<RawList<CompoundChild>> SubPoolCompoundChildList;//= new LockingResourcePool<RawList<CompoundChild>>();
         static ResourcePool<TriangleCollidable> SubPoolTriangleCollidables;
         static ResourcePool<RawList<BEPUphysics.CollisionTests.Manifolds.TriangleMeshConvexContactManifold.TriangleIndices>> SubPoolTriangleIndicesList;
+        static ResourcePool<SimulationIslandConnection> SimulationIslandConnections;
         //#endif
         /// <summary>
         /// Retrieves a ray cast result list from the resource pool.
@@ -391,6 +394,25 @@ namespace BEPUphysics.ResourceManagement
         {
             triangleIndices.Clear();
             SubPoolTriangleIndicesList.GiveBack(triangleIndices);
+        }
+        
+        /// <summary>
+        /// Retrieves a simulation island connection from the resource pool.
+        /// </summary>
+        /// <returns>Uninitialized simulation island connection.</returns>
+        public static SimulationIslandConnection GetSimulationIslandConnection()
+        {
+            return SimulationIslandConnections.Take();
+        }
+
+        /// <summary>
+        /// Returns a resource to the pool.
+        /// </summary>
+        /// <param name="connection">Connection to return.</param>
+        public static void GiveBack(SimulationIslandConnection connection)
+        {
+            connection.CleanUp();
+            SimulationIslandConnections.GiveBack(connection);
         }
     }
 }

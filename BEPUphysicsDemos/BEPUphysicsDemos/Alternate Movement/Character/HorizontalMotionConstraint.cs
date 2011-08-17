@@ -280,7 +280,6 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 if (support != null)
                 {
                     supportEntity = support.Entity;
-
                 }
                 else
                 {

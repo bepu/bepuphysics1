@@ -36,7 +36,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         /// Gets the manager responsible for finding places for the character to step up and down to.
         /// </summary>
         public StepManager StepManager { get; private set; }
-        
+
         /// <summary>
         /// Gets the manager responsible for crouching, standing, and the verification involved in changing states.
         /// </summary>
@@ -57,7 +57,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         /// Gets the constraint used by the character to stay glued to surfaces it stands on.
         /// </summary>
         public VerticalMotionConstraint VerticalMotionConstraint { get; private set; }
-        
+
         private float jumpSpeed = 4.5f;
         public float JumpSpeed
         {
@@ -239,6 +239,10 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     float velocityChange = Math.Max(jumpSpeed - currentUpVelocity, 0);
                     ApplyJumpVelocity(ref supportData, Body.OrientationMatrix.Up * velocityChange, ref relativeVelocity);
 
+
+                    //Prevent any old contacts from hanging around and coming back with a negative depth.
+                    foreach (var pair in Body.CollisionInformation.Pairs)
+                        pair.ClearContacts();
                     SupportFinder.ClearSupportData();
                     supportData = new SupportData();
                 }
@@ -250,6 +254,9 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     float velocityChange = Math.Max(slidingJumpSpeed - currentNormalVelocity, 0);
                     ApplyJumpVelocity(ref supportData, supportData.Normal * -velocityChange, ref relativeVelocity);
 
+                    //Prevent any old contacts from hanging around and coming back with a negative depth.
+                    foreach (var pair in Body.CollisionInformation.Pairs)
+                        pair.ClearContacts();
                     SupportFinder.ClearSupportData();
                     supportData = new SupportData();
                 }

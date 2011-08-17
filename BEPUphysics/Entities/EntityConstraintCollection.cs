@@ -10,14 +10,14 @@ namespace BEPUphysics.Entities
     ///</summary>
     public class EntityConstraintCollection : IEnumerable<TwoEntityConstraint>
     {
-        private RawList<ISimulationIslandConnection> connections;
+        private RawList<SimulationIslandConnection> connections;
 
 
         /// <summary>
         /// Constructs a new constraint collection.
         /// </summary>
         /// <param name="connections">Solver updateables to enumerate over.</param>
-        public EntityConstraintCollection(RawList<ISimulationIslandConnection> connections)
+        public EntityConstraintCollection(RawList<SimulationIslandConnection> connections)
         {
             this.connections = connections;
         }
@@ -46,7 +46,7 @@ namespace BEPUphysics.Entities
         ///</summary>
         public struct Enumerator : IEnumerator<TwoEntityConstraint>
         {
-            private RawList<ISimulationIslandConnection> connections;
+            private RawList<SimulationIslandConnection> connections;
             private int index;
             private TwoEntityConstraint current;
 
@@ -54,7 +54,7 @@ namespace BEPUphysics.Entities
             /// Constructs an enumerator for the solver updateables list.
             /// </summary>
             /// <param name="connections">List of solver updateables to enumerate.</param>
-            public Enumerator(RawList<ISimulationIslandConnection> connections)
+            public Enumerator(RawList<SimulationIslandConnection> connections)
             {
                 this.connections = connections;
                 index = -1;
@@ -96,9 +96,12 @@ namespace BEPUphysics.Entities
             {
                 while (++index < connections.Count)
                 {
-                    current = connections[index] as TwoEntityConstraint;
-                    if (current != null)
-                        return true;
+                    if (!connections.Elements[index].SlatedForRemoval)
+                    {
+                        current = connections.Elements[index].Owner as TwoEntityConstraint;
+                        if (current != null)
+                            return true;
+                    }
                 }
                 return false;
             }

@@ -3,14 +3,16 @@ using BEPUphysics.Constraints;
 using System.Collections.ObjectModel;
 using BEPUphysics.DeactivationManagement;
 using BEPUphysics.DataStructures;
+using BEPUphysics.ResourceManagement;
 
 namespace BEPUphysics.SolverSystems
 {
     ///<summary>
     /// Superclass of all objects that live in the solver.
     ///</summary>
-    public abstract class SolverUpdateable : ISimulationIslandConnection, ISpaceObject
+    public abstract class SolverUpdateable : ISimulationIslandConnectionOwner, ISpaceObject
     {
+        internal int solverIndex;
 
         protected internal Solver solver;
         ///<summary>
@@ -26,6 +28,14 @@ namespace BEPUphysics.SolverSystems
             {
                 solver = value;
             }
+        }
+
+        protected SolverUpdateable()
+        {
+            //Initialize the connection.
+            //It will usually be overridden and end up floating on back to the resource pool.
+            simulationIslandConnection = Resources.GetSimulationIslandConnection();
+            simulationIslandConnection.Owner = this;
         }
 
         ///<summary>
@@ -114,9 +124,9 @@ namespace BEPUphysics.SolverSystems
             {
                 //This is a simulation island connection.  We already know that all connected objects share the
                 //same simulation island (or don't have one, in the case of kinematics).  All we have to do is test to see if that island is active!
-                for (int i = 0; i < connectedMembers.count; i++)
+                for (int i = 0; i < simulationIslandConnection.members.count; i++)
                 {
-                    var island = connectedMembers.Elements[i].SimulationIsland;
+                    var island = simulationIslandConnection.members.Elements[i].SimulationIsland;
                     if (island != null && island.isActive)
                     {
                         isActiveInSolver = true;
@@ -179,29 +189,14 @@ namespace BEPUphysics.SolverSystems
         public object Tag { get; set; }
 
 
-        //Connected members are handled slightly differently from involved entities.
-        protected internal RawList<SimulationIslandMember> connectedMembers = new RawList<SimulationIslandMember>(2);
-        ReadOnlyList<SimulationIslandMember> ISimulationIslandConnection.ConnectedMembers { get { return new ReadOnlyList<SimulationIslandMember>(connectedMembers); } }
+        protected internal SimulationIslandConnection simulationIslandConnection;
 
-
-        void ISimulationIslandConnection.AddReferencesToConnectedMembers()
+        /// <summary>
+        /// Gets the simulation island connection associated with this updateable.
+        /// </summary>
+        public SimulationIslandConnection SimulationIslandConnection
         {
-            //Add back the references to this to entities
-            for (int i = 0; i < connectedMembers.Count; i++)
-            {
-                connectedMembers[i].AddConnectionReference(this);
-            }
+            get { return simulationIslandConnection; }
         }
-
-        void ISimulationIslandConnection.RemoveReferencesFromConnectedMembers()
-        {
-            //Clean out the references entities may have had to this solver updateable.
-            for (int i = 0; i < connectedMembers.Count; i++)
-            {
-                connectedMembers[i].RemoveConnectionReference(this);
-            }
-        }
-
-        DeactivationManager ISimulationIslandConnection.DeactivationManager { get; set; }
     }
 }
