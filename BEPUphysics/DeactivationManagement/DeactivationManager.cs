@@ -4,6 +4,9 @@ using BEPUphysics.Threading;
 using BEPUphysics.DataStructures;
 using BEPUphysics.ResourceManagement;
 using System.Collections.ObjectModel;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
+using System.Diagnostics;
 
 namespace BEPUphysics.DeactivationManagement
 {
@@ -199,24 +202,107 @@ namespace BEPUphysics.DeactivationManagement
         Action<int> multithreadedCandidacyLoopDelegate;
         void MultithreadedCandidacyLoop(int i)
         {
-                simulationIslandMembers.Elements[i].UpdateDeactivationCandidacy(timeStepSettings.TimeStepDuration);
+            simulationIslandMembers.Elements[i].UpdateDeactivationCandidacy(timeStepSettings.TimeStepDuration);
         }
 
         protected override void UpdateMultithreaded()
         {
-            ThreadManager.ForLoop(0, simulationIslandMembers.count, multithreadedCandidacyLoopDelegate);
+            FlushSplits();
 
+            ThreadManager.ForLoop(0, simulationIslandMembers.count, multithreadedCandidacyLoopDelegate);
 
             DeactivateObjects();
         }
 
+        //RawList<SimulationIslandConnection> debugConnections = new RawList<SimulationIslandConnection>();
         protected override void UpdateSingleThreaded()
         {
+            FlushSplits();
+
             for (int i = 0; i < simulationIslandMembers.count; i++)
-                    simulationIslandMembers.Elements[i].UpdateDeactivationCandidacy(timeStepSettings.TimeStepDuration);
+                simulationIslandMembers.Elements[i].UpdateDeactivationCandidacy(timeStepSettings.TimeStepDuration);
 
             DeactivateObjects();
 
+        }
+
+
+        Queue<SimulationIslandConnection> splitAttempts = new Queue<SimulationIslandConnection>();
+
+        static float maximumSplitAttemptsFraction = .01f;
+        /// <summary>
+        /// Gets or sets the fraction of splits that the deactivation manager will attempt in a single frame.
+        /// The total splits queued multiplied by this value results in the number of splits managed.
+        /// Defaults to .04f.
+        /// </summary>
+        public static float MaximumSplitAttemptsFraction
+        {
+            get
+            {
+                return maximumSplitAttemptsFraction;
+            }
+            set
+            {
+                if (value > 1 || value < 0)
+                    throw new Exception("Value must be from zero to one.");
+                maximumSplitAttemptsFraction = value;
+            }
+        }
+        static int minimumSplitAttempts = 3;
+        /// <summary>
+        /// Gets or sets the minimum number of splits attempted in a single frame.
+        /// Defaults to 5.
+        /// </summary>
+        public static int MinimumSplitAttempts
+        {
+            get
+            {
+                return minimumSplitAttempts;
+            }
+            set
+            {
+                if (value >= 0)
+                    throw new Exception("Minimum split count must be nonnegative.");
+                minimumSplitAttempts = value;
+            }
+        }
+        void FlushSplits()
+        {
+            //Only do a portion of the total splits.
+            int maxAttempts = Math.Max(minimumSplitAttempts, (int)(splitAttempts.Count * maximumSplitAttemptsFraction));
+            int attempts = 0;
+            while (attempts < maxAttempts && splitAttempts.Count > 0)
+            {
+                var attempt = splitAttempts.Dequeue();
+                if (attempt.SlatedForRemoval) //If it was re-added, don't split!
+                {
+                    attempt.SlatedForRemoval = false; //Reset the removal state so that future adds will add back references, since we're about to remove them.
+                    attempt.RemoveReferencesFromConnectedMembers();
+                    bool triedToSplit = false;
+                    for (int i = 0; i < attempt.members.count; i++)
+                    {
+                        for (int j = i + 1; j < attempt.members.count; j++)
+                        {
+                            triedToSplit |= TryToSplit(attempt.members.Elements[i], attempt.members.Elements[j]);
+                        }
+                    }
+                    //Only count the split if it does any work.
+                    if (triedToSplit)
+                        attempts++;
+                    if (attempt.Owner == null)
+                    {
+                        //It's an orphan connection.  No one owns it, and now that it's been dequeued from the deactivation manager,
+                        //it has no home at all.
+                        //Don't let it rot- return it to the pool!
+                        Resources.GiveBack(attempt);
+                        //This occurs when a constraint changes members.
+                        //Because connections need to be immutable for this scheme to work,
+                        //the old connection is orphaned and put into the deactivation manager's removal queue
+                        //while a new one from the pool takes its place.
+                    }
+                }
+
+            }
         }
 
         void DeactivateObjects()
@@ -247,19 +333,19 @@ namespace BEPUphysics.DeactivationManagement
         ///</summary>
         ///<param name="connection">Connection to add.</param>
         ///<exception cref="ArgumentException">Thrown if the connection already belongs to a manager.</exception>
-        public void Add(ISimulationIslandConnection connection)
+        public void Add(SimulationIslandConnection connection)
         {
             //DO A MERGE IF NECESSARY
             if (connection.DeactivationManager == null)
             {
                 connection.DeactivationManager = this;
-                if (connection.ConnectedMembers.Count > 0)
+                if (connection.members.count > 0)
                 {
-                    var island = connection.ConnectedMembers[0].SimulationIsland;
-                    for (int i = 1; i < connection.ConnectedMembers.Count; i++)
+                    var island = connection.members.Elements[0].SimulationIsland;
+                    for (int i = 1; i < connection.members.count; i++)
                     {
                         SimulationIsland opposingIsland;
-                        if (island != (opposingIsland = connection.ConnectedMembers[i].SimulationIsland))
+                        if (island != (opposingIsland = connection.members.Elements[i].SimulationIsland))
                         {
                             //Need to do a merge between the two islands.
                             //Note that this merge may eliminate the need for a merge with subsequent connection if they belong to the same island.
@@ -267,7 +353,12 @@ namespace BEPUphysics.DeactivationManagement
                         }
 
                     }
-                    connection.AddReferencesToConnectedMembers();
+
+                    if (connection.SlatedForRemoval)
+                        connection.SlatedForRemoval = false; //If it was slated for removal, that means connections are still present.  Just set the flag and the removal system will ignore the removal order.
+                    else
+                        connection.AddReferencesToConnectedMembers();
+                    //debugConnections.Add(connection);
                 }
             }
             else
@@ -303,7 +394,7 @@ namespace BEPUphysics.DeactivationManagement
                 s2 = s1;
                 s1 = biggerIsland;
             }
-            
+
             s1.Activate();
             s2.immediateParent = s1;
 
@@ -319,32 +410,40 @@ namespace BEPUphysics.DeactivationManagement
         }
 
 
+
         ///<summary>
         /// Removes a simulation island connection from the manager.
         ///</summary>
         ///<param name="connection">Connection to remove from the manager.</param>
-        ///<returns>Whether or not a split process was attempted for the connection.</returns>
         ///<exception cref="ArgumentException">Thrown if the connection does not belong to this manager.</exception>
-        public bool Remove(ISimulationIslandConnection connection)
+        public void Remove(SimulationIslandConnection connection)
         {
             if (connection.DeactivationManager == this)
             {
-                connection.DeactivationManager = null;
+
+                connection.DeactivationManager = null; //TODO: Should it remove here, or in the deferred final case? probably here, since otherwise Add-Remove-Add would throw an exception!
                 //Try to split by examining the connections and breadth-first searching outward.
                 //If it is determined that a split is required, grab a new island and add it.
                 //This is a little tricky because it's a theoretically N-way split.
 
                 //For two members which have the same simulation island (they will initially), try to split.
-                connection.RemoveReferencesFromConnectedMembers();
-                bool splitSuccessful = false;
-                for (int i = 0; i < connection.ConnectedMembers.Count; i++)
-                {
-                    for (int j = i + 1; j < connection.ConnectedMembers.Count; j++)
-                    {
-                        splitSuccessful |= TryToSplit(connection.ConnectedMembers[i], connection.ConnectedMembers[j]);
-                    }
-                }
-                return splitSuccessful;
+                //debugConnections.Remove(connection);
+                connection.SlatedForRemoval = true;
+                //Don't immediately do the removal.
+                //Defer them!
+                splitAttempts.Enqueue(connection);
+                //connection.RemoveReferencesFromConnectedMembers();
+                //for (int i = 0; i < connection.members.count; i++)
+                //{
+                //    for (int j = i + 1; j < connection.members.count; j++)
+                //    {
+                //        //Notice that the splits are not performed immediately! They are deferred and spread over multiple frames.
+                //        //Split operations aren't cheap, and overdoing them can lead to pointless re-merging and re-splitting.
+                //        splitAttempts.Enqueue(new SplitAttempt() { a = connection.members.Elements[i], b = connection.members.Elements[j] });
+                //        //TryToSplit(connection.ConnectedMembers[i], connection.ConnectedMembers[j]);
+                //    }
+                //}
+
             }
             else
             {
@@ -390,12 +489,12 @@ namespace BEPUphysics.DeactivationManagement
 
 
                 SimulationIslandMember currentNode = member1Friends.Dequeue();
-                for (int i = 0; i < currentNode.Connections.Count; i++)
+                for (int i = 0; i < currentNode.connections.count; i++)
                 {
-                    for (int j = 0; j < currentNode.Connections[i].ConnectedMembers.Count; j++)
+                    for (int j = 0; j < currentNode.connections.Elements[i].members.count; j++)
                     {
                         SimulationIslandMember connectedNode;
-                        if ((connectedNode = currentNode.Connections[i].ConnectedMembers[j]) != currentNode &&
+                        if ((connectedNode = currentNode.connections.Elements[i].members.Elements[j]) != currentNode &&
                             connectedNode.SimulationIsland != null) //The connection could be connected to something that isn't in the Space and has no island, or it's not dynamic.
                         {
                             switch (connectedNode.searchState)
@@ -418,12 +517,12 @@ namespace BEPUphysics.DeactivationManagement
                 }
 
                 currentNode = member2Friends.Dequeue();
-                for (int i = 0; i < currentNode.Connections.Count; i++)
+                for (int i = 0; i < currentNode.connections.count; i++)
                 {
-                    for (int j = 0; j < currentNode.Connections[i].ConnectedMembers.Count; j++)
+                    for (int j = 0; j < currentNode.connections.Elements[i].members.count; j++)
                     {
                         SimulationIslandMember connectedNode;
-                        if ((connectedNode = currentNode.Connections[i].ConnectedMembers[j]) != currentNode &&
+                        if ((connectedNode = currentNode.connections.Elements[i].members.Elements[j]) != currentNode &&
                             connectedNode.SimulationIsland != null) //The connection could be connected to something that isn't in the Space and has no island, or it's not dynamic.
                         {
                             switch (connectedNode.searchState)
@@ -527,15 +626,15 @@ namespace BEPUphysics.DeactivationManagement
                     return;
                 }
             }
-            if (member.Connections.Count > 0)
+            if (member.connections.count > 0)
             {
                 for (int i = 0; i < member.Connections.Count; i++)
                 {
                     //Find a member with a non-null island to represent connection i.
                     SimulationIslandMember representativeA = null;
-                    for (int j = 0; j < member.Connections[i].ConnectedMembers.Count; j++)
+                    for (int j = 0; j < member.connections.Elements[i].members.count; j++)
                     {
-                        if (member.Connections[i].ConnectedMembers[j].SimulationIsland != null)
+                        if (member.connections.Elements[i].members.Elements[j].SimulationIsland != null)
                         {
                             representativeA = member;
                             break;
@@ -555,9 +654,9 @@ namespace BEPUphysics.DeactivationManagement
                     {
                         //Find a representative for another connection.
                         SimulationIslandMember representativeB = null;
-                        for (int k = 0; k < member.Connections[j].ConnectedMembers.Count; k++)
+                        for (int k = 0; k < member.connections.Elements[j].members.count; k++)
                         {
-                            if (member.Connections[j].ConnectedMembers[k].SimulationIsland != null)
+                            if (member.connections.Elements[j].members.Elements[k].SimulationIsland != null)
                             {
                                 representativeB = member;
                                 break;
@@ -572,6 +671,8 @@ namespace BEPUphysics.DeactivationManagement
                         }
 
                         //Try to split the representatives.
+                        //Don't bother doing any deferring; this is a rare activity
+                        //and it's best just to do it up front.
                         TryToSplit(representativeA, representativeB);
 
 
@@ -599,9 +700,9 @@ namespace BEPUphysics.DeactivationManagement
                 //Find a simulation starting island to live in.
                 for (int i = 0; i < member.Connections.Count; i++)
                 {
-                    for (int j = 0; j < member.Connections[i].ConnectedMembers.Count; j++)
+                    for (int j = 0; j < member.connections.Elements[i].members.count; j++)
                     {
-                        island = member.Connections[i].ConnectedMembers[j].SimulationIsland;
+                        island = member.connections.Elements[i].members.Elements[j].SimulationIsland;
                         if (island != null)
                         {
                             island.Add(member);
@@ -629,11 +730,11 @@ namespace BEPUphysics.DeactivationManagement
                 //Merges must be attempted between its connected members.
                 for (int i = 0; i < member.Connections.Count; i++)
                 {
-                    for (int j = 0; j < member.Connections[i].ConnectedMembers.Count; j++)
+                    for (int j = 0; j < member.connections.Elements[i].members.Count; j++)
                     {
-                        if (member.Connections[i].ConnectedMembers[j] == member)
+                        if (member.connections.Elements[i].members.Elements[j] == member)
                             continue; //Don't bother trying to compare against ourselves.  That would cause an erroneous early-out sometimes.
-                        SimulationIsland opposingIsland = member.Connections[i].ConnectedMembers[j].SimulationIsland;
+                        SimulationIsland opposingIsland = member.connections.Elements[i].members.Elements[j].SimulationIsland;
                         if (opposingIsland != null)
                         {
                             if (island != opposingIsland)

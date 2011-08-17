@@ -14,10 +14,9 @@ namespace BEPUphysics.Constraints
     /// Superclass of objects types which require solving by the velocity solver.
     /// These are updated within the internal iterative solver when owned by a space.
     /// </summary>
-    public abstract class EntitySolverUpdateable : SolverUpdateable//, ISolverBatchUpdateable
+    public abstract class EntitySolverUpdateable : SolverUpdateable
     {
-        
-        //protected internal SolverBatch batch;
+
 
 
 
@@ -38,7 +37,7 @@ namespace BEPUphysics.Constraints
         }
 
 
-        
+
         /// <summary>
         /// Number of entities used in the solver updateable.
         /// Note that this is set automatically by the sortInvolvedEntities method
@@ -81,7 +80,7 @@ namespace BEPUphysics.Constraints
             {
                 if (involvedEntities.Elements[i].isDynamic) //Only need to lock dynamic entities.
                     involvedEntities.Elements[i].locker.Exit();
-                    //Monitor.Exit(involvedEntities[i].locker);
+                //Monitor.Exit(involvedEntities[i].locker);
             }
         }
 
@@ -125,22 +124,6 @@ namespace BEPUphysics.Constraints
         }
 
 
-        void UpdateConnectedMembers()
-        {
-            connectedMembers.Clear();
-            for (int i = 0; i < involvedEntities.count; i++)
-            {
-                connectedMembers.Add(involvedEntities.Elements[i].activityInformation);
-            }
-        }
-
-
-        /// <summary>
-        /// Adds entities associated with the solver item to the involved entities list.
-        /// This allows the non-batched multithreading system to lock properly.
-        /// </summary>
-        protected internal abstract void CollectInvolvedEntities(RawList<Entity> outputInvolvedEntities);
-
 
 
         /// <summary>
@@ -167,56 +150,25 @@ namespace BEPUphysics.Constraints
             {
                 entitiesChanged = true;
             }
-
-            //TODO: This code is bad.  It refers back to a specific kind of solver (batched) and is just messy overall.
+            
             if (entitiesChanged)
             {
                 //Probably need to wake things up given that such a significant change was made.
+                
                 for (int i = 0; i < involvedEntities.count; i++)
                 {
                     Entity e = involvedEntities.Elements[i];
                     if (e.isDynamic)
+                    {
                         e.activityInformation.Activate();
+                        break;//Don't bother activating other entities; they are all a part of the same simulation island.
+                    }
                 }
 
-
-                //Since we're about to change this updateable's connections, make sure the 
-                //simulation islands hear about it.  This is NOT thread safe.
-                var activityManager = ((ISimulationIslandConnection)this).DeactivationManager;
-                if (activityManager != null) //solver != null && SolverGroup == null)
-                    activityManager.Remove(this);
-                //Note that the above means that anything in the Solver must belong to an DeactivationManager in order to maintain
-                //the correct connected references.
-                //Since the default implementation of the Solver does behave in such a way, it's okay, but watch out when 
-                //making any large changes.
+                //CollectInvolvedEntities will give the updateable a new simulationIslandConnection and get rid of the old one.
+                CollectInvolvedEntities();
 
 
-                //if it's a batched solver, the batches need to be updated.
-                //BatchedSolver batchedSolver;
-                //if (solver != null && SolverGroup == null && solver.AllowMultithreading && (batchedSolver = solver as BatchedSolver) != null)
-                //{
-                //    batchedSolver.Remove(this);
-                //    involvedEntities.Clear();
-                //    involvedEntities.AddRange(newInvolvedEntities);
-                //    SortInvolvedEntities();
-                //    batchedSolver.Add(this);
-                //}
-                //else
-                //{
-                    //If it's not a batched solver, 
-                    involvedEntities.Clear();
-                    involvedEntities.AddRange(newInvolvedEntities);
-                    SortInvolvedEntities();
-                 //}
-                //Connected members need to be updated too..
-                UpdateConnectedMembers();
-
-                
-                //Add the new references back.
-                if (activityManager != null)//solver != null && SolverGroup == null)
-                    activityManager.Add(this);
-
-              
 
                 if (SolverGroup != null)
                     SolverGroup.OnInvolvedEntitiesChanged();
@@ -226,7 +178,10 @@ namespace BEPUphysics.Constraints
                 {
                     Entity e = involvedEntities.Elements[i];
                     if (e.isDynamic)
+                    {
                         e.activityInformation.Activate();
+                        break; //Don't bother activating other entities; they are all a part of the same simulation island.
+                    }
                 }
             }
             Resources.GiveBack(newInvolvedEntities);
@@ -243,6 +198,13 @@ namespace BEPUphysics.Constraints
             UpdateConnectedMembers();
         }
 
+
+        /// <summary>
+        /// Adds entities associated with the solver item to the involved entities list.
+        /// This allows the non-batched multithreading system to lock properly.
+        /// </summary>
+        protected internal abstract void CollectInvolvedEntities(RawList<Entity> outputInvolvedEntities);
+
         /// <summary>
         /// Sorts the involved entities according to their hashcode to allow non-batched multithreading to avoid deadlocks.
         /// </summary>
@@ -251,6 +213,37 @@ namespace BEPUphysics.Constraints
             numberOfInvolvedEntities = involvedEntities.Count;
             involvedEntities.Sort(comparer);
         }
+
+
+
+        void UpdateConnectedMembers()
+        {
+            //Since we're about to change this updateable's connections, make sure the 
+            //simulation islands hear about it.  This is NOT thread safe.
+            var deactivationManager = simulationIslandConnection.DeactivationManager;
+            if (deactivationManager != null)
+            {
+                simulationIslandConnection.Owner = null; //Orphan the simulation island connection.
+                deactivationManager.Remove(simulationIslandConnection);
+            }
+            else if (!simulationIslandConnection.SlatedForRemoval) //If it's not already going to be cleaned up, then we need to do it here.
+                Resources.GiveBack(simulationIslandConnection); //Well, since we're going to orphan the connection, we'll need to take care of its trash.
+
+            //The SimulationIslandConnection is immutable.
+            //So create a new one!
+            //Assume we've already dealt with the old connection.
+            simulationIslandConnection = Resources.GetSimulationIslandConnection();
+            for (int i = 0; i < involvedEntities.count; i++)
+            {
+                simulationIslandConnection.members.Add(involvedEntities.Elements[i].activityInformation);
+            }
+            simulationIslandConnection.Owner = this;
+
+            //Add the new reference back.
+            if (deactivationManager != null)
+                deactivationManager.Add(simulationIslandConnection);
+        }
+
 
         private static EntityComparer comparer = new EntityComparer();
         private class EntityComparer : IComparer<Entity>
@@ -270,22 +263,7 @@ namespace BEPUphysics.Constraints
         }
 
 
-        //SolverBatch ISolverBatchUpdateable.SolverBatch
-        //{
-        //    get
-        //    {
-        //        return batch;
-        //    }
-        //    set
-        //    {
-        //        batch = value;
-        //    }
-        //}
 
-        //ReadOnlyCollection<ISimulationIslandMember> ISolverBatchUpdateable.ConnectedMembers { get { return (this as ISimulationIslandConnection).ConnectedMembers; } }
-
-
-  
 
     }
 }

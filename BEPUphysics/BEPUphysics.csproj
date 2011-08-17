@@ -249,8 +249,10 @@
     <None Include="DeactivationManagement\Testing\SimulationIslandMember.cs" />
     <Compile Include="DeactivationManagement\DeactivationManager.cs" />
     <Compile Include="DeactivationManagement\ISimulationIslandConnection.cs" />
+    <Compile Include="DeactivationManagement\ISimulationIslandConnectionOwner.cs" />
     <Compile Include="DeactivationManagement\ISimulationIslandMemberOwner.cs" />
     <Compile Include="DeactivationManagement\SimulationIsland.cs" />
+    <Compile Include="DeactivationManagement\SimulationIslandConnection.cs" />
     <Compile Include="DeactivationManagement\SimulationIslandMember.cs" />
     <Compile Include="Entities\EntitySolverUpdateableCollection.cs" />
     <Compile Include="Entities\EntityConstraintCollection.cs" />
@@ -266,7 +268,6 @@
     <Compile Include="Entities\Prefabs\TransformableEntity.cs" />
     <Compile Include="Entities\Prefabs\Triangle.cs" />
     <Compile Include="Entities\Prefabs\WrappedBody.cs" />
-    <Compile Include="NarrowPhaseSystems\NarrowPhasePairConstraint.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\CompoundMobileMeshPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\ContactCollection.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\ContactInformation.cs" />

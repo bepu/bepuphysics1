@@ -37,15 +37,15 @@ namespace BEPUphysics.DeactivationManagement
             this.owner = owner;
         }
 
-        internal RawList<ISimulationIslandConnection> connections = new RawList<ISimulationIslandConnection>();
+        internal RawList<SimulationIslandConnection> connections = new RawList<SimulationIslandConnection>(8);
         ///<summary>
         /// Gets the connections associated with this member.
         ///</summary>
-        public ReadOnlyList<ISimulationIslandConnection> Connections
+        public ReadOnlyList<SimulationIslandConnection> Connections
         {
             get
             {
-                return new ReadOnlyList<ISimulationIslandConnection>(connections);
+                return new ReadOnlyList<SimulationIslandConnection>(connections);
             }
         }
 
@@ -125,12 +125,12 @@ namespace BEPUphysics.DeactivationManagement
                             //TODO: Connected members iteration goes through interface overhead.
                             //This section is rarely executed (unless there's lots of moving kinematics in lots of collisions),
                             //but it would still be nice to eliminate it.
-                            var connectedMembers = connections.Elements[i].ConnectedMembers;
-                            for (int j = connectedMembers.Count - 1; j >= 0; j--)
+                            var connectedMembers = connections.Elements[i].members;
+                            for (int j = connectedMembers.count - 1; j >= 0; j--)
                             {
-                                if (connectedMembers[j].SimulationIsland != null)
+                                if (connectedMembers.Elements[j].SimulationIsland != null)
                                     //Objects connected to an active kinematic cannot go to sleep.
-                                    connectedMembers[j].SimulationIsland.allowDeactivation = false;
+                                    connectedMembers.Elements[j].SimulationIsland.allowDeactivation = false;
                                 //TODO: Is it possible for an active kinematic to be involved with a simulation island that is currently inactive?
                                 //I THINK the collision pair creation/merge takes care of the entry case, while this takes care of the maintenance.
                                 //But, if it turns out that's wrong, the simulation island could be forced active here.  It's a simple boolean operation, and would only ever be set to true during this stage.
@@ -342,7 +342,7 @@ namespace BEPUphysics.DeactivationManagement
         /// Removes a connection reference from the member.
         ///</summary>
         ///<param name="connection">Reference to remove.</param>
-        internal void RemoveConnectionReference(ISimulationIslandConnection connection)
+        internal void RemoveConnectionReference(SimulationIslandConnection connection)
         {
             connections.FastRemove(connection);
         }
@@ -350,7 +350,7 @@ namespace BEPUphysics.DeactivationManagement
         /// Adds a connection reference to the member.
         ///</summary>
         ///<param name="connection">Reference to add.</param>
-        internal void AddConnectionReference(ISimulationIslandConnection connection)
+        internal void AddConnectionReference(SimulationIslandConnection connection)
         {
             connections.Add(connection);
         }

@@ -9,19 +9,6 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
     public abstract class NarrowPhasePair
     {
 
-        internal NarrowPhasePairConstraint constraint;
-
-        /// <summary>
-        /// Gets the constraint used by the pair.
-        /// </summary>
-        public NarrowPhasePairConstraint Constraint
-        {
-            get
-            {
-                return constraint;
-            }
-        }
-
         ///<summary>
         /// Updates the collision between the broad phase entries.
         ///</summary>
