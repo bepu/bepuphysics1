@@ -75,14 +75,23 @@ namespace BEPUphysicsDrawer.Models
         protected ModelDrawer(Game game)
         {
             Game = game;
-            textures[0] = game.Content.Load<Texture2D>("Textures//red");
-            textures[1] = game.Content.Load<Texture2D>("Textures//yellow");
-            textures[2] = game.Content.Load<Texture2D>("Textures//purple");
-            textures[3] = game.Content.Load<Texture2D>("Textures//orange");
-            textures[4] = game.Content.Load<Texture2D>("Textures//green");
-            textures[5] = game.Content.Load<Texture2D>("Textures//lightblue");
-            textures[6] = game.Content.Load<Texture2D>("Textures//prorange");
-            textures[7] = game.Content.Load<Texture2D>("Textures//teal");
+            Color[][] colours = new Color[][] 
+            { 
+                new Color[1]{Color.Red},
+                new Color[1]{Color.Yellow},
+                new Color[1]{Color.Purple},
+                new Color[1]{Color.Orange},
+                new Color[1]{Color.Green},
+                new Color[1]{Color.LightBlue},
+                new Color[1]{Color.OrangeRed},
+                new Color[1]{Color.Teal}   
+            };
+
+            for (int i = 0; i < 8; i++)
+            {
+                textures[i] = new Texture2D(Game.GraphicsDevice, 1, 1);
+                textures[i].SetData<Color>(colours[i]);
+            }
 
 
             fillState = new RasterizerState();
