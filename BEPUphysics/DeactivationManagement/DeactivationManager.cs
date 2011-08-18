@@ -611,9 +611,12 @@ namespace BEPUphysics.DeactivationManagement
             //Becoming kinematic eliminates the member as a possible path.
             //Splits must be attempted between its connected members.
             //Don't need to split same-connection members.  Splitting one non-null entry against a non null entry in each of the other connections will do the trick.
-            if (member.SimulationIsland != null)
+            if (member.simulationIsland != null)
             {
-                SimulationIsland island = member.SimulationIsland;
+                //Note that this is using the most immediate simulation island.  This is because the immediate simulation island
+                //is the one who 'owns' the member; not the root parent.  The root parent will own the member in the next frame
+                //after the deactivation candidacy loop runs.
+                SimulationIsland island = member.simulationIsland;
                 island.Remove(member);
                 if (island.memberCount == 0)
                 {
@@ -728,9 +731,9 @@ namespace BEPUphysics.DeactivationManagement
 
                 //Becoming dynamic adds a new path.
                 //Merges must be attempted between its connected members.
-                for (int i = 0; i < member.Connections.Count; i++)
+                for (int i = 0; i < member.connections.count; i++)
                 {
-                    for (int j = 0; j < member.connections.Elements[i].members.Count; j++)
+                    for (int j = 0; j < member.connections.Elements[i].members.count; j++)
                     {
                         if (member.connections.Elements[i].members.Elements[j] == member)
                             continue; //Don't bother trying to compare against ourselves.  That would cause an erroneous early-out sometimes.

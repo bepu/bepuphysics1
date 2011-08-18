@@ -75,7 +75,7 @@ namespace BEPUphysics.NarrowPhaseSystems
     ///</summary>
     public class NarrowPhase : MultithreadedProcessingStage
     {
-        RawList<BroadPhaseOverlap> broadPhaseOverlaps; //Could be a reference passed into the system somehow too... use rawlist?
+        RawList<BroadPhaseOverlap> broadPhaseOverlaps;
         ///<summary>
         /// Gets or sets the list of broad phase overlaps used by the narrow phase to manage pairs.
         ///</summary>
@@ -251,14 +251,7 @@ namespace BEPUphysics.NarrowPhaseSystems
         void RemoveStaleOverlaps()
         {
             //Remove stale objects.
-            //TODO: This could possibly be done with a computation spreading approach.
-            //Problem: Consider a collision pair that has contacts one frame, and in the next, no longer even has a broad phase overlap.
-            //It will receive no update, and the collision pair will still have a contact in it.
-            //Collision solver will operate on permanently out of date information.
-            //One possible solution requires that the user of the narrow phase object checks its age, and if it's out of date, ignore it.
-            //In a subsequent frame, the system will get rid of it.  This has an advantage of lowering the (somewhat tiny) per frame cost of removal management.
-            //Additionally, in highly chaotic situations where collisions are constantly being created/destroyed, spreading out the computations
-            //smooths the work out a bit.
+            //Only look over a subset of the total pairs each frame for extra speed.
 
             maxTraversedPairs = Math.Max(1, (int)(narrowPhasePairs.count * maximumTraversedPairs));
 
@@ -368,7 +361,6 @@ namespace BEPUphysics.NarrowPhaseSystems
         public void NotifyUpdateableAdded(SolverUpdateable addedItem)
         {
             solverUpdateableChanges.Enqueue(new SolverUpdateableChange(true, addedItem));
-            //pair.constraint.SolverUpdateable.IsActive = true;
         }
         ///<summary>
         /// Enqueues a solver updateable removed by some pair for flushing into the solver later.
@@ -376,11 +368,9 @@ namespace BEPUphysics.NarrowPhaseSystems
         ///<param name="removedItem">Solver updateable to remove.</param>
         public void NotifyUpdateableRemoved(SolverUpdateable removedItem)
         {
-            //removedItem.SolverUpdateable.IsActive = false;
             solverUpdateableChanges.Enqueue(new SolverUpdateableChange(false, removedItem));
         }
 
-        //Dictionary<SolverUpdateable, bool> testRemoves = new Dictionary<SolverUpdateable, bool>();
 
         /// <summary>
         /// Flushes the new solver updateables into the solver.
@@ -388,13 +378,6 @@ namespace BEPUphysics.NarrowPhaseSystems
         /// </summary>
         public void FlushGeneratedSolverUpdateables()
         {
-            //testRemoves.Clear();
-
-            //This method is only called when the constraint was not previously in the solver.
-            //Further, the adder will also ensure that the new constraint's ShouldRemove was set to 
-            //FALSE before it gets here.
-            //So all this method has to do is flux add the new constraints.
-            //Why do it here instead of in the main update?  Because this must be done sequentially; it modifies simulation islands.
             SolverUpdateableChange change;
             while (solverUpdateableChanges.TryUnsafeDequeueFirst(out change))
             {
@@ -405,18 +388,6 @@ namespace BEPUphysics.NarrowPhaseSystems
                     //We should check the new constraint's solver status before adding it here.
                     if (change.Item.solver == null)
                     {
-                        //bool value;
-                        //if (testRemoves.TryGetValue(change.Item, out value))
-                        //{
-                        //    if (!value)
-                        //    {
-                        //        //Already attempted a split for this pair previously.  There's a good chance
-                        //        //that the pair is stuck in a forever split manner!
-                        //        Debug.WriteLine("INVALID ORDER!");
-                        //    }
-                        //}
-                        //else
-                        //    testRemoves.Add(change.Item, true);
                         Solver.Add(change.Item);
                     }
                 }
@@ -424,89 +395,15 @@ namespace BEPUphysics.NarrowPhaseSystems
                 {
                     if (change.Item.solver != null)
                     {
-                        //if (!testRemoves.ContainsKey(change.Item))
-                        //{
-                        //    testRemoves.Add(change.Item, false);
-                        //}
                         Solver.Remove(change.Item);
                     }
                 }
             }
 
-            //foreach (var pair in narrowPhasePairs)
-            //{
-            //    if (pair.constraint.SolverUpdateable.solver != null && (pair as CollidablePairHandler).ContactCount == 0)
-            //        Debug.WriteLine("break.");
-            //}
         }
 
 
 
 
-        //The following are methods which can be used to split the narrow phase pair creation
-        //from the pair update.  This can be helpful for some update orders where they cannot
-        //be done simultaneously.  For performance, these would also need to implement 
-        //multithreaded options.
-        //void TryToAddOverlap(int i)
-        //{
-        //    BroadPhaseOverlap overlap = broadPhaseOverlaps.Elements[i];
-        //    if (overlap.collisionRule < CollisionRule.NoNarrowPhasePair)
-        //    {
-        //        INarrowPhasePair narrowPhaseObject;
-        //        //see if the overlap is already present in the narrow phase.
-        //        if (!overlapMapping.TryGetValue(overlap, out narrowPhaseObject))
-        //        {
-        //            //Create/enqueue based on collision table
-        //            narrowPhaseObject = NarrowPhaseHelper.GetPair(ref overlap);
-        //            if (narrowPhaseObject != null)
-        //            {
-        //                narrowPhaseObject.NarrowPhase = this;
-        //                //Add the new object to the 'todo' list.
-        //                //Technically, this doesn't need to be thread-safe when this is called from the sequential context.
-        //                //It's just bunched together for maintainability despite the slightly performance hit.
-        //                newNarrowPhasePairs.Enqueue(narrowPhaseObject);
-        //            }
-        //        }
-        //        if (narrowPhaseObject != null)
-        //        {
-        //            narrowPhaseObject.NeedsUpdate = false;  //This is hacky.
-        //        }
-        //    }
-        //}
-
-        //public void UpdatePairList()
-        //{
-        //    for (int i = 0; i < broadPhaseOverlaps.count; i++)
-        //        TryToAddOverlap(i);
-
-        //    if (narrowPhasePairs.Count < MultithreadedRemovalCutoff)
-        //    {
-        //        RemoveStaleOverlaps();
-        //    }
-        //    else
-        //    {
-        //        ThreadManager.ForLoop(0, narrowPhasePairs.Count, multithreadedRemovalLoopDelegate);
-        //        INarrowPhasePair overlapToRemove;
-        //        while (overlapsToRemove.TryUnsafeDequeueFirst(out overlapToRemove))
-        //        {
-        //            narrowPhasePairs[narrowPhasePairs.IndexOf(overlapToRemove)] = narrowPhasePairs[narrowPhasePairs.Count - 1];
-        //            narrowPhasePairs.RemoveAt(narrowPhasePairs.Count - 1);
-        //            OnRemovePair(overlapToRemove);
-        //        }
-        //    }
-
-
-        //    AddNewNarrowPhaseObjects();
-        //}
-
-        //public void UpdatePairs()
-        //{
-        //    for (int i = 0; i < narrowPhasePairs.Count; i++)
-        //    {
-        //        if (narrowPhasePairs[i].BroadPhaseOverlap.collisionRule < CollisionRule.NoNarrowPhaseUpdate &&
-        //            (narrowPhasePairs[i].BroadPhaseOverlap.entryA.IsActive || narrowPhasePairs[i].BroadPhaseOverlap.entryB.IsActive))
-        //            narrowPhasePairs[i].UpdateCollision(TimeStepSettings.TimeStepDuration);
-        //    }
-        //}
     }
 }

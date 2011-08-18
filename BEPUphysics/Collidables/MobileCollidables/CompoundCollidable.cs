@@ -83,13 +83,17 @@ namespace BEPUphysics.Collidables.MobileCollidables
         public CompoundCollidable(IList<CompoundChildData> children)
         {
             var shapeList = new RawList<CompoundShapeEntry>();
+            //Create the shape first.
             for (int i = 0; i < children.Count; i++)
             {
-                CompoundChild child = GetChild(children[i], i);
                 shapeList.Add(children[i].Entry);
-                this.children.Add(child);
             }
             base.Shape = new CompoundShape(shapeList);
+            //Now create the actual child objects.
+            for (int i = 0; i < children.Count; i++)
+            {
+                this.children.Add(GetChild(children[i], i));
+            }
             hierarchy = new CompoundHierarchy(this);
  
         }
@@ -102,13 +106,17 @@ namespace BEPUphysics.Collidables.MobileCollidables
         public CompoundCollidable(IList<CompoundChildData> children, out Vector3 center)
         {
             var shapeList = new RawList<CompoundShapeEntry>();
+            //Create the shape first.
             for (int i = 0; i < children.Count; i++)
             {
-                CompoundChild child = GetChild(children[i], i);
                 shapeList.Add(children[i].Entry);
-                this.children.Add(child);
             }
             base.Shape = new CompoundShape(shapeList, out center);
+            //Now create the actual child objects.
+            for (int i = 0; i < children.Count; i++)
+            {
+                this.children.Add(GetChild(children[i], i));
+            }
             hierarchy = new CompoundHierarchy(this);
 
         }
