@@ -27,40 +27,27 @@ namespace BEPUphysicsDemos.Demos.Tests
             : base(game)
         {
 
-            Space.Add(new Box(new Vector3(0, 0, 0), 1000, 10,1000));
+            Space.Add(new Box(new Vector3(0, 0, 0), 1000, 10, 1000));
             //MotionSettings.DefaultPositionUpdateMode = BEPUphysics.PositionUpdating.PositionUpdateMode.Continuous;
 
             NarrowPhaseHelper.Factories.SphereSphere.EnsureCount(15000);
             NarrowPhaseHelper.Factories.BoxSphere.EnsureCount(3000);
+            NarrowPhaseHelper.Factories.BoxBox.EnsureCount(35000);
             //Space.BroadPhase = new Grid2DSortAndSweep(Space.ThreadManager);
 
-            //ConfigurationHelper.ApplySuperSpeedySettings(Space);
+            ConfigurationHelper.ApplySuperSpeedySettings(Space);
             //Space.ForceUpdater.Gravity = new Vector3();
             Space.Solver.IterationLimit = 1;
-            //for (int i = 0; i < 20; i++)
-            //{
-            //    for (int j = 0; j < 10; j++)
-            //    {
-            //        for (int k = 0; k < 20; k++)
-            //        {
-            //            Space.Add(new Sphere(new Vector3(0 + i * 3, 20 + j * 3, 0 + k * 3), 0.5f, 1)
-            //            {
-            //                //LocalInertiaTensorInverse = new Matrix3X3()
-            //                //Tag = "noDisplayObject",
-            //                IsAlwaysActive = true
-            //            });
-            //        }
-            //    }
-            //}
+
 
 
             Random rand = new Random();
 
 
-            //float width = 20;
+            //float width = 200;
             //float height = 200;
-            //float length = 20;
-            //for (int i = 0; i < 2000; i++)
+            //float length = 200;
+            //for (int i = 0; i < 5000; i++)
             //{
             //    Vector3 position =
             //        new Vector3((float)rand.NextDouble() * width - width * .5f,
@@ -72,7 +59,7 @@ namespace BEPUphysicsDemos.Demos.Tests
             //}
 
             float width = 10;
-            float height = 30;
+            float height = 50;
             float length = 10;
             for (int i = 0; i < width; i++)
             {
@@ -84,9 +71,10 @@ namespace BEPUphysicsDemos.Demos.Tests
                             new Vector3(i * 3 + j * .2f,
                                 20 + j * 3f,
                                 k * 3 + j * .2f);
-                        var sphere = new Sphere(position, 1, 1);// { Tag = "noDisplayObject" };
-                        sphere.ActivityInformation.IsAlwaysActive = true;
-                        Space.Add(sphere);
+                        var e = new Sphere(position, 1, 1) { Tag = "noDisplayObject" };
+                        //var e = new Box(position, 1, 1, 1, 1) { Tag = "noDisplayObject" };
+                        e.ActivityInformation.IsAlwaysActive = true;
+                        Space.Add(e);
                     }
                 }
             }
@@ -119,7 +107,7 @@ namespace BEPUphysicsDemos.Demos.Tests
 
         public override void DrawUI()
         {
-            Game.DataTextDrawer.Draw("Simulation time: ", time, 5, new Vector2(50, 50)); 
+            Game.DataTextDrawer.Draw("Simulation time: ", time, 5, new Vector2(50, 50));
             base.DrawUI();
         }
 
