@@ -75,23 +75,22 @@ namespace BEPUphysicsDrawer.Models
         protected ModelDrawer(Game game)
         {
             Game = game;
-            Color[] colours = new Color[8] 
+            Color[][] colours = new Color[][] 
             { 
-            Color.Red,  
-            Color.Yellow,  
-            Color.Purple,  
-            Color.Orange,  
-            Color.Green,  
-            Color.LightBlue,  
-            Color.OrangeRed,  
-            Color.Teal           
+                new Color[1]{Color.Red},
+                new Color[1]{Color.Yellow},
+                new Color[1]{Color.Purple},
+                new Color[1]{Color.Orange},
+                new Color[1]{Color.Green},
+                new Color[1]{Color.LightBlue},
+                new Color[1]{Color.OrangeRed},
+                new Color[1]{Color.Teal}   
             };
 
             for (int i = 0; i < 8; i++)
             {
                 textures[i] = new Texture2D(Game.GraphicsDevice, 1, 1);
-                Color[] tex_col = new Color[1] { colours[i] };
-                textures[i].SetData<Color>(tex_col);
+                textures[i].SetData<Color>(colours[i]);
             }
 
 
