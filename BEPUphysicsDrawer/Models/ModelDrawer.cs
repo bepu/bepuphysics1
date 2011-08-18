@@ -77,14 +77,14 @@ namespace BEPUphysicsDrawer.Models
             Game = game;
             Color[][] colours = new Color[][] 
             { 
-                new Color[1]{Color.Red},
-                new Color[1]{Color.Yellow},
-                new Color[1]{Color.Purple},
-                new Color[1]{Color.Orange},
-                new Color[1]{Color.Green},
-                new Color[1]{Color.LightBlue},
-                new Color[1]{Color.OrangeRed},
-                new Color[1]{Color.Teal}   
+                new Color[1]{new Color(255, 216, 0)},
+                new Color[1]{new Color(79, 200, 255)},
+                new Color[1]{new Color(255, 0, 0)},
+                new Color[1]{new Color(177, 0, 254)},
+                new Color[1]{new Color(255, 130, 151)},
+                new Color[1]{new Color(254, 106, 0)},
+                new Color[1]{new Color(168, 165, 255)},
+                new Color[1]{new Color(0, 254, 33)}
             };
 
             for (int i = 0; i < 8; i++)
@@ -187,7 +187,7 @@ namespace BEPUphysicsDrawer.Models
         public void Remove(object objectToRemove)
         {
             Remove(displayObjects[objectToRemove]);
-            displayObjects.Remove(objectToRemove);   
+            displayObjects.Remove(objectToRemove);
         }
 
         /// <summary>

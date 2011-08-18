@@ -1,15 +1,3 @@
-Content\Textures\blue.xnb
-Content\Textures\green.xnb
-Content\Textures\lightblue.xnb
-Content\Textures\orange.xnb
-Content\Textures\prorange.xnb
-Content\Textures\purple.xnb
-Content\Textures\red.xnb
-Content\Textures\teal.xnb
-Content\Textures\yellow.xnb
-Content\bepuphysicscontrols.xnb
-Content\wheel.xnb
-Content\whitePixel.xnb
 Content\InstancedEffect.xnb
 Content\barrelandplatform.xnb
 Content\bepubox.xnb
@@ -25,3 +13,6 @@ Content\360 thick sphere.xnb
 Content\CharacterControllerTestTerrain.xnb
 Content\DataFont.xnb
 Content\TinyFont.xnb
+Content\bepuphysicscontrols.xnb
+Content\wheel.xnb
+Content\whitePixel.xnb
