@@ -145,6 +145,7 @@
     <Compile Include="Demos\Tests\BroadPhasesTestDemo.cs" />
     <Compile Include="Demos\Tests\TriangleTestDemo.cs" />
     <Compile Include="Demos\CharacterPlaygroundDemo.cs" />
+    <Compile Include="Demos\Tests\AddRemoveStressDemo.cs" />
     <Compile Include="Demos\TornadoDemo.cs" />
     <Compile Include="Demos\UnfortunateGuyDemo.cs" />
     <Compile Include="Demos\DiscreteVsContinuousDemo.cs" />

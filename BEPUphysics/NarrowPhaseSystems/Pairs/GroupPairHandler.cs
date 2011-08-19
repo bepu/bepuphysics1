@@ -99,6 +99,9 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             foreach (CollidablePairHandler pairHandler in subPairs.Values)
             {
                 pairHandler.CleanUp();
+                //Don't forget to give the pair back to the factory!
+                //There'd be a lot of leaks otherwise.
+                pairHandler.Factory.GiveBack(pairHandler);
             }
             subPairs.Clear();
             //don't need to remove constraints directly from our group, since cleaning up our children should get rid of them.
@@ -167,7 +170,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                 CollidablePairHandler toReturn = subPairs[pairsToRemove.Elements[i]];
                 subPairs.Remove(pairsToRemove.Elements[i]);
                 toReturn.CleanUp();
-                ((NarrowPhasePair)toReturn).Factory.GiveBack(toReturn);
+                toReturn.Factory.GiveBack(toReturn);
 
             }
             containedPairs.Clear();

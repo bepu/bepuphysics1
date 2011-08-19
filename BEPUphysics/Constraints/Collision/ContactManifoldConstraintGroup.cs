@@ -1,5 +1,6 @@
 ﻿using BEPUphysics.Constraints.SolverGroups;
 using BEPUphysics.Entities;
+using System;
 
 namespace BEPUphysics.Constraints.Collision
 {
@@ -27,7 +28,29 @@ namespace BEPUphysics.Constraints.Collision
         ///<param name="manifoldConstraint">Constraint to add.</param>
         public new void Add(EntitySolverUpdateable manifoldConstraint)
         {
-            base.Add(manifoldConstraint);
+            //This is a similar process to a normal solver group.
+            //However, it does not attempt to change involved entities.
+            //This is for two reasons:
+            //-It is unnecessary; a contact manifold is always between the same two entities throughout its lifespan.
+            //-It causes race conditions; this method is called in a multithreaded context and changing involved 
+            // entities calls upon sequential-only methods.
+            if (manifoldConstraint.solver == null)
+            {
+                if (manifoldConstraint.SolverGroup == null)
+                {
+                    solverUpdateables.Add(manifoldConstraint);
+                    manifoldConstraint.SolverGroup = this;
+                    manifoldConstraint.Solver = solver;
+                }
+                else
+                {
+                    throw new InvalidOperationException("Cannot add SolverUpdateable to SolverGroup; it already belongs to a SolverGroup.");
+                }
+            }
+            else
+            {
+                throw new InvalidOperationException("Cannot add SolverUpdateable to SolverGroup; it already belongs to a solver.");
+            }
         }
 
         ///<summary>
@@ -36,7 +59,22 @@ namespace BEPUphysics.Constraints.Collision
         ///<param name="manifoldConstraint">Constraint to remove.</param>
         public new void Remove(EntitySolverUpdateable manifoldConstraint)
         {
-            base.Remove(manifoldConstraint);
+            //This is a similar process to a normal solver group.
+            //However, it does not attempt to change involved entities.
+            //This is for two reasons:
+            //-It is unnecessary; a contact manifold is always between the same two entities throughout its lifespan.
+            //-It causes race conditions; this method is called in a multithreaded context and changing involved 
+            // entities calls upon sequential-only methods.
+            if (manifoldConstraint.SolverGroup == this)
+            {
+                solverUpdateables.Remove(manifoldConstraint);
+                manifoldConstraint.SolverGroup = null;
+                manifoldConstraint.Solver = null;
+            }
+            else
+            {
+                throw new InvalidOperationException("Cannot remove SolverUpdateable from SolverGroup; it doesn't belong to this SolverGroup.");
+            }
         }
 
         protected internal override void CollectInvolvedEntities(DataStructures.RawList<Entity> outputInvolvedEntities)
