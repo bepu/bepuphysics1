@@ -179,8 +179,8 @@ namespace BEPUphysicsDemos
                                                     .Invoke(new object[] { this });
 
 #else
-            currentSimulation = (Demo)Activator.CreateInstance(demoType, new object[] { this });
-            //currentSimulation = new SimulationIslandStressTestDemo(this);
+            //currentSimulation = (Demo)Activator.CreateInstance(demoType, new object[] { this });
+            currentSimulation = new AddRemoveStressDemo(this);
 #endif
             #region DisplayObject creation
 
