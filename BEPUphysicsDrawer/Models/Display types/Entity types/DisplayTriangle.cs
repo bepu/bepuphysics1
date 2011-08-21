@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using System;
 using BEPUphysics.CollisionShapes;
+using BEPUphysics.Collidables.MobileCollidables;
 
 namespace BEPUphysicsDrawer.Models
 {
@@ -15,9 +16,9 @@ namespace BEPUphysicsDrawer.Models
     {
 
 
-        public static void GetShapeMeshData(CollisionShape shape, List<VertexPositionNormalTexture> vertices, List<ushort> indices)
+        public static void GetShapeMeshData(EntityCollidable collidable, List<VertexPositionNormalTexture> vertices, List<ushort> indices)
         {
-            var triangleShape = shape as TriangleShape;
+            var triangleShape = collidable.Shape as TriangleShape;
             if(triangleShape == null)
                 throw new ArgumentException("Wrong shape type.");
             Vector3 normal = triangleShape.GetLocalNormal();

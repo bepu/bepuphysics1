@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.CollisionShapes;
+using BEPUphysics.Collidables.MobileCollidables;
 
 namespace BEPUphysicsDrawer.Models
 {
@@ -18,9 +19,9 @@ namespace BEPUphysicsDrawer.Models
         public static int NumSides = 24;
 
 
-        public static void GetShapeMeshData(CollisionShape shape, List<VertexPositionNormalTexture> vertices, List<ushort> indices)
+        public static void GetShapeMeshData(EntityCollidable collidable, List<VertexPositionNormalTexture> vertices, List<ushort> indices)
         {
-            ConeShape coneShape = shape as ConeShape;
+            ConeShape coneShape = collidable.Shape as ConeShape;
             if (coneShape == null)
                 throw new ArgumentException("Wrong shape type.");
 

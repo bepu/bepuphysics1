@@ -29,7 +29,7 @@ namespace BEPUphysicsDrawer.Models
 
         public override void GetMeshData(List<VertexPositionNormalTexture> vertices, List<ushort> indices)
         {
-            ModelDrawer.ShapeMeshGetters[DisplayedObject.CollisionInformation.Shape.GetType()](DisplayedObject.CollisionInformation.Shape, vertices, indices);
+            ModelDrawer.ShapeMeshGetters[DisplayedObject.CollisionInformation.GetType()](DisplayedObject.CollisionInformation, vertices, indices);
         }
 
 

@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using System;
 using BEPUphysics.CollisionShapes;
+using BEPUphysics.Collidables.MobileCollidables;
 
 namespace BEPUphysicsDrawer.Models
 {
@@ -13,9 +14,9 @@ namespace BEPUphysicsDrawer.Models
     public static class DisplayBox
     {
 
-        public static void GetShapeMeshData(CollisionShape shape, List<VertexPositionNormalTexture> vertices, List<ushort> indices)
+        public static void GetShapeMeshData(EntityCollidable collidable, List<VertexPositionNormalTexture> vertices, List<ushort> indices)
         {
-            var boxShape = shape as BoxShape;
+            var boxShape = collidable.Shape as BoxShape;
             if (boxShape == null)
                 throw new ArgumentException("Wrong shape type.");
 

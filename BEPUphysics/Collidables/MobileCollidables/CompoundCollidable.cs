@@ -27,6 +27,10 @@ namespace BEPUphysics.Collidables.MobileCollidables
             {
                 return (CompoundShape)shape;
             }
+            protected internal set
+            {
+                base.Shape = value;
+            }
         }
 
         internal RawList<CompoundChild> children = new RawList<CompoundChild>();
@@ -76,6 +80,12 @@ namespace BEPUphysics.Collidables.MobileCollidables
             return new CompoundChild(Shape, instance, index);
         }
 
+        //Used to efficiently split compounds.
+        internal CompoundCollidable()
+        {
+            hierarchy = new CompoundHierarchy(this);
+        }
+
         ///<summary>
         /// Constructs a compound collidable using additional information about the shapes in the compound.
         ///</summary>
@@ -95,7 +105,7 @@ namespace BEPUphysics.Collidables.MobileCollidables
                 this.children.Add(GetChild(children[i], i));
             }
             hierarchy = new CompoundHierarchy(this);
- 
+
         }
 
         ///<summary>
@@ -135,7 +145,7 @@ namespace BEPUphysics.Collidables.MobileCollidables
                 this.children.Add(child);
             }
             hierarchy = new CompoundHierarchy(this);
- 
+
         }
 
 
@@ -213,7 +223,7 @@ namespace BEPUphysics.Collidables.MobileCollidables
             Resources.GiveBack(hitElements);
             return false;
         }
-        
+
         //TODO: Substantial redundancy here.  If a change is ever needed, compress them down.
 
         /// <summary>
@@ -388,6 +398,17 @@ namespace BEPUphysics.Collidables.MobileCollidables
         CompoundShape shape;
         internal int shapeIndex;
 
+        /// <summary>
+        /// Gets the index of the shape used by this child in the CompoundShape's shapes list.
+        /// </summary>
+        public int ShapeIndex
+        {
+            get
+            {
+                return shapeIndex;
+            }
+        }
+
         private EntityCollidable collisionInformation;
         ///<summary>
         /// Gets the Collidable associated with the child.
@@ -439,5 +460,7 @@ namespace BEPUphysics.Collidables.MobileCollidables
         {
             get { return collisionInformation.boundingBox; }
         }
+
+
     }
 }

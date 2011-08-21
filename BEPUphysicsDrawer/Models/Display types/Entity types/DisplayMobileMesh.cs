@@ -4,6 +4,7 @@ using BEPUphysics.MathExtensions;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using BEPUphysics.CollisionShapes;
+using BEPUphysics.Collidables.MobileCollidables;
 
 namespace BEPUphysicsDrawer.Models
 {
@@ -12,9 +13,9 @@ namespace BEPUphysicsDrawer.Models
     /// </summary>
     public class DisplayMobileMesh
     {
-        public static void GetShapeMeshData(CollisionShape shapeInput, List<VertexPositionNormalTexture> vertices, List<ushort> indices)
+        public static void GetShapeMeshData(EntityCollidable collidable, List<VertexPositionNormalTexture> vertices, List<ushort> indices)
         {
-            MobileMeshShape shape = shapeInput as MobileMeshShape;
+            MobileMeshShape shape = collidable.Shape as MobileMeshShape;
             var tempVertices = new VertexPositionNormalTexture[shape.TriangleMesh.Data.Vertices.Length];
             for (int i = 0; i < shape.TriangleMesh.Data.Vertices.Length; i++)
             {
