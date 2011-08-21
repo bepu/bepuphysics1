@@ -59,23 +59,39 @@ namespace BEPUphysics.Collidables.MobileCollidables
                 b.Initialize(bCollidable, newMassB, distributionInfoB.VolumeDistribution, distributionInfoB.Volume);
 
 
-                Reposition(a, b, ref distributionInfoA, ref distributionInfoB);
+                Reposition(a, b, ref distributionInfoA, ref distributionInfoB, weightA, weightB);
                 return true;
             }
             else
                 return false;
         }
 
-        static void Reposition(Entity a, Entity b, ref ShapeDistributionInformation distributionInfoA, ref ShapeDistributionInformation distributionInfoB)
+        static void Reposition(Entity a, Entity b, ref ShapeDistributionInformation distributionInfoA, ref ShapeDistributionInformation distributionInfoB, float weightA, float weightB)
         {               
             //The compounds are not aligned with the original's position yet.
             //In order to align them, first look at the centers the split method computed.
             //They are offsets from the center of the original shape in local space.
             //These can be used to reposition the objects in world space.
+            Vector3 weightedA, weightedB;
+            Vector3.Multiply(ref distributionInfoA.Center, weightA, out weightedA);
+            Vector3.Multiply(ref distributionInfoB.Center, weightB, out weightedB);
+            Vector3 newLocalCenter;
+            Vector3.Add(ref weightedA, ref weightedB, out newLocalCenter);
+            Vector3.Divide(ref newLocalCenter, weightA + weightB, out newLocalCenter);
+            
+            Vector3 localOffsetA;
+            Vector3 localOffsetB;
+            Vector3.Subtract(ref distributionInfoA.Center, ref newLocalCenter, out localOffsetA);
+            Vector3.Subtract(ref distributionInfoB.Center, ref newLocalCenter, out localOffsetB);
+
             Vector3 originalPosition = a.position;
+
             b.Orientation = a.Orientation;
-            Vector3 offsetA = Vector3.Transform(distributionInfoA.Center, a.Orientation);
-            Vector3 offsetB = Vector3.Transform(distributionInfoB.Center, a.Orientation);
+            //Imagine a split that does not occur right down the middle, but along a far side: (oo - (o - o))
+            //Both distributions will be positive.  Only the first split works properly because there the position
+            //was aligned with the local space origin.
+            Vector3 offsetA = Vector3.Transform(localOffsetA, a.Orientation);
+            Vector3 offsetB = Vector3.Transform(localOffsetB, a.Orientation);
             a.Position = originalPosition + offsetA;
             b.Position = originalPosition + offsetB;
 
@@ -134,7 +150,7 @@ namespace BEPUphysics.Collidables.MobileCollidables
                 b.Initialize(b.CollisionInformation, newMassB, distributionInfoB.VolumeDistribution, distributionInfoB.Volume);
 
 
-                Reposition(a, b, ref distributionInfoA, ref distributionInfoB);
+                Reposition(a, b, ref distributionInfoA, ref distributionInfoB, weightA, weightB);
 
                 return true;
             }
