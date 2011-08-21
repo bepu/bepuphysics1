@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.CollisionShapes;
+using BEPUphysics.Collidables.MobileCollidables;
 
 namespace BEPUphysicsDrawer.Models
 {
@@ -19,9 +20,9 @@ namespace BEPUphysicsDrawer.Models
         public static int NumSamples = 16;
 
 
-        public static void GetShapeMeshData(CollisionShape shape, List<VertexPositionNormalTexture> vertices, List<ushort> indices)
+        public static void GetShapeMeshData(EntityCollidable collidable, List<VertexPositionNormalTexture> vertices, List<ushort> indices)
         {
-            var wrappedShape = shape as WrappedShape;
+            var wrappedShape = collidable.Shape as WrappedShape;
             if (wrappedShape == null)
                 throw new ArgumentException("Wrong shape type");
             var points = new List<Vector3>();

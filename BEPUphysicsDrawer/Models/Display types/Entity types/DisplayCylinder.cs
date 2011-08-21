@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.CollisionShapes;
+using BEPUphysics.Collidables.MobileCollidables;
 
 namespace BEPUphysicsDrawer.Models
 {
@@ -19,9 +20,9 @@ namespace BEPUphysicsDrawer.Models
         public static int NumSides = 24;
 
 
-        public static void GetShapeMeshData(CollisionShape shape, List<VertexPositionNormalTexture> vertices, List<ushort> indices)
+        public static void GetShapeMeshData(EntityCollidable collidable, List<VertexPositionNormalTexture> vertices, List<ushort> indices)
         {
-            var cylinderShape = shape as CylinderShape;
+            var cylinderShape = collidable.Shape as CylinderShape;
             if (cylinderShape == null)
                 throw new ArgumentException("Wrong shape type.");
 

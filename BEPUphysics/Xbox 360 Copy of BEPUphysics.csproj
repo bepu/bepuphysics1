@@ -84,6 +84,7 @@
     <Compile Include="Collidables\Events\IEntryEventTriggerer.cs" />
     <Compile Include="Collidables\InstancedMesh.cs" />
     <Compile Include="Collidables\MobileCollidables\CompoundCollidable.cs" />
+    <Compile Include="Collidables\MobileCollidables\CompoundHelper.cs" />
     <Compile Include="Collidables\MobileCollidables\CompoundHierarchy.cs" />
     <Compile Include="Collidables\MobileCollidables\ConvexCollidable.cs" />
     <Compile Include="Collidables\MobileCollidables\EntityCollidable.cs" />

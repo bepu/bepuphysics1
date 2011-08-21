@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using BEPUphysics.CollisionShapes;
 using System;
+using BEPUphysics.Collidables.MobileCollidables;
 
 namespace BEPUphysicsDrawer.Models
 {
@@ -13,30 +14,33 @@ namespace BEPUphysicsDrawer.Models
     public static class DisplayCompoundBody
     {
 
-        public static void GetShapeMeshData(CollisionShape shape, List<VertexPositionNormalTexture> vertices, List<ushort> indices)
+        public static void GetShapeMeshData(EntityCollidable collidable, List<VertexPositionNormalTexture> vertices, List<ushort> indices)
         {
-            var compoundShape = shape as CompoundShape;
-            if (compoundShape == null)
+            var compoundCollidable = collidable as CompoundCollidable;
+            if (compoundCollidable == null)
                 throw new ArgumentException("Wrong shape type.");
             var tempIndices = new List<ushort>();
             var tempVertices = new List<VertexPositionNormalTexture>();
-            for (int i = 0; i < compoundShape.Shapes.Count; i++)
+            for (int i = 0; i < compoundCollidable.Children.Count; i++)
             {
-                CompoundShapeEntry entry = compoundShape.Shapes[i];
+                var child = compoundCollidable.Children[i];
                 ModelDrawer.ShapeMeshGetter shapeMeshGetter;
-                if (ModelDrawer.ShapeMeshGetters.TryGetValue(entry.Shape.GetType(), out shapeMeshGetter))
+                if (ModelDrawer.ShapeMeshGetters.TryGetValue(child.CollisionInformation.GetType(), out shapeMeshGetter))
                 {
-                    shapeMeshGetter(entry.Shape, tempVertices, tempIndices);
+                    shapeMeshGetter(child.CollisionInformation, tempVertices, tempIndices);
 
                     for (int j = 0; j < tempIndices.Count; j++)
                     {
                         indices.Add((ushort)(tempIndices[j] + vertices.Count));
                     }
+                    RigidTransform localTransform = child.Entry.LocalTransform;
+                    Vector3 localPosition = child.CollisionInformation.LocalPosition;
                     for (int j = 0; j < tempVertices.Count; j++)
                     {
                         VertexPositionNormalTexture vertex = tempVertices[j];
-                        RigidTransform.Transform(ref vertex.Position, ref entry.LocalTransform, out vertex.Position);
-                        vertex.Normal = Vector3.Transform(vertex.Normal, entry.LocalTransform.Orientation);
+                        Vector3.Add(ref vertex.Position, ref localPosition, out vertex.Position);
+                        RigidTransform.Transform(ref vertex.Position, ref localTransform, out vertex.Position);
+                        Vector3.Transform(ref vertex.Normal, ref localTransform.Orientation, out vertex.Normal);
                         vertices.Add(vertex);
                     }
 

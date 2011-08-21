@@ -301,7 +301,8 @@ namespace BEPUphysics.CollisionShapes
             for (int i = 0; i < shapes.count; i++)
             {
                 totalWeight += shapes.Elements[i].Weight;
-                Matrix3X3 contribution = GetContribution(shapes.Elements[i].Shape, ref shapes.Elements[i].LocalTransform, ref Toolbox.ZeroVector, shapes.Elements[i].Weight);
+                Matrix3X3 contribution;
+                GetContribution(shapes.Elements[i].Shape, ref shapes.Elements[i].LocalTransform, ref Toolbox.ZeroVector, shapes.Elements[i].Weight, out contribution);
                 Matrix3X3.Add(ref contribution, ref volumeDistribution, out volumeDistribution);
 
             }
@@ -329,7 +330,8 @@ namespace BEPUphysics.CollisionShapes
             for (int i = 0; i < entries.Count; i++)
             {
                 RigidTransform transform = entries[i].LocalTransform;
-                Matrix3X3 contribution = GetContribution(entries[i].Shape, ref transform, ref center, entries[i].Weight);
+                Matrix3X3 contribution;
+                GetContribution(entries[i].Shape, ref transform, ref center, entries[i].Weight, out contribution);
                 Matrix3X3.Add(ref volumeDistribution, ref contribution, out volumeDistribution);
             }
             return volumeDistribution;
@@ -342,12 +344,15 @@ namespace BEPUphysics.CollisionShapes
         ///<param name="transform">Transform of the shape.</param>
         ///<param name="center">Center to use when computing the distribution.</param>
         ///<param name="weight">Weighting to apply to the contribution.</param>
-        ///<returns>Volume distribution of the contribution.</returns>
-        public static Matrix3X3 GetContribution(EntityShape shape, ref RigidTransform transform, ref Vector3 center, float weight)
+        ///<param name="contribution">Volume distribution of the contribution.</param>
+        public static void GetContribution(EntityShape shape, ref RigidTransform transform, ref Vector3 center, float weight, out Matrix3X3 contribution)
         {
-            Matrix3X3 baseContribution = shape.ComputeVolumeDistribution();
-            return TransformContribution(ref transform, ref center, ref baseContribution, weight);
+            contribution = shape.ComputeVolumeDistribution();
+            TransformContribution(ref transform, ref center, ref contribution, weight, out contribution);
+            //return TransformContribution(ref transform, ref center, ref contribution, weight);
         }
+
+
 
         /// <summary>
         /// Modifies a contribution using a transform, position, and weight.
@@ -356,23 +361,20 @@ namespace BEPUphysics.CollisionShapes
         /// <param name="center">Center to use to modify the contribution.</param>
         /// <param name="baseContribution">Original unmodified contribution.</param>
         /// <param name="weight">Weight of the contribution.</param>
-        /// <returns>Transformed contribution.</returns>
-        public static Matrix3X3 TransformContribution(ref RigidTransform transform, ref Vector3 center, ref Matrix3X3 baseContribution, float weight)
+        /// <param name="contribution">Transformed contribution.</param>
+        public static void TransformContribution(ref RigidTransform transform, ref Vector3 center, ref Matrix3X3 baseContribution, float weight, out Matrix3X3 contribution)
         {
             Matrix3X3 rotation;
             Matrix3X3.CreateFromQuaternion(ref transform.Orientation, out rotation);
-            Matrix3X3 inverseRotation;
-            Matrix3X3.Transpose(ref rotation, out inverseRotation);
-
-            Matrix3X3 contribution;
+            Matrix3X3 temp;
 
             //TODO: Verify contribution
 
             //Do angular transformed contribution first...
-            Matrix3X3.Multiply(ref inverseRotation, ref baseContribution, out contribution);
-            Matrix3X3.Multiply(ref contribution, ref rotation, out contribution);
+            Matrix3X3.MultiplyTransposed(ref rotation, ref baseContribution, out temp);
+            Matrix3X3.Multiply(ref temp, ref rotation, out temp);
 
-            Matrix3X3 volumeDistribution = contribution;
+            contribution = temp;
 
             //Now add in the offset from the origin.
             Vector3 offset;
@@ -382,12 +384,11 @@ namespace BEPUphysics.CollisionShapes
             Matrix3X3 outerProduct;
             Matrix3X3.CreateOuterProduct(ref offset, ref offset, out outerProduct);
 
-            Matrix3X3.Subtract(ref innerProduct, ref outerProduct, out contribution);
+            Matrix3X3.Subtract(ref innerProduct, ref outerProduct, out temp);
 
-            Matrix3X3.Add(ref volumeDistribution, ref contribution, out volumeDistribution);
-            Matrix3X3.Multiply(ref volumeDistribution, weight, out volumeDistribution);
+            Matrix3X3.Add(ref contribution, ref temp, out contribution);
+            Matrix3X3.Multiply(ref contribution, weight, out contribution);
 
-            return volumeDistribution;
         }
 
 
@@ -423,6 +424,20 @@ namespace BEPUphysics.CollisionShapes
         }
 
         #endregion
+
+        /// <summary>
+        /// Computes and returns the volume, volume distribution, and center contributions from each child shape in the compound shape.
+        /// </summary>
+        /// <returns>Volume, volume distribution, and center contributions from each child shape in the compound shape.</returns>
+        public ShapeDistributionInformation[] ComputeChildContributions()
+        {
+            var toReturn = new ShapeDistributionInformation[shapes.count];
+            for (int i = 0; i < shapes.count; i++)
+            {
+                shapes.Elements[i].Shape.ComputeDistributionInformation(out toReturn[i]);
+            }
+            return toReturn;
+        }
     }
 
 

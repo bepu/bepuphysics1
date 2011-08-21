@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.CollisionShapes;
+using BEPUphysics.Collidables.MobileCollidables;
 
 namespace BEPUphysicsDrawer.Models
 {
@@ -20,9 +21,9 @@ namespace BEPUphysicsDrawer.Models
         public static int NumSamples = 20;
 
 
-        public static void GetShapeMeshData(CollisionShape shape, List<VertexPositionNormalTexture> vertices, List<ushort> indices)
+        public static void GetShapeMeshData(EntityCollidable collidable, List<VertexPositionNormalTexture> vertices, List<ushort> indices)
         {
-            var minkowskiShape = shape as MinkowskiSumShape;
+            var minkowskiShape = collidable.Shape as MinkowskiSumShape;
             if (minkowskiShape == null)
                 throw new ArgumentException("Wrong shape type.");
 

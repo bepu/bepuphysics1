@@ -15,9 +15,12 @@ namespace BEPUphysics.Entities
         ///<summary>
         /// Gets the collidable used by the entity.
         ///</summary>
-        public new T CollisionInformation { get { return (T)collisionInformation; } }
+        public new T CollisionInformation
+        {
+            get { return (T)collisionInformation; }
+        }
 
-        protected Entity()
+        protected internal Entity()
         {
 
         }

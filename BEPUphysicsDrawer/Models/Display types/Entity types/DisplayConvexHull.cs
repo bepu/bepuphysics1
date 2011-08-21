@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 using BEPUphysics.CollisionShapes;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using System;
+using BEPUphysics.Collidables.MobileCollidables;
 
 namespace BEPUphysicsDrawer.Models
 {
@@ -16,9 +17,9 @@ namespace BEPUphysicsDrawer.Models
     public static class DisplayConvexHull
     {
 
-        public static void GetShapeMeshData(CollisionShape shape, List<VertexPositionNormalTexture> vertices, List<ushort> indices)
+        public static void GetShapeMeshData(EntityCollidable collidable, List<VertexPositionNormalTexture> vertices, List<ushort> indices)
         {
-            var convexHullShape = shape as ConvexHullShape;
+            var convexHullShape = collidable.Shape as ConvexHullShape;
             if (convexHullShape == null)
                 throw new ArgumentException("Wrong shape type.");
 

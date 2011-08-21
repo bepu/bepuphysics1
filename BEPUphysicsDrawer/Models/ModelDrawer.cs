@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using BEPUphysics.CollisionShapes;
 using BEPUphysics.CollisionShapes.ConvexShapes;
+using BEPUphysics.Collidables.MobileCollidables;
 
 namespace BEPUphysicsDrawer.Models
 {
@@ -57,18 +58,18 @@ namespace BEPUphysicsDrawer.Models
 
 
             //Entity types are handled through a special case that uses an Entity's Shape to look up one of the ShapeMeshGetters.
-            shapeMeshGetters.Add(typeof(BoxShape), DisplayBox.GetShapeMeshData);
-            shapeMeshGetters.Add(typeof(SphereShape), DisplaySphere.GetShapeMeshData);
-            shapeMeshGetters.Add(typeof(CapsuleShape), DisplayCapsule.GetShapeMeshData);
-            shapeMeshGetters.Add(typeof(CylinderShape), DisplayCylinder.GetShapeMeshData);
-            shapeMeshGetters.Add(typeof(ConeShape), DisplayCone.GetShapeMeshData);
-            shapeMeshGetters.Add(typeof(TriangleShape), DisplayTriangle.GetShapeMeshData);
-            shapeMeshGetters.Add(typeof(ConvexHullShape), DisplayConvexHull.GetShapeMeshData);
-            shapeMeshGetters.Add(typeof(MinkowskiSumShape), DisplayMinkowskiSum.GetShapeMeshData);
-            shapeMeshGetters.Add(typeof(WrappedShape), DisplayWrappedBody.GetShapeMeshData);
-            shapeMeshGetters.Add(typeof(TransformableShape), DisplayTransformable.GetShapeMeshData);
-            shapeMeshGetters.Add(typeof(CompoundShape), DisplayCompoundBody.GetShapeMeshData);
-            shapeMeshGetters.Add(typeof(MobileMeshShape), DisplayMobileMesh.GetShapeMeshData);
+            shapeMeshGetters.Add(typeof(ConvexCollidable<BoxShape>), DisplayBox.GetShapeMeshData);
+            shapeMeshGetters.Add(typeof(ConvexCollidable<SphereShape>), DisplaySphere.GetShapeMeshData);
+            shapeMeshGetters.Add(typeof(ConvexCollidable<CapsuleShape>), DisplayCapsule.GetShapeMeshData);
+            shapeMeshGetters.Add(typeof(ConvexCollidable<CylinderShape>), DisplayCylinder.GetShapeMeshData);
+            shapeMeshGetters.Add(typeof(ConvexCollidable<ConeShape>), DisplayCone.GetShapeMeshData);
+            shapeMeshGetters.Add(typeof(ConvexCollidable<TriangleShape>), DisplayTriangle.GetShapeMeshData);
+            shapeMeshGetters.Add(typeof(ConvexCollidable<ConvexHullShape>), DisplayConvexHull.GetShapeMeshData);
+            shapeMeshGetters.Add(typeof(ConvexCollidable<MinkowskiSumShape>), DisplayMinkowskiSum.GetShapeMeshData);
+            shapeMeshGetters.Add(typeof(ConvexCollidable<WrappedShape>), DisplayWrappedBody.GetShapeMeshData);
+            shapeMeshGetters.Add(typeof(ConvexCollidable<TransformableShape>), DisplayTransformable.GetShapeMeshData);
+            shapeMeshGetters.Add(typeof(CompoundCollidable), DisplayCompoundBody.GetShapeMeshData);
+            shapeMeshGetters.Add(typeof(MobileMeshCollidable), DisplayMobileMesh.GetShapeMeshData);
 
         }
 
@@ -270,6 +271,6 @@ namespace BEPUphysicsDrawer.Models
         /// <param name="projectionMatrix">Projection matrix to use to draw the objects.</param>
         protected abstract void DrawManagedModels(Matrix viewMatrix, Matrix projectionMatrix);
 
-        public delegate void ShapeMeshGetter(CollisionShape shape, List<VertexPositionNormalTexture> vertices, List<ushort> indices);
+        public delegate void ShapeMeshGetter(EntityCollidable collidable, List<VertexPositionNormalTexture> vertices, List<ushort> indices);
     }
 }
