@@ -179,8 +179,8 @@ namespace BEPUphysicsDemos
                                                     .Invoke(new object[] { this });
 
 #else
-            //currentSimulation = (Demo)Activator.CreateInstance(demoType, new object[] { this });
-            currentSimulation = new MutableCompoundDemo(this);
+            currentSimulation = (Demo)Activator.CreateInstance(demoType, new object[] { this });
+            //currentSimulation = new MutableCompoundDemo(this);
 #endif
             #region DisplayObject creation
 
