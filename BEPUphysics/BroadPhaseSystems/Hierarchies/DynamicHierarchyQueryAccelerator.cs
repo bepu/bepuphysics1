@@ -21,7 +21,8 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
         /// <param name="entries">Entries of the space which intersect the bounding box.</param>
         public void GetEntries(BoundingBox box, IList<BroadPhaseEntry> entries)
         {
-            hierarchy.root.GetOverlaps(ref box, entries);
+            if (hierarchy.root != null)
+                hierarchy.root.GetOverlaps(ref box, entries);
 
         }
 
@@ -32,7 +33,8 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
         /// <param name="entries">Entries of the space which intersect the frustum.</param>
         public void GetEntries(BoundingFrustum frustum, IList<BroadPhaseEntry> entries)
         {
-            hierarchy.root.GetOverlaps(ref frustum, entries);
+            if (hierarchy.root != null)
+                hierarchy.root.GetOverlaps(ref frustum, entries);
 
         }
 
@@ -43,7 +45,8 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
         /// <param name="entries">Entries of the space which intersect the sphere.</param>
         public void GetEntries(BoundingSphere sphere, IList<BroadPhaseEntry> entries)
         {
-            hierarchy.root.GetOverlaps(ref sphere, entries);
+            if (hierarchy.root != null)
+                hierarchy.root.GetOverlaps(ref sphere, entries);
 
         }
 
@@ -56,9 +59,13 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
         /// <param name="entries">Entries which have bounding boxes that overlap the ray.</param>
         public bool RayCast(Ray ray, float maximumLength, IList<BroadPhaseEntry> entries)
         {
-            hierarchy.root.GetOverlaps(ref ray, maximumLength, entries);
+            if (hierarchy.root != null)
+            {
+                hierarchy.root.GetOverlaps(ref ray, maximumLength, entries);
 
-            return entries.Count > 0;
+                return entries.Count > 0;
+            }
+            return false;
         }
 
 
@@ -69,9 +76,13 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
         /// <param name="entries">Entries which have bounding boxes that overlap the ray.</param>
         public bool RayCast(Ray ray, IList<BroadPhaseEntry> entries)
         {
-            hierarchy.root.GetOverlaps(ref ray, float.MaxValue, entries);
+            if (hierarchy.root != null)
+            {
+                hierarchy.root.GetOverlaps(ref ray, float.MaxValue, entries);
 
-            return entries.Count > 0;
+                return entries.Count > 0;
+            }
+            return false;
         }
 
 
