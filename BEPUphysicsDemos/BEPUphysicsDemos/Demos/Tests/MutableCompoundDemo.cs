@@ -6,6 +6,8 @@ using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.MathExtensions;
 using BEPUphysics.Collidables.MobileCollidables;
 using BEPUphysics.Entities;
+using System;
+using System.Diagnostics;
 
 namespace BEPUphysicsDemos.Demos.Tests
 {
@@ -21,9 +23,9 @@ namespace BEPUphysicsDemos.Demos.Tests
         public MutableCompoundDemo(DemosGame game)
             : base(game)
         {
-            int width = 40;
-            int height = 4;
-            int length = 4;
+            int width = 1;
+            int height = 1;
+            int length = 10;
             float blockWidth = 1f;
             float blockHeight = 1f;
             float blockLength = 1f;
@@ -56,7 +58,14 @@ namespace BEPUphysicsDemos.Demos.Tests
                 //compound.AngularVelocity = new Vector3(0, 1, 0);
                 Entity<CompoundCollidable> compound2, compound3;
                 CompoundHelper.SplitCompound(x => x.ShapeIndex >= shapes.Count / 2, compound, out compound2);
-                CompoundHelper.SplitCompound(x => x.ShapeIndex >= 20 * shapes.Count / 21, compound2, out compound3); 
+                CompoundHelper.SplitCompound(x => x.ShapeIndex == shapes.Count - 1, compound2, out compound3);
+
+                if (Math.Abs(compound3.LocalInertiaTensor.M11 - compound3.LocalInertiaTensor.M22) > .01f ||
+                    Math.Abs(compound3.LocalInertiaTensor.M22 - compound3.LocalInertiaTensor.M33) > .01f)
+                {
+                    Debug.WriteLine("Breka.");
+                }
+
 
                 compound.ActivityInformation.IsAlwaysActive = true;
                 compound.IsAffectedByGravity = false;
