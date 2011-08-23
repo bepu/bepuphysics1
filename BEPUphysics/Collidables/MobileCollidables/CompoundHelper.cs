@@ -39,12 +39,35 @@ namespace BEPUphysics.Collidables.MobileCollidables
         public static bool SplitCompound(IList<ShapeDistributionInformation> childContributions, Func<CompoundChild, bool> splitPredicate,
             Entity<CompoundCollidable> a, out Entity<CompoundCollidable> b)
         {
+
+            ShapeDistributionInformation distributionInfoA, distributionInfoB;
+            if (SplitCompound(childContributions, splitPredicate, a, out b, out distributionInfoA, out distributionInfoB))
+            {
+                return true;
+            }
+            else
+                return false;
+        }
+
+        /// <summary>
+        /// Splits a single compound collidable into two separate compound collidables and computes information needed by the simulation.
+        /// </summary>
+        /// <param name="childContributions">List of distribution information associated with each child shape of the whole compound shape used by the compound being split.</param>
+        /// <param name="splitPredicate">Delegate which determines if a child in the original compound should be moved to the new compound.</param>
+        /// <param name="a">Original compound to be split.  Children in this compound will be removed and added to the other compound.</param>
+        /// <param name="b">Compound to receive children removed from the original compound.</param>
+        /// <param name="distributionInfoA">Volume, volume distribution, and center information about the new form of the original compound collidable.</param>
+        /// <param name="distributionInfoB">Volume, volume distribution, and center information about the new compound collidable.</param>
+        /// <returns>Whether or not the predicate returned true for any element in the original compound and split the compound.</returns>
+        public static bool SplitCompound(IList<ShapeDistributionInformation> childContributions, Func<CompoundChild, bool> splitPredicate,
+                        Entity<CompoundCollidable> a, out Entity<CompoundCollidable> b,
+                        out ShapeDistributionInformation distributionInfoA, out ShapeDistributionInformation distributionInfoB)
+        {
             CompoundCollidable bCollidable = new CompoundCollidable();
             bCollidable.Shape = a.CollisionInformation.Shape;
             b = new Entity<CompoundCollidable>();
 
 
-            ShapeDistributionInformation distributionInfoA, distributionInfoB;
             float weightA, weightB;
             if (SplitCompound(childContributions, splitPredicate, a.CollisionInformation, bCollidable, out distributionInfoA, out distributionInfoB, out weightA, out weightB))
             {
@@ -67,7 +90,7 @@ namespace BEPUphysics.Collidables.MobileCollidables
         }
 
         static void Reposition(Entity a, Entity b, ref ShapeDistributionInformation distributionInfoA, ref ShapeDistributionInformation distributionInfoB, float weightA, float weightB)
-        {               
+        {
             //The compounds are not aligned with the original's position yet.
             //In order to align them, first look at the centers the split method computed.
             //They are offsets from the center of the original shape in local space.
@@ -78,7 +101,7 @@ namespace BEPUphysics.Collidables.MobileCollidables
             Vector3 newLocalCenter;
             Vector3.Add(ref weightedA, ref weightedB, out newLocalCenter);
             Vector3.Divide(ref newLocalCenter, weightA + weightB, out newLocalCenter);
-            
+
             Vector3 localOffsetA;
             Vector3 localOffsetB;
             Vector3.Subtract(ref distributionInfoA.Center, ref newLocalCenter, out localOffsetA);
@@ -136,6 +159,28 @@ namespace BEPUphysics.Collidables.MobileCollidables
             Entity<CompoundCollidable> a, Entity<CompoundCollidable> b)
         {
             ShapeDistributionInformation distributionInfoA, distributionInfoB;
+            if (SplitCompound(childContributions, splitPredicate, a, b, out distributionInfoA, out distributionInfoB))
+            {
+                return true;
+            }
+            else
+                return false;
+        }
+
+        /// <summary>
+        /// Splits a single compound collidable into two separate compound collidables and computes information needed by the simulation.
+        /// </summary>
+        /// <param name="childContributions">List of distribution information associated with each child shape of the whole compound shape used by the compound being split.</param>
+        /// <param name="splitPredicate">Delegate which determines if a child in the original compound should be moved to the new compound.</param>
+        /// <param name="distributionInfoA">Volume, volume distribution, and center information about the new form of the original compound collidable.</param>
+        /// <param name="distributionInfoB">Volume, volume distribution, and center information about the new compound collidable.</param>
+        /// <param name="a">Original compound to be split.  Children in this compound will be removed and added to the other compound.</param>
+        /// <param name="b">Compound to receive children removed from the original compound.</param>
+        /// <returns>Whether or not the predicate returned true for any element in the original compound and split the compound.</returns>
+        public static bool SplitCompound(IList<ShapeDistributionInformation> childContributions, Func<CompoundChild, bool> splitPredicate,
+                        Entity<CompoundCollidable> a, Entity<CompoundCollidable> b,
+                        out ShapeDistributionInformation distributionInfoA, out ShapeDistributionInformation distributionInfoB)
+        {
             float weightA, weightB;
             if (SplitCompound(childContributions, splitPredicate, a.CollisionInformation, b.CollisionInformation, out distributionInfoA, out distributionInfoB, out weightA, out weightB))
             {
@@ -255,9 +300,9 @@ namespace BEPUphysics.Collidables.MobileCollidables
                 var child = b.children.Elements[i];
                 child.CollisionInformation.localPosition = offsetB;
                 var entry = child.Entry;
-                Vector3.Add(ref entry.LocalTransform.Position, ref offsetB, out entry.LocalTransform.Position);
                 var contribution = childContributions[child.shapeIndex];
                 CompoundShape.TransformContribution(ref entry.LocalTransform, ref distributionInfoB.Center, ref contribution.VolumeDistribution, entry.Weight, out contribution.VolumeDistribution);
+                Vector3.Add(ref entry.LocalTransform.Position, ref offsetB, out entry.LocalTransform.Position);
                 Matrix3X3.Add(ref contribution.VolumeDistribution, ref distributionInfoB.VolumeDistribution, out distributionInfoB.VolumeDistribution);
             }
 

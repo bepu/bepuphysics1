@@ -21,8 +21,8 @@ namespace BEPUphysicsDemos.Demos.Tests
         public MutableCompoundDemo(DemosGame game)
             : base(game)
         {
-            int width = 4;
-            int height = 15;
+            int width = 40;
+            int height = 4;
             int length = 4;
             float blockWidth = 1f;
             float blockHeight = 1f;
@@ -30,7 +30,7 @@ namespace BEPUphysicsDemos.Demos.Tests
 
 
 
-            for (int q = 0; q < 5; q++)
+            for (int q = 0; q < 1; q++)
             {
                 List<CompoundShapeEntry> shapes = new List<CompoundShapeEntry>();
                 float totalWeight = 0;
@@ -56,7 +56,7 @@ namespace BEPUphysicsDemos.Demos.Tests
                 //compound.AngularVelocity = new Vector3(0, 1, 0);
                 Entity<CompoundCollidable> compound2, compound3;
                 CompoundHelper.SplitCompound(x => x.ShapeIndex >= shapes.Count / 2, compound, out compound2);
-                CompoundHelper.SplitCompound(x => x.ShapeIndex >= 3 * shapes.Count / 4, compound2, out compound3); 
+                CompoundHelper.SplitCompound(x => x.ShapeIndex >= 20 * shapes.Count / 21, compound2, out compound3); 
 
                 compound.ActivityInformation.IsAlwaysActive = true;
                 compound.IsAffectedByGravity = false;
@@ -68,6 +68,7 @@ namespace BEPUphysicsDemos.Demos.Tests
                 Space.Add(compound);
                 Space.Add(compound2);
                 Space.Add(compound3);
+
             }
 
             Box ground = new Box(new Vector3(0, -4.5f, 0), 50, 1, 50);
