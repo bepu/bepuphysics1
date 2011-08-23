@@ -290,9 +290,9 @@ namespace BEPUphysics.Collidables.MobileCollidables
                 var child = a.children.Elements[i];
                 child.CollisionInformation.localPosition = offsetA;
                 var entry = child.Entry;
-                Vector3.Add(ref entry.LocalTransform.Position, ref offsetA, out entry.LocalTransform.Position);
                 var contribution = childContributions[child.shapeIndex];
                 CompoundShape.TransformContribution(ref entry.LocalTransform, ref distributionInfoA.Center, ref contribution.VolumeDistribution, entry.Weight, out contribution.VolumeDistribution);
+                Vector3.Add(ref entry.LocalTransform.Position, ref offsetA, out entry.LocalTransform.Position);
                 Matrix3X3.Add(ref contribution.VolumeDistribution, ref distributionInfoA.VolumeDistribution, out distributionInfoA.VolumeDistribution);
             }
             for (int i = b.children.count - 1; i >= 0; i--)
