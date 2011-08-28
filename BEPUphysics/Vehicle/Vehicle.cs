@@ -28,6 +28,9 @@ namespace BEPUphysics.Vehicle
             IsUpdatedSequentially = false;
             Body = shape;
             Body.activityInformation.IsAlwaysActive = true;
+            //The body is always active, so don't bother with stabilization either.
+            //Stabilization can introduce artifacts as wel.
+            body.AllowStabilization = false;
         }
 
         /// <summary>
