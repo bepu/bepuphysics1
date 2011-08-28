@@ -127,6 +127,7 @@ namespace BEPUphysicsDemos.AlternateMovement
 
             #endregion
 
+
             foreach (Wheel wheel in Vehicle.Wheels)
             {
                 //This is a cosmetic setting that makes it looks like the car doesn't have antilock brakes.
@@ -134,6 +135,8 @@ namespace BEPUphysicsDemos.AlternateMovement
 
                 //By default, wheels use as many iterations as the space.  By lowering it,
                 //performance can be improved at the cost of a little accuracy.
+                //However, because the suspension and friction are not really rigid,
+                //the lowered accuracy is not so much of a problem.
                 wheel.Suspension.SolverSettings.MaximumIterations = 1;
                 wheel.Brake.SolverSettings.MaximumIterations = 1;
                 wheel.SlidingFriction.SolverSettings.MaximumIterations = 1;

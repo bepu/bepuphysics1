@@ -23,8 +23,8 @@ namespace BEPUphysicsDemos.Demos.Tests
         public MutableCompoundDemo(DemosGame game)
             : base(game)
         {
-            int width = 1;
-            int height = 1;
+            int width = 3;
+            int height = 3;
             int length = 10;
             float blockWidth = 1f;
             float blockHeight = 1f;
@@ -58,21 +58,16 @@ namespace BEPUphysicsDemos.Demos.Tests
                 //compound.AngularVelocity = new Vector3(0, 1, 0);
                 Entity<CompoundCollidable> compound2, compound3;
                 CompoundHelper.SplitCompound(x => x.ShapeIndex >= shapes.Count / 2, compound, out compound2);
-                CompoundHelper.SplitCompound(x => x.ShapeIndex == shapes.Count - 1, compound2, out compound3);
-
-                if (Math.Abs(compound3.LocalInertiaTensor.M11 - compound3.LocalInertiaTensor.M22) > .01f ||
-                    Math.Abs(compound3.LocalInertiaTensor.M22 - compound3.LocalInertiaTensor.M33) > .01f)
-                {
-                    Debug.WriteLine("Breka.");
-                }
+                CompoundHelper.SplitCompound(x => x.ShapeIndex >= 3 * shapes.Count / 4, compound2, out compound3);
 
 
-                compound.ActivityInformation.IsAlwaysActive = true;
-                compound.IsAffectedByGravity = false;
-                compound2.ActivityInformation.IsAlwaysActive = true;
-                compound2.IsAffectedByGravity = false;
-                compound3.ActivityInformation.IsAlwaysActive = true;
-                compound3.IsAffectedByGravity = false;
+
+                //compound.ActivityInformation.IsAlwaysActive = true;
+                //compound.IsAffectedByGravity = false;
+                //compound2.ActivityInformation.IsAlwaysActive = true;
+                //compound2.IsAffectedByGravity = false;
+                //compound3.ActivityInformation.IsAlwaysActive = true;
+                //compound3.IsAffectedByGravity = false;
                 //compound.Tag = "noDisplayObject";
                 Space.Add(compound);
                 Space.Add(compound2);
