@@ -226,47 +226,18 @@ namespace BEPUphysics.NarrowPhaseSystems
 
         }
 
-        int staleLoopIndex;
-        static float maximumTraversedPairs = .1f;
-        /// <summary>
-        /// Gets or sets the fraction of all narrow phase pairs traversed by the "remove stale pairs" loop.
-        /// A fraction closer to 1 clears out more pairs, but takes more time.
-        /// Defaults to .1f.
-        /// </summary>
-        public static float MaximumTraversedPairsFraction
-        {
-            get
-            {
-                return maximumTraversedPairs;
-            }
-            set
-            {
-                if (value < 0 || value > 1)
-                    throw new Exception("Value must be from zero to one.");
-                maximumTraversedPairs = value;
-            }
-        }
-        int maxTraversedPairs;
 
         void RemoveStaleOverlaps()
         {
             //Remove stale objects.
-            //Only look over a subset of the total pairs each frame for extra speed.
-
-            maxTraversedPairs = Math.Max(1, (int)(narrowPhasePairs.count * maximumTraversedPairs));
-
-            int traversedPairs = 0;
-            while (traversedPairs++ < maxTraversedPairs && narrowPhasePairs.count > 0)
+            for (int i = narrowPhasePairs.count - 1; i >= 0; i--)
             {
-                if (--staleLoopIndex < 0 || staleLoopIndex >= narrowPhasePairs.count)
-                    staleLoopIndex = narrowPhasePairs.count - 1; //Rather adding back upwards, just restart at the top.  The length can change.
-
-                var pair = narrowPhasePairs.Elements[staleLoopIndex];
+                var pair = narrowPhasePairs.Elements[i];
                 if (pair.NeedsUpdate &&
                     //Overlap will not be refreshed if entries are inactive, but shouldn't remove narrow phase pair.
                     (pair.BroadPhaseOverlap.entryA.IsActive || pair.BroadPhaseOverlap.entryB.IsActive))
                 {
-                    narrowPhasePairs.FastRemoveAt(staleLoopIndex);
+                    narrowPhasePairs.FastRemoveAt(i);
                     OnRemovePair(pair);
                 }
                 else
@@ -275,33 +246,7 @@ namespace BEPUphysics.NarrowPhaseSystems
             }
 
 
-            //for (int i = narrowPhasePairs.count - 1; i >= 0; i--)
-            //{
-            //    NarrowPhasePair narrowPhaseObject = narrowPhasePairs.Elements[i];
-            //    //Overlap will not be refreshed if entries are inactive, but shouldn't remove narrow phase pair.
-            //    if (narrowPhaseObject.BroadPhaseOverlap.entryA.IsActive || narrowPhaseObject.BroadPhaseOverlap.entryB.IsActive)
-            //    {
-            //        if (narrowPhaseObject.NeedsUpdate)
-            //        {
-            //            //The pair is stale!
-            //            narrowPhasePairs.FastRemoveAt(i);
-            //            //Is the constraint is in the solver, we have to get rid of it.
-            //            //TODO: This may simplify some things in the cleanup of pairs.  They didn't previously have guarantees
-            //            //that it was not in the solver.
-            //            if (narrowPhaseObject.constraint.Constraint.solver != null)
-            //                narrowPhaseObject.constraint.Constraint.solver.FluxRemove(narrowPhaseObject.constraint.Constraint);
-            //            OnRemovePair(narrowPhaseObject);
-            //        }
-            //        else
-            //        {
-            //            //The pair isn't stale... but is the constraint?
-            //            //Check to make sure it hasn't already been removed before attempting to remove it.
-            //            if (narrowPhaseObject.constraint.ShouldRemove && narrowPhaseObject.constraint.Constraint.solver != null)
-            //                narrowPhaseObject.constraint.Constraint.solver.FluxRemove(narrowPhaseObject.constraint.Constraint);
-            //        }
-            //    }
-            //    narrowPhaseObject.NeedsUpdate = true;
-            //}
+
         }
 
         void AddNewNarrowPhaseObjects()

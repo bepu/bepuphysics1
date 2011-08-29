@@ -88,7 +88,7 @@ namespace BEPUphysicsDemos.Demos.Tests
             //Pre-simulate.
             for (int i = 0; i < 30; i++)
             {
-                //Space.Update();
+                Space.Update();
             }
 
             int numRuns = 500;
@@ -96,7 +96,7 @@ namespace BEPUphysicsDemos.Demos.Tests
             double startTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
             for (int i = 0; i < numRuns; i++)
             {
-                //Space.Update();
+                Space.Update();
             }
 
             double endTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
