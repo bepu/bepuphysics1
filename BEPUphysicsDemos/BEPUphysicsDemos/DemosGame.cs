@@ -180,7 +180,7 @@ namespace BEPUphysicsDemos
 
 #else
             currentSimulation = (Demo)Activator.CreateInstance(demoType, new object[] { this });
-            //currentSimulation = new MutableCompoundDemo(this);
+            //currentSimulation = new SimulationIslandStressTestDemo(this);
 #endif
             #region DisplayObject creation
 

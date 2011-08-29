@@ -49,7 +49,6 @@ namespace BEPUphysics.CollisionTests.Manifolds
 
         Contact contact = new Contact();
         bool previouslyColliding;
-        bool colliding;
 
         ///<summary>
         /// Updates the manifold.
@@ -58,15 +57,20 @@ namespace BEPUphysics.CollisionTests.Manifolds
         public override void Update(float dt)
         {
             ContactData contactData;
-            if (colliding = BoxSphereTester.AreShapesColliding(box.Shape, sphere.Shape, ref box.worldTransform, ref sphere.worldTransform.Position, out contactData))
+            bool colliding = false;
+            if (BoxSphereTester.AreShapesColliding(box.Shape, sphere.Shape, ref box.worldTransform, ref sphere.worldTransform.Position, out contactData))
             {
-                if (!previouslyColliding)
+                if (!previouslyColliding && contactData.PenetrationDepth >= 0)//Don't use the contact if it's an initial contact and the depth is negative.  Why not? Bounciness and InitialCollisionDetected.
+                {
                     Add(ref contactData);
-                else
+                    colliding = true;
+                }
+                else if (previouslyColliding)
                 {
                     contact.Normal = contactData.Normal;
                     contact.PenetrationDepth = contactData.PenetrationDepth;
                     contact.Position = contactData.Position;
+                    colliding = true;
                 }
             }
             else
