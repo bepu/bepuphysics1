@@ -114,6 +114,7 @@
     <Compile Include="Demos\SpaceshipDemo.cs" />
     <Compile Include="Demos\TerrainDemo.cs" />
     <Compile Include="Demos\Tests\AddRemoveStressDemo.cs" />
+    <Compile Include="Demos\Tests\BoxBoxTestDemo.cs" />
     <Compile Include="Demos\Tests\BroadPhasesTestDemo.cs" />
     <Compile Include="Demos\Tests\ClothTestDemo.cs" />
     <Compile Include="Demos\Tests\DeterminismTestDemo.cs" />

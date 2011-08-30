@@ -155,6 +155,25 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     }
                 }
 
+                ////Go through the indices to remove.
+                ////For each one, replace the removal index with a contact in the new manifold.
+                //int removalIndex;
+                //for (removalIndex = toRemove.count - 1; removalIndex >= 0 && manifold.count > 0; removalIndex--)
+                //{
+                //    int indexToReplace = toRemove[removalIndex];
+                //    toRemove.RemoveAt(removalIndex);
+                //    manifold.Get(manifold.count - 1, out data);
+                //    //Update contact...
+                //    contacts.Elements[indexToReplace].Position = data.Position;
+                //    contacts.Elements[indexToReplace].PenetrationDepth = -data.Depth;
+                //    contacts.Elements[indexToReplace].Normal = axis;
+                //    contacts.Elements[indexToReplace].Id = data.Id;
+                //    //Remove manifold entry
+                //    manifold.RemoveAt(manifold.count - 1);
+
+                //}
+
+                //Alright, we ran out of contacts to replace (if, in fact, toRemove isn't empty now).  Just remove the remainder.
                 //toRemove is sorted by increasing index.  Go backwards along it so that the indices are valid all the way through.
                 for (int i = toRemove.Count - 1; i >= 0; i--)
                     Remove(toRemove[i]);
