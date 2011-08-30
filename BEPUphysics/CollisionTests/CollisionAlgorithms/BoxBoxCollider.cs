@@ -5,6 +5,7 @@ using BEPUphysics.MathExtensions;
 using Microsoft.Xna.Framework;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using System.Diagnostics;
+using BEPUphysics.Settings;
 
 namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 {
@@ -1470,10 +1471,6 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 #else
             contactData = new TinyStructList<BoxContactData>();
 #endif
-            //positions = new TinyStructList<Vector3>();
-            //depths = new TinyList<float>();
-            //ids = new TinyList<int>();
-
             //Relative rotation from A to B.
             Matrix3X3 bR;
 
@@ -1755,7 +1752,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             if (minimumFeature != 1)
                 minimumDistance -= antiBBias;
 
-            const float antiEdgeBias = .01f;
+            float antiEdgeBias = .01f;
             minimumDistance += antiEdgeBias;
             float axisLengthInverse;
             Vector3 tempAxis;
@@ -2293,23 +2290,26 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
             if (minimumFeature == 2)
             {
-                Vector3 position;
+
+                //Edge-edge contact conceptually only has one contact, but allowing it to create multiple due to penetration is more robust.
+                GetEdgeEdgeContact(a, b, ref transformA.Position, ref aO, ref transformB.Position, ref bO, minimumDistance, ref minimumAxis, out contactData);
+
+                //Vector3 position;
                 //float depth;
-                int id;
-                //In the edge-edge case, there's only one contact.  The minimumDistance computed earlier is the proper distance between the two, so the GetEdgeEdgeContact doesn't need to compute it.
-                GetEdgeEdgeContact(a, b, ref transformA.Position, ref aO, ref transformB.Position, ref bO, ref minimumAxis, out position, out id);
-#if ALLOWUNSAFE
-                contactData.D1.Position = position;
-                contactData.D1.Depth = minimumDistance; 
-                contactData.D1.Id = id;
-                contactData.Count = 1;
-#else
-                var toAdd = new BoxContactData();
-                toAdd.Position = position;
-                toAdd.Depth = minimumDistance;
-                toAdd.Id = id;
-                contactData.Add(ref toAdd);
-#endif
+                //int id;
+                //                GetEdgeEdgeContact(a, b, ref transformA.Position, ref aO, ref transformB.Position, ref bO, ref minimumAxis, out position, out id);
+                //#if ALLOWUNSAFE
+                //                contactData.D1.Position = position;
+                //                contactData.D1.Depth = minimumDistance; 
+                //                contactData.D1.Id = id;
+                //                contactData.Count = 1;
+                //#else
+                //                var toAdd = new BoxContactData();
+                //                toAdd.Position = position;
+                //                toAdd.Depth = minimumDistance;
+                //                toAdd.Id = id;
+                //                contactData.Add(ref toAdd);
+                //#endif
             }
             else
             {
@@ -2323,9 +2323,46 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             return true;
         }
 
-
-        internal static void GetEdgeEdgeContact(BoxShape a, BoxShape b, ref Vector3 positionA, ref Matrix3X3 orientationA, ref Vector3 positionB, ref Matrix3X3 orientationB, ref Vector3 mtd, out Vector3 point, out int id)
+#if ALLOWUNSAFE
+        internal static void GetEdgeEdgeContact(BoxShape a, BoxShape b, ref Vector3 positionA, ref Matrix3X3 orientationA, ref Vector3 positionB, ref Matrix3X3 orientationB, float depth, ref Vector3 mtd, out BoxContactDataCache contactData)
+#else
+        internal static void GetEdgeEdgeContact(BoxShape a, BoxShape b, ref Vector3 positionA, ref Matrix3X3 orientationA, ref Vector3 positionB, ref Matrix3X3 orientationB, float depth, ref Vector3 mtd, out TinyStructList<BoxContactData> contactData)
+#endif
         {
+            //Edge-edge contacts conceptually can only create one contact in perfectly rigid collisions.
+            //However, this is a discrete approximation of rigidity; things can penetrate each other.
+            //If edge-edge only returns a single contact, there's a good chance that the box will get into
+            //an oscillating state when under pressure.
+
+            //To avoid the oscillation, we may sometimes need two edge contacts.
+            //To determine which edges to use, compute 8 dot products.
+            //One for each edge parallel to the contributing axis on each of the two shapes.
+            //The resulting cases are:
+            //One edge on A touching one edge on B.
+            //Two edges on A touching one edge on B.
+            //One edge on A touching two edges on B.
+            //Two edges on A touching two edges on B.
+
+            //The three latter cases SHOULD be covered by the face-contact system, but in practice,
+            //they are not sufficiently covered because the system decides that the single edge-edge pair
+            //should be used and drops the other contacts, producting the aforementioned oscillation.
+
+            //All edge cross products result in the MTD, so no recalculation is necessary.
+
+            //Of the four edges which are aligned with the local edge axis, pick the two
+            //who have vertices which, when dotted with the local mtd, are greatest.
+
+            //Compute the closest points between each edge pair.  For two edges each,
+            //this comes out to four total closest point tests.
+            //This is not a traditional closest point between segments test.
+            //Completely ignore the pair if the closest points turn out to be beyond the intervals of the segments.
+
+            //Use the offsets found from each test.
+            //Test the A to B offset against the MTD, which is also known to be oriented in a certain way.
+            //That known directionality allows easy computation of depth using MTD dot offset.
+            //Do not use any contacts which have negative depth/positive distance.
+
+
             //Put the minimum translation direction into the local space of each object.
             Vector3 mtdA, mtdB;
             Vector3 negatedMtd;
@@ -2335,11 +2372,11 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
 
 #if !WINDOWS
-            Vector3 edgeA1 = new Vector3(), edgeA2 = new Vector3();
-            Vector3 edgeB1 = new Vector3(), edgeB2 = new Vector3();
+            Vector3 edgeAStart1 = new Vector3(), edgeAEnd1 = new Vector3(), edgeAStart2 = new Vector3(), edgeAEnd2 = new Vector3();
+            Vector3 edgeBStart1 = new Vector3(), edgeBEnd1 = new Vector3(), edgeBStart2 = new Vector3(), edgeBEnd2 = new Vector3();
 #else
-            Vector3 edgeA1, edgeA2;
-            Vector3 edgeB1, edgeB2;
+            Vector3 edgeAStart1, edgeAEnd1, edgeAStart2, edgeAEnd2;
+            Vector3 edgeBStart1, edgeBEnd1, edgeBStart2, edgeBEnd2;
 #endif
             float aHalfWidth = a.halfWidth;
             float aHalfHeight = a.halfHeight;
@@ -2349,8 +2386,9 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             float bHalfHeight = b.halfHeight;
             float bHalfLength = b.halfLength;
 
-            int edgeA1Id, edgeA2Id;
-            int edgeB1Id, edgeB2Id;
+            //Letter stands for owner.  Number stands for edge (1 or 2).
+            int edgeAStart1Id, edgeAEnd1Id, edgeAStart2Id, edgeAEnd2Id;
+            int edgeBStart1Id, edgeBEnd1Id, edgeBStart2Id, edgeBEnd2Id;
 
             //This is an edge-edge collision, so one (AND ONLY ONE) of the components in the 
             //local direction must be very close to zero.  We can use an arbitrary fixed 
@@ -2361,200 +2399,58 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             if (Math.Abs(mtdA.X) < Toolbox.Epsilon)
             {
                 //mtd is in the Y-Z plane.
-                if (mtdA.Y > 0)
-                {
-                    if (mtdA.Z > 0)
-                    {
-                        //++
-                        edgeA1.X = -aHalfWidth;
-                        edgeA1.Y = aHalfHeight;
-                        edgeA1.Z = aHalfLength;
+                //Perform an implicit dot with the edge location relative to the center.
+                //Find the two edges furthest in the direction of the mtdA.
+                var dots = new TinyList<float>();
+                dots.Add(-aHalfHeight * mtdA.Y - aHalfLength * mtdA.Z);
+                dots.Add(-aHalfHeight * mtdA.Y + aHalfLength * mtdA.Z);
+                dots.Add(aHalfHeight * mtdA.Y - aHalfLength * mtdA.Z);
+                dots.Add(aHalfHeight * mtdA.Y + aHalfLength * mtdA.Z);
 
-                        edgeA2.X = aHalfWidth;
-                        edgeA2.Y = aHalfHeight;
-                        edgeA2.Z = aHalfLength;
+                //Find the first and second highest indices.
+                int highestIndex, secondHighestIndex;
+                FindHighestIndices(ref dots, out highestIndex, out secondHighestIndex);
+                //Use the indices to compute the edges.
+                GetEdgeData(highestIndex, 0, aHalfWidth, aHalfHeight, aHalfLength, out edgeAStart1, out edgeAEnd1, out edgeAStart1Id, out edgeAEnd1Id);
+                GetEdgeData(secondHighestIndex, 0, aHalfWidth, aHalfHeight, aHalfLength, out edgeAStart2, out edgeAEnd2, out edgeAStart2Id, out edgeAEnd2Id);
 
-                        edgeA1Id = 6;
-                        edgeA2Id = 7;
-                    }
-                    else
-                    {
-                        //+-
-                        edgeA1.X = -aHalfWidth;
-                        edgeA1.Y = aHalfHeight;
-                        edgeA1.Z = -aHalfLength;
 
-                        edgeA2.X = aHalfWidth;
-                        edgeA2.Y = aHalfHeight;
-                        edgeA2.Z = -aHalfLength;
-
-                        edgeA1Id = 2;
-                        edgeA2Id = 3;
-                    }
-                }
-                else
-                {
-                    if (mtdA.Z > 0)
-                    {
-                        //-+
-                        edgeA1.X = -aHalfWidth;
-                        edgeA1.Y = -aHalfHeight;
-                        edgeA1.Z = aHalfLength;
-
-                        edgeA2.X = aHalfWidth;
-                        edgeA2.Y = -aHalfHeight;
-                        edgeA2.Z = aHalfLength;
-
-                        edgeA1Id = 4;
-                        edgeA2Id = 5;
-                    }
-                    else
-                    {
-                        //--
-                        edgeA1.X = -aHalfWidth;
-                        edgeA1.Y = -aHalfHeight;
-                        edgeA1.Z = -aHalfLength;
-
-                        edgeA2.X = aHalfWidth;
-                        edgeA2.Y = -aHalfHeight;
-                        edgeA2.Z = -aHalfLength;
-
-                        edgeA1Id = 0;
-                        edgeA2Id = 1;
-                    }
-                }
             }
             else if (Math.Abs(mtdA.Y) < Toolbox.Epsilon)
             {
                 //mtd is in the X-Z plane
-                if (mtdA.X > 0)
-                {
-                    if (mtdA.Z > 0)
-                    {
-                        //++
-                        edgeA1.X = aHalfWidth;
-                        edgeA1.Y = -aHalfHeight;
-                        edgeA1.Z = aHalfLength;
+                //Perform an implicit dot with the edge location relative to the center.
+                //Find the two edges furthest in the direction of the mtdA.
+                var dots = new TinyList<float>();
+                dots.Add(-aHalfWidth * mtdA.X - aHalfLength * mtdA.Z);
+                dots.Add(-aHalfWidth * mtdA.X + aHalfLength * mtdA.Z);
+                dots.Add(aHalfWidth * mtdA.X - aHalfLength * mtdA.Z);
+                dots.Add(aHalfWidth * mtdA.X + aHalfLength * mtdA.Z);
 
-                        edgeA2.X = aHalfWidth;
-                        edgeA2.Y = aHalfHeight;
-                        edgeA2.Z = aHalfLength;
-
-                        edgeA1Id = 5;
-                        edgeA2Id = 7;
-                    }
-                    else
-                    {
-                        //+-
-                        edgeA1.X = aHalfWidth;
-                        edgeA1.Y = -aHalfHeight;
-                        edgeA1.Z = -aHalfLength;
-
-                        edgeA2.X = aHalfWidth;
-                        edgeA2.Y = aHalfHeight;
-                        edgeA2.Z = -aHalfLength;
-
-                        edgeA1Id = 1;
-                        edgeA2Id = 3;
-                    }
-                }
-                else
-                {
-                    if (mtdA.Z > 0)
-                    {
-                        //-+
-                        edgeA1.X = -aHalfWidth;
-                        edgeA1.Y = -aHalfHeight;
-                        edgeA1.Z = aHalfLength;
-
-                        edgeA2.X = -aHalfWidth;
-                        edgeA2.Y = aHalfHeight;
-                        edgeA2.Z = aHalfLength;
-
-                        edgeA1Id = 4;
-                        edgeA2Id = 6;
-                    }
-                    else
-                    {
-                        //--
-                        edgeA1.X = -aHalfWidth;
-                        edgeA1.Y = -aHalfHeight;
-                        edgeA1.Z = -aHalfLength;
-
-                        edgeA2.X = -aHalfWidth;
-                        edgeA2.Y = aHalfHeight;
-                        edgeA2.Z = -aHalfLength;
-
-                        edgeA1Id = 0;
-                        edgeA2Id = 2;
-                    }
-                }
+                //Find the first and second highest indices.
+                int highestIndex, secondHighestIndex;
+                FindHighestIndices(ref dots, out highestIndex, out secondHighestIndex);
+                //Use the indices to compute the edges.
+                GetEdgeData(highestIndex, 1, aHalfWidth, aHalfHeight, aHalfLength, out edgeAStart1, out edgeAEnd1, out edgeAStart1Id, out edgeAEnd1Id);
+                GetEdgeData(secondHighestIndex, 1, aHalfWidth, aHalfHeight, aHalfLength, out edgeAStart2, out edgeAEnd2, out edgeAStart2Id, out edgeAEnd2Id);
             }
             else
             {
                 //mtd is in the X-Y plane
-                if (mtdA.X > 0)
-                {
-                    if (mtdA.Y > 0)
-                    {
-                        //++
-                        edgeA1.X = aHalfWidth;
-                        edgeA1.Y = aHalfHeight;
-                        edgeA1.Z = -aHalfLength;
+                //Perform an implicit dot with the edge location relative to the center.
+                //Find the two edges furthest in the direction of the mtdA.
+                var dots = new TinyList<float>();
+                dots.Add(-aHalfWidth * mtdA.X - aHalfHeight * mtdA.Y);
+                dots.Add(-aHalfWidth * mtdA.X + aHalfHeight * mtdA.Y);
+                dots.Add(aHalfWidth * mtdA.X - aHalfHeight * mtdA.Y);
+                dots.Add(aHalfWidth * mtdA.X + aHalfHeight * mtdA.Y);
 
-                        edgeA2.X = aHalfWidth;
-                        edgeA2.Y = aHalfHeight;
-                        edgeA2.Z = aHalfLength;
-
-                        edgeA1Id = 3;
-                        edgeA2Id = 7;
-                    }
-                    else
-                    {
-                        //+-
-                        edgeA1.X = aHalfWidth;
-                        edgeA1.Y = -aHalfHeight;
-                        edgeA1.Z = -aHalfLength;
-
-                        edgeA2.X = aHalfWidth;
-                        edgeA2.Y = -aHalfHeight;
-                        edgeA2.Z = aHalfLength;
-
-                        edgeA1Id = 1;
-                        edgeA2Id = 5;
-                    }
-                }
-                else
-                {
-                    if (mtdA.Y > 0)
-                    {
-                        //-+
-                        edgeA1.X = -aHalfWidth;
-                        edgeA1.Y = aHalfHeight;
-                        edgeA1.Z = -aHalfLength;
-
-                        edgeA2.X = -aHalfWidth;
-                        edgeA2.Y = aHalfHeight;
-                        edgeA2.Z = aHalfLength;
-
-                        edgeA1Id = 2;
-                        edgeA2Id = 6;
-                    }
-                    else
-                    {
-                        //--
-                        edgeA1.X = -aHalfWidth;
-                        edgeA1.Y = -aHalfHeight;
-                        edgeA1.Z = -aHalfLength;
-
-                        edgeA2.X = -aHalfWidth;
-                        edgeA2.Y = -aHalfHeight;
-                        edgeA2.Z = aHalfLength;
-
-                        edgeA1Id = 0;
-                        edgeA2Id = 4;
-                    }
-                }
+                //Find the first and second highest indices.
+                int highestIndex, secondHighestIndex;
+                FindHighestIndices(ref dots, out highestIndex, out secondHighestIndex);
+                //Use the indices to compute the edges.
+                GetEdgeData(highestIndex, 2, aHalfWidth, aHalfHeight, aHalfLength, out edgeAStart1, out edgeAEnd1, out edgeAStart1Id, out edgeAEnd1Id);
+                GetEdgeData(secondHighestIndex, 2, aHalfWidth, aHalfHeight, aHalfLength, out edgeAStart2, out edgeAEnd2, out edgeAStart2Id, out edgeAEnd2Id);
             }
 
             #endregion
@@ -2564,229 +2460,931 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             if (Math.Abs(mtdB.X) < Toolbox.Epsilon)
             {
                 //mtd is in the Y-Z plane.
-                if (mtdB.Y > 0)
-                {
-                    if (mtdB.Z > 0)
-                    {
-                        //++
-                        edgeB1.X = -bHalfWidth;
-                        edgeB1.Y = bHalfHeight;
-                        edgeB1.Z = bHalfLength;
+                //Perform an implicit dot with the edge location relative to the center.
+                //Find the two edges furthest in the direction of the mtdB.
+                var dots = new TinyList<float>();
+                dots.Add(-bHalfHeight * mtdB.Y - bHalfLength * mtdB.Z);
+                dots.Add(-bHalfHeight * mtdB.Y + bHalfLength * mtdB.Z);
+                dots.Add(bHalfHeight * mtdB.Y - bHalfLength * mtdB.Z);
+                dots.Add(bHalfHeight * mtdB.Y + bHalfLength * mtdB.Z);
 
-                        edgeB2.X = bHalfWidth;
-                        edgeB2.Y = bHalfHeight;
-                        edgeB2.Z = bHalfLength;
+                //Find the first and second highest indices.
+                int highestIndex, secondHighestIndex;
+                FindHighestIndices(ref dots, out highestIndex, out secondHighestIndex);
+                //Use the indices to compute the edges.
+                GetEdgeData(highestIndex, 0, bHalfWidth, bHalfHeight, bHalfLength, out edgeBStart1, out edgeBEnd1, out edgeBStart1Id, out edgeBEnd1Id);
+                GetEdgeData(secondHighestIndex, 0, bHalfWidth, bHalfHeight, bHalfLength, out edgeBStart2, out edgeBEnd2, out edgeBStart2Id, out edgeBEnd2Id);
 
-                        edgeB1Id = 6;
-                        edgeB2Id = 7;
-                    }
-                    else
-                    {
-                        //+-
-                        edgeB1.X = -bHalfWidth;
-                        edgeB1.Y = bHalfHeight;
-                        edgeB1.Z = -bHalfLength;
 
-                        edgeB2.X = bHalfWidth;
-                        edgeB2.Y = bHalfHeight;
-                        edgeB2.Z = -bHalfLength;
-
-                        edgeB1Id = 2;
-                        edgeB2Id = 3;
-                    }
-                }
-                else
-                {
-                    if (mtdB.Z > 0)
-                    {
-                        //-+
-                        edgeB1.X = -bHalfWidth;
-                        edgeB1.Y = -bHalfHeight;
-                        edgeB1.Z = bHalfLength;
-
-                        edgeB2.X = bHalfWidth;
-                        edgeB2.Y = -bHalfHeight;
-                        edgeB2.Z = bHalfLength;
-
-                        edgeB1Id = 4;
-                        edgeB2Id = 5;
-                    }
-                    else
-                    {
-                        //--
-                        edgeB1.X = -bHalfWidth;
-                        edgeB1.Y = -bHalfHeight;
-                        edgeB1.Z = -bHalfLength;
-
-                        edgeB2.X = bHalfWidth;
-                        edgeB2.Y = -bHalfHeight;
-                        edgeB2.Z = -bHalfLength;
-
-                        edgeB1Id = 0;
-                        edgeB2Id = 1;
-                    }
-                }
             }
             else if (Math.Abs(mtdB.Y) < Toolbox.Epsilon)
             {
                 //mtd is in the X-Z plane
-                if (mtdB.X > 0)
-                {
-                    if (mtdB.Z > 0)
-                    {
-                        //++
-                        edgeB1.X = bHalfWidth;
-                        edgeB1.Y = -bHalfHeight;
-                        edgeB1.Z = bHalfLength;
+                //Perform an implicit dot with the edge location relative to the center.
+                //Find the two edges furthest in the direction of the mtdB.
+                var dots = new TinyList<float>();
+                dots.Add(-bHalfWidth * mtdB.X - bHalfLength * mtdB.Z);
+                dots.Add(-bHalfWidth * mtdB.X + bHalfLength * mtdB.Z);
+                dots.Add(bHalfWidth * mtdB.X - bHalfLength * mtdB.Z);
+                dots.Add(bHalfWidth * mtdB.X + bHalfLength * mtdB.Z);
 
-                        edgeB2.X = bHalfWidth;
-                        edgeB2.Y = bHalfHeight;
-                        edgeB2.Z = bHalfLength;
-
-                        edgeB1Id = 5;
-                        edgeB2Id = 7;
-                    }
-                    else
-                    {
-                        //+-
-                        edgeB1.X = bHalfWidth;
-                        edgeB1.Y = -bHalfHeight;
-                        edgeB1.Z = -bHalfLength;
-
-                        edgeB2.X = bHalfWidth;
-                        edgeB2.Y = bHalfHeight;
-                        edgeB2.Z = -bHalfLength;
-
-                        edgeB1Id = 1;
-                        edgeB2Id = 3;
-                    }
-                }
-                else
-                {
-                    if (mtdB.Z > 0)
-                    {
-                        //-+
-                        edgeB1.X = -bHalfWidth;
-                        edgeB1.Y = -bHalfHeight;
-                        edgeB1.Z = bHalfLength;
-
-                        edgeB2.X = -bHalfWidth;
-                        edgeB2.Y = bHalfHeight;
-                        edgeB2.Z = bHalfLength;
-
-                        edgeB1Id = 4;
-                        edgeB2Id = 6;
-                    }
-                    else
-                    {
-                        //--
-                        edgeB1.X = -bHalfWidth;
-                        edgeB1.Y = -bHalfHeight;
-                        edgeB1.Z = -bHalfLength;
-
-                        edgeB2.X = -bHalfWidth;
-                        edgeB2.Y = bHalfHeight;
-                        edgeB2.Z = -bHalfLength;
-
-                        edgeB1Id = 0;
-                        edgeB2Id = 2;
-                    }
-                }
+                //Find the first and second highest indices.
+                int highestIndex, secondHighestIndex;
+                FindHighestIndices(ref dots, out highestIndex, out secondHighestIndex);
+                //Use the indices to compute the edges.
+                GetEdgeData(highestIndex, 1, bHalfWidth, bHalfHeight, bHalfLength, out edgeBStart1, out edgeBEnd1, out edgeBStart1Id, out edgeBEnd1Id);
+                GetEdgeData(secondHighestIndex, 1, bHalfWidth, bHalfHeight, bHalfLength, out edgeBStart2, out edgeBEnd2, out edgeBStart2Id, out edgeBEnd2Id);
             }
             else
             {
                 //mtd is in the X-Y plane
-                if (mtdB.X > 0)
-                {
-                    if (mtdB.Y > 0)
-                    {
-                        //++
-                        edgeB1.X = bHalfWidth;
-                        edgeB1.Y = bHalfHeight;
-                        edgeB1.Z = -bHalfLength;
+                //Perform an implicit dot with the edge location relative to the center.
+                //Find the two edges furthest in the direction of the mtdB.
+                var dots = new TinyList<float>();
+                dots.Add(-bHalfWidth * mtdB.X - bHalfHeight * mtdB.Y);
+                dots.Add(-bHalfWidth * mtdB.X + bHalfHeight * mtdB.Y);
+                dots.Add(bHalfWidth * mtdB.X - bHalfHeight * mtdB.Y);
+                dots.Add(bHalfWidth * mtdB.X + bHalfHeight * mtdB.Y);
 
-                        edgeB2.X = bHalfWidth;
-                        edgeB2.Y = bHalfHeight;
-                        edgeB2.Z = bHalfLength;
-
-                        edgeB1Id = 3;
-                        edgeB2Id = 7;
-                    }
-                    else
-                    {
-                        //+-
-                        edgeB1.X = bHalfWidth;
-                        edgeB1.Y = -bHalfHeight;
-                        edgeB1.Z = -bHalfLength;
-
-                        edgeB2.X = bHalfWidth;
-                        edgeB2.Y = -bHalfHeight;
-                        edgeB2.Z = bHalfLength;
-
-                        edgeB1Id = 1;
-                        edgeB2Id = 5;
-                    }
-                }
-                else
-                {
-                    if (mtdB.Y > 0)
-                    {
-                        //-+
-                        edgeB1.X = -bHalfWidth;
-                        edgeB1.Y = bHalfHeight;
-                        edgeB1.Z = -bHalfLength;
-
-                        edgeB2.X = -bHalfWidth;
-                        edgeB2.Y = bHalfHeight;
-                        edgeB2.Z = bHalfLength;
-
-                        edgeB1Id = 2;
-                        edgeB2Id = 6;
-                    }
-                    else
-                    {
-                        //--
-                        edgeB1.X = -bHalfWidth;
-                        edgeB1.Y = -bHalfHeight;
-                        edgeB1.Z = -bHalfLength;
-
-                        edgeB2.X = -bHalfWidth;
-                        edgeB2.Y = -bHalfHeight;
-                        edgeB2.Z = bHalfLength;
-
-                        edgeB1Id = 0;
-                        edgeB2Id = 4;
-                    }
-                }
+                //Find the first and second highest indices.
+                int highestIndex, secondHighestIndex;
+                FindHighestIndices(ref dots, out highestIndex, out secondHighestIndex);
+                //Use the indices to compute the edges.
+                GetEdgeData(highestIndex, 2, bHalfWidth, bHalfHeight, bHalfLength, out edgeBStart1, out edgeBEnd1, out edgeBStart1Id, out edgeBEnd1Id);
+                GetEdgeData(secondHighestIndex, 2, bHalfWidth, bHalfHeight, bHalfLength, out edgeBStart2, out edgeBEnd2, out edgeBStart2Id, out edgeBEnd2Id);
             }
 
             #endregion
 
-            //TODO: Since the above uniquely identifies the edge from each box based on two vertices,
-            //get the edge feature id from vertexA id combined with vertexB id.
-            //Vertex id's are 3 bit binary 'numbers' because ---, --+, -+-, etc.
 
+            Matrix3X3.Transform(ref edgeAStart1, ref orientationA, out edgeAStart1);
+            Matrix3X3.Transform(ref edgeAEnd1, ref orientationA, out edgeAEnd1);
+            Matrix3X3.Transform(ref edgeBStart1, ref orientationB, out edgeBStart1);
+            Matrix3X3.Transform(ref edgeBEnd1, ref orientationB, out edgeBEnd1);
 
-            Matrix3X3.Transform(ref edgeA1, ref orientationA, out edgeA1);
-            Matrix3X3.Transform(ref edgeA2, ref orientationA, out edgeA2);
-            Matrix3X3.Transform(ref edgeB1, ref orientationB, out edgeB1);
-            Matrix3X3.Transform(ref edgeB2, ref orientationB, out edgeB2);
-            Vector3.Add(ref edgeA1, ref positionA, out edgeA1);
-            Vector3.Add(ref edgeA2, ref positionA, out edgeA2);
-            Vector3.Add(ref edgeB1, ref positionB, out edgeB1);
-            Vector3.Add(ref edgeB2, ref positionB, out edgeB2);
+            Matrix3X3.Transform(ref edgeAStart2, ref orientationA, out edgeAStart2);
+            Matrix3X3.Transform(ref edgeAEnd2, ref orientationA, out edgeAEnd2);
+            Matrix3X3.Transform(ref edgeBStart2, ref orientationB, out edgeBStart2);
+            Matrix3X3.Transform(ref edgeBEnd2, ref orientationB, out edgeBEnd2);
+
+            Vector3.Add(ref edgeAStart1, ref positionA, out edgeAStart1);
+            Vector3.Add(ref edgeAEnd1, ref positionA, out edgeAEnd1);
+            Vector3.Add(ref edgeBStart1, ref positionB, out edgeBStart1);
+            Vector3.Add(ref edgeBEnd1, ref positionB, out edgeBEnd1);
+
+            Vector3.Add(ref edgeAStart2, ref positionA, out edgeAStart2);
+            Vector3.Add(ref edgeAEnd2, ref positionA, out edgeAEnd2);
+            Vector3.Add(ref edgeBStart2, ref positionB, out edgeBStart2);
+            Vector3.Add(ref edgeBEnd2, ref positionB, out edgeBEnd2);
+
+            Vector3 onA, onB;
+            Vector3 offset;
+            float dot;
+#if ALLOWUNSAFE
+            var tempContactData = new BoxContactDataCache();
+            unsafe
+            {
+                var contactDataPointer = &tempContactData.D1;
+#else
+            contactData = new TinyStructList<BoxContactData>();
+#endif
+
+                //Go through the pairs and add any contacts with positive depth that are within the segments' intervals.
+
+                if (GetClosestPointsBetweenSegments(ref edgeAStart1, ref edgeAEnd1, ref edgeBStart1, ref edgeBEnd1, out onA, out onB))
+                {
+                    Vector3.Subtract(ref onA, ref onB, out offset);
+                    Vector3.Dot(ref offset, ref mtd, out dot);
+                    if (dot < 0) //Distance must be negative.
+                    {
+                        BoxContactData data;
+                        data.Position = onA;
+                        data.Depth = dot;
+                        data.Id = GetContactId(edgeAStart1Id, edgeAEnd1Id, edgeBStart1Id, edgeBEnd1Id);
+#if ALLOWUNSAFE
+                        contactDataPointer[tempContactData.Count] = data;
+                        tempContactData.Count++;
+#else
+                        contactData.Add(ref data);
+#endif
+                    }
+
+                }
+                if (GetClosestPointsBetweenSegments(ref edgeAStart1, ref edgeAEnd1, ref edgeBStart2, ref edgeBEnd2, out onA, out onB))
+                {
+                    Vector3.Subtract(ref onA, ref onB, out offset);
+                    Vector3.Dot(ref offset, ref mtd, out dot);
+                    if (dot < 0) //Distance must be negative.
+                    {
+                        BoxContactData data;
+                        data.Position = onA;
+                        data.Depth = dot;
+                        data.Id = GetContactId(edgeAStart1Id, edgeAEnd1Id, edgeBStart2Id, edgeBEnd2Id);
+#if ALLOWUNSAFE
+                        contactDataPointer[tempContactData.Count] = data;
+                        tempContactData.Count++;
+#else
+                        contactData.Add(ref data);
+#endif
+                    }
+
+                }
+                if (GetClosestPointsBetweenSegments(ref edgeAStart2, ref edgeAEnd2, ref edgeBStart1, ref edgeBEnd1, out onA, out onB))
+                {
+                    Vector3.Subtract(ref onA, ref onB, out offset);
+                    Vector3.Dot(ref offset, ref mtd, out dot);
+                    if (dot < 0) //Distance must be negative.
+                    {
+                        BoxContactData data;
+                        data.Position = onA;
+                        data.Depth = dot;
+                        data.Id = GetContactId(edgeAStart2Id, edgeAEnd2Id, edgeBStart1Id, edgeBEnd1Id);
+#if ALLOWUNSAFE
+                        contactDataPointer[tempContactData.Count] = data;
+                        tempContactData.Count++;
+#else
+                        contactData.Add(ref data);
+#endif
+                    }
+
+                }
+                if (GetClosestPointsBetweenSegments(ref edgeAStart2, ref edgeAEnd2, ref edgeBStart2, ref edgeBEnd2, out onA, out onB))
+                {
+                    Vector3.Subtract(ref onA, ref onB, out offset);
+                    Vector3.Dot(ref offset, ref mtd, out dot);
+                    if (dot < 0) //Distance must be negative.
+                    {
+                        BoxContactData data;
+                        data.Position = onA;
+                        data.Depth = dot;
+                        data.Id = GetContactId(edgeAStart2Id, edgeAEnd2Id, edgeBStart2Id, edgeBEnd2Id);
+#if ALLOWUNSAFE
+                        contactDataPointer[tempContactData.Count] = data;
+                        tempContactData.Count++;
+#else
+                        contactData.Add(ref data);
+#endif
+                    }
+
+                }
+#if ALLOWUNSAFE
+            }
+            contactData = tempContactData;
+#endif
+
+        }
+
+        private static void GetEdgeData(int index, int axis, float x, float y, float z, out Vector3 edgeStart, out Vector3 edgeEnd, out int edgeStartId, out int edgeEndId)
+        {
+            //Index defines which edge to use.
+            //They follow this pattern:
+            //0: --
+            //1: -+
+            //2: +-
+            //3: ++
+
+            //The axis index determines the dimensions to use.
+            //0: plane with normal X
+            //1: plane with normal Y
+            //2: plane with normal Z
+
+            switch (index + axis * 4)
+            {
+                case 0:
+                    //X--
+                    edgeStart.X = -x;
+                    edgeStart.Y = -y;
+                    edgeStart.Z = -z;
+                    edgeStartId = 0; //000
+
+                    edgeEnd.X = x;
+                    edgeEnd.Y = -y;
+                    edgeEnd.Z = -z;
+                    edgeEndId = 4; //100
+                    break;
+                case 1:
+                    //X-+
+                    edgeStart.X = -x;
+                    edgeStart.Y = -y;
+                    edgeStart.Z = z;
+                    edgeStartId = 1; //001
+
+                    edgeEnd.X = x;
+                    edgeEnd.Y = -y;
+                    edgeEnd.Z = z;
+                    edgeEndId = 5; //101
+                    break;
+                case 2:
+                    //X+-
+                    edgeStart.X = -x;
+                    edgeStart.Y = y;
+                    edgeStart.Z = -z;
+                    edgeStartId = 2; //010
+
+                    edgeEnd.X = x;
+                    edgeEnd.Y = y;
+                    edgeEnd.Z = -z;
+                    edgeEndId = 6; //110
+                    break;
+                case 3:
+                    //X++
+                    edgeStart.X = -x;
+                    edgeStart.Y = y;
+                    edgeStart.Z = z;
+                    edgeStartId = 3; //011
+
+                    edgeEnd.X = x;
+                    edgeEnd.Y = y;
+                    edgeEnd.Z = z;
+                    edgeEndId = 7; //111
+                    break;
+                case 4:
+                    //-Y-
+                    edgeStart.X = -x;
+                    edgeStart.Y = -y;
+                    edgeStart.Z = -z;
+                    edgeStartId = 0; //000
+
+                    edgeEnd.X = -x;
+                    edgeEnd.Y = y;
+                    edgeEnd.Z = -z;
+                    edgeEndId = 2; //010
+                    break;
+                case 5:
+                    //-Y+
+                    edgeStart.X = -x;
+                    edgeStart.Y = -y;
+                    edgeStart.Z = z;
+                    edgeStartId = 1; //001
+
+                    edgeEnd.X = -x;
+                    edgeEnd.Y = y;
+                    edgeEnd.Z = z;
+                    edgeEndId = 3; //011
+                    break;
+                case 6:
+                    //+Y-
+                    edgeStart.X = x;
+                    edgeStart.Y = -y;
+                    edgeStart.Z = -z;
+                    edgeStartId = 4; //100
+
+                    edgeEnd.X = x;
+                    edgeEnd.Y = y;
+                    edgeEnd.Z = -z;
+                    edgeEndId = 6; //110
+                    break;
+                case 7:
+                    //+Y+
+                    edgeStart.X = x;
+                    edgeStart.Y = -y;
+                    edgeStart.Z = z;
+                    edgeStartId = 5; //101
+
+                    edgeEnd.X = x;
+                    edgeEnd.Y = y;
+                    edgeEnd.Z = z;
+                    edgeEndId = 7; //111
+                    break;
+                case 8:
+                    //--Z
+                    edgeStart.X = -x;
+                    edgeStart.Y = -y;
+                    edgeStart.Z = -z;
+                    edgeStartId = 0; //000
+
+                    edgeEnd.X = -x;
+                    edgeEnd.Y = -y;
+                    edgeEnd.Z = z;
+                    edgeEndId = 1; //001
+                    break;
+                case 9:
+                    //-+Z
+                    edgeStart.X = -x;
+                    edgeStart.Y = y;
+                    edgeStart.Z = -z;
+                    edgeStartId = 2; //010
+
+                    edgeEnd.X = -x;
+                    edgeEnd.Y = y;
+                    edgeEnd.Z = z;
+                    edgeEndId = 3; //011
+                    break;
+                case 10:
+                    //+-Z
+                    edgeStart.X = x;
+                    edgeStart.Y = -y;
+                    edgeStart.Z = -z;
+                    edgeStartId = 4; //100
+
+                    edgeEnd.X = x;
+                    edgeEnd.Y = -y;
+                    edgeEnd.Z = z;
+                    edgeEndId = 5; //101
+                    break;
+                case 11:
+                    //++Z
+                    edgeStart.X = x;
+                    edgeStart.Y = y;
+                    edgeStart.Z = -z;
+                    edgeStartId = 6; //110
+
+                    edgeEnd.X = x;
+                    edgeEnd.Y = y;
+                    edgeEnd.Z = z;
+                    edgeEndId = 7; //111
+                    break;
+                default:
+                    throw new Exception("Invalid index or axis.");
+            }
+        }
+
+        static void FindHighestIndices(ref TinyList<float> dots, out int highestIndex, out int secondHighestIndex)
+        {
+            highestIndex = 0;
+            float highestValue = dots[0];
+            for (int i = 1; i < 4; i++)
+            {
+                float dot = dots[i];
+                if (dot > highestValue)
+                {
+                    highestIndex = i;
+                    highestValue = dot;
+                }
+            }
+            secondHighestIndex = 0;
+            float secondHighestValue = -float.MaxValue;
+            for (int i = 0; i < 4; i++)
+            {
+                float dot = dots[i];
+                if (i != highestIndex && dot > secondHighestValue)
+                {
+                    secondHighestIndex = i;
+                    secondHighestValue = dot;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Computes closest points c1 and c2 betwen segments p1q1 and p2q2.
+        /// </summary>
+        /// <param name="p1">First point of first segment.</param>
+        /// <param name="q1">Second point of first segment.</param>
+        /// <param name="p2">First point of second segment.</param>
+        /// <param name="q2">Second point of second segment.</param>
+        /// <param name="c1">Closest point on first segment.</param>
+        /// <param name="c2">Closest point on second segment.</param>
+        static bool GetClosestPointsBetweenSegments(ref Vector3 p1, ref Vector3 q1, ref Vector3 p2, ref Vector3 q2,
+                                                           out Vector3 c1, out Vector3 c2)
+        {
+            //Segment direction vectors
+            Vector3 d1;
+            Vector3.Subtract(ref q1, ref p1, out d1);
+            Vector3 d2;
+            Vector3.Subtract(ref q2, ref p2, out d2);
+            Vector3 r;
+            Vector3.Subtract(ref p1, ref p2, out r);
+            //distance
+            float a = d1.LengthSquared();
+            float e = d2.LengthSquared();
+            float f;
+            Vector3.Dot(ref d2, ref r, out f);
 
             float s, t;
-            Vector3 onA, onB;
-            Toolbox.GetClosestPointsBetweenSegments(ref edgeA1, ref edgeA2, ref edgeB1, ref edgeB2, out s, out t, out onA, out onB);
-            //Vector3.Add(ref onA, ref onB, out point);
-            //Vector3.Multiply(ref point, .5f, out point);
-            point = onA;
 
-            //depth = (onB.X - onA.X) * mtd.X + (onB.Y - onA.Y) * mtd.Y + (onB.Z - onA.Z) * mtd.Z;
+            if (a <= Toolbox.Epsilon && e <= Toolbox.Epsilon)
+            {
+                //These segments are more like points.
+                s = t = 0.0f;
+                c1 = p1;
+                c2 = p2;
+                return false;
+            }
+            if (a <= Toolbox.Epsilon)
+            {
+                // First segment is basically a point.
+                s = 0.0f;
+                t = f / e;
+                if (t < 0 || t > 1)
+                {
+                    c1 = new Vector3();
+                    c2 = new Vector3();
+                    return false;
+                }
+            }
+            else
+            {
+                float c = Vector3.Dot(d1, r);
+                if (e <= Toolbox.Epsilon)
+                {
+                    // Second segment is basically a point.
+                    t = 0.0f;
+                    s = MathHelper.Clamp(-c / a, 0.0f, 1.0f);
+                }
+                else
+                {
+                    float b = Vector3.Dot(d1, d2);
+                    float denom = a * e - b * b;
 
-            id = GetContactId(edgeA1Id, edgeA2Id, edgeB1Id, edgeB2Id);
+                    // If segments not parallel, compute closest point on L1 to L2, and
+                    // clamp to segment S1. Else pick some s (here .5f)
+                    if (denom != 0.0f)
+                    {
+                        s = (b * f - c * e) / denom;
+                        if (s < 0 || s > 1)
+                        {
+                            //Closest point would be outside of the segment.
+                            c1 = new Vector3();
+                            c2 = new Vector3();
+                            return false;
+                        }
+                    }
+                    else //Parallel, just use .5f
+                        s = .5f;
+
+
+                    t = (b * s + f) / e;
+
+                    if (t < 0 || t > 1)
+                    {
+                        //Closest point would be outside of the segment.
+                        c1 = new Vector3();
+                        c2 = new Vector3();
+                        return false;
+                    }
+                }
+            }
+
+            Vector3.Multiply(ref d1, s, out c1);
+            Vector3.Add(ref c1, ref p1, out c1);
+            Vector3.Multiply(ref d2, t, out c2);
+            Vector3.Add(ref c2, ref p2, out c2);
+            return true;
         }
+
+        //        internal static void GetEdgeEdgeContact(BoxShape a, BoxShape b, ref Vector3 positionA, ref Matrix3X3 orientationA, ref Vector3 positionB, ref Matrix3X3 orientationB, float depth, ref Vector3 mtd, out TinyStructList<BoxContactData> contactData)
+        //        {
+        //            //Put the minimum translation direction into the local space of each object.
+        //            Vector3 mtdA, mtdB;
+        //            Vector3 negatedMtd;
+        //            Vector3.Negate(ref mtd, out negatedMtd);
+        //            Matrix3X3.TransformTranspose(ref negatedMtd, ref orientationA, out mtdA);
+        //            Matrix3X3.TransformTranspose(ref mtd, ref orientationB, out mtdB);
+
+
+        //#if !WINDOWS
+        //            Vector3 edgeA1 = new Vector3(), edgeA2 = new Vector3();
+        //            Vector3 edgeB1 = new Vector3(), edgeB2 = new Vector3();
+        //#else
+        //            Vector3 edgeA1, edgeA2;
+        //            Vector3 edgeB1, edgeB2;
+        //#endif
+        //            float aHalfWidth = a.halfWidth;
+        //            float aHalfHeight = a.halfHeight;
+        //            float aHalfLength = a.halfLength;
+
+        //            float bHalfWidth = b.halfWidth;
+        //            float bHalfHeight = b.halfHeight;
+        //            float bHalfLength = b.halfLength;
+
+        //            int edgeA1Id, edgeA2Id;
+        //            int edgeB1Id, edgeB2Id;
+
+        //            //This is an edge-edge collision, so one (AND ONLY ONE) of the components in the 
+        //            //local direction must be very close to zero.  We can use an arbitrary fixed 
+        //            //epsilon because the mtd is always unit length.
+
+        //            #region Edge A
+
+        //            if (Math.Abs(mtdA.X) < Toolbox.Epsilon)
+        //            {
+        //                //mtd is in the Y-Z plane.
+        //                if (mtdA.Y > 0)
+        //                {
+        //                    if (mtdA.Z > 0)
+        //                    {
+        //                        //++
+        //                        edgeA1.X = -aHalfWidth;
+        //                        edgeA1.Y = aHalfHeight;
+        //                        edgeA1.Z = aHalfLength;
+
+        //                        edgeA2.X = aHalfWidth;
+        //                        edgeA2.Y = aHalfHeight;
+        //                        edgeA2.Z = aHalfLength;
+
+        //                        edgeA1Id = 6;
+        //                        edgeA2Id = 7;
+        //                    }
+        //                    else
+        //                    {
+        //                        //+-
+        //                        edgeA1.X = -aHalfWidth;
+        //                        edgeA1.Y = aHalfHeight;
+        //                        edgeA1.Z = -aHalfLength;
+
+        //                        edgeA2.X = aHalfWidth;
+        //                        edgeA2.Y = aHalfHeight;
+        //                        edgeA2.Z = -aHalfLength;
+
+        //                        edgeA1Id = 2;
+        //                        edgeA2Id = 3;
+        //                    }
+        //                }
+        //                else
+        //                {
+        //                    if (mtdA.Z > 0)
+        //                    {
+        //                        //-+
+        //                        edgeA1.X = -aHalfWidth;
+        //                        edgeA1.Y = -aHalfHeight;
+        //                        edgeA1.Z = aHalfLength;
+
+        //                        edgeA2.X = aHalfWidth;
+        //                        edgeA2.Y = -aHalfHeight;
+        //                        edgeA2.Z = aHalfLength;
+
+        //                        edgeA1Id = 4;
+        //                        edgeA2Id = 5;
+        //                    }
+        //                    else
+        //                    {
+        //                        //--
+        //                        edgeA1.X = -aHalfWidth;
+        //                        edgeA1.Y = -aHalfHeight;
+        //                        edgeA1.Z = -aHalfLength;
+
+        //                        edgeA2.X = aHalfWidth;
+        //                        edgeA2.Y = -aHalfHeight;
+        //                        edgeA2.Z = -aHalfLength;
+
+        //                        edgeA1Id = 0;
+        //                        edgeA2Id = 1;
+        //                    }
+        //                }
+        //            }
+        //            else if (Math.Abs(mtdA.Y) < Toolbox.Epsilon)
+        //            {
+        //                //mtd is in the X-Z plane
+        //                if (mtdA.X > 0)
+        //                {
+        //                    if (mtdA.Z > 0)
+        //                    {
+        //                        //++
+        //                        edgeA1.X = aHalfWidth;
+        //                        edgeA1.Y = -aHalfHeight;
+        //                        edgeA1.Z = aHalfLength;
+
+        //                        edgeA2.X = aHalfWidth;
+        //                        edgeA2.Y = aHalfHeight;
+        //                        edgeA2.Z = aHalfLength;
+
+        //                        edgeA1Id = 5;
+        //                        edgeA2Id = 7;
+        //                    }
+        //                    else
+        //                    {
+        //                        //+-
+        //                        edgeA1.X = aHalfWidth;
+        //                        edgeA1.Y = -aHalfHeight;
+        //                        edgeA1.Z = -aHalfLength;
+
+        //                        edgeA2.X = aHalfWidth;
+        //                        edgeA2.Y = aHalfHeight;
+        //                        edgeA2.Z = -aHalfLength;
+
+        //                        edgeA1Id = 1;
+        //                        edgeA2Id = 3;
+        //                    }
+        //                }
+        //                else
+        //                {
+        //                    if (mtdA.Z > 0)
+        //                    {
+        //                        //-+
+        //                        edgeA1.X = -aHalfWidth;
+        //                        edgeA1.Y = -aHalfHeight;
+        //                        edgeA1.Z = aHalfLength;
+
+        //                        edgeA2.X = -aHalfWidth;
+        //                        edgeA2.Y = aHalfHeight;
+        //                        edgeA2.Z = aHalfLength;
+
+        //                        edgeA1Id = 4;
+        //                        edgeA2Id = 6;
+        //                    }
+        //                    else
+        //                    {
+        //                        //--
+        //                        edgeA1.X = -aHalfWidth;
+        //                        edgeA1.Y = -aHalfHeight;
+        //                        edgeA1.Z = -aHalfLength;
+
+        //                        edgeA2.X = -aHalfWidth;
+        //                        edgeA2.Y = aHalfHeight;
+        //                        edgeA2.Z = -aHalfLength;
+
+        //                        edgeA1Id = 0;
+        //                        edgeA2Id = 2;
+        //                    }
+        //                }
+        //            }
+        //            else
+        //            {
+        //                //mtd is in the X-Y plane
+        //                if (mtdA.X > 0)
+        //                {
+        //                    if (mtdA.Y > 0)
+        //                    {
+        //                        //++
+        //                        edgeA1.X = aHalfWidth;
+        //                        edgeA1.Y = aHalfHeight;
+        //                        edgeA1.Z = -aHalfLength;
+
+        //                        edgeA2.X = aHalfWidth;
+        //                        edgeA2.Y = aHalfHeight;
+        //                        edgeA2.Z = aHalfLength;
+
+        //                        edgeA1Id = 3;
+        //                        edgeA2Id = 7;
+        //                    }
+        //                    else
+        //                    {
+        //                        //+-
+        //                        edgeA1.X = aHalfWidth;
+        //                        edgeA1.Y = -aHalfHeight;
+        //                        edgeA1.Z = -aHalfLength;
+
+        //                        edgeA2.X = aHalfWidth;
+        //                        edgeA2.Y = -aHalfHeight;
+        //                        edgeA2.Z = aHalfLength;
+
+        //                        edgeA1Id = 1;
+        //                        edgeA2Id = 5;
+        //                    }
+        //                }
+        //                else
+        //                {
+        //                    if (mtdA.Y > 0)
+        //                    {
+        //                        //-+
+        //                        edgeA1.X = -aHalfWidth;
+        //                        edgeA1.Y = aHalfHeight;
+        //                        edgeA1.Z = -aHalfLength;
+
+        //                        edgeA2.X = -aHalfWidth;
+        //                        edgeA2.Y = aHalfHeight;
+        //                        edgeA2.Z = aHalfLength;
+
+        //                        edgeA1Id = 2;
+        //                        edgeA2Id = 6;
+        //                    }
+        //                    else
+        //                    {
+        //                        //--
+        //                        edgeA1.X = -aHalfWidth;
+        //                        edgeA1.Y = -aHalfHeight;
+        //                        edgeA1.Z = -aHalfLength;
+
+        //                        edgeA2.X = -aHalfWidth;
+        //                        edgeA2.Y = -aHalfHeight;
+        //                        edgeA2.Z = aHalfLength;
+
+        //                        edgeA1Id = 0;
+        //                        edgeA2Id = 4;
+        //                    }
+        //                }
+        //            }
+
+        //            #endregion
+
+        //            #region Edge B
+
+        //            if (Math.Abs(mtdB.X) < Toolbox.Epsilon)
+        //            {
+        //                //mtd is in the Y-Z plane.
+        //                if (mtdB.Y > 0)
+        //                {
+        //                    if (mtdB.Z > 0)
+        //                    {
+        //                        //++
+        //                        edgeB1.X = -bHalfWidth;
+        //                        edgeB1.Y = bHalfHeight;
+        //                        edgeB1.Z = bHalfLength;
+
+        //                        edgeB2.X = bHalfWidth;
+        //                        edgeB2.Y = bHalfHeight;
+        //                        edgeB2.Z = bHalfLength;
+
+        //                        edgeB1Id = 6;
+        //                        edgeB2Id = 7;
+        //                    }
+        //                    else
+        //                    {
+        //                        //+-
+        //                        edgeB1.X = -bHalfWidth;
+        //                        edgeB1.Y = bHalfHeight;
+        //                        edgeB1.Z = -bHalfLength;
+
+        //                        edgeB2.X = bHalfWidth;
+        //                        edgeB2.Y = bHalfHeight;
+        //                        edgeB2.Z = -bHalfLength;
+
+        //                        edgeB1Id = 2;
+        //                        edgeB2Id = 3;
+        //                    }
+        //                }
+        //                else
+        //                {
+        //                    if (mtdB.Z > 0)
+        //                    {
+        //                        //-+
+        //                        edgeB1.X = -bHalfWidth;
+        //                        edgeB1.Y = -bHalfHeight;
+        //                        edgeB1.Z = bHalfLength;
+
+        //                        edgeB2.X = bHalfWidth;
+        //                        edgeB2.Y = -bHalfHeight;
+        //                        edgeB2.Z = bHalfLength;
+
+        //                        edgeB1Id = 4;
+        //                        edgeB2Id = 5;
+        //                    }
+        //                    else
+        //                    {
+        //                        //--
+        //                        edgeB1.X = -bHalfWidth;
+        //                        edgeB1.Y = -bHalfHeight;
+        //                        edgeB1.Z = -bHalfLength;
+
+        //                        edgeB2.X = bHalfWidth;
+        //                        edgeB2.Y = -bHalfHeight;
+        //                        edgeB2.Z = -bHalfLength;
+
+        //                        edgeB1Id = 0;
+        //                        edgeB2Id = 1;
+        //                    }
+        //                }
+        //            }
+        //            else if (Math.Abs(mtdB.Y) < Toolbox.Epsilon)
+        //            {
+        //                //mtd is in the X-Z plane
+        //                if (mtdB.X > 0)
+        //                {
+        //                    if (mtdB.Z > 0)
+        //                    {
+        //                        //++
+        //                        edgeB1.X = bHalfWidth;
+        //                        edgeB1.Y = -bHalfHeight;
+        //                        edgeB1.Z = bHalfLength;
+
+        //                        edgeB2.X = bHalfWidth;
+        //                        edgeB2.Y = bHalfHeight;
+        //                        edgeB2.Z = bHalfLength;
+
+        //                        edgeB1Id = 5;
+        //                        edgeB2Id = 7;
+        //                    }
+        //                    else
+        //                    {
+        //                        //+-
+        //                        edgeB1.X = bHalfWidth;
+        //                        edgeB1.Y = -bHalfHeight;
+        //                        edgeB1.Z = -bHalfLength;
+
+        //                        edgeB2.X = bHalfWidth;
+        //                        edgeB2.Y = bHalfHeight;
+        //                        edgeB2.Z = -bHalfLength;
+
+        //                        edgeB1Id = 1;
+        //                        edgeB2Id = 3;
+        //                    }
+        //                }
+        //                else
+        //                {
+        //                    if (mtdB.Z > 0)
+        //                    {
+        //                        //-+
+        //                        edgeB1.X = -bHalfWidth;
+        //                        edgeB1.Y = -bHalfHeight;
+        //                        edgeB1.Z = bHalfLength;
+
+        //                        edgeB2.X = -bHalfWidth;
+        //                        edgeB2.Y = bHalfHeight;
+        //                        edgeB2.Z = bHalfLength;
+
+        //                        edgeB1Id = 4;
+        //                        edgeB2Id = 6;
+        //                    }
+        //                    else
+        //                    {
+        //                        //--
+        //                        edgeB1.X = -bHalfWidth;
+        //                        edgeB1.Y = -bHalfHeight;
+        //                        edgeB1.Z = -bHalfLength;
+
+        //                        edgeB2.X = -bHalfWidth;
+        //                        edgeB2.Y = bHalfHeight;
+        //                        edgeB2.Z = -bHalfLength;
+
+        //                        edgeB1Id = 0;
+        //                        edgeB2Id = 2;
+        //                    }
+        //                }
+        //            }
+        //            else
+        //            {
+        //                //mtd is in the X-Y plane
+        //                if (mtdB.X > 0)
+        //                {
+        //                    if (mtdB.Y > 0)
+        //                    {
+        //                        //++
+        //                        edgeB1.X = bHalfWidth;
+        //                        edgeB1.Y = bHalfHeight;
+        //                        edgeB1.Z = -bHalfLength;
+
+        //                        edgeB2.X = bHalfWidth;
+        //                        edgeB2.Y = bHalfHeight;
+        //                        edgeB2.Z = bHalfLength;
+
+        //                        edgeB1Id = 3;
+        //                        edgeB2Id = 7;
+        //                    }
+        //                    else
+        //                    {
+        //                        //+-
+        //                        edgeB1.X = bHalfWidth;
+        //                        edgeB1.Y = -bHalfHeight;
+        //                        edgeB1.Z = -bHalfLength;
+
+        //                        edgeB2.X = bHalfWidth;
+        //                        edgeB2.Y = -bHalfHeight;
+        //                        edgeB2.Z = bHalfLength;
+
+        //                        edgeB1Id = 1;
+        //                        edgeB2Id = 5;
+        //                    }
+        //                }
+        //                else
+        //                {
+        //                    if (mtdB.Y > 0)
+        //                    {
+        //                        //-+
+        //                        edgeB1.X = -bHalfWidth;
+        //                        edgeB1.Y = bHalfHeight;
+        //                        edgeB1.Z = -bHalfLength;
+
+        //                        edgeB2.X = -bHalfWidth;
+        //                        edgeB2.Y = bHalfHeight;
+        //                        edgeB2.Z = bHalfLength;
+
+        //                        edgeB1Id = 2;
+        //                        edgeB2Id = 6;
+        //                    }
+        //                    else
+        //                    {
+        //                        //--
+        //                        edgeB1.X = -bHalfWidth;
+        //                        edgeB1.Y = -bHalfHeight;
+        //                        edgeB1.Z = -bHalfLength;
+
+        //                        edgeB2.X = -bHalfWidth;
+        //                        edgeB2.Y = -bHalfHeight;
+        //                        edgeB2.Z = bHalfLength;
+
+        //                        edgeB1Id = 0;
+        //                        edgeB2Id = 4;
+        //                    }
+        //                }
+        //            }
+
+        //            #endregion
+
+        //            //TODO: Since the above uniquely identifies the edge from each box based on two vertices,
+        //            //get the edge feature id from vertexA id combined with vertexB id.
+        //            //Vertex id's are 3 bit binary 'numbers' because ---, --+, -+-, etc.
+
+
+        //            Matrix3X3.Transform(ref edgeA1, ref orientationA, out edgeA1);
+        //            Matrix3X3.Transform(ref edgeA2, ref orientationA, out edgeA2);
+        //            Matrix3X3.Transform(ref edgeB1, ref orientationB, out edgeB1);
+        //            Matrix3X3.Transform(ref edgeB2, ref orientationB, out edgeB2);
+        //            Vector3.Add(ref edgeA1, ref positionA, out edgeA1);
+        //            Vector3.Add(ref edgeA2, ref positionA, out edgeA2);
+        //            Vector3.Add(ref edgeB1, ref positionB, out edgeB1);
+        //            Vector3.Add(ref edgeB2, ref positionB, out edgeB2);
+
+        //            float s, t;
+        //            Vector3 onA, onB;
+        //            Toolbox.GetClosestPointsBetweenSegments(ref edgeA1, ref edgeA2, ref edgeB1, ref edgeB2, out s, out t, out onA, out onB);
+        //            //Vector3.Add(ref onA, ref onB, out point);
+        //            //Vector3.Multiply(ref point, .5f, out point);
+        //            point = onA;
+
+        //            //depth = (onB.X - onA.X) * mtd.X + (onB.Y - onA.Y) * mtd.Y + (onB.Z - onA.Z) * mtd.Z;
+
+        //            id = GetContactId(edgeA1Id, edgeA2Id, edgeB1Id, edgeB2Id);
+        //        }
 
 #if ALLOWUNSAFE
         internal static void GetFaceContacts(BoxShape a, BoxShape b, ref Vector3 positionA, ref Matrix3X3 orientationA, ref Vector3 positionB, ref Matrix3X3 orientationB, bool aIsFaceOwner, ref Vector3 mtd, out BoxContactDataCache contactData)
@@ -2816,11 +3414,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             else
                 ClipFacesDirect(ref bBoxFace, ref aBoxFace, ref mtd, out contactData);
 
-#if ALLOWUNSAFE
             if (contactData.Count > 4)
-#else
-            if (contactData.Count > 4)
-#endif
                 PruneContactsMaxDistance(ref mtd, contactData, out contactData);
         }
 
@@ -3262,7 +3856,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             //To test bounds, recall that clipX is the length of the X edge.
             //Going from the center to the max or min goes half of the length of X edge, or +/- 0.5.
             //Bias could be added here.
-            const float extent = .51f; //.5f is the default, the extra is for robustness.
+            const float extent = .5f; //.5f is the default, extra could be added for robustness or speed.
             float clipCenterMaxX = clipCenterX + extent;
             float clipCenterMaxY = clipCenterY + extent;
             float clipCenterMinX = clipCenterX - extent;
@@ -3997,7 +4591,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             //To test bounds, recall that clipX is the length of the X edge.
             //Going from the center to the max or min goes half of the length of X edge, or +/- 0.5.
             //Bias could be added here.
-            const float extent = .51f; //.5f is the default, the extra is for robustness.
+            float extent = .5f; //.5f is the default, extra could be added for robustness or speed.
             float clipCenterMaxX = clipCenterX + extent;
             float clipCenterMaxY = clipCenterY + extent;
             float clipCenterMinX = clipCenterX - extent;
@@ -4110,7 +4704,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 contactData.Add(ref item);
             }
 
-        #endregion
+            #endregion
 
             //Compute depths.
             TinyStructList<BoxContactData> tempData = contactData;
@@ -4122,7 +4716,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 tempData.Get(i, out item);
                 Vector3.Dot(ref item.Position, ref mtd, out faceDot);
                 item.Depth = faceDot - clipFaceDot;
-                if (item.Depth < 0)
+                if (item.Depth <= 0)
                 {
                     contactData.Add(ref item);
                 }
@@ -4187,7 +4781,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 contactData.Add(ref item);
             }
 
-        #endregion
+            #endregion
 
             //Compute depths.
             int postClipCount = contactData.Count;
@@ -4201,7 +4795,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 tempData.Get(i, out item);
                 Vector3.Dot(ref item.Position, ref mtd, out faceDot);
                 item.Depth = faceDot - clipFaceDot;
-                if (item.Depth < 0)
+                if (item.Depth <= 0)
                 {
                     contactData.Add(ref item);
                 }
@@ -4329,7 +4923,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 }
             }
 
-        #endregion
+            #endregion
 
         #region CLIP EDGE: v2 v3
 
@@ -4439,7 +5033,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 }
             }
 
-        #endregion
+            #endregion
 
         #region CLIP EDGE: v3 v4
 
@@ -4545,7 +5139,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 }
             }
 
-        #endregion
+            #endregion
 
         #region CLIP EDGE: v4 v1
 
@@ -4651,7 +5245,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 }
             }
 
-        #endregion
+            #endregion
 
             //Compute depths.
             postClipCount = contactData.Count;
@@ -4664,7 +5258,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 tempData.Get(i, out item);
                 Vector3.Dot(ref item.Position, ref mtd, out faceDot);
                 item.Depth = faceDot - clipFaceDot;
-                if (item.Depth < 0)
+                if (item.Depth <= 0)
                 {
                     contactData.Add(ref item);
                 }
