@@ -318,13 +318,13 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             Vector3 center;
             Vector3.Add(ref triangle.vA, ref triangle.vB, out center);
             Vector3.Add(ref center, ref triangle.vC, out center);
-            Vector3.Divide(ref center, 3, out center);
+            Vector3.Multiply(ref center, 1f / 3f, out center);
 
             ContactData contact;
 
             contactList = new TinyStructList<ContactData>();
 
-            if (MPRToolbox.GetLocalOverlapPosition(convex, triangle, ref center, ref Toolbox.RigidIdentity, out contact.Position))
+            if (MPRToolbox.AreLocalShapesOverlapping(convex, triangle, ref center, ref Toolbox.RigidIdentity))
             {
 
                 float dot;
@@ -339,7 +339,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 {
                     //Degenerate triangle! That's no good.
                     //Just use the direction pointing from A to B, "B" being the triangle.  That direction is center - origin, or just center.
-                    MPRToolbox.LocalSurfaceCast(convex, triangle, ref Toolbox.RigidIdentity, ref center, out contact.PenetrationDepth, out contact.Normal);
+                    MPRToolbox.LocalSurfaceCast(convex, triangle, ref Toolbox.RigidIdentity, ref center, out contact.PenetrationDepth, out contact.Normal, out contact.Position);
                 }
                 else
                 {
@@ -620,7 +620,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
 
 
-                MPRToolbox.RefinePenetration(convex, triangle, ref Toolbox.RigidIdentity, contact.PenetrationDepth, ref contact.Normal, out contact.PenetrationDepth, out contact.Normal);
+                MPRToolbox.RefinePenetration(convex, triangle, ref Toolbox.RigidIdentity, contact.PenetrationDepth, ref contact.Normal, out contact.PenetrationDepth, out contact.Normal, out contact.Position);
 
 
 
