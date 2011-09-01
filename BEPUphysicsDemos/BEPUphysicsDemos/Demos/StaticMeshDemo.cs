@@ -51,12 +51,17 @@ namespace BEPUphysicsDemos.Demos
                 for (int j = 0; j < numColumns; j++)
                     for (int k = 0; k < numHigh; k++)
                     {
-                        toAdd = new Box(
-                            new Vector3(
+                        //toAdd = new Box(
+                        //    new Vector3(
+                        //    separation * i - numRows * separation / 2,
+                        //    30f + k * separation,
+                        //    separation * j - numColumns * separation / 2),
+                        //    2, 2, 2, 15);
+                        toAdd = new Cylinder(new Vector3(
                             separation * i - numRows * separation / 2,
                             30f + k * separation,
                             separation * j - numColumns * separation / 2),
-                            2, 2, 2, 15);
+                            1, 1, 1);
                         Space.Add(toAdd);
                     }
 

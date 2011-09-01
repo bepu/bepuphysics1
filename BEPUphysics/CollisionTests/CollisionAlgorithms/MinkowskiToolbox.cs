@@ -59,6 +59,31 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
         ///<param name="direction">Extreme point direction in local space.</param>
         ///<param name="localTransformB">Transform of shapeB in the local space of A.</param>
         /// <param name="extremePointA">The extreme point on shapeA.</param>
+        ///<param name="extremePoint">The extreme point in the local space of A.</param>
+        public static void GetLocalMinkowskiExtremePoint(ConvexShape shapeA, ConvexShape shapeB, ref Vector3 direction, ref RigidTransform localTransformB,
+                                                 out Vector3 extremePointA, out Vector3 extremePoint)
+        {
+            //Extreme point of A-B along D = (extreme point of A along D) - (extreme point of B along -D)
+            shapeA.GetLocalExtremePointWithoutMargin(ref direction, out extremePointA);
+            Vector3 v;
+            Vector3.Negate(ref direction, out v);
+            Vector3 extremePointB;
+            shapeB.GetExtremePointWithoutMargin(v, ref localTransformB, out extremePointB);
+
+            ExpandMinkowskiSum(shapeA.collisionMargin, shapeB.collisionMargin, direction, ref extremePointA, ref extremePointB);
+            Vector3.Subtract(ref extremePointA, ref extremePointB, out extremePoint);
+
+
+        }
+
+        ///<summary>
+        /// Gets the extreme point of the minkowski difference of shapeA and shapeB in the local space of shapeA.
+        ///</summary>
+        ///<param name="shapeA">First shape.</param>
+        ///<param name="shapeB">Second shape.</param>
+        ///<param name="direction">Extreme point direction in local space.</param>
+        ///<param name="localTransformB">Transform of shapeB in the local space of A.</param>
+        /// <param name="extremePointA">The extreme point on shapeA.</param>
         /// <param name="extremePointB">The extreme point on shapeB.</param>
         ///<param name="extremePoint">The extreme point in the local space of A.</param>
         public static void GetLocalMinkowskiExtremePoint(ConvexShape shapeA, ConvexShape shapeB, ref Vector3 direction, ref RigidTransform localTransformB,

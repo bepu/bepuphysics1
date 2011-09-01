@@ -2549,84 +2549,84 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             contactData = new TinyStructList<BoxContactData>();
 #endif
 
-                //Go through the pairs and add any contacts with positive depth that are within the segments' intervals.
+            //Go through the pairs and add any contacts with positive depth that are within the segments' intervals.
 
-                if (GetClosestPointsBetweenSegments(ref edgeAStart1, ref edgeAEnd1, ref edgeBStart1, ref edgeBEnd1, out onA, out onB))
+            if (GetClosestPointsBetweenSegments(ref edgeAStart1, ref edgeAEnd1, ref edgeBStart1, ref edgeBEnd1, out onA, out onB))
+            {
+                Vector3.Subtract(ref onA, ref onB, out offset);
+                Vector3.Dot(ref offset, ref mtd, out dot);
+                if (dot < 0) //Distance must be negative.
                 {
-                    Vector3.Subtract(ref onA, ref onB, out offset);
-                    Vector3.Dot(ref offset, ref mtd, out dot);
-                    if (dot < 0) //Distance must be negative.
-                    {
-                        BoxContactData data;
-                        data.Position = onA;
-                        data.Depth = dot;
-                        data.Id = GetContactId(edgeAStart1Id, edgeAEnd1Id, edgeBStart1Id, edgeBEnd1Id);
+                    BoxContactData data;
+                    data.Position = onA;
+                    data.Depth = dot;
+                    data.Id = GetContactId(edgeAStart1Id, edgeAEnd1Id, edgeBStart1Id, edgeBEnd1Id);
 #if ALLOWUNSAFE
                         contactDataPointer[tempContactData.Count] = data;
                         tempContactData.Count++;
 #else
-                        contactData.Add(ref data);
+                    contactData.Add(ref data);
 #endif
-                    }
-
                 }
-                if (GetClosestPointsBetweenSegments(ref edgeAStart1, ref edgeAEnd1, ref edgeBStart2, ref edgeBEnd2, out onA, out onB))
+
+            }
+            if (GetClosestPointsBetweenSegments(ref edgeAStart1, ref edgeAEnd1, ref edgeBStart2, ref edgeBEnd2, out onA, out onB))
+            {
+                Vector3.Subtract(ref onA, ref onB, out offset);
+                Vector3.Dot(ref offset, ref mtd, out dot);
+                if (dot < 0) //Distance must be negative.
                 {
-                    Vector3.Subtract(ref onA, ref onB, out offset);
-                    Vector3.Dot(ref offset, ref mtd, out dot);
-                    if (dot < 0) //Distance must be negative.
-                    {
-                        BoxContactData data;
-                        data.Position = onA;
-                        data.Depth = dot;
-                        data.Id = GetContactId(edgeAStart1Id, edgeAEnd1Id, edgeBStart2Id, edgeBEnd2Id);
+                    BoxContactData data;
+                    data.Position = onA;
+                    data.Depth = dot;
+                    data.Id = GetContactId(edgeAStart1Id, edgeAEnd1Id, edgeBStart2Id, edgeBEnd2Id);
 #if ALLOWUNSAFE
                         contactDataPointer[tempContactData.Count] = data;
                         tempContactData.Count++;
 #else
-                        contactData.Add(ref data);
+                    contactData.Add(ref data);
 #endif
-                    }
-
                 }
-                if (GetClosestPointsBetweenSegments(ref edgeAStart2, ref edgeAEnd2, ref edgeBStart1, ref edgeBEnd1, out onA, out onB))
+
+            }
+            if (GetClosestPointsBetweenSegments(ref edgeAStart2, ref edgeAEnd2, ref edgeBStart1, ref edgeBEnd1, out onA, out onB))
+            {
+                Vector3.Subtract(ref onA, ref onB, out offset);
+                Vector3.Dot(ref offset, ref mtd, out dot);
+                if (dot < 0) //Distance must be negative.
                 {
-                    Vector3.Subtract(ref onA, ref onB, out offset);
-                    Vector3.Dot(ref offset, ref mtd, out dot);
-                    if (dot < 0) //Distance must be negative.
-                    {
-                        BoxContactData data;
-                        data.Position = onA;
-                        data.Depth = dot;
-                        data.Id = GetContactId(edgeAStart2Id, edgeAEnd2Id, edgeBStart1Id, edgeBEnd1Id);
+                    BoxContactData data;
+                    data.Position = onA;
+                    data.Depth = dot;
+                    data.Id = GetContactId(edgeAStart2Id, edgeAEnd2Id, edgeBStart1Id, edgeBEnd1Id);
 #if ALLOWUNSAFE
                         contactDataPointer[tempContactData.Count] = data;
                         tempContactData.Count++;
 #else
-                        contactData.Add(ref data);
+                    contactData.Add(ref data);
 #endif
-                    }
-
                 }
-                if (GetClosestPointsBetweenSegments(ref edgeAStart2, ref edgeAEnd2, ref edgeBStart2, ref edgeBEnd2, out onA, out onB))
+
+            }
+            if (GetClosestPointsBetweenSegments(ref edgeAStart2, ref edgeAEnd2, ref edgeBStart2, ref edgeBEnd2, out onA, out onB))
+            {
+                Vector3.Subtract(ref onA, ref onB, out offset);
+                Vector3.Dot(ref offset, ref mtd, out dot);
+                if (dot < 0) //Distance must be negative.
                 {
-                    Vector3.Subtract(ref onA, ref onB, out offset);
-                    Vector3.Dot(ref offset, ref mtd, out dot);
-                    if (dot < 0) //Distance must be negative.
-                    {
-                        BoxContactData data;
-                        data.Position = onA;
-                        data.Depth = dot;
-                        data.Id = GetContactId(edgeAStart2Id, edgeAEnd2Id, edgeBStart2Id, edgeBEnd2Id);
+                    BoxContactData data;
+                    data.Position = onA;
+                    data.Depth = dot;
+                    data.Id = GetContactId(edgeAStart2Id, edgeAEnd2Id, edgeBStart2Id, edgeBEnd2Id);
 #if ALLOWUNSAFE
                         contactDataPointer[tempContactData.Count] = data;
                         tempContactData.Count++;
 #else
-                        contactData.Add(ref data);
+                    contactData.Add(ref data);
 #endif
-                    }
-
                 }
+
+            }
 #if ALLOWUNSAFE
             }
             contactData = tempContactData;
@@ -3813,27 +3813,31 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             Vector3 clipX, clipY;
             Vector3.Subtract(ref clipFace.V4, ref clipFace.V3, out clipX);
             Vector3.Subtract(ref clipFace.V2, ref clipFace.V3, out clipY);
-            float inverse = 1 / clipX.LengthSquared();
-            clipX.X *= inverse;
-            clipX.Y *= inverse;
-            clipX.Z *= inverse;
-            inverse = 1 / clipY.LengthSquared();
-            clipY.X *= inverse;
-            clipY.Y *= inverse;
-            clipY.Z *= inverse;
+            float inverseClipWidth = 1 / clipFace.Width;
+            float inverseClipHeight = 1 / clipFace.Height;
+            float inverseClipWidthSquared = inverseClipWidth * inverseClipWidth;
+            clipX.X *= inverseClipWidthSquared;
+            clipX.Y *= inverseClipWidthSquared;
+            clipX.Z *= inverseClipWidthSquared;
+            float inverseClipHeightSquared = inverseClipHeight * inverseClipHeight;
+            clipY.X *= inverseClipHeightSquared;
+            clipY.Y *= inverseClipHeightSquared;
+            clipY.Z *= inverseClipHeightSquared;
 
             //Local directions on the opposing face.  Their length is equal to the length of an edge.
             Vector3 faceX, faceY;
             Vector3.Subtract(ref face.V4, ref face.V3, out faceX);
             Vector3.Subtract(ref face.V2, ref face.V3, out faceY);
-            inverse = 1 / faceX.LengthSquared();
-            faceX.X *= inverse;
-            faceX.Y *= inverse;
-            faceX.Z *= inverse;
-            inverse = 1 / faceY.LengthSquared();
-            faceY.X *= inverse;
-            faceY.Y *= inverse;
-            faceY.Z *= inverse;
+            float inverseFaceWidth = 1 / face.Width;
+            float inverseFaceHeight = 1 / face.Height;
+            float inverseFaceWidthSquared = inverseFaceWidth * inverseFaceWidth;
+            faceX.X *= inverseFaceWidthSquared;
+            faceX.Y *= inverseFaceWidthSquared;
+            faceX.Z *= inverseFaceWidthSquared;
+            float inverseFaceHeightSquared = inverseFaceHeight * inverseFaceHeight;
+            faceY.X *= inverseFaceHeightSquared;
+            faceY.Y *= inverseFaceHeightSquared;
+            faceY.Z *= inverseFaceHeightSquared;
 
             Vector3 clipCenter;
             Vector3.Add(ref clipFace.V1, ref clipFace.V3, out clipCenter);
@@ -3856,16 +3860,794 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             //To test bounds, recall that clipX is the length of the X edge.
             //Going from the center to the max or min goes half of the length of X edge, or +/- 0.5.
             //Bias could be added here.
-            const float extent = .5f; //.5f is the default, extra could be added for robustness or speed.
-            float clipCenterMaxX = clipCenterX + extent;
-            float clipCenterMaxY = clipCenterY + extent;
-            float clipCenterMinX = clipCenterX - extent;
-            float clipCenterMinY = clipCenterY - extent;
+            //const float extent = .5f; //.5f is the default, extra could be added for robustness or speed.
+            float extentX = .5f + .01f * inverseClipWidth;
+            float extentY = .5f + .01f * inverseClipHeight;
+            //float extentX = .5f + .01f * inverseClipXLength;
+            //float extentY = .5f + .01f * inverseClipYLength;
+            float clipCenterMaxX = clipCenterX + extentX;
+            float clipCenterMaxY = clipCenterY + extentY;
+            float clipCenterMinX = clipCenterX - extentX;
+            float clipCenterMinY = clipCenterY - extentY;
 
-            float faceCenterMaxX = faceCenterX + extent;
-            float faceCenterMaxY = faceCenterY + extent;
-            float faceCenterMinX = faceCenterX - extent;
-            float faceCenterMinY = faceCenterY - extent;
+            extentX = .5f + .01f * inverseFaceWidth;
+            extentY = .5f + .01f * inverseFaceHeight;
+            //extentX = .5f + .01f * inverseFaceXLength;
+            //extentY = .5f + .01f * inverseFaceYLength;
+            float faceCenterMaxX = faceCenterX + extentX;
+            float faceCenterMaxY = faceCenterY + extentY;
+            float faceCenterMinX = faceCenterX - extentX;
+            float faceCenterMinY = faceCenterY - extentY;
+
+            //Find out where the opposing face is.
+            float dotX, dotY;
+
+            //The four edges can be thought of as minX, maxX, minY and maxY.
+
+            //Face v1
+            Vector3.Dot(ref clipX, ref face.V1, out dotX);
+            bool v1MaxXInside = dotX < clipCenterMaxX;
+            bool v1MinXInside = dotX > clipCenterMinX;
+            Vector3.Dot(ref clipY, ref face.V1, out dotY);
+            bool v1MaxYInside = dotY < clipCenterMaxY;
+            bool v1MinYInside = dotY > clipCenterMinY;
+
+            //Face v2
+            Vector3.Dot(ref clipX, ref face.V2, out dotX);
+            bool v2MaxXInside = dotX < clipCenterMaxX;
+            bool v2MinXInside = dotX > clipCenterMinX;
+            Vector3.Dot(ref clipY, ref face.V2, out dotY);
+            bool v2MaxYInside = dotY < clipCenterMaxY;
+            bool v2MinYInside = dotY > clipCenterMinY;
+
+            //Face v3
+            Vector3.Dot(ref clipX, ref face.V3, out dotX);
+            bool v3MaxXInside = dotX < clipCenterMaxX;
+            bool v3MinXInside = dotX > clipCenterMinX;
+            Vector3.Dot(ref clipY, ref face.V3, out dotY);
+            bool v3MaxYInside = dotY < clipCenterMaxY;
+            bool v3MinYInside = dotY > clipCenterMinY;
+
+            //Face v4
+            Vector3.Dot(ref clipX, ref face.V4, out dotX);
+            bool v4MaxXInside = dotX < clipCenterMaxX;
+            bool v4MinXInside = dotX > clipCenterMinX;
+            Vector3.Dot(ref clipY, ref face.V4, out dotY);
+            bool v4MaxYInside = dotY < clipCenterMaxY;
+            bool v4MinYInside = dotY > clipCenterMinY;
+
+            //Find out where the clip face is.
+            //Clip v1
+            Vector3.Dot(ref faceX, ref clipFace.V1, out dotX);
+            bool clipv1MaxXInside = dotX < faceCenterMaxX;
+            bool clipv1MinXInside = dotX > faceCenterMinX;
+            Vector3.Dot(ref faceY, ref clipFace.V1, out dotY);
+            bool clipv1MaxYInside = dotY < faceCenterMaxY;
+            bool clipv1MinYInside = dotY > faceCenterMinY;
+
+            //Clip v2
+            Vector3.Dot(ref faceX, ref clipFace.V2, out dotX);
+            bool clipv2MaxXInside = dotX < faceCenterMaxX;
+            bool clipv2MinXInside = dotX > faceCenterMinX;
+            Vector3.Dot(ref faceY, ref clipFace.V2, out dotY);
+            bool clipv2MaxYInside = dotY < faceCenterMaxY;
+            bool clipv2MinYInside = dotY > faceCenterMinY;
+
+            //Clip v3
+            Vector3.Dot(ref faceX, ref clipFace.V3, out dotX);
+            bool clipv3MaxXInside = dotX < faceCenterMaxX;
+            bool clipv3MinXInside = dotX > faceCenterMinX;
+            Vector3.Dot(ref faceY, ref clipFace.V3, out dotY);
+            bool clipv3MaxYInside = dotY < faceCenterMaxY;
+            bool clipv3MinYInside = dotY > faceCenterMinY;
+
+            //Clip v4
+            Vector3.Dot(ref faceX, ref clipFace.V4, out dotX);
+            bool clipv4MaxXInside = dotX < faceCenterMaxX;
+            bool clipv4MinXInside = dotX > faceCenterMinX;
+            Vector3.Dot(ref faceY, ref clipFace.V4, out dotY);
+            bool clipv4MaxYInside = dotY < faceCenterMaxY;
+            bool clipv4MinYInside = dotY > faceCenterMinY;
+
+        #region Face Vertices
+
+            if (v1MinXInside && v1MaxXInside && v1MinYInside && v1MaxYInside)
+            {
+                data[contactData.Count].Position = face.V1;
+                data[contactData.Count].Id = face.Id1;
+                contactData.Count++;
+            }
+
+            if (v2MinXInside && v2MaxXInside && v2MinYInside && v2MaxYInside)
+            {
+                data[contactData.Count].Position = face.V2;
+                data[contactData.Count].Id = face.Id2;
+                contactData.Count++;
+            }
+
+            if (v3MinXInside && v3MaxXInside && v3MinYInside && v3MaxYInside)
+            {
+                data[contactData.Count].Position = face.V3;
+                data[contactData.Count].Id = face.Id3;
+                contactData.Count++;
+            }
+
+            if (v4MinXInside && v4MaxXInside && v4MinYInside && v4MaxYInside)
+            {
+                data[contactData.Count].Position = face.V4;
+                data[contactData.Count].Id = face.Id4;
+                contactData.Count++;
+            }
+
+            #endregion
+
+            //Compute depths.
+            tempData = contactData;
+            contactData.Count = 0;
+            float depth;
+            float clipFaceDot, faceDot;
+            Vector3.Dot(ref clipFace.V1, ref mtd, out clipFaceDot);
+            for (int i = 0; i < tempData.Count; i++)
+            {
+                Vector3.Dot(ref temp[i].Position, ref mtd, out faceDot);
+                depth = faceDot - clipFaceDot;
+                if (depth <= 0)
+                {
+                    data[contactData.Count].Position = temp[i].Position;
+                    data[contactData.Count].Depth = depth;
+                    data[contactData.Count].Id = temp[i].Id;
+                    contactData.Count++;
+                }
+            }
+
+            byte previousCount = contactData.Count;
+            if (previousCount >= 4) //Early finish :)
+            {
+                outputData = contactData;
+                return;
+            }
+
+        #region Clip face vertices
+
+            Vector3 v;
+            float a, b;
+            Vector3.Dot(ref face.V1, ref face.Normal, out b);
+            //CLIP FACE
+            if (clipv1MinXInside && clipv1MaxXInside && clipv1MinYInside && clipv1MaxYInside)
+            {
+                Vector3.Dot(ref clipFace.V1, ref face.Normal, out a);
+                Vector3.Multiply(ref face.Normal, a - b, out v);
+                Vector3.Subtract(ref clipFace.V1, ref v, out v);
+                data[contactData.Count].Position = v;
+                data[contactData.Count].Id = clipFace.Id1 + 8;
+                contactData.Count++;
+            }
+
+            if (clipv2MinXInside && clipv2MaxXInside && clipv2MinYInside && clipv2MaxYInside)
+            {
+                Vector3.Dot(ref clipFace.V2, ref face.Normal, out a);
+                Vector3.Multiply(ref face.Normal, a - b, out v);
+                Vector3.Subtract(ref clipFace.V2, ref v, out v);
+                data[contactData.Count].Position = v;
+                data[contactData.Count].Id = clipFace.Id2 + 8;
+                contactData.Count++;
+            }
+
+            if (clipv3MinXInside && clipv3MaxXInside && clipv3MinYInside && clipv3MaxYInside)
+            {
+                Vector3.Dot(ref clipFace.V3, ref face.Normal, out a);
+                Vector3.Multiply(ref face.Normal, a - b, out v);
+                Vector3.Subtract(ref clipFace.V3, ref v, out v);
+                data[contactData.Count].Position = v;
+                data[contactData.Count].Id = clipFace.Id3 + 8;
+                contactData.Count++;
+            }
+
+            if (clipv4MinXInside && clipv4MaxXInside && clipv4MinYInside && clipv4MaxYInside)
+            {
+                Vector3.Dot(ref clipFace.V4, ref face.Normal, out a);
+                Vector3.Multiply(ref face.Normal, a - b, out v);
+                Vector3.Subtract(ref clipFace.V4, ref v, out v);
+                data[contactData.Count].Position = v;
+                data[contactData.Count].Id = clipFace.Id4 + 8;
+                contactData.Count++;
+            }
+
+            #endregion
+
+            //Compute depths.
+            byte postClipCount = contactData.Count;
+            tempData = contactData;
+            contactData.Count = previousCount;
+
+            for (int i = previousCount; i < tempData.Count; i++)
+            {
+                Vector3.Dot(ref temp[i].Position, ref mtd, out faceDot);
+                depth = faceDot - clipFaceDot;
+                if (depth <= 0)
+                {
+                    data[contactData.Count].Position = temp[i].Position;
+                    data[contactData.Count].Depth = depth;
+                    data[contactData.Count].Id = temp[i].Id;
+                    contactData.Count++;
+                }
+            }
+
+            previousCount = contactData.Count;
+            if (previousCount >= 4) //Early finish :)
+            {
+                outputData = contactData;
+                return;
+            }
+
+            //Intersect edges.
+
+            //maxX maxY -> v1
+            //minX maxY -> v2
+            //minX minY -> v3
+            //maxX minY -> v4
+
+            //Once we get here there can only be 3 contacts or less.
+            //Once 4 possible contacts have been added, switch to using safe increments.
+            //float dot;
+
+        #region CLIP EDGE: v1 v2
+
+            FaceEdge clipEdge;
+            clipFace.GetEdge(0, out clipEdge);
+            if (!v1MaxYInside)
+            {
+                if (v2MaxYInside)
+                {
+                    //ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipX, ref v, out dot);
+                    //if (dot > clipCenterMinX && dot < clipCenterMaxX)
+                    if (ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v))
+                    {
+                        data[contactData.Count].Position = v;
+                        data[contactData.Count].Id = GetContactId(face.Id1, face.Id2, ref clipEdge);
+                        contactData.Count++;
+                    }
+                }
+                if (v4MaxYInside)
+                {
+                    //ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipX, ref v, out dot);
+                    //if (dot > clipCenterMinX && dot < clipCenterMaxX)
+                    if (ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v))
+                    {
+                        data[contactData.Count].Position = v;
+                        data[contactData.Count].Id = GetContactId(face.Id4, face.Id1, ref clipEdge);
+                        contactData.Count++;
+                    }
+                }
+            }
+            if (!v2MaxYInside)
+            {
+                if (v1MaxYInside)
+                {
+                    //ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipX, ref v, out dot);
+                    //if (dot > clipCenterMinX && dot < clipCenterMaxX)
+                    if (ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v))
+                    {
+                        data[contactData.Count].Position = v;
+                        data[contactData.Count].Id = GetContactId(face.Id1, face.Id2, ref clipEdge);
+                        contactData.Count++;
+                    }
+                }
+                if (v3MaxYInside)
+                {
+                    //ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipX, ref v, out dot);
+                    //if (dot > clipCenterMinX && dot < clipCenterMaxX)
+                    if (ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v))
+                    {
+                        data[contactData.Count].Position = v;
+                        data[contactData.Count].Id = GetContactId(face.Id2, face.Id3, ref clipEdge);
+                        contactData.Count++;
+                    }
+                }
+            }
+            if (!v3MaxYInside)
+            {
+                if (v2MaxYInside)
+                {
+                    //ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipX, ref v, out dot);
+                    //if (dot > clipCenterMinX && dot < clipCenterMaxX)
+                    if (ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v))
+                    {
+                        data[contactData.Count].Position = v;
+                        data[contactData.Count].Id = GetContactId(face.Id2, face.Id3, ref clipEdge);
+                        contactData.Count++;
+                    }
+                }
+                if (v4MaxYInside && contactData.Count < 8)
+                {
+                    //ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipX, ref v, out dot);
+                    //if (dot > clipCenterMinX && dot < clipCenterMaxX)
+                    if (ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v))
+                    {
+                        data[contactData.Count].Position = v;
+                        data[contactData.Count].Id = GetContactId(face.Id3, face.Id4, ref clipEdge);
+                        contactData.Count++;
+                    }
+                }
+            }
+            if (!v4MaxYInside)
+            {
+                if (v1MaxYInside && contactData.Count < 8)
+                {
+                    //ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipX, ref v, out dot);
+                    //if (dot > clipCenterMinX && dot < clipCenterMaxX)
+                    if (ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v))
+                    {
+                        data[contactData.Count].Position = v;
+                        data[contactData.Count].Id = GetContactId(face.Id4, face.Id1, ref clipEdge);
+                        contactData.Count++;
+                    }
+                }
+                if (v3MaxYInside && contactData.Count < 8)
+                {
+                    //ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipX, ref v, out dot);
+                    //if (dot > clipCenterMinX && dot < clipCenterMaxX)
+                    if (ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v))
+                    {
+                        data[contactData.Count].Position = v;
+                        data[contactData.Count].Id = GetContactId(face.Id3, face.Id4, ref clipEdge);
+                        contactData.Count++;
+                    }
+                }
+            }
+
+            #endregion
+
+        #region CLIP EDGE: v2 v3
+
+            clipFace.GetEdge(1, out clipEdge);
+            if (!v1MinXInside)
+            {
+                if (v2MinXInside && contactData.Count < 8)
+                {
+                    //test v1-v2 against minXminY-minXmaxY
+                    //ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipY, ref v, out dot);
+                    //if (dot > clipCenterMinY && dot < clipCenterMaxY)
+                    if (ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v))
+                    {
+                        data[contactData.Count].Position = v;
+                        data[contactData.Count].Id = GetContactId(face.Id1, face.Id2, ref clipEdge);
+                        contactData.Count++;
+                    }
+                }
+                if (v4MinXInside && contactData.Count < 8)
+                {
+                    //test v1-v3 against minXminY-minXmaxY
+                    //ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipY, ref v, out dot);
+                    //if (dot > clipCenterMinY && dot < clipCenterMaxY)
+                    if (ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v))
+                    {
+                        data[contactData.Count].Position = v;
+                        data[contactData.Count].Id = GetContactId(face.Id4, face.Id1, ref clipEdge);
+                        contactData.Count++;
+                    }
+                }
+            }
+            if (!v2MinXInside)
+            {
+                if (v1MinXInside && contactData.Count < 8)
+                {
+                    //test v1-v2 against minXminY-minXmaxY
+                    //ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipY, ref v, out dot);
+                    //if (dot > clipCenterMinY && dot < clipCenterMaxY)
+                    if (ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v))
+                    {
+                        data[contactData.Count].Position = v;
+                        data[contactData.Count].Id = GetContactId(face.Id1, face.Id2, ref clipEdge);
+                        contactData.Count++;
+                    }
+                }
+                if (v3MinXInside && contactData.Count < 8)
+                {
+                    //test v2-v4 against minXminY-minXmaxY
+                    //ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipY, ref v, out dot);
+                    //if (dot > clipCenterMinY && dot < clipCenterMaxY)
+                    if (ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v))
+                    {
+                        data[contactData.Count].Position = v;
+                        data[contactData.Count].Id = GetContactId(face.Id2, face.Id3, ref clipEdge);
+                        contactData.Count++;
+                    }
+                }
+            }
+            if (!v3MinXInside)
+            {
+                if (v2MinXInside && contactData.Count < 8)
+                {
+                    //test v1-v3 against minXminY-minXmaxY
+                    //ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipY, ref v, out dot);
+                    //if (dot > clipCenterMinY && dot < clipCenterMaxY)
+                    if (ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v))
+                    {
+                        data[contactData.Count].Position = v;
+                        data[contactData.Count].Id = GetContactId(face.Id2, face.Id3, ref clipEdge);
+                        contactData.Count++;
+                    }
+                }
+                if (v4MinXInside && contactData.Count < 8)
+                {
+                    //test v3-v4 against minXminY-minXmaxY
+                    //ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipY, ref v, out dot);
+                    //if (dot > clipCenterMinY && dot < clipCenterMaxY)
+                    if (ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v))
+                    {
+                        data[contactData.Count].Position = v;
+                        data[contactData.Count].Id = GetContactId(face.Id3, face.Id4, ref clipEdge);
+                        contactData.Count++;
+                    }
+                }
+            }
+            if (!v4MinXInside)
+            {
+                if (v1MinXInside && contactData.Count < 8)
+                {
+                    //test v2-v4 against minXminY-minXmaxY
+                    //ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipY, ref v, out dot);
+                    //if (dot > clipCenterMinY && dot < clipCenterMaxY)
+                    if (ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v))
+                    {
+                        data[contactData.Count].Position = v;
+                        data[contactData.Count].Id = GetContactId(face.Id4, face.Id1, ref clipEdge);
+                        contactData.Count++;
+                    }
+                }
+                if (v3MinXInside && contactData.Count < 8)
+                {
+                    //test v3-v4 against minXminY-minXmaxY
+                    //ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipY, ref v, out dot);
+                    //if (dot > clipCenterMinY && dot < clipCenterMaxY)
+                    if (ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v))
+                    {
+                        data[contactData.Count].Position = v;
+                        data[contactData.Count].Id = GetContactId(face.Id3, face.Id4, ref clipEdge);
+                        contactData.Count++;
+                    }
+                }
+            }
+
+            #endregion
+
+        #region CLIP EDGE: v3 v4
+
+            clipFace.GetEdge(2, out clipEdge);
+            if (!v1MinYInside)
+            {
+                if (v2MinYInside && contactData.Count < 8)
+                {
+                    //ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipX, ref v, out dot);
+                    //if (dot > clipCenterMinX && dot < clipCenterMaxX)
+                    if (ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v))
+                    {
+                        data[contactData.Count].Position = v;
+                        data[contactData.Count].Id = GetContactId(face.Id1, face.Id2, ref clipEdge);
+                        contactData.Count++;
+                    }
+                }
+                if (v4MinYInside && contactData.Count < 8)
+                {
+                    //ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipX, ref v, out dot);
+                    //if (dot > clipCenterMinX && dot < clipCenterMaxX)
+                    if (ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v))
+                    {
+                        data[contactData.Count].Position = v;
+                        data[contactData.Count].Id = GetContactId(face.Id4, face.Id1, ref clipEdge);
+                        contactData.Count++;
+                    }
+                }
+            }
+            if (!v2MinYInside)
+            {
+                if (v1MinYInside && contactData.Count < 8)
+                {
+                    //ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipX, ref v, out dot);
+                    //if (dot > clipCenterMinX && dot < clipCenterMaxX)
+                    if (ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v))
+                    {
+                        data[contactData.Count].Position = v;
+                        data[contactData.Count].Id = GetContactId(face.Id1, face.Id2, ref clipEdge);
+                        contactData.Count++;
+                    }
+                }
+                if (v3MinYInside && contactData.Count < 8)
+                {
+                    //ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipX, ref v, out dot);
+                    //if (dot > clipCenterMinX && dot < clipCenterMaxX)
+                    if (ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v))
+                    {
+                        data[contactData.Count].Position = v;
+                        data[contactData.Count].Id = GetContactId(face.Id2, face.Id3, ref clipEdge);
+                        contactData.Count++;
+                    }
+                }
+            }
+            if (!v3MinYInside)
+            {
+                if (v2MinYInside && contactData.Count < 8)
+                {
+                    //ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipX, ref v, out dot);
+                    //if (dot > clipCenterMinX && dot < clipCenterMaxX)
+                    if (ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v))
+                    {
+                        data[contactData.Count].Position = v;
+                        data[contactData.Count].Id = GetContactId(face.Id2, face.Id3, ref clipEdge);
+                        contactData.Count++;
+                    }
+                }
+                if (v4MinYInside && contactData.Count < 8)
+                {
+                    //ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipX, ref v, out dot);
+                    //if (dot > clipCenterMinX && dot < clipCenterMaxX)
+                    if (ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v))
+                    {
+                        data[contactData.Count].Position = v;
+                        data[contactData.Count].Id = GetContactId(face.Id3, face.Id4, ref clipEdge);
+                        contactData.Count++;
+                    }
+                }
+            }
+            if (!v4MinYInside)
+            {
+                if (v3MinYInside && contactData.Count < 8)
+                {
+                    //ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipX, ref v, out dot);
+                    //if (dot > clipCenterMinX && dot < clipCenterMaxX)
+                    if (ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v))
+                    {
+                        data[contactData.Count].Position = v;
+                        data[contactData.Count].Id = GetContactId(face.Id3, face.Id4, ref clipEdge);
+                        contactData.Count++;
+                    }
+                }
+                if (v1MinYInside && contactData.Count < 8)
+                {
+                    //ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipX, ref v, out dot);
+                    //if (dot > clipCenterMinX && dot < clipCenterMaxX)
+                    if (ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v))
+                    {
+                        data[contactData.Count].Position = v;
+                        data[contactData.Count].Id = GetContactId(face.Id4, face.Id1, ref clipEdge);
+                        contactData.Count++;
+                    }
+                }
+            }
+
+            #endregion
+
+        #region CLIP EDGE: v4 v1
+
+            clipFace.GetEdge(3, out clipEdge);
+            if (!v1MaxXInside)
+            {
+                if (v2MaxXInside && contactData.Count < 8)
+                {
+                    //ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipY, ref v, out dot);
+                    //if (dot > clipCenterMinY && dot < clipCenterMaxY)
+                    if (ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v))
+                    {
+                        data[contactData.Count].Position = v;
+                        data[contactData.Count].Id = GetContactId(face.Id1, face.Id2, ref clipEdge);
+                        contactData.Count++;
+                    }
+                }
+                if (v4MaxXInside && contactData.Count < 8)
+                {
+                    //ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipY, ref v, out dot);
+                    //if (dot > clipCenterMinY && dot < clipCenterMaxY)
+                    if (ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v))
+                    {
+                        data[contactData.Count].Position = v;
+                        data[contactData.Count].Id = GetContactId(face.Id4, face.Id1, ref clipEdge);
+                        contactData.Count++;
+                    }
+                }
+            }
+            if (!v2MaxXInside)
+            {
+                if (v1MaxXInside && contactData.Count < 8)
+                {
+                    //ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipY, ref v, out dot);
+                    //if (dot > clipCenterMinY && dot < clipCenterMaxY)
+                    if (ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v))
+                    {
+                        data[contactData.Count].Position = v;
+                        data[contactData.Count].Id = GetContactId(face.Id1, face.Id2, ref clipEdge);
+                        contactData.Count++;
+                    }
+                }
+                if (v3MaxXInside && contactData.Count < 8)
+                {
+                    //ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipY, ref v, out dot);
+                    //if (dot > clipCenterMinY && dot < clipCenterMaxY)
+                    if (ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v))
+                    {
+                        data[contactData.Count].Position = v;
+                        data[contactData.Count].Id = GetContactId(face.Id2, face.Id3, ref clipEdge);
+                        contactData.Count++;
+                    }
+                }
+            }
+            if (!v3MaxXInside)
+            {
+                if (v2MaxXInside && contactData.Count < 8)
+                {
+                    //ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipY, ref v, out dot);
+                    //if (dot > clipCenterMinY && dot < clipCenterMaxY)
+                    if (ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v))
+                    {
+                        data[contactData.Count].Position = v;
+                        data[contactData.Count].Id = GetContactId(face.Id2, face.Id3, ref clipEdge);
+                        contactData.Count++;
+                    }
+                }
+                if (v4MaxXInside && contactData.Count < 8)
+                {
+                    //ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipY, ref v, out dot);
+                    //if (dot > clipCenterMinY && dot < clipCenterMaxY)
+                    if (ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v))
+                    {
+                        data[contactData.Count].Position = v;
+                        data[contactData.Count].Id = GetContactId(face.Id3, face.Id4, ref clipEdge);
+                        contactData.Count++;
+                    }
+                }
+            }
+            if (!v4MaxXInside)
+            {
+                if (v1MaxXInside && contactData.Count < 8)
+                {
+                    //ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipY, ref v, out dot);
+                    //if (dot > clipCenterMinY && dot < clipCenterMaxY)
+                    if (ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v))
+                    {
+                        data[contactData.Count].Position = v;
+                        data[contactData.Count].Id = GetContactId(face.Id4, face.Id1, ref clipEdge);
+                        contactData.Count++;
+                    }
+                }
+                if (v3MaxXInside && contactData.Count < 8)
+                {
+                    //ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipY, ref v, out dot);
+                    //if (dot > clipCenterMinY && dot < clipCenterMaxY)
+                    if (ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v))
+                    {
+                        data[contactData.Count].Position = v;
+                        data[contactData.Count].Id = GetContactId(face.Id3, face.Id4, ref clipEdge);
+                        contactData.Count++;
+                    }
+                }
+            }
+
+            #endregion
+
+            //Compute depths.
+            tempData = contactData;
+            contactData.Count = previousCount;
+
+            for (int i = previousCount; i < tempData.Count; i++)
+            {
+                Vector3.Dot(ref temp[i].Position, ref mtd, out faceDot);
+                depth = faceDot - clipFaceDot;
+                if (depth <= 0)
+                {
+                    data[contactData.Count].Position = temp[i].Position;
+                    data[contactData.Count].Depth = depth;
+                    data[contactData.Count].Id = temp[i].Id;
+                    contactData.Count++;
+                }
+            }
+            outputData = contactData;
+        }
+#else
+        private static void ClipFacesDirect(ref BoxFace clipFace, ref BoxFace face, ref Vector3 mtd, out TinyStructList<BoxContactData> contactData)
+        {
+            contactData = new TinyStructList<BoxContactData>();
+
+            //Local directions on the clip face.  Their length is equal to the length of an edge.
+            Vector3 clipX, clipY;
+            Vector3.Subtract(ref clipFace.V4, ref clipFace.V3, out clipX);
+            Vector3.Subtract(ref clipFace.V2, ref clipFace.V3, out clipY);
+            float inverseClipWidth = 1 / clipFace.Width;
+            float inverseClipHeight = 1 / clipFace.Height;
+            float inverseClipWidthSquared = inverseClipWidth * inverseClipWidth;
+            clipX.X *= inverseClipWidthSquared;
+            clipX.Y *= inverseClipWidthSquared;
+            clipX.Z *= inverseClipWidthSquared;
+            float inverseClipHeightSquared = inverseClipHeight * inverseClipHeight;
+            clipY.X *= inverseClipHeightSquared;
+            clipY.Y *= inverseClipHeightSquared;
+            clipY.Z *= inverseClipHeightSquared;
+
+            //Local directions on the opposing face.  Their length is equal to the length of an edge.
+            Vector3 faceX, faceY;
+            Vector3.Subtract(ref face.V4, ref face.V3, out faceX);
+            Vector3.Subtract(ref face.V2, ref face.V3, out faceY);
+            float inverseFaceWidth = 1 / face.Width;
+            float inverseFaceHeight = 1 / face.Height;
+            float inverseFaceWidthSquared = inverseFaceWidth * inverseFaceWidth;
+            faceX.X *= inverseFaceWidthSquared;
+            faceX.Y *= inverseFaceWidthSquared;
+            faceX.Z *= inverseFaceWidthSquared;
+            float inverseFaceHeightSquared = inverseFaceHeight * inverseFaceHeight;
+            faceY.X *= inverseFaceHeightSquared;
+            faceY.Y *= inverseFaceHeightSquared;
+            faceY.Z *= inverseFaceHeightSquared;
+
+            Vector3 clipCenter;
+            Vector3.Add(ref clipFace.V1, ref clipFace.V3, out clipCenter);
+            //Defer division until after dot product (2 multiplies instead of 3)
+            float clipCenterX, clipCenterY;
+            Vector3.Dot(ref clipCenter, ref clipX, out clipCenterX);
+            Vector3.Dot(ref clipCenter, ref clipY, out clipCenterY);
+            clipCenterX *= .5f;
+            clipCenterY *= .5f;
+
+            Vector3 faceCenter;
+            Vector3.Add(ref face.V1, ref face.V3, out faceCenter);
+            //Defer division until after dot product (2 multiplies instead of 3)
+            float faceCenterX, faceCenterY;
+            Vector3.Dot(ref faceCenter, ref faceX, out faceCenterX);
+            Vector3.Dot(ref faceCenter, ref faceY, out faceCenterY);
+            faceCenterX *= .5f;
+            faceCenterY *= .5f;
+
+            //To test bounds, recall that clipX is the length of the X edge.
+            //Going from the center to the max or min goes half of the length of X edge, or +/- 0.5.
+            //Bias could be added here.
+            //const float extent = .5f; //.5f is the default, extra could be added for robustness or speed.
+            float extentX = .5f + .01f * inverseClipWidth;
+            float extentY = .5f + .01f * inverseClipHeight;
+            //float extentX = .5f + .01f * inverseClipXLength;
+            //float extentY = .5f + .01f * inverseClipYLength;
+            float clipCenterMaxX = clipCenterX + extentX;
+            float clipCenterMaxY = clipCenterY + extentY;
+            float clipCenterMinX = clipCenterX - extentX;
+            float clipCenterMinY = clipCenterY - extentY;
+
+            extentX = .5f + .01f * inverseFaceWidth;
+            extentY = .5f + .01f * inverseFaceHeight;
+            //extentX = .5f + .01f * inverseFaceXLength;
+            //extentY = .5f + .01f * inverseFaceYLength;
+            float faceCenterMaxX = faceCenterX + extentX;
+            float faceCenterMaxY = faceCenterY + extentY;
+            float faceCenterMinX = faceCenterX - extentX;
+            float faceCenterMinY = faceCenterY - extentY;
 
             //Find out where the opposing face is.
             float dotX, dotY;
@@ -3938,744 +4720,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             bool clipv4MinYInside = dotY > faceCenterMinY;
 
             #region Face Vertices
-
-            if (v1MinXInside && v1MaxXInside && v1MinYInside && v1MaxYInside)
-            {
-                data[contactData.Count].Position = face.V1;
-                data[contactData.Count].Id = face.Id1;
-                contactData.Count++;
-            }
-
-            if (v2MinXInside && v2MaxXInside && v2MinYInside && v2MaxYInside)
-            {
-                data[contactData.Count].Position = face.V2;
-                data[contactData.Count].Id = face.Id2;
-                contactData.Count++;
-            }
-
-            if (v3MinXInside && v3MaxXInside && v3MinYInside && v3MaxYInside)
-            {
-                data[contactData.Count].Position = face.V3;
-                data[contactData.Count].Id = face.Id3;
-                contactData.Count++;
-            }
-
-            if (v4MinXInside && v4MaxXInside && v4MinYInside && v4MaxYInside)
-            {
-                data[contactData.Count].Position = face.V4;
-                data[contactData.Count].Id = face.Id4;
-                contactData.Count++;
-            }
-
-            #endregion
-
-            //Compute depths.
-            tempData = contactData;
-            contactData.Count = 0;
-            float depth;
-            float clipFaceDot, faceDot;
-            Vector3.Dot(ref clipFace.V1, ref mtd, out clipFaceDot);
-            for (int i = 0; i < tempData.Count; i++)
-            {
-                Vector3.Dot(ref temp[i].Position, ref mtd, out faceDot);
-                depth = faceDot - clipFaceDot;
-                if (depth <= 0)
-                {
-                    data[contactData.Count].Position = temp[i].Position;
-                    data[contactData.Count].Depth = depth;
-                    data[contactData.Count].Id = temp[i].Id;
-                    contactData.Count++;
-                }
-            }
-
-            byte previousCount = contactData.Count;
-            if (previousCount >= 4) //Early finish :)
-            {
-                outputData = contactData;
-                return;
-            }
-
-            #region Clip face vertices
-
-            Vector3 faceNormal;
-            Vector3.Cross(ref faceY, ref faceX, out faceNormal);
-            //inverse = 1 / faceNormal.LengthSquared();
-            //faceNormal.X *= inverse;
-            //faceNormal.Y *= inverse;
-            //faceNormal.Z *= inverse;
-            faceNormal.Normalize();
-            Vector3 v;
-            float a, b;
-            Vector3.Dot(ref face.V1, ref faceNormal, out b);
-            //CLIP FACE
-            if (clipv1MinXInside && clipv1MaxXInside && clipv1MinYInside && clipv1MaxYInside)
-            {
-                Vector3.Dot(ref clipFace.V1, ref faceNormal, out a);
-                Vector3.Multiply(ref faceNormal, a - b, out v);
-                Vector3.Subtract(ref clipFace.V1, ref v, out v);
-                data[contactData.Count].Position = v;
-                data[contactData.Count].Id = clipFace.Id1 + 8;
-                contactData.Count++;
-            }
-
-            if (clipv2MinXInside && clipv2MaxXInside && clipv2MinYInside && clipv2MaxYInside)
-            {
-                Vector3.Dot(ref clipFace.V2, ref faceNormal, out a);
-                Vector3.Multiply(ref faceNormal, a - b, out v);
-                Vector3.Subtract(ref clipFace.V2, ref v, out v);
-                data[contactData.Count].Position = v;
-                data[contactData.Count].Id = clipFace.Id2 + 8;
-                contactData.Count++;
-            }
-
-            if (clipv3MinXInside && clipv3MaxXInside && clipv3MinYInside && clipv3MaxYInside)
-            {
-                Vector3.Dot(ref clipFace.V3, ref faceNormal, out a);
-                Vector3.Multiply(ref faceNormal, a - b, out v);
-                Vector3.Subtract(ref clipFace.V3, ref v, out v);
-                data[contactData.Count].Position = v;
-                data[contactData.Count].Id = clipFace.Id3 + 8;
-                contactData.Count++;
-            }
-
-            if (clipv4MinXInside && clipv4MaxXInside && clipv4MinYInside && clipv4MaxYInside)
-            {
-                Vector3.Dot(ref clipFace.V4, ref faceNormal, out a);
-                Vector3.Multiply(ref faceNormal, a - b, out v);
-                Vector3.Subtract(ref clipFace.V4, ref v, out v);
-                data[contactData.Count].Position = v;
-                data[contactData.Count].Id = clipFace.Id4 + 8;
-                contactData.Count++;
-            }
-
-            #endregion
-
-            //Compute depths.
-            byte postClipCount = contactData.Count;
-            tempData = contactData;
-            contactData.Count = previousCount;
-
-            for (int i = previousCount; i < tempData.Count; i++)
-            {
-                Vector3.Dot(ref temp[i].Position, ref mtd, out faceDot);
-                depth = faceDot - clipFaceDot;
-                if (depth <= 0)
-                {
-                    data[contactData.Count].Position = temp[i].Position;
-                    data[contactData.Count].Depth = depth;
-                    data[contactData.Count].Id = temp[i].Id;
-                    contactData.Count++;
-                }
-            }
-
-            previousCount = contactData.Count;
-            if (previousCount >= 4) //Early finish :)
-            {
-                outputData = contactData;
-                return;
-            }
-
-            //Intersect edges.
-
-            //maxX maxY -> v1
-            //minX maxY -> v2
-            //minX minY -> v3
-            //maxX minY -> v4
-
-            //Once we get here there can only be 3 contacts or less.
-            //Once 4 possible contacts have been added, switch to using safe increments.
-            float dot;
-
-            #region CLIP EDGE: v1 v2
-
-            FaceEdge clipEdge;
-            clipFace.GetEdge(0, ref mtd, out clipEdge);
-            if (!v1MaxYInside)
-            {
-                if (v2MaxYInside)
-                {
-                    ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v);
-                    Vector3.Dot(ref clipX, ref v, out dot);
-                    if (dot > clipCenterMinX && dot < clipCenterMaxX)
-                    {
-                        data[contactData.Count].Position = v;
-                        data[contactData.Count].Id = GetContactId(face.Id1, face.Id2, ref clipEdge);
-                        contactData.Count++;
-                    }
-                }
-                if (v4MaxYInside)
-                {
-                    ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v);
-                    Vector3.Dot(ref clipX, ref v, out dot);
-                    if (dot > clipCenterMinX && dot < clipCenterMaxX)
-                    {
-                        data[contactData.Count].Position = v;
-                        data[contactData.Count].Id = GetContactId(face.Id4, face.Id1, ref clipEdge);
-                        contactData.Count++;
-                    }
-                }
-            }
-            if (!v2MaxYInside)
-            {
-                if (v1MaxYInside)
-                {
-                    ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v);
-                    Vector3.Dot(ref clipX, ref v, out dot);
-                    if (dot > clipCenterMinX && dot < clipCenterMaxX)
-                    {
-                        data[contactData.Count].Position = v;
-                        data[contactData.Count].Id = GetContactId(face.Id1, face.Id2, ref clipEdge);
-                        contactData.Count++;
-                    }
-                }
-                if (v3MaxYInside)
-                {
-                    ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v);
-                    Vector3.Dot(ref clipX, ref v, out dot);
-                    if (dot > clipCenterMinX && dot < clipCenterMaxX)
-                    {
-                        data[contactData.Count].Position = v;
-                        data[contactData.Count].Id = GetContactId(face.Id2, face.Id3, ref clipEdge);
-                        contactData.Count++;
-                    }
-                }
-            }
-            if (!v3MaxYInside)
-            {
-                if (v2MaxYInside)
-                {
-                    ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v);
-                    Vector3.Dot(ref clipX, ref v, out dot);
-                    if (dot > clipCenterMinX && dot < clipCenterMaxX)
-                    {
-                        data[contactData.Count].Position = v;
-                        data[contactData.Count].Id = GetContactId(face.Id2, face.Id3, ref clipEdge);
-                        contactData.Count++;
-                    }
-                }
-                if (v4MaxYInside && contactData.Count < 8)
-                {
-                    ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v);
-                    Vector3.Dot(ref clipX, ref v, out dot);
-                    if (dot > clipCenterMinX && dot < clipCenterMaxX)
-                    {
-                        data[contactData.Count].Position = v;
-                        data[contactData.Count].Id = GetContactId(face.Id3, face.Id4, ref clipEdge);
-                        contactData.Count++;
-                    }
-                }
-            }
-            if (!v4MaxYInside)
-            {
-                if (v1MaxYInside && contactData.Count < 8)
-                {
-                    ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v);
-                    Vector3.Dot(ref clipX, ref v, out dot);
-                    if (dot > clipCenterMinX && dot < clipCenterMaxX)
-                    {
-                        data[contactData.Count].Position = v;
-                        data[contactData.Count].Id = GetContactId(face.Id4, face.Id1, ref clipEdge);
-                        contactData.Count++;
-                    }
-                }
-                if (v3MaxYInside && contactData.Count < 8)
-                {
-                    ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v);
-                    Vector3.Dot(ref clipX, ref v, out dot);
-                    if (dot > clipCenterMinX && dot < clipCenterMaxX)
-                    {
-                        data[contactData.Count].Position = v;
-                        data[contactData.Count].Id = GetContactId(face.Id3, face.Id4, ref clipEdge);
-                        contactData.Count++;
-                    }
-                }
-            }
-
-            #endregion
-
-            #region CLIP EDGE: v2 v3
-
-            clipFace.GetEdge(1, ref mtd, out clipEdge);
-            if (!v1MinXInside)
-            {
-                if (v2MinXInside && contactData.Count < 8)
-                {
-                    //test v1-v2 against minXminY-minXmaxY
-                    ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v);
-                    Vector3.Dot(ref clipY, ref v, out dot);
-                    if (dot > clipCenterMinY && dot < clipCenterMaxY)
-                    {
-                        data[contactData.Count].Position = v;
-                        data[contactData.Count].Id = GetContactId(face.Id1, face.Id2, ref clipEdge);
-                        contactData.Count++;
-                    }
-                }
-                if (v4MinXInside && contactData.Count < 8)
-                {
-                    //test v1-v3 against minXminY-minXmaxY
-                    ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v);
-                    Vector3.Dot(ref clipY, ref v, out dot);
-                    if (dot > clipCenterMinY && dot < clipCenterMaxY)
-                    {
-                        data[contactData.Count].Position = v;
-                        data[contactData.Count].Id = GetContactId(face.Id4, face.Id1, ref clipEdge);
-                        contactData.Count++;
-                    }
-                }
-            }
-            if (!v2MinXInside)
-            {
-                if (v1MinXInside && contactData.Count < 8)
-                {
-                    //test v1-v2 against minXminY-minXmaxY
-                    ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v);
-                    Vector3.Dot(ref clipY, ref v, out dot);
-                    if (dot > clipCenterMinY && dot < clipCenterMaxY)
-                    {
-                        data[contactData.Count].Position = v;
-                        data[contactData.Count].Id = GetContactId(face.Id1, face.Id2, ref clipEdge);
-                        contactData.Count++;
-                    }
-                }
-                if (v3MinXInside && contactData.Count < 8)
-                {
-                    //test v2-v4 against minXminY-minXmaxY
-                    ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v);
-                    Vector3.Dot(ref clipY, ref v, out dot);
-                    if (dot > clipCenterMinY && dot < clipCenterMaxY)
-                    {
-                        data[contactData.Count].Position = v;
-                        data[contactData.Count].Id = GetContactId(face.Id2, face.Id3, ref clipEdge);
-                        contactData.Count++;
-                    }
-                }
-            }
-            if (!v3MinXInside)
-            {
-                if (v2MinXInside && contactData.Count < 8)
-                {
-                    //test v1-v3 against minXminY-minXmaxY
-                    ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v);
-                    Vector3.Dot(ref clipY, ref v, out dot);
-                    if (dot > clipCenterMinY && dot < clipCenterMaxY)
-                    {
-                        data[contactData.Count].Position = v;
-                        data[contactData.Count].Id = GetContactId(face.Id2, face.Id3, ref clipEdge);
-                        contactData.Count++;
-                    }
-                }
-                if (v4MinXInside && contactData.Count < 8)
-                {
-                    //test v3-v4 against minXminY-minXmaxY
-                    ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v);
-                    Vector3.Dot(ref clipY, ref v, out dot);
-                    if (dot > clipCenterMinY && dot < clipCenterMaxY)
-                    {
-                        data[contactData.Count].Position = v;
-                        data[contactData.Count].Id = GetContactId(face.Id3, face.Id4, ref clipEdge);
-                        contactData.Count++;
-                    }
-                }
-            }
-            if (!v4MinXInside)
-            {
-                if (v1MinXInside && contactData.Count < 8)
-                {
-                    //test v2-v4 against minXminY-minXmaxY
-                    ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v);
-                    Vector3.Dot(ref clipY, ref v, out dot);
-                    if (dot > clipCenterMinY && dot < clipCenterMaxY)
-                    {
-                        data[contactData.Count].Position = v;
-                        data[contactData.Count].Id = GetContactId(face.Id4, face.Id1, ref clipEdge);
-                        contactData.Count++;
-                    }
-                }
-                if (v3MinXInside && contactData.Count < 8)
-                {
-                    //test v3-v4 against minXminY-minXmaxY
-                    ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v);
-                    Vector3.Dot(ref clipY, ref v, out dot);
-                    if (dot > clipCenterMinY && dot < clipCenterMaxY)
-                    {
-                        data[contactData.Count].Position = v;
-                        data[contactData.Count].Id = GetContactId(face.Id3, face.Id4, ref clipEdge);
-                        contactData.Count++;
-                    }
-                }
-            }
-
-            #endregion
-
-            #region CLIP EDGE: v3 v4
-
-            clipFace.GetEdge(2, ref mtd, out clipEdge);
-            if (!v1MinYInside)
-            {
-                if (v2MinYInside && contactData.Count < 8)
-                {
-                    ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v);
-                    Vector3.Dot(ref clipX, ref v, out dot);
-                    if (dot > clipCenterMinX && dot < clipCenterMaxX)
-                    {
-                        data[contactData.Count].Position = v;
-                        data[contactData.Count].Id = GetContactId(face.Id1, face.Id2, ref clipEdge);
-                        contactData.Count++;
-                    }
-                }
-                if (v4MinYInside && contactData.Count < 8)
-                {
-                    ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v);
-                    Vector3.Dot(ref clipX, ref v, out dot);
-                    if (dot > clipCenterMinX && dot < clipCenterMaxX)
-                    {
-                        data[contactData.Count].Position = v;
-                        data[contactData.Count].Id = GetContactId(face.Id4, face.Id1, ref clipEdge);
-                        contactData.Count++;
-                    }
-                }
-            }
-            if (!v2MinYInside)
-            {
-                if (v1MinYInside && contactData.Count < 8)
-                {
-                    ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v);
-                    Vector3.Dot(ref clipX, ref v, out dot);
-                    if (dot > clipCenterMinX && dot < clipCenterMaxX)
-                    {
-                        data[contactData.Count].Position = v;
-                        data[contactData.Count].Id = GetContactId(face.Id1, face.Id2, ref clipEdge);
-                        contactData.Count++;
-                    }
-                }
-                if (v3MinYInside && contactData.Count < 8)
-                {
-                    ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v);
-                    Vector3.Dot(ref clipX, ref v, out dot);
-                    if (dot > clipCenterMinX && dot < clipCenterMaxX)
-                    {
-                        data[contactData.Count].Position = v;
-                        data[contactData.Count].Id = GetContactId(face.Id2, face.Id3, ref clipEdge);
-                        contactData.Count++;
-                    }
-                }
-            }
-            if (!v3MinYInside)
-            {
-                if (v2MinYInside && contactData.Count < 8)
-                {
-                    ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v);
-                    Vector3.Dot(ref clipX, ref v, out dot);
-                    if (dot > clipCenterMinX && dot < clipCenterMaxX)
-                    {
-                        data[contactData.Count].Position = v;
-                        data[contactData.Count].Id = GetContactId(face.Id2, face.Id3, ref clipEdge);
-                        contactData.Count++;
-                    }
-                }
-                if (v4MinYInside && contactData.Count < 8)
-                {
-                    ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v);
-                    Vector3.Dot(ref clipX, ref v, out dot);
-                    if (dot > clipCenterMinX && dot < clipCenterMaxX)
-                    {
-                        data[contactData.Count].Position = v;
-                        data[contactData.Count].Id = GetContactId(face.Id3, face.Id4, ref clipEdge);
-                        contactData.Count++;
-                    }
-                }
-            }
-            if (!v4MinYInside)
-            {
-                if (v3MinYInside && contactData.Count < 8)
-                {
-                    ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v);
-                    Vector3.Dot(ref clipX, ref v, out dot);
-                    if (dot > clipCenterMinX && dot < clipCenterMaxX)
-                    {
-                        data[contactData.Count].Position = v;
-                        data[contactData.Count].Id = GetContactId(face.Id3, face.Id4, ref clipEdge);
-                        contactData.Count++;
-                    }
-                }
-                if (v1MinYInside && contactData.Count < 8)
-                {
-                    ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v);
-                    Vector3.Dot(ref clipX, ref v, out dot);
-                    if (dot > clipCenterMinX && dot < clipCenterMaxX)
-                    {
-                        data[contactData.Count].Position = v;
-                        data[contactData.Count].Id = GetContactId(face.Id4, face.Id4, ref clipEdge);
-                        contactData.Count++;
-                    }
-                }
-            }
-
-            #endregion
-
-            #region CLIP EDGE: v4 v1
-
-            clipFace.GetEdge(3, ref mtd, out clipEdge);
-            if (!v1MaxXInside)
-            {
-                if (v2MaxXInside && contactData.Count < 8)
-                {
-                    ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v);
-                    Vector3.Dot(ref clipY, ref v, out dot);
-                    if (dot > clipCenterMinY && dot < clipCenterMaxY)
-                    {
-                        data[contactData.Count].Position = v;
-                        data[contactData.Count].Id = GetContactId(face.Id1, face.Id2, ref clipEdge);
-                        contactData.Count++;
-                    }
-                }
-                if (v4MaxXInside && contactData.Count < 8)
-                {
-                    ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v);
-                    Vector3.Dot(ref clipY, ref v, out dot);
-                    if (dot > clipCenterMinY && dot < clipCenterMaxY)
-                    {
-                        data[contactData.Count].Position = v;
-                        data[contactData.Count].Id = GetContactId(face.Id4, face.Id1, ref clipEdge);
-                        contactData.Count++;
-                    }
-                }
-            }
-            if (!v2MaxXInside)
-            {
-                if (v1MaxXInside && contactData.Count < 8)
-                {
-                    ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v);
-                    Vector3.Dot(ref clipY, ref v, out dot);
-                    if (dot > clipCenterMinY && dot < clipCenterMaxY)
-                    {
-                        data[contactData.Count].Position = v;
-                        data[contactData.Count].Id = GetContactId(face.Id1, face.Id2, ref clipEdge);
-                        contactData.Count++;
-                    }
-                }
-                if (v3MaxXInside && contactData.Count < 8)
-                {
-                    ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v);
-                    Vector3.Dot(ref clipY, ref v, out dot);
-                    if (dot > clipCenterMinY && dot < clipCenterMaxY)
-                    {
-                        data[contactData.Count].Position = v;
-                        data[contactData.Count].Id = GetContactId(face.Id2, face.Id3, ref clipEdge);
-                        contactData.Count++;
-                    }
-                }
-            }
-            if (!v3MaxXInside)
-            {
-                if (v2MaxXInside && contactData.Count < 8)
-                {
-                    ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v);
-                    Vector3.Dot(ref clipY, ref v, out dot);
-                    if (dot > clipCenterMinY && dot < clipCenterMaxY)
-                    {
-                        data[contactData.Count].Position = v;
-                        data[contactData.Count].Id = GetContactId(face.Id2, face.Id3, ref clipEdge);
-                        contactData.Count++;
-                    }
-                }
-                if (v4MaxXInside && contactData.Count < 8)
-                {
-                    ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v);
-                    Vector3.Dot(ref clipY, ref v, out dot);
-                    if (dot > clipCenterMinY && dot < clipCenterMaxY)
-                    {
-                        data[contactData.Count].Position = v;
-                        data[contactData.Count].Id = GetContactId(face.Id3, face.Id4, ref clipEdge);
-                        contactData.Count++;
-                    }
-                }
-            }
-            if (!v4MaxXInside)
-            {
-                if (v1MaxXInside && contactData.Count < 8)
-                {
-                    ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v);
-                    Vector3.Dot(ref clipY, ref v, out dot);
-                    if (dot > clipCenterMinY && dot < clipCenterMaxY)
-                    {
-                        data[contactData.Count].Position = v;
-                        data[contactData.Count].Id = GetContactId(face.Id4, face.Id1, ref clipEdge);
-                        contactData.Count++;
-                    }
-                }
-                if (v3MaxXInside && contactData.Count < 8)
-                {
-                    ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v);
-                    Vector3.Dot(ref clipY, ref v, out dot);
-                    if (dot > clipCenterMinY && dot < clipCenterMaxY)
-                    {
-                        data[contactData.Count].Position = v;
-                        data[contactData.Count].Id = GetContactId(face.Id3, face.Id4, ref clipEdge);
-                        contactData.Count++;
-                    }
-                }
-            }
-
-            #endregion
-
-            //Compute depths.
-            tempData = contactData;
-            contactData.Count = previousCount;
-
-            for (int i = previousCount; i < tempData.Count; i++)
-            {
-                Vector3.Dot(ref temp[i].Position, ref mtd, out faceDot);
-                depth = faceDot - clipFaceDot;
-                if (depth <= 0)
-                {
-                    data[contactData.Count].Position = temp[i].Position;
-                    data[contactData.Count].Depth = depth;
-                    data[contactData.Count].Id = temp[i].Id;
-                    contactData.Count++;
-                }
-            }
-            outputData = contactData;
-        }
-#else
-        private static void ClipFacesDirect(ref BoxFace clipFace, ref BoxFace face, ref Vector3 mtd, out TinyStructList<BoxContactData> contactData)
-        {
-            contactData = new TinyStructList<BoxContactData>();
-            //BoxContactData* data = &contactData.d1;
-            //BoxContactData* temp = &tempData.d1;
-
-            //Local directions on the clip face.  Their length is equal to the length of an edge.
-            Vector3 clipX, clipY;
-            Vector3.Subtract(ref clipFace.V4, ref clipFace.V3, out clipX);
-            Vector3.Subtract(ref clipFace.V2, ref clipFace.V3, out clipY);
-            float inverse = 1 / clipX.LengthSquared();
-            clipX.X *= inverse;
-            clipX.Y *= inverse;
-            clipX.Z *= inverse;
-            inverse = 1 / clipY.LengthSquared();
-            clipY.X *= inverse;
-            clipY.Y *= inverse;
-            clipY.Z *= inverse;
-
-            //Local directions on the opposing face.  Their length is equal to the length of an edge.
-            Vector3 faceX, faceY;
-            Vector3.Subtract(ref face.V4, ref face.V3, out faceX);
-            Vector3.Subtract(ref face.V2, ref face.V3, out faceY);
-            inverse = 1 / faceX.LengthSquared();
-            faceX.X *= inverse;
-            faceX.Y *= inverse;
-            faceX.Z *= inverse;
-            inverse = 1 / faceY.LengthSquared();
-            faceY.X *= inverse;
-            faceY.Y *= inverse;
-            faceY.Z *= inverse;
-
-            Vector3 clipCenter;
-            Vector3.Add(ref clipFace.V1, ref clipFace.V3, out clipCenter);
-            //Defer division until after dot product (2 multiplies instead of 3)
-            float clipCenterX, clipCenterY;
-            Vector3.Dot(ref clipCenter, ref clipX, out clipCenterX);
-            Vector3.Dot(ref clipCenter, ref clipY, out clipCenterY);
-            clipCenterX *= .5f;
-            clipCenterY *= .5f;
-
-            Vector3 faceCenter;
-            Vector3.Add(ref face.V1, ref face.V3, out faceCenter);
-            //Defer division until after dot product (2 multiplies instead of 3)
-            float faceCenterX, faceCenterY;
-            Vector3.Dot(ref faceCenter, ref faceX, out faceCenterX);
-            Vector3.Dot(ref faceCenter, ref faceY, out faceCenterY);
-            faceCenterX *= .5f;
-            faceCenterY *= .5f;
-
-            //To test bounds, recall that clipX is the length of the X edge.
-            //Going from the center to the max or min goes half of the length of X edge, or +/- 0.5.
-            //Bias could be added here.
-            float extent = .5f; //.5f is the default, extra could be added for robustness or speed.
-            float clipCenterMaxX = clipCenterX + extent;
-            float clipCenterMaxY = clipCenterY + extent;
-            float clipCenterMinX = clipCenterX - extent;
-            float clipCenterMinY = clipCenterY - extent;
-
-            float faceCenterMaxX = faceCenterX + extent;
-            float faceCenterMaxY = faceCenterY + extent;
-            float faceCenterMinX = faceCenterX - extent;
-            float faceCenterMinY = faceCenterY - extent;
-
-            //Find out where the opposing face is.
-            float dotX, dotY;
-
-            //The four edges can be thought of as minX, maxX, minY and maxY.
-
-            //Face v1
-            Vector3.Dot(ref clipX, ref face.V1, out dotX);
-            bool v1MaxXInside = dotX < clipCenterMaxX;
-            bool v1MinXInside = dotX > clipCenterMinX;
-            Vector3.Dot(ref clipY, ref face.V1, out dotY);
-            bool v1MaxYInside = dotY < clipCenterMaxY;
-            bool v1MinYInside = dotY > clipCenterMinY;
-
-            //Face v2
-            Vector3.Dot(ref clipX, ref face.V2, out dotX);
-            bool v2MaxXInside = dotX < clipCenterMaxX;
-            bool v2MinXInside = dotX > clipCenterMinX;
-            Vector3.Dot(ref clipY, ref face.V2, out dotY);
-            bool v2MaxYInside = dotY < clipCenterMaxY;
-            bool v2MinYInside = dotY > clipCenterMinY;
-
-            //Face v3
-            Vector3.Dot(ref clipX, ref face.V3, out dotX);
-            bool v3MaxXInside = dotX < clipCenterMaxX;
-            bool v3MinXInside = dotX > clipCenterMinX;
-            Vector3.Dot(ref clipY, ref face.V3, out dotY);
-            bool v3MaxYInside = dotY < clipCenterMaxY;
-            bool v3MinYInside = dotY > clipCenterMinY;
-
-            //Face v4
-            Vector3.Dot(ref clipX, ref face.V4, out dotX);
-            bool v4MaxXInside = dotX < clipCenterMaxX;
-            bool v4MinXInside = dotX > clipCenterMinX;
-            Vector3.Dot(ref clipY, ref face.V4, out dotY);
-            bool v4MaxYInside = dotY < clipCenterMaxY;
-            bool v4MinYInside = dotY > clipCenterMinY;
-
-            //Find out where the clip face is.
-            //Clip v1
-            Vector3.Dot(ref faceX, ref clipFace.V1, out dotX);
-            bool clipv1MaxXInside = dotX < faceCenterMaxX;
-            bool clipv1MinXInside = dotX > faceCenterMinX;
-            Vector3.Dot(ref faceY, ref clipFace.V1, out dotY);
-            bool clipv1MaxYInside = dotY < faceCenterMaxY;
-            bool clipv1MinYInside = dotY > faceCenterMinY;
-
-            //Clip v2
-            Vector3.Dot(ref faceX, ref clipFace.V2, out dotX);
-            bool clipv2MaxXInside = dotX < faceCenterMaxX;
-            bool clipv2MinXInside = dotX > faceCenterMinX;
-            Vector3.Dot(ref faceY, ref clipFace.V2, out dotY);
-            bool clipv2MaxYInside = dotY < faceCenterMaxY;
-            bool clipv2MinYInside = dotY > faceCenterMinY;
-
-            //Clip v3
-            Vector3.Dot(ref faceX, ref clipFace.V3, out dotX);
-            bool clipv3MaxXInside = dotX < faceCenterMaxX;
-            bool clipv3MinXInside = dotX > faceCenterMinX;
-            Vector3.Dot(ref faceY, ref clipFace.V3, out dotY);
-            bool clipv3MaxYInside = dotY < faceCenterMaxY;
-            bool clipv3MinYInside = dotY > faceCenterMinY;
-
-            //Clip v4
-            Vector3.Dot(ref faceX, ref clipFace.V4, out dotX);
-            bool clipv4MaxXInside = dotX < faceCenterMaxX;
-            bool clipv4MinXInside = dotX > faceCenterMinX;
-            Vector3.Dot(ref faceY, ref clipFace.V4, out dotY);
-            bool clipv4MaxYInside = dotY < faceCenterMaxY;
-            bool clipv4MinYInside = dotY > faceCenterMinY;
-
-            var item = new BoxContactData();
-
-        #region Face Vertices
-
+            BoxContactData item = new BoxContactData();
             if (v1MinXInside && v1MaxXInside && v1MinYInside && v1MaxYInside)
             {
                 item.Position = face.V1;
@@ -4728,23 +4773,16 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 return;
             }
 
-        #region Clip face vertices
+            #region Clip face vertices
 
-            Vector3 faceNormal;
-            Vector3.Cross(ref faceY, ref faceX, out faceNormal);
-            //inverse = 1 / faceNormal.LengthSquared();
-            //faceNormal.X *= inverse;
-            //faceNormal.Y *= inverse;
-            //faceNormal.Z *= inverse;
-            faceNormal.Normalize();
             Vector3 v;
             float a, b;
-            Vector3.Dot(ref face.V1, ref faceNormal, out b);
+            Vector3.Dot(ref face.V1, ref face.Normal, out b);
             //CLIP FACE
             if (clipv1MinXInside && clipv1MaxXInside && clipv1MinYInside && clipv1MaxYInside)
             {
-                Vector3.Dot(ref clipFace.V1, ref faceNormal, out a);
-                Vector3.Multiply(ref faceNormal, a - b, out v);
+                Vector3.Dot(ref clipFace.V1, ref face.Normal, out a);
+                Vector3.Multiply(ref face.Normal, a - b, out v);
                 Vector3.Subtract(ref clipFace.V1, ref v, out v);
                 item.Position = v;
                 item.Id = clipFace.Id1 + 8;
@@ -4753,8 +4791,8 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
             if (clipv2MinXInside && clipv2MaxXInside && clipv2MinYInside && clipv2MaxYInside)
             {
-                Vector3.Dot(ref clipFace.V2, ref faceNormal, out a);
-                Vector3.Multiply(ref faceNormal, a - b, out v);
+                Vector3.Dot(ref clipFace.V2, ref face.Normal, out a);
+                Vector3.Multiply(ref face.Normal, a - b, out v);
                 Vector3.Subtract(ref clipFace.V2, ref v, out v);
                 item.Position = v;
                 item.Id = clipFace.Id2 + 8;
@@ -4763,8 +4801,8 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
             if (clipv3MinXInside && clipv3MaxXInside && clipv3MinYInside && clipv3MaxYInside)
             {
-                Vector3.Dot(ref clipFace.V3, ref faceNormal, out a);
-                Vector3.Multiply(ref faceNormal, a - b, out v);
+                Vector3.Dot(ref clipFace.V3, ref face.Normal, out a);
+                Vector3.Multiply(ref face.Normal, a - b, out v);
                 Vector3.Subtract(ref clipFace.V3, ref v, out v);
                 item.Position = v;
                 item.Id = clipFace.Id3 + 8;
@@ -4773,8 +4811,8 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
             if (clipv4MinXInside && clipv4MaxXInside && clipv4MinYInside && clipv4MaxYInside)
             {
-                Vector3.Dot(ref clipFace.V4, ref faceNormal, out a);
-                Vector3.Multiply(ref faceNormal, a - b, out v);
+                Vector3.Dot(ref clipFace.V4, ref face.Normal, out a);
+                Vector3.Multiply(ref face.Normal, a - b, out v);
                 Vector3.Subtract(ref clipFace.V4, ref v, out v);
                 item.Position = v;
                 item.Id = clipFace.Id4 + 8;
@@ -4806,7 +4844,6 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             {
                 return;
             }
-
             //Intersect edges.
 
             //maxX maxY -> v1
@@ -4816,19 +4853,20 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
             //Once we get here there can only be 3 contacts or less.
             //Once 4 possible contacts have been added, switch to using safe increments.
-            float dot;
+            //float dot;
 
-        #region CLIP EDGE: v1 v2
+            #region CLIP EDGE: v1 v2
 
             FaceEdge clipEdge;
-            clipFace.GetEdge(0, ref mtd, out clipEdge);
+            clipFace.GetEdge(0, out clipEdge);
             if (!v1MaxYInside)
             {
                 if (v2MaxYInside)
                 {
-                    ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v);
-                    Vector3.Dot(ref clipX, ref v, out dot);
-                    if (dot > clipCenterMinX && dot < clipCenterMaxX)
+                    //ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipX, ref v, out dot);
+                    //if (dot > clipCenterMinX && dot < clipCenterMaxX)
+                    if (ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v))
                     {
                         item.Position = v;
                         item.Id = GetContactId(face.Id1, face.Id2, ref clipEdge);
@@ -4837,9 +4875,10 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 }
                 if (v4MaxYInside)
                 {
-                    ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v);
-                    Vector3.Dot(ref clipX, ref v, out dot);
-                    if (dot > clipCenterMinX && dot < clipCenterMaxX)
+                    //ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipX, ref v, out dot);
+                    //if (dot > clipCenterMinX && dot < clipCenterMaxX)
+                    if (ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v))
                     {
                         item.Position = v;
                         item.Id = GetContactId(face.Id4, face.Id1, ref clipEdge);
@@ -4851,9 +4890,10 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             {
                 if (v1MaxYInside)
                 {
-                    ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v);
-                    Vector3.Dot(ref clipX, ref v, out dot);
-                    if (dot > clipCenterMinX && dot < clipCenterMaxX)
+                    //ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipX, ref v, out dot);
+                    //if (dot > clipCenterMinX && dot < clipCenterMaxX)
+                    if (ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v))
                     {
                         item.Position = v;
                         item.Id = GetContactId(face.Id1, face.Id2, ref clipEdge);
@@ -4862,9 +4902,10 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 }
                 if (v3MaxYInside)
                 {
-                    ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v);
-                    Vector3.Dot(ref clipX, ref v, out dot);
-                    if (dot > clipCenterMinX && dot < clipCenterMaxX)
+                    //ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipX, ref v, out dot);
+                    //if (dot > clipCenterMinX && dot < clipCenterMaxX)
+                    if (ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v))
                     {
                         item.Position = v;
                         item.Id = GetContactId(face.Id2, face.Id3, ref clipEdge);
@@ -4876,9 +4917,10 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             {
                 if (v2MaxYInside)
                 {
-                    ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v);
-                    Vector3.Dot(ref clipX, ref v, out dot);
-                    if (dot > clipCenterMinX && dot < clipCenterMaxX)
+                    //ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipX, ref v, out dot);
+                    //if (dot > clipCenterMinX && dot < clipCenterMaxX)
+                    if (ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v))
                     {
                         item.Position = v;
                         item.Id = GetContactId(face.Id2, face.Id3, ref clipEdge);
@@ -4887,9 +4929,10 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 }
                 if (v4MaxYInside && contactData.Count < 8)
                 {
-                    ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v);
-                    Vector3.Dot(ref clipX, ref v, out dot);
-                    if (dot > clipCenterMinX && dot < clipCenterMaxX)
+                    //ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipX, ref v, out dot);
+                    //if (dot > clipCenterMinX && dot < clipCenterMaxX)
+                    if (ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v))
                     {
                         item.Position = v;
                         item.Id = GetContactId(face.Id3, face.Id4, ref clipEdge);
@@ -4901,9 +4944,10 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             {
                 if (v1MaxYInside && contactData.Count < 8)
                 {
-                    ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v);
-                    Vector3.Dot(ref clipX, ref v, out dot);
-                    if (dot > clipCenterMinX && dot < clipCenterMaxX)
+                    //ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipX, ref v, out dot);
+                    //if (dot > clipCenterMinX && dot < clipCenterMaxX)
+                    if (ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v))
                     {
                         item.Position = v;
                         item.Id = GetContactId(face.Id4, face.Id1, ref clipEdge);
@@ -4912,9 +4956,10 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 }
                 if (v3MaxYInside && contactData.Count < 8)
                 {
-                    ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v);
-                    Vector3.Dot(ref clipX, ref v, out dot);
-                    if (dot > clipCenterMinX && dot < clipCenterMaxX)
+                    //ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipX, ref v, out dot);
+                    //if (dot > clipCenterMinX && dot < clipCenterMaxX)
+                    if (ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v))
                     {
                         item.Position = v;
                         item.Id = GetContactId(face.Id3, face.Id4, ref clipEdge);
@@ -4925,17 +4970,18 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
             #endregion
 
-        #region CLIP EDGE: v2 v3
+            #region CLIP EDGE: v2 v3
 
-            clipFace.GetEdge(1, ref mtd, out clipEdge);
+            clipFace.GetEdge(1, out clipEdge);
             if (!v1MinXInside)
             {
                 if (v2MinXInside && contactData.Count < 8)
                 {
                     //test v1-v2 against minXminY-minXmaxY
-                    ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v);
-                    Vector3.Dot(ref clipY, ref v, out dot);
-                    if (dot > clipCenterMinY && dot < clipCenterMaxY)
+                    //ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipY, ref v, out dot);
+                    //if (dot > clipCenterMinY && dot < clipCenterMaxY)
+                    if (ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v))
                     {
                         item.Position = v;
                         item.Id = GetContactId(face.Id1, face.Id2, ref clipEdge);
@@ -4945,9 +4991,10 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 if (v4MinXInside && contactData.Count < 8)
                 {
                     //test v1-v3 against minXminY-minXmaxY
-                    ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v);
-                    Vector3.Dot(ref clipY, ref v, out dot);
-                    if (dot > clipCenterMinY && dot < clipCenterMaxY)
+                    //ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipY, ref v, out dot);
+                    //if (dot > clipCenterMinY && dot < clipCenterMaxY)
+                    if (ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v))
                     {
                         item.Position = v;
                         item.Id = GetContactId(face.Id4, face.Id1, ref clipEdge);
@@ -4959,9 +5006,11 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             {
                 if (v1MinXInside && contactData.Count < 8)
                 {
-                    ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v);
-                    Vector3.Dot(ref clipY, ref v, out dot);
-                    if (dot > clipCenterMinY && dot < clipCenterMaxY)
+                    //test v1-v2 against minXminY-minXmaxY
+                    //ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipY, ref v, out dot);
+                    //if (dot > clipCenterMinY && dot < clipCenterMaxY)
+                    if (ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v))
                     {
                         item.Position = v;
                         item.Id = GetContactId(face.Id1, face.Id2, ref clipEdge);
@@ -4970,9 +5019,11 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 }
                 if (v3MinXInside && contactData.Count < 8)
                 {
-                    ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v);
-                    Vector3.Dot(ref clipY, ref v, out dot);
-                    if (dot > clipCenterMinY && dot < clipCenterMaxY)
+                    //test v2-v4 against minXminY-minXmaxY
+                    //ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipY, ref v, out dot);
+                    //if (dot > clipCenterMinY && dot < clipCenterMaxY)
+                    if (ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v))
                     {
                         item.Position = v;
                         item.Id = GetContactId(face.Id2, face.Id3, ref clipEdge);
@@ -4984,9 +5035,11 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             {
                 if (v2MinXInside && contactData.Count < 8)
                 {
-                    ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v);
-                    Vector3.Dot(ref clipY, ref v, out dot);
-                    if (dot > clipCenterMinY && dot < clipCenterMaxY)
+                    //test v1-v3 against minXminY-minXmaxY
+                    //ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipY, ref v, out dot);
+                    //if (dot > clipCenterMinY && dot < clipCenterMaxY)
+                    if (ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v))
                     {
                         item.Position = v;
                         item.Id = GetContactId(face.Id2, face.Id3, ref clipEdge);
@@ -4995,9 +5048,11 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 }
                 if (v4MinXInside && contactData.Count < 8)
                 {
-                    ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v);
-                    Vector3.Dot(ref clipY, ref v, out dot);
-                    if (dot > clipCenterMinY && dot < clipCenterMaxY)
+                    //test v3-v4 against minXminY-minXmaxY
+                    //ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipY, ref v, out dot);
+                    //if (dot > clipCenterMinY && dot < clipCenterMaxY)
+                    if (ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v))
                     {
                         item.Position = v;
                         item.Id = GetContactId(face.Id3, face.Id4, ref clipEdge);
@@ -5010,9 +5065,10 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 if (v1MinXInside && contactData.Count < 8)
                 {
                     //test v2-v4 against minXminY-minXmaxY
-                    ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v);
-                    Vector3.Dot(ref clipY, ref v, out dot);
-                    if (dot > clipCenterMinY && dot < clipCenterMaxY)
+                    //ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipY, ref v, out dot);
+                    //if (dot > clipCenterMinY && dot < clipCenterMaxY)
+                    if (ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v))
                     {
                         item.Position = v;
                         item.Id = GetContactId(face.Id4, face.Id1, ref clipEdge);
@@ -5022,9 +5078,10 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 if (v3MinXInside && contactData.Count < 8)
                 {
                     //test v3-v4 against minXminY-minXmaxY
-                    ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v);
-                    Vector3.Dot(ref clipY, ref v, out dot);
-                    if (dot > clipCenterMinY && dot < clipCenterMaxY)
+                    //ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipY, ref v, out dot);
+                    //if (dot > clipCenterMinY && dot < clipCenterMaxY)
+                    if (ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v))
                     {
                         item.Position = v;
                         item.Id = GetContactId(face.Id3, face.Id4, ref clipEdge);
@@ -5035,16 +5092,17 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
             #endregion
 
-        #region CLIP EDGE: v3 v4
+            #region CLIP EDGE: v3 v4
 
-            clipFace.GetEdge(2, ref mtd, out clipEdge);
+            clipFace.GetEdge(2, out clipEdge);
             if (!v1MinYInside)
             {
                 if (v2MinYInside && contactData.Count < 8)
                 {
-                    ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v);
-                    Vector3.Dot(ref clipX, ref v, out dot);
-                    if (dot > clipCenterMinX && dot < clipCenterMaxX)
+                    //ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipX, ref v, out dot);
+                    //if (dot > clipCenterMinX && dot < clipCenterMaxX)
+                    if (ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v))
                     {
                         item.Position = v;
                         item.Id = GetContactId(face.Id1, face.Id2, ref clipEdge);
@@ -5053,9 +5111,10 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 }
                 if (v4MinYInside && contactData.Count < 8)
                 {
-                    ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v);
-                    Vector3.Dot(ref clipX, ref v, out dot);
-                    if (dot > clipCenterMinX && dot < clipCenterMaxX)
+                    //ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipX, ref v, out dot);
+                    //if (dot > clipCenterMinX && dot < clipCenterMaxX)
+                    if (ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v))
                     {
                         item.Position = v;
                         item.Id = GetContactId(face.Id4, face.Id1, ref clipEdge);
@@ -5067,9 +5126,10 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             {
                 if (v1MinYInside && contactData.Count < 8)
                 {
-                    ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v);
-                    Vector3.Dot(ref clipX, ref v, out dot);
-                    if (dot > clipCenterMinX && dot < clipCenterMaxX)
+                    //ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipX, ref v, out dot);
+                    //if (dot > clipCenterMinX && dot < clipCenterMaxX)
+                    if (ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v))
                     {
                         item.Position = v;
                         item.Id = GetContactId(face.Id1, face.Id2, ref clipEdge);
@@ -5078,9 +5138,10 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 }
                 if (v3MinYInside && contactData.Count < 8)
                 {
-                    ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v);
-                    Vector3.Dot(ref clipX, ref v, out dot);
-                    if (dot > clipCenterMinX && dot < clipCenterMaxX)
+                    //ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipX, ref v, out dot);
+                    //if (dot > clipCenterMinX && dot < clipCenterMaxX)
+                    if (ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v))
                     {
                         item.Position = v;
                         item.Id = GetContactId(face.Id2, face.Id3, ref clipEdge);
@@ -5092,9 +5153,10 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             {
                 if (v2MinYInside && contactData.Count < 8)
                 {
-                    ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v);
-                    Vector3.Dot(ref clipX, ref v, out dot);
-                    if (dot > clipCenterMinX && dot < clipCenterMaxX)
+                    //ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipX, ref v, out dot);
+                    //if (dot > clipCenterMinX && dot < clipCenterMaxX)
+                    if (ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v))
                     {
                         item.Position = v;
                         item.Id = GetContactId(face.Id2, face.Id3, ref clipEdge);
@@ -5103,9 +5165,10 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 }
                 if (v4MinYInside && contactData.Count < 8)
                 {
-                    ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v);
-                    Vector3.Dot(ref clipX, ref v, out dot);
-                    if (dot > clipCenterMinX && dot < clipCenterMaxX)
+                    //ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipX, ref v, out dot);
+                    //if (dot > clipCenterMinX && dot < clipCenterMaxX)
+                    if (ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v))
                     {
                         item.Position = v;
                         item.Id = GetContactId(face.Id3, face.Id4, ref clipEdge);
@@ -5117,9 +5180,10 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             {
                 if (v3MinYInside && contactData.Count < 8)
                 {
-                    ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v);
-                    Vector3.Dot(ref clipX, ref v, out dot);
-                    if (dot > clipCenterMinX && dot < clipCenterMaxX)
+                    //ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipX, ref v, out dot);
+                    //if (dot > clipCenterMinX && dot < clipCenterMaxX)
+                    if (ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v))
                     {
                         item.Position = v;
                         item.Id = GetContactId(face.Id3, face.Id4, ref clipEdge);
@@ -5128,9 +5192,10 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 }
                 if (v1MinYInside && contactData.Count < 8)
                 {
-                    ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v);
-                    Vector3.Dot(ref clipX, ref v, out dot);
-                    if (dot > clipCenterMinX && dot < clipCenterMaxX)
+                    //ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipX, ref v, out dot);
+                    //if (dot > clipCenterMinX && dot < clipCenterMaxX)
+                    if (ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v))
                     {
                         item.Position = v;
                         item.Id = GetContactId(face.Id4, face.Id1, ref clipEdge);
@@ -5141,16 +5206,17 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
             #endregion
 
-        #region CLIP EDGE: v4 v1
+            #region CLIP EDGE: v4 v1
 
-            clipFace.GetEdge(3, ref mtd, out clipEdge);
+            clipFace.GetEdge(3, out clipEdge);
             if (!v1MaxXInside)
             {
                 if (v2MaxXInside && contactData.Count < 8)
                 {
-                    ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v);
-                    Vector3.Dot(ref clipY, ref v, out dot);
-                    if (dot > clipCenterMinY && dot < clipCenterMaxY)
+                    //ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipY, ref v, out dot);
+                    //if (dot > clipCenterMinY && dot < clipCenterMaxY)
+                    if (ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v))
                     {
                         item.Position = v;
                         item.Id = GetContactId(face.Id1, face.Id2, ref clipEdge);
@@ -5159,9 +5225,10 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 }
                 if (v4MaxXInside && contactData.Count < 8)
                 {
-                    ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v);
-                    Vector3.Dot(ref clipY, ref v, out dot);
-                    if (dot > clipCenterMinY && dot < clipCenterMaxY)
+                    //ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipY, ref v, out dot);
+                    //if (dot > clipCenterMinY && dot < clipCenterMaxY)
+                    if (ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v))
                     {
                         item.Position = v;
                         item.Id = GetContactId(face.Id4, face.Id1, ref clipEdge);
@@ -5173,9 +5240,10 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             {
                 if (v1MaxXInside && contactData.Count < 8)
                 {
-                    ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v);
-                    Vector3.Dot(ref clipY, ref v, out dot);
-                    if (dot > clipCenterMinY && dot < clipCenterMaxY)
+                    //ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipY, ref v, out dot);
+                    //if (dot > clipCenterMinY && dot < clipCenterMaxY)
+                    if (ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v))
                     {
                         item.Position = v;
                         item.Id = GetContactId(face.Id1, face.Id2, ref clipEdge);
@@ -5184,9 +5252,10 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 }
                 if (v3MaxXInside && contactData.Count < 8)
                 {
-                    ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v);
-                    Vector3.Dot(ref clipY, ref v, out dot);
-                    if (dot > clipCenterMinY && dot < clipCenterMaxY)
+                    //ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipY, ref v, out dot);
+                    //if (dot > clipCenterMinY && dot < clipCenterMaxY)
+                    if (ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v))
                     {
                         item.Position = v;
                         item.Id = GetContactId(face.Id2, face.Id3, ref clipEdge);
@@ -5198,9 +5267,10 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             {
                 if (v2MaxXInside && contactData.Count < 8)
                 {
-                    ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v);
-                    Vector3.Dot(ref clipY, ref v, out dot);
-                    if (dot > clipCenterMinY && dot < clipCenterMaxY)
+                    //ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipY, ref v, out dot);
+                    //if (dot > clipCenterMinY && dot < clipCenterMaxY)
+                    if (ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v))
                     {
                         item.Position = v;
                         item.Id = GetContactId(face.Id2, face.Id3, ref clipEdge);
@@ -5209,9 +5279,10 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 }
                 if (v4MaxXInside && contactData.Count < 8)
                 {
-                    ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v);
-                    Vector3.Dot(ref clipY, ref v, out dot);
-                    if (dot > clipCenterMinY && dot < clipCenterMaxY)
+                    //ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipY, ref v, out dot);
+                    //if (dot > clipCenterMinY && dot < clipCenterMaxY)
+                    if (ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v))
                     {
                         item.Position = v;
                         item.Id = GetContactId(face.Id3, face.Id4, ref clipEdge);
@@ -5223,9 +5294,10 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             {
                 if (v1MaxXInside && contactData.Count < 8)
                 {
-                    ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v);
-                    Vector3.Dot(ref clipY, ref v, out dot);
-                    if (dot > clipCenterMinY && dot < clipCenterMaxY)
+                    //ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipY, ref v, out dot);
+                    //if (dot > clipCenterMinY && dot < clipCenterMaxY)
+                    if (ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v))
                     {
                         item.Position = v;
                         item.Id = GetContactId(face.Id4, face.Id1, ref clipEdge);
@@ -5234,9 +5306,10 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 }
                 if (v3MaxXInside && contactData.Count < 8)
                 {
-                    ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v);
-                    Vector3.Dot(ref clipY, ref v, out dot);
-                    if (dot > clipCenterMinY && dot < clipCenterMaxY)
+                    //ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v);
+                    //Vector3.Dot(ref clipY, ref v, out dot);
+                    //if (dot > clipCenterMinY && dot < clipCenterMaxY)
+                    if (ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v))
                     {
                         item.Position = v;
                         item.Id = GetContactId(face.Id3, face.Id4, ref clipEdge);
@@ -5264,9 +5337,735 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 }
             }
         }
+        //private static void ClipFacesDirect(ref BoxFace clipFace, ref BoxFace face, ref Vector3 mtd, out TinyStructList<BoxContactData> contactData)
+        //{
+        //    contactData = new TinyStructList<BoxContactData>();
+        //    //BoxContactData* data = &contactData.d1;
+        //    //BoxContactData* temp = &tempData.d1;
+
+        //    //Local directions on the clip face.  Their length is equal to the length of an edge.
+        //    Vector3 clipX, clipY;
+        //    Vector3.Subtract(ref clipFace.V4, ref clipFace.V3, out clipX);
+        //    Vector3.Subtract(ref clipFace.V2, ref clipFace.V3, out clipY);
+        //    float inverse = 1 / clipX.LengthSquared();
+        //    clipX.X *= inverse;
+        //    clipX.Y *= inverse;
+        //    clipX.Z *= inverse;
+        //    inverse = 1 / clipY.LengthSquared();
+        //    clipY.X *= inverse;
+        //    clipY.Y *= inverse;
+        //    clipY.Z *= inverse;
+
+        //    //Local directions on the opposing face.  Their length is equal to the length of an edge.
+        //    Vector3 faceX, faceY;
+        //    Vector3.Subtract(ref face.V4, ref face.V3, out faceX);
+        //    Vector3.Subtract(ref face.V2, ref face.V3, out faceY);
+        //    inverse = 1 / faceX.LengthSquared();
+        //    faceX.X *= inverse;
+        //    faceX.Y *= inverse;
+        //    faceX.Z *= inverse;
+        //    inverse = 1 / faceY.LengthSquared();
+        //    faceY.X *= inverse;
+        //    faceY.Y *= inverse;
+        //    faceY.Z *= inverse;
+
+        //    Vector3 clipCenter;
+        //    Vector3.Add(ref clipFace.V1, ref clipFace.V3, out clipCenter);
+        //    //Defer division until after dot product (2 multiplies instead of 3)
+        //    float clipCenterX, clipCenterY;
+        //    Vector3.Dot(ref clipCenter, ref clipX, out clipCenterX);
+        //    Vector3.Dot(ref clipCenter, ref clipY, out clipCenterY);
+        //    clipCenterX *= .5f;
+        //    clipCenterY *= .5f;
+
+        //    Vector3 faceCenter;
+        //    Vector3.Add(ref face.V1, ref face.V3, out faceCenter);
+        //    //Defer division until after dot product (2 multiplies instead of 3)
+        //    float faceCenterX, faceCenterY;
+        //    Vector3.Dot(ref faceCenter, ref faceX, out faceCenterX);
+        //    Vector3.Dot(ref faceCenter, ref faceY, out faceCenterY);
+        //    faceCenterX *= .5f;
+        //    faceCenterY *= .5f;
+
+        //    //To test bounds, recall that clipX is the length of the X edge.
+        //    //Going from the center to the max or min goes half of the length of X edge, or +/- 0.5.
+        //    //Bias could be added here.
+        //    float extent = .5f; //.5f is the default, extra could be added for robustness or speed.
+        //    float clipCenterMaxX = clipCenterX + extent;
+        //    float clipCenterMaxY = clipCenterY + extent;
+        //    float clipCenterMinX = clipCenterX - extent;
+        //    float clipCenterMinY = clipCenterY - extent;
+
+        //    float faceCenterMaxX = faceCenterX + extent;
+        //    float faceCenterMaxY = faceCenterY + extent;
+        //    float faceCenterMinX = faceCenterX - extent;
+        //    float faceCenterMinY = faceCenterY - extent;
+
+        //    //Find out where the opposing face is.
+        //    float dotX, dotY;
+
+        //    //The four edges can be thought of as minX, maxX, minY and maxY.
+
+        //    //Face v1
+        //    Vector3.Dot(ref clipX, ref face.V1, out dotX);
+        //    bool v1MaxXInside = dotX < clipCenterMaxX;
+        //    bool v1MinXInside = dotX > clipCenterMinX;
+        //    Vector3.Dot(ref clipY, ref face.V1, out dotY);
+        //    bool v1MaxYInside = dotY < clipCenterMaxY;
+        //    bool v1MinYInside = dotY > clipCenterMinY;
+
+        //    //Face v2
+        //    Vector3.Dot(ref clipX, ref face.V2, out dotX);
+        //    bool v2MaxXInside = dotX < clipCenterMaxX;
+        //    bool v2MinXInside = dotX > clipCenterMinX;
+        //    Vector3.Dot(ref clipY, ref face.V2, out dotY);
+        //    bool v2MaxYInside = dotY < clipCenterMaxY;
+        //    bool v2MinYInside = dotY > clipCenterMinY;
+
+        //    //Face v3
+        //    Vector3.Dot(ref clipX, ref face.V3, out dotX);
+        //    bool v3MaxXInside = dotX < clipCenterMaxX;
+        //    bool v3MinXInside = dotX > clipCenterMinX;
+        //    Vector3.Dot(ref clipY, ref face.V3, out dotY);
+        //    bool v3MaxYInside = dotY < clipCenterMaxY;
+        //    bool v3MinYInside = dotY > clipCenterMinY;
+
+        //    //Face v4
+        //    Vector3.Dot(ref clipX, ref face.V4, out dotX);
+        //    bool v4MaxXInside = dotX < clipCenterMaxX;
+        //    bool v4MinXInside = dotX > clipCenterMinX;
+        //    Vector3.Dot(ref clipY, ref face.V4, out dotY);
+        //    bool v4MaxYInside = dotY < clipCenterMaxY;
+        //    bool v4MinYInside = dotY > clipCenterMinY;
+
+        //    //Find out where the clip face is.
+        //    //Clip v1
+        //    Vector3.Dot(ref faceX, ref clipFace.V1, out dotX);
+        //    bool clipv1MaxXInside = dotX < faceCenterMaxX;
+        //    bool clipv1MinXInside = dotX > faceCenterMinX;
+        //    Vector3.Dot(ref faceY, ref clipFace.V1, out dotY);
+        //    bool clipv1MaxYInside = dotY < faceCenterMaxY;
+        //    bool clipv1MinYInside = dotY > faceCenterMinY;
+
+        //    //Clip v2
+        //    Vector3.Dot(ref faceX, ref clipFace.V2, out dotX);
+        //    bool clipv2MaxXInside = dotX < faceCenterMaxX;
+        //    bool clipv2MinXInside = dotX > faceCenterMinX;
+        //    Vector3.Dot(ref faceY, ref clipFace.V2, out dotY);
+        //    bool clipv2MaxYInside = dotY < faceCenterMaxY;
+        //    bool clipv2MinYInside = dotY > faceCenterMinY;
+
+        //    //Clip v3
+        //    Vector3.Dot(ref faceX, ref clipFace.V3, out dotX);
+        //    bool clipv3MaxXInside = dotX < faceCenterMaxX;
+        //    bool clipv3MinXInside = dotX > faceCenterMinX;
+        //    Vector3.Dot(ref faceY, ref clipFace.V3, out dotY);
+        //    bool clipv3MaxYInside = dotY < faceCenterMaxY;
+        //    bool clipv3MinYInside = dotY > faceCenterMinY;
+
+        //    //Clip v4
+        //    Vector3.Dot(ref faceX, ref clipFace.V4, out dotX);
+        //    bool clipv4MaxXInside = dotX < faceCenterMaxX;
+        //    bool clipv4MinXInside = dotX > faceCenterMinX;
+        //    Vector3.Dot(ref faceY, ref clipFace.V4, out dotY);
+        //    bool clipv4MaxYInside = dotY < faceCenterMaxY;
+        //    bool clipv4MinYInside = dotY > faceCenterMinY;
+
+        //    var item = new BoxContactData();
+
+        //    #region Face Vertices
+
+        //    if (v1MinXInside && v1MaxXInside && v1MinYInside && v1MaxYInside)
+        //    {
+        //        item.Position = face.V1;
+        //        item.Id = face.Id1;
+        //        contactData.Add(ref item);
+        //    }
+
+        //    if (v2MinXInside && v2MaxXInside && v2MinYInside && v2MaxYInside)
+        //    {
+        //        item.Position = face.V2;
+        //        item.Id = face.Id2;
+        //        contactData.Add(ref item);
+        //    }
+
+        //    if (v3MinXInside && v3MaxXInside && v3MinYInside && v3MaxYInside)
+        //    {
+        //        item.Position = face.V3;
+        //        item.Id = face.Id3;
+        //        contactData.Add(ref item);
+        //    }
+
+        //    if (v4MinXInside && v4MaxXInside && v4MinYInside && v4MaxYInside)
+        //    {
+        //        item.Position = face.V4;
+        //        item.Id = face.Id4;
+        //        contactData.Add(ref item);
+        //    }
+
+        //    #endregion
+
+        //    //Compute depths.
+        //    TinyStructList<BoxContactData> tempData = contactData;
+        //    contactData.Clear();
+        //    float clipFaceDot, faceDot;
+        //    Vector3.Dot(ref clipFace.V1, ref mtd, out clipFaceDot);
+        //    for (int i = 0; i < tempData.Count; i++)
+        //    {
+        //        tempData.Get(i, out item);
+        //        Vector3.Dot(ref item.Position, ref mtd, out faceDot);
+        //        item.Depth = faceDot - clipFaceDot;
+        //        if (item.Depth <= 0)
+        //        {
+        //            contactData.Add(ref item);
+        //        }
+        //    }
+
+        //    int previousCount = contactData.Count;
+        //    if (previousCount >= 4) //Early finish :)
+        //    {
+        //        return;
+        //    }
+
+        //    #region Clip face vertices
+
+        //    Vector3 faceNormal;
+        //    Vector3.Cross(ref faceY, ref faceX, out faceNormal);
+        //    //inverse = 1 / faceNormal.LengthSquared();
+        //    //faceNormal.X *= inverse;
+        //    //faceNormal.Y *= inverse;
+        //    //faceNormal.Z *= inverse;
+        //    faceNormal.Normalize();
+        //    Vector3 v;
+        //    float a, b;
+        //    Vector3.Dot(ref face.V1, ref faceNormal, out b);
+        //    //CLIP FACE
+        //    if (clipv1MinXInside && clipv1MaxXInside && clipv1MinYInside && clipv1MaxYInside)
+        //    {
+        //        Vector3.Dot(ref clipFace.V1, ref faceNormal, out a);
+        //        Vector3.Multiply(ref faceNormal, a - b, out v);
+        //        Vector3.Subtract(ref clipFace.V1, ref v, out v);
+        //        item.Position = v;
+        //        item.Id = clipFace.Id1 + 8;
+        //        contactData.Add(ref item);
+        //    }
+
+        //    if (clipv2MinXInside && clipv2MaxXInside && clipv2MinYInside && clipv2MaxYInside)
+        //    {
+        //        Vector3.Dot(ref clipFace.V2, ref faceNormal, out a);
+        //        Vector3.Multiply(ref faceNormal, a - b, out v);
+        //        Vector3.Subtract(ref clipFace.V2, ref v, out v);
+        //        item.Position = v;
+        //        item.Id = clipFace.Id2 + 8;
+        //        contactData.Add(ref item);
+        //    }
+
+        //    if (clipv3MinXInside && clipv3MaxXInside && clipv3MinYInside && clipv3MaxYInside)
+        //    {
+        //        Vector3.Dot(ref clipFace.V3, ref faceNormal, out a);
+        //        Vector3.Multiply(ref faceNormal, a - b, out v);
+        //        Vector3.Subtract(ref clipFace.V3, ref v, out v);
+        //        item.Position = v;
+        //        item.Id = clipFace.Id3 + 8;
+        //        contactData.Add(ref item);
+        //    }
+
+        //    if (clipv4MinXInside && clipv4MaxXInside && clipv4MinYInside && clipv4MaxYInside)
+        //    {
+        //        Vector3.Dot(ref clipFace.V4, ref faceNormal, out a);
+        //        Vector3.Multiply(ref faceNormal, a - b, out v);
+        //        Vector3.Subtract(ref clipFace.V4, ref v, out v);
+        //        item.Position = v;
+        //        item.Id = clipFace.Id4 + 8;
+        //        contactData.Add(ref item);
+        //    }
+
+        //    #endregion
+
+        //    //Compute depths.
+        //    int postClipCount = contactData.Count;
+        //    tempData = contactData;
+        //    for (int i = postClipCount - 1; i >= previousCount; i--) //TODO: >=?
+        //        contactData.RemoveAt(i);
+
+
+        //    for (int i = previousCount; i < tempData.Count; i++)
+        //    {
+        //        tempData.Get(i, out item);
+        //        Vector3.Dot(ref item.Position, ref mtd, out faceDot);
+        //        item.Depth = faceDot - clipFaceDot;
+        //        if (item.Depth <= 0)
+        //        {
+        //            contactData.Add(ref item);
+        //        }
+        //    }
+
+        //    previousCount = contactData.Count;
+        //    if (previousCount >= 4) //Early finish :)
+        //    {
+        //        return;
+        //    }
+
+        //    //Intersect edges.
+
+        //    //maxX maxY -> v1
+        //    //minX maxY -> v2
+        //    //minX minY -> v3
+        //    //maxX minY -> v4
+
+        //    //Once we get here there can only be 3 contacts or less.
+        //    //Once 4 possible contacts have been added, switch to using safe increments.
+        //    float dot;
+
+        //    #region CLIP EDGE: v1 v2
+
+        //    FaceEdge clipEdge;
+        //    clipFace.GetEdge(0, ref mtd, out clipEdge);
+        //    if (!v1MaxYInside)
+        //    {
+        //        if (v2MaxYInside)
+        //        {
+        //            ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v);
+        //            Vector3.Dot(ref clipX, ref v, out dot);
+        //            if (dot > clipCenterMinX && dot < clipCenterMaxX)
+        //            {
+        //                item.Position = v;
+        //                item.Id = GetContactId(face.Id1, face.Id2, ref clipEdge);
+        //                contactData.Add(ref item);
+        //            }
+        //        }
+        //        if (v4MaxYInside)
+        //        {
+        //            ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v);
+        //            Vector3.Dot(ref clipX, ref v, out dot);
+        //            if (dot > clipCenterMinX && dot < clipCenterMaxX)
+        //            {
+        //                item.Position = v;
+        //                item.Id = GetContactId(face.Id4, face.Id1, ref clipEdge);
+        //                contactData.Add(ref item);
+        //            }
+        //        }
+        //    }
+        //    if (!v2MaxYInside)
+        //    {
+        //        if (v1MaxYInside)
+        //        {
+        //            ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v);
+        //            Vector3.Dot(ref clipX, ref v, out dot);
+        //            if (dot > clipCenterMinX && dot < clipCenterMaxX)
+        //            {
+        //                item.Position = v;
+        //                item.Id = GetContactId(face.Id1, face.Id2, ref clipEdge);
+        //                contactData.Add(ref item);
+        //            }
+        //        }
+        //        if (v3MaxYInside)
+        //        {
+        //            ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v);
+        //            Vector3.Dot(ref clipX, ref v, out dot);
+        //            if (dot > clipCenterMinX && dot < clipCenterMaxX)
+        //            {
+        //                item.Position = v;
+        //                item.Id = GetContactId(face.Id2, face.Id3, ref clipEdge);
+        //                contactData.Add(ref item);
+        //            }
+        //        }
+        //    }
+        //    if (!v3MaxYInside)
+        //    {
+        //        if (v2MaxYInside)
+        //        {
+        //            ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v);
+        //            Vector3.Dot(ref clipX, ref v, out dot);
+        //            if (dot > clipCenterMinX && dot < clipCenterMaxX)
+        //            {
+        //                item.Position = v;
+        //                item.Id = GetContactId(face.Id2, face.Id3, ref clipEdge);
+        //                contactData.Add(ref item);
+        //            }
+        //        }
+        //        if (v4MaxYInside && contactData.Count < 8)
+        //        {
+        //            ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v);
+        //            Vector3.Dot(ref clipX, ref v, out dot);
+        //            if (dot > clipCenterMinX && dot < clipCenterMaxX)
+        //            {
+        //                item.Position = v;
+        //                item.Id = GetContactId(face.Id3, face.Id4, ref clipEdge);
+        //                contactData.Add(ref item);
+        //            }
+        //        }
+        //    }
+        //    if (!v4MaxYInside)
+        //    {
+        //        if (v1MaxYInside && contactData.Count < 8)
+        //        {
+        //            ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v);
+        //            Vector3.Dot(ref clipX, ref v, out dot);
+        //            if (dot > clipCenterMinX && dot < clipCenterMaxX)
+        //            {
+        //                item.Position = v;
+        //                item.Id = GetContactId(face.Id4, face.Id1, ref clipEdge);
+        //                contactData.Add(ref item);
+        //            }
+        //        }
+        //        if (v3MaxYInside && contactData.Count < 8)
+        //        {
+        //            ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v);
+        //            Vector3.Dot(ref clipX, ref v, out dot);
+        //            if (dot > clipCenterMinX && dot < clipCenterMaxX)
+        //            {
+        //                item.Position = v;
+        //                item.Id = GetContactId(face.Id3, face.Id4, ref clipEdge);
+        //                contactData.Add(ref item);
+        //            }
+        //        }
+        //    }
+
+        //    #endregion
+
+        //    #region CLIP EDGE: v2 v3
+
+        //    clipFace.GetEdge(1, ref mtd, out clipEdge);
+        //    if (!v1MinXInside)
+        //    {
+        //        if (v2MinXInside && contactData.Count < 8)
+        //        {
+        //            //test v1-v2 against minXminY-minXmaxY
+        //            ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v);
+        //            Vector3.Dot(ref clipY, ref v, out dot);
+        //            if (dot > clipCenterMinY && dot < clipCenterMaxY)
+        //            {
+        //                item.Position = v;
+        //                item.Id = GetContactId(face.Id1, face.Id2, ref clipEdge);
+        //                contactData.Add(ref item);
+        //            }
+        //        }
+        //        if (v4MinXInside && contactData.Count < 8)
+        //        {
+        //            //test v1-v3 against minXminY-minXmaxY
+        //            ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v);
+        //            Vector3.Dot(ref clipY, ref v, out dot);
+        //            if (dot > clipCenterMinY && dot < clipCenterMaxY)
+        //            {
+        //                item.Position = v;
+        //                item.Id = GetContactId(face.Id4, face.Id1, ref clipEdge);
+        //                contactData.Add(ref item);
+        //            }
+        //        }
+        //    }
+        //    if (!v2MinXInside)
+        //    {
+        //        if (v1MinXInside && contactData.Count < 8)
+        //        {
+        //            ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v);
+        //            Vector3.Dot(ref clipY, ref v, out dot);
+        //            if (dot > clipCenterMinY && dot < clipCenterMaxY)
+        //            {
+        //                item.Position = v;
+        //                item.Id = GetContactId(face.Id1, face.Id2, ref clipEdge);
+        //                contactData.Add(ref item);
+        //            }
+        //        }
+        //        if (v3MinXInside && contactData.Count < 8)
+        //        {
+        //            ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v);
+        //            Vector3.Dot(ref clipY, ref v, out dot);
+        //            if (dot > clipCenterMinY && dot < clipCenterMaxY)
+        //            {
+        //                item.Position = v;
+        //                item.Id = GetContactId(face.Id2, face.Id3, ref clipEdge);
+        //                contactData.Add(ref item);
+        //            }
+        //        }
+        //    }
+        //    if (!v3MinXInside)
+        //    {
+        //        if (v2MinXInside && contactData.Count < 8)
+        //        {
+        //            ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v);
+        //            Vector3.Dot(ref clipY, ref v, out dot);
+        //            if (dot > clipCenterMinY && dot < clipCenterMaxY)
+        //            {
+        //                item.Position = v;
+        //                item.Id = GetContactId(face.Id2, face.Id3, ref clipEdge);
+        //                contactData.Add(ref item);
+        //            }
+        //        }
+        //        if (v4MinXInside && contactData.Count < 8)
+        //        {
+        //            ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v);
+        //            Vector3.Dot(ref clipY, ref v, out dot);
+        //            if (dot > clipCenterMinY && dot < clipCenterMaxY)
+        //            {
+        //                item.Position = v;
+        //                item.Id = GetContactId(face.Id3, face.Id4, ref clipEdge);
+        //                contactData.Add(ref item);
+        //            }
+        //        }
+        //    }
+        //    if (!v4MinXInside)
+        //    {
+        //        if (v1MinXInside && contactData.Count < 8)
+        //        {
+        //            //test v2-v4 against minXminY-minXmaxY
+        //            ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v);
+        //            Vector3.Dot(ref clipY, ref v, out dot);
+        //            if (dot > clipCenterMinY && dot < clipCenterMaxY)
+        //            {
+        //                item.Position = v;
+        //                item.Id = GetContactId(face.Id4, face.Id1, ref clipEdge);
+        //                contactData.Add(ref item);
+        //            }
+        //        }
+        //        if (v3MinXInside && contactData.Count < 8)
+        //        {
+        //            //test v3-v4 against minXminY-minXmaxY
+        //            ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v);
+        //            Vector3.Dot(ref clipY, ref v, out dot);
+        //            if (dot > clipCenterMinY && dot < clipCenterMaxY)
+        //            {
+        //                item.Position = v;
+        //                item.Id = GetContactId(face.Id3, face.Id4, ref clipEdge);
+        //                contactData.Add(ref item);
+        //            }
+        //        }
+        //    }
+
+        //    #endregion
+
+        //    #region CLIP EDGE: v3 v4
+
+        //    clipFace.GetEdge(2, ref mtd, out clipEdge);
+        //    if (!v1MinYInside)
+        //    {
+        //        if (v2MinYInside && contactData.Count < 8)
+        //        {
+        //            ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v);
+        //            Vector3.Dot(ref clipX, ref v, out dot);
+        //            if (dot > clipCenterMinX && dot < clipCenterMaxX)
+        //            {
+        //                item.Position = v;
+        //                item.Id = GetContactId(face.Id1, face.Id2, ref clipEdge);
+        //                contactData.Add(ref item);
+        //            }
+        //        }
+        //        if (v4MinYInside && contactData.Count < 8)
+        //        {
+        //            ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v);
+        //            Vector3.Dot(ref clipX, ref v, out dot);
+        //            if (dot > clipCenterMinX && dot < clipCenterMaxX)
+        //            {
+        //                item.Position = v;
+        //                item.Id = GetContactId(face.Id4, face.Id1, ref clipEdge);
+        //                contactData.Add(ref item);
+        //            }
+        //        }
+        //    }
+        //    if (!v2MinYInside)
+        //    {
+        //        if (v1MinYInside && contactData.Count < 8)
+        //        {
+        //            ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v);
+        //            Vector3.Dot(ref clipX, ref v, out dot);
+        //            if (dot > clipCenterMinX && dot < clipCenterMaxX)
+        //            {
+        //                item.Position = v;
+        //                item.Id = GetContactId(face.Id1, face.Id2, ref clipEdge);
+        //                contactData.Add(ref item);
+        //            }
+        //        }
+        //        if (v3MinYInside && contactData.Count < 8)
+        //        {
+        //            ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v);
+        //            Vector3.Dot(ref clipX, ref v, out dot);
+        //            if (dot > clipCenterMinX && dot < clipCenterMaxX)
+        //            {
+        //                item.Position = v;
+        //                item.Id = GetContactId(face.Id2, face.Id3, ref clipEdge);
+        //                contactData.Add(ref item);
+        //            }
+        //        }
+        //    }
+        //    if (!v3MinYInside)
+        //    {
+        //        if (v2MinYInside && contactData.Count < 8)
+        //        {
+        //            ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v);
+        //            Vector3.Dot(ref clipX, ref v, out dot);
+        //            if (dot > clipCenterMinX && dot < clipCenterMaxX)
+        //            {
+        //                item.Position = v;
+        //                item.Id = GetContactId(face.Id2, face.Id3, ref clipEdge);
+        //                contactData.Add(ref item);
+        //            }
+        //        }
+        //        if (v4MinYInside && contactData.Count < 8)
+        //        {
+        //            ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v);
+        //            Vector3.Dot(ref clipX, ref v, out dot);
+        //            if (dot > clipCenterMinX && dot < clipCenterMaxX)
+        //            {
+        //                item.Position = v;
+        //                item.Id = GetContactId(face.Id3, face.Id4, ref clipEdge);
+        //                contactData.Add(ref item);
+        //            }
+        //        }
+        //    }
+        //    if (!v4MinYInside)
+        //    {
+        //        if (v3MinYInside && contactData.Count < 8)
+        //        {
+        //            ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v);
+        //            Vector3.Dot(ref clipX, ref v, out dot);
+        //            if (dot > clipCenterMinX && dot < clipCenterMaxX)
+        //            {
+        //                item.Position = v;
+        //                item.Id = GetContactId(face.Id3, face.Id4, ref clipEdge);
+        //                contactData.Add(ref item);
+        //            }
+        //        }
+        //        if (v1MinYInside && contactData.Count < 8)
+        //        {
+        //            ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v);
+        //            Vector3.Dot(ref clipX, ref v, out dot);
+        //            if (dot > clipCenterMinX && dot < clipCenterMaxX)
+        //            {
+        //                item.Position = v;
+        //                item.Id = GetContactId(face.Id4, face.Id1, ref clipEdge);
+        //                contactData.Add(ref item);
+        //            }
+        //        }
+        //    }
+
+        //    #endregion
+
+        //    #region CLIP EDGE: v4 v1
+
+        //    clipFace.GetEdge(3, ref mtd, out clipEdge);
+        //    if (!v1MaxXInside)
+        //    {
+        //        if (v2MaxXInside && contactData.Count < 8)
+        //        {
+        //            ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v);
+        //            Vector3.Dot(ref clipY, ref v, out dot);
+        //            if (dot > clipCenterMinY && dot < clipCenterMaxY)
+        //            {
+        //                item.Position = v;
+        //                item.Id = GetContactId(face.Id1, face.Id2, ref clipEdge);
+        //                contactData.Add(ref item);
+        //            }
+        //        }
+        //        if (v4MaxXInside && contactData.Count < 8)
+        //        {
+        //            ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v);
+        //            Vector3.Dot(ref clipY, ref v, out dot);
+        //            if (dot > clipCenterMinY && dot < clipCenterMaxY)
+        //            {
+        //                item.Position = v;
+        //                item.Id = GetContactId(face.Id4, face.Id1, ref clipEdge);
+        //                contactData.Add(ref item);
+        //            }
+        //        }
+        //    }
+        //    if (!v2MaxXInside)
+        //    {
+        //        if (v1MaxXInside && contactData.Count < 8)
+        //        {
+        //            ComputeIntersection(ref face.V1, ref face.V2, ref clipEdge, out v);
+        //            Vector3.Dot(ref clipY, ref v, out dot);
+        //            if (dot > clipCenterMinY && dot < clipCenterMaxY)
+        //            {
+        //                item.Position = v;
+        //                item.Id = GetContactId(face.Id1, face.Id2, ref clipEdge);
+        //                contactData.Add(ref item);
+        //            }
+        //        }
+        //        if (v3MaxXInside && contactData.Count < 8)
+        //        {
+        //            ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v);
+        //            Vector3.Dot(ref clipY, ref v, out dot);
+        //            if (dot > clipCenterMinY && dot < clipCenterMaxY)
+        //            {
+        //                item.Position = v;
+        //                item.Id = GetContactId(face.Id2, face.Id3, ref clipEdge);
+        //                contactData.Add(ref item);
+        //            }
+        //        }
+        //    }
+        //    if (!v3MaxXInside)
+        //    {
+        //        if (v2MaxXInside && contactData.Count < 8)
+        //        {
+        //            ComputeIntersection(ref face.V2, ref face.V3, ref clipEdge, out v);
+        //            Vector3.Dot(ref clipY, ref v, out dot);
+        //            if (dot > clipCenterMinY && dot < clipCenterMaxY)
+        //            {
+        //                item.Position = v;
+        //                item.Id = GetContactId(face.Id2, face.Id3, ref clipEdge);
+        //                contactData.Add(ref item);
+        //            }
+        //        }
+        //        if (v4MaxXInside && contactData.Count < 8)
+        //        {
+        //            ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v);
+        //            Vector3.Dot(ref clipY, ref v, out dot);
+        //            if (dot > clipCenterMinY && dot < clipCenterMaxY)
+        //            {
+        //                item.Position = v;
+        //                item.Id = GetContactId(face.Id3, face.Id4, ref clipEdge);
+        //                contactData.Add(ref item);
+        //            }
+        //        }
+        //    }
+        //    if (!v4MaxXInside)
+        //    {
+        //        if (v1MaxXInside && contactData.Count < 8)
+        //        {
+        //            ComputeIntersection(ref face.V4, ref face.V1, ref clipEdge, out v);
+        //            Vector3.Dot(ref clipY, ref v, out dot);
+        //            if (dot > clipCenterMinY && dot < clipCenterMaxY)
+        //            {
+        //                item.Position = v;
+        //                item.Id = GetContactId(face.Id4, face.Id1, ref clipEdge);
+        //                contactData.Add(ref item);
+        //            }
+        //        }
+        //        if (v3MaxXInside && contactData.Count < 8)
+        //        {
+        //            ComputeIntersection(ref face.V3, ref face.V4, ref clipEdge, out v);
+        //            Vector3.Dot(ref clipY, ref v, out dot);
+        //            if (dot > clipCenterMinY && dot < clipCenterMaxY)
+        //            {
+        //                item.Position = v;
+        //                item.Id = GetContactId(face.Id3, face.Id4, ref clipEdge);
+        //                contactData.Add(ref item);
+        //            }
+        //        }
+        //    }
+
+        //    #endregion
+
+        //    //Compute depths.
+        //    postClipCount = contactData.Count;
+        //    tempData = contactData;
+        //    for (int i = postClipCount - 1; i >= previousCount; i--)
+        //        contactData.RemoveAt(i);
+
+        //    for (int i = previousCount; i < tempData.Count; i++)
+        //    {
+        //        tempData.Get(i, out item);
+        //        Vector3.Dot(ref item.Position, ref mtd, out faceDot);
+        //        item.Depth = faceDot - clipFaceDot;
+        //        if (item.Depth <= 0)
+        //        {
+        //            contactData.Add(ref item);
+        //        }
+        //    }
+        //}
 #endif
 
-        private static void ComputeIntersection(ref Vector3 edgeA1, ref Vector3 edgeA2, ref FaceEdge clippingEdge, out Vector3 intersection)
+        private static bool ComputeIntersection(ref Vector3 edgeA1, ref Vector3 edgeA2, ref FaceEdge clippingEdge, out Vector3 intersection)
         {
             //Intersect the incoming edge (edgeA1, edgeA2) with the clipping edge's PLANE.  Nicely given by one of its positions and its 'perpendicular,'
             //which is its normal.
@@ -5280,8 +6079,25 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             Vector3.Dot(ref offset, ref clippingEdge.Perpendicular, out distanceToPlane);
             float edgeDirectionLength;
             Vector3.Dot(ref edgeDirection, ref clippingEdge.Perpendicular, out edgeDirectionLength);
-            Vector3.Multiply(ref edgeDirection, distanceToPlane / edgeDirectionLength, out offset);
+            float t = distanceToPlane / edgeDirectionLength;
+            if (t < 0 || t > 1)
+            {
+                //It's outside of the incoming edge!
+                intersection = new Vector3();
+                return false;
+            }
+            Vector3.Multiply(ref edgeDirection, t, out offset);
             Vector3.Add(ref offset, ref edgeA1, out intersection);
+
+            Vector3.Subtract(ref intersection, ref clippingEdge.A, out offset);
+            Vector3.Subtract(ref clippingEdge.B, ref clippingEdge.A, out edgeDirection);
+            Vector3.Dot(ref edgeDirection, ref offset, out t);
+            if (t < 0 || t > edgeDirection.LengthSquared())
+            {
+                //It's outside of the clipping edge!
+                return false;
+            }
+            return true;
         }
 
         private static void GetNearestFace(ref Vector3 position, ref Matrix3X3 orientation, ref Vector3 mtd, float halfWidth, float halfHeight, float halfLength, out BoxFace boxFace)
@@ -5334,6 +6150,14 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 Vector3.Transform(ref candidate, ref worldTransform, out candidate);
                 boxFace.V4 = candidate;
 
+                if (xDot < 0)
+                    boxFace.Normal = orientation.Left;
+                else
+                    boxFace.Normal = orientation.Right;
+
+                boxFace.Width = halfHeight * 2;
+                boxFace.Height = halfLength * 2;
+
                 boxFace.Id1 = bit + 2 + 4;
                 boxFace.Id2 = bit + 4;
                 boxFace.Id3 = bit + 2;
@@ -5361,6 +6185,14 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 candidate = new Vector3(halfWidth, halfHeight, -halfLength);
                 Vector3.Transform(ref candidate, ref worldTransform, out candidate);
                 boxFace.V4 = candidate;
+
+                if (yDot < 0)
+                    boxFace.Normal = orientation.Down;
+                else
+                    boxFace.Normal = orientation.Up;
+
+                boxFace.Width = halfWidth * 2;
+                boxFace.Height = halfLength * 2;
 
                 boxFace.Id1 = 1 + bit + 4;
                 boxFace.Id2 = bit + 4;
@@ -5390,6 +6222,14 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 Vector3.Transform(ref candidate, ref worldTransform, out candidate);
                 boxFace.V4 = candidate;
 
+                if (zDot < 0)
+                    boxFace.Normal = orientation.Forward;
+                else
+                    boxFace.Normal = orientation.Backward;
+
+                boxFace.Width = halfWidth * 2;
+                boxFace.Height = halfHeight * 2;
+
                 boxFace.Id1 = 1 + 2 + bit;
                 boxFace.Id2 = 2 + bit;
                 boxFace.Id3 = 1 + bit;
@@ -5402,6 +6242,8 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
         {
             public int Id1, Id2, Id3, Id4;
             public Vector3 V1, V2, V3, V4;
+            public Vector3 Normal;
+            public float Width, Height;
 
             public int GetId(int i)
             {
@@ -5439,7 +6281,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 v = Toolbox.NoVector;
             }
 
-            internal void GetEdge(int i, ref Vector3 mtd, out FaceEdge clippingEdge)
+            internal void GetEdge(int i, out FaceEdge clippingEdge)
             {
                 Vector3 insidePoint;
                 switch (i)
@@ -5469,14 +6311,14 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                         clippingEdge.Id = GetEdgeId(Id4, Id1);
                         break;
                     default:
-                        clippingEdge.A = Toolbox.NoVector;
-                        clippingEdge.B = Toolbox.NoVector;
-                        insidePoint = Toolbox.NoVector;
-                        clippingEdge.Id = -1;
-                        break;
+                        throw new IndexOutOfRangeException();
                 }
-                Vector3.Subtract(ref clippingEdge.B, ref clippingEdge.A, out clippingEdge.EdgeDirection);
-                Vector3.Cross(ref clippingEdge.EdgeDirection, ref mtd, out clippingEdge.Perpendicular);
+                //TODO: Edge direction and perpendicular not normalized.
+                Vector3 edgeDirection;
+                Vector3.Subtract(ref clippingEdge.B, ref clippingEdge.A, out edgeDirection);
+                edgeDirection.Normalize();
+                Vector3.Cross(ref edgeDirection, ref Normal, out clippingEdge.Perpendicular);
+
                 float dot;
                 Vector3 offset;
                 Vector3.Subtract(ref insidePoint, ref clippingEdge.A, out offset);
@@ -5509,7 +6351,6 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
         private struct FaceEdge : IEquatable<FaceEdge>
         {
             public Vector3 A, B;
-            public Vector3 EdgeDirection;
             public float EdgeDistance;
             public int Id;
             public Vector3 Perpendicular;

@@ -179,6 +179,8 @@ namespace BEPUphysicsDemos
                                                     .Invoke(new object[] { this });
 
 #else
+
+            //CollisionDetectionSettings.DefaultMargin = 0;
             currentSimulation = (Demo)Activator.CreateInstance(demoType, new object[] { this });
             //currentSimulation = new BoxBoxTestDemo(this);
 #endif

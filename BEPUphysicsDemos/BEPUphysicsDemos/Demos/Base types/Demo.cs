@@ -69,6 +69,8 @@ namespace BEPUphysicsDemos.Demos
         /// <param name="dt">Game timestep.</param>
         public virtual void Update(float dt)
         {
+            if (Game.WasKeyPressed(Microsoft.Xna.Framework.Input.Keys.P))
+                Debug.WriteLine("breka.");
             long startTime = Stopwatch.GetTimestamp();
 
             //Update the simulation.
