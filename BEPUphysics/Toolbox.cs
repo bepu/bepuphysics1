@@ -2811,37 +2811,60 @@ namespace BEPUphysics
             Quaternion.Multiply(ref halfspinQuaternion, ref normalizedOrientation, out orientationChange);
         }
 
+        
         /// <summary>
         /// Gets the barycentric coordinates of the point with respect to a triangle's vertices.
         /// </summary>
-        /// <param name="point">Point to compute the barycentric coordinates of.</param>
-        /// <param name="v1">First vertex in the triangle.</param>
-        /// <param name="v2">Second vertex in the triangle.</param>
-        /// <param name="v3">Third vertex in the triangle.</param>
-        /// <param name="v1Weight">Weight of the first vertex.</param>
-        /// <param name="v2Weight">Weight of the second vertex.</param>
-        /// <param name="v3Weight">Weight of the third vertex.</param>
-        public static void GetBarycentricCoordinates(ref Vector3 point, ref Vector3 v1, ref Vector3 v2, ref Vector3 v3, out float v1Weight, out float v2Weight, out float v3Weight)
+        /// <param name="p">Point to compute the barycentric coordinates of.</param>
+        /// <param name="a">First vertex in the triangle.</param>
+        /// <param name="b">Second vertex in the triangle.</param>
+        /// <param name="c">Third vertex in the triangle.</param>
+        /// <param name="aWeight">Weight of the first vertex.</param>
+        /// <param name="bWeight">Weight of the second vertex.</param>
+        /// <param name="cWeight">Weight of the third vertex.</param>
+        public static void GetBarycentricCoordinates(ref Vector3 p, ref Vector3 a, ref Vector3 b, ref Vector3 c, out float aWeight, out float bWeight, out float cWeight)
         {
-            //Triangle edge vectors.   
-            Vector3 e0, e1, e2;
-            Vector3.Subtract(ref v3, ref v1, out e0);
-            Vector3.Subtract(ref v2, ref v1, out e1);
-            Vector3.Subtract(ref point, ref v1, out e2);
-
-            //Set up precalculations
-            float d00 = e0.LengthSquared();
-            float d01;
-            Vector3.Dot(ref e0, ref e1, out d01);
-            float d02;
-            Vector3.Dot(ref e0, ref e2, out d02);
-            float d11 = e1.LengthSquared();
-            float d12;
-            Vector3.Dot(ref e1, ref e2, out d12);
-            //Find barycoords
-            float denom = (d00 * d11 - d01 * d01);
-            if (denom < 1e-9f && denom > -1e-9f)
+            Vector3 ab, ac;
+            Vector3.Subtract(ref b, ref a, out ab);
+            Vector3.Subtract(ref c, ref a, out ac);
+            Vector3 triangleNormal;
+            Vector3.Cross(ref ab, ref ac, out triangleNormal);
+            float x = triangleNormal.X < 0 ? -triangleNormal.X : triangleNormal.X;
+            float y = triangleNormal.Y < 0 ? -triangleNormal.Y : triangleNormal.Y;
+            float z = triangleNormal.Z < 0 ? -triangleNormal.Z : triangleNormal.Z;
+            
+            float numeratorU, numeratorV, denominator;
+            if (x >= y && x >= z)
             {
+                //The projection of the triangle on the YZ plane is the largest.
+                numeratorU = (p.Y - b.Y) * (b.Z - c.Z) - (b.Y - c.Y) * (p.Z - b.Z); //PBC
+                numeratorV = (p.Y - c.Y) * (c.Z - a.Z) - (c.Y - a.Y) * (p.Z - c.Z); //PCA
+                denominator = triangleNormal.X;
+            }
+            else if (y >= z)
+            {
+                //The projection of the triangle on the XZ plane is the largest.
+                numeratorU = (p.X - b.X) * (b.Z - c.Z) - (b.X - c.X) * (p.Z - b.Z); //PBC
+                numeratorV = (p.X - c.X) * (c.Z - a.Z) - (c.X - a.X) * (p.Z - c.Z); //PCA
+                denominator = -triangleNormal.Y;
+            }
+            else
+            {
+                //The projection of the triangle on the XY plane is the largest.
+                numeratorU = (p.X - b.X) * (b.Y - c.Y) - (b.X - c.X) * (p.Y - b.Y); //PBC
+                numeratorV = (p.X - c.X) * (c.Y - a.Y) - (c.X - a.X) * (p.Y - c.Y); //PCA
+                denominator = triangleNormal.Z;
+            }
+
+            if (denominator < -1e-9 || denominator > 1e-9)
+            {
+                denominator = 1 / denominator;
+                aWeight = numeratorU * denominator;
+                bWeight = numeratorV * denominator;
+                cWeight = 1 - aWeight - bWeight;
+            }
+            else
+            {               
                 //It seems to be a degenerate triangle.
                 //In that case, pick one of the closest vertices.
                 //MOST of the time, this will happen when the vertices
@@ -2850,51 +2873,110 @@ namespace BEPUphysics
                 //If it's a little inefficient, don't worry- this is a corner case anyway.
 
                 float distance1, distance2, distance3;
-                Vector3.DistanceSquared(ref point, ref v1, out distance1);
-                Vector3.DistanceSquared(ref point, ref v2, out distance2);
-                Vector3.DistanceSquared(ref point, ref v3, out distance3);
+                Vector3.DistanceSquared(ref p, ref a, out distance1);
+                Vector3.DistanceSquared(ref p, ref b, out distance2);
+                Vector3.DistanceSquared(ref p, ref c, out distance3);
                 if (distance1 < distance2 && distance1 < distance3)
                 {
-                    v1Weight = 1;
-                    v2Weight = 0;
-                    v3Weight = 0;
+                    aWeight = 1;
+                    bWeight = 0;
+                    cWeight = 0;
                 }
                 else if (distance2 < distance3)
                 {
-                    v1Weight = 0;
-                    v2Weight = 1;
-                    v3Weight = 0;
+                    aWeight = 0;
+                    bWeight = 1;
+                    cWeight = 0;
                 }
                 else
                 {
-                    v1Weight = 0;
-                    v2Weight = 0;
-                    v3Weight = 1;
+                    aWeight = 0;
+                    bWeight = 0;
+                    cWeight = 1;
                 }
             }
-            else
-            {
-                denom = 1 / denom;
-                v3Weight = (d11 * d02 - d01 * d12) * denom;
-                v2Weight = (d00 * d12 - d01 * d02) * denom;
-                v1Weight = 1 - v3Weight - v2Weight;
-            }
 
-
-
-            //float y2y3 = v2.Y - v3.Y;
-            //float x3x2 = v3.X - v2.X;
-            //float xx3 = point.X - v3.X;
-            //float yy3 = point.Y - v3.Y;
-            //float y1y3 = v1.Y - v3.Y;
-            //float x1x3 = v1.X - v3.X;
-            //v1Weight = (y2y3 * xx3 + x3x2 * yy3) / 
-            //           (y2y3 * x1x3 + x3x2 * y1y3);
-            //v2Weight = (x1x3 * yy3 - y1y3 * xx3) / 
-            //           (y1y3 * x3x2 + x1x3 * y2y3);
-            //v3Weight = 1 - v1Weight - v2Weight;
-
+            //if (((a * aWeight + b * bWeight + c * cWeight) - p).LengthSquared() > .01f)
+            //    return;
+            
         }
+
+       
+
+        ///// <summary>
+        ///// Gets the barycentric coordinates of the point with respect to a triangle's vertices.
+        ///// </summary>
+        ///// <param name="point">Point to compute the barycentric coordinates of.</param>
+        ///// <param name="v1">First vertex in the triangle.</param>
+        ///// <param name="v2">Second vertex in the triangle.</param>
+        ///// <param name="v3">Third vertex in the triangle.</param>
+        ///// <param name="v1Weight">Weight of the first vertex.</param>
+        ///// <param name="v2Weight">Weight of the second vertex.</param>
+        ///// <param name="v3Weight">Weight of the third vertex.</param>
+        //public static void GetBarycentricCoordinates(ref Vector3 point, ref Vector3 v1, ref Vector3 v2, ref Vector3 v3, out float v1Weight, out float v2Weight, out float v3Weight)
+        //{
+        //    //Triangle edge vectors.   
+        //    Vector3 e0, e1, e2;
+        //    Vector3.Subtract(ref v3, ref v1, out e0);
+        //    Vector3.Subtract(ref v2, ref v1, out e1);
+        //    Vector3.Subtract(ref point, ref v1, out e2);
+
+        //    //Set up precalculations
+        //    float d00 = e0.LengthSquared();
+        //    float d01;
+        //    Vector3.Dot(ref e0, ref e1, out d01);
+        //    float d02;
+        //    Vector3.Dot(ref e0, ref e2, out d02);
+        //    float d11 = e1.LengthSquared();
+        //    float d12;
+        //    Vector3.Dot(ref e1, ref e2, out d12);
+        //    //Find barycoords
+        //    float denom = (d00 * d11 - d01 * d01);
+        //    if (denom < 1e-9f && denom > -1e-9f)
+        //    {
+        //        //It seems to be a degenerate triangle.
+        //        //In that case, pick one of the closest vertices.
+        //        //MOST of the time, this will happen when the vertices
+        //        //are all very close together (all three points form a single point).
+        //        //Sometimes, though, it could be that it's more of a line.
+        //        //If it's a little inefficient, don't worry- this is a corner case anyway.
+
+        //        float distance1, distance2, distance3;
+        //        Vector3.DistanceSquared(ref point, ref v1, out distance1);
+        //        Vector3.DistanceSquared(ref point, ref v2, out distance2);
+        //        Vector3.DistanceSquared(ref point, ref v3, out distance3);
+        //        if (distance1 < distance2 && distance1 < distance3)
+        //        {
+        //            v1Weight = 1;
+        //            v2Weight = 0;
+        //            v3Weight = 0;
+        //        }
+        //        else if (distance2 < distance3)
+        //        {
+        //            v1Weight = 0;
+        //            v2Weight = 1;
+        //            v3Weight = 0;
+        //        }
+        //        else
+        //        {
+        //            v1Weight = 0;
+        //            v2Weight = 0;
+        //            v3Weight = 1;
+        //        }
+        //    }
+        //    else
+        //    {
+        //        denom = 1 / denom;
+        //        v3Weight = (d11 * d02 - d01 * d12) * denom;
+        //        v2Weight = (d00 * d12 - d01 * d02) * denom;
+        //        v1Weight = 1 - v3Weight - v2Weight;
+        //    }
+
+
+        //    if (((v1 * v1Weight + v2 * v2Weight + v3 * v3Weight) - point).LengthSquared() > 1f)
+        //        return;
+
+        //}
 
         #endregion
 
