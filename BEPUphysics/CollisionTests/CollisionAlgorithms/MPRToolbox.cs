@@ -1063,7 +1063,9 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                     }
 
                     float v1Weight, v2Weight, v3Weight;
-                    Toolbox.GetBarycentricCoordinates(ref Toolbox.ZeroVector, ref v1, ref v2, ref v3, out v1Weight, out v2Weight, out v3Weight);
+                    Vector3.Multiply(ref direction, t, out position);
+
+                    Toolbox.GetBarycentricCoordinates(ref position, ref v1, ref v2, ref v3, out v1Weight, out v2Weight, out v3Weight);
                     Vector3.Multiply(ref v1A, v1Weight, out position);
                     Vector3 temp;
                     Vector3.Multiply(ref v2A, v2Weight, out temp);
