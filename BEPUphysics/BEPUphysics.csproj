@@ -342,7 +342,7 @@
     <Compile Include="RayHit.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\GJK\SimpleSimplex.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\GJK\GJKToolbox.cs" />
-    <Compile Include="CollisionTests\CollisionAlgorithms\GJK\Simplex.cs" />
+    <Compile Include="CollisionTests\CollisionAlgorithms\GJK\PairSimplex.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\MinkowskiToolbox.cs" />
     <Compile Include="CollisionTests\Contact.cs" />
     <Compile Include="CollisionTests\ContactData.cs" />

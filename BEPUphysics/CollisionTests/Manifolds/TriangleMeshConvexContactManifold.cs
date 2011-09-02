@@ -153,7 +153,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
             }
 
 
-
+ 
 
             if (UseImprovedBoundaryHandling)
             {
@@ -167,6 +167,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     {
                         //If it's not blocked, use the contact as-is without correcting it.
                         AddLocalContact(ref edgeContacts.Elements[i].ContactData, ref orientation);
+
                     }
                     else if (edgeContacts.Elements[i].ShouldCorrect)
                     {
@@ -178,6 +179,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                         edgeContacts.Elements[i].ContactData.Normal = edgeContacts.Elements[i].CorrectedNormal;
                         edgeContacts.Elements[i].ContactData.PenetrationDepth *= MathHelper.Max(0, dot); //Never cause a negative penetration depth.
                         AddLocalContact(ref edgeContacts.Elements[i].ContactData, ref orientation);
+
 
                     }
                     //If it's blocked AND it doesn't allow correction, ignore its existence.
@@ -216,7 +218,6 @@ namespace BEPUphysics.CollisionTests.Manifolds
             }
 
 
-     
 
             //Remove stale pair testers.
             //This will only remove 8 stale ones per frame, but it doesn't really matter.
@@ -244,13 +245,9 @@ namespace BEPUphysics.CollisionTests.Manifolds
             }
 
 
-
-
             //Some child types will want to do some extra post processing on the manifold.        
             ProcessCandidates(candidatesToAdd);
 
-
-     
 
             //Check if adding the new contacts would overflow the manifold.
             if (contacts.count + candidatesToAdd.count > 4)
@@ -272,7 +269,6 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     Add(ref candidatesToAdd.Elements[i]);
                 }
             }
-
 
         
 

@@ -243,8 +243,7 @@ namespace BEPUphysics
         /// <summary>
         /// Finds the intersection between the given ray and the given plane.
         /// </summary>
-        /// <param name="a">First endpoint of segment defining the line.</param>
-        /// <param name="b">Second endpoint of segment defining the line.</param>
+        /// <param name="ray">Ray to test against the plane.</param>
         /// <param name="p">Plane for comparison.</param>
         /// <param name="t">Interval along line to intersection (A + t * AB).</param>
         /// <param name="q">Intersection point.</param>
@@ -375,6 +374,7 @@ namespace BEPUphysics
         /// <param name="p">Point for comparison.</param>
         /// <param name="subsimplex">The source of the voronoi region which contains the point.</param>
         /// <param name="closestPoint">Closest point on tetrahedron to point.</param>
+        [Obsolete("Used for simplex tests; consider using the PairSimplex and its variants instead for simplex-related testing.")]
         public static void GetClosestPointOnTriangleToPoint(ref Vector3 a, ref Vector3 b, ref Vector3 c, ref Vector3 p, RawList<Vector3> subsimplex, out Vector3 closestPoint)
         {
             subsimplex.Clear();
@@ -482,6 +482,7 @@ namespace BEPUphysics
         /// <param name="subsimplex">The source of the voronoi region which contains the point, enumerated as a = 0, b = 1, c = 2.</param>
         /// <param name="baryCoords">Barycentric coordinates of the point on the triangle.</param>
         /// <param name="closestPoint">Closest point on tetrahedron to point.</param>
+        [Obsolete("Used for simplex tests; consider using the PairSimplex and its variants instead for simplex-related testing.")]
         public static void GetClosestPointOnTriangleToPoint(RawList<Vector3> q, int i, int j, int k, ref Vector3 p, RawList<int> subsimplex, RawList<float> baryCoords, out Vector3 closestPoint)
         {
             subsimplex.Clear();
@@ -676,6 +677,7 @@ namespace BEPUphysics
         /// <param name="p">Point for comparison.</param>
         /// <param name="subsimplex">The source of the voronoi region which contains the point.</param>
         /// <param name="closestPoint">Closest point on the edge to p.</param>
+        [Obsolete("Used for simplex tests; consider using the PairSimplex and its variants instead for simplex-related testing.")]
         public static void GetClosestPointOnSegmentToPoint(ref Vector3 a, ref Vector3 b, ref Vector3 p, List<Vector3> subsimplex, out Vector3 closestPoint)
         {
             subsimplex.Clear();
@@ -722,6 +724,7 @@ namespace BEPUphysics
         /// <param name="subsimplex">The source of the voronoi region which contains the point, enumerated as a = 0, b = 1.</param>
         /// <param name="baryCoords">Barycentric coordinates of the point.</param>
         /// <param name="closestPoint">Closest point on the edge to p.</param>
+        [Obsolete("Used for simplex tests; consider using the PairSimplex and its variants instead for simplex-related testing.")]
         public static void GetClosestPointOnSegmentToPoint(List<Vector3> q, int i, int j, ref Vector3 p, List<int> subsimplex, List<float> baryCoords, out Vector3 closestPoint)
         {
             Vector3 a = q[i];
@@ -763,19 +766,6 @@ namespace BEPUphysics
             }
         }
 
-        /// <summary>
-        /// Determines the shortest distance from the point to the line.
-        /// </summary>
-        /// <param name="p">Point to check against the line.</param>
-        /// <param name="a">First point on the line for comparison.</param>
-        /// <param name="b">Second point on the line for comparison.</param>
-        /// <returns>Shortest distance from the point to the line.</returns>
-        public static float GetDistanceFromPointToLine(Vector3 p, Vector3 a, Vector3 b)
-        {
-            Vector3 vl = b - a;
-            float numerator = Vector3.Cross(vl, p - a).Length();
-            return numerator / vl.Length();
-        }
 
         /// <summary>
         /// Determines the shortest squared distance from the point to the line.
@@ -784,28 +774,19 @@ namespace BEPUphysics
         /// <param name="a">First point on the line.</param>
         /// <param name="b">Second point on the line.</param>
         /// <returns>Shortest squared distance from the point to the line.</returns>
-        public static float GetSquaredDistanceFromPointToLine(Vector3 p, Vector3 a, Vector3 b)
+        public static float GetSquaredDistanceFromPointToLine(ref Vector3 p, ref Vector3 a, ref Vector3 b)
         {
-            Vector3 ap = p - a;
-            Vector3 ab = b - a;
-            float e = Vector3.Dot(ap, ab);
-            return Vector3.Dot(ap, ap) - e * e / Vector3.Dot(ab, ab);
+            Vector3 ap, ab;
+            Vector3.Subtract(ref p, ref a, out ap);
+            Vector3.Subtract(ref b, ref a, out ab);
+            float e;
+            Vector3.Dot(ref ap, ref ab, out e);
+            return ap.LengthSquared() - e * e / ab.LengthSquared();
         }
 
         #endregion
 
         #region Line-Line Tests
-
-        /// <summary>
-        /// Determines if the given directions are parallel.
-        /// </summary>
-        /// <param name="dirA">First line direction.</param>
-        /// <param name="dirB">Second line direction.</param>
-        /// <returns>Whether or not the given directions are parallel.</returns>
-        public static bool AreSegmentsParallel(Vector3 dirA, Vector3 dirB)
-        {
-            return (GetSquaredDistanceLinePoint(ZeroVector, dirA, dirB) < Epsilon);
-        }
 
         /// <summary>
         /// Computes closest points c1 and c2 betwen segments p1q1 and p2q2.
@@ -982,431 +963,10 @@ namespace BEPUphysics
             Vector3.Add(ref c2, ref p2, out c2);
         }
 
-        /// <summary>
-        /// Determines the minimum distance between two lines.
-        /// </summary>
-        /// <param name="p1">First point of the first line for comparison.</param>
-        /// <param name="p2">Second point of the first line for comparison.</param>
-        /// <param name="p3">First point of the second line for comparison.</param>
-        /// <param name="p4">Second point of the second line for comparison.</param>
-        /// <returns>Minimum distance between two lines.</returns>
-        public static float GetDistanceBetweenLines(Vector3 p1, Vector3 p2, Vector3 p3, Vector3 p4)
-        {
-            Vector3 pa, pb;
-            if (GetLineLineIntersection(p1, p2, p3, p4, out pa, out pb))
-            {
-                return Vector3.Distance(pa, pb);
-            }
-            return 0;
-        }
 
-        /// <summary>
-        /// Determines the intersection of two parallel segments represented by two points.
-        /// </summary>
-        /// <param name="p1">First endpoint of first segment.</param>
-        /// <param name="q1">Second endpoint of first segment.</param>
-        /// <param name="p2">First endpoint of second segment.</param>
-        /// <param name="q2">Second endpoint of second segment.</param>
-        /// <param name="a">First endpoint of intersection area.</param>
-        /// <param name="b">Last endpoint of intersection area.</param>
-        /// <returns>Whether or not the segments are parallel.</returns>
-        public static bool GetIntersectionParallelSegments(Vector3 p1, Vector3 q1, Vector3 p2, Vector3 q2, out Vector3 a, out Vector3 b)
-        {
-            //Just do a series of clamps and then use interval arithmatic to identify the a and b.
-            a = NoVector;
-            b = NoVector;
-            Vector3 edge1Dir = q1 - p1;
-            Vector3 edge2Dir = q2 - p2;
-            if (!AreSegmentsParallel(edge1Dir, edge2Dir))
-                return false;
-            float a1 = Vector3.Dot(p1, edge1Dir);
-            float b1 = Vector3.Dot(q1, edge1Dir);
-            float a2 = Vector3.Dot(p2, edge1Dir);
-            float b2 = Vector3.Dot(q2, edge1Dir);
-            if (a1 < a2 && a1 < b2 && b1 < a2 && b1 < b2)
-                return false;
-            float clampa1 = Clamp(a1, a2, b2);
-            float clampb1 = Clamp(b1, a2, b2);
-            float clampa2 = Clamp(a2, a1, b1);
-            float clampb2 = Clamp(b2, a1, b1);
-            float min = Math.Min(clampa1, Math.Min(clampb1, Math.Min(clampa2, clampb2)));
-            float max = Math.Max(clampa1, Math.Max(clampb1, Math.Max(clampa2, clampb2)));
-            float axisLengthInverse = 1 / edge1Dir.LengthSquared();
-            a = (min * axisLengthInverse) * edge1Dir;
-            b = (max * axisLengthInverse) * edge1Dir;
-            return true;
-        }
-
-        /// <summary>
-        /// Finds the shortest line segment between two lines.
-        /// </summary>
-        /// <param name="p1">First point of the first line for comparison.</param>
-        /// <param name="p2">Second point of the first line for comparison.</param>
-        /// <param name="p3">First point of the second line for comparison.</param>
-        /// <param name="p4">Second point of the second line for comparison.</param>
-        /// <param name="pa">First point of the shortest line.</param>
-        /// <param name="pb">Second point of the shortest line.</param>
-        /// <returns>Whether or not an intersection could be identified.</returns>
-        public static bool GetLineLineIntersection(Vector3 p1, Vector3 p2, Vector3 p3, Vector3 p4, out Vector3 pa, out Vector3 pb)
-        {
-            //Thanks to Paul Bourke for the base of this function.
-            //Note on usage: This returns a line-line intersect in the form of a vector from pa->pb, allowing for lines which are skew (IE not coplanar)
-            Vector3 p13, p43, p21;
-            pa = pb = NoVector;
-            float d1343, d4321, d1321, d4343, d2121, mua, mub;
-            float numer, denom;
-            p13 = p1 - p3;
-            p43 = p4 - p3;
-
-            if (p43.LengthSquared() < Epsilon)
-                return false;
-            p21 = p2 - p1;
-            if (p21.LengthSquared() < Epsilon)
-                return false;
-
-            d1343 = Vector3.Dot(p13, p43);
-            d4321 = Vector3.Dot(p43, p21);
-            d1321 = Vector3.Dot(p13, p21);
-            d4343 = Vector3.Dot(p43, p43);
-            d2121 = Vector3.Dot(p21, p21);
-
-            denom = d2121 * d4343 - d4321 * d4321;
-            if (Math.Abs(denom) < Epsilon)
-                return false;
-            numer = d1343 * d4321 - d1321 * d4343;
-
-            mua = numer / denom;
-            mub = (d1343 + d4321 * (mua)) / d4343;
-
-            pa.X = p1.X + mua * p21.X;
-            pa.Y = p1.Y + mua * p21.Y;
-            pa.Z = p1.Z + mua * p21.Z;
-            pb.X = p3.X + mub * p43.X;
-            pb.Y = p3.Y + mub * p43.Y;
-            pb.Z = p3.Z + mub * p43.Z;
-
-            return true;
-        }
-
-        /// <summary>
-        /// Finds the intersection point between two coplanar segments.
-        /// Note: Does not explicitly test coplanarity; functionality for non-coplanar parameters is undefined.
-        /// </summary>
-        /// <param name="p1">First point of the first line for comparison.</param>
-        /// <param name="p2">Second point of the first line for comparison.</param>
-        /// <param name="p3">First point of the second line for comparison.</param>
-        /// <param name="p4">Second point of the second line for comparison.</param>
-        /// <param name="intersection">Point of intersection.</param>
-        /// <returns>Intersection between the two coplanar lines.</returns>
-        public static bool GetLineLineIntersection(Vector3 p1, Vector3 p2, Vector3 p3, Vector3 p4, out Vector3 intersection)
-        {
-            //This intersection method only returns a single intersection point between two assumed coplanar lines.
-
-            intersection = NoVector;
-            Vector3 a = p2 - p1;
-            Vector3 b = p4 - p3;
-            Vector3 c = p3 - p1;
-            Vector3 d = p1 - p3;
-            Vector3 denom = Vector3.Cross(a, b);
-            float denomLengthSquared = denom.LengthSquared();
-            if (Math.Abs(Vector3.Dot(d, Vector3.Cross(a, b))) < Epsilon && denomLengthSquared > 0)
-            {
-                //The lines are coplanar, or close enough for the end result to be valid.
-                intersection = p1 + (a) * (Vector3.Dot(Vector3.Cross(c, b), Vector3.Cross(a, b)) / denomLengthSquared);
-                return true;
-            }
-            /*
-            if (isPointCollinear(p1, p3, p4) && isPointCollinear(p2, p3, p4))
-            {//Lines are collinear
-                //Determine if the points intersect.
-                //TODO: Collinear test actually makes the final result less accurate due to counting off vertices and such.  Consider removing.
-                List<Vector3> lines1 = new List<Vector3>();
-                List<Vector3> lines2 = new List<Vector3>();
-                lines1.Add(p1); lines1.Add(p2);
-                lines2.Add(p3); lines2.Add(p4);
-                if (areIntersecting(lines1, lines2, p1))
-                {
-                    intersection = (p2 + p3) / 2;
-                    return true;
-                }
-            }
-            */
-
-            return false;
-        }
-
-        /// <summary>
-        /// Finds the squared distance from a point to a line.
-        /// </summary>
-        /// <param name="a">First point on the line.</param>
-        /// <param name="b">Second point on the line.</param>
-        /// <param name="p">Point for comparison.</param>
-        /// <returns>Squared distance from the point to the line.</returns>
-        public static float GetSquaredDistanceLinePoint(Vector3 a, Vector3 b, Vector3 p)
-        {
-            Vector3 u = b - a;
-            return Vector3.Cross(u, a - p).LengthSquared() / u.LengthSquared();
-        }
-
-        /// <summary>
-        /// Determines if the given point is collinear with the line.
-        /// </summary>
-        /// <param name="point">Point for comparison.</param>
-        /// <param name="a">First endpoint of the line.</param>
-        /// <param name="b">Second endpoint of the line.</param>
-        /// <returns>Whether or not the point is collinear with the line.</returns>
-        public static bool IsPointCollinear(Vector3 point, Vector3 a, Vector3 b)
-        {
-            return Vector3.Cross((a - point), (point - b)).LengthSquared() < Epsilon;
-        }
 
         #endregion
 
-        #region Triangle-Triangle Tests
-
-        /*
-        /// <summary>
-        /// Finds the intersection between two triangles.
-        /// </summary>
-        /// <param name="va1">First vertex of the first triangle.</param>
-        /// <param name="vb1">Second vertex of the first triangle.</param>
-        /// <param name="vc1">Third vertex of the first triangle.</param>
-        /// <param name="va2">First vertex of the second triangle.</param>
-        /// <param name="vb2">Second vertex of the second triangle.</param>
-        /// <param name="vc2">Third vertex of the second triangle.</param>
-        /// <param name="intersection">Point representing the intersection of the two triangles.</param>
-        /// <returns>Whether or not the triangles intersect.</returns>
-        public static bool getTriangleTriangleIntersection(Vector3 va1, Vector3 vb1, Vector3 vc1, Vector3 va2, Vector3 vb2, Vector3 vc2, out Vector3 intersection)
-        {
-            intersection = noVector;
-            Vector3 t1normal = Vector3.Cross(vb1 - va1, vc1 - va1);
-            Vector3 t2normal = Vector3.Cross(vb2 - va2, vc2 - va2);
-            float t1d = -Vector3.Dot(t1normal, va1); //plane distances
-            float t2d = -Vector3.Dot(t2normal, va2);
-            float d10 = Vector3.Dot(t2normal, va1) + t2d;
-            float d20 = Vector3.Dot(t1normal, va2) + t1d;
-            float d11 = Vector3.Dot(t2normal, vb1) + t2d;
-            float d21 = Vector3.Dot(t1normal, vb2) + t1d;
-            float d12 = Vector3.Dot(t2normal, vc1) + t2d;
-            float d22 = Vector3.Dot(t1normal, vc2) + t1d;
-            if ((d1[0] * d1[1] > epsilon && d1[0] * d1[2] > epsilon) || (d2[0] * d2[1] > epsilon && d2[0] * d2[2] > epsilon))
-            {//Triangles do not intersect if all distances from triangle to oppposing plane are positive or all are negative.
-                return false;
-            }
-            if (!(Math.Abs(d10) < epsilon && Math.Abs(d11) < epsilon && Math.Abs(d12) < epsilon &&
-                  Math.Abs(d20) < epsilon && Math.Abs(d21) < epsilon && Math.Abs(d22) < epsilon))
-            {//If the triangles are not coplanar:
-                float c = Vector3.Dot(t1normal, t2normal);
-                Vector3 direction = Vector3.Cross(t1normal, t2normal); //of plane intersection line
-                Vector3 origin = ((t2d * c - t1d) / (1 - c * c)) * t1normal + ((t1d * c - t2d) / (1 - c * c)) * t2normal + direction * 1000; //Calculation of origin could be slightly sped by using a direct linear equation method. //TODO: dir*1000 fudge needs to be remembered.
-                List<Vector3> lineIntersections = new List<Vector3>();
-                List<Vector3> t1intersections = new List<Vector3>();
-                List<Vector3> t2intersections = new List<Vector3>();
-                Vector3 isect;
-                //Triangle 1 intersections with intersection line.
-                if (LineLineIntersect(origin, origin + direction, va1.position, vb1.position, out isect))
-                {
-                    lineIntersections.Add(isect);
-                    t1intersections.Add(isect);
-                }
-                if (LineLineIntersect(origin, origin + direction, vb1.position, vc1.position, out isect))
-                {
-                    lineIntersections.Add(isect);
-                    t1intersections.Add(isect);
-                }
-                if (LineLineIntersect(origin, origin + direction, vc1.position, va1.position, out isect))
-                {
-                    lineIntersections.Add(isect);
-                    t1intersections.Add(isect);
-                }
-                //Triangle 2 intersections with intersection line.
-                if (LineLineIntersect(origin, origin + direction, va2.position, vb2.position, out isect))
-                {
-                    lineIntersections.Add(isect);
-                    t2intersections.Add(isect);
-                }
-                if (LineLineIntersect(origin, origin + direction, vb2.position, vc2.position, out isect))
-                {
-                    lineIntersections.Add(isect);
-                    t2intersections.Add(isect);
-                }
-                if (LineLineIntersect(origin, origin + direction, vc2.position, va2.position, out isect))
-                {
-                    lineIntersections.Add(isect);
-                    t2intersections.Add(isect);
-                }
-                //Determine if intersections on line are interconnected or seperate.  If seperate, return false as there is no collision.
-                if (!areIntervalsIntersecting(t1intersections, t2intersections, origin))
-                    return false;
-                sortLines(lineIntersections, origin);
-                intersection = (lineIntersections[(lineIntersections.Count - 1) / 2] + lineIntersections[(lineIntersections.Count - 1) / 2 + 1]) / 2;
-
-                return true;
-
-            }
-            else
-            {//If the triangle are coplanar:
-
-                if (coplanarTriangleIntersection(T1, T2, out intersection))
-                    return true;
-                else
-                {
-                    intersection = noVector;
-                    return false;
-                }
-            }
-
-        }
-
-        /// <summary>
-        /// Returns the intersection of two coplanar triangles.
-        /// Note: Does not verify the coplanarity; functionality for non-coplanar triangles is undefined.
-        /// </summary>
-        /// <param name="T1">First triangle for comparison.</param>
-        /// <param name="T2">Second triangle for comparison.</param>
-        /// <param name="intersection">Represents the point of intersection of triangles.</param>
-        /// <returns>Whether or not the triangles intersect.</returns>
-        public static bool coplanarTriangleIntersection(PolyhedronTriangle T1, PolyhedronTriangle T2, out Vector3 intersection)
-        {//Finds an intersection between two coplanar triangles in 3d space.  Generated from the average of line intersections.
-            intersection = zeroVector;
-            //If a triangle fully contains the other triangle:
-            bool[] T1pointsInsideT2 = new bool[3];
-            bool[] T2pointsInsideT1 = new bool[3];
-            for (int k = 0; k < 3; k++)
-            {
-                T1pointsInsideT2[k] = isPointInsideTriangle(ref T1.vertices[k].position, T2);
-                T2pointsInsideT1[k] = isPointInsideTriangle(ref T2.vertices[k].position, T1);
-            }
-            if (!T1pointsInsideT2[0] && !T1pointsInsideT2[1] && !T1pointsInsideT2[2] && !T2pointsInsideT1[0] && !T2pointsInsideT1[1] && !T2pointsInsideT1[2])
-            {//Neither triangle has any vertices of the other triangle within it.
-                return false;
-            }
-            if (T1pointsInsideT2[0] && T1pointsInsideT2[1] && T1pointsInsideT2[2])
-            {
-                intersection = (T1.vertices[0].position + T1.vertices[1].position + T1.vertices[2].position) / 3;
-                return true;
-            }
-            if (T2pointsInsideT1[0] && T2pointsInsideT1[1] && T2pointsInsideT1[2])
-            {
-                intersection = (T2.vertices[0].position + T2.vertices[1].position + T2.vertices[2].position) / 3;
-                return true;
-            }
-
-            //From here on out, we are guaranteed to have an intersection.  If not, something is wrong.
-            List<Vector3> intersections = new List<Vector3>();
-            Vector3 isect;
-            Vector3[,] t1edges = T1.edgePositions;
-            Vector3[,] t2edges = T2.edgePositions;
-            for (int k = 0; k < 3; k++)
-            {//Test each segment of T1 against each segment of T2.
-                for (int j = 0; j < 3; j++)
-                {
-                    if (LineLineIntersect(t1edges[k, 0], t1edges[k, 1], t2edges[j, 0], t2edges[j, 1], out isect))
-                    {
-                        intersections.Add(isect);
-                        if (Vector3.DistanceSquared(t1edges[k, 0], t1edges[k, 1]) < Vector3.DistanceSquared(t1edges[k, 0], isect)) // Remove any invalid catches.  Include in first if?
-                            intersections.Remove(isect);
-                        else
-                            if (Vector3.DistanceSquared(t2edges[j, 0], t2edges[j, 1]) < Vector3.DistanceSquared(t2edges[j, 0], isect))
-                                intersections.Remove(isect);
-                            else
-                                if (!isPointInsideTriangle(ref isect, T1)) //To be valid, must lie within both of the triangles.
-                                    intersections.Remove(isect);
-                                else
-                                    if (!isPointInsideTriangle(ref isect, T2))
-                                        intersections.Remove(isect);
-                    }
-
-                }
-            }
-
-
-            if (intersections.Count == 0)
-            {
-                intersection = noVector;
-                return false;
-            }
-            for (int k = 0; k < intersections.Count; k++)
-            {
-                intersection += intersections[k];
-            }
-            intersection /= intersections.Count;
-            return true;
-        }
-
-        /// <summary>
-        /// Determines if the intervals of intersection are intersecting.
-        /// </summary>
-        /// <param name="lines1">Intersections of triangle 1 with the intersection line.</param>
-        /// <param name="lines2">Intersections of triangle 2 with the intersection line.</param>
-        /// <param name="origin">A point on the intersection line.</param>
-        /// <returns>Whether or not the intervals of intersection intersect.</returns>
-        private static bool areIntervalsIntersecting(List<Vector3> lines1, List<Vector3> lines2, Vector3 origin)
-        {
-            for (int k = 0; k < lines1.Count; k++)
-            {//Remove origin for distance calculations.
-                lines1[k] = lines1[k] - origin;
-            }
-            for (int k = 0; k < lines2.Count; k++)
-            {//Remove origin for distance calculations.
-                lines2[k] = lines2[k] - origin;
-            }
-            List<float> lines1Distances = new List<float>();
-            for (int k = 0; k < lines1.Count; k++)
-            {//Add the distances to a group specific list.
-                lines1Distances.Add(lines1[k].LengthSquared());
-            }
-            List<float> lines2Distances = new List<float>();
-            for (int k = 0; k < lines2.Count; k++)
-            {//Add the distances to a group specific list.
-                lines2Distances.Add(lines2[k].LengthSquared());
-            }
-            // If lines1 are all greater than lines2 OR if lines1 are all less than lines2, then it does not intersect.
-            if (Math.Abs(lines1Distances[0] - lines2Distances[0]) < epsilon)
-                return true;
-            if (lines1Distances[0] < lines2Distances[0]) //For it to be not intersecting, all of 1 must be less than 2
-                for (int i = 0; i < lines1.Count; i++)
-                {
-                    for (int j = 0; j < lines2.Count; j++)
-                    {
-                        if (!(lines1Distances[i] <= lines2Distances[j] - epsilon))
-                            return true;
-                    }
-                }
-            else if (lines1Distances[0] > lines2Distances[0])
-                for (int i = 0; i < lines1.Count; i++)
-                {
-                    for (int j = 0; j < lines2.Count; j++)
-                    {
-                        if (!(lines1Distances[i] >= lines2Distances[j] + epsilon))
-                            return true;
-                    }
-                }
-            return false;
-        }*/
-
-        #endregion
-
-        #region Sorting Vectors
-
-        /// <summary>
-        /// Acts as a comparator condition based on length for two vectors.
-        /// </summary>
-        /// <param name="v1">First vector for comparison.</param>
-        /// <param name="v2">Second vector for comparison.</param>
-        /// <returns>Comparator int.</returns>
-        internal static int CompareVectorLengths(Vector3 v1, Vector3 v2)
-        {
-            float v1Length = v1.LengthSquared();
-            float v2Length = v2.LengthSquared();
-            if (v1Length < v2Length)
-            {
-                return -1;
-            }
-            return 1;
-        }
-
-        #endregion
 
         #region Point-Plane Tests
 
@@ -1444,9 +1004,13 @@ namespace BEPUphysics
         /// <param name="normal">Normal of the plane.</param>
         /// <param name="pointOnPlane">Point located on the plane.</param>
         /// <returns>Distance from the point to the plane.</returns>
-        public static float GetDistancePointToPlane(Vector3 point, Vector3 normal, Vector3 pointOnPlane)
+        public static float GetDistancePointToPlane(ref Vector3 point, ref Vector3 normal, ref Vector3 pointOnPlane)
         {
-            return (Vector3.Dot(normal, point) - Vector3.Dot(pointOnPlane, normal)) / normal.LengthSquared();
+            Vector3 offset;
+            Vector3.Subtract(ref point, ref pointOnPlane, out offset);
+            float dot;
+            Vector3.Dot(ref normal, ref offset, out dot);
+            return dot / normal.LengthSquared();
         }
 
         /// <summary>
@@ -1455,19 +1019,17 @@ namespace BEPUphysics
         /// <param name="point">Point to project onto plane.</param>
         /// <param name="normal">Normal of the plane.</param>
         /// <param name="pointOnPlane">Point located on the plane.</param>
-        /// <returns>Projected location of point onto plane.</returns>
-        public static Vector3 GetPointProjectedOnPlane(Vector3 point, Vector3 normal, Vector3 pointOnPlane)
+        /// <param name="projectedPoint">Projected location of point onto plane.</param>
+        public static void GetPointProjectedOnPlane(ref Vector3 point, ref Vector3 normal, ref Vector3 pointOnPlane, out Vector3 projectedPoint)
         {
             float dot;
             Vector3.Dot(ref normal, ref point, out dot);
             float dot2;
             Vector3.Dot(ref pointOnPlane, ref normal, out dot2);
             float t = (dot - dot2) / normal.LengthSquared();
-            Vector3 toReturn;
             Vector3 multiply;
             Vector3.Multiply(ref normal, t, out multiply);
-            Vector3.Subtract(ref point, ref multiply, out toReturn);
-            return toReturn;
+            Vector3.Subtract(ref point, ref multiply, out projectedPoint);
         }
 
         /// <summary>
@@ -1481,8 +1043,10 @@ namespace BEPUphysics
         {
             foreach (Plane plane in planes)
             {
-                float centroidPlaneDot = plane.DotCoordinate(centroid);
-                float pointPlaneDot = plane.DotCoordinate(point);
+                float centroidPlaneDot;
+                plane.DotCoordinate(ref centroid, out centroidPlaneDot);
+                float pointPlaneDot;
+                plane.DotCoordinate(ref point, out pointPlaneDot);
                 if (!((centroidPlaneDot <= Epsilon && pointPlaneDot <= Epsilon) || (centroidPlaneDot >= -Epsilon && pointPlaneDot >= -Epsilon)))
                 {
                     //Point's NOT the same side of the centroid, so it's 'outside.'
@@ -1492,41 +1056,11 @@ namespace BEPUphysics
             return true;
         }
 
-        /// <summary>
-        /// Determines if a point lies within the bounds of a set of planes representing edge planes.
-        /// If it is outside, a set of possible separating planes will be provided.
-        /// </summary>
-        /// <param name="point">Location to test for inclusion.</param>
-        /// <param name="planes">Representation of edge planes on a face.</param>
-        /// <param name="centroid">A point determined to be within all planes.</param>
-        /// <param name="separatingPlanes">Possible planes that the point may come from wtihin the object (as with a line segment).</param>
-        /// <returns>Whether or not the point is within the extrusion.</returns>
-        public static bool IsPointWithinFaceExtrusion(Vector3 point, List<Plane> planes, Vector3 centroid, out List<Plane> separatingPlanes)
-        {
-            separatingPlanes = new List<Plane>();
-            bool outside = false;
-            foreach (Plane plane in planes)
-            {
-                float centroidPlaneDot = plane.DotCoordinate(centroid);
-                float pointPlaneDot = plane.DotCoordinate(point);
-                if (!((centroidPlaneDot <= 0 && pointPlaneDot <= 0) || (centroidPlaneDot >= 0 && pointPlaneDot >= 0)))
-                {
-                    //Point's NOT the same side of the centroid, so it's 'outside.'
-                    outside = true;
-                    separatingPlanes.Add(plane);
-                }
-            }
-            if (outside == false)
-                return true;
-            return false;
-        }
 
         #endregion
 
         #region Tetrahedron Tests
-
-        //static List<int> subsimplexCandidate = new List<int>();
-        //static List<float> baryCoordsCandidate = new List<float>();
+        //Note: These methods are unused in modern systems, but are kept around for verification.
 
         /// <summary>
         /// Determines the closest point on a tetrahedron to a provided point p.
@@ -1537,6 +1071,7 @@ namespace BEPUphysics
         /// <param name="d">Fourth vertex of the tetrahedron.</param>
         /// <param name="p">Point for comparison.</param>
         /// <param name="closestPoint">Closest point on the tetrahedron to the point.</param>
+        [Obsolete("This method was used for older GJK simplex tests.  If you need simplex tests, consider the PairSimplex class and its variants.")]
         public static void GetClosestPointOnTetrahedronToPoint(ref Vector3 a, ref Vector3 b, ref Vector3 c, ref Vector3 d, ref Vector3 p, out Vector3 closestPoint)
         {
             // Start out assuming point inside all halfspaces, so closest to itself
@@ -1604,6 +1139,7 @@ namespace BEPUphysics
         /// <param name="p">Point for comparison.</param>
         /// <param name="subsimplex">The source of the voronoi region which contains the point.</param>
         /// <param name="closestPoint">Closest point on the tetrahedron to the point.</param>
+        [Obsolete("This method was used for older GJK simplex tests.  If you need simplex tests, consider the PairSimplex class and its variants.")]
         public static void GetClosestPointOnTetrahedronToPoint(ref Vector3 a, ref Vector3 b, ref Vector3 c, ref Vector3 d, ref Vector3 p, RawList<Vector3> subsimplex, out Vector3 closestPoint)
         {
             // Start out assuming point inside all halfspaces, so closest to itself
@@ -1674,6 +1210,7 @@ namespace BEPUphysics
         /// <param name="subsimplex">The source of the voronoi region which contains the point, enumerated as a = 0, b = 1, c = 2, d = 3.</param>
         /// <param name="baryCoords">Barycentric coordinates of p on the tetrahedron.</param>
         /// <param name="closestPoint">Closest point on the tetrahedron to the point.</param>
+        [Obsolete("This method was used for older GJK simplex tests.  If you need simplex tests, consider the PairSimplex class and its variants.")]
         public static void GetClosestPointOnTetrahedronToPoint(RawList<Vector3> tetrahedron, ref Vector3 p, RawList<int> subsimplex, RawList<float> baryCoords, out Vector3 closestPoint)
         {
             var subsimplexCandidate = Resources.GetIntList();
@@ -2178,7 +1715,7 @@ namespace BEPUphysics
         /// Identifies the points on the surface of hull.
         /// </summary>
         /// <param name="points">List of points in the set.</param>
-        /// <param name="indices">List of indices composing the triangulated surface of the convex hull.
+        /// <param name="outputIndices">List of indices composing the triangulated surface of the convex hull.
         /// Each group of 3 indices represents a triangle on the surface of the hull.</param>
         /// <param name="outputSurfacePoints">Unique points on the surface of the convex hull.</param>
         public static void GetConvexHull(IList<Vector3> points, IList<int> outputIndices, IList<Vector3> outputSurfacePoints)
@@ -2206,92 +1743,7 @@ namespace BEPUphysics
         #endregion
 
         #region Miscellaneous
-        ////Note: this method is a nettle-style sweep.  It can miss some collisions, even 'properly' implemented.
-        //public static bool SweepSphereAgainstTriangle(Ray ray, float radius, ref Vector3 vA, ref Vector3 vB, ref Vector3 vC, TriangleSidedness sidedness, int maximumLength, out RayHit rayHit)
-        //{
-        //    //Put it into 'sort of local space.'
-        //    Vector3 a, b, c;
-        //    Vector3.Subtract(ref vA, ref ray.Position, out a);
-        //    Vector3.Subtract(ref vB, ref ray.Position, out b);
-        //    Vector3.Subtract(ref vC, ref ray.Position, out c);
-
-        //    //Only perform sweep if the object is in danger of hitting the object.
-        //    //Triangles can be one sided, so check the velocity against the triangle normal.
-        //    Vector3 normal;
-        //    Vector3 AB, AC;
-        //    Vector3.Subtract(ref b, ref a, out AB);
-        //    Vector3.Subtract(ref c, ref a, out AC);
-        //    Vector3.Cross(ref AB, ref AC, out normal);
-        //    float dot;
-        //    Vector3.Dot(ref ray.Direction, ref normal, out dot);
-        //    //Calibrate the normal so that it opposes the velocity and check the sidedness.
-        //    switch (sidedness)
-        //    {
-        //        case TriangleSidedness.Clockwise:
-        //            if (dot < 0)
-        //            {
-        //                rayHit = new RayHit();
-        //                return false;
-        //            }
-        //            break;
-        //        case TriangleSidedness.Counterclockwise:
-        //            if (dot > 0)
-        //            {
-        //                rayHit = new RayHit();
-        //                return false;
-        //            }
-        //            Vector3.Negate(ref normal, out normal);
-        //            break;
-        //        case TriangleSidedness.DoubleSided:
-        //            if (dot > 0)
-        //                Vector3.Negate(ref normal, out normal);
-        //            break;
-        //    }
-
-
-        //    normal.Normalize();
-
-        //    //If the collision is going to happen inside the triangle, then the first collision
-        //    //will happen along the segment starting at the offsetOrigin and continuing along the ray direction.
-        //    Vector3 offsetOrigin;
-        //    Vector3.Multiply(ref normal, -radius, out offsetOrigin); //we're in the sphere's local space, so the origin is its position.
-
-        //    //Find the location that the ray hits the triangle plane.
-        //    Vector3 displacement;
-        //    Vector3.Subtract(ref offsetOrigin, ref a, out displacement);
-        //    float distanceFromPlane;
-        //    Vector3.Dot(ref displacement, ref normal, out distanceFromPlane);
-        //    Vector3.Dot(ref ray.Direction, ref normal, out dot);
-
-        //    float t = -distanceFromPlane / dot;
-        //    Vector3 planeIntersection;
-        //    Vector3.Multiply(ref ray.Direction, t, out planeIntersection);
-        //    Vector3.Add(ref offsetOrigin, ref planeIntersection, out planeIntersection);
-
-        //    Vector3 closestPoint;
-        //    if (Toolbox.GetClosestPointOnTriangleToPoint(ref a, ref b, ref c, ref planeIntersection, out closestPoint))
-        //    {
-        //        //The point was on the face of the triangle, so we're done.
-        //        rayHit.T = t;
-        //        Vector3.Add(ref planeIntersection, ref ray.Position, out rayHit.Location);
-        //        rayHit.Normal = normal;
-        //        return rayHit.T >= 0 && rayHit.T <= maximumLength;
-        //    }
-
-        //    //The intersection point was outside the triangle.  Cast back from the computed closest point
-        //    //to the sphere.
-        //    Ray backwardsRay;
-        //    backwardsRay.Position = closestPoint;
-        //    Vector3.Negate(ref ray.Direction, out backwardsRay.Direction);
-        //    bool toReturn = RayCastSphere(ref backwardsRay, ref ZeroVector, radius, maximumLength, out rayHit);
-        //    if (toReturn)
-        //    {
-        //        Vector3.Add(ref ray.Position, ref rayHit.Location, out rayHit.Location);
-        //        rayHit.Normal = normal;
-        //    }
-        //    return toReturn;
-        //}
-
+        
         ///<summary>
         /// Tests a ray against a sphere.
         ///</summary>
@@ -2332,7 +1784,6 @@ namespace BEPUphysics
             return true;
         }
 
-
         /// <summary>
         /// Computes a bounding box and expands it.
         /// </summary>
@@ -2346,6 +1797,7 @@ namespace BEPUphysics
             ExpandBoundingBox(ref boundingBox, ref sweep);
 
         }
+
         /// <summary>
         /// Expands a bounding box by the given sweep.
         /// </summary>
@@ -2468,65 +1920,6 @@ namespace BEPUphysics
         }
 
         /// <summary>
-        /// Clamps a value between a minimum and maximum.
-        /// </summary>
-        /// <param name="n">Value to clamp.</param>
-        /// <param name="min">Minimum value allowed.</param>
-        /// <param name="max">Maximum value allowed.</param>
-        /// <returns>Clamped value.</returns>
-        public static float Clamp(float n, float min, float max)
-        {
-            if (n < min) return min;
-            if (n > max) return max;
-            return n;
-        }
-
-        /// <summary>
-        /// Compares the vectors for equality.
-        /// </summary>
-        /// <param name="a">First vector for testing.</param>
-        /// <param name="b">Second vector for testing.</param>
-        /// <returns>Whether or not the two vectors are equal.</returns>
-        public static bool AreVectorsEqual(Vector3 a, Vector3 b)
-        {
-            if (a.X == b.X && a.Y == b.Y && a.Z == b.Z)
-                return true;
-            return false;
-        }
-
-        /// <summary>
-        /// Determines if two vectors have similar components.
-        /// </summary>
-        /// <param name="a">First vector for comparison.</param>
-        /// <param name="b">Second vector for comparison.</param>
-        /// <returns>Whether or not the vectors are similar.</returns>
-        public static bool AreVectorsSimilar(Vector3 a, Vector3 b)
-        {
-            const float tolerance = .001f;
-            if (Math.Abs(a.X - b.X) < tolerance && Math.Abs(a.Y - b.Y) < tolerance && Math.Abs(a.Z - b.Z) < tolerance)
-                return true;
-            return false;
-        }
-
-        /// <summary>
-        /// Determines if a list contains a Vector3 representing an axis (both negative and positive), allowing for a small amount of error.
-        /// </summary>
-        /// <param name="list">List to check.</param>
-        /// <param name="toCheck">Axis to check.</param>
-        /// <returns>Whether or not the list contains the provided axis.</returns>
-        public static bool ContainsSimilarAxis(List<Vector3> list, Vector3 toCheck)
-        {
-            foreach (Vector3 inList in list)
-            {
-                if (AreVectorsSimilar(toCheck, inList))
-                    return true;
-                if (AreVectorsSimilar(-toCheck, inList))
-                    return true;
-            }
-            return false;
-        }
-
-        /// <summary>
         /// Computes the angle change represented by a normalized quaternion.
         /// </summary>
         /// <param name="q">Quaternion to be converted.</param>
@@ -2579,44 +1972,6 @@ namespace BEPUphysics
 
 
         /// <summary>
-        /// Returns the cross product matrix for the given vector.
-        /// </summary>
-        /// <param name="v">Vector to be used in finding the cross product matrix.</param>
-        /// <returns>Cross product matrix form of the vector.</returns>
-        public static Matrix GetCrossProductMatrix(Vector3 v)
-        {
-            //return new Matrix(0, v.Z, -v.Y, 0, -v.Z, 0, v.X, 0, v.Y, -v.X, 0, 0, 0, 0, 0, 0);
-            return new Matrix(0, -v.Z, v.Y, 0, v.Z, 0, -v.X, 0, -v.Y, v.X, 0, 0, 0, 0, 0, 0);
-        }
-
-
-
-
-        /// <summary>
-        /// Converts a vector into a matrix.
-        /// </summary>
-        /// <param name="v">Vector to be matrix-fied.</param>
-        /// <returns>Matrix form of the vector.</returns>
-        public static Matrix GetMatrixFromVector(Vector3 v)
-        {
-            return new Matrix(v.X, v.Y, v.Z, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-        }
-
-        /// <summary>
-        /// Computes the outer product of the given vectors.
-        /// </summary>
-        /// <param name="a">First vector.</param>
-        /// <param name="b">Second vector.</param>
-        /// <returns>Outer product result.</returns>
-        public static Matrix GetOuterProduct(Vector3 a, Vector3 b)
-        {
-            return new Matrix(a.X * b.X, a.X * b.Y, a.X * b.Z, 0,
-                              a.Y * b.X, a.Y * b.Y, a.Y * b.Z, 0,
-                              a.Z * b.X, a.Z * b.Y, a.Z * b.Z, 0,
-                              0, 0, 0, 1);
-        }
-
-        /// <summary>
         /// Computes the quaternion rotation between two normalized vectors.
         /// </summary>
         /// <param name="v1">First unit-length vector.</param>
@@ -2638,16 +1993,6 @@ namespace BEPUphysics
         }
 
         /// <summary>
-        /// Finds the transposed matrix of a vector.
-        /// </summary>
-        /// <param name="v">Vector to be transposed.</param>
-        /// <returns>Transposed vector in matrix form.</returns>
-        public static Matrix GetTransposedVector(Vector3 v)
-        {
-            return new Matrix(v.X, 0, 0, 0, v.Y, 0, 0, 0, v.Z, 0, 0, 0, 0, 0, 0, 0);
-        }
-
-        /// <summary>
         /// Finds the velocity of a point as if it were connected to the given entity.
         /// </summary>
         /// <param name="p">Location of point.</param>
@@ -2658,89 +2003,7 @@ namespace BEPUphysics
             return obj.linearVelocity + Vector3.Cross(obj.angularVelocity, p - obj.position);
         }
 
-        /// <summary>
-        /// Compares elements in the lists, removing any duplicates from the lists.
-        /// Two vectors will be considered duplicate if they are parallel, even if facing opposite directions.
-        /// </summary>
-        /// <param name="a">First set of vectors for comparison.</param>
-        /// <param name="b">Second set of vectors for comparison.</param>
-        public static void PruneDirectionalDuplicates(List<Vector3> a, List<Vector3> b)
-        {
-            var comparison = new List<Vector3>();
-            var toRemoveA = new List<Vector3>();
-            var toRemoveB = new List<Vector3>();
-            foreach (Vector3 v in a)
-            {
-                if (!ContainsSimilarAxis(comparison, v))
-                    comparison.Add(v);
-                else
-                    toRemoveA.Add(v);
-            }
-            foreach (Vector3 v in b)
-            {
-                if (!ContainsSimilarAxis(comparison, v))
-                    comparison.Add(v);
-                else
-                    toRemoveB.Add(v);
-            }
-            foreach (Vector3 v in toRemoveA)
-            {
-                a.Remove(v);
-            }
-            foreach (Vector3 v in toRemoveB)
-            {
-                b.Remove(v);
-            }
-        }
 
-
-
-        //TODO: RK4 integrators
-        internal static void IntegrateAngularVelocity(Entity e, float dt, out Quaternion initial, out Quaternion final)
-        {
-            initial = e.orientation;
-            Vector3 angVel;
-            Vector3.Multiply(ref e.angularVelocity, dt * .5f, out angVel);
-            var component = new Quaternion(angVel.X, angVel.Y, angVel.Z, 0);
-            Quaternion.Multiply(ref component, ref initial, out final);
-            Quaternion.Add(ref initial, ref final, out final);
-            Quaternion.Normalize(ref final, out final);
-        }
-
-        internal static void IntegrateAngularVelocity(Entity a, Entity b, float dt, out Quaternion aInitial, out Quaternion bInitial, out Quaternion aFinal, out Quaternion bFinal)
-        {
-            aInitial = a.orientation;
-            bInitial = b.orientation;
-
-            Vector3 aAngVel, bAngVel;
-            Vector3.Multiply(ref a.angularVelocity, dt * .5f, out aAngVel);
-            Vector3.Multiply(ref b.angularVelocity, dt * .5f, out bAngVel);
-            var aComponent = new Quaternion(aAngVel.X, aAngVel.Y, aAngVel.Z, 0);
-            var bComponent = new Quaternion(bAngVel.X, bAngVel.Y, bAngVel.Z, 0);
-            Quaternion.Multiply(ref aComponent, ref aInitial, out aFinal);
-            Quaternion.Multiply(ref bComponent, ref bInitial, out bFinal);
-            Quaternion.Add(ref aInitial, ref aFinal, out aFinal);
-            Quaternion.Add(ref bInitial, ref bFinal, out bFinal);
-            Quaternion.Normalize(ref aFinal, out aFinal);
-            Quaternion.Normalize(ref bFinal, out bFinal);
-        }
-
-        internal static void IntegrateLinearVelocity(Entity e, float dt, out Vector3 initial, out Vector3 final)
-        {
-            initial = e.position;
-            Vector3.Multiply(ref e.linearVelocity, dt, out final);
-            Vector3.Add(ref initial, ref final, out final);
-        }
-
-        internal static void IntegrateLinearVelocity(Entity a, Entity b, float dt, out Vector3 aInitial, out Vector3 bInitial, out Vector3 aFinal, out Vector3 bFinal)
-        {
-            aInitial = a.position;
-            bInitial = b.position;
-            Vector3.Multiply(ref a.linearVelocity, dt, out aFinal);
-            Vector3.Add(ref aInitial, ref aFinal, out aFinal);
-            Vector3.Multiply(ref b.linearVelocity, dt, out bFinal);
-            Vector3.Add(ref bInitial, ref bFinal, out bFinal);
-        }
 
         /// <summary>
         /// Updates the quaternion using RK4 integration.
@@ -2811,7 +2074,7 @@ namespace BEPUphysics
             Quaternion.Multiply(ref halfspinQuaternion, ref normalizedOrientation, out orientationChange);
         }
 
-        
+
         /// <summary>
         /// Gets the barycentric coordinates of the point with respect to a triangle's vertices.
         /// </summary>
@@ -2832,7 +2095,7 @@ namespace BEPUphysics
             float x = triangleNormal.X < 0 ? -triangleNormal.X : triangleNormal.X;
             float y = triangleNormal.Y < 0 ? -triangleNormal.Y : triangleNormal.Y;
             float z = triangleNormal.Z < 0 ? -triangleNormal.Z : triangleNormal.Z;
-            
+
             float numeratorU, numeratorV, denominator;
             if (x >= y && x >= z)
             {
@@ -2864,7 +2127,7 @@ namespace BEPUphysics
                 cWeight = 1 - aWeight - bWeight;
             }
             else
-            {               
+            {
                 //It seems to be a degenerate triangle.
                 //In that case, pick one of the closest vertices.
                 //MOST of the time, this will happen when the vertices
@@ -2896,121 +2159,15 @@ namespace BEPUphysics
                 }
             }
 
-            //if (((a * aWeight + b * bWeight + c * cWeight) - p).LengthSquared() > .01f)
-            //    return;
-            
+
         }
 
-       
-
-        ///// <summary>
-        ///// Gets the barycentric coordinates of the point with respect to a triangle's vertices.
-        ///// </summary>
-        ///// <param name="point">Point to compute the barycentric coordinates of.</param>
-        ///// <param name="v1">First vertex in the triangle.</param>
-        ///// <param name="v2">Second vertex in the triangle.</param>
-        ///// <param name="v3">Third vertex in the triangle.</param>
-        ///// <param name="v1Weight">Weight of the first vertex.</param>
-        ///// <param name="v2Weight">Weight of the second vertex.</param>
-        ///// <param name="v3Weight">Weight of the third vertex.</param>
-        //public static void GetBarycentricCoordinates(ref Vector3 point, ref Vector3 v1, ref Vector3 v2, ref Vector3 v3, out float v1Weight, out float v2Weight, out float v3Weight)
-        //{
-        //    //Triangle edge vectors.   
-        //    Vector3 e0, e1, e2;
-        //    Vector3.Subtract(ref v3, ref v1, out e0);
-        //    Vector3.Subtract(ref v2, ref v1, out e1);
-        //    Vector3.Subtract(ref point, ref v1, out e2);
-
-        //    //Set up precalculations
-        //    float d00 = e0.LengthSquared();
-        //    float d01;
-        //    Vector3.Dot(ref e0, ref e1, out d01);
-        //    float d02;
-        //    Vector3.Dot(ref e0, ref e2, out d02);
-        //    float d11 = e1.LengthSquared();
-        //    float d12;
-        //    Vector3.Dot(ref e1, ref e2, out d12);
-        //    //Find barycoords
-        //    float denom = (d00 * d11 - d01 * d01);
-        //    if (denom < 1e-9f && denom > -1e-9f)
-        //    {
-        //        //It seems to be a degenerate triangle.
-        //        //In that case, pick one of the closest vertices.
-        //        //MOST of the time, this will happen when the vertices
-        //        //are all very close together (all three points form a single point).
-        //        //Sometimes, though, it could be that it's more of a line.
-        //        //If it's a little inefficient, don't worry- this is a corner case anyway.
-
-        //        float distance1, distance2, distance3;
-        //        Vector3.DistanceSquared(ref point, ref v1, out distance1);
-        //        Vector3.DistanceSquared(ref point, ref v2, out distance2);
-        //        Vector3.DistanceSquared(ref point, ref v3, out distance3);
-        //        if (distance1 < distance2 && distance1 < distance3)
-        //        {
-        //            v1Weight = 1;
-        //            v2Weight = 0;
-        //            v3Weight = 0;
-        //        }
-        //        else if (distance2 < distance3)
-        //        {
-        //            v1Weight = 0;
-        //            v2Weight = 1;
-        //            v3Weight = 0;
-        //        }
-        //        else
-        //        {
-        //            v1Weight = 0;
-        //            v2Weight = 0;
-        //            v3Weight = 1;
-        //        }
-        //    }
-        //    else
-        //    {
-        //        denom = 1 / denom;
-        //        v3Weight = (d11 * d02 - d01 * d12) * denom;
-        //        v2Weight = (d00 * d12 - d01 * d02) * denom;
-        //        v1Weight = 1 - v3Weight - v2Weight;
-        //    }
 
 
-        //    if (((v1 * v1Weight + v2 * v2Weight + v3 * v3Weight) - point).LengthSquared() > 1f)
-        //        return;
-
-        //}
 
         #endregion
 
-        #region debug functions
 
-        #endregion
-
-        #region Shape-plane volume tests
-
-        /// <summary>
-        /// Calculates the volume of the sphere 'below' the given plane.
-        /// </summary>
-        /// <param name="spherePosition">Center of mass of the sphere.</param>
-        /// <param name="sphereVolume">Precalculated total volume of the sphere (4/3 * pi * radius ^ 3).</param>
-        /// <param name="radius">Radius of the sphere.</param>
-        /// <param name="p">A point on the plane.</param>
-        /// <param name="norm">Normal of the plane.</param>
-        /// <param name="volume">Volume of the sphere which is opposite the normal direction.</param>
-        public static void GetSphereVolumeSplitByPlane(Vector3 spherePosition, float sphereVolume, float radius, Vector3 p, Vector3 norm, out float volume)
-        {
-            Vector3 newP = GetPointProjectedOnPlane(spherePosition, norm, p);
-            Vector3 diff = newP - spherePosition;
-
-            float distance = diff.Length();
-            //Strange but true!
-            float h = radius - distance;
-            float vol = (float)Math.PI * h * h * (radius - .3333333f * h);
-            if (Vector3.Dot(diff, norm) > 0) //more than half taken up 
-                volume = sphereVolume - vol;
-            else
-                volume = vol;
-        }
-
-        #endregion
 
 
 
