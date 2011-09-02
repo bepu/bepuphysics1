@@ -113,9 +113,9 @@
     <None Include="CollisionTests\CollisionAlgorithms\GJK\SimplexBackup.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\GJK\GJKToolbox.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\GJK\OldGJKVerifier.cs" />
+    <Compile Include="CollisionTests\CollisionAlgorithms\GJK\PairSimplex.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\GJK\RaySimplex.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\GJK\SimpleSimplex.cs" />
-    <Compile Include="CollisionTests\CollisionAlgorithms\GJK\Simplex.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\MPRToolbox.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\Testing\MPRToolboxOld.cs" />
     <None Include="CollisionTests\CollisionAlgorithms\Testing\OldCAStuff.cs" />

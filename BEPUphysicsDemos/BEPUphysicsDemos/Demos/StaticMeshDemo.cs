@@ -42,8 +42,8 @@ namespace BEPUphysicsDemos.Demos
 
 
             //Dump some boxes on top of it for fun.
-            int numColumns = 1;
-            int numRows = 1;
+            int numColumns = 8;
+            int numRows = 8;
             int numHigh = 1;
             float separation = 8;
             Entity toAdd;
