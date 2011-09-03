@@ -4,6 +4,7 @@ using BEPUphysics.UpdateableSystems.ForceFields;
 using BEPUphysicsDemos.SampleCode;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
+using BEPUphysics.NarrowPhaseSystems;
 
 namespace BEPUphysicsDemos.Demos
 {
@@ -20,6 +21,9 @@ namespace BEPUphysicsDemos.Demos
             : base(game)
         {
             Space.ForceUpdater.Gravity = Vector3.Zero;
+
+            //By pre-allocating a bunch of box-box pair handlers, the simulation will avoid having to allocate new ones at runtime.
+            NarrowPhaseHelper.Factories.BoxBox.EnsureCount(1000);
 
             var planet = new Sphere(new Vector3(0, 0, 0), 30);
             Space.Add(planet);

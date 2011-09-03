@@ -2648,6 +2648,11 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             //1: plane with normal Y
             //2: plane with normal Z
 
+#if !WINDOWS
+            edgeStart = new Vector3();
+            edgeEnd = new Vector3();
+#endif
+
             switch (index + axis * 4)
             {
                 case 0:
