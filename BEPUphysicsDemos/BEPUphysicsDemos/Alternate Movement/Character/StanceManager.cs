@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Microsoft.Xna.Framework;
 using BEPUphysics.CollisionTests;
 using BEPUphysics.DataStructures;
 using BEPUphysics.Settings;
 using BEPUphysics;
+using BEPUphysics.MathExtensions;
 
 namespace BEPUphysicsDemos.AlternateMovement.Character
 {

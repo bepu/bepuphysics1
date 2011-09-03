@@ -12,5 +12,11 @@ namespace BEPUphysics.MathExtensions
     {
         public float Radius;
         public Vector3 Center;
+
+        public BoundingSphere(Vector3 center, float radius)
+        {
+            this.Center = center;
+            this.Radius = radius;
+        }
     }
 }

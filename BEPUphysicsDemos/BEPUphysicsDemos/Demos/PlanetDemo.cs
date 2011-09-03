@@ -2,9 +2,9 @@
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.UpdateableSystems.ForceFields;
 using BEPUphysicsDemos.SampleCode;
-using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using BEPUphysics.NarrowPhaseSystems;
+using BEPUphysics.MathExtensions;
 
 namespace BEPUphysicsDemos.Demos
 {
@@ -47,7 +47,7 @@ namespace BEPUphysicsDemos.Demos
                         toAdd.AngularDamping = 0;
                         Space.Add(toAdd);
                     }
-            game.Camera.Position = new Vector3(0, 0, 150);
+            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(0, 0, 150);
         }
 
         /// <summary>

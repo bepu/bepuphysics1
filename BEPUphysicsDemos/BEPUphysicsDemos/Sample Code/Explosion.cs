@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using BEPUphysics;
 using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.Collidables.MobileCollidables;
-using Microsoft.Xna.Framework;
+using BEPUphysics.MathExtensions;
 
 namespace BEPUphysicsDemos.SampleCode
 {

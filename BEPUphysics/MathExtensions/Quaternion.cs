@@ -233,5 +233,62 @@ namespace BEPUphysics.MathExtensions
         {
             return a.X != b.X || a.Y != b.Y || a.Z != b.Z || a.W != b.W;
         }
+
+        public static Quaternion operator *(Quaternion a, Quaternion b)
+        {
+            Quaternion toReturn;
+            Multiply(ref a, ref b, out toReturn);
+            return toReturn;
+        }
+
+        public static Quaternion CreateFromAxisAngle(Vector3 axis, float angle)
+        {
+            float halfAngle = angle * .5f;
+            float s = (float)Math.Sin(halfAngle);
+            Quaternion q;
+            q.X = axis.X * s;
+            q.Y = axis.Y * s;
+            q.Z = axis.Z * s;
+            q.W = (float)Math.Cos(halfAngle);
+            return q;
+        }
+
+        public static void CreateFromAxisAngle(ref Vector3 axis, float angle, out Quaternion q)
+        {
+            float halfAngle = angle * .5f;
+            float s = (float)Math.Sin(halfAngle);
+            q.X = axis.X * s;
+            q.Y = axis.Y * s;
+            q.Z = axis.Z * s;
+            q.W = (float)Math.Cos(halfAngle);
+        }
+
+        public static Quaternion CreateFromYawPitchRoll(float yaw, float pitch, float roll)
+        {
+            Quaternion toReturn;
+            CreateFromYawPitchRoll(yaw, pitch, roll, out toReturn);
+            return toReturn;
+        }
+
+        public static void CreateFromYawPitchRoll(float yaw, float pitch, float roll, out Quaternion q)
+        {
+            double cosYaw = Math.Cos(yaw * .5f);
+            double cosPitch = Math.Cos(pitch * .5f);
+            double cosRoll = Math.Cos(roll * .5f);
+
+            double sinYaw = Math.Sin(yaw * .5f);
+            double sinPitch = Math.Sin(pitch * .5f);
+            double sinRoll = Math.Sin(roll * .5f);
+
+            double cosYawCosPitch = cosYaw * cosPitch;
+            double cosYawSinPitch = cosYaw * sinPitch;
+            double sinYawCosPitch = sinYaw * cosPitch;
+            double sinYawSinPitch = sinYaw * sinPitch;
+
+            q.W = (float)(cosYawCosPitch * cosRoll + sinYawSinPitch * sinRoll);
+            q.X = (float)(sinYawCosPitch * cosRoll - cosYawSinPitch * sinRoll);
+            q.Y = (float)(cosYawSinPitch * cosRoll + sinYawCosPitch * sinRoll);
+            q.Z = (float)(cosYawCosPitch * sinRoll - sinYawSinPitch * cosRoll);
+        }
     }
 }

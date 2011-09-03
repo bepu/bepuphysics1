@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using BEPUphysics.UpdateableSystems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using ConversionHelper;
 
 namespace BEPUphysicsDrawer.Models
 {
@@ -29,13 +30,14 @@ namespace BEPUphysicsDrawer.Models
         {
             for (int i = 0; i < DisplayedObject.SurfaceTriangles.Count; i++)
             {
-                vertices.Add(new VertexPositionNormalTexture(DisplayedObject.SurfaceTriangles[i][0], DisplayedObject.UpVector, new Vector2(0, 0)));
-                vertices.Add(new VertexPositionNormalTexture(DisplayedObject.SurfaceTriangles[i][1], DisplayedObject.UpVector, new Vector2(0, 1)));
-                vertices.Add(new VertexPositionNormalTexture(DisplayedObject.SurfaceTriangles[i][2], DisplayedObject.UpVector, new Vector2(1, 0)));
+                Vector3 upVector = MathConverter.Convert(DisplayedObject.UpVector);
+                vertices.Add(new VertexPositionNormalTexture(MathConverter.Convert(DisplayedObject.SurfaceTriangles[i][0]), upVector, new Vector2(0, 0)));
+                vertices.Add(new VertexPositionNormalTexture(MathConverter.Convert(DisplayedObject.SurfaceTriangles[i][1]), upVector, new Vector2(0, 1)));
+                vertices.Add(new VertexPositionNormalTexture(MathConverter.Convert(DisplayedObject.SurfaceTriangles[i][2]), upVector, new Vector2(1, 0)));
 
-                vertices.Add(new VertexPositionNormalTexture(DisplayedObject.SurfaceTriangles[i][0], -DisplayedObject.UpVector, new Vector2(0, 0)));
-                vertices.Add(new VertexPositionNormalTexture(DisplayedObject.SurfaceTriangles[i][1], -DisplayedObject.UpVector, new Vector2(0, 1)));
-                vertices.Add(new VertexPositionNormalTexture(DisplayedObject.SurfaceTriangles[i][2], -DisplayedObject.UpVector, new Vector2(1, 0)));
+                vertices.Add(new VertexPositionNormalTexture(MathConverter.Convert(DisplayedObject.SurfaceTriangles[i][0]), -upVector, new Vector2(0, 0)));
+                vertices.Add(new VertexPositionNormalTexture(MathConverter.Convert(DisplayedObject.SurfaceTriangles[i][1]), -upVector, new Vector2(0, 1)));
+                vertices.Add(new VertexPositionNormalTexture(MathConverter.Convert(DisplayedObject.SurfaceTriangles[i][2]), -upVector, new Vector2(1, 0)));
 
                 indices.Add((ushort) (i * 6));
                 indices.Add((ushort) (i * 6 + 1));

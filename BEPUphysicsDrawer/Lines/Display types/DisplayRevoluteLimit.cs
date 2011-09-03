@@ -1,5 +1,6 @@
 ﻿using BEPUphysics.Constraints.TwoEntity.JointLimits;
 using Microsoft.Xna.Framework;
+using ConversionHelper;
 
 namespace BEPUphysicsDrawer.Lines
 {
@@ -46,14 +47,14 @@ namespace BEPUphysicsDrawer.Lines
         public override void Update()
         {
             //Move lines around
-            Vector3 left = LineObject.ConnectionB.Position - LineObject.Basis.PrimaryAxis;
-            Vector3 right = LineObject.ConnectionB.Position + LineObject.Basis.PrimaryAxis;
+            Vector3 left = MathConverter.Convert(LineObject.ConnectionB.Position - LineObject.Basis.PrimaryAxis);
+            Vector3 right = MathConverter.Convert(LineObject.ConnectionB.Position + LineObject.Basis.PrimaryAxis);
 
-            Vector3 upwardsOffset = Vector3.TransformNormal(LineObject.Basis.XAxis, Matrix.CreateFromAxisAngle(LineObject.Basis.PrimaryAxis, LineObject.MaximumAngle));
+            Vector3 upwardsOffset = Vector3.TransformNormal(MathConverter.Convert(LineObject.Basis.XAxis), Matrix.CreateFromAxisAngle(MathConverter.Convert(LineObject.Basis.PrimaryAxis), LineObject.MaximumAngle));
             Vector3 topRightPosition = right + upwardsOffset;
             Vector3 topLeftPosition = left + upwardsOffset;
 
-            Vector3 downwardsOffset = Vector3.TransformNormal(LineObject.Basis.XAxis, Matrix.CreateFromAxisAngle(LineObject.Basis.PrimaryAxis, LineObject.MinimumAngle));
+            Vector3 downwardsOffset = Vector3.TransformNormal(MathConverter.Convert(LineObject.Basis.XAxis), Matrix.CreateFromAxisAngle(MathConverter.Convert(LineObject.Basis.PrimaryAxis), LineObject.MinimumAngle));
             Vector3 bottomRightPosition = right + downwardsOffset;
             Vector3 bottomLeftPosition = left + downwardsOffset;
 
@@ -78,8 +79,8 @@ namespace BEPUphysicsDrawer.Lines
             bottom.PositionA = bottomLeftPosition;
             bottom.PositionB = bottomRightPosition;
 
-            testAxis.PositionA = LineObject.ConnectionB.Position;
-            testAxis.PositionB = LineObject.ConnectionB.Position + LineObject.TestAxis;
+            testAxis.PositionA = MathConverter.Convert(LineObject.ConnectionB.Position);
+            testAxis.PositionB = MathConverter.Convert(LineObject.ConnectionB.Position + LineObject.TestAxis);
         }
     }
 }

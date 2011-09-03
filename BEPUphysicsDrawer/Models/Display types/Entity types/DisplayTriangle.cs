@@ -6,6 +6,7 @@ using BEPUphysics.CollisionShapes.ConvexShapes;
 using System;
 using BEPUphysics.CollisionShapes;
 using BEPUphysics.Collidables.MobileCollidables;
+using ConversionHelper;
 
 namespace BEPUphysicsDrawer.Models
 {
@@ -21,14 +22,14 @@ namespace BEPUphysicsDrawer.Models
             var triangleShape = collidable.Shape as TriangleShape;
             if(triangleShape == null)
                 throw new ArgumentException("Wrong shape type.");
-            Vector3 normal = triangleShape.GetLocalNormal();
-            vertices.Add(new VertexPositionNormalTexture(triangleShape.VertexA, -normal, new Vector2(0, 0)));
-            vertices.Add(new VertexPositionNormalTexture(triangleShape.VertexB, -normal, new Vector2(0, 1)));
-            vertices.Add(new VertexPositionNormalTexture(triangleShape.VertexC, -normal, new Vector2(1, 0)));
+            Vector3 normal = MathConverter.Convert(triangleShape.GetLocalNormal());
+            vertices.Add(new VertexPositionNormalTexture(MathConverter.Convert(triangleShape.VertexA), -normal, new Vector2(0, 0)));
+            vertices.Add(new VertexPositionNormalTexture(MathConverter.Convert(triangleShape.VertexB), -normal, new Vector2(0, 1)));
+            vertices.Add(new VertexPositionNormalTexture(MathConverter.Convert(triangleShape.VertexC), -normal, new Vector2(1, 0)));
 
-            vertices.Add(new VertexPositionNormalTexture(triangleShape.VertexA, normal, new Vector2(0, 0)));
-            vertices.Add(new VertexPositionNormalTexture(triangleShape.VertexB, normal, new Vector2(0, 1)));
-            vertices.Add(new VertexPositionNormalTexture(triangleShape.VertexC, normal, new Vector2(1, 0)));
+            vertices.Add(new VertexPositionNormalTexture(MathConverter.Convert(triangleShape.VertexA), normal, new Vector2(0, 0)));
+            vertices.Add(new VertexPositionNormalTexture(MathConverter.Convert(triangleShape.VertexB), normal, new Vector2(0, 1)));
+            vertices.Add(new VertexPositionNormalTexture(MathConverter.Convert(triangleShape.VertexC), normal, new Vector2(1, 0)));
 
             indices.Add(0);
             indices.Add(1);

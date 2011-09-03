@@ -4,11 +4,11 @@ using BEPUphysics.Constraints.TwoEntity.Joints;
 using BEPUphysics.Constraints.TwoEntity.Motors;
 using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
-using Microsoft.Xna.Framework;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.CollisionShapes;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using System.Collections.Generic;
+using BEPUphysics.MathExtensions;
 
 namespace BEPUphysicsDemos.Demos
 {
@@ -110,7 +110,7 @@ namespace BEPUphysicsDemos.Demos
             CollisionRules.AddRule(lowerArm, upperArm, CollisionRule.NoBroadPhase);
             CollisionRules.AddRule(lowerArm, hand, CollisionRule.NoBroadPhase);
 
-            game.Camera.Position = new Vector3(0, 4, 20);
+            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(0, 4, 20);
         }
 
         /// <summary>

@@ -19,6 +19,13 @@ namespace BEPUphysics.MathExtensions
             this.Direction = direction;
         }
 
+        public float? Intersects(BoundingBox boundingBox)
+        {
+            float? toReturn;
+            Intersects(ref boundingBox, out toReturn);
+            return toReturn;
+        }
+
         public void Intersects(ref BoundingBox boundingBox, out float? result)
         {
             float halfWidth = boundingBox.Max.X - boundingBox.Min.X;

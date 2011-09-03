@@ -187,7 +187,7 @@ namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
                         {
                             bool intersects;
                             var item = cell.entries.Elements[k].item;
-                            boundingShape.Intersects(ref item.boundingBox, out intersects);
+                            item.boundingBox.Intersects(ref boundingShape, out intersects);
                             if (intersects && !overlaps.Contains(item))
                             {
                                 overlaps.Add(item);
@@ -198,9 +198,9 @@ namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
             }
         }
 
-        public void GetEntries(BoundingFrustum boundingShape, IList<BroadPhaseEntry> overlaps)
-        {
-            throw new NotSupportedException("The Grid2DSortAndSweep broad phase cannot accelerate frustum tests.  Consider using a broad phase which supports frustum tests or using a custom solution.");
-        }
+        //public void GetEntries(BoundingFrustum boundingShape, IList<BroadPhaseEntry> overlaps)
+        //{
+        //    throw new NotSupportedException("The Grid2DSortAndSweep broad phase cannot accelerate frustum tests.  Consider using a broad phase which supports frustum tests or using a custom solution.");
+        //}
     }
 }

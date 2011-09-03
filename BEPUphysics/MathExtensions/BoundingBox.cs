@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace BEPUphysics.MathExtensions
-{    
+{
     /// <summary>
     /// Provides XNA-like axis-aligned bounding box functionality needed by the engine.
     /// </summary>
@@ -12,6 +12,12 @@ namespace BEPUphysics.MathExtensions
     {
         public Vector3 Min;
         public Vector3 Max;
+
+        public BoundingBox(Vector3 min, Vector3 max)
+        {
+            this.Min = min;
+            this.Max = max;
+        }
 
         public static BoundingBox CreateFromPoints(IList<Vector3> points)
         {
@@ -56,15 +62,15 @@ namespace BEPUphysics.MathExtensions
             else
                 merged.Min.Z = b.Min.Z;
 
-            if (a.Max.X < b.Max.X)
+            if (a.Max.X > b.Max.X)
                 merged.Max.X = a.Max.X;
             else
                 merged.Max.X = b.Max.X;
-            if (a.Max.Y < b.Max.Y)
+            if (a.Max.Y > b.Max.Y)
                 merged.Max.Y = a.Max.Y;
             else
                 merged.Max.Y = b.Max.Y;
-            if (a.Max.Z < b.Max.Z)
+            if (a.Max.Z > b.Max.Z)
                 merged.Max.Z = a.Max.Z;
             else
                 merged.Max.Z = b.Max.Z;
@@ -122,7 +128,28 @@ namespace BEPUphysics.MathExtensions
             float distanceSquared;
             Vector3.DistanceSquared(ref clampedLocation, ref boundingSphere.Center, out distanceSquared);
             intersects = distanceSquared <= boundingSphere.Radius * boundingSphere.Radius;
-                
+
+        }
+
+        //public bool Intersects(BoundingFrustum frustum)
+        //{
+        //    bool intersects;
+        //    frustum.Intersects(ref this, out intersects);
+        //    return intersects;
+        //}
+
+        public Vector3[] GetCorners()
+        {
+            var toReturn = new Vector3[8];
+            toReturn[0] = new Vector3(Min.X, Max.Y, Max.Z);
+            toReturn[1] = Max;
+            toReturn[2] = new Vector3(Max.X, Min.Y, Max.Z);
+            toReturn[3] = new Vector3(Min.X, Min.Y, Max.Z);
+            toReturn[4] = new Vector3(Min.X, Max.Y, Min.Z);
+            toReturn[5] = new Vector3(Max.X, Max.Y, Min.Z);
+            toReturn[6] = new Vector3(Max.X, Min.Y, Min.Z);
+            toReturn[7] = Min;
+            return toReturn;
         }
     }
 }

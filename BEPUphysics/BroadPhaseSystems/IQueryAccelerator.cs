@@ -42,11 +42,11 @@ namespace BEPUphysics.BroadPhaseSystems
         /// <param name="boundingShape">Bounding shape to test.</param>
         /// <param name="overlaps">Overlapped entries.</param>
         void GetEntries(BoundingSphere boundingShape, IList<BroadPhaseEntry> overlaps);
-        /// <summary>
-        /// Gets the entries with bounding boxes which overlap the bounding shape.
-        /// </summary>
-        /// <param name="boundingShape">Bounding shape to test.</param>
-        /// <param name="overlaps">Overlapped entries.</param>
-        void GetEntries(BoundingFrustum boundingShape, IList<BroadPhaseEntry> overlaps);
+        ///// <summary>
+        ///// Gets the entries with bounding boxes which overlap the bounding shape.
+        ///// </summary>
+        ///// <param name="boundingShape">Bounding shape to test.</param>
+        ///// <param name="overlaps">Overlapped entries.</param>
+        //void GetEntries(BoundingFrustum boundingShape, IList<BroadPhaseEntry> overlaps);
     }
 }

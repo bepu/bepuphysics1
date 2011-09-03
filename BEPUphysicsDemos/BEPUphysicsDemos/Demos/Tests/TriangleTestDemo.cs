@@ -1,5 +1,4 @@
 ﻿using BEPUphysics.Entities.Prefabs;
-using Microsoft.Xna.Framework;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using Microsoft.Xna.Framework.Graphics;
@@ -7,6 +6,8 @@ using BEPUphysics.DataStructures;
 using BEPUphysics.CollisionTests;
 using Microsoft.Xna.Framework.Input;
 using BEPUphysics.CollisionTests.CollisionAlgorithms.Testing;
+using BEPUphysics.MathExtensions;
+using ConversionHelper;
 
 namespace BEPUphysicsDemos.Demos.Tests
 {
@@ -28,7 +29,6 @@ namespace BEPUphysicsDemos.Demos.Tests
         public TriangleTestDemo(DemosGame game)
             : base(game)
         {
-            Vector3 center;
             triangleB = new TriangleShape(new Vector3(-1, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1));
             triangleA = new TriangleShape() { VertexA = new Vector3(0, 1, 0), VertexB = new Vector3(0, 3, 0), VertexC = new Vector3(0, 2, 1) };
             triangleB.Sidedness = TriangleSidedness.Counterclockwise;
@@ -36,7 +36,7 @@ namespace BEPUphysicsDemos.Demos.Tests
             pairTester = new TriangleTrianglePairTester2();
             pairTester.Initialize(triangleB, triangleA);
 
-            game.Camera.Position = new Vector3(0, 6, 15);
+            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(0, 6, 15);
         }
 
         public override void Update(float dt)
@@ -91,19 +91,26 @@ namespace BEPUphysicsDemos.Demos.Tests
         public override void Draw()
         {
             base.Draw();
-            triangleLines[0] = new VertexPositionColor(triangleA.VertexA, Color.Yellow);
-            triangleLines[1] = new VertexPositionColor(triangleA.VertexB, Color.Yellow);
-            triangleLines[2] = new VertexPositionColor(triangleA.VertexB, Color.Yellow);
-            triangleLines[3] = new VertexPositionColor(triangleA.VertexC, Color.Yellow);
-            triangleLines[4] = new VertexPositionColor(triangleA.VertexC, Color.Yellow);
-            triangleLines[5] = new VertexPositionColor(triangleA.VertexA, Color.Yellow);
+            var aa = MathConverter.Convert(triangleA.VertexA);
+                  var ab = MathConverter.Convert(triangleA.VertexB);
+                  var ac = MathConverter.Convert(triangleA.VertexC);
+                  var ba = MathConverter.Convert(triangleB.VertexA);
+                  var bb = MathConverter.Convert(triangleB.VertexB);
+                  var bc = MathConverter.Convert(triangleB.VertexC);
 
-            triangleLines[6] = new VertexPositionColor(triangleB.VertexA, Color.Orange);
-            triangleLines[7] = new VertexPositionColor(triangleB.VertexB, Color.Orange);
-            triangleLines[8] = new VertexPositionColor(triangleB.VertexB, Color.Orange);
-            triangleLines[9] = new VertexPositionColor(triangleB.VertexC, Color.Orange);
-            triangleLines[10] = new VertexPositionColor(triangleB.VertexC, Color.Orange);
-            triangleLines[11] = new VertexPositionColor(triangleB.VertexA, Color.Orange);
+            triangleLines[0] = new VertexPositionColor(aa, Microsoft.Xna.Framework.Color.Yellow);
+            triangleLines[1] = new VertexPositionColor(ab, Microsoft.Xna.Framework.Color.Yellow);
+            triangleLines[2] = new VertexPositionColor(ab, Microsoft.Xna.Framework.Color.Yellow);
+            triangleLines[3] = new VertexPositionColor(ac, Microsoft.Xna.Framework.Color.Yellow);
+            triangleLines[4] = new VertexPositionColor(ac, Microsoft.Xna.Framework.Color.Yellow);
+            triangleLines[5] = new VertexPositionColor(aa, Microsoft.Xna.Framework.Color.Yellow);
+
+            triangleLines[6] = new VertexPositionColor(ba, Microsoft.Xna.Framework.Color.Orange);
+            triangleLines[7] = new VertexPositionColor(bb, Microsoft.Xna.Framework.Color.Orange);
+            triangleLines[8] = new VertexPositionColor(bb, Microsoft.Xna.Framework.Color.Orange);
+            triangleLines[9] = new VertexPositionColor(bc, Microsoft.Xna.Framework.Color.Orange);
+            triangleLines[10] = new VertexPositionColor(bc, Microsoft.Xna.Framework.Color.Orange);
+            triangleLines[11] = new VertexPositionColor(ba, Microsoft.Xna.Framework.Color.Orange);
 
             TinyStructList<ContactData> contacts;
             pairTester.GenerateContactCandidate(out contacts);
@@ -113,10 +120,10 @@ namespace BEPUphysicsDemos.Demos.Tests
                 ContactData contact;
                 contacts.Get(i, out contact);
 
-                contactLines.Add(new VertexPositionColor(contact.Position, Color.White));
-                contactLines.Add(new VertexPositionColor(contact.Position + contact.Normal * contact.PenetrationDepth, Color.Red));
-                contactLines.Add(new VertexPositionColor(contact.Position + contact.Normal * contact.PenetrationDepth, Color.White));
-                contactLines.Add(new VertexPositionColor(contact.Position + contact.Normal * (contact.PenetrationDepth + .3f), Color.White));
+                contactLines.Add(new VertexPositionColor(MathConverter.Convert(contact.Position), Microsoft.Xna.Framework.Color.White));
+                contactLines.Add(new VertexPositionColor(MathConverter.Convert(contact.Position + contact.Normal * contact.PenetrationDepth), Microsoft.Xna.Framework.Color.Red));
+                contactLines.Add(new VertexPositionColor(MathConverter.Convert(contact.Position + contact.Normal * contact.PenetrationDepth), Microsoft.Xna.Framework.Color.White));
+                contactLines.Add(new VertexPositionColor(MathConverter.Convert(contact.Position + contact.Normal * (contact.PenetrationDepth + .3f)), Microsoft.Xna.Framework.Color.White));
 
 
             }

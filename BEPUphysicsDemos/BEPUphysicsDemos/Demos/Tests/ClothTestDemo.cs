@@ -1,7 +1,6 @@
 ﻿using BEPUphysics.Constraints.TwoEntity.Joints;
 using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
-using Microsoft.Xna.Framework;
 using BEPUphysics.MathExtensions;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.NarrowPhaseSystems;
@@ -157,7 +156,7 @@ namespace BEPUphysicsDemos.Demos.Tests
             Space.Add(new Sphere(new Vector3(7, 0, 0), 10));
             Space.Add(new Box(new Vector3(0, -20.5f, 0), 100f, 10, 100f));
 
-            game.Camera.Position = new Vector3(0, 5, 25);
+            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(0, 5, 25);
         }
 
         /// <summary>

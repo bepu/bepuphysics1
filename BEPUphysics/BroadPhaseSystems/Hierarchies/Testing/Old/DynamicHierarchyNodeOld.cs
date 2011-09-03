@@ -287,30 +287,30 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies.Testing.Old
             }
         }
 
-        internal void GetEntities(ref BoundingFrustum frustum, IList<BroadPhaseEntry> outputEntries)
-        {
-            if (children.Count > 0)
-            {
-                if (BoundingBox.Intersects(frustum))
-                {
-                    foreach (DynamicHierarchyNodeOld child in children)
-                    {
-                        if (child.BoundingBox.Intersects(frustum))
-                        {
-                            child.GetEntities(ref frustum, outputEntries);
-                        }
-                    }
-                }
-            }
-            else
-            {
-                foreach (BroadPhaseEntry e in entries)
-                {
-                    if (e.boundingBox.Intersects(frustum))
-                        outputEntries.Add(e);
-                }
-            }
-        }
+        //internal void GetEntities(ref BoundingFrustum frustum, IList<BroadPhaseEntry> outputEntries)
+        //{
+        //    if (children.Count > 0)
+        //    {
+        //        if (BoundingBox.Intersects(frustum))
+        //        {
+        //            foreach (DynamicHierarchyNodeOld child in children)
+        //            {
+        //                if (child.BoundingBox.Intersects(frustum))
+        //                {
+        //                    child.GetEntities(ref frustum, outputEntries);
+        //                }
+        //            }
+        //        }
+        //    }
+        //    else
+        //    {
+        //        foreach (BroadPhaseEntry e in entries)
+        //        {
+        //            if (e.boundingBox.Intersects(frustum))
+        //                outputEntries.Add(e);
+        //        }
+        //    }
+        //}
 
         internal void RayCast(ref Ray ray, float maximumLength, IList<BroadPhaseEntry> outEntries)
         {

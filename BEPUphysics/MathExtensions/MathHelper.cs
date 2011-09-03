@@ -69,5 +69,15 @@ namespace BEPUphysics.MathExtensions
         {
             return a < b ? a : b;
         }
+
+        public static float ToRadians(float degrees)
+        {
+            return degrees * (Pi / 180f);
+        }
+
+        public static float ToDegrees(float radians)
+        {
+            return radians * (180f / Pi);
+        }
     }
 }

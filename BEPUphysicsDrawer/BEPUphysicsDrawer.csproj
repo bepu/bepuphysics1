@@ -124,6 +124,10 @@
       <Project>{2A9D2227-78D7-4804-B6D1-560BB43AE911}</Project>
       <Name>BEPUphysics</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ConversionHelper\ConversionHelper.csproj">
+      <Project>{BB5BF3E0-DD34-44D4-86FB-F336BB4720CA}</Project>
+      <Name>ConversionHelper</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\Microsoft.Xna.GameStudio.targets" />

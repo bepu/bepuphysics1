@@ -179,6 +179,10 @@
       <Project>{A7931B1B-6BF4-43C5-B924-6AEB732243BA}</Project>
       <Name>BEPUphysicsDrawer</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\ConversionHelper\ConversionHelper.csproj">
+      <Project>{BB5BF3E0-DD34-44D4-86FB-F336BB4720CA}</Project>
+      <Name>ConversionHelper</Name>
+    </ProjectReference>
     <ProjectReference Include="..\BEPUphysicsDemosContent\BEPUphysicsDemosContent.contentproj">
       <Name>BEPUphysicsDemosContent %28Content%29</Name>
       <XnaReferenceType>Content</XnaReferenceType>
