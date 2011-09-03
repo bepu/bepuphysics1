@@ -4,8 +4,6 @@ using BEPUphysics.Threading;
 using BEPUphysics.DataStructures;
 using BEPUphysics.ResourceManagement;
 using System.Collections.ObjectModel;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 using System.Diagnostics;
 
 namespace BEPUphysics.DeactivationManagement

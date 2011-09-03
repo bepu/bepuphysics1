@@ -1,7 +1,8 @@
 ﻿using System;
 using BEPUphysics.Entities;
-using Microsoft.Xna.Framework;
+ 
 using BEPUphysics.Settings;
+using BEPUphysics.MathExtensions;
 
 namespace BEPUphysics.Constraints.Collision
 {

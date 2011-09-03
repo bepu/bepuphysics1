@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using BEPUphysics.BroadPhaseSystems;
-using Microsoft.Xna.Framework;
+ 
 
 namespace BEPUphysics.DataStructures
 {

@@ -3,7 +3,7 @@ using BEPUphysics.Collidables;
 using BEPUphysics.Collidables.MobileCollidables;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
 using BEPUphysics.MathExtensions;
-using Microsoft.Xna.Framework;
+ 
 using BEPUphysics.DataStructures;
 using BEPUphysics.Settings;
 using BEPUphysics.ResourceManagement;

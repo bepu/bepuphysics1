@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using BEPUphysics.Entities;
 using BEPUphysics.MathExtensions;
-using Microsoft.Xna.Framework;
+ 
 
 namespace BEPUphysics.Constraints
 {

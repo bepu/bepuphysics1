@@ -1,5 +1,5 @@
 ﻿using System;
-using Microsoft.Xna.Framework;
+ 
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.MathExtensions;

@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using BEPUphysics.CollisionShapes.ConvexShapes;
-using Microsoft.Xna.Framework;
+ 
 using BEPUphysics.DataStructures;
+using BEPUphysics.MathExtensions;
 
 namespace BEPUphysics.CollisionTests.CollisionAlgorithms.Testing
 {

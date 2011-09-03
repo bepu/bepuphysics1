@@ -1,6 +1,6 @@
 ﻿using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.MathExtensions;
-using Microsoft.Xna.Framework;
+ 
 using BEPUphysics.Settings;
 
 namespace BEPUphysics.CollisionTests.CollisionAlgorithms.GJK

@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+﻿ 
 using BEPUphysics.DataStructures;
 using BEPUphysics.MathExtensions;
 using BEPUphysics.Collidables.MobileCollidables;

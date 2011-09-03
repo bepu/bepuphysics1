@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+using BEPUphysics.MathExtensions;
 
 namespace BEPUphysics.BroadPhaseSystems.Hierarchies.Testing.Old
 {
@@ -42,57 +41,7 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies.Testing.Old
             Z
         } ;
 
-        /// <summary>
-        /// Collects all of the endpoints of lines of bounding boxes within the hierarchy.
-        /// </summary>
-        /// <param name="lineEndpoints">Endpoints of lines of bounding boxes within the hierarchy.</param>
-        /// <param name="includeInternalNodes">Whether or not to collect the lines from internal node bounding boxes.</param>
-        public void CollectBoundingBoxLines(List<VertexPositionColor> lineEndpoints, bool includeInternalNodes)
-        {
-            if (children.Count == 0 || includeInternalNodes)
-            {
-                Vector3[] boundingBoxCorners = BoundingBox.GetCorners();
-                lineEndpoints.Add(new VertexPositionColor(boundingBoxCorners[0], Color.DarkRed));
-                lineEndpoints.Add(new VertexPositionColor(boundingBoxCorners[1], Color.DarkRed));
 
-                lineEndpoints.Add(new VertexPositionColor(boundingBoxCorners[0], Color.DarkRed));
-                lineEndpoints.Add(new VertexPositionColor(boundingBoxCorners[3], Color.DarkRed));
-
-                lineEndpoints.Add(new VertexPositionColor(boundingBoxCorners[0], Color.DarkRed));
-                lineEndpoints.Add(new VertexPositionColor(boundingBoxCorners[4], Color.DarkRed));
-
-                lineEndpoints.Add(new VertexPositionColor(boundingBoxCorners[1], Color.DarkRed));
-                lineEndpoints.Add(new VertexPositionColor(boundingBoxCorners[2], Color.DarkRed));
-
-                lineEndpoints.Add(new VertexPositionColor(boundingBoxCorners[1], Color.DarkRed));
-                lineEndpoints.Add(new VertexPositionColor(boundingBoxCorners[5], Color.DarkRed));
-
-                lineEndpoints.Add(new VertexPositionColor(boundingBoxCorners[2], Color.DarkRed));
-                lineEndpoints.Add(new VertexPositionColor(boundingBoxCorners[3], Color.DarkRed));
-
-                lineEndpoints.Add(new VertexPositionColor(boundingBoxCorners[2], Color.DarkRed));
-                lineEndpoints.Add(new VertexPositionColor(boundingBoxCorners[6], Color.DarkRed));
-
-                lineEndpoints.Add(new VertexPositionColor(boundingBoxCorners[3], Color.DarkRed));
-                lineEndpoints.Add(new VertexPositionColor(boundingBoxCorners[7], Color.DarkRed));
-
-                lineEndpoints.Add(new VertexPositionColor(boundingBoxCorners[4], Color.DarkRed));
-                lineEndpoints.Add(new VertexPositionColor(boundingBoxCorners[5], Color.DarkRed));
-
-                lineEndpoints.Add(new VertexPositionColor(boundingBoxCorners[4], Color.DarkRed));
-                lineEndpoints.Add(new VertexPositionColor(boundingBoxCorners[7], Color.DarkRed));
-
-                lineEndpoints.Add(new VertexPositionColor(boundingBoxCorners[5], Color.DarkRed));
-                lineEndpoints.Add(new VertexPositionColor(boundingBoxCorners[6], Color.DarkRed));
-
-                lineEndpoints.Add(new VertexPositionColor(boundingBoxCorners[6], Color.DarkRed));
-                lineEndpoints.Add(new VertexPositionColor(boundingBoxCorners[7], Color.DarkRed));
-            }
-            foreach (DynamicHierarchyNodeOld child in children)
-            {
-                child.CollectBoundingBoxLines(lineEndpoints, includeInternalNodes);
-            }
-        }
 
 
         /// <exception cref="InvalidOperationException">Thrown when the entity to add to the DynamicBinaryHierarchy has an invalid state.</exception>

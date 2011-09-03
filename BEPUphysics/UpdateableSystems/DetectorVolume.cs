@@ -5,10 +5,11 @@ using BEPUphysics.Collidables.MobileCollidables;
 using BEPUphysics.DataStructures;
 using BEPUphysics.Entities;
 using BEPUphysics.ResourceManagement;
-using Microsoft.Xna.Framework;
+ 
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.NarrowPhaseSystems;
+using BEPUphysics.MathExtensions;
 
 namespace BEPUphysics.UpdateableSystems
 {

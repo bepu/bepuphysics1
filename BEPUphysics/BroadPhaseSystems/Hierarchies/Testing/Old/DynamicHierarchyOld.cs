@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using BEPUphysics.ResourceManagement;
-using Microsoft.Xna.Framework;
+ 
 using BEPUphysics.Threading;
+using BEPUphysics.MathExtensions;
 
 namespace BEPUphysics.BroadPhaseSystems.Hierarchies.Testing.Old
 {

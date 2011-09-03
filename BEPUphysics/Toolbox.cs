@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using BEPUphysics.Entities;
 using BEPUphysics.ResourceManagement;
-using Microsoft.Xna.Framework;
+ 
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.MathExtensions;
 using BEPUphysics.CollisionTests;

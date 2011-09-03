@@ -1,7 +1,7 @@
 ﻿using System;
 using BEPUphysics.Collidables.Events;
 using BEPUphysics.CollisionShapes;
-using Microsoft.Xna.Framework;
+ 
 using BEPUphysics.Materials;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.CollisionShapes.ConvexShapes;

@@ -1,6 +1,7 @@
 ﻿using System;
 using BEPUphysics.DataStructures;
-using Microsoft.Xna.Framework;
+using BEPUphysics.MathExtensions;
+ 
 
 namespace BEPUphysics.CollisionTests
 {

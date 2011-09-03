@@ -154,6 +154,7 @@
     <Compile Include="Demos\WallDemo.cs" />
     <Compile Include="Extra Display Types\DisplayMotorizedGrabSpring.cs" />
     <Compile Include="Extra Display Types\DisplayGrabSpring.cs" />
+    <Compile Include="ModelDataExtractor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Sample Code\MotorizedGrabSpring.cs" />

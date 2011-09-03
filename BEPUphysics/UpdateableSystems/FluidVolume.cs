@@ -4,8 +4,9 @@ using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.Collidables;
 using BEPUphysics.Collidables.MobileCollidables;
 using BEPUphysics.ResourceManagement;
-using Microsoft.Xna.Framework;
+ 
 using BEPUphysics.Threading;
+using BEPUphysics.MathExtensions;
 
 namespace BEPUphysics.UpdateableSystems
 {

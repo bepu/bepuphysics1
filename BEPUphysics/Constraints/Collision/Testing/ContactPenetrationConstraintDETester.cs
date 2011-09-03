@@ -1,5 +1,5 @@
 ﻿using BEPUphysics.Entities;
-using Microsoft.Xna.Framework;
+ 
 
 namespace BEPUphysics.Constraints
 {

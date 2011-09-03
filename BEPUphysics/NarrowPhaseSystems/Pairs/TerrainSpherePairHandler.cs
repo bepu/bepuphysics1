@@ -8,7 +8,7 @@ using BEPUphysics.CollisionTests.Manifolds;
 using BEPUphysics.Constraints.Collision;
 using BEPUphysics.PositionUpdating;
 using BEPUphysics.Settings;
-using Microsoft.Xna.Framework;
+ 
 using BEPUphysics.ResourceManagement;
 
 namespace BEPUphysics.NarrowPhaseSystems.Pairs

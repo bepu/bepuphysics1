@@ -2,10 +2,11 @@
 using BEPUphysics.Collidables.MobileCollidables;
 using BEPUphysics.Entities;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
-using Microsoft.Xna.Framework;
+ 
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.MathExtensions;
 using BEPUphysics.Materials;
+using System;
 
 namespace BEPUphysics.Vehicle
 {
@@ -40,7 +41,7 @@ namespace BEPUphysics.Vehicle
         public override sealed float Radius
         {
             get { return graphicalRadius; }
-            set { graphicalRadius = MathHelper.Max(value, 0); }
+            set { graphicalRadius = Math.Max(value, 0); }
         }
 
         /// <summary>

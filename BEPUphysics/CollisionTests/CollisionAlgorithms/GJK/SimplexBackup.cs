@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Microsoft.Xna.Framework;
+ 
 using BEPUphysics.CollisionShapes;
 
 namespace BEPUphysics.CollisionTests.CollisionAlgorithms

@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.Collidables.MobileCollidables;
 using BEPUphysics.Entities;
-using Microsoft.Xna.Framework;
+ 
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.DataStructures;
 using BEPUphysics.DeactivationManagement;
+using BEPUphysics.MathExtensions;
 
 namespace BEPUphysics.ResourceManagement
 {

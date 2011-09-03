@@ -2,7 +2,7 @@
 using BEPUphysics.Collidables.Events;
 using BEPUphysics.CollisionShapes;
 using BEPUphysics.MathExtensions;
-using Microsoft.Xna.Framework;
+ 
 using BEPUphysics.DataStructures;
 using BEPUphysics.Materials;
 using BEPUphysics.CollisionRuleManagement;

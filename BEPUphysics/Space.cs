@@ -12,11 +12,12 @@ using BEPUphysics.SolverSystems;
 using BEPUphysics.Threading;
 using BEPUphysics.NarrowPhaseSystems;
 using BEPUphysics.UpdateableSystems;
-using Microsoft.Xna.Framework;
+ 
 using BEPUphysics.ResourceManagement;
 using System.Collections.ObjectModel;
 using BEPUphysics.BroadPhaseSystems.SortAndSweep;
 using BEPUphysics.DataStructures;
+using BEPUphysics.MathExtensions;
 
 namespace BEPUphysics
 {

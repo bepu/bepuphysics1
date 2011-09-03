@@ -9,7 +9,7 @@ using BEPUphysics.DataStructures;
 using BEPUphysics.ResourceManagement;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.CollisionTests;
-using Microsoft.Xna.Framework;
+ 
 using BEPUphysics.MathExtensions;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.CollisionTests.Manifolds;

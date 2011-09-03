@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using BEPUphysics.MathExtensions;
-using Microsoft.Xna.Framework;
+ 
 using BEPUphysics.ResourceManagement;
 using BEPUphysics.DataStructures;
 

@@ -9,7 +9,7 @@ using BEPUphysics.EntityStateManagement;
 using BEPUphysics.OtherSpaceStages;
 using BEPUphysics.PositionUpdating;
 using BEPUphysics.Settings;
-using Microsoft.Xna.Framework;
+ 
 using BEPUphysics.MathExtensions;
 using BEPUphysics.Materials;
 using BEPUphysics.Constraints;

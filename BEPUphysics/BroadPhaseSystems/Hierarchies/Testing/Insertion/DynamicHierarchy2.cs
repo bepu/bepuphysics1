@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using BEPUphysics.DataStructures;
-using Microsoft.Xna.Framework;
+ 
 using System.Runtime.InteropServices;
+using BEPUphysics.MathExtensions;
 
 namespace BEPUphysics.BroadPhaseSystems.Hierarchies.Testing.Insertion
 {
