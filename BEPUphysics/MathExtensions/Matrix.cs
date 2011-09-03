@@ -135,6 +135,13 @@ namespace BEPUphysics.MathExtensions
             }
         }
 
+        public static Matrix CreateFromAxisAngle(Vector3 axis, float angle)
+        {
+            Matrix toReturn;
+            CreateFromAxisAngle(ref axis, angle, out toReturn);
+            return toReturn;
+        }
+
         public static void CreateFromAxisAngle(ref Vector3 axis, float angle, out Matrix result)
         {
             float xx = axis.X * axis.X;
@@ -148,23 +155,23 @@ namespace BEPUphysics.MathExtensions
             float oneMinusCosAngle = 1 - (float)Math.Cos(angle);
 
             result.M11 = 1 + oneMinusCosAngle * (xx - 1);
-            result.M12 = -axis.Z * sinAngle + oneMinusCosAngle * xy;
-            result.M13 = axis.Y * sinAngle + oneMinusCosAngle * xz;
-            result.M14 = 0;
-
-            result.M21 = axis.Z * sinAngle + oneMinusCosAngle * xy;
-            result.M22 = 1 + oneMinusCosAngle * (yy - 1);
-            result.M23 = -axis.X * sinAngle + oneMinusCosAngle * yz;
-            result.M24 = 0;
-
-            result.M31 = -axis.Y * sinAngle + oneMinusCosAngle * xz;
-            result.M32 = axis.X * sinAngle + oneMinusCosAngle * yz;
-            result.M33 = 1 + oneMinusCosAngle * (zz - 1);
-            result.M34 = 0;
-
+            result.M21 = -axis.Z * sinAngle + oneMinusCosAngle * xy;
+            result.M31 = axis.Y * sinAngle + oneMinusCosAngle * xz;
             result.M41 = 0;
+
+            result.M12 = axis.Z * sinAngle + oneMinusCosAngle * xy;
+            result.M22 = 1 + oneMinusCosAngle * (yy - 1);
+            result.M32 = -axis.X * sinAngle + oneMinusCosAngle * yz;
             result.M42 = 0;
+
+            result.M13 = -axis.Y * sinAngle + oneMinusCosAngle * xz;
+            result.M23 = axis.X * sinAngle + oneMinusCosAngle * yz;
+            result.M33 = 1 + oneMinusCosAngle * (zz - 1);
             result.M43 = 0;
+
+            result.M14 = 0;
+            result.M24 = 0;
+            result.M34 = 0;
             result.M44 = 1;
         }
 
@@ -218,10 +225,10 @@ namespace BEPUphysics.MathExtensions
             float resultM33 = a.M31 * b.M13 + a.M32 * b.M23 + a.M33 * b.M33 + a.M34 * b.M43;
             float resultM34 = a.M31 * b.M14 + a.M32 * b.M24 + a.M33 * b.M34 + a.M34 * b.M44;
 
-            float resultM41 = a.M31 * b.M11 + a.M32 * b.M21 + a.M33 * b.M31 + a.M34 * b.M41;
-            float resultM42 = a.M31 * b.M12 + a.M32 * b.M22 + a.M33 * b.M32 + a.M34 * b.M42;
-            float resultM43 = a.M31 * b.M13 + a.M32 * b.M23 + a.M33 * b.M33 + a.M34 * b.M43;
-            float resultM44 = a.M31 * b.M14 + a.M32 * b.M24 + a.M33 * b.M34 + a.M34 * b.M44;
+            float resultM41 = a.M41 * b.M11 + a.M42 * b.M21 + a.M43 * b.M31 + a.M44 * b.M41;
+            float resultM42 = a.M41 * b.M12 + a.M42 * b.M22 + a.M43 * b.M32 + a.M44 * b.M42;
+            float resultM43 = a.M41 * b.M13 + a.M42 * b.M23 + a.M43 * b.M33 + a.M44 * b.M43;
+            float resultM44 = a.M41 * b.M14 + a.M42 * b.M24 + a.M43 * b.M34 + a.M44 * b.M44;
 
             result.M11 = resultM11;
             result.M12 = resultM12;
@@ -258,6 +265,34 @@ namespace BEPUphysics.MathExtensions
                 (M12 * ((M21 * det1 - M23 * det4) + M24 * det5)) + 
                 (M13 * ((M21 * det2 - M22 * det4) + M24 * det6)) -
                 (M14 * ((M21 * det3 - M22 * det5) + M23 * det6));
+        }
+
+        public static Matrix Identity
+        {
+            get
+            {
+                Matrix toReturn;
+                toReturn.M11 = 1;
+                toReturn.M12 = 0;
+                toReturn.M13 = 0;
+                toReturn.M14 = 0;
+
+                toReturn.M21 = 0;
+                toReturn.M22 = 1;
+                toReturn.M23 = 0;
+                toReturn.M24 = 0;
+
+                toReturn.M31 = 0;
+                toReturn.M32 = 0;
+                toReturn.M33 = 1;
+                toReturn.M34 = 0;
+
+                toReturn.M41 = 0;
+                toReturn.M42 = 0;
+                toReturn.M43 = 0;
+                toReturn.M44 = 1;
+                return toReturn;
+            }
         }
     }
 }

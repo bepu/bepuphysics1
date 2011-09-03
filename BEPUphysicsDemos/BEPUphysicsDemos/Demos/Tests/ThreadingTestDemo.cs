@@ -2,7 +2,6 @@
 using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.PositionUpdating;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using System.Diagnostics;
 using System.Collections.Generic;
@@ -151,8 +150,8 @@ namespace BEPUphysicsDemos.Demos.Tests
         public override void DrawUI()
         {
             base.DrawUI();
-            Game.DataTextDrawer.Draw("Time per SingleThreaded:    ", singleThreadedTime * 1e6, new Vector2(50, 50));
-            Game.DataTextDrawer.Draw("Time per Multithreaded:    ", multiThreadedTime * 1e6, new Vector2(50, 80));
+            Game.DataTextDrawer.Draw("Time per SingleThreaded:    ", singleThreadedTime * 1e6, new Microsoft.Xna.Framework.Vector2(50, 50));
+            Game.DataTextDrawer.Draw("Time per Multithreaded:    ", multiThreadedTime * 1e6, new Microsoft.Xna.Framework.Vector2(50, 80));
 
         }
 

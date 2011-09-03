@@ -2,7 +2,6 @@
 using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.PositionUpdating;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using System.Diagnostics;
 using System.Collections.Generic;
@@ -311,10 +310,10 @@ namespace BEPUphysicsDemos.Demos.Tests
         public override void DrawUI()
         {
             base.DrawUI();
-            Game.DataTextDrawer.Draw("Time per DHold:    ", DHOldTime * 1e6f, new Vector2(50, 50));
-            Game.DataTextDrawer.Draw("Time per DH:    ", DHtime * 1e6f, new Vector2(50, 80));
-            Game.DataTextDrawer.Draw("Time per SAP1D: ", SAS1Dtime * 1e6f, new Vector2(50, 110));
-            Game.DataTextDrawer.Draw("Time per Grid2DSortAndSweep: ", grid2DSAStime * 1e6f, new Vector2(50, 140));
+            Game.DataTextDrawer.Draw("Time per DHold:    ", DHOldTime * 1e6f, new Microsoft.Xna.Framework.Vector2(50, 50));
+            Game.DataTextDrawer.Draw("Time per DH:    ", DHtime * 1e6f, new Microsoft.Xna.Framework.Vector2(50, 80));
+            Game.DataTextDrawer.Draw("Time per SAP1D: ", SAS1Dtime * 1e6f, new Microsoft.Xna.Framework.Vector2(50, 110));
+            Game.DataTextDrawer.Draw("Time per Grid2DSortAndSweep: ", grid2DSAStime * 1e6f, new Microsoft.Xna.Framework.Vector2(50, 140));
         }
 
 

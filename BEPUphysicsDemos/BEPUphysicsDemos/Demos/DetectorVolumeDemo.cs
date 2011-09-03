@@ -3,8 +3,8 @@ using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.UpdateableSystems;
 using BEPUphysicsDrawer.Models;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using BEPUphysics.MathExtensions;
 
 namespace BEPUphysicsDemos.Demos
 {
@@ -26,7 +26,7 @@ namespace BEPUphysicsDemos.Demos
             var tubeModel = game.Content.Load<Model>("tube");
             Vector3[] modelVertices;
             int[] modelIndices;
-            TriangleMesh.GetVerticesAndIndicesFromModel(tubeModel, out modelVertices, out modelIndices);
+            ModelDataExtractor.GetVerticesAndIndicesFromModel(tubeModel, out modelVertices, out modelIndices);
             var detectorVolume = new DetectorVolume(new StaticMeshData(modelVertices, modelIndices), Space.BroadPhase.QueryAccelerator);
             Space.Add(detectorVolume);
 
@@ -45,7 +45,7 @@ namespace BEPUphysicsDemos.Demos
             detectorVolume.VolumeBeginsContainingEntity += BeginsContaining;
             detectorVolume.VolumeStopsContainingEntity += StopsContaining;
 
-            game.Camera.Position = new Vector3(0, 0, 22);
+            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(0, 0, 22);
         }
 
         /// <summary>

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+using ConversionHelper;
 
 namespace BEPUphysicsDemos
 {
@@ -146,6 +147,18 @@ namespace BEPUphysicsDemos
             }
         }
 #else
+        /// <summary>
+        /// Gets an array of vertices and indices from the provided model.
+        /// </summary>
+        /// <param name="collisionModel">Model to use for the collision shape.</param>
+        /// <param name="vertices">Compiled set of vertices from the model.</param>
+        /// <param name="indices">Compiled set of indices from the model.</param>
+        public static void GetVerticesAndIndicesFromModel(Model collisionModel, out BEPUphysics.MathExtensions.Vector3[] vertices, out int[] indices)
+        {
+            Vector3[] tempVertices;
+            GetVerticesAndIndicesFromModel(collisionModel, out tempVertices, out indices);
+            vertices = MathConverter.Convert(tempVertices);
+        }
 
         /// <summary>
         /// Gets an array of vertices and indices from the provided model.

@@ -2,7 +2,6 @@
 using BEPUphysics.DataStructures;
 using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using BEPUphysics.MathExtensions;
 using BEPUphysics.CollisionShapes.ConvexShapes;
@@ -32,7 +31,7 @@ namespace BEPUphysicsDemos.Demos
             var playgroundModel = game.Content.Load<Model>("playground");
             //This load method wraps the TriangleMesh.GetVerticesAndIndicesFromModel method 
             //to output vertices of type StaticTriangleGroupVertex instead of TriangleMeshVertex or simply Vector3.
-            TriangleMesh.GetVerticesAndIndicesFromModel(playgroundModel, out staticTriangleVertices, out staticTriangleIndices);
+            ModelDataExtractor.GetVerticesAndIndicesFromModel(playgroundModel, out staticTriangleVertices, out staticTriangleIndices);
             var staticMesh = new StaticMesh(staticTriangleVertices, staticTriangleIndices, new AffineTransform(Matrix3X3.CreateFromAxisAngle(Vector3.Up, MathHelper.Pi), new Vector3(0, -10, 0)));
             staticMesh.Sidedness = TriangleSidedness.Counterclockwise;
 
@@ -63,7 +62,7 @@ namespace BEPUphysicsDemos.Demos
 
 
 
-            game.Camera.Position = new Vector3(0, 10, 40);
+            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(0, 10, 40);
 
 
         }

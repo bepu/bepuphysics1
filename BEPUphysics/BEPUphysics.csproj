@@ -238,7 +238,6 @@
     <Compile Include="Entities\Prefabs\WrappedBody.cs" />
     <Compile Include="MathExtensions\BoundingBox.cs" />
     <Compile Include="MathExtensions\BoundingSphere.cs" />
-    <Compile Include="MathExtensions\BoundingFrustum.cs" />
     <Compile Include="MathExtensions\Plane.cs" />
     <Compile Include="MathExtensions\MathHelper.cs" />
     <Compile Include="MathExtensions\Ray.cs" />

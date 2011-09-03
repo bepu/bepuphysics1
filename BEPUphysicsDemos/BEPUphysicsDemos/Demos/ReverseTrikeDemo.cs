@@ -5,7 +5,6 @@ using BEPUphysics.Constraints.TwoEntity.Joints;
 using BEPUphysics.Constraints.TwoEntity.Motors;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.MathExtensions;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.Materials;
@@ -35,7 +34,7 @@ namespace BEPUphysicsDemos.Demos
         public ReverseTrikeDemo(DemosGame game)
             : base(game)
         {
-            game.Camera.Position = new Vector3(0, 2, 15);
+            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(0, 2, 15);
             game.Camera.Yaw = 0;
             game.Camera.Pitch = 0;
 

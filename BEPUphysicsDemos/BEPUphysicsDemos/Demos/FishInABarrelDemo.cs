@@ -4,10 +4,10 @@ using BEPUphysics.DataStructures;
 using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysicsDrawer.Models;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
+using BEPUphysics.MathExtensions;
 
 namespace BEPUphysicsDemos.Demos
 {
@@ -28,7 +28,7 @@ namespace BEPUphysicsDemos.Demos
         public FishInABarrelDemo(DemosGame game)
             : base(game)
         {
-            game.Camera.Position = new Vector3(0, 7, 30);
+            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(0, 7, 30);
 
             var detector = new Box(new Vector3(0, 0, 0), 1.5f, 1.5f, 1.5f);
             detector.CollisionInformation.CollisionRules.Personal = CollisionRule.NoSolver;
@@ -46,7 +46,7 @@ namespace BEPUphysicsDemos.Demos
             var barrelAndPlatform = game.Content.Load<Model>("barrelAndPlatform");
             Vector3[] staticTriangleVertices;
             int[] staticTriangleIndices;
-            TriangleMesh.GetVerticesAndIndicesFromModel(barrelAndPlatform, out staticTriangleVertices, out staticTriangleIndices);
+            ModelDataExtractor.GetVerticesAndIndicesFromModel(barrelAndPlatform, out staticTriangleVertices, out staticTriangleIndices);
 
             //Note that the final 'margin' parameter is optional, but can be used to specify a collision margin on triangles in the static triangle group.
             var fishDepositoryGroup = new StaticMesh(staticTriangleVertices, staticTriangleIndices);
@@ -100,7 +100,7 @@ namespace BEPUphysicsDemos.Demos
 
         public override void DrawUI()
         {
-            Game.DataTextDrawer.Draw("Put the fish in the barrel!", new Vector2(50, 50));
+            Game.DataTextDrawer.Draw("Put the fish in the barrel!", new Microsoft.Xna.Framework.Vector2(50, 50));
             base.DrawUI();
         }
     }

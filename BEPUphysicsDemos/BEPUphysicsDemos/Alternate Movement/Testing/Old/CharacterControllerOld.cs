@@ -1,7 +1,6 @@
 ﻿using System;
 using BEPUphysics;
 using BEPUphysics.Entities;
-using Microsoft.Xna.Framework;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.MathExtensions;
 using BEPUphysics.NarrowPhaseSystems.Pairs;

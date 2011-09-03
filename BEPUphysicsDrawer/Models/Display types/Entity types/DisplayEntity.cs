@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using BEPUphysics.MathExtensions;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
+using ConversionHelper;
 
 namespace BEPUphysicsDrawer.Models
 {
@@ -36,10 +37,10 @@ namespace BEPUphysicsDrawer.Models
         public override void Update()
         {
             //TODO: This is awfully annoying.  Could use some built-in convenience methods to ease the usage.
-            Vector3 translation = Matrix3X3.Transform(DisplayedObject.CollisionInformation.LocalPosition, DisplayedObject.BufferedStates.InterpolatedStates.OrientationMatrix);
+            var translation = Matrix3X3.Transform(DisplayedObject.CollisionInformation.LocalPosition, DisplayedObject.BufferedStates.InterpolatedStates.OrientationMatrix);
             translation += DisplayedObject.BufferedStates.InterpolatedStates.Position;
-            Matrix worldTransform = Matrix3X3.ToMatrix4X4(DisplayedObject.BufferedStates.InterpolatedStates.OrientationMatrix);
-            worldTransform.Translation = translation;
+            var worldTransform = MathConverter.Convert(DisplayedObject.BufferedStates.InterpolatedStates.OrientationMatrix);
+            worldTransform.Translation = MathConverter.Convert(translation);
 
             WorldTransform = worldTransform;
 

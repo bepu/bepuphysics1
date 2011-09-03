@@ -13,6 +13,12 @@ namespace BEPUphysics.MathExtensions
         public Vector3 Normal;
         public float D;
 
+        public Plane(Vector3 normal, float d)
+        {
+            this.Normal = normal;
+            this.D = d;
+        }
+
         public void DotCoordinate(ref Vector3 v, out float dot)
         {
             dot = Normal.X * v.X + Normal.Y * v.Y + Normal.Z * v.Z + D;

@@ -89,5 +89,64 @@ namespace BEPUphysics.MathExtensions
             X *= inverse;
             Y *= inverse;
         }
+
+        public static Vector2 operator *(Vector2 v, float f)
+        {
+            Vector2 toReturn;
+            toReturn.X = v.X * f;
+            toReturn.Y = v.Y * f;
+            return toReturn;
+        }
+
+        public static Vector2 operator *(float f, Vector2 v)
+        {
+            Vector2 toReturn;
+            toReturn.X = v.X * f;
+            toReturn.Y = v.Y * f;
+            return toReturn;
+        }
+
+
+        public static Vector2 operator /(Vector2 v, float f)
+        {
+            Vector2 toReturn;
+            f = 1 / f;
+            toReturn.X = v.X * f;
+            toReturn.Y = v.Y * f;
+            return toReturn;
+        }
+
+        public static Vector2 operator -(Vector2 a, Vector2 b)
+        {
+            Vector2 v;
+            v.X = a.X - b.X;
+            v.Y = a.Y - b.Y;
+            return v;
+        }
+
+        public static Vector2 operator +(Vector2 a, Vector2 b)
+        {
+            Vector2 v;
+            v.X = a.X + b.X;
+            v.Y = a.Y + b.Y;
+            return v;
+        }
+
+        public static Vector2 operator -(Vector2 v)
+        {
+            v.X = -v.X;
+            v.Y = -v.Y;
+            return v;
+        }
+
+        public static bool operator ==(Vector2 a, Vector2 b)
+        {
+            return a.X == b.X && a.Y == b.Y;
+        }
+
+        public static bool operator !=(Vector2 a, Vector2 b)
+        {
+            return a.X != b.X || a.Y != b.Y;
+        }
     }
 }

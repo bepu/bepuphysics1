@@ -400,5 +400,6 @@ namespace BEPUphysics.MathExtensions
             Hermite(ref value1, ref tangent1, ref value2, ref tangent2, interpolationAmount, out toReturn);
             return toReturn;
         }
+
     }
 }

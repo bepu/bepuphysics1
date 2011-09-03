@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.UpdateableSystems;
-using Microsoft.Xna.Framework;
+using BEPUphysics.MathExtensions;
 
 namespace BEPUphysicsDemos.Demos
 {
@@ -89,7 +89,7 @@ namespace BEPUphysicsDemos.Demos
             }*/
 
 
-            game.Camera.Position = new Vector3(0, waterHeight + 5, 35);
+            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(0, waterHeight + 5, 35);
         }
 
         /// <summary>

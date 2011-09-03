@@ -1,6 +1,7 @@
 using BEPUphysics;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using ConversionHelper;
+using BEPUphysics.MathExtensions;
 
 namespace BEPUphysicsDemos.AlternateMovement.Testing.ConvexCast
 {
@@ -63,7 +64,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.ConvexCast
                 IsActive = true;
                 Camera.UseMovementControls = false;
                 Space.Add(CharacterController);
-                CharacterController.Body.Position = (Camera.Position);
+                CharacterController.Body.Position = MathConverter.Convert(Camera.Position);
             }
         }
 
@@ -97,7 +98,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.ConvexCast
                 //This method's job is simply to tell the character to move around based on the Camera and input.
 
                 //Puts the Camera at eye level.
-                Camera.Position = CharacterController.Body.Position + CameraOffset;
+                Camera.Position = MathConverter.Convert(CharacterController.Body.Position + CameraOffset);
                 Vector2 totalMovement = Vector2.Zero;
 
 
@@ -107,22 +108,22 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.ConvexCast
 
                 if (keyboardInput.IsKeyDown(Keys.E))
                 {
-                    movementDir = Camera.WorldMatrix.Forward;
+                    movementDir = MathConverter.Convert(Camera.WorldMatrix.Forward);
                     totalMovement += Vector2.Normalize(new Vector2(movementDir.X, movementDir.Z));
                 }
                 if (keyboardInput.IsKeyDown(Keys.D))
                 {
-                    movementDir = Camera.WorldMatrix.Forward;
+                    movementDir = MathConverter.Convert(Camera.WorldMatrix.Forward);
                     totalMovement -= Vector2.Normalize(new Vector2(movementDir.X, movementDir.Z));
                 }
                 if (keyboardInput.IsKeyDown(Keys.S))
                 {
-                    movementDir = Camera.WorldMatrix.Left;
+                    movementDir = MathConverter.Convert(Camera.WorldMatrix.Left);
                     totalMovement += Vector2.Normalize(new Vector2(movementDir.X, movementDir.Z));
                 }
                 if (keyboardInput.IsKeyDown(Keys.F))
                 {
-                    movementDir = Camera.WorldMatrix.Right;
+                    movementDir = MathConverter.Convert(Camera.WorldMatrix.Right);
                     totalMovement += Vector2.Normalize(new Vector2(movementDir.X, movementDir.Z));
                 }
                 if (totalMovement == Vector2.Zero)

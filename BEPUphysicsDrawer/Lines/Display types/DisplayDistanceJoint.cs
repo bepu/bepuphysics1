@@ -1,5 +1,6 @@
 ﻿using BEPUphysics.Constraints.TwoEntity.Joints;
 using Microsoft.Xna.Framework;
+using ConversionHelper;
 
 namespace BEPUphysicsDrawer.Lines
 {
@@ -30,11 +31,11 @@ namespace BEPUphysicsDrawer.Lines
         public override void Update()
         {
             //Move lines around
-            aToConnection.PositionA = LineObject.ConnectionA.Position;
-            aToConnection.PositionB = LineObject.WorldAnchorA;
+            aToConnection.PositionA = MathConverter.Convert(LineObject.ConnectionA.Position);
+            aToConnection.PositionB = MathConverter.Convert(LineObject.WorldAnchorA);
 
-            bToConnection.PositionA = LineObject.ConnectionB.Position;
-            bToConnection.PositionB = LineObject.WorldAnchorB;
+            bToConnection.PositionA = MathConverter.Convert(LineObject.ConnectionB.Position);
+            bToConnection.PositionB = MathConverter.Convert(LineObject.WorldAnchorB);
 
             error.PositionA = aToConnection.PositionB;
             error.PositionB = bToConnection.PositionB;

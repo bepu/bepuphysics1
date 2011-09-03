@@ -2,7 +2,6 @@
 using BEPUphysics.Collidables;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.MathExtensions;
-using Microsoft.Xna.Framework;
 using BEPUphysics.Settings;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
 using BEPUphysics.CollisionRuleManagement;
@@ -83,7 +82,7 @@ namespace BEPUphysicsDemos.Demos.Tests
 
 
 
-            game.Camera.Position = new Vector3(0, 30, 20);
+            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(0, 30, 20);
 
             //Pre-simulate.
             for (int i = 0; i < 30; i++)
@@ -107,7 +106,7 @@ namespace BEPUphysicsDemos.Demos.Tests
 
         public override void DrawUI()
         {
-            Game.DataTextDrawer.Draw("Simulation time: ", time, 5, new Vector2(50, 50));
+            Game.DataTextDrawer.Draw("Simulation time: ", time, 5, new Microsoft.Xna.Framework.Vector2(50, 50));
             base.DrawUI();
         }
 

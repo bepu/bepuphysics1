@@ -5,7 +5,6 @@ using System.Text;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.UpdateableSystems;
 using BEPUphysics;
-using Microsoft.Xna.Framework;
 using BEPUphysics.MathExtensions;
 using BEPUphysics.Collidables.MobileCollidables;
 using BEPUphysics.BroadPhaseSystems;
@@ -16,7 +15,6 @@ using BEPUphysics.DataStructures;
 using System.Diagnostics;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.Collidables;
-using Microsoft.Xna.Framework.Input;
 using BEPUphysics.Entities;
 
 namespace BEPUphysicsDemos.AlternateMovement.Character

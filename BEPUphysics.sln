@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BEPUphysics", "BEPUphysics\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BEPUphysicsDemosContent", "BEPUphysicsDemos\BEPUphysicsDemosContent\BEPUphysicsDemosContent.contentproj", "{1D5E29E3-772E-419C-916C-0E755384B16A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConversionHelper", "ConversionHelper\ConversionHelper.csproj", "{BB5BF3E0-DD34-44D4-86FB-F336BB4720CA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -74,6 +76,20 @@ Global
 		{1D5E29E3-772E-419C-916C-0E755384B16A}.Release|Windows Phone.ActiveCfg = Debug|Any CPU
 		{1D5E29E3-772E-419C-916C-0E755384B16A}.Release|x86.ActiveCfg = Debug|Any CPU
 		{1D5E29E3-772E-419C-916C-0E755384B16A}.Release|Xbox 360.ActiveCfg = Debug|Any CPU
+		{BB5BF3E0-DD34-44D4-86FB-F336BB4720CA}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{BB5BF3E0-DD34-44D4-86FB-F336BB4720CA}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{BB5BF3E0-DD34-44D4-86FB-F336BB4720CA}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{BB5BF3E0-DD34-44D4-86FB-F336BB4720CA}.Debug|Windows Phone.ActiveCfg = Debug|x86
+		{BB5BF3E0-DD34-44D4-86FB-F336BB4720CA}.Debug|x86.ActiveCfg = Debug|x86
+		{BB5BF3E0-DD34-44D4-86FB-F336BB4720CA}.Debug|x86.Build.0 = Debug|x86
+		{BB5BF3E0-DD34-44D4-86FB-F336BB4720CA}.Debug|Xbox 360.ActiveCfg = Debug|x86
+		{BB5BF3E0-DD34-44D4-86FB-F336BB4720CA}.Release|Any CPU.ActiveCfg = Release|x86
+		{BB5BF3E0-DD34-44D4-86FB-F336BB4720CA}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{BB5BF3E0-DD34-44D4-86FB-F336BB4720CA}.Release|Mixed Platforms.Build.0 = Release|x86
+		{BB5BF3E0-DD34-44D4-86FB-F336BB4720CA}.Release|Windows Phone.ActiveCfg = Release|x86
+		{BB5BF3E0-DD34-44D4-86FB-F336BB4720CA}.Release|x86.ActiveCfg = Release|x86
+		{BB5BF3E0-DD34-44D4-86FB-F336BB4720CA}.Release|x86.Build.0 = Release|x86
+		{BB5BF3E0-DD34-44D4-86FB-F336BB4720CA}.Release|Xbox 360.ActiveCfg = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

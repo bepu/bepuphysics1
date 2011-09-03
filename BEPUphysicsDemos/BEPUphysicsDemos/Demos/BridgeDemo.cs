@@ -1,7 +1,7 @@
 ﻿using BEPUphysics.Constraints.TwoEntity.Joints;
 using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
-using Microsoft.Xna.Framework;
+using BEPUphysics.MathExtensions;
 
 namespace BEPUphysicsDemos.Demos
 {
@@ -63,7 +63,7 @@ namespace BEPUphysicsDemos.Demos
             }
 
 
-            game.Camera.Position = new Vector3(-180, 70, 300);
+            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(-180, 70, 300);
             game.Camera.Yaw = MathHelper.ToRadians(-24);
             game.Camera.Pitch = MathHelper.ToRadians(-5);
         }

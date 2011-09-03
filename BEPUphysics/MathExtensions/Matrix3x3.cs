@@ -1364,29 +1364,9 @@ namespace BEPUphysics.MathExtensions
         /// <returns>Matrix representing the rotation.</returns>
         public static Matrix3X3 CreateFromAxisAngle(Vector3 axis, float angle)
         {
-            Matrix3X3 result;
-            float xx = axis.X * axis.X;
-            float yy = axis.Y * axis.Y;
-            float zz = axis.Z * axis.Z;
-            float xy = axis.X * axis.Y;
-            float xz = axis.X * axis.Z;
-            float yz = axis.Y * axis.Z;
-
-            float sinAngle = (float)Math.Sin(angle);
-            float cosAngle = (float)Math.Cos(angle);
-
-            result.M11 = 1 + (1 - cosAngle) * (xx - 1);
-            result.M12 = -axis.Z * sinAngle + (1 - cosAngle) * xy;
-            result.M13 = axis.Y * sinAngle + (1 - cosAngle) * xz;
-
-            result.M21 = axis.Z * sinAngle + (1 - cosAngle) * xy;
-            result.M22 = 1 + (1 - cosAngle) * (yy - 1);
-            result.M23 = -axis.X * sinAngle + (1 - cosAngle) * yz;
-
-            result.M31 = -axis.Y * sinAngle + (1 - cosAngle) * xz;
-            result.M32 = axis.X * sinAngle + (1 - cosAngle) * yz;
-            result.M33 = 1 + (1 - cosAngle) * (zz - 1);
-            return result;
+            Matrix3X3 toReturn;
+            CreateFromAxisAngle(ref axis, angle, out toReturn);
+            return toReturn;
         }
 
         /// <summary>
@@ -1405,19 +1385,19 @@ namespace BEPUphysics.MathExtensions
             float yz = axis.Y * axis.Z;
 
             float sinAngle = (float)Math.Sin(angle);
-            float cosAngle = (float)Math.Cos(angle);
+            float oneMinusCosAngle = 1 - (float)Math.Cos(angle);
 
-            result.M11 = 1 + (1 - cosAngle) * (xx - 1);
-            result.M12 = -axis.Z * sinAngle + (1 - cosAngle) * xy;
-            result.M13 = axis.Y * sinAngle + (1 - cosAngle) * xz;
+            result.M11 = 1 + oneMinusCosAngle * (xx - 1);
+            result.M21 = -axis.Z * sinAngle + oneMinusCosAngle * xy;
+            result.M31 = axis.Y * sinAngle + oneMinusCosAngle * xz;
 
-            result.M21 = axis.Z * sinAngle + (1 - cosAngle) * xy;
-            result.M22 = 1 + (1 - cosAngle) * (yy - 1);
-            result.M23 = -axis.X * sinAngle + (1 - cosAngle) * yz;
+            result.M12 = axis.Z * sinAngle + oneMinusCosAngle * xy;
+            result.M22 = 1 + oneMinusCosAngle * (yy - 1);
+            result.M32 = -axis.X * sinAngle + oneMinusCosAngle * yz;
 
-            result.M31 = -axis.Y * sinAngle + (1 - cosAngle) * xz;
-            result.M32 = axis.X * sinAngle + (1 - cosAngle) * yz;
-            result.M33 = 1 + (1 - cosAngle) * (zz - 1);
+            result.M13 = -axis.Y * sinAngle + oneMinusCosAngle * xz;
+            result.M23 = axis.X * sinAngle + oneMinusCosAngle * yz;
+            result.M33 = 1 + oneMinusCosAngle * (zz - 1);
         }
 
 

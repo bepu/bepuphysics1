@@ -27,17 +27,17 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
 
         }
 
-        /// <summary>
-        /// Collects all entries with bounding boxes which intersect the given frustum.
-        /// </summary>
-        /// <param name="frustum">Frustum to test against the world.</param>
-        /// <param name="entries">Entries of the space which intersect the frustum.</param>
-        public void GetEntries(BoundingFrustum frustum, IList<BroadPhaseEntry> entries)
-        {
-            if (hierarchy.root != null)
-                hierarchy.root.GetOverlaps(ref frustum, entries);
+        ///// <summary>
+        ///// Collects all entries with bounding boxes which intersect the given frustum.
+        ///// </summary>
+        ///// <param name="frustum">Frustum to test against the world.</param>
+        ///// <param name="entries">Entries of the space which intersect the frustum.</param>
+        //public void GetEntries(BoundingFrustum frustum, IList<BroadPhaseEntry> entries)
+        //{
+        //    if (hierarchy.root != null)
+        //        hierarchy.root.GetOverlaps(ref frustum, entries);
 
-        }
+        //}
 
         /// <summary>
         /// Collects all entries with bounding boxes which intersect the given sphere.

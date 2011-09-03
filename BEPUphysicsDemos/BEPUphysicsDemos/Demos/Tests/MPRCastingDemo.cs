@@ -2,7 +2,6 @@
 using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.PositionUpdating;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using System.Diagnostics;
 using System.Collections.Generic;
@@ -26,6 +25,7 @@ using BEPUphysics;
 using BEPUphysics.EntityStateManagement;
 using BEPUphysics.ResourceManagement;
 using BEPUphysics.NarrowPhaseSystems;
+using ConversionHelper;
 
 namespace BEPUphysicsDemos.Demos.Tests
 {
@@ -58,7 +58,7 @@ namespace BEPUphysicsDemos.Demos.Tests
             aTransform = new RigidTransform(new Vector3(0, 0, 0), a.Orientation);
             bTransform = new RigidTransform(new Vector3(0, 10, 0), b.Orientation);
 
-            game.Camera.Position = new Vector3(0, 5, 17);
+            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(0, 5, 17);
         }
 
 
@@ -105,22 +105,22 @@ namespace BEPUphysicsDemos.Demos.Tests
         {
             if (hit)
             {
-                Game.TinyTextDrawer.Draw("Time: ", hitData.T, 10, new Vector2(50, 50));
+                Game.TinyTextDrawer.Draw("Time: ", hitData.T, 10, new Microsoft.Xna.Framework.Vector2(50, 50));
             }
             else
             {
-                Game.TinyTextDrawer.Draw("No hit.", new Vector2(50, 50));
+                Game.TinyTextDrawer.Draw("No hit.", new Microsoft.Xna.Framework.Vector2(50, 50));
             }
             base.DrawUI();
         }
 
-        VertexPositionColor[] lines = new VertexPositionColor[] { new VertexPositionColor(new Vector3(), Color.Red), new VertexPositionColor(new Vector3(), Color.White) };
+        VertexPositionColor[] lines = new VertexPositionColor[] { new VertexPositionColor(new Microsoft.Xna.Framework.Vector3(), Microsoft.Xna.Framework.Color.Red), new VertexPositionColor(new Microsoft.Xna.Framework.Vector3(), Microsoft.Xna.Framework.Color.White) };
         public override void Draw()
         {
             if (hit)
             {
-                lines[0].Position = hitData.Location;
-                lines[1].Position = hitData.Location + hitData.Normal;
+                lines[0].Position = MathConverter.Convert(hitData.Location);
+                lines[1].Position = MathConverter.Convert(hitData.Location + hitData.Normal);
                 foreach (EffectPass pass in Game.LineDrawer.CurrentTechnique.Passes)
                 {
                     pass.Apply();

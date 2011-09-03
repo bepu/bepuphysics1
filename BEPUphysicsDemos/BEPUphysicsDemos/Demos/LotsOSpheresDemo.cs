@@ -1,5 +1,5 @@
 ﻿using BEPUphysics.Entities.Prefabs;
-using Microsoft.Xna.Framework;
+using BEPUphysics.MathExtensions;
 
 namespace BEPUphysicsDemos.Demos
 {
@@ -15,7 +15,7 @@ namespace BEPUphysicsDemos.Demos
         public LotsOSpheresDemo(DemosGame game)
             : base(game)
         {
-            game.Camera.Position = new Vector3(0, 8, 25);
+            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(0, 8, 25);
             Space.Add(new Box(new Vector3(0, 0, 0), 120, 1, 120));
 
             int numColumns = 5;
