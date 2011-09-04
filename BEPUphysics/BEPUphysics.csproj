@@ -72,16 +72,10 @@
     <Compile Include="BroadPhaseSystems\Hierarchies\DynamicHierarchy.cs" />
     <Compile Include="BroadPhaseSystems\Hierarchies\DynamicHierarchyNode.cs" />
     <Compile Include="BroadPhaseSystems\Hierarchies\DynamicHierarchyQueryAccelerator.cs" />
-    <Compile Include="BroadPhaseSystems\Hierarchies\Testing\Insertion\DynamicHierarchy2.cs" />
-    <Compile Include="BroadPhaseSystems\Hierarchies\Testing\Insertion\DynamicHierarchyNode2.cs" />
-    <Compile Include="BroadPhaseSystems\Hierarchies\Testing\Old\DynamicHierarchyNodeOld.cs" />
-    <Compile Include="BroadPhaseSystems\Hierarchies\Testing\Old\DynamicHierarchyOld.cs" />
-    <Compile Include="BroadPhaseSystems\Hierarchies\Testing\Old\DynamicHierarchyQueryAcceleratorOld.cs" />
     <Compile Include="BroadPhaseSystems\IBoundingBoxOwner.cs" />
     <Compile Include="BroadPhaseSystems\IBroadPhaseEntryOwner.cs" />
     <Compile Include="BroadPhaseSystems\IQueryAccelerator.cs" />
     <Compile Include="BroadPhaseSystems\SortAndSweep\Grid2DEntry.cs" />
-    <None Include="DataStructures\Deprecated\MeshBoundingBoxTree.cs" />
     <Compile Include="BroadPhaseSystems\SortAndSweep\Grid2DSortAndSweep.cs" />
     <Compile Include="BroadPhaseSystems\SortAndSweep\Grid2DSortAndSweepQueryAccelerator.cs" />
     <Compile Include="BroadPhaseSystems\SortAndSweep\GridCell2D.cs" />
@@ -93,7 +87,6 @@
     <Compile Include="Collidables\MobileCollidables\CompoundHelper.cs" />
     <Compile Include="Collidables\MobileCollidables\MobileMeshCollidable.cs" />
     <Compile Include="CollisionShapes\MobileMeshShape.cs" />
-    <Compile Include="CollisionTests\CollisionAlgorithms\Testing\TriangleTrianglePairTester2.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\TrianglePairTester.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\TriangleSpherePairTester.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\MPRToolbox.cs" />
@@ -118,7 +111,6 @@
     <Compile Include="DataStructures\StaticMeshData.cs" />
     <Compile Include="DataStructures\TransformableMeshData.cs" />
     <Compile Include="DataStructures\TreeOverlapPair.cs" />
-    <None Include="DeactivationManagement\Testing\DeactivationManager.cs" />
     <Compile Include="Collidables\CollidableCollection.cs" />
     <Compile Include="Collidables\CollidablePair.cs" />
     <Compile Include="Collidables\EntityCollidableCollection.cs" />
@@ -141,14 +133,10 @@
     <Compile Include="CollisionShapes\InstancedMeshShape.cs" />
     <Compile Include="CollisionShapes\ShapeDistributionInformation.cs" />
     <Compile Include="CollisionShapes\ConvexShapes\InertiaHelper.cs" />
-    <None Include="CollisionTests\CollisionAlgorithms\Testing\OldCAStuff.cs" />
-    <None Include="CollisionTests\CollisionAlgorithms\GJK\SimplexBackup.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\BoxBoxCollider.cs" />
-    <Compile Include="CollisionTests\CollisionAlgorithms\BoxBoxColliderOld.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\BoxSphereTester.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\TriangleConvexPairTester.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\GJK\RaySimplex.cs" />
-    <Compile Include="CollisionTests\CollisionAlgorithms\GJK\OldGJKVerifier.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\SphereTester.cs" />
     <Compile Include="CollisionTests\Manifolds\BoxContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\InstancedMeshConvexContactManifold.cs" />
@@ -163,10 +151,6 @@
     <Compile Include="Constraints\Collision\ConvexContactManifoldConstraint.cs" />
     <Compile Include="Constraints\Collision\NonConvexContactManifoldConstraint.cs" />
     <Compile Include="Constraints\Collision\SlidingFrictionTwoAxis.cs" />
-    <None Include="Constraints\Collision\Testing\ContactPenetrationConstraintDETester.cs" />
-    <None Include="Constraints\Collision\Testing\DirectEnumerationSolver.cs" />
-    <None Include="Constraints\Collision\Testing\SlidingFrictionOneAxisConstraint.cs" />
-    <None Include="Constraints\Collision\Testing\SlidingFrictionTwoAxisObsolete.cs" />
     <Compile Include="Constraints\Collision\TwistFrictionConstraint.cs" />
     <Compile Include="Constraints\EntitySolverUpdateable.cs" />
     <Compile Include="Constraints\IJacobians.cs" />
@@ -213,8 +197,6 @@
     <Compile Include="Constraints\TwoEntity\Motors\RevoluteMotor.cs" />
     <Compile Include="Constraints\TwoEntity\Motors\TwistMotor.cs" />
     <Compile Include="Constraints\TwoEntity\TwoEntityConstraint.cs" />
-    <None Include="DeactivationManagement\Testing\ISimulationIslandMemberOwner.cs" />
-    <None Include="DeactivationManagement\Testing\SimulationIslandMember.cs" />
     <Compile Include="DeactivationManagement\DeactivationManager.cs" />
     <Compile Include="DeactivationManagement\ISimulationIslandConnection.cs" />
     <Compile Include="DeactivationManagement\ISimulationIslandConnectionOwner.cs" />
@@ -299,7 +281,6 @@
     <Compile Include="DataStructures\TriangleMesh.cs" />
     <Compile Include="EntityStateManagement\MotionState.cs" />
     <Compile Include="RayCastResult.cs" />
-    <Compile Include="SolverSystems\BatchedSolver.cs" />
     <Compile Include="OtherSpaceStages\BoundingBoxUpdater.cs" />
     <Compile Include="OtherSpaceStages\DeferredEventDispatcher.cs" />
     <Compile Include="OtherSpaceStages\ForceUpdater.cs" />
@@ -328,7 +309,6 @@
     <Compile Include="CollisionTests\Manifolds\GeneralConvexContactManifold.cs" />
     <Compile Include="CollisionTests\ContactRefresher.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\GeneralConvexPairTester.cs" />
-    <None Include="DataStructures\Deprecated\BoundingBoxTree.cs" />
     <Compile Include="DataStructures\RawValueList.cs" />
     <Compile Include="DataStructures\RawList.cs" />
     <Compile Include="DataStructures\ObservableDictionary.cs" />
@@ -360,7 +340,6 @@
     <Compile Include="EntityStateManagement\InterpolatedStatesManager.cs" />
     <Compile Include="MultithreadedProcessingStage.cs" />
     <Compile Include="MathExtensions\RigidTransform.cs" />
-    <None Include="DeactivationManagement\Testing\ISimulationIslandConnection.cs" />
     <Compile Include="Materials\Material.cs" />
     <Compile Include="Materials\MaterialManager.cs" />
     <Compile Include="Materials\MaterialPair.cs" />
@@ -369,7 +348,6 @@
     <Compile Include="NarrowPhaseSystems\Pairs\CollidablePairHandler.cs" />
     <Compile Include="Materials\PropertyCombiners.cs" />
     <Compile Include="Settings\CollisionDetectionSettings.cs" />
-    <Compile Include="SolverSystems\ISolverBatchUpdateable.cs" />
     <Compile Include="SolverSystems\SolverUpdateable.cs" />
     <Compile Include="ISpace.cs" />
     <Compile Include="ISpaceObject.cs" />
@@ -378,7 +356,6 @@
     <Compile Include="MathExtensions\Matrix2x3.cs" />
     <Compile Include="MathExtensions\Matrix3x2.cs" />
     <Compile Include="MathExtensions\Matrix3x3.cs" />
-    <Compile Include="CollisionTests\CollisionAlgorithms\Testing\MPRToolboxOld.cs" />
     <Compile Include="Collidables\Collidable.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\NarrowPhasePair.cs" />
     <Compile Include="NarrowPhaseSystems\NarrowPhase.cs" />
@@ -396,7 +373,6 @@
     <Compile Include="Paths\LinearInterpolationCurve3D.cs" />
     <Compile Include="Paths\Path following\EntityMover.cs" />
     <Compile Include="Paths\Path following\EntityRotator.cs" />
-    <Compile Include="Paths\Path following\EntityTransformer.cs" />
     <Compile Include="Paths\Path.cs" />
     <Compile Include="Paths\QuaternionSlerpCurve.cs" />
     <Compile Include="Paths\SpeedControlledCurve.cs" />
@@ -409,9 +385,7 @@
     <Compile Include="ResourceManagement\ResourcePool.cs" />
     <Compile Include="ResourceManagement\Resources.cs" />
     <Compile Include="ResourceManagement\UnsafeResourcePool.cs" />
-    <None Include="DeactivationManagement\Testing\SimulationIsland.cs" />
     <Compile Include="SolverSystems\Solver.cs" />
-    <Compile Include="SolverSystems\SolverBatch.cs" />
     <Compile Include="SolverSystems\SolverUpdateableChange.cs" />
     <Compile Include="Space.cs" />
     <Compile Include="OtherSpaceStages\SpaceObjectBuffer.cs" />

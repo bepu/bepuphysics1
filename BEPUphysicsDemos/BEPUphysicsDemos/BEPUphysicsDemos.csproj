@@ -144,7 +144,6 @@
     <Compile Include="Demos\Tests\MPRTestDemo.cs" />
     <Compile Include="Demos\Tests\MPRCastingDemo.cs" />
     <Compile Include="Demos\Tests\BroadPhasesTestDemo.cs" />
-    <Compile Include="Demos\Tests\TriangleTestDemo.cs" />
     <Compile Include="Demos\CharacterPlaygroundDemo.cs" />
     <Compile Include="Demos\Tests\AddRemoveStressDemo.cs" />
     <Compile Include="Demos\Tests\MutableCompoundDemo.cs" />
