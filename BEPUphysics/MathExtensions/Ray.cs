@@ -10,15 +10,32 @@ namespace BEPUphysics.MathExtensions
     /// </summary>
     public struct Ray
     {
+        /// <summary>
+        /// Starting position of the ray.
+        /// </summary>
         public Vector3 Position;
+        /// <summary>
+        /// Direction in which the ray points.
+        /// </summary>
         public Vector3 Direction;
 
+
+        /// <summary>
+        /// Constructs a new ray.
+        /// </summary>
+        /// <param name="position">Starting position of the ray.</param>
+        /// <param name="direction">Direction in which the ray points.</param>
         public Ray(Vector3 position, Vector3 direction)
         {
             this.Position = position;
             this.Direction = direction;
         }
 
+        /// <summary>
+        /// Determines if and when the ray intersects the bounding box.
+        /// </summary>
+        /// <param name="boundingBox">Bounding box to test against.</param>
+        /// <returns>The length along the ray to the impact, or null if no impact is found.</returns>
         public float? Intersects(BoundingBox boundingBox)
         {
             float? toReturn;
@@ -26,6 +43,11 @@ namespace BEPUphysics.MathExtensions
             return toReturn;
         }
 
+        /// <summary>
+        /// Determines if and when the ray intersects the bounding box.
+        /// </summary>
+        /// <param name="boundingBox">Bounding box to test against.</param>
+        /// <param name="result">The length along the ray to the impact, or null if no impact is found.</param>
         public void Intersects(ref BoundingBox boundingBox, out float? result)
         {
             if (Math.Abs(Direction.X) < Toolbox.Epsilon && (Position.X < boundingBox.Min.X || Position.X > boundingBox.Max.X))

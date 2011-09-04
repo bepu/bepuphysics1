@@ -90,6 +90,25 @@ namespace BEPUphysics.MathExtensions
         /// </summary>
         public float M44;
 
+        /// <summary>
+        /// Constructs a new 4 row, 4 column matrix.
+        /// </summary>
+        /// <param name="m11">Value at row 1, column 1 of the matrix.</param>
+        /// <param name="m12">Value at row 1, column 2 of the matrix.</param>
+        /// <param name="m13">Value at row 1, column 3 of the matrix.</param>
+        /// <param name="m14">Value at row 1, column 4 of the matrix.</param>
+        /// <param name="m21">Value at row 2, column 1 of the matrix.</param>
+        /// <param name="m22">Value at row 2, column 2 of the matrix.</param>
+        /// <param name="m23">Value at row 2, column 3 of the matrix.</param>
+        /// <param name="m24">Value at row 2, column 4 of the matrix.</param>
+        /// <param name="m31">Value at row 3, column 1 of the matrix.</param>
+        /// <param name="m32">Value at row 3, column 2 of the matrix.</param>
+        /// <param name="m33">Value at row 3, column 3 of the matrix.</param>
+        /// <param name="m34">Value at row 3, column 4 of the matrix.</param>
+        /// <param name="m31">Value at row 4, column 1 of the matrix.</param>
+        /// <param name="m32">Value at row 4, column 2 of the matrix.</param>
+        /// <param name="m33">Value at row 4, column 3 of the matrix.</param>
+        /// <param name="m34">Value at row 4, column 4 of the matrix.</param>
         public Matrix(float m11, float m12, float m13, float m14,
                       float m21, float m22, float m23, float m24,
                       float m31, float m32, float m33, float m34,
@@ -116,6 +135,9 @@ namespace BEPUphysics.MathExtensions
             this.M44 = m44;
         }
 
+        /// <summary>
+        /// Gets or sets the translation component of the transform.
+        /// </summary>
         public Vector3 Translation
         {
             get
@@ -135,6 +157,32 @@ namespace BEPUphysics.MathExtensions
             }
         }
 
+        /// <summary>
+        /// Computes the determinant of the matrix.
+        /// </summary>
+        /// <returns></returns>
+        public float Determinant()
+        {
+            //Compute the re-used 2x2 determinants.
+            float det1 = M33 * M44 - M34 * M43;
+            float det2 = M32 * M44 - M34 * M42;
+            float det3 = M32 * M43 - M33 * M42;
+            float det4 = M31 * M44 - M34 * M41;
+            float det5 = M31 * M43 - M33 * M41;
+            float det6 = M31 * M42 - M32 * M41;
+            return
+                (M11 * ((M22 * det1 - M23 * det2) + M24 * det3)) -
+                (M12 * ((M21 * det1 - M23 * det4) + M24 * det5)) +
+                (M13 * ((M21 * det2 - M22 * det4) + M24 * det6)) -
+                (M14 * ((M21 * det3 - M22 * det5) + M23 * det6));
+        }
+
+        /// <summary>
+        /// Creates a matrix representing the given axis and angle rotation.
+        /// </summary>
+        /// <param name="axis">Axis around which to rotate.</param>
+        /// <param name="angle">Angle to rotate around the axis.</param>
+        /// <returns>Matrix created from the axis and angle.</returns>
         public static Matrix CreateFromAxisAngle(Vector3 axis, float angle)
         {
             Matrix toReturn;
@@ -142,6 +190,12 @@ namespace BEPUphysics.MathExtensions
             return toReturn;
         }
 
+        /// <summary>
+        /// Creates a matrix representing the given axis and angle rotation.
+        /// </summary>
+        /// <param name="axis">Axis around which to rotate.</param>
+        /// <param name="angle">Angle to rotate around the axis.</param>
+        /// <param name="result">Matrix created from the axis and angle.</param>
         public static void CreateFromAxisAngle(ref Vector3 axis, float angle, out Matrix result)
         {
             float xx = axis.X * axis.X;
@@ -175,6 +229,11 @@ namespace BEPUphysics.MathExtensions
             result.M44 = 1;
         }
 
+        /// <summary>
+        /// Creates a rotation matrix from a quaternion.
+        /// </summary>
+        /// <param name="quaternion">Quaternion to convert.</param>
+        /// <param name="result">Rotation matrix created from the quaternion.</param>
         public static void CreateFromQuaternion(ref Quaternion quaternion, out Matrix result)
         {
             float XX = 2 * quaternion.X * quaternion.X;
@@ -208,6 +267,12 @@ namespace BEPUphysics.MathExtensions
             result.M44 = 1;
         }
 
+        /// <summary>
+        /// Multiplies two matrices together.
+        /// </summary>
+        /// <param name="a">First matrix to multiply.</param>
+        /// <param name="b">Second matrix to multiply.</param>
+        /// <param name="result">Combined transformation.</param>
         public static void Multiply(ref Matrix a, ref Matrix b, out Matrix result)
         {
             float resultM11 = a.M11 * b.M11 + a.M12 * b.M21 + a.M13 * b.M31 + a.M14 * b.M41;
@@ -251,22 +316,12 @@ namespace BEPUphysics.MathExtensions
             result.M44 = resultM44;
         }
 
-        public float Determinant()
-        {
-            //Compute the re-used 2x2 determinants.
-            float det1 = M33 * M44 - M34 * M43;
-            float det2 = M32 * M44 - M34 * M42;
-            float det3 = M32 * M43 - M33 * M42;
-            float det4 = M31 * M44 - M34 * M41;
-            float det5 = M31 * M43 - M33 * M41;
-            float det6 = M31 * M42 - M32 * M41;
-            return 
-                (M11 * ((M22 * det1 - M23 * det2) + M24 * det3)) - 
-                (M12 * ((M21 * det1 - M23 * det4) + M24 * det5)) + 
-                (M13 * ((M21 * det2 - M22 * det4) + M24 * det6)) -
-                (M14 * ((M21 * det3 - M22 * det5) + M23 * det6));
-        }
 
+   
+
+        /// <summary>
+        /// Gets the 4x4 identity matrix.
+        /// </summary>
         public static Matrix Identity
         {
             get
