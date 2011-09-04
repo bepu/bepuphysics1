@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using BEPUphysics.CollisionShapes;
 using ConversionHelper;
+using System;
 
 namespace BEPUphysicsDrawer.Models
 {
@@ -60,6 +61,7 @@ namespace BEPUphysicsDrawer.Models
                     DisplayedObject.GetNormal(i, j, out n);
                     MathConverter.Convert(ref position, out v.Position);
                     MathConverter.Convert(ref n, out v.Normal);
+       
                     if (reverseWinding)
                         Vector3.Negate(ref v.Normal, out v.Normal);
                     v.TextureCoordinate = new Vector2(i, j);

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace BEPUphysics.MathExtensions
-{    
+{
     /// <summary>
     /// Provides XNA-like ray functionality needed by the engine.
     /// </summary>
@@ -28,64 +28,76 @@ namespace BEPUphysics.MathExtensions
 
         public void Intersects(ref BoundingBox boundingBox, out float? result)
         {
-            float halfWidth = boundingBox.Max.X - boundingBox.Min.X;
-            float halfHeight = boundingBox.Max.Y - boundingBox.Min.Y;
-            float halfLength = boundingBox.Max.Z - boundingBox.Min.Z;
-            if (Math.Abs(Direction.X) < Toolbox.Epsilon && (Position.X < -halfWidth || Position.X > halfWidth))
+            if (Math.Abs(Direction.X) < Toolbox.Epsilon && (Position.X < boundingBox.Min.X || Position.X > boundingBox.Max.X))
+            {
+                //If the ray isn't pointing along the axis at all, and is outside of the box's interval, then it
+                //can't be intersecting.
                 result = null;
-            float temp, tmin = 0, tmax = float.MaxValue;
+                return;
+            }
+            float tmin = 0, tmax = float.MaxValue;
             float inverseDirection = 1 / Direction.X;
-            float t1 = (-halfWidth - Position.X) * inverseDirection;
-            float t2 = (halfWidth - Position.X) * inverseDirection;
-            var tempNormal = new Vector3(-1, 0, 0);
+            float t1 = (boundingBox.Min.X - Position.X) * inverseDirection;
+            float t2 = (boundingBox.Max.X - Position.X) * inverseDirection;
             if (t1 > t2)
             {
-                temp = t1;
+                float temp = t1;
                 t1 = t2;
                 t2 = temp;
-                tempNormal *= -1;
             }
-            temp = tmin;
             tmin = Math.Max(tmin, t1);
             tmax = Math.Min(tmax, t2);
             if (tmin > tmax)
-                result = null;
-            if (Math.Abs(Direction.Y) < Toolbox.Epsilon && (Position.Y < -halfHeight || Position.Y > halfHeight))
-                result = null;
-            inverseDirection = 1 / Direction.Y;
-            t1 = (-halfHeight - Position.Y) * inverseDirection;
-            t2 = (halfHeight - Position.Y) * inverseDirection;
-            tempNormal = new Vector3(0, -1, 0);
-            if (t1 > t2)
             {
-                temp = t1;
-                t1 = t2;
-                t2 = temp;
-                tempNormal *= -1;
-            }
-            temp = tmin;
-            tmin = Math.Max(tmin, t1);
-            tmax = Math.Min(tmax, t2);
-            if (tmin > tmax)
                 result = null;
-            if (Math.Abs(Direction.Z) < Toolbox.Epsilon && (Position.Z < -halfLength || Position.Z > halfLength))
+                return;
+            }
+            if (Math.Abs(Direction.Y) < Toolbox.Epsilon && (Position.Y < boundingBox.Min.Y || Position.Y > boundingBox.Max.Y))
+            {                
+                //If the ray isn't pointing along the axis at all, and is outside of the box's interval, then it
+                //can't be intersecting.
                 result = null; 
-            inverseDirection = 1 / Direction.Z;
-            t1 = (-halfLength - Position.Z) * inverseDirection;
-            t2 = (halfLength - Position.Z) * inverseDirection;
-            tempNormal = new Vector3(0, 0, -1);
+                return;
+            }
+            inverseDirection = 1 / Direction.Y;
+            t1 = (boundingBox.Min.Y - Position.Y) * inverseDirection;
+            t2 = (boundingBox.Max.Y - Position.Y) * inverseDirection;
             if (t1 > t2)
             {
-                temp = t1;
+                float temp = t1;
                 t1 = t2;
                 t2 = temp;
-                tempNormal *= -1;
             }
-            temp = tmin;
             tmin = Math.Max(tmin, t1);
             tmax = Math.Min(tmax, t2);
             if (tmin > tmax)
-                result = null;
+            {
+                result = null; 
+                return;
+            }
+            if (Math.Abs(Direction.Z) < Toolbox.Epsilon && (Position.Z < -boundingBox.Min.Z || Position.Z > boundingBox.Max.Z))
+            {              
+                //If the ray isn't pointing along the axis at all, and is outside of the box's interval, then it
+                //can't be intersecting.
+                result = null; 
+                return;
+            }
+            inverseDirection = 1 / Direction.Z;
+            t1 = (boundingBox.Min.Z - Position.Z) * inverseDirection;
+            t2 = (boundingBox.Max.Z - Position.Z) * inverseDirection;
+            if (t1 > t2)
+            {
+                float temp = t1;
+                t1 = t2;
+                t2 = temp;
+            }
+            tmin = Math.Max(tmin, t1);
+            tmax = Math.Min(tmax, t2);
+            if (tmin > tmax)
+            {
+                result = null; 
+                return;
+            }
             result = tmin;
         }
     }

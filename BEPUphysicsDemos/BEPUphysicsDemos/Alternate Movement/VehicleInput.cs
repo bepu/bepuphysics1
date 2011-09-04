@@ -204,8 +204,7 @@ namespace BEPUphysicsDemos.AlternateMovement
         /// <param name="gamePadInput">Gamepad state.</param>
         public void Update(float dt, KeyboardState keyboardInput, GamePadState gamePadInput)
         {
-            if (keyboardInput.IsKeyDown(Keys.P))
-                Debug.WriteLine("breka.");
+
             //Update the wheel's graphics.
             for (int k = 0; k < 4; k++)
             {
