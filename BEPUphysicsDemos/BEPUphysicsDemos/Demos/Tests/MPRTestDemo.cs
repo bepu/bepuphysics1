@@ -21,7 +21,6 @@ using BEPUphysics.Constraints.SolverGroups;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
 using BEPUphysics.CollisionTests;
 using BEPUphysics;
-using BEPUphysics.CollisionTests.CollisionAlgorithms.Testing;
 using Microsoft.Xna.Framework.Input;
 using ConversionHelper;
 
@@ -56,7 +55,7 @@ namespace BEPUphysicsDemos.Demos.Tests
             MPRToolbox.LocalSurfaceCast(shapeA, shapeB, ref transformB, ref direction, out depth, out normal);
 
             ContactData contactData;
-            bool overlappedOld = MPRToolboxOld.AreObjectsColliding(shapeA, shapeB, ref transformA, ref transformB, out contactData);
+            //bool overlappedOld = MPRToolboxOld.AreObjectsColliding(shapeA, shapeB, ref transformA, ref transformB, out contactData);
 
             //Random rand = new Random(0);
             //for (int i = 0; i < 10000000; i++)

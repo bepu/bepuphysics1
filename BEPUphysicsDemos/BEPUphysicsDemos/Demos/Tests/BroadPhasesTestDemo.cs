@@ -26,7 +26,6 @@ using BEPUphysics.EntityStateManagement;
 using BEPUphysics.ResourceManagement;
 using BEPUphysics.BroadPhaseSystems.Hierarchies;
 using BEPUphysics.BroadPhaseSystems.SortAndSweep;
-using BEPUphysics.BroadPhaseSystems.Hierarchies.Testing.Old;
 
 namespace BEPUphysicsDemos.Demos.Tests
 {
@@ -55,7 +54,7 @@ namespace BEPUphysicsDemos.Demos.Tests
             //BoundingBox box = new BoundingBox(new Vector3(-5, 1, 1), new Vector3(5, 7, 7));
             BoundingBox box = new BoundingBox(new Vector3(-50, -50, -50), new Vector3(50, 50, 50));
 
-            DynamicHierarchyOld dhOld = new DynamicHierarchyOld(Space.ThreadManager);
+            //DynamicHierarchyOld dhOld = new DynamicHierarchyOld(Space.ThreadManager);
             DynamicHierarchy dh = new DynamicHierarchy(Space.ThreadManager);
             SortAndSweep1D sas1d = new SortAndSweep1D(Space.ThreadManager);
             Grid2DSortAndSweep grid2DSAS = new Grid2DSortAndSweep(Space.ThreadManager);
@@ -78,7 +77,7 @@ namespace BEPUphysicsDemos.Demos.Tests
                 toAdd.CollisionInformation.CollisionRules.Personal = CollisionRule.NoNarrowPhasePair;
                 toAdd.CollisionInformation.UpdateBoundingBox(0);
                 //Space.Add(toAdd);
-                dhOld.Add(toAdd.CollisionInformation);
+                //dhOld.Add(toAdd.CollisionInformation);
                 dh.Add(toAdd.CollisionInformation);
                 sas1d.Add(toAdd.CollisionInformation);
                 grid2DSAS.Add(toAdd.CollisionInformation);
@@ -93,7 +92,7 @@ namespace BEPUphysicsDemos.Demos.Tests
             //Prime the system.
             grid2DSAS.Update();
             sas1d.Update();
-            dhOld.Update();
+            //dhOld.Update();
             dh.Update();
             var testType = Test.Update;
 
@@ -105,11 +104,11 @@ namespace BEPUphysicsDemos.Demos.Tests
                 case Test.Update:
                     for (int i = 0; i < numRuns; i++)
                     {
-                        //DH
-                        startTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
-                        dhOld.Update();
-                        endTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
-                        DHOldTime += endTime - startTime;
+                        ////DH
+                        //startTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
+                        //dhOld.Update();
+                        //endTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
+                        //DHOldTime += endTime - startTime;
 
                         //DH4
                         startTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
@@ -190,16 +189,16 @@ namespace BEPUphysicsDemos.Demos.Tests
                     RawList<BroadPhaseEntry> outputIntersections = new RawList<BroadPhaseEntry>();
 
 
-                    //DH
-                    startTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
-                    for (int i = 0; i < numRuns; i++)
-                    {
-                        dhOld.QueryAccelerator.RayCast(rays.Elements[i], rayLength, outputIntersections);
-                        outputIntersections.Clear();
+                    ////DH
+                    //startTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
+                    //for (int i = 0; i < numRuns; i++)
+                    //{
+                    //    dhOld.QueryAccelerator.RayCast(rays.Elements[i], rayLength, outputIntersections);
+                    //    outputIntersections.Clear();
 
-                    }
-                    endTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
-                    DHOldTime = endTime - startTime;
+                    //}
+                    //endTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
+                    //DHOldTime = endTime - startTime;
 
                     //DH4
                     startTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
@@ -242,16 +241,16 @@ namespace BEPUphysicsDemos.Demos.Tests
 
                     outputIntersections = new RawList<BroadPhaseEntry>();
 
-                    //DH
-                    startTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
-                    for (int i = 0; i < numRuns; i++)
-                    {
-                        dhOld.QueryAccelerator.GetEntries(boundingBoxes.Elements[i], outputIntersections);
-                        outputIntersections.Clear();
+                    ////DH
+                    //startTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
+                    //for (int i = 0; i < numRuns; i++)
+                    //{
+                    //    dhOld.QueryAccelerator.GetEntries(boundingBoxes.Elements[i], outputIntersections);
+                    //    outputIntersections.Clear();
 
-                    }
-                    endTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
-                    DHOldTime = endTime - startTime;
+                    //}
+                    //endTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
+                    //DHOldTime = endTime - startTime;
 
                     //DH4
                     startTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
