@@ -175,7 +175,7 @@ namespace BEPUphysics.DataStructures
         public bool RayCast(Ray ray, float maximumLength, TriangleSidedness sidedness, IList<RayHit> hits)
         {
             var hitElements = Resources.GetIntList();
-            tree.GetOverlaps(ray, hitElements);
+            tree.GetOverlaps(ray, maximumLength, hitElements);
             for (int i = 0; i < hitElements.Count; i++)
             {
                 Vector3 v1, v2, v3;
