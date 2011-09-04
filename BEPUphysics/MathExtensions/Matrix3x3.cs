@@ -1273,33 +1273,37 @@ namespace BEPUphysics.MathExtensions
             if (tr > 0)
             {
                 var S = (float)Math.Sqrt(tr + 1.0) * 2; // S=4*qw 
+                var inverseS = 1 / S;
                 q.W = 0.25f * S;
-                q.X = (r.M32 - r.M23) / S;
-                q.Y = (r.M13 - r.M31) / S;
-                q.Z = (r.M21 - r.M12) / S;
+                q.X = (r.M32 - r.M23) * inverseS;
+                q.Y = (r.M13 - r.M31) * inverseS;
+                q.Z = (r.M21 - r.M12) * inverseS;
             }
             else if ((r.M11 > r.M22) & (r.M11 > r.M33))
             {
                 var S = (float)Math.Sqrt(1.0 + r.M11 - r.M22 - r.M33) * 2; // S=4*qx 
-                q.W = (r.M32 - r.M23) / S;
+                var inverseS = 1 / S;
+                q.W = (r.M32 - r.M23) * inverseS;
                 q.X = 0.25f * S;
-                q.Y = (r.M12 + r.M21) / S;
-                q.Z = (r.M13 + r.M31) / S;
+                q.Y = (r.M12 + r.M21) * inverseS;
+                q.Z = (r.M13 + r.M31) * inverseS;
             }
             else if (r.M22 > r.M33)
             {
                 var S = (float)Math.Sqrt(1.0 + r.M22 - r.M11 - r.M33) * 2; // S=4*qy
-                q.W = (r.M13 - r.M31) / S;
-                q.X = (r.M12 + r.M21) / S;
+                var inverseS = 1 / S;
+                q.W = (r.M13 - r.M31) * inverseS;
+                q.X = (r.M12 + r.M21) * inverseS;
                 q.Y = 0.25f * S;
-                q.Z = (r.M23 + r.M32) / S;
+                q.Z = (r.M23 + r.M32) * inverseS;
             }
             else
             {
                 var S = (float)Math.Sqrt(1.0 + r.M33 - r.M11 - r.M22) * 2; // S=4*qz
-                q.W = (r.M21 - r.M12) / S;
-                q.X = (r.M13 + r.M31) / S;
-                q.Y = (r.M23 + r.M32) / S;
+                var inverseS = 1 / S;
+                q.W = (r.M21 - r.M12) * inverseS;
+                q.X = (r.M13 + r.M31) * inverseS;
+                q.Y = (r.M23 + r.M32) * inverseS;
                 q.Z = 0.25f * S;
             }
         }

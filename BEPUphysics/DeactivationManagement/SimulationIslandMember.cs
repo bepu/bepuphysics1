@@ -127,25 +127,22 @@ namespace BEPUphysics.DeactivationManagement
                         //To solve this, when we encounter active kinematic objects,
                         //tell simulation islands associated with connected objects that they aren't allowed to deactivate.
 
-                        //Note that this method is executed in parallel.  It's okay to set this without protection because:
-                        //-It is never read during the parallel stage.
-                        //-The write is atomic (no corrupted half-state).
-                        //-It is only ever set to true.  It doesn't matter what order the sets come in.
                         for (int i = 0; i < connections.count; i++)
                         {
-                            //TODO: Connected members iteration goes through interface overhead.
-                            //This section is rarely executed (unless there's lots of moving kinematics in lots of collisions),
-                            //but it would still be nice to eliminate it.
                             var connectedMembers = connections.Elements[i].members;
                             for (int j = connectedMembers.count - 1; j >= 0; j--)
                             {
+                                //The change locker must be obtained before attempting to access the SimulationIsland.
+                                //Path compression can force the simulation island to evaluate to null briefly.
+                                //Do not permit the object to undergo path compression during this (brief) operation.
+                                connectedMembers.Elements[j].simulationIslandChangeLocker.Enter();
                                 if (connectedMembers.Elements[j].SimulationIsland != null)
-                                    //Objects connected to an active kinematic cannot go to sleep.
                                     connectedMembers.Elements[j].SimulationIsland.allowDeactivation = false;
-                                //TODO: Is it possible for an active kinematic to be involved with a simulation island that is currently inactive?
-                                //I THINK the collision pair creation/merge takes care of the entry case, while this takes care of the maintenance.
-                                //But, if it turns out that's wrong, the simulation island could be forced active here.  It's a simple boolean operation, and would only ever be set to true during this stage.
-                                //If there's a nasty special case that I forgot about that takes care of kinematics creating pairs, then adding in that force-activate would be a good idea to localize the effect
+                                connectedMembers.Elements[j].simulationIslandChangeLocker.Exit();
+                                //Note: Is it possible for an active kinematic to be involved with a simulation island that is currently inactive?
+                                //Collision pair creation/merge should take care of the entry case, while this takes care of the maintenance.
+                                //But, if it turns out that's wrong later, the simulation island could be forced active here.  It's a simple boolean operation, and would only ever be set to true during this stage.
+                                //If there's a nasty special case that takes care of kinematics creating pairs, then adding in that force-activate would be a good idea to localize the effect
                                 //of the deactivation system.
                             }
                         }
@@ -190,6 +187,7 @@ namespace BEPUphysics.DeactivationManagement
             }
         }
 
+        internal BEPUphysics.Threading.SpinLock simulationIslandChangeLocker = new BEPUphysics.Threading.SpinLock();
         void TryToCompressIslandHierarchy()
         {
 
@@ -199,12 +197,16 @@ namespace BEPUphysics.DeactivationManagement
                 if (currentSimulationIsland.immediateParent != currentSimulationIsland)
                 {
                     //Only remove ourselves from the owning simulation island, not all the way up the chain.
+                    //The change locker must be obtained first to prevent kinematic notifications in the candidacy update 
+                    //from attempting to evaluate the SimulationIsland while we are reorganizing things.
+                    simulationIslandChangeLocker.Enter();
                     lock (currentSimulationIsland)
                         currentSimulationIsland.Remove(this);
                     currentSimulationIsland = currentSimulationIsland.Parent;
                     //Add ourselves to the new owner.
                     lock (currentSimulationIsland)
                         currentSimulationIsland.Add(this);
+                    simulationIslandChangeLocker.Exit();
                     //TODO: Should it activate the new island?  This might avoid a possible corner case.
                     //It could interfere with the activated event meaningfulness, since that is triggered
                     //at the end of the update candidacy loop..
