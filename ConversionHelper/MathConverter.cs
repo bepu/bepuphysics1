@@ -6,8 +6,42 @@ using Microsoft.Xna.Framework;
 
 namespace ConversionHelper
 {
+    /// <summary>
+    /// Helps convert between XNA math types and the BEPUphysics replacement math types.
+    /// A version of this converter could be created for other platforms to ease the integration of the engine.
+    /// </summary>
     public static class MathConverter
     {
+        //Vector2
+        public static Vector2 Convert(BEPUphysics.MathExtensions.Vector2 bepuVector)
+        {
+            Vector2 toReturn;
+            toReturn.X = bepuVector.X;
+            toReturn.Y = bepuVector.Y;
+            return toReturn;
+        }
+
+        public static void Convert(ref BEPUphysics.MathExtensions.Vector2 bepuVector, out Vector2 xnaVector)
+        {
+            xnaVector.X = bepuVector.X;
+            xnaVector.Y = bepuVector.Y;
+        }
+
+        public static BEPUphysics.MathExtensions.Vector2 Convert(Vector2 xnaVector)
+        {
+            BEPUphysics.MathExtensions.Vector2 toReturn;
+            toReturn.X = xnaVector.X;
+            toReturn.Y = xnaVector.Y;
+            return toReturn;
+        }
+
+        public static void Convert(ref Vector2 xnaVector, out BEPUphysics.MathExtensions.Vector2 bepuVector)
+        {
+            bepuVector.X = xnaVector.X;
+            bepuVector.Y = xnaVector.Y;
+        }
+
+        //Vector3
         public static Vector3 Convert(BEPUphysics.MathExtensions.Vector3 bepuVector)
         {
             Vector3 toReturn;
@@ -62,6 +96,7 @@ namespace ConversionHelper
 
         }
 
+        //Matrix
         public static Matrix Convert(BEPUphysics.MathExtensions.Matrix matrix)
         {
             Matrix toReturn;
@@ -131,7 +166,6 @@ namespace ConversionHelper
             return toReturn;
         }
 
-
         public static void Convert(ref BEPUphysics.MathExtensions.Matrix3X3 matrix, out Matrix xnaMatrix)
         {
             xnaMatrix.M11 = matrix.M11;
@@ -171,33 +205,7 @@ namespace ConversionHelper
 
         }
 
-        public static BEPUphysics.MathExtensions.Ray Convert(Ray ray)
-        {
-            BEPUphysics.MathExtensions.Ray toReturn;
-            Convert(ref ray.Position, out toReturn.Position);
-            Convert(ref ray.Direction, out toReturn.Direction);
-            return toReturn;
-        }
-        public static void Convert(ref Ray ray, out BEPUphysics.MathExtensions.Ray bepuRay)
-        {
-            Convert(ref ray.Position, out bepuRay.Position);
-            Convert(ref ray.Direction, out bepuRay.Direction);
-        }
-
-        public static Ray Convert(BEPUphysics.MathExtensions.Ray ray)
-        {
-            Ray toReturn;
-            Convert(ref ray.Position, out toReturn.Position);
-            Convert(ref ray.Direction, out toReturn.Direction);
-            return toReturn;
-        }
-
-        public static void Convert(ref BEPUphysics.MathExtensions.Ray ray, out Ray xnaRay)
-        {
-            Convert(ref ray.Position, out xnaRay.Position);
-            Convert(ref ray.Direction, out xnaRay.Direction);
-        }
-
+        //Quaternion
         public static Quaternion Convert(BEPUphysics.MathExtensions.Quaternion quaternion)
         {
             Quaternion toReturn;
@@ -234,6 +242,36 @@ namespace ConversionHelper
             bepuQuaternion.W = quaternion.W;
         }
 
+        //Ray
+        public static BEPUphysics.MathExtensions.Ray Convert(Ray ray)
+        {
+            BEPUphysics.MathExtensions.Ray toReturn;
+            Convert(ref ray.Position, out toReturn.Position);
+            Convert(ref ray.Direction, out toReturn.Direction);
+            return toReturn;
+        }
+
+        public static void Convert(ref Ray ray, out BEPUphysics.MathExtensions.Ray bepuRay)
+        {
+            Convert(ref ray.Position, out bepuRay.Position);
+            Convert(ref ray.Direction, out bepuRay.Direction);
+        }
+
+        public static Ray Convert(BEPUphysics.MathExtensions.Ray ray)
+        {
+            Ray toReturn;
+            Convert(ref ray.Position, out toReturn.Position);
+            Convert(ref ray.Direction, out toReturn.Direction);
+            return toReturn;
+        }
+
+        public static void Convert(ref BEPUphysics.MathExtensions.Ray ray, out Ray xnaRay)
+        {
+            Convert(ref ray.Position, out xnaRay.Position);
+            Convert(ref ray.Direction, out xnaRay.Direction);
+        }
+
+        //BoundingBox
         public static BoundingBox Convert(BEPUphysics.MathExtensions.BoundingBox boundingBox)
         {
             BoundingBox toReturn;
@@ -250,7 +288,6 @@ namespace ConversionHelper
             return toReturn;
         }
 
-
         public static void Convert(ref BEPUphysics.MathExtensions.BoundingBox boundingBox, out BoundingBox xnaBoundingBox)
         {
             Convert(ref boundingBox.Min, out xnaBoundingBox.Min);
@@ -261,6 +298,64 @@ namespace ConversionHelper
         {
             Convert(ref boundingBox.Min, out bepuBoundingBox.Min);
             Convert(ref boundingBox.Max, out bepuBoundingBox.Max);
+        }
+
+        //BoundingSphere
+        public static BoundingSphere Convert(BEPUphysics.MathExtensions.BoundingSphere boundingSphere)
+        {
+            BoundingSphere toReturn;
+            Convert(ref boundingSphere.Center, out toReturn.Center);
+            toReturn.Radius = boundingSphere.Radius;
+            return toReturn;
+        }
+
+        public static BEPUphysics.MathExtensions.BoundingSphere Convert(BoundingSphere boundingSphere)
+        {
+            BEPUphysics.MathExtensions.BoundingSphere toReturn;
+            Convert(ref boundingSphere.Center, out toReturn.Center);
+            toReturn.Radius = boundingSphere.Radius;
+            return toReturn;
+        }
+
+        public static void Convert(ref BEPUphysics.MathExtensions.BoundingSphere boundingSphere, out BoundingSphere xnaBoundingSphere)
+        {
+            Convert(ref boundingSphere.Center, out xnaBoundingSphere.Center);
+            xnaBoundingSphere.Radius = boundingSphere.Radius;
+        }
+
+        public static void Convert(ref BoundingSphere boundingSphere, out BEPUphysics.MathExtensions.BoundingSphere bepuBoundingSphere)
+        {
+            Convert(ref boundingSphere.Center, out bepuBoundingSphere.Center);
+            bepuBoundingSphere.Radius = boundingSphere.Radius;
+        }
+
+        //Plane
+        public static Plane Convert(BEPUphysics.MathExtensions.Plane plane)
+        {
+            Plane toReturn;
+            Convert(ref plane.Normal, out toReturn.Normal);
+            toReturn.D = plane.D;
+            return toReturn;
+        }
+
+        public static BEPUphysics.MathExtensions.Plane Convert(Plane plane)
+        {
+            BEPUphysics.MathExtensions.Plane toReturn;
+            Convert(ref plane.Normal, out toReturn.Normal);
+            toReturn.D = plane.D;
+            return toReturn;
+        }
+
+        public static void Convert(ref BEPUphysics.MathExtensions.Plane plane, out Plane xnaPlane)
+        {
+            Convert(ref plane.Normal, out xnaPlane.Normal);
+            xnaPlane.D = plane.D;
+        }
+
+        public static void Convert(ref Plane plane, out BEPUphysics.MathExtensions.Plane bepuPlane)
+        {
+            Convert(ref plane.Normal, out bepuPlane.Normal);
+            bepuPlane.D = plane.D;
         }
     }
 }
