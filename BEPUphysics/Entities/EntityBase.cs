@@ -233,23 +233,6 @@ namespace BEPUphysics.Entities
 
 
 
-        bool allowStabilization = true;
-        /// <summary>
-        /// Gets or sets whether or not the entity can be stabilized by the deactivation system.  This allows systems of objects to go to sleep faster.
-        /// Defaults to true.
-        /// </summary>
-        public bool AllowStabilization
-        {
-            get
-            {
-                return allowStabilization;
-            }
-            set
-            {
-                allowStabilization = value;
-            }
-        }
-
         bool isAffectedByGravity = true;
         ///<summary>
         /// Gets or sets whether or not the entity can be affected by gravity applied by the ForceUpdater.
@@ -915,7 +898,7 @@ namespace BEPUphysics.Entities
             }
 
             //Boost damping at very low velocities.  This is a strong stabilizer; removes a ton of energy from the system.
-            if (activityInformation.DeactivationManager.useStabilization && allowStabilization && 
+            if (activityInformation.DeactivationManager.useStabilization && activityInformation.allowStabilization && 
                 (activityInformation.isSlowing || activityInformation.velocityTimeBelowLimit > activityInformation.DeactivationManager.lowVelocityTimeMinimum))
             {
                 float energy = linearVelocity.LengthSquared() + angularVelocity.LengthSquared();
