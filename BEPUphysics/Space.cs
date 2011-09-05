@@ -518,7 +518,7 @@ namespace BEPUphysics
         public void Update(float dt)
         {
             TimeStepSettings.AccumulatedTime += dt;
-            for (int i = 0; i < TimeStepSettings.TimeStepCountPerFrameMaximum; i++)
+            for (int i = 0; i < TimeStepSettings.MaximumTimeStepsPerFrame; i++)
             {
                 if (TimeStepSettings.AccumulatedTime >= TimeStepSettings.TimeStepDuration)
                 {
