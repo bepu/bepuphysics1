@@ -66,6 +66,15 @@ namespace BEPUphysics.MathExtensions
         }
 
         /// <summary>
+        /// Gets a string representation of the vector.
+        /// </summary>
+        /// <returns>String representing the vector.</returns>
+        public override string ToString()
+        {
+            return "{" + X + ", " + Y + ", " + Z + "}";
+        }
+
+        /// <summary>
         /// Computes the dot product of two vectors.
         /// </summary>
         /// <param name="a">First vector in the product.</param>
@@ -409,9 +418,12 @@ namespace BEPUphysics.MathExtensions
         /// <param name="result">Cross product of the two vectors.</param>
         public static void Cross(ref Vector3 a, ref Vector3 b, out Vector3 result)
         {
-            result.X = a.Y * b.Z - a.Z * b.Y;
-            result.Y = a.Z * b.X - a.X * b.Z;
-            result.Z = a.X * b.Y - a.Y * b.X;
+            float resultX = a.Y * b.Z - a.Z * b.Y;
+            float resultY = a.Z * b.X - a.X * b.Z;
+            float resultZ = a.X * b.Y - a.Y * b.X;
+            result.X = resultX;
+            result.Y = resultY;
+            result.Z = resultZ;
         }
 
         /// <summary>
