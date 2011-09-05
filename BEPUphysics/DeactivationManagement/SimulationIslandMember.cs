@@ -276,6 +276,22 @@ namespace BEPUphysics.DeactivationManagement
         /// </summary>
         public bool IsAlwaysActive { get; set; }
 
+        internal bool allowStabilization = true;
+        /// <summary>
+        /// Gets or sets whether or not the entity can be stabilized by the deactivation system.  This allows systems of objects to go to sleep faster.
+        /// Defaults to true.
+        /// </summary>
+        public bool AllowStabilization
+        {
+            get
+            {
+                return allowStabilization;
+            }
+            set
+            {
+                allowStabilization = value;
+            }
+        }
 
         //simulationisland should hook into the activated event.  If it is fired and the simulation island is inactive, the simulation island should activate.
         //Obviously only call event if it goes from inactive to active.
