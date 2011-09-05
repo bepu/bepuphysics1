@@ -9,7 +9,7 @@
         /// Maximum number of timesteps to perform during a given frame when Space.Update(float) is used.  The unsimulated time will be accumulated for subsequent calls to Space.Update(float).
         /// Defaults to 3.
         /// </summary>
-        public int TimeStepCountPerFrameMaximum = 3;
+        public int MaximumTimeStepsPerFrame = 3;
 
         /// <summary>
         /// Length of each integration step.  Calling a Space's Update() method moves time forward this much.

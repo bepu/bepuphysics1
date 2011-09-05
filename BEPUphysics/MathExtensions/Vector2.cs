@@ -48,6 +48,14 @@ namespace BEPUphysics.MathExtensions
             return (float)Math.Sqrt(X * X + Y * Y);
         }
 
+        /// <summary>
+        /// Gets a string representation of the vector.
+        /// </summary>
+        /// <returns>String representing the vector.</returns>
+        public override string ToString()
+        {
+            return "{" + X + ", " + Y + "}";
+        }
 
         /// <summary>
         /// Adds two vectors together.
