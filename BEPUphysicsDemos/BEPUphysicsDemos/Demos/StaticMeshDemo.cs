@@ -38,7 +38,6 @@ namespace BEPUphysicsDemos.Demos
 
             Space.Add(staticMesh);
             game.ModelDrawer.Add(staticMesh);
-           
 
 
             //Dump some boxes on top of it for fun.
