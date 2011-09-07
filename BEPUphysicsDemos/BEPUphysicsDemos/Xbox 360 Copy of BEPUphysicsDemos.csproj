@@ -107,7 +107,7 @@
     <Compile Include="Demos\MultipendulumDemo.cs" />
     <Compile Include="Demos\PathFollowingDemo.cs" />
     <Compile Include="Demos\PyramidDemo.cs" />
-    <Compile Include="Demos\ReverseTrikeDemo.cs" />
+    <Compile Include="Demos\Tests\ReverseTrikeDemo.cs" />
     <Compile Include="Demos\RobotArmDemo.cs" />
     <Compile Include="Demos\SawContraptionDemo.cs" />
     <Compile Include="Demos\SleepModeDemo.cs" />
@@ -116,7 +116,7 @@
     <Compile Include="Demos\Tests\AddRemoveStressDemo.cs" />
     <Compile Include="Demos\Tests\BoxBoxTestDemo.cs" />
     <Compile Include="Demos\Tests\BroadPhasesTestDemo.cs" />
-    <Compile Include="Demos\Tests\ClothTestDemo.cs" />
+    <Compile Include="Demos\Tests\SelfCollidingClothDemo.cs" />
     <Compile Include="Demos\Tests\DeterminismTestDemo.cs" />
     <Compile Include="Demos\Tests\MPRCastingDemo.cs" />
     <Compile Include="Demos\Tests\MPRTestDemo.cs" />
