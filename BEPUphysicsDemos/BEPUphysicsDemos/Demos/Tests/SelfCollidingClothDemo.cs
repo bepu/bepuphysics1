@@ -10,13 +10,13 @@ namespace BEPUphysicsDemos.Demos.Tests
     /// <summary>
     /// A basic lattice of constraints acting like cloth.
     /// </summary>
-    public class ClothTestDemo : StandardDemo
+    public class SelfCollidingClothDemo : StandardDemo
     {
         /// <summary>
         /// Constructs a new demo.
         /// </summary>
         /// <param name="game">Game owning this demo.</param>
-        public ClothTestDemo(DemosGame game)
+        public SelfCollidingClothDemo(DemosGame game)
             : base(game)
         {
             //Joints can also act like springs by modifying their springSettings.
