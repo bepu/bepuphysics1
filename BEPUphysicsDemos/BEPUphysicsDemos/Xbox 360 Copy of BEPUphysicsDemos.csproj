@@ -122,6 +122,7 @@
     <Compile Include="Demos\Tests\MPRTestDemo.cs" />
     <Compile Include="Demos\Tests\MutableCompoundDemo.cs" />
     <Compile Include="Demos\Tests\SimulationIslandStressTestDemo.cs" />
+    <Compile Include="Demos\Tests\SuspensionCarDemo.cs" />
     <Compile Include="Demos\Tests\TerrainTesting.cs" />
     <Compile Include="Demos\Tests\ThreadingTestDemo.cs" />
     <Compile Include="Demos\Tests\ThreadManagerTestDemo.cs" />
