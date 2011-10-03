@@ -1,3 +1,6 @@
+Content\bepuphysicscontrols.xnb
+Content\wheel.xnb
+Content\whitePixel.xnb
 Content\InstancedEffect.xnb
 Content\barrelandplatform.xnb
 Content\bepubox.xnb
@@ -13,6 +16,4 @@ Content\360 thick sphere.xnb
 Content\CharacterControllerTestTerrain.xnb
 Content\DataFont.xnb
 Content\TinyFont.xnb
-Content\bepuphysicscontrols.xnb
-Content\wheel.xnb
-Content\whitePixel.xnb
+Content\plane.xnb
