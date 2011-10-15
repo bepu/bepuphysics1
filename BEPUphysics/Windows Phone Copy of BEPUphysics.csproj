@@ -22,6 +22,7 @@
     <TileImage Condition="$(XnaOutputType)=='Game'">Background.png</TileImage>
     <TileTitle Condition="$(XnaOutputType)=='Game'">$(AssemblyName)</TileTitle>
     <SupportedCultures />
+    <XnaRefreshLevel>1</XnaRefreshLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|Windows Phone' ">
     <OutputPath>bin\Windows Phone\Debug</OutputPath>
