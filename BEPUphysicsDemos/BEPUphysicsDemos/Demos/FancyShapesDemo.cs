@@ -4,6 +4,10 @@ using BEPUphysics.Entities.Prefabs;
 using Microsoft.Xna.Framework;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.MathExtensions;
+using BEPUphysics;
+using System.Diagnostics;
+using BEPUphysicsDrawer.Models;
+using BEPUphysics.DataStructures;
 
 namespace BEPUphysicsDemos.Demos
 {
@@ -12,6 +16,8 @@ namespace BEPUphysicsDemos.Demos
     /// </summary>
     public class FancyShapesDemo : StandardDemo
     {
+        double time;
+
         /// <summary>
         /// Constructs a new demo.
         /// </summary>
@@ -25,7 +31,7 @@ namespace BEPUphysicsDemos.Demos
             var points = new List<Vector3>();
 
             //Setup a random distribution in a cube and compute a convex hull.
-            var random = new Random();
+            var random = new Random(0);
             for (int k = 0; k < 40; k++)
             {
                 points.Add(new Vector3(3 * (float)random.NextDouble(), 5 * (float)random.NextDouble(), 3 * (float)random.NextDouble()));
@@ -38,13 +44,66 @@ namespace BEPUphysicsDemos.Demos
 
             
             //Create another random distribution, but this time with more points.
+            //points.Clear();
+            //for (int k = 0; k < 400; k++)
+            //{
+            //    points.Add(new Vector3(1 * (float)random.NextDouble(), 3 * (float)random.NextDouble(), 1 * (float)random.NextDouble()));
+            //}
+
             points.Clear();
-            for (int k = 0; k < 400; k++)
+            for (int i = 1; i <= 20; i++)
             {
-                points.Add(new Vector3(1 * (float)random.NextDouble(), 3 * (float)random.NextDouble(), 1 * (float)random.NextDouble()));
+                for (int j = 1; j <= 20; j++)
+                {
+                    points.Add(new Vector3(i * .1f, 0, j * .1f));
+                }
             }
+            points.Add(new Vector3(1, -1, 1));
+
+
+            //int NumSides = 24;
+            //float angleBetweenFacets = MathHelper.TwoPi / NumSides;
+            //float radius = 3;
+            //points.Add(new Vector3(0, radius, 0));
+
+            //for (int i = 1; i < NumSides / 2; i++)
+            //{
+            //    float phi = MathHelper.PiOver2 - i * angleBetweenFacets;
+            //    var sinPhi = (float)Math.Sin(phi);
+            //    var cosPhi = (float)Math.Cos(phi);
+
+            //    for (int j = 0; j < NumSides; j++)
+            //    {
+            //        float theta = j * angleBetweenFacets;
+            //        Vector3 n;
+            //        n.X = (float)Math.Cos(theta) * cosPhi;
+            //        n.Y = sinPhi;
+            //        n.Z = (float)Math.Sin(theta) * cosPhi;
+
+            //        points.Add(n * radius);
+            //    }
+            //}
+            //points.Add(new Vector3(0, -radius, 0));
+
             convexHull = new ConvexHull(new Vector3(4, 7, 0), points, 10);
             Space.Add(convexHull);
+
+            List<int> indices = new List<int>();
+
+            List<Vector3> hullPoints = null;
+            for (int i = 0; i < 10; i++)
+            {
+                hullPoints = new List<Vector3>(points);
+                double startTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
+                Toolbox.GetConvexHull(hullPoints, indices);
+
+                double endTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
+                time += endTime - startTime;
+            }
+            time /= 10;
+
+            var mesh = new TriangleMesh(new StaticMeshData(hullPoints.ToArray(), indices.ToArray()));
+            game.ModelDrawer.Add(mesh);
 
 
             //Minkowski Sums are fancy 'combinations' of objects, where the result is the sum of the individual points making up shapes.
@@ -109,6 +168,12 @@ namespace BEPUphysicsDemos.Demos
 
             game.Camera.Position = new Vector3(0, 0, 30);
 
+        }
+
+        public override void DrawUI()
+        {
+            Game.DataTextDrawer.Draw(time, 6, new Vector2(50, 50));
+            base.DrawUI();
         }
 
         /// <summary>
