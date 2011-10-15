@@ -1365,14 +1365,15 @@ namespace BEPUphysics
         /// <param name="points">List of all points to be indexed from.</param>
         /// <returns>The point furthest along the direction in the list of points.</returns>
         /// <param name="maxIndex">Index of the maximum point in the list.</param>
-        public static Vector3 GetExtremePointOfSet(Vector3 direction, IList<int> pointIndices, IList<Vector3> points, out int maxIndex)
+        private static Vector3 GetExtremePointOfSet(Vector3 direction, RawList<int> pointIndices, RawList<Vector3> points, out int maxIndex)
         {
             float max = float.MinValue;
             Vector3 maximum = ZeroVector;
             maxIndex = 0;
-            for (int k = 0; k < pointIndices.Count; k++)
+            for (int k = 0; k < pointIndices.count; k++)
             {
-                float dot = Vector3.Dot(points[pointIndices[k]], direction);
+                float dot;
+                Vector3.Dot(ref direction, ref points.Elements[pointIndices.Elements[k]], out dot);
                 if (dot > max)
                 {
                     max = dot;
@@ -1391,7 +1392,7 @@ namespace BEPUphysics
         /// <param name="minimum">Index of the point furthest back along the direction in the point list.</param>
         /// <param name="maximum">Index of the point furthest forward along the direction in the point list.</param>
         /// <returns>The point furthest along the direction in the list of points.</returns>
-        public static void GetExtremePointsOfSet(Vector3 direction, IList<Vector3> points, out int minimum, out int maximum)
+        private static void GetExtremePointsOfSet(Vector3 direction, RawList<Vector3> points, out int minimum, out int maximum)
         {
             float max = float.MinValue;
             float min = float.MaxValue;
@@ -1400,7 +1401,8 @@ namespace BEPUphysics
 
             for (int k = 0; k < points.Count; k++)
             {
-                float dot = Vector3.Dot(points[k], direction);
+                float dot;
+                Vector3.Dot(ref points.Elements[k], ref direction, out dot);
                 if (dot > max)
                 {
                     max = dot;
@@ -1413,7 +1415,7 @@ namespace BEPUphysics
                 }
             }
         }
-        internal static void GetExtremePointsOfSet(Vector3 direction, IList<Vector3> points, out int minimum, out int maximum, out float min, out float max)
+        private static void GetExtremePointsOfSet(Vector3 direction, RawList<Vector3> points, out int minimum, out int maximum, out float min, out float max)
         {
             max = float.MinValue;
             min = float.MaxValue;
@@ -1422,7 +1424,8 @@ namespace BEPUphysics
 
             for (int k = 0; k < points.Count; k++)
             {
-                float dot = Vector3.Dot(points[k], direction);
+                float dot;
+                Vector3.Dot(ref points.Elements[k], ref direction, out dot);
                 if (dot > max)
                 {
                     max = dot;
@@ -1435,12 +1438,9 @@ namespace BEPUphysics
                 }
             }
         }
-        private static Vector3 FindNormal(IList<Vector3> points, IList<int> indices, int startIndex)
-        {
-            return Vector3.Cross(points[indices[startIndex + 2]] - points[indices[startIndex]], points[indices[startIndex + 1]] - points[indices[startIndex]]);
-        }
 
-        private static void MaintainEdge(int a, int b, IList<int> edges)
+
+        private static void MaintainEdge(int a, int b, RawList<int> edges)
         {
             bool contained = false;
             int index = 0;
@@ -1466,7 +1466,7 @@ namespace BEPUphysics
             }
         }
 
-        private static void RemovePointsInPolyhedronIfInside(IList<int> outsidePoints, IList<Vector3> points, IList<int> indices)
+        private static void RemovePointsInPolyhedronIfInside(RawList<int> outsidePoints, RawList<Vector3> points, RawList<int> indices)
         {
             var outsidePointsTemp = Resources.GetIntList();
             for (int k = 0; k < outsidePoints.Count; k++)
@@ -1476,11 +1476,17 @@ namespace BEPUphysics
             outsidePoints.Clear();
             for (int k = 0; k < indices.Count && outsidePointsTemp.Count > 0; k += 3)
             {
-                Vector3 normal = FindNormal(points, indices, k);
+                Vector3 normal;
+                FindNormal(indices, points, k, out normal);
                 for (int n = 0; n < outsidePointsTemp.Count; n++)
                 {
-                    Vector3 point = points[outsidePointsTemp[n]];
-                    if (Vector3.Dot(point, normal) - Vector3.Dot(points[indices[k]], normal) > 0)
+                    //Offset from the triangle to the current point, tested against the normal, determines if the current point is visible
+                    //from the triangle face.
+                    Vector3 offset;
+                    Vector3.Subtract(ref points.Elements[outsidePointsTemp.Elements[n]], ref points.Elements[indices.Elements[k]], out offset);
+                    float dot;
+                    Vector3.Dot(ref offset, ref normal, out dot);
+                    if (dot >= 0)
                     {
                         outsidePoints.Add(outsidePointsTemp[n]);
                         outsidePointsTemp.RemoveAt(n);
@@ -1491,7 +1497,33 @@ namespace BEPUphysics
             Resources.GiveBack(outsidePointsTemp);
         }
 
-        private static void VerifyWindings(IList<int> indices, IList<Vector3> points)
+        private static void FindNormal(RawList<int> indices, RawList<Vector3> points, int triangleIndex, out Vector3 normal)
+        {
+            var a = points.Elements[indices.Elements[triangleIndex]];
+            Vector3 ab, ac;
+            Vector3.Subtract(ref points.Elements[indices.Elements[triangleIndex + 1]], ref a, out ab);
+            Vector3.Subtract(ref points.Elements[indices.Elements[triangleIndex + 2]], ref a, out ac);
+            Vector3.Cross(ref ac, ref ab, out normal);
+        }
+
+        private static bool IsTriangleVisibleFromPoint(RawList<int> indices, RawList<Vector3> points, int triangleIndex, ref Vector3 point)
+        {
+            //Compute the normal of the triangle.
+            var a = points.Elements[indices.Elements[triangleIndex]];
+            Vector3 ab, ac;
+            Vector3.Subtract(ref points.Elements[indices.Elements[triangleIndex + 1]], ref a, out ab);
+            Vector3.Subtract(ref points.Elements[indices.Elements[triangleIndex + 2]], ref a, out ac);
+            Vector3 normal;
+            Vector3.Cross(ref ac, ref ab, out normal);
+            //Assume a consistent winding.  Check to see if the normal points at the point.
+            Vector3 offset;
+            Vector3.Subtract(ref point, ref a, out offset);
+            float dot;
+            Vector3.Dot(ref offset, ref normal, out dot);
+            return dot >= 0;
+        }
+
+        private static void VerifyWindings(RawList<int> indices, RawList<Vector3> points)
         {
             //Find centroid
             Vector3 centroid = ZeroVector;
@@ -1500,11 +1532,12 @@ namespace BEPUphysics
                 centroid += points[indices[k]];
             }
             centroid /= indices.Count;
-            //Go through every triangle
+            //Go through every triangle.
             for (int k = 0; k < indices.Count; k += 3)
             {
-                //Check if it faces away or towards the centroid
-                if (Vector3.Dot(points[indices[k]] - centroid, FindNormal(points, indices, k)) < 0)
+                //Check if the triangle faces away or towards the centroid.
+
+                if (IsTriangleVisibleFromPoint(indices, points, k, ref centroid))
                 {
                     //If it's towards, flip winding
                     int temp = indices[k + 1];
@@ -1521,6 +1554,26 @@ namespace BEPUphysics
         /// <param name="indices">List of indices composing the triangulated surface of the convex hull.
         /// Each group of 3 indices represents a triangle on the surface of the hull.</param>
         public static void GetConvexHull(IList<Vector3> points, IList<int> indices)
+        {
+            var rawPoints = Resources.GetVectorList();
+            var rawIndices = Resources.GetIntList();
+            rawPoints.AddRange(points);
+            GetConvexHull(rawPoints, rawIndices);
+            Resources.GiveBack(rawPoints);
+            for (int i = 0; i < rawIndices.count; i++)
+            {
+                indices.Add(rawIndices[i]);
+            }
+            Resources.GiveBack(rawIndices);
+        }
+
+        /// <summary>
+        /// Identifies the indices of points in a set which are on the outer convex hull of the set.
+        /// </summary>
+        /// <param name="points">List of points in the set.</param>
+        /// <param name="indices">List of indices composing the triangulated surface of the convex hull.
+        /// Each group of 3 indices represents a triangle on the surface of the hull.</param>
+        public static void GetConvexHull(RawList<Vector3> points, RawList<int> indices)
         {
             //Points is what will be used as a vertex buffer.
             var outsidePoints = Resources.GetIntList();
@@ -1645,14 +1698,24 @@ namespace BEPUphysics
                 //While the convex hull is incomplete
                 for (int k = 0; k < indices.Count; k += 3)
                 {
-                    //For each triangle
                     //Find the normal of the triangle
-                    Vector3 normal = FindNormal(points, indices, k);
-                    //Get the furthest point
+                    Vector3 normal;
+                    FindNormal(indices, points, k, out normal);
+
+                    //Get the furthest point in the direction of the normal.
                     int maxIndex;
                     Vector3 maximum = GetExtremePointOfSet(normal, outsidePoints, points, out maxIndex);
-                    //If the point is visible by the triangle, continue
-                    if (Vector3.Dot(maximum, normal) - Vector3.Dot(points[indices[k]], normal) > 0)
+
+                 
+
+
+                    
+                    //If the point is visible by the triangle, continue.
+                    Vector3 offset;
+                    Vector3.Subtract(ref maximum, ref points.Elements[indices.Elements[k]], out offset);
+                    float dot;
+                    Vector3.Dot(ref normal, ref offset, out dot);
+                    if (dot >= 0)
                     {
                         //It's been picked! Remove the maximum point from the outside.
                         outsidePoints.Remove(maxIndex);
@@ -1662,8 +1725,7 @@ namespace BEPUphysics
                         for (int n = 0; n < indices.Count; n += 3)
                         {
                             //Go through each triangle, if it can be seen, delete it and use maintainEdge on its edges.
-                            normal = FindNormal(points, indices, n);
-                            if (Vector3.Dot(maximum, normal) - Vector3.Dot(points[indices[n]], normal) > 0)
+                            if (IsTriangleVisibleFromPoint(indices, points, n, ref maximum))
                             {
                                 //This triangle can see it!
                                 MaintainEdge(indices[n], indices[n + 1], edges);
@@ -1706,10 +1768,24 @@ namespace BEPUphysics
         /// <param name="outputSurfacePoints">Unique points on the surface of the convex hull.</param>
         public static void GetConvexHull(IList<Vector3> points, IList<Vector3> outputSurfacePoints)
         {
+            var rawPoints = Resources.GetVectorList();
+            rawPoints.AddRange(points);
+            GetConvexHull(rawPoints, outputSurfacePoints);
+            Resources.GiveBack(rawPoints);
+        }
+
+        /// <summary>
+        /// Identifies the points on the surface of hull.
+        /// </summary>
+        /// <param name="points">List of points in the set.</param>
+        /// <param name="outputSurfacePoints">Unique points on the surface of the convex hull.</param>
+        public static void GetConvexHull(RawList<Vector3> points, RawList<Vector3> outputSurfacePoints)
+        {
             var indices = Resources.GetIntList();
             GetConvexHull(points, indices, outputSurfacePoints);
             Resources.GiveBack(indices);
         }
+
 
         /// <summary>
         /// Identifies the points on the surface of hull.
@@ -1720,11 +1796,32 @@ namespace BEPUphysics
         /// <param name="outputSurfacePoints">Unique points on the surface of the convex hull.</param>
         public static void GetConvexHull(IList<Vector3> points, IList<int> outputIndices, IList<Vector3> outputSurfacePoints)
         {
+            var rawPoints = Resources.GetVectorList();
+            var rawIndices = Resources.GetIntList();
+            rawPoints.AddRange(points);
+            GetConvexHull(rawPoints, rawIndices, outputSurfacePoints);
+            Resources.GiveBack(rawPoints); 
+            for (int i = 0; i < rawIndices.count; i++)
+            {
+                outputIndices.Add(rawIndices[i]);
+            }
+            Resources.GiveBack(rawIndices);
+        }
+
+        /// <summary>
+        /// Identifies the points on the surface of hull.
+        /// </summary>
+        /// <param name="points">List of points in the set.</param>
+        /// <param name="outputIndices">List of indices composing the triangulated surface of the convex hull.
+        /// Each group of 3 indices represents a triangle on the surface of the hull.</param>
+        /// <param name="outputSurfacePoints">Unique points on the surface of the convex hull.</param>
+        public static void GetConvexHull(RawList<Vector3> points, RawList<int> outputIndices, IList<Vector3> outputSurfacePoints)
+        {
             //TODO: This isn't incredibly fast, but neither is the original GetConvexHull method.
             //This whole system could use some optimization.
             GetConvexHull(points, outputIndices);
 
-            var alreadyContainedIndices = Resources.GetIntList();
+            var alreadyContainedIndices = Resources.GetIntSet();
 
             for (int i = outputIndices.Count - 1; i >= 0; i--)
             {
@@ -1743,7 +1840,7 @@ namespace BEPUphysics
         #endregion
 
         #region Miscellaneous
-        
+
         ///<summary>
         /// Tests a ray against a sphere.
         ///</summary>
