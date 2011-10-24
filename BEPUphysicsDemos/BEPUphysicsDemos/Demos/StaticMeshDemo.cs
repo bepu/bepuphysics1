@@ -39,6 +39,8 @@ namespace BEPUphysicsDemos.Demos
             Space.Add(staticMesh);
             game.ModelDrawer.Add(staticMesh);
 
+      
+
 
             //Dump some boxes on top of it for fun.
             int numColumns = 8;
@@ -56,7 +58,7 @@ namespace BEPUphysicsDemos.Demos
                             30f + k * separation,
                             separation * j - numColumns * separation / 2),
                             2, 2, 2, 15);
-                    
+
                         Space.Add(toAdd);
                     }
 
@@ -66,6 +68,7 @@ namespace BEPUphysicsDemos.Demos
 
 
         }
+
 
         /// <summary>
         /// Gets the name of the simulation.

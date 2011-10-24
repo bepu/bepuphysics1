@@ -8,6 +8,10 @@ namespace BEPUphysics.BroadPhaseSystems
     ///</summary>
     public interface IQueryAccelerator
     {
+        /// <summary>
+        /// Gets the broad phase associated with this query accelerator, if any.
+        /// </summary>
+        BroadPhase BroadPhase { get; }
         ///<summary>
         /// Gets the broad phase entries overlapping the ray.
         ///</summary>
@@ -23,7 +27,7 @@ namespace BEPUphysics.BroadPhaseSystems
         ///<param name="outputIntersections">Overlapped entries.</param>
         ///<returns>Whether or not the ray hit anything.</returns>
         bool RayCast(Ray ray, float maximumLength, IList<BroadPhaseEntry> outputIntersections);
-        
+
         //There's no single-hit version because the TOI on queries isn't really meaningful.
         //TODO: IQueryAccelerator + BroadPhase.  Both have add methods.  A user might expect to be able to add separately, but that doesn't really work.
         //Consider pulling the query accelerator into the broadphase so people consider it to be a part of the broadphase- it accelerates queries against the broadphase.

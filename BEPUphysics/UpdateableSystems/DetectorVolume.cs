@@ -83,6 +83,10 @@ namespace BEPUphysics.UpdateableSystems
         {
             TriangleMesh = new TriangleMesh(triangleMesh);
             QueryAccelerator = queryAccelerator;
+            collisionRules = new CollisionRules()
+            {
+                 group = new CollisionGroup()
+            };
         }
 
         /// <summary>
@@ -150,7 +154,7 @@ namespace BEPUphysics.UpdateableSystems
             for (int i = 0; i < entries.count; i++)
             {
                 var e = entries.Elements[i] as EntityCollidable;
-                if (e != null)
+                if (e != null && CollisionRules.collisionRuleCalculator(e.collisionRules, collisionRules) <= CollisionRule.NoSolver)
                     entities.Add(e.Entity);
             }
             entries.Clear();
