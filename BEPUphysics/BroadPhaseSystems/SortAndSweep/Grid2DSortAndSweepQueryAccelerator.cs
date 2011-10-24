@@ -14,6 +14,17 @@ namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
             this.owner = owner;
         }
 
+        /// <summary>
+        /// Gets the broad phase associated with this query accelerator.
+        /// </summary>
+        public BroadPhase BroadPhase
+        {
+            get
+            {
+                return owner;
+            }
+        }
+
         public bool RayCast(Microsoft.Xna.Framework.Ray ray, IList<BroadPhaseEntry> outputIntersections)
         {
             throw new NotSupportedException("The Grid2DSortAndSweep broad phase cannot accelerate infinite ray casts.  Consider specifying a maximum length or using a broad phase which supports infinite ray casts.");
