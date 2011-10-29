@@ -376,24 +376,60 @@
     <Compile Include="TimeStepSettings.cs" />
     <Compile Include="Toolbox.cs" />
     <Compile Include="Materials\IMaterialOwner.cs" />
-    <Compile Include="UpdateableSystems\CombinedUpdateable.cs" />
-    <Compile Include="UpdateableSystems\DetectorVolume.cs" />
-    <Compile Include="UpdateableSystems\FluidVolume.cs" />
-    <Compile Include="UpdateableSystems\ForceFields\BoundingBoxForceFieldShape.cs" />
-    <Compile Include="UpdateableSystems\ForceFields\ForceField.cs" />
-    <Compile Include="UpdateableSystems\ForceFields\ForceFieldShape.cs" />
-    <Compile Include="UpdateableSystems\ForceFields\InfiniteForceFieldShape.cs" />
-    <Compile Include="UpdateableSystems\ForceFields\VolumeForceFieldShape.cs" />
-    <Compile Include="UpdateableSystems\IBeforeNarrowPhaseUpdateable.cs" />
-    <Compile Include="UpdateableSystems\IBeforePositionUpdateUpdateable.cs" />
-    <Compile Include="UpdateableSystems\IBeforeSolverUpdateable.cs" />
-    <Compile Include="UpdateableSystems\IDuringForcesUpdateable.cs" />
-    <Compile Include="UpdateableSystems\IEndOfFrameUpdateable.cs" />
-    <Compile Include="UpdateableSystems\IEndOfTimeStepUpdateable.cs" />
-    <Compile Include="UpdateableSystems\ISpaceUpdateable.cs" />
-    <Compile Include="UpdateableSystems\Updateable.cs" />
-    <Compile Include="UpdateableSystems\UpdateableManager.cs" />
-    <Compile Include="UpdateableSystems\UpdateableManagers.cs" />
+    <Compile Include="UpdateableSystems\CombinedUpdateable.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="UpdateableSystems\DetectorVolume.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="UpdateableSystems\FluidVolume.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="UpdateableSystems\ForceFields\BoundingBoxForceFieldShape.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="UpdateableSystems\ForceFields\ForceField.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="UpdateableSystems\ForceFields\ForceFieldShape.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="UpdateableSystems\ForceFields\InfiniteForceFieldShape.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="UpdateableSystems\ForceFields\VolumeForceFieldShape.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="UpdateableSystems\IBeforeNarrowPhaseUpdateable.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="UpdateableSystems\IBeforePositionUpdateUpdateable.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="UpdateableSystems\IBeforeSolverUpdateable.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="UpdateableSystems\IDuringForcesUpdateable.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="UpdateableSystems\IEndOfFrameUpdateable.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="UpdateableSystems\IEndOfTimeStepUpdateable.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="UpdateableSystems\ISpaceUpdateable.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="UpdateableSystems\Updateable.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="UpdateableSystems\UpdateableManager.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="UpdateableSystems\UpdateableManagers.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Vehicle\RaycastWheelShape.cs" />
     <Compile Include="Vehicle\Vehicle.cs" />
     <Compile Include="Vehicle\Wheel.cs" />

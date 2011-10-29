@@ -100,6 +100,9 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     if (character.SupportFinder.HasSupport)
                     {
                         //Standing requires a query to verify that the new state is safe.
+                        //TODO: State queries can be expensive if the character is crouching beneath something really detailed.
+                        //There are some situations where you may want to do an upwards-pointing ray cast first.  If it hits something,
+                        //there's no need to do the full query.
                         newPosition = character.Body.Position - character.Body.OrientationMatrix.Down * ((StandingHeight - CrouchingHeight) * .5f);
                         character.QueryManager.QueryContacts(newPosition, Stance.Standing);
                         if (IsObstructed(character.QueryManager.SideContacts, character.QueryManager.HeadContacts))
