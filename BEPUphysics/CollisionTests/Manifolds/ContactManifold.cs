@@ -100,7 +100,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
         /// <summary>
         /// Clears the contacts associated with this manifold.
         /// </summary>
-        public void ClearContacts()
+        public virtual void ClearContacts()
         {
             for (int i = contacts.count - 1; i >= 0; i--)
             {

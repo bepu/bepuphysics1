@@ -397,7 +397,12 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
                 foreach (var c in pair.Contacts)
                 {
                     //It's possible that a subpair has a non-normal collision rule, even if the parent pair is normal.
-                    if (c.Pair.CollisionRule != CollisionRule.Normal)
+                    //Note that only contacts with nonnegative penetration depths are used.
+                    //Negative depth contacts are 'speculative' in nature.
+                    //If we were to use such a speculative contact for support, the character would find supports
+                    //in situations where it should not.
+                    //This can actually be useful in some situations, but keep it disabled by default.
+                    if (c.Pair.CollisionRule != CollisionRule.Normal || c.Contact.PenetrationDepth < 0) 
                         continue;
                     //Compute the offset from the position of the character's body to the contact.
                     Vector3 contactOffset;
@@ -480,16 +485,16 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
 
             bool hasTractionDueToContacts = HasTraction;
 
-            //Start the ray halfway between the center of the shape and the bottom of the shape.  That extra margin prevents it from getting stuck in the ground and returning t = 0 unhelpfully.
+            //Cast a ray straight down.
             SupportRayData = null;
-            bottomHeight = body.Radius * .5f;
+            bottomHeight = character.Body.Radius;
             //If the contacts aren't available to support the character, raycast down to find the ground.
             if (!hasTractionDueToContacts && hadTraction)
             {
 
                 //TODO: could also require that the character has a nonzero movement direction in order to use a ray cast.  Questionable- would complicate the behavior on edges.
                 float length = hadTraction ? bottomHeight + maximumAssistedDownStepHeight: bottomHeight;
-                Ray ray = new Ray(body.Position + downDirection * body.Radius * .5f, downDirection);
+                Ray ray = new Ray(body.Position, downDirection);
 
                 bool hasTraction;
                 SupportRayData data;
@@ -507,12 +512,11 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
             {
 
                 Ray ray = new Ray(body.Position +
-                    new Vector3(character.HorizontalMotionConstraint.MovementDirection.X, 0, character.HorizontalMotionConstraint.MovementDirection.Y) * (character.Body.Radius - character.Body.CollisionInformation.Shape.CollisionMargin) +
-                    downDirection * body.Radius * .5f, downDirection);
+                    new Vector3(character.HorizontalMotionConstraint.MovementDirection.X, 0, character.HorizontalMotionConstraint.MovementDirection.Y) * (character.Body.Radius), downDirection);
 
                 //Have to test to make sure the ray doesn't get obstructed.  This could happen if the character is deeply embedded in a wall; we wouldn't want it detecting things inside the wall as a support!
                 Ray obstructionRay;
-                obstructionRay.Position = body.Position + downDirection * body.Radius * .5f;
+                obstructionRay.Position = body.Position;
                 obstructionRay.Direction = ray.Position - obstructionRay.Position;
                 if (!character.QueryManager.RayCastHitAnything(obstructionRay, 1))
                 {
@@ -545,8 +549,8 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
                 //Compute the horizontal offset direction.  Down direction and the movement direction are normalized and perpendicular, so the result is too.
                 Vector3 horizontalOffset = new Vector3(character.HorizontalMotionConstraint.MovementDirection.X, 0, character.HorizontalMotionConstraint.MovementDirection.Y);
                 Vector3.Cross(ref horizontalOffset, ref downDirection, out horizontalOffset);
-                Vector3.Multiply(ref horizontalOffset, character.Body.Radius - character.Body.CollisionInformation.Shape.CollisionMargin, out horizontalOffset);
-                Ray ray = new Ray(body.Position + horizontalOffset + downDirection * body.Radius * .5f, downDirection);
+                Vector3.Multiply(ref horizontalOffset, character.Body.Radius, out horizontalOffset);
+                Ray ray = new Ray(body.Position + horizontalOffset, downDirection);
 
                 //Have to test to make sure the ray doesn't get obstructed.  This could happen if the character is deeply embedded in a wall; we wouldn't want it detecting things inside the wall as a support!
                 Ray obstructionRay;
@@ -583,8 +587,8 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
                 //Compute the horizontal offset direction.  Down direction and the movement direction are normalized and perpendicular, so the result is too.
                 Vector3 horizontalOffset = new Vector3(character.HorizontalMotionConstraint.MovementDirection.X, 0, character.HorizontalMotionConstraint.MovementDirection.Y);
                 Vector3.Cross(ref downDirection, ref horizontalOffset, out horizontalOffset);
-                Vector3.Multiply(ref horizontalOffset, character.Body.Radius - character.Body.CollisionInformation.Shape.CollisionMargin, out horizontalOffset);
-                Ray ray = new Ray(body.Position + horizontalOffset + downDirection * body.Radius * .5f, downDirection);
+                Vector3.Multiply(ref horizontalOffset, character.Body.Radius, out horizontalOffset);
+                Ray ray = new Ray(body.Position + horizontalOffset, downDirection);
 
                 //Have to test to make sure the ray doesn't get obstructed.  This could happen if the character is deeply embedded in a wall; we wouldn't want it detecting things inside the wall as a support!
                 Ray obstructionRay;
