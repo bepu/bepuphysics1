@@ -183,6 +183,5 @@ namespace BEPUphysics.CollisionTests.Manifolds
             base.CleanUp();
         }
 
-
     }
 }

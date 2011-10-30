@@ -149,11 +149,11 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
 #else
             Vector3 offset = new Vector3();
 #endif
-                offset.X = radius;
+                offset.X = 0;
                 offset.Y = SupportFinder.MaximumAssistedDownStepHeight;
-                offset.Z = radius;
+                offset.Z = 0;
                 BoundingBox box = Body.CollisionInformation.BoundingBox;
-                Vector3.Add(ref box.Max, ref offset, out box.Max);
+                //Vector3.Add(ref box.Max, ref offset, out box.Max);
                 Vector3.Subtract(ref box.Min, ref offset, out box.Min);
                 Body.CollisionInformation.BoundingBox = box;
             }
@@ -182,6 +182,8 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
 
         void IBeforeSolverUpdateable.Update(float dt)
         {
+            if (Keyboard.GetState().IsKeyDown(Keys.P))
+                Debug.WriteLine("break");
             CorrectContacts();
 
             bool hadTraction = SupportFinder.HasTraction;
