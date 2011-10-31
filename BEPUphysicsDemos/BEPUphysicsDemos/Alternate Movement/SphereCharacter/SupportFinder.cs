@@ -36,7 +36,7 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
             }
             set
             {
-                maximumAssistedDownStepHeight = Math.Max(value, 0); 
+                maximumAssistedDownStepHeight = Math.Max(value, 0);
             }
         }
 
@@ -374,7 +374,7 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
                     //If we were to use such a speculative contact for support, the character would find supports
                     //in situations where it should not.
                     //This can actually be useful in some situations, but keep it disabled by default.
-                    if (c.Pair.CollisionRule != CollisionRule.Normal || c.Contact.PenetrationDepth < 0) 
+                    if (c.Pair.CollisionRule != CollisionRule.Normal || c.Contact.PenetrationDepth < 0)
                         continue;
                     //Compute the offset from the position of the character's body to the contact.
                     Vector3 contactOffset;
@@ -431,17 +431,16 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
 
             }
 
-            bool hasTractionDueToContacts = HasTraction;
 
             //Cast a ray straight down.
             SupportRayData = null;
             bottomHeight = character.Body.Radius;
             //If the contacts aren't available to support the character, raycast down to find the ground.
-            if (!hasTractionDueToContacts && hadTraction)
+            if (!HasTraction && hadTraction)
             {
 
                 //TODO: could also require that the character has a nonzero movement direction in order to use a ray cast.  Questionable- would complicate the behavior on edges.
-                float length = hadTraction ? bottomHeight + maximumAssistedDownStepHeight: bottomHeight;
+                float length = hadTraction ? bottomHeight + maximumAssistedDownStepHeight : bottomHeight;
                 Ray ray = new Ray(body.Position, downDirection);
 
                 bool hasTraction;
@@ -456,7 +455,7 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
 
             //If contacts and the center ray cast failed, try a ray offset in the movement direction.
             bool tryingToMove = character.HorizontalMotionConstraint.MovementDirection.LengthSquared() > 0;
-            if (!hasTractionDueToContacts && hadTraction && tryingToMove)
+            if (!HasTraction && hadTraction && tryingToMove)
             {
 
                 Ray ray = new Ray(body.Position +
@@ -492,7 +491,7 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
             }
 
             //If contacts, center ray, AND forward ray failed to find traction, try a side ray created from down x forward.
-            if (!hasTractionDueToContacts && hadTraction && tryingToMove)
+            if (!HasTraction && hadTraction && tryingToMove)
             {
                 //Compute the horizontal offset direction.  Down direction and the movement direction are normalized and perpendicular, so the result is too.
                 Vector3 horizontalOffset = new Vector3(character.HorizontalMotionConstraint.MovementDirection.X, 0, character.HorizontalMotionConstraint.MovementDirection.Y);
@@ -513,7 +512,7 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
                     if (TryDownCast(ref ray, length, out hasTraction, out data))
                     {
                         if (SupportRayData == null || data.HitData.T < SupportRayData.Value.HitData.T)
-                        {                            
+                        {
                             //Only replace the previous support ray if we now have traction or we didn't have a support ray at all before,
                             //or this hit is a better (sooner) hit.
                             if (hasTraction)
@@ -530,7 +529,7 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
             }
 
             //If contacts, center ray, forward ray, AND the first side ray failed to find traction, try a side ray created from forward x down.
-            if (!hasTractionDueToContacts && hadTraction && tryingToMove)
+            if (!HasTraction && hadTraction && tryingToMove)
             {
                 //Compute the horizontal offset direction.  Down direction and the movement direction are normalized and perpendicular, so the result is too.
                 Vector3 horizontalOffset = new Vector3(character.HorizontalMotionConstraint.MovementDirection.X, 0, character.HorizontalMotionConstraint.MovementDirection.Y);
