@@ -18,6 +18,7 @@ using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.Collidables;
 using Microsoft.Xna.Framework.Input;
 using BEPUphysics.Entities;
+using BEPUphysics.Threading;
 
 namespace BEPUphysicsDemos.AlternateMovement.Character
 {
@@ -105,6 +106,13 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         }
 
         /// <summary>
+        /// This is used to control the access to simulation islands when there are multiple character controllers updating in parallel.
+        /// If other parts of the program are modifying simulation islands during the IBeforeSolverUpdateable.Update stage, the synchronization
+        /// umbrella will need to be widened.
+        /// </summary>
+        private static SpinLock ConstraintAccessLocker = new SpinLock();
+
+        /// <summary>
         /// Gets the support finder used by the character.
         /// The support finder analyzes the character's contacts to see if any of them provide support and/or traction.
         /// </summary>
@@ -133,6 +141,10 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             StepManager = new StepManager(this);
             StanceManager = new StanceManager(this);
             QueryManager = new QueryManager(this);
+
+            //Enable multithreading for the sphere characters.  
+            //See the bottom of the Update method for more information about using multithreading with this character.
+            IsUpdatedSequentially = false;
 
 
         }
@@ -215,7 +227,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             if (SupportFinder.HasTraction && !hadTraction && verticalVelocity < 0)
             {
                 SupportFinder.ClearSupportData();
-                HorizontalMotionConstraint.SupportData = new SupportData();
+                supportData = new SupportData();
             }
 
             //If we can compute that we're separating faster than we can handle, take off.
@@ -304,20 +316,21 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
 
 
-            //Warning:
-            //Changing a constraint's support data is not thread safe; it modifies simulation islands!
-            //If your game can guarantee that character controllers will be the only ones performing such shared modifications
-            //while this updateable stage runs, then addressing this is fairly simple.  Wrap this section (minimally, the SupportData property sets)
-            //in a critical section.  A single contended resource isn't great, but then again, the lock will be fairly brief compared to the stepping
-            //and support queries performed above.  Implementing such parallelization is probably only it worth when the number of characters gets fairly high.
-            //These characters seem to cost about 50-400 microseconds a piece on a single core of a Q6600@2.4ghz, with 400 microseconds being a temporary worst case.
-            HorizontalMotionConstraint.SupportData = supportData;
             //Vertical support data is different because it has the capacity to stop the character from moving unless
             //contacts are pruned appropriately.
             SupportData verticalSupportData;
             Vector3 movement3d = new Vector3(HorizontalMotionConstraint.MovementDirection.X, 0, HorizontalMotionConstraint.MovementDirection.Y);
             SupportFinder.GetTractionInDirection(ref movement3d, out verticalSupportData);
+
+
+            //Warning:
+            //Changing a constraint's support data is not thread safe; it modifies simulation islands!
+            //If something other than a CharacterController can modify simulation islands is running
+            //simultaneously (in the IBeforeSolverUpdateable.Update stage), it will need to be synchronized.
+            ConstraintAccessLocker.Enter();
+            HorizontalMotionConstraint.SupportData = supportData;
             VerticalMotionConstraint.SupportData = verticalSupportData;
+            ConstraintAccessLocker.Exit();
 
 
 

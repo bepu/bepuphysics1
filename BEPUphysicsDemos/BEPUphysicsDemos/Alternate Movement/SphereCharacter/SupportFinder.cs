@@ -22,10 +22,6 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
 
         internal RawList<SupportContact> supports = new RawList<SupportContact>();
 
-        internal RawList<OtherContact> sideContacts = new RawList<OtherContact>();
-
-        internal RawList<OtherContact> headContacts = new RawList<OtherContact>();
-
         float maximumAssistedDownStepHeight = 1;
         /// <summary>
         /// Gets or sets the maximum distance from the character to the support that will be assisted by downstepping.
@@ -304,28 +300,6 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
         }
 
         /// <summary>
-        /// Gets the contacts on the side of the character.
-        /// </summary>
-        public ReadOnlyList<OtherContact> SideContacts
-        {
-            get
-            {
-                return new ReadOnlyList<OtherContact>(sideContacts);
-            }
-        }
-
-        /// <summary>
-        /// Gets the contacts on the top of the character.
-        /// </summary>
-        public ReadOnlyList<OtherContact> HeadContacts
-        {
-            get
-            {
-                return new ReadOnlyList<OtherContact>(headContacts);
-            }
-        }
-
-        /// <summary>
         /// Gets a collection of the character's supports that provide traction.
         /// Traction means that the surface's slope is flat enough to stand on normally.
         /// </summary>
@@ -382,8 +356,6 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
 
 
             supports.Clear();
-            sideContacts.Clear();
-            headContacts.Clear();
             //Analyze the cylinder's contacts to see if we're supported.
             //Anything that can be a support will have a normal that's off horizontal.
             //That could be at the top or bottom, so only consider points on the bottom half of the shape.
@@ -452,32 +424,8 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
                             supportContact.HasTraction = true;
                             HasTraction = true;
                         }
-                        else
-                            sideContacts.Add(new OtherContact() { Collidable = supportContact.Support, Contact = supportContact.Contact });  //Considering the side contacts to be supports can help with upstepping.
 
                         supports.Add(supportContact);
-                    }
-                    else if (dot < -SideContactThreshold)
-                    {
-                        //Head contact
-                        OtherContact otherContact;
-                        otherContact.Collidable = pair.BroadPhaseOverlap.EntryA != body.CollisionInformation ? (Collidable)pair.BroadPhaseOverlap.EntryA : (Collidable)pair.BroadPhaseOverlap.EntryB;
-                        otherContact.Contact.Position = c.Contact.Position;
-                        otherContact.Contact.Normal = normal;
-                        otherContact.Contact.PenetrationDepth = c.Contact.PenetrationDepth;
-                        otherContact.Contact.Id = c.Contact.Id;
-                        headContacts.Add(otherContact);
-                    }
-                    else
-                    {
-                        //Side contact 
-                        OtherContact otherContact;
-                        otherContact.Collidable = pair.BroadPhaseOverlap.EntryA != body.CollisionInformation ? (Collidable)pair.BroadPhaseOverlap.EntryA : (Collidable)pair.BroadPhaseOverlap.EntryB;
-                        otherContact.Contact.Position = c.Contact.Position;
-                        otherContact.Contact.Normal = normal;
-                        otherContact.Contact.PenetrationDepth = c.Contact.PenetrationDepth;
-                        otherContact.Contact.Id = c.Contact.Id;
-                        sideContacts.Add(otherContact);
                     }
                 }
 
@@ -775,20 +723,6 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
         /// Whether or not the contact was found to have traction.
         /// </summary>
         public bool HasTraction;
-    }
-    /// <summary>
-    /// Contact associated with the character that isn't a support.
-    /// </summary>
-    public struct OtherContact
-    {
-        /// <summary>
-        /// Core information about the contact.
-        /// </summary>
-        public ContactData Contact;
-        /// <summary>
-        /// Object that created this contact with the character.
-        /// </summary>
-        public Collidable Collidable;
     }
 
     /// <summary>

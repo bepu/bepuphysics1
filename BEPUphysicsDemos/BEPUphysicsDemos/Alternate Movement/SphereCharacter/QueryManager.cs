@@ -33,8 +33,6 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
         public RawList<ContactData> Contacts { get { return contacts; } }
         public RawList<ContactData> SupportContacts { get { return supportContacts; } }
         public RawList<ContactData> TractionContacts { get { return tractionContacts; } }
-        public RawList<ContactData> SideContacts { get { return sideContacts; } }
-        public RawList<ContactData> HeadContacts { get { return headContacts; } }
 
         EntityCollidable queryObject;
         SphereCharacterController character;
