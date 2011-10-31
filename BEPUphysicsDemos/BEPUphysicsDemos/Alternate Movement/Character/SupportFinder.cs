@@ -460,13 +460,12 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
             }
 
-            bool hasTractionDueToContacts = HasTraction;
 
             //Start the ray halfway between the center of the shape and the bottom of the shape.  That extra margin prevents it from getting stuck in the ground and returning t = 0 unhelpfully.
             SupportRayData = null;
             bottomHeight = body.Height * .25f;
             //If the contacts aren't available to support the character, raycast down to find the ground.
-            if (!hasTractionDueToContacts && hadTraction)
+            if (!HasTraction && hadTraction)
             {
 
                 //TODO: could also require that the character has a nonzero movement direction in order to use a ray cast.  Questionable- would complicate the behavior on edges.
@@ -485,7 +484,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
             //If contacts and the center ray cast failed, try a ray offset in the movement direction.
             bool tryingToMove = character.HorizontalMotionConstraint.MovementDirection.LengthSquared() > 0;
-            if (!hasTractionDueToContacts && hadTraction && tryingToMove)
+            if (!HasTraction && hadTraction && tryingToMove)
             {
 
                 Ray ray = new Ray(body.Position +
@@ -522,7 +521,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             }
 
             //If contacts, center ray, AND forward ray failed to find traction, try a side ray created from down x forward.
-            if (!hasTractionDueToContacts && hadTraction && tryingToMove)
+            if (!HasTraction && hadTraction && tryingToMove)
             {
                 //Compute the horizontal offset direction.  Down direction and the movement direction are normalized and perpendicular, so the result is too.
                 Vector3 horizontalOffset = new Vector3(character.HorizontalMotionConstraint.MovementDirection.X, 0, character.HorizontalMotionConstraint.MovementDirection.Y);
@@ -560,7 +559,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             }
 
             //If contacts, center ray, forward ray, AND the first side ray failed to find traction, try a side ray created from forward x down.
-            if (!hasTractionDueToContacts && hadTraction && tryingToMove)
+            if (!HasTraction && hadTraction && tryingToMove)
             {
                 //Compute the horizontal offset direction.  Down direction and the movement direction are normalized and perpendicular, so the result is too.
                 Vector3 horizontalOffset = new Vector3(character.HorizontalMotionConstraint.MovementDirection.X, 0, character.HorizontalMotionConstraint.MovementDirection.Y);
