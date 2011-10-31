@@ -18,12 +18,14 @@ using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.Collidables;
 using Microsoft.Xna.Framework.Input;
 using BEPUphysics.Entities;
+using BEPUphysics.Threading;
 
 namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
 {
     /// <summary>
-    /// Gives a physical object FPS-like control, including stepping and jumping.
-    /// This is more robust/expensive than the SimpleCharacterController.
+    /// Gives a physical object simple and cheap FPS-like control.
+    /// This character has less features than the full CharacterController but offers
+    /// an alternative to the SimpleCharacterController.
     /// </summary>
     public class SphereCharacterController : Updateable, IBeforeSolverUpdateable
     {
@@ -95,6 +97,13 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
         }
 
         /// <summary>
+        /// This is used to control the access to simulation islands when there are multiple character controllers updating in parallel.
+        /// If other parts of the program are modifying simulation islands during the IBeforeSolverUpdateable.Update stage, the synchronization
+        /// umbrella will need to be widened.
+        /// </summary>
+        private static SpinLock ConstraintAccessLocker = new SpinLock();
+
+        /// <summary>
         /// Gets the support finder used by the character.
         /// The support finder analyzes the character's contacts to see if any of them provide support and/or traction.
         /// </summary>
@@ -120,6 +129,12 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
             VerticalMotionConstraint = new VerticalMotionConstraint(this);
             QueryManager = new QueryManager(this);
 
+            //Enable multithreading for the sphere characters.  
+            //See the bottom of the Update method for more information about using multithreading with this character.
+            IsUpdatedSequentially = false;
+
+
+
 
         }
 
@@ -139,22 +154,21 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
             if (Body.ActivityInformation.IsActive)
             {
                 //This runs after the bounding box updater is run, but before the broad phase.
-                //Expanding the character's bounding box ensures that minor variations in velocity will not cause
-                //any missed information.
-                //For a character which is not bound to Vector3.Up (such as a character that needs to run around a spherical planet),
-                //the bounding box expansion needs to be changed.  It behaves like a capsule.
-                float radius = Body.Radius; //Fatten up the character.
-#if WINDOWS
-                Vector3 offset;
-#else
-            Vector3 offset = new Vector3();
-#endif
-                offset.X = 0;
-                offset.Y = SupportFinder.MaximumAssistedDownStepHeight;
-                offset.Z = 0;
+                //The expansion allows the downward pointing raycast to collect hit points.
+                Vector3 down = SupportFinder.MaximumAssistedDownStepHeight * Body.OrientationMatrix.Down;
                 BoundingBox box = Body.CollisionInformation.BoundingBox;
-                //Vector3.Add(ref box.Max, ref offset, out box.Max);
-                Vector3.Subtract(ref box.Min, ref offset, out box.Min);
+                if (down.X < 0)
+                    box.Min.X += down.X;
+                else
+                    box.Max.X += down.X;
+                if (down.Y < 0)
+                    box.Min.Y += down.Y;
+                else
+                    box.Max.Y += down.Y;
+                if (down.Z < 0)
+                    box.Min.Z += down.Z;
+                else
+                    box.Max.Z += down.Z;
                 Body.CollisionInformation.BoundingBox = box;
             }
 
@@ -182,14 +196,11 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
 
         void IBeforeSolverUpdateable.Update(float dt)
         {
-            if (Keyboard.GetState().IsKeyDown(Keys.P))
-                Debug.WriteLine("break");
-            CorrectContacts();
+            //CorrectContacts();
 
             bool hadTraction = SupportFinder.HasTraction;
 
             var supportData = CollectSupportData();
-
 
             //Compute the initial velocities relative to the support.
             Vector3 relativeVelocity;
@@ -203,7 +214,7 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
             if (SupportFinder.HasTraction && !hadTraction && verticalVelocity < 0)
             {
                 SupportFinder.ClearSupportData();
-                HorizontalMotionConstraint.SupportData = new SupportData();
+                supportData = new SupportData();
             }
 
             //If we can compute that we're separating faster than we can handle, take off.
@@ -212,6 +223,7 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
                 SupportFinder.ClearSupportData();
                 supportData = new SupportData();
             }
+
 
             //Attempt to jump.
             if (tryToJump) //Jumping while crouching would be a bit silly.
@@ -252,19 +264,6 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
             tryToJump = false;
 
 
-            ////Try to step!
-            //Vector3 newPosition;
-            //if (StepManager.TryToStepDown(out newPosition) ||
-            //    StepManager.TryToStepUp(out newPosition))
-            //{
-            //    TeleportToPosition(newPosition, dt);
-            //}
-
-            //if (StanceManager.UpdateStance(out newPosition))
-            //{
-            //    TeleportToPosition(newPosition, dt);
-            //}
-
             //if (SupportFinder.HasTraction && SupportFinder.Supports.Count == 0)
             //{
             //    //There's another way to step down that is a lot cheaper, but less robust.
@@ -292,21 +291,22 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
 
 
 
-            //Warning:
-            //Changing a constraint's support data is not thread safe; it modifies simulation islands!
-            //If your game can guarantee that character controllers will be the only ones performing such shared modifications
-            //while this updateable stage runs, then addressing this is fairly simple.  Wrap this section (minimally, the SupportData property sets)
-            //in a critical section.  A single contended resource isn't great, but then again, the lock will be fairly brief compared to the stepping
-            //and support queries performed above.  Implementing such parallelization is probably only it worth when the number of characters gets fairly high.
-            //These characters seem to cost about 50-400 microseconds a piece on a single core of a Q6600@2.4ghz, with 400 microseconds being a temporary worst case.
-            HorizontalMotionConstraint.SupportData = supportData;
+
             //Vertical support data is different because it has the capacity to stop the character from moving unless
             //contacts are pruned appropriately.
             SupportData verticalSupportData;
             Vector3 movement3d = new Vector3(HorizontalMotionConstraint.MovementDirection.X, 0, HorizontalMotionConstraint.MovementDirection.Y);
             SupportFinder.GetTractionInDirection(ref movement3d, out verticalSupportData);
-            VerticalMotionConstraint.SupportData = verticalSupportData;
 
+
+            //Warning:
+            //Changing a constraint's support data is not thread safe; it modifies simulation islands!
+            //If something other than the SphereCharacterController can modify simulation islands is running
+            //simultaneously (in the IBeforeSolverUpdateable.Update stage), it will need to be synchronized.
+            ConstraintAccessLocker.Enter();
+            HorizontalMotionConstraint.SupportData = supportData;
+            VerticalMotionConstraint.SupportData = verticalSupportData;
+            ConstraintAccessLocker.Exit();
 
 
 
@@ -314,6 +314,7 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
 
 
         }
+
 
         void TeleportToPosition(Vector3 newPosition, float dt)
         {
