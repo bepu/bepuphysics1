@@ -69,7 +69,9 @@
     <Compile Include="Alternate Movement\Character\VerticalMotionConstraint.cs" />
     <Compile Include="Alternate Movement\SimpleCharacter\SimpleCharacterController.cs" />
     <Compile Include="Alternate Movement\SimpleCharacter\SimpleCharacterControllerInput.cs" />
-    <Compile Include="Alternate Movement\SphereCharacter\HorizontalMotionConstraint.cs" />
+    <Compile Include="Alternate Movement\SphereCharacter\HorizontalMotionConstraint.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Alternate Movement\SphereCharacter\QueryManager.cs" />
     <Compile Include="Alternate Movement\SphereCharacter\SphereCharacterController.cs" />
     <Compile Include="Alternate Movement\SphereCharacter\SphereCharacterControllerInput.cs" />

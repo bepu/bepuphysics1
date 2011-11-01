@@ -196,7 +196,9 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
 
         void IBeforeSolverUpdateable.Update(float dt)
         {
-            //CorrectContacts();
+
+            if (Keyboard.GetState().IsKeyDown(Keys.P))
+                Debug.WriteLine("breka.");
 
             bool hadTraction = SupportFinder.HasTraction;
 
@@ -333,75 +335,6 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
             //Also re-collect supports.
             //This will ensure the constraint and other velocity affectors have the most recent information available.
             CollectSupportData();
-        }
-
-        void CorrectContacts()
-        {
-            //Go through the contacts associated with the character.
-            //If the contact is at the bottom of the character, regardless of its normal, take a closer look.
-            //If the direction from the closest point on the inner cylinder to the contact position has traction
-            //and the contact's normal does not, then replace the contact normal with the offset direction.
-
-            //This is necessary because various convex pair manifolds use persistent manifolds.
-            //Contacts in these persistent manifolds can live too long for the character to behave perfectly
-            //when going over (usually tiny) steps.
-
-            Vector3 downDirection = Body.OrientationMatrix.Down;
-            Vector3 position = Body.Position;
-            foreach (var pair in Body.CollisionInformation.Pairs)
-            {
-                foreach (var contactData in pair.Contacts)
-                {
-                    var contact = contactData.Contact;
-                    float dot;
-                    //Vector3.Dot(ref contact.Normal, ref downDirection, out dot);
-                    //if (Math.Abs(dot) > SupportFinder.cosMaximumSlope)
-                    //{
-                    //    //This contact will already be considered to have traction.
-                    //    //Don't bother doing the somewhat expensive correction process on it.
-                    //    //TODO: Test this; see how much benefit there is.
-                    //    continue;
-                    //}
-                    //Check to see if the contact position is at the bottom of the character.
-                    Vector3 offsetDirection = contact.Position - position;
-                    Vector3.Dot(ref offsetDirection, ref downDirection, out dot);
-                    if (dot > 0)
-                    {
-
-                        //It is a 'bottom' contact!
-
-                        //Compute the offset from the center of the sphere to the contact and use it to correct the contact normal.
-                        var length = offsetDirection.LengthSquared();
-                        if (length > Toolbox.Epsilon)
-                        {
-                            //Normalize the offset.
-                            Vector3.Divide(ref offsetDirection, (float)Math.Sqrt(length), out offsetDirection);
-                        }
-                        else
-                            continue; //If there's no offset, it's really deep and correcting this contact might be a bad idea.
-
-                        Vector3.Dot(ref offsetDirection, ref downDirection, out dot);
-                        float dotOriginal;
-                        Vector3.Dot(ref contact.Normal, ref downDirection, out dotOriginal);
-                        if (Math.Abs(dot) > Math.Abs(dotOriginal)) //if the new offsetDirection normal is less steep than the original slope...
-                        {
-                            //Then use it!
-                            Vector3.Dot(ref offsetDirection, ref contact.Normal, out dot);
-                            if (dot < 0)
-                            {
-                                //Don't flip the normal relative to the contact normal.  That would be bad!
-                                Vector3.Negate(ref offsetDirection, out offsetDirection);
-                                dot = -dot;
-                            }
-                            //Update the contact data using the corrected information.
-                            //The penetration depth is conservatively updated; it will be less than or equal to the 'true' depth in this direction.
-                            contact.PenetrationDepth *= dot;
-                            contact.Normal = offsetDirection;
-                        }
-                    }
-                }
-            }
-
         }
 
         void ComputeRelativeVelocity(ref SupportData supportData, out Vector3 relativeVelocity)
