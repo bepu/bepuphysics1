@@ -2090,14 +2090,30 @@ namespace BEPUphysics
         }
 
         /// <summary>
-        /// Finds the velocity of a point as if it were connected to the given entity.
+        /// Finds the velocity of a world space point as if it were connected to the given entity.
         /// </summary>
-        /// <param name="p">Location of point.</param>
-        /// <param name="obj">Collidable for connection.</param>
-        /// <returns>Acceleration of the point.</returns>
-        public static Vector3 GetVelocityOfPoint(Vector3 p, Entity obj)
+        /// <param name="p">Location of point in world space.</param>
+        /// <param name="entity">Entity with which to measure the velocity.</param>
+        /// <returns>Velocity of the point on the entity.</returns>
+        public static Vector3 GetVelocityOfPoint(Vector3 p, Entity entity)
         {
-            return obj.linearVelocity + Vector3.Cross(obj.angularVelocity, p - obj.position);
+            Vector3 toReturn;
+            GetVelocityOfPoint(ref p, entity, out toReturn);
+            return toReturn;
+        }
+
+        /// <summary>
+        /// Finds the velocity of a world space point as if it were connected to the given entity.
+        /// </summary>
+        /// <param name="p">Location of point in world space.</param>
+        /// <param name="entity">Entity with which to measure the velocity.</param>
+        /// <param name="velocity">Velocity of the point on the entity.</param>
+        public static void GetVelocityOfPoint(ref Vector3 p, Entity entity, out Vector3 velocity)
+        {
+            Vector3 offset;
+            Vector3.Subtract(ref p, ref entity.position, out offset);
+            Vector3.Cross(ref entity.angularVelocity, ref offset, out velocity);
+            Vector3.Add(ref entity.linearVelocity, ref velocity, out velocity);
         }
 
 

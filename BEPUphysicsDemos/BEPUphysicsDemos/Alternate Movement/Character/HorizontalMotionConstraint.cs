@@ -40,6 +40,16 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 if (oldSupport != supportData.SupportObject)
                 {
                     OnInvolvedEntitiesChanged();
+                    var supportEntityCollidable = supportData.SupportObject as EntityCollidable;
+                    if (supportEntityCollidable != null)
+                    {
+                        supportEntity = supportEntityCollidable.Entity;
+                    }
+                    else
+                    {
+                        //We aren't on an entity, so clear out the support entity.
+                        supportEntity = null;
+                    }
                 }
             }
         }
@@ -66,6 +76,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 }
             }
         }
+
 
         float speed = 8f;
         /// <summary>
@@ -275,17 +286,6 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             bool isTryingToMove = movementDirection.LengthSquared() > 0;
             if (supportData.SupportObject != null)
             {
-                //Get an easy reference to the support.
-                var support = supportData.SupportObject as EntityCollidable;
-                if (support != null)
-                {
-                    supportEntity = support.Entity;
-                }
-                else
-                {
-                    supportEntity = null;
-
-                }
                 if (supportData.HasTraction)
                 {
                     MovementMode = MovementMode.Traction;
@@ -578,35 +578,8 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         /// <returns>Impulse magnitude computed by the iteration.</returns>
         public override float SolveIteration()
         {
-            //The relative velocity's x component is in the movement direction.
-            //y is the perpendicular direction.
-#if !WINDOWS
-            Vector2 relativeVelocity = new Vector2();
-#else
-            Vector2 relativeVelocity;
-#endif
-
-            Vector3 bodyVelocity = character.Body.LinearVelocity;
-            Vector3.Dot(ref linearJacobianA1, ref bodyVelocity, out relativeVelocity.X);
-            Vector3.Dot(ref linearJacobianA2, ref bodyVelocity, out relativeVelocity.Y);
-
-            float x, y;
-            if (supportEntity != null)
-            {
-                Vector3 supportLinearVelocity = supportEntity.LinearVelocity;
-                Vector3 supportAngularVelocity = supportEntity.AngularVelocity;
-
-
-                Vector3.Dot(ref linearJacobianB1, ref supportLinearVelocity, out x);
-                Vector3.Dot(ref linearJacobianB2, ref supportLinearVelocity, out y);
-                relativeVelocity.X += x;
-                relativeVelocity.Y += y;
-                Vector3.Dot(ref angularJacobianB1, ref supportAngularVelocity, out x);
-                Vector3.Dot(ref angularJacobianB2, ref supportAngularVelocity, out y);
-                relativeVelocity.X += x;
-                relativeVelocity.Y += y;
-
-            }
+         
+            Vector2 relativeVelocity = RelativeVelocity;
 
             Vector2.Add(ref relativeVelocity, ref positionCorrectionBias, out relativeVelocity);
 
@@ -649,8 +622,8 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             Vector3 impulse;
             Vector3 torque;
 #endif
-            x = lambda.X;
-            y = lambda.Y;
+            float x = lambda.X;
+            float y = lambda.Y;
             impulse.X = linearJacobianA1.X * x + linearJacobianA2.X * y;
             impulse.Y = linearJacobianA1.Y * x + linearJacobianA2.Y * y;
             impulse.Z = linearJacobianA1.Z * x + linearJacobianA2.Z * y;
@@ -686,6 +659,8 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         {
             get
             {
+                //The relative velocity's x component is in the movement direction.
+                //y is the perpendicular direction.
 #if !WINDOWS
                 Vector2 relativeVelocity = new Vector2();
 #else

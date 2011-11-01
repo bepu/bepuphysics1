@@ -51,7 +51,7 @@ namespace BEPUphysicsDemos.Demos
             kapow = new Sphere(new Vector3(11000, 0, 0), .6f, 20);
             kapowMaker = new Explosion(Vector3.Zero, 400, 15, Space);
             //Create the right-click grab spring.
-            grabber = new MotorizedGrabSpring();//30f, .8f, .6f);
+            grabber = new MotorizedGrabSpring();
             grabberGraphic = game.ConstraintDrawer.Add(grabber);
             grabberGraphic.IsDrawing = false;
             Space.Add(grabber);
