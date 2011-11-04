@@ -129,7 +129,7 @@
     <Compile Include="CollisionTests\Manifolds\MobileMeshContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\InstancedMeshSphereContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\InstancedMeshContactManifold.cs" />
-    <Compile Include="CollisionTests\Manifolds\StaticMeshSphereContactManifold.cs" />
+    <Compile Include="CollisionTests\Manifolds\StaticMeshConvexContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\StaticMeshContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\TerrainConvexContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\SphereContactManifold.cs" />
@@ -175,7 +175,7 @@
     <Compile Include="CollisionTests\Manifolds\InstancedMeshConvexContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\TerrainContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\TriangleMeshConvexContactManifold.cs" />
-    <Compile Include="CollisionTests\Manifolds\StaticMeshConvexContactManifold.cs" />
+    <Compile Include="CollisionTests\Manifolds\StaticMeshSphereContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\TriangleConvexContactManifold.cs" />
     <Compile Include="Constraints\Collision\ContactFrictionConstraint.cs" />
     <Compile Include="Constraints\Collision\ContactManifoldConstraint.cs" />

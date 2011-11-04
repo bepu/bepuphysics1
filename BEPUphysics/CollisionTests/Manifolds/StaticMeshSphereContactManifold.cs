@@ -10,14 +10,14 @@ namespace BEPUphysics.CollisionTests.Manifolds
     ///<summary>
     /// Manages persistent contacts between a static mesh and a convex.
     ///</summary>
-    public class StaticMeshConvexContactManifold : StaticMeshContactManifold
+    public class StaticMeshSphereContactManifold : StaticMeshContactManifold
     {
 
 
-        UnsafeResourcePool<TriangleConvexPairTester> testerPool = new UnsafeResourcePool<TriangleConvexPairTester>();
+        UnsafeResourcePool<TriangleSpherePairTester> testerPool = new UnsafeResourcePool<TriangleSpherePairTester>();
         protected override void GiveBackTester(CollisionAlgorithms.TrianglePairTester tester)
         {
-            testerPool.GiveBack((TriangleConvexPairTester)tester);
+            testerPool.GiveBack((TriangleSpherePairTester)tester);
         }
 
         protected override CollisionAlgorithms.TrianglePairTester GetTester()
