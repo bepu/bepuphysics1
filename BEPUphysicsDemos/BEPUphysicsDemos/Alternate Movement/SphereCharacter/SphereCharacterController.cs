@@ -176,7 +176,7 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
         }
 
 
-        SupportData CollectSupportData()
+        void CollectSupportData()
         {
             //Identify supports.
             SupportFinder.UpdateSupports();
@@ -185,14 +185,15 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
             if (SupportFinder.HasSupport)
             {
                 if (SupportFinder.HasTraction)
-                    return SupportFinder.TractionData.Value;
+                    supportData = SupportFinder.TractionData.Value;
                 else
-                    return SupportFinder.SupportData.Value;
+                    supportData = SupportFinder.SupportData.Value;
             }
             else
-                return new SupportData();
+                supportData = new SupportData();
         }
 
+        SupportData supportData;
 
         void IBeforeSolverUpdateable.Update(float dt)
         {
@@ -202,7 +203,7 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
 
             bool hadTraction = SupportFinder.HasTraction;
 
-            var supportData = CollectSupportData();
+            CollectSupportData();
 
             //Compute the initial velocities relative to the support.
             Vector3 relativeVelocity;
