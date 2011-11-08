@@ -179,7 +179,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         }
 
 
-        internal override void GetContactInformation(int index, out ContactInformation info)
+        protected internal override void GetContactInformation(int index, out ContactInformation info)
         {
             info.Contact = TerrainManifold.contacts.Elements[index];
             //Find the contact's normal and friction forces.

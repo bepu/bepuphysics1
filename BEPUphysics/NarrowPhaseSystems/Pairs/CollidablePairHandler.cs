@@ -206,7 +206,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         }
 
 
-        internal abstract void GetContactInformation(int index, out ContactInformation info);
+        protected internal abstract void GetContactInformation(int index, out ContactInformation info);
 
 
         ///<summary>

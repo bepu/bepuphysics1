@@ -308,7 +308,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         }
 
 
-        internal override void GetContactInformation(int index, out ContactInformation info)
+        protected internal override void GetContactInformation(int index, out ContactInformation info)
         {
             foreach (CollidablePairHandler pair in subPairs.Values)
             {
