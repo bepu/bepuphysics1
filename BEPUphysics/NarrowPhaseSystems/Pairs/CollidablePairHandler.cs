@@ -22,7 +22,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         protected abstract Entity EntityA { get; }
         protected abstract Entity EntityB { get; }
 
-        internal abstract int ContactCount { get; }
+        protected internal abstract int ContactCount { get; }
 
 
 
