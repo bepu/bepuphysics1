@@ -15,7 +15,7 @@ namespace BEPUphysics.DeactivationManagement
     ///</summary>
     public class DeactivationManager : MultithreadedProcessingStage
     {
-        private int maximumDeactivationsPerFrame = 100;
+        private int maximumDeactivationAttemptsPerFrame = 100;
         private int deactivationIslandIndex;
 
         internal float velocityLowerLimitSquared = .07f;
@@ -87,7 +87,7 @@ namespace BEPUphysics.DeactivationManagement
         /// Gets or sets the maximum number of objects to attempt to deactivate each frame.
         /// Defaults to 100.
         ///</summary>
-        public int MaximumDeactivationsPerFrame { get { return maximumDeactivationsPerFrame; } set { maximumDeactivationsPerFrame = value; } }
+        public int MaximumDeactivationAttemptsPerFrame { get { return maximumDeactivationAttemptsPerFrame; } set { maximumDeactivationAttemptsPerFrame = value; } }
 
         TimeStepSettings timeStepSettings;
         ///<summary>
@@ -305,11 +305,14 @@ namespace BEPUphysics.DeactivationManagement
             }
         }
 
+
         void DeactivateObjects()
         {
             //Deactivate only some objects each frame.
             int numberOfEntitiesDeactivated = 0;
-            while (numberOfEntitiesDeactivated < maximumDeactivationsPerFrame && simulationIslands.count > 0)
+            int numberOfIslandsChecked = 0;
+            int originalIslandCount = simulationIslands.count;
+            while (numberOfEntitiesDeactivated < maximumDeactivationAttemptsPerFrame && simulationIslands.count > 0 && numberOfIslandsChecked < originalIslandCount)
             {
                 deactivationIslandIndex = (deactivationIslandIndex + 1) % simulationIslands.count;
                 var island = simulationIslands.Elements[deactivationIslandIndex];
@@ -325,6 +328,7 @@ namespace BEPUphysics.DeactivationManagement
                     island.TryToDeactivate();
                     numberOfEntitiesDeactivated += island.memberCount;
                 }
+                numberOfIslandsChecked++;
             }
         }
 
