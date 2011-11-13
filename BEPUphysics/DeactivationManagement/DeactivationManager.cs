@@ -189,7 +189,24 @@ namespace BEPUphysics.DeactivationManagement
         {
             if (simulationIslandMember.DeactivationManager == this)
             {
-                simulationIslandMember.Activate();
+                if (simulationIslandMember.IsDynamic)
+                    simulationIslandMember.Activate();
+                else
+                {
+                    //If the object was NOT dynamic, then simply calling activate will be insufficient
+                    //because it does not share any simulation island with connected objects.
+                    //We need to notify its connections directly.
+                    foreach (var connection in simulationIslandMember.connections)
+                    {
+                        foreach (var member in connection.members)
+                        {
+                            if (member != simulationIslandMember)
+                            {
+                                member.Activate();
+                            }
+                        }
+                    }
+                }
                 simulationIslandMember.DeactivationManager = null;
                 simulationIslandMembers.Remove(simulationIslandMember);
                 RemoveSimulationIslandFromMember(simulationIslandMember);
@@ -424,7 +441,18 @@ namespace BEPUphysics.DeactivationManagement
         {
             if (connection.DeactivationManager == this)
             {
-
+                //Make sure all members of this connection are awake.
+                for (int i = 0; i < connection.members.count; i++)
+                {
+                    var island = connection.members.Elements[i].SimulationIsland;
+                    if (island != null)
+                    {
+                        //Only need to find one dynamic entity to wake up the whole simulation island.
+                        island.Activate();
+                        //Quit!
+                        break;
+                    }
+                }
                 connection.DeactivationManager = null; //TODO: Should it remove here, or in the deferred final case? probably here, since otherwise Add-Remove-Add would throw an exception!
                 //Try to split by examining the connections and breadth-first searching outward.
                 //If it is determined that a split is required, grab a new island and add it.
