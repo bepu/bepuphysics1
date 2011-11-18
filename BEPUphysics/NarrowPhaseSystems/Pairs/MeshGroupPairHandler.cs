@@ -163,10 +163,10 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             {
                 var collidablePair = new CollidablePair(CollidableA, entry.Collidable = GetOpposingCollidable(index));
                 var newPair = (MobileMeshPairHandler)NarrowPhaseHelper.GetPairHandler(ref collidablePair);
-                newPair.CollisionRule = CollisionRule;
-                newPair.UpdateMaterialProperties(MaterialA, MaterialB);  //Override the materials, if necessary.  Meshes don't currently support custom materials but..
                 if (newPair != null)
                 {
+                    newPair.CollisionRule = CollisionRule;
+                    newPair.UpdateMaterialProperties(MaterialA, MaterialB);  //Override the materials, if necessary.  Meshes don't currently support custom materials but..
                     newPair.Parent = this;
                     subPairs.Add(entry, newPair);
                 }
