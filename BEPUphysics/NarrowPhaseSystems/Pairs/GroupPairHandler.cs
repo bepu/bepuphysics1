@@ -137,9 +137,9 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                 if (!subPairs.ContainsKey(pair))
                 {
                     CollidablePairHandler newPair = NarrowPhaseHelper.GetPairHandler(ref pair, rule);
-                    newPair.UpdateMaterialProperties(materialA, materialB);  //Override the materials, if necessary.
                     if (newPair != null)
                     {
+                        newPair.UpdateMaterialProperties(materialA, materialB);  //Override the materials, if necessary.
                         newPair.Parent = this;
                         subPairs.Add(pair, newPair);
                     }
