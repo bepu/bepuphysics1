@@ -321,9 +321,10 @@ namespace BEPUphysics.Constraints.Collision
             if (length > Toolbox.Epsilon)
             {
                 length = (float)Math.Sqrt(length);
-                linearA.M11 = relativeVelocity.X / length;
-                linearA.M12 = relativeVelocity.Y / length;
-                linearA.M13 = relativeVelocity.Z / length;
+                float inverseLength = 1 / length;
+                linearA.M11 = relativeVelocity.X * inverseLength;
+                linearA.M12 = relativeVelocity.Y * inverseLength;
+                linearA.M13 = relativeVelocity.Z * inverseLength;
 
 
                 friction = length > CollisionResponseSettings.StaticFrictionVelocityThreshold ?
@@ -346,9 +347,10 @@ namespace BEPUphysics.Constraints.Collision
                     if (length > Toolbox.Epsilon)
                     {
                         length = (float)Math.Sqrt(length);
-                        linearA.M11 = axis1.X / length;
-                        linearA.M12 = axis1.Y / length;
-                        linearA.M13 = axis1.Z / length;
+                        float inverseLength = 1 / length;
+                        linearA.M11 = axis1.X * inverseLength;
+                        linearA.M12 = axis1.Y * inverseLength;
+                        linearA.M13 = axis1.Z * inverseLength;
                     }
                     else
                     {
