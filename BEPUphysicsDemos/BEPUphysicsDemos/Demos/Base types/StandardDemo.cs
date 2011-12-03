@@ -83,7 +83,7 @@ namespace BEPUphysicsDemos.Demos
         Func<BroadPhaseEntry, bool> rayCastFilter;
         bool RayCastFilter(BroadPhaseEntry entry)
         {
-            return entry.CollisionRules.Personal <= CollisionRule.Normal;
+            return entry != character.CharacterController.Body.CollisionInformation && entry.CollisionRules.Personal <= CollisionRule.Normal;
         }
 
         public override void Update(float dt)
@@ -118,15 +118,9 @@ namespace BEPUphysicsDemos.Demos
             if (Game.MouseInput.RightButton == ButtonState.Pressed && !grabber.IsGrabbing)
 #endif
             {
-                Vector3 startPosition;
-                if (character.IsActive)
-                    startPosition = Game.Camera.Position + 5 * Game.Camera.WorldMatrix.Forward;
-                else
-                    startPosition = Game.Camera.Position;
-
                 //Find the earliest ray hit
                 RayCastResult raycastResult;
-                if (Space.RayCast(new Ray(startPosition, Game.Camera.WorldMatrix.Forward), 1000, rayCastFilter, out raycastResult))
+                if (Space.RayCast(new Ray(Game.Camera.Position, Game.Camera.WorldMatrix.Forward), 1000, rayCastFilter, out raycastResult))
                 {
                     var entityCollision = raycastResult.HitObject as EntityCollidable;
                     //If there's a valid ray hit, then grab the connected object!
@@ -134,10 +128,7 @@ namespace BEPUphysicsDemos.Demos
                     {
                         grabber.Setup(entityCollision.Entity, raycastResult.HitData.Location);
                         grabberGraphic.IsDrawing = true;
-                        if (character.IsActive)
-                            grabDistance = raycastResult.HitData.T + 5;
-                        else
-                            grabDistance = raycastResult.HitData.T;
+                        grabDistance = raycastResult.HitData.T;
                     }
                 }
 
