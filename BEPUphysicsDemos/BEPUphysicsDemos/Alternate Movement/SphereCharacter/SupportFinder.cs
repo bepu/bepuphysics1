@@ -4,12 +4,11 @@ using System.Linq;
 using System.Text;
 using BEPUphysics.CollisionTests;
 using BEPUphysics.DataStructures;
-using Microsoft.Xna.Framework;
 using BEPUphysics;
 using BEPUphysics.Collidables;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.BroadPhaseSystems;
-using System.Diagnostics;
+using BEPUphysics.MathExtensions;
 
 namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
 {
