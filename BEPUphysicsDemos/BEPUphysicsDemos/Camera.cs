@@ -191,8 +191,8 @@ namespace BEPUphysicsDemos
 #if !WINDOWS
         public void Update(float dt, KeyboardState keyboardInput, GamePadState gamePadInput)
         {
-            yaw += gamePadInput.ThumbSticks.Right.X * -1.5f * dt;
-            pitch += gamePadInput.ThumbSticks.Right.Y * 1.5f * dt;
+            Yaw += gamePadInput.ThumbSticks.Right.X * -1.5f * dt;
+            Pitch += gamePadInput.ThumbSticks.Right.Y * 1.5f * dt;
 
 #else
         public void Update(float dt, KeyboardState keyboardInput, MouseState mouseInput, GamePadState gamePadInput)
