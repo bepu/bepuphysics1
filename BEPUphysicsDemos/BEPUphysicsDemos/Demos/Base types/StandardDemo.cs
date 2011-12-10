@@ -120,7 +120,7 @@ namespace BEPUphysicsDemos.Demos
             {
                 //Find the earliest ray hit
                 RayCastResult raycastResult;
-                if (Space.RayCast(new Ray(Game.Camera.Position, Game.Camera.WorldMatrix.Forward), 1000, rayCastFilter, out raycastResult))
+                if (Space.RayCast(new Ray(MathConverter.Convert(Game.Camera.Position), MathConverter.Convert(Game.Camera.WorldMatrix.Forward)), 1000, rayCastFilter, out raycastResult))
                 {
                     var entityCollision = raycastResult.HitObject as EntityCollidable;
                     //If there's a valid ray hit, then grab the connected object!

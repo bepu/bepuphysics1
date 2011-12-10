@@ -5,7 +5,6 @@ using System.Text;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.UpdateableSystems;
 using BEPUphysics;
-using Microsoft.Xna.Framework;
 using BEPUphysics.MathExtensions;
 using BEPUphysics.Collidables.MobileCollidables;
 using BEPUphysics.BroadPhaseSystems;
