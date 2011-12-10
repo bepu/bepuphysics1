@@ -126,6 +126,7 @@
     <Compile Include="Demos\Tests\SelfCollidingClothDemo.cs" />
     <Compile Include="Demos\Tests\BoxBoxTestDemo.cs" />
     <Compile Include="Demos\Tests\SimulationIslandStressTestDemo.cs" />
+    <Compile Include="Demos\Tests\SuspensionCarDemo.cs" />
     <Compile Include="Demos\Tests\ThreadingTestDemo.cs" />
     <Compile Include="Demos\Tests\ThreadManagerTestDemo.cs" />
     <Compile Include="Demos\Tests\TerrainTesting.cs" />
