@@ -91,6 +91,12 @@
     <Compile Include="Alternate Movement\Character\VerticalMotionConstraint.cs" />
     <Compile Include="Alternate Movement\Character\HorizontalMotionConstraint.cs" />
     <Compile Include="Alternate Movement\Character\StepManager.cs" />
+    <Compile Include="Alternate Movement\SphereCharacter\HorizontalMotionConstraint.cs" />
+    <Compile Include="Alternate Movement\SphereCharacter\QueryManager.cs" />
+    <Compile Include="Alternate Movement\SphereCharacter\SphereCharacterController.cs" />
+    <Compile Include="Alternate Movement\SphereCharacter\SphereCharacterControllerInput.cs" />
+    <Compile Include="Alternate Movement\SphereCharacter\SupportFinder.cs" />
+    <Compile Include="Alternate Movement\SphereCharacter\VerticalMotionConstraint.cs" />
     <Compile Include="Alternate Movement\Testing\Old\CharacterControllerOld.cs" />
     <Compile Include="Alternate Movement\Testing\Old\CharacterControllerInputOld.cs" />
     <Compile Include="Alternate Movement\Testing\ConvexCast\CharacterControllerConvexCast.cs" />
