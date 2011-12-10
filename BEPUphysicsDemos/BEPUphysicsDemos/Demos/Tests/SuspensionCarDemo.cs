@@ -1,6 +1,5 @@
 ﻿using BEPUphysics.Constraints.TwoEntity.Motors;
 using BEPUphysics.Entities.Prefabs;
-using Microsoft.Xna.Framework;
 using BEPUphysics.Entities;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.Constraints.TwoEntity.Joints;
@@ -9,6 +8,7 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using BEPUphysics.MathExtensions;
 using BEPUphysics.Collidables;
+using ConversionHelper;
 namespace BEPUphysicsDemos.Demos.Tests
 {
     /// <summary>
@@ -34,7 +34,7 @@ namespace BEPUphysicsDemos.Demos.Tests
         public SuspensionCarDemo(DemosGame game)
             : base(game)
         {
-            game.Camera.Position = new Vector3(0, 2, 15);
+            game.Camera.Position = MathConverter.Convert(new Vector3(0, 2, 15));
             game.Camera.Yaw = 0;
             game.Camera.Pitch = 0;
 
