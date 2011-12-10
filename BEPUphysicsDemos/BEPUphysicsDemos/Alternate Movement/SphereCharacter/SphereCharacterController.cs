@@ -20,28 +20,19 @@ using Microsoft.Xna.Framework.Input;
 using BEPUphysics.Entities;
 using BEPUphysics.Threading;
 
-namespace BEPUphysicsDemos.AlternateMovement.Character
+namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
 {
     /// <summary>
-    /// Gives a physical object FPS-like control, including stepping and jumping.
-    /// This is more robust/expensive than the SimpleCharacterController.
+    /// Gives a physical object simple and cheap FPS-like control.
+    /// This character has less features than the full CharacterController but offers
+    /// an alternative to the SimpleCharacterController.
     /// </summary>
-    public class CharacterController : Updateable, IBeforeSolverUpdateable
+    public class SphereCharacterController : Updateable, IBeforeSolverUpdateable
     {
         /// <summary>
         /// Gets the physical body of the character.
         /// </summary>
-        public Cylinder Body { get; private set; }
-
-        /// <summary>
-        /// Gets the manager responsible for finding places for the character to step up and down to.
-        /// </summary>
-        public StepManager StepManager { get; private set; }
-
-        /// <summary>
-        /// Gets the manager responsible for crouching, standing, and the verification involved in changing states.
-        /// </summary>
-        public StanceManager StanceManager { get; private set; }
+        public Sphere Body { get; private set; }
 
         /// <summary>
         /// Gets the support system which other systems use to perform local ray casts and contact queries.
@@ -123,11 +114,9 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         /// <summary>
         /// Constructs a new character controller with the default configuration.
         /// </summary>
-        public CharacterController()
+        public SphereCharacterController()
         {
-            Body = new Cylinder(Vector3.Zero, 1.7f, .6f, 10);
-            Body.IgnoreShapeChanges = true; //Wouldn't want inertia tensor recomputations to occur when crouching and such.
-            Body.CollisionInformation.Shape.CollisionMargin = .1f;
+            Body = new Sphere(Vector3.Zero, 1, 10);
             //Making the character a continuous object prevents it from flying through walls which would be pretty jarring from a player's perspective.
             Body.PositionUpdateMode = PositionUpdateMode.Continuous;
             Body.LocalInertiaTensorInverse = new Matrix3X3();
@@ -138,13 +127,13 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             SupportFinder = new SupportFinder(this);
             HorizontalMotionConstraint = new HorizontalMotionConstraint(this);
             VerticalMotionConstraint = new VerticalMotionConstraint(this);
-            StepManager = new StepManager(this);
-            StanceManager = new StanceManager(this);
             QueryManager = new QueryManager(this);
 
             //Enable multithreading for the sphere characters.  
             //See the bottom of the Update method for more information about using multithreading with this character.
             IsUpdatedSequentially = false;
+
+
 
 
         }
@@ -165,22 +154,21 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             if (Body.ActivityInformation.IsActive)
             {
                 //This runs after the bounding box updater is run, but before the broad phase.
-                //Expanding the character's bounding box ensures that minor variations in velocity will not cause
-                //any missed information.
-                //For a character which is not bound to Vector3.Up (such as a character that needs to run around a spherical planet),
-                //the bounding box expansion needs to be changed such that it includes the full motion of the character.
-                float radius = Body.CollisionInformation.Shape.CollisionMargin * 1.1f; //The character can teleport by its collision margin when stepping up.
-#if WINDOWS
-                Vector3 offset;
-#else
-            Vector3 offset = new Vector3();
-#endif
-                offset.X = radius;
-                offset.Y = StepManager.MaximumStepHeight;
-                offset.Z = radius;
+                //The expansion allows the downward pointing raycast to collect hit points.
+                Vector3 down = SupportFinder.MaximumAssistedDownStepHeight * Body.OrientationMatrix.Down;
                 BoundingBox box = Body.CollisionInformation.BoundingBox;
-                Vector3.Add(ref box.Max, ref offset, out box.Max);
-                Vector3.Subtract(ref box.Min, ref offset, out box.Min);
+                if (down.X < 0)
+                    box.Min.X += down.X;
+                else
+                    box.Max.X += down.X;
+                if (down.Y < 0)
+                    box.Min.Y += down.Y;
+                else
+                    box.Max.Y += down.Y;
+                if (down.Z < 0)
+                    box.Min.Z += down.Z;
+                else
+                    box.Max.Z += down.Z;
                 Body.CollisionInformation.BoundingBox = box;
             }
 
@@ -207,15 +195,11 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
         SupportData supportData;
 
-
         void IBeforeSolverUpdateable.Update(float dt)
         {
-            CorrectContacts();
-
             bool hadTraction = SupportFinder.HasTraction;
 
             CollectSupportData();
-
 
             //Compute the initial velocities relative to the support.
             Vector3 relativeVelocity;
@@ -239,8 +223,9 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 supportData = new SupportData();
             }
 
+
             //Attempt to jump.
-            if (tryToJump && StanceManager.CurrentStance != Stance.Crouching) //Jumping while crouching would be a bit silly.
+            if (tryToJump) //Jumping while crouching would be a bit silly.
             {
                 //In the following, note that the jumping velocity changes are computed such that the separating velocity is specifically achieved,
                 //rather than just adding some speed along an arbitrary direction.  This avoids some cases where the character could otherwise increase
@@ -278,42 +263,30 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             tryToJump = false;
 
 
-            //Try to step!
-            Vector3 newPosition;
-            if (StepManager.TryToStepDown(out newPosition) ||
-                StepManager.TryToStepUp(out newPosition))
-            {
-                TeleportToPosition(newPosition, dt);
-            }
-
-            if (StanceManager.UpdateStance(out newPosition))
-            {
-                TeleportToPosition(newPosition, dt);
-            }
-
             //if (SupportFinder.HasTraction && SupportFinder.Supports.Count == 0)
             //{
-            //There's another way to step down that is a lot cheaper, but less robust.
-            //This modifies the velocity of the character to make it fall faster.
-            //Impacts with the ground will be harder, so it will apply superfluous force to supports.
-            //Additionally, it will not be consistent with instant up-stepping.
-            //However, because it does not do any expensive queries, it is very fast!
+            //    //There's another way to step down that is a lot cheaper, but less robust.
+            //    //This modifies the velocity of the character to make it fall faster.
+            //    //Impacts with the ground will be harder, so it will apply superfluous force to supports.
+            //    //Additionally, it will not be consistent with instant up-stepping.
+            //    //However, because it does not do any expensive queries, it is very fast!
 
-            ////We are being supported by a ray cast, but we're floating.
-            ////Let's try to get to the ground faster.
-            ////How fast?  Try picking an arbitrary velocity and setting our relative vertical velocity to that value.
-            ////Don't go farther than the maximum distance, though.
-            //float maxVelocity = (SupportFinder.SupportRayData.Value.HitData.T - SupportFinder.RayLengthToBottom);
-            //if (maxVelocity > 0)
-            //{
-            //    maxVelocity = (maxVelocity + .01f) / dt;
+            //    //We are being supported by a ray cast, but we're floating.
+            //    //Let's try to get to the ground faster.
+            //    //How fast?  Try picking an arbitrary velocity and setting our relative vertical velocity to that value.
+            //    //Don't go farther than the maximum distance, though.
+            //    float maxVelocity = (SupportFinder.SupportRayData.Value.HitData.T - SupportFinder.RayLengthToBottom);
+            //    if (maxVelocity > 0)
+            //    {
+            //        maxVelocity = (maxVelocity + .01f) / dt;
 
-            //    float targetVerticalVelocity = -3;
-            //    verticalVelocity = Vector3.Dot(Body.OrientationMatrix.Up, relativeVelocity);
-            //    float change = MathHelper.Clamp(targetVerticalVelocity - verticalVelocity, -maxVelocity, 0);
-            //    ChangeVelocityUnilaterally(Body.OrientationMatrix.Up * change, ref relativeVelocity);
+            //        float targetVerticalVelocity = -3;
+            //        verticalVelocity = Vector3.Dot(Body.OrientationMatrix.Up, relativeVelocity);
+            //        float change = MathHelper.Clamp(targetVerticalVelocity - verticalVelocity, -maxVelocity, 0);
+            //        ChangeVelocityUnilaterally(Body.OrientationMatrix.Up * change, ref relativeVelocity);
+            //    }
             //}
-            //}
+
 
 
 
@@ -327,7 +300,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
             //Warning:
             //Changing a constraint's support data is not thread safe; it modifies simulation islands!
-            //If something other than a CharacterController can modify simulation islands is running
+            //If something other than the SphereCharacterController can modify simulation islands is running
             //simultaneously (in the IBeforeSolverUpdateable.Update stage), it will need to be synchronized.
             ConstraintAccessLocker.Enter();
             HorizontalMotionConstraint.SupportData = supportData;
@@ -339,8 +312,8 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
 
 
-
         }
+
 
         void TeleportToPosition(Vector3 newPosition, float dt)
         {
@@ -359,99 +332,6 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             //Also re-collect supports.
             //This will ensure the constraint and other velocity affectors have the most recent information available.
             CollectSupportData();
-        }
-
-        void CorrectContacts()
-        {
-            //Go through the contacts associated with the character.
-            //If the contact is at the bottom of the character, regardless of its normal, take a closer look.
-            //If the direction from the closest point on the inner cylinder to the contact position has traction
-            //and the contact's normal does not, then replace the contact normal with the offset direction.
-
-            //This is necessary because various convex pair manifolds use persistent manifolds.
-            //Contacts in these persistent manifolds can live too long for the character to behave perfectly
-            //when going over (usually tiny) steps.
-
-            Vector3 downDirection = Body.OrientationMatrix.Down;
-            Vector3 position = Body.Position;
-            float margin = Body.CollisionInformation.Shape.CollisionMargin;
-            float minimumHeight = Body.Height * .5f - margin;
-            float coreRadius = Body.Radius - margin;
-            float coreRadiusSquared = coreRadius * coreRadius;
-            foreach (var pair in Body.CollisionInformation.Pairs)
-            {
-                foreach (var contactData in pair.Contacts)
-                {
-                    var contact = contactData.Contact;
-                    float dot;
-                    //Vector3.Dot(ref contact.Normal, ref downDirection, out dot);
-                    //if (Math.Abs(dot) > SupportFinder.cosMaximumSlope)
-                    //{
-                    //    //This contact will already be considered to have traction.
-                    //    //Don't bother doing the somewhat expensive correction process on it.
-                    //    //TODO: Test this; see how much benefit there is.
-                    //    continue;
-                    //}
-                    //Check to see if the contact position is at the bottom of the character.
-                    Vector3 offset = contact.Position - Body.Position;
-                    Vector3.Dot(ref offset, ref downDirection, out dot);
-                    if (dot > minimumHeight)
-                    {
-
-                        //It is a 'bottom' contact!
-                        //So, compute the offset from the inner cylinder to the contact.
-                        //To do this, compute the closest point on the inner cylinder.
-                        //Since we know it's on the bottom, all we need is to compute the horizontal offset.
-                        Vector3.Dot(ref offset, ref downDirection, out dot);
-                        Vector3 horizontalOffset;
-                        Vector3.Multiply(ref downDirection, dot, out horizontalOffset);
-                        Vector3.Subtract(ref offset, ref horizontalOffset, out horizontalOffset);
-                        float length = horizontalOffset.LengthSquared();
-                        if (length > coreRadiusSquared)
-                        {
-                            //It's beyond the edge of the cylinder; clamp it.
-                            Vector3.Multiply(ref horizontalOffset, coreRadius / (float)Math.Sqrt(length), out horizontalOffset);
-                        }
-                        //It's on the bottom, so add the bottom height.
-                        Vector3 closestPointOnCylinder;
-                        Vector3.Multiply(ref downDirection, minimumHeight, out closestPointOnCylinder);
-                        Vector3.Add(ref closestPointOnCylinder, ref horizontalOffset, out closestPointOnCylinder);
-                        Vector3.Add(ref closestPointOnCylinder, ref position, out closestPointOnCylinder);
-
-                        //Compute the offset from the cylinder to the offset.
-                        Vector3 offsetDirection;
-                        Vector3.Subtract(ref contact.Position, ref closestPointOnCylinder, out offsetDirection);
-                        length = offsetDirection.LengthSquared();
-                        if (length > Toolbox.Epsilon)
-                        {
-                            //Normalize the offset.
-                            Vector3.Divide(ref offsetDirection, (float)Math.Sqrt(length), out offsetDirection);
-                        }
-                        else
-                            continue; //If there's no offset, it's really deep and correcting this contact might be a bad idea.
-
-                        Vector3.Dot(ref offsetDirection, ref downDirection, out dot);
-                        float dotOriginal;
-                        Vector3.Dot(ref contact.Normal, ref downDirection, out dotOriginal);
-                        if (Math.Abs(dot) > Math.Abs(dotOriginal)) //if the new offsetDirection normal is less steep than the original slope...
-                        {
-                            //Then use it!
-                            Vector3.Dot(ref offsetDirection, ref contact.Normal, out dot);
-                            if (dot < 0)
-                            {
-                                //Don't flip the normal relative to the contact normal.  That would be bad!
-                                Vector3.Negate(ref offsetDirection, out offsetDirection);
-                                dot = -dot;
-                            }
-                            //Update the contact data using the corrected information.
-                            //The penetration depth is conservatively updated; it will be less than or equal to the 'true' depth in this direction.
-                            contact.PenetrationDepth *= dot;
-                            contact.Normal = offsetDirection;
-                        }
-                    }
-                }
-            }
-
         }
 
         void ComputeRelativeVelocity(ref SupportData supportData, out Vector3 relativeVelocity)

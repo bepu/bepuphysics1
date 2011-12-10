@@ -16,6 +16,17 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
         }
 
         /// <summary>
+        /// Gets the broad phase associated with this query accelerator.
+        /// </summary>
+        public BroadPhase BroadPhase
+        {
+            get
+            {
+                return hierarchy;
+            }
+        }
+
+        /// <summary>
         /// Collects all entries with bounding boxes which intersect the given bounding box.
         /// </summary>
         /// <param name="box">Bounding box to test against the world.</param>

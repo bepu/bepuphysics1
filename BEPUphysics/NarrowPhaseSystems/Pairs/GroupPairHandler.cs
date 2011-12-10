@@ -137,9 +137,9 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                 if (!subPairs.ContainsKey(pair))
                 {
                     CollidablePairHandler newPair = NarrowPhaseHelper.GetPairHandler(ref pair, rule);
-                    newPair.UpdateMaterialProperties(materialA, materialB);  //Override the materials, if necessary.
                     if (newPair != null)
                     {
+                        newPair.UpdateMaterialProperties(materialA, materialB);  //Override the materials, if necessary.
                         newPair.Parent = this;
                         subPairs.Add(pair, newPair);
                     }
@@ -253,7 +253,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         }
 
 
-        internal override void GetContactInformation(int index, out ContactInformation info)
+        protected internal override void GetContactInformation(int index, out ContactInformation info)
         {
             foreach (CollidablePairHandler pair in subPairs.Values)
             {
@@ -322,7 +322,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         /// <summary>
         /// Gets the number of contacts in the pair.
         /// </summary>
-        internal override int ContactCount
+        protected internal override int ContactCount
         {
             get { return contactCount; }
         }

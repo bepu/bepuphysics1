@@ -101,7 +101,7 @@ namespace BEPUphysicsDemos.AlternateMovement
                 new CompoundShapeEntry(new BoxShape(3, .7f, 4f), new Vector3(0, .5f + .35f, .5f), 1)
             };
             var body = new CompoundBody(bodies, 501);
-            body.CollisionInformation.LocalPosition = new Vector3(0, -.5f, 0);
+            body.CollisionInformation.LocalPosition = new Vector3(0, .5f, 0);
             body.Position = (position); //At first, just keep it out of the way.
             Vehicle = new Vehicle(body);
 

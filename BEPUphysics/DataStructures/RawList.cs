@@ -166,6 +166,25 @@ namespace BEPUphysics.DataStructures
 
         }
 
+        ///<summary>
+        /// Adds a range of elements to the list from another list.
+        ///</summary>
+        ///<param name="items">Elements to add.</param>
+        public void AddRange(IList<T> items)
+        {
+            int neededLength = count + items.Count;
+            if (neededLength > Elements.Length)
+            {
+                int newLength = Elements.Length * 2;
+                if (newLength < neededLength)
+                    newLength = neededLength;
+                Capacity = newLength;
+            }
+            items.CopyTo(Elements, 0);
+            count = neededLength;
+
+        }
+
         /// <summary>
         /// Removes all items from the <see cref="T:System.Collections.Generic.ICollection`1"/>.
         /// </summary>
@@ -279,6 +298,11 @@ namespace BEPUphysics.DataStructures
                 Add(item);
         }
 
+        /// <summary>
+        /// Gets or sets the element of the list at the given index.
+        /// </summary>
+        /// <param name="index">Index in the list.</param>
+        /// <returns>Element at the given index.</returns>
         public T this[int index]
         {
             get
@@ -301,13 +325,22 @@ namespace BEPUphysics.DataStructures
 
         #region ICollection<T> Members
 
-
+        /// <summary>
+        /// Determines if an item is present in the list.
+        /// </summary>
+        /// <param name="item">Item to be tested.</param>
+        /// <returns>Whether or not the item was contained by the list.</returns>
         public bool Contains(T item)
         {
             return IndexOf(item) != -1;
         }
 
-        void ICollection<T>.CopyTo(T[] array, int arrayIndex)
+        /// <summary>
+        /// Copies the list's contents to the array.
+        /// </summary>
+        /// <param name="array">Array to receive the list's contents.</param>
+        /// <param name="arrayIndex">Index in the array to start the dump.</param>
+        public void CopyTo(T[] array, int arrayIndex)
         {
             Array.Copy(Elements, 0, array, arrayIndex, count);
         }

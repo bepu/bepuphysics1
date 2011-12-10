@@ -28,6 +28,7 @@ namespace BEPUphysics.ResourceManagement
             SubPoolCollisionEntryList = new LockingResourcePool<RawList<BroadPhaseEntry>>();
             SubPoolCompoundChildList = new LockingResourcePool<RawList<CompoundChild>>();
             SubPoolIntList = new LockingResourcePool<RawList<int>>();
+            SubPoolIntSet = new LockingResourcePool<HashSet<int>>();
             SubPoolFloatList = new LockingResourcePool<RawList<float>>();
             SubPoolVectorList = new LockingResourcePool<RawList<Vector3>>();
             SubPoolEntityRawList = new LockingResourcePool<RawList<Entity>>(16);
@@ -143,6 +144,7 @@ namespace BEPUphysics.ResourceManagement
         static ResourcePool<RawList<RayCastResult>> SubPoolRayCastResultList;// = new LockingResourcePool<RawList<RayCastResult>>();
         static ResourcePool<RawList<BroadPhaseEntry>> SubPoolCollisionEntryList;// = new LockingResourcePool<RawList<BroadPhaseEntry>>();
         static ResourcePool<RawList<int>> SubPoolIntList;// = new LockingResourcePool<List<int>>();
+        static ResourcePool<HashSet<int>> SubPoolIntSet;
         static ResourcePool<RawList<float>> SubPoolFloatList;// = new LockingResourcePool<List<float>>();
         static ResourcePool<RawList<Vector3>> SubPoolVectorList;// = new LockingResourcePool<List<Vector3>>();;
         static ResourcePool<RawList<Entity>> SubPoolEntityRawList;//= new LockingResourcePool<RawList<Entity>>(16);
@@ -245,6 +247,25 @@ namespace BEPUphysics.ResourceManagement
         {
             list.Clear();
             SubPoolIntList.GiveBack(list);
+        }
+
+        /// <summary>
+        /// Retrieves a int hash set from the resource pool.
+        /// </summary>
+        /// <returns>Empty int set.</returns>
+        public static HashSet<int> GetIntSet()
+        {
+            return SubPoolIntSet.Take();
+        }
+
+        /// <summary>
+        /// Returns a resource to the pool.
+        /// </summary>
+        /// <param name="set">Set to return.</param>
+        public static void GiveBack(HashSet<int> set)
+        {
+            set.Clear();
+            SubPoolIntSet.GiveBack(set);
         }
 
         /// <summary>

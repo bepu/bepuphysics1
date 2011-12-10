@@ -13,7 +13,7 @@ namespace BEPUphysics.DeactivationManagement
     ///</summary>
     public class DeactivationManager : MultithreadedProcessingStage
     {
-        private int maximumDeactivationsPerFrame = 100;
+        private int maximumDeactivationAttemptsPerFrame = 100;
         private int deactivationIslandIndex;
 
         internal float velocityLowerLimitSquared = .07f;
@@ -85,7 +85,7 @@ namespace BEPUphysics.DeactivationManagement
         /// Gets or sets the maximum number of objects to attempt to deactivate each frame.
         /// Defaults to 100.
         ///</summary>
-        public int MaximumDeactivationsPerFrame { get { return maximumDeactivationsPerFrame; } set { maximumDeactivationsPerFrame = value; } }
+        public int MaximumDeactivationAttemptsPerFrame { get { return maximumDeactivationAttemptsPerFrame; } set { maximumDeactivationAttemptsPerFrame = value; } }
 
         TimeStepSettings timeStepSettings;
         ///<summary>
@@ -187,7 +187,22 @@ namespace BEPUphysics.DeactivationManagement
         {
             if (simulationIslandMember.DeactivationManager == this)
             {
-                simulationIslandMember.Activate();
+                if (simulationIslandMember.IsDynamic)
+                    simulationIslandMember.Activate();
+                else
+                {
+                    //If the object was NOT dynamic, then simply calling activate will be insufficient
+                    //because it does not share any simulation island with connected objects.
+                    //We need to notify its connections directly.
+                    foreach (var connection in simulationIslandMember.connections)
+                    {
+                        foreach (var member in connection.members)
+                        {
+                            if (member != simulationIslandMember)
+                                member.Activate();
+                        }
+                    }
+                }
                 simulationIslandMember.DeactivationManager = null;
                 simulationIslandMembers.Remove(simulationIslandMember);
                 RemoveSimulationIslandFromMember(simulationIslandMember);
@@ -303,11 +318,14 @@ namespace BEPUphysics.DeactivationManagement
             }
         }
 
+
         void DeactivateObjects()
         {
             //Deactivate only some objects each frame.
             int numberOfEntitiesDeactivated = 0;
-            while (numberOfEntitiesDeactivated < maximumDeactivationsPerFrame && simulationIslands.count > 0)
+            int numberOfIslandsChecked = 0;
+            int originalIslandCount = simulationIslands.count;
+            while (numberOfEntitiesDeactivated < maximumDeactivationAttemptsPerFrame && simulationIslands.count > 0 && numberOfIslandsChecked < originalIslandCount)
             {
                 deactivationIslandIndex = (deactivationIslandIndex + 1) % simulationIslands.count;
                 var island = simulationIslands.Elements[deactivationIslandIndex];
@@ -323,6 +341,7 @@ namespace BEPUphysics.DeactivationManagement
                     island.TryToDeactivate();
                     numberOfEntitiesDeactivated += island.memberCount;
                 }
+                numberOfIslandsChecked++;
             }
         }
 
@@ -418,7 +437,6 @@ namespace BEPUphysics.DeactivationManagement
         {
             if (connection.DeactivationManager == this)
             {
-
                 connection.DeactivationManager = null; //TODO: Should it remove here, or in the deferred final case? probably here, since otherwise Add-Remove-Add would throw an exception!
                 //Try to split by examining the connections and breadth-first searching outward.
                 //If it is determined that a split is required, grab a new island and add it.

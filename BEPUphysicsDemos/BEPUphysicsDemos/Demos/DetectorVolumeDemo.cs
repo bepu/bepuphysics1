@@ -32,13 +32,13 @@ namespace BEPUphysicsDemos.Demos
 
             game.ModelDrawer.Add(detectorVolume.TriangleMesh);
 
-            Entity toAdd = new Box(new Vector3(0, -10, 0), 1, 1, 1);
-            toAdd.Tag = "noDisplayObject";
-            displayBox = game.ModelDrawer.Add(toAdd);
+            Entity box = new Box(new Vector3(0, -10, 0), 1, 1, 1);
+            box.Tag = "noDisplayObject";
+            displayBox = game.ModelDrawer.Add(box);
             displayBox.TextureIndex = 0;
             game.ModelDrawer.IsWireframe = true;
-            toAdd.LinearVelocity = new Vector3(0, 1, 0);
-            Space.Add(toAdd); //Create the ground
+            box.LinearVelocity = new Vector3(0, 1, 0);
+            Space.Add(box);
 
             detectorVolume.EntityBeginsTouching += BeginsTouching;
             detectorVolume.EntityStopsTouching += StopsTouching;

@@ -69,13 +69,17 @@ namespace BEPUphysics.Collidables.MobileCollidables
 
         protected internal RigidTransform worldTransform;
         ///<summary>
-        /// Gets the world transform of the collidable.
+        /// Gets or sets the world transform of the collidable.
         ///</summary>
         public RigidTransform WorldTransform
         {
             get
             {
                 return worldTransform;
+            }
+            set
+            {
+                UpdateWorldTransform(ref value.Position, ref value.Orientation);
             }
         }
 
