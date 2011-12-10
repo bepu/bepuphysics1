@@ -26,8 +26,9 @@ namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
             }
         }
 
+        public bool RayCast(Ray ray, IList<BroadPhaseEntry> outputIntersections)
         {
-            throw new NotSupportedException("The Grid2DSortAndSweep broad phase cannot accelerate infinite ray casts.  Consider specifying a maximum length or using a broad phase which supports infinite ray casts.");
+            throw new NotSupportedException("The Grid2DSortAndSweep broad phase cannot accelerate infinite ray casts.  Consider using a broad phase which supports infinite tests, using a custom solution, or using a finite ray.");
         }
 
         public bool RayCast(Ray ray, float maximumLength, IList<BroadPhaseEntry> outputIntersections)
@@ -212,5 +213,8 @@ namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
         //{
         //    throw new NotSupportedException("The Grid2DSortAndSweep broad phase cannot accelerate frustum tests.  Consider using a broad phase which supports frustum tests or using a custom solution.");
         //}
+
+
+
     }
 }
