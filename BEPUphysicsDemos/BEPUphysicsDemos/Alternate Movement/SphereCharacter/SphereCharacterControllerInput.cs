@@ -131,8 +131,6 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
                 totalMovement += gamePadInput.ThumbSticks.Left.Y * new Vector2(forward.X, forward.Z);
                 totalMovement += gamePadInput.ThumbSticks.Left.X * new Vector2(right.X, right.Z);
                 CharacterController.HorizontalMotionConstraint.MovementDirection = Vector2.Normalize(totalMovement);
-                
-                CharacterController.StanceManager.DesiredStance = gamePadInput.IsButtonDown(Buttons.RightStick) ? Stance.Crouching : Stance.Standing;
 
                 //Jumping
                 if (previousGamePadInput.IsButtonUp(Buttons.LeftStick) && gamePadInput.IsButtonDown(Buttons.LeftStick))
