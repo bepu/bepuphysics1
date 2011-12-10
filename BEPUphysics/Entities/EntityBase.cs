@@ -277,11 +277,6 @@ namespace BEPUphysics.Entities
         public Matrix3X3 InertiaTensor
         {
             get { return inertiaTensor; }
-            set
-            {
-                //Settable, but only for extensibility.  It will be computed...
-                inertiaTensor = value;
-            }
         }
 
         internal Matrix3X3 localInertiaTensor;
