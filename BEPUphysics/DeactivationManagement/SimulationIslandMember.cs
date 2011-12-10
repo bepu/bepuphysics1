@@ -136,14 +136,18 @@ namespace BEPUphysics.DeactivationManagement
                                 //Path compression can force the simulation island to evaluate to null briefly.
                                 //Do not permit the object to undergo path compression during this (brief) operation.
                                 connectedMembers.Elements[j].simulationIslandChangeLocker.Enter();
-                                if (connectedMembers.Elements[j].SimulationIsland != null)
-                                    connectedMembers.Elements[j].SimulationIsland.allowDeactivation = false;
+                                var island = connectedMembers.Elements[j].SimulationIsland;
+                                if (island != null)
+                                {
+                                    //It's possible a kinematic entity to go inactive for one frame, allowing nearby entities to go to sleep.
+                                    //The next frame, it could wake up again.  Because kinematics do not have simulation islands and thus
+                                    //do not automatically wake up touching dynamic entities, we must do so manually.
+                                    //This is safe because the island.Activate command is a single boolean set.
+                                    //We're also inside the island change locker, so we don't have to worry about the island changing beneath our feet.
+                                    island.Activate();
+                                    island.allowDeactivation = false;
+                                }
                                 connectedMembers.Elements[j].simulationIslandChangeLocker.Exit();
-                                //Note: Is it possible for an active kinematic to be involved with a simulation island that is currently inactive?
-                                //Collision pair creation/merge should take care of the entry case, while this takes care of the maintenance.
-                                //But, if it turns out that's wrong later, the simulation island could be forced active here.  It's a simple boolean operation, and would only ever be set to true during this stage.
-                                //If there's a nasty special case that takes care of kinematics creating pairs, then adding in that force-activate would be a good idea to localize the effect
-                                //of the deactivation system.
                             }
                         }
 
@@ -275,6 +279,25 @@ namespace BEPUphysics.DeactivationManagement
         /// Gets or sets whether or not this member is always active.
         /// </summary>
         public bool IsAlwaysActive { get; set; }
+
+
+
+        internal bool allowStabilization = true;
+        /// <summary>
+        /// Gets or sets whether or not the entity can be stabilized by the deactivation system.  This allows systems of objects to go to sleep faster.
+        /// Defaults to true.
+        /// </summary>
+        public bool AllowStabilization
+        {
+            get
+            {
+                return allowStabilization;
+            }
+            set
+            {
+                allowStabilization = value;
+            }
+        }
 
         internal bool allowStabilization = true;
         /// <summary>

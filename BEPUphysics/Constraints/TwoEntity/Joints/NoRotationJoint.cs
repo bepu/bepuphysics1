@@ -172,7 +172,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Joints
 
             Vector3 lambda;
             Vector3.Add(ref velocityDifference, ref biasVelocity, out lambda);
-            Vector3.Add(ref lambda, ref softnessVector, out lambda);
+            Vector3.Subtract(ref lambda, ref softnessVector, out lambda);
             Matrix3X3.Transform(ref lambda, ref effectiveMassMatrix, out lambda);
 
             Vector3.Add(ref lambda, ref accumulatedImpulse, out accumulatedImpulse);

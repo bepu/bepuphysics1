@@ -5,20 +5,21 @@ using System.Text;
 using BEPUphysics.Constraints;
 using BEPUphysics.DataStructures;
 using BEPUphysics.Entities;
+using Microsoft.Xna.Framework;
 using BEPUphysics.Collidables.MobileCollidables;
 using BEPUphysics.MathExtensions;
 using BEPUphysics;
 using System.Diagnostics;
 using BEPUphysics.Settings;
 
-namespace BEPUphysicsDemos.AlternateMovement.Character
+namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
 {
     /// <summary>
     /// Keeps a character glued to the ground, if possible.
     /// </summary>
     public class VerticalMotionConstraint : EntitySolverUpdateable
     {
-        CharacterController character;
+        SphereCharacterController character;
 
 
         SupportData supportData;
@@ -106,7 +107,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         /// Constructs a new vertical motion constraint.
         /// </summary>
         /// <param name="characterController">Character governed by the constraint.</param>
-        public VerticalMotionConstraint(CharacterController characterController)
+        public VerticalMotionConstraint(SphereCharacterController characterController)
         {
             this.character = characterController;
         }

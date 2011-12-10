@@ -163,10 +163,10 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             {
                 var collidablePair = new CollidablePair(CollidableA, entry.Collidable = GetOpposingCollidable(index));
                 var newPair = (MobileMeshPairHandler)NarrowPhaseHelper.GetPairHandler(ref collidablePair);
-                newPair.CollisionRule = CollisionRule;
-                newPair.UpdateMaterialProperties(MaterialA, MaterialB);  //Override the materials, if necessary.  Meshes don't currently support custom materials but..
                 if (newPair != null)
                 {
+                    newPair.CollisionRule = CollisionRule;
+                    newPair.UpdateMaterialProperties(MaterialA, MaterialB);  //Override the materials, if necessary.  Meshes don't currently support custom materials but..
                     newPair.Parent = this;
                     subPairs.Add(entry, newPair);
                 }
@@ -308,7 +308,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         }
 
 
-        internal override void GetContactInformation(int index, out ContactInformation info)
+        protected internal override void GetContactInformation(int index, out ContactInformation info)
         {
             foreach (CollidablePairHandler pair in subPairs.Values)
             {
@@ -378,7 +378,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         /// <summary>
         /// Gets the number of contacts in the pair.
         /// </summary>
-        internal override int ContactCount
+        protected internal override int ContactCount
         {
             get { return contactCount; }
         }

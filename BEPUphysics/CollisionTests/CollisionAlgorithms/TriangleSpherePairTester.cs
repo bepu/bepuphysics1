@@ -114,7 +114,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
         {
             get
             {
-                return true;
+                return false;
             }
         }
 

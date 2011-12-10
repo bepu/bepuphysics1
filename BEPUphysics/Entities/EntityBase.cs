@@ -233,7 +233,6 @@ namespace BEPUphysics.Entities
 
 
 
-
         bool isAffectedByGravity = true;
         ///<summary>
         /// Gets or sets whether or not the entity can be affected by gravity applied by the ForceUpdater.
@@ -278,11 +277,6 @@ namespace BEPUphysics.Entities
         public Matrix3X3 InertiaTensor
         {
             get { return inertiaTensor; }
-            set
-            {
-                //Settable, but only for extensibility.  It will be computed...
-                inertiaTensor = value;
-            }
         }
 
         internal Matrix3X3 localInertiaTensor;
@@ -686,7 +680,7 @@ namespace BEPUphysics.Entities
             }
         }
 
-        
+
 
         ///<summary>
         /// Applies an impulse to the entity.
@@ -899,7 +893,7 @@ namespace BEPUphysics.Entities
             }
 
             //Boost damping at very low velocities.  This is a strong stabilizer; removes a ton of energy from the system.
-            if (activityInformation.DeactivationManager.useStabilization && activityInformation.allowStabilization && 
+            if (activityInformation.DeactivationManager.useStabilization && activityInformation.allowStabilization &&
                 (activityInformation.isSlowing || activityInformation.velocityTimeBelowLimit > activityInformation.DeactivationManager.lowVelocityTimeMinimum))
             {
                 float energy = linearVelocity.LengthSquared() + angularVelocity.LengthSquared();
@@ -1053,9 +1047,12 @@ namespace BEPUphysics.Entities
             //I must order the pairs to compute a time of impact.
 
             //The pair method works in such a way that, when this method is run asynchronously, there will be no race conditions.
-            for (int i = 0; i < collisionInformation.pairs.Count; i++)
+            for (int i = 0; i < collisionInformation.pairs.count; i++)
             {
-                collisionInformation.pairs.Elements[i].UpdateTimeOfImpact(collisionInformation, dt);
+                //Only perform CCD if we're either supposed to test against no solver pairs or if this isn't a no solver pair.
+                if (MotionSettings.UseCCDForNoSolverPairs ||
+                    collisionInformation.pairs.Elements[i].broadPhaseOverlap.collisionRule < CollisionRule.NoSolver)
+                    collisionInformation.pairs.Elements[i].UpdateTimeOfImpact(collisionInformation, dt);
             }
         }
 

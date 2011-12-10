@@ -5,19 +5,21 @@ using System.Text;
 using BEPUphysics.Constraints;
 using BEPUphysics.DataStructures;
 using BEPUphysics.Entities;
+using Microsoft.Xna.Framework;
 using BEPUphysics.Collidables.MobileCollidables;
 using BEPUphysics.MathExtensions;
 using BEPUphysics;
 using System.Diagnostics;
+using Microsoft.Xna.Framework.Input;
 
-namespace BEPUphysicsDemos.AlternateMovement.Character
+namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
 {
     /// <summary>
     /// Manages the horizontal movement of a character.
     /// </summary>
     public class HorizontalMotionConstraint : EntitySolverUpdateable
     {
-        CharacterController character;
+        SphereCharacterController character;
 
 
         SupportData supportData;
@@ -76,6 +78,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         }
 
 
+
         float speed = 8f;
         /// <summary>
         /// Gets or sets the maximum speed at which the character can move while standing with a support that provides traction.
@@ -92,24 +95,6 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 if (value < 0)
                     throw new Exception("Value must be nonnegative.");
                 speed = value;
-            }
-        }
-        float crouchingSpeed = 3f;
-        /// <summary>
-        /// Gets or sets the maximum speed at which the character can move while crouching with a support that provides traction.
-        /// Relative velocities with a greater magnitude will be decelerated.
-        /// </summary>
-        public float CrouchingSpeed
-        {
-            get
-            {
-                return crouchingSpeed;
-            }
-            set
-            {
-                if (value < 0)
-                    throw new Exception("Value must be nonnegative.");
-                crouchingSpeed = value;
             }
         }
         float slidingSpeed = 6;
@@ -256,7 +241,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         /// Constructs a new horizontal motion constraint.
         /// </summary>
         /// <param name="characterController">Character to be governed by this constraint.</param>
-        public HorizontalMotionConstraint(CharacterController characterController)
+        public HorizontalMotionConstraint(SphereCharacterController characterController)
         {
             this.character = characterController;
             CollectInvolvedEntities();
@@ -287,10 +272,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 if (supportData.HasTraction)
                 {
                     MovementMode = MovementMode.Traction;
-                    if (character.StanceManager.CurrentStance == Stance.Standing)
-                        maxSpeed = speed;
-                    else
-                        maxSpeed = crouchingSpeed;
+                    maxSpeed = speed;
                     maxForce = maximumForce;
                 }
                 else
@@ -486,7 +468,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     timeSinceTransition += dt;
                 if (timeSinceTransition >= tractionDecelerationTime)
                 {
-                    Vector3.Multiply(ref downDirection, character.Body.Height * .5f, out positionLocalOffset);
+                    Vector3.Multiply(ref downDirection, character.Body.Radius, out positionLocalOffset);
                     positionLocalOffset = (positionLocalOffset + character.Body.Position) - supportEntity.Position;
                     positionLocalOffset = Matrix3X3.TransformTranspose(positionLocalOffset, supportEntity.OrientationMatrix);
                     timeSinceTransition = -1; //Negative 1 means that the offset has been computed.
@@ -494,7 +476,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 if (timeSinceTransition < 0)
                 {
                     Vector3 targetPosition;
-                    Vector3.Multiply(ref downDirection, character.Body.Height * .5f, out targetPosition);
+                    Vector3.Multiply(ref downDirection, character.Body.Radius, out targetPosition);
                     targetPosition += character.Body.Position;
                     Vector3 worldSupportLocation = Matrix3X3.Transform(positionLocalOffset, supportEntity.OrientationMatrix) + supportEntity.Position;
                     Vector3 error;
@@ -502,7 +484,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     //If the error is too large, then recompute the offset.  We don't want the character rubber banding around.
                     if (error.LengthSquared() > .15f * .15f)
                     {
-                        Vector3.Multiply(ref downDirection, character.Body.Height * .5f, out positionLocalOffset);
+                        Vector3.Multiply(ref downDirection, character.Body.Radius, out positionLocalOffset);
                         positionLocalOffset = (positionLocalOffset + character.Body.Position) - supportEntity.Position;
                         positionLocalOffset = Matrix3X3.TransformTranspose(positionLocalOffset, supportEntity.OrientationMatrix);
                         positionCorrectionBias = new Vector2();
@@ -576,7 +558,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         /// <returns>Impulse magnitude computed by the iteration.</returns>
         public override float SolveIteration()
         {
-         
+
             Vector2 relativeVelocity = RelativeVelocity;
 
             Vector2.Add(ref relativeVelocity, ref positionCorrectionBias, out relativeVelocity);
@@ -686,6 +668,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     relativeVelocity.Y += y;
 
                 }
+
                 return relativeVelocity;
             }
         }
@@ -704,6 +687,8 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     return bodyVelocity;
             }
         }
+
+
 
 
 

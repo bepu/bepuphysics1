@@ -51,7 +51,7 @@ namespace BEPUphysicsDemos.Demos
             kapow = new Sphere(new Vector3(11000, 0, 0), .6f, 20);
             kapowMaker = new Explosion(Vector3.Zero, 400, 15, Space);
             //Create the right-click grab spring.
-            grabber = new MotorizedGrabSpring();//30f, .8f, .6f);
+            grabber = new MotorizedGrabSpring();
             grabberGraphic = game.ConstraintDrawer.Add(grabber);
             grabberGraphic.IsDrawing = false;
             Space.Add(grabber);
@@ -83,7 +83,7 @@ namespace BEPUphysicsDemos.Demos
         Func<BroadPhaseEntry, bool> rayCastFilter;
         bool RayCastFilter(BroadPhaseEntry entry)
         {
-            return entry.CollisionRules.Personal <= CollisionRule.Normal;
+            return entry != character.CharacterController.Body.CollisionInformation && entry.CollisionRules.Personal <= CollisionRule.Normal;
         }
 
         public override void Update(float dt)
@@ -118,15 +118,9 @@ namespace BEPUphysicsDemos.Demos
             if (Game.MouseInput.RightButton == ButtonState.Pressed && !grabber.IsGrabbing)
 #endif
             {
-                Vector3 startPosition;
-                if (character.IsActive)
-                    startPosition = MathConverter.Convert(Game.Camera.Position + 5 * Game.Camera.WorldMatrix.Forward);
-                else
-                    startPosition = MathConverter.Convert(Game.Camera.Position);
-
                 //Find the earliest ray hit
                 RayCastResult raycastResult;
-                if (Space.RayCast(new Ray(startPosition, MathConverter.Convert(Game.Camera.WorldMatrix.Forward)), 1000, rayCastFilter, out raycastResult))
+                if (Space.RayCast(new Ray(Game.Camera.Position, Game.Camera.WorldMatrix.Forward), 1000, rayCastFilter, out raycastResult))
                 {
                     var entityCollision = raycastResult.HitObject as EntityCollidable;
                     //If there's a valid ray hit, then grab the connected object!
@@ -134,10 +128,7 @@ namespace BEPUphysicsDemos.Demos
                     {
                         grabber.Setup(entityCollision.Entity, raycastResult.HitData.Location);
                         grabberGraphic.IsDrawing = true;
-                        if (character.IsActive)
-                            grabDistance = raycastResult.HitData.T + 5;
-                        else
-                            grabDistance = raycastResult.HitData.T;
+                        grabDistance = raycastResult.HitData.T;
                     }
                 }
 

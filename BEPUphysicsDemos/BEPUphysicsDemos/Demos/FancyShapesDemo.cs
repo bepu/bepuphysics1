@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.MathExtensions;
+using BEPUphysics;
+using System.Diagnostics;
+using BEPUphysicsDrawer.Models;
+using BEPUphysics.DataStructures;
 
 namespace BEPUphysicsDemos.Demos
 {
@@ -24,7 +28,7 @@ namespace BEPUphysicsDemos.Demos
             var points = new List<Vector3>();
 
             //Setup a random distribution in a cube and compute a convex hull.
-            var random = new Random();
+            var random = new Random(0);
             for (int k = 0; k < 40; k++)
             {
                 points.Add(new Vector3(3 * (float)random.NextDouble(), 5 * (float)random.NextDouble(), 3 * (float)random.NextDouble()));
@@ -35,15 +39,18 @@ namespace BEPUphysicsDemos.Demos
 
             points.Clear();
 
-            
+
             //Create another random distribution, but this time with more points.
             points.Clear();
             for (int k = 0; k < 400; k++)
             {
                 points.Add(new Vector3(1 * (float)random.NextDouble(), 3 * (float)random.NextDouble(), 1 * (float)random.NextDouble()));
             }
+
+
             convexHull = new ConvexHull(new Vector3(4, 7, 0), points, 10);
             Space.Add(convexHull);
+
 
 
             //Minkowski Sums are fancy 'combinations' of objects, where the result is the sum of the individual points making up shapes.
@@ -109,6 +116,7 @@ namespace BEPUphysicsDemos.Demos
             game.Camera.Position = new Microsoft.Xna.Framework.Vector3(0, 0, 30);
 
         }
+
 
         /// <summary>
         /// Gets the name of the simulation.

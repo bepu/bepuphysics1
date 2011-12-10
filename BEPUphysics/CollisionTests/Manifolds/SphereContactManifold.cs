@@ -129,6 +129,13 @@ namespace BEPUphysics.CollisionTests.Manifolds
             base.CleanUp();
         }
 
-
+        /// <summary>
+        /// Clears the contacts associated with this manifold.
+        /// </summary>
+        public override void ClearContacts()
+        {
+            previouslyColliding = false;
+            base.ClearContacts();
+        }
     }
 }

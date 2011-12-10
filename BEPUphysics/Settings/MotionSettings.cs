@@ -58,5 +58,14 @@ namespace BEPUphysics.Settings
         /// Defaults to false.
         /// </summary>
         public static bool UseExtraExpansionForContinuousBoundingBoxes;
+
+        /// <summary>
+        /// When this is set to false, collision pairs with a CollisionRule of NoSolver or more restrictive will not 
+        /// be tested with continuous collision detection.  This avoids jerky motion when passing through a trigger volume, for example.
+        /// On the other hand, an entity may pass completely through a trigger volume without being noticed.  When set to true, objects will
+        /// stop on the boundary of NoSolver-ruled objects briefly, ensuring detection but introducing discontinuous motion.
+        /// Defaults to false.
+        /// </summary>
+        public static bool UseCCDForNoSolverPairs;
     }
 }
