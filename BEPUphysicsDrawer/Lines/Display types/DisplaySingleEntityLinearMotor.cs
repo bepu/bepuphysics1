@@ -28,7 +28,7 @@ namespace BEPUphysicsDrawer.Lines
         public override void Update()
         {
             //Move lines around
-            if (LineObject.IsActiveInSolver)
+            if (LineObject.IsActive)
             {
                 toPoint.PositionA = LineObject.Entity.Position;
                 toPoint.PositionB = LineObject.Point;
