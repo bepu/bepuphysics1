@@ -15,8 +15,7 @@ namespace BEPUphysics.Materials
         public static PropertyBlendMethod BouncinessBlendMethod = PropertyBlendMethod.Max;
 
         /// <summary>
-        /// The property blender used by default in collision bounciness.
-        /// Uses the space's bounciness PropertyBlendMethod to blend.
+        /// The property blender used to blend a pair's bounciness contributions together.
         /// </summary>
         public static PropertyBlender BouncinessBlender;
 
@@ -27,8 +26,7 @@ namespace BEPUphysics.Materials
         public static PropertyBlendMethod FrictionBlendMethod = PropertyBlendMethod.Average;
 
         /// <summary>
-        /// The property blender used by default in collision friction.
-        /// Uses the space's friction PropertyBlendMethod to blend.
+        /// The property blender used to blend a pair's friction contributions together.
         /// </summary>
         public static PropertyBlender FrictionBlender;
 

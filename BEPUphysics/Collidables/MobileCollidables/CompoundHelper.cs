@@ -110,9 +110,6 @@ namespace BEPUphysics.Collidables.MobileCollidables
             Vector3 originalPosition = a.position;
 
             b.Orientation = a.Orientation;
-            //Imagine a split that does not occur right down the middle, but along a far side: (oo - (o - o))
-            //Both distributions will be positive.  Only the first split works properly because there the position
-            //was aligned with the local space origin.
             Vector3 offsetA = Vector3.Transform(localOffsetA, a.Orientation);
             Vector3 offsetB = Vector3.Transform(localOffsetB, a.Orientation);
             a.Position = originalPosition + offsetA;
@@ -288,21 +285,29 @@ namespace BEPUphysics.Collidables.MobileCollidables
             for (int i = a.children.count - 1; i >= 0; i--)
             {
                 var child = a.children.Elements[i];
-                child.CollisionInformation.localPosition = offsetA;
                 var entry = child.Entry;
+                Vector3 transformedOffset;
+                Quaternion conjugate;
+                Quaternion.Conjugate(ref entry.LocalTransform.Orientation, out conjugate);
+                Vector3.Transform(ref offsetA, ref conjugate, out transformedOffset);
+                child.CollisionInformation.localPosition = transformedOffset;
                 var contribution = childContributions[child.shapeIndex];
                 CompoundShape.TransformContribution(ref entry.LocalTransform, ref distributionInfoA.Center, ref contribution.VolumeDistribution, entry.Weight, out contribution.VolumeDistribution);
-                Vector3.Add(ref entry.LocalTransform.Position, ref offsetA, out entry.LocalTransform.Position);
+                //Vector3.Add(ref entry.LocalTransform.Position, ref offsetA, out entry.LocalTransform.Position);
                 Matrix3X3.Add(ref contribution.VolumeDistribution, ref distributionInfoA.VolumeDistribution, out distributionInfoA.VolumeDistribution);
             }
             for (int i = b.children.count - 1; i >= 0; i--)
             {
                 var child = b.children.Elements[i];
-                child.CollisionInformation.localPosition = offsetB;
                 var entry = child.Entry;
+                Vector3 transformedOffset;
+                Quaternion conjugate;
+                Quaternion.Conjugate(ref entry.LocalTransform.Orientation, out conjugate);
+                Vector3.Transform(ref offsetB, ref conjugate, out transformedOffset);
+                child.CollisionInformation.localPosition = transformedOffset;
                 var contribution = childContributions[child.shapeIndex];
                 CompoundShape.TransformContribution(ref entry.LocalTransform, ref distributionInfoB.Center, ref contribution.VolumeDistribution, entry.Weight, out contribution.VolumeDistribution);
-                Vector3.Add(ref entry.LocalTransform.Position, ref offsetB, out entry.LocalTransform.Position);
+                //Vector3.Add(ref entry.LocalTransform.Position, ref offsetB, out entry.LocalTransform.Position);
                 Matrix3X3.Add(ref contribution.VolumeDistribution, ref distributionInfoB.VolumeDistribution, out distributionInfoB.VolumeDistribution);
             }
 

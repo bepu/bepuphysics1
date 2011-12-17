@@ -23,6 +23,48 @@ namespace BEPUphysicsDemos.Demos.Tests
         public MutableCompoundDemo(DemosGame game)
             : base(game)
         {
+
+            List<CompoundShapeEntry> shapes = new List<CompoundShapeEntry>();
+            float totalWeight = 0;
+            float density = 10;
+
+
+            float weight = density * 2;
+            totalWeight += weight;
+            for (int i = 0; i < 4; i++)
+            {
+                shapes.Add(new CompoundShapeEntry(
+                    new BoxShape(1, 1, 2),
+                    new RigidTransform(
+                    new Vector3(-.5f + i * 1, 0, 15),
+                    Quaternion.CreateFromAxisAngle(Vector3.Forward, MathHelper.PiOver2 * 2))
+                    //Quaternion.Identity)
+                    , weight));
+            }
+
+
+
+            var compound = new CompoundBody(shapes, totalWeight);
+            //compound.Orientation = Quaternion.CreateFromYawPitchRoll(1, 1, 1);
+            //compound.AngularVelocity = new Vector3(0, 1, 0);
+            Entity<CompoundCollidable> compound2, compound3;
+            CompoundHelper.SplitCompound(x => x.ShapeIndex >= shapes.Count / 2, compound, out compound2);
+            CompoundHelper.SplitCompound(x => x.ShapeIndex >= 3 * shapes.Count / 4, compound2, out compound3);
+
+
+
+            //compound.ActivityInformation.IsAlwaysActive = true;
+            //compound.IsAffectedByGravity = false;
+            //compound2.ActivityInformation.IsAlwaysActive = true;
+            //compound2.IsAffectedByGravity = false;
+            //compound3.ActivityInformation.IsAlwaysActive = true;
+            //compound3.IsAffectedByGravity = false;
+            //compound.Tag = "noDisplayObject";
+            Space.Add(compound);
+            Space.Add(compound2);
+            Space.Add(compound3);
+
+
             int width = 3;
             int height = 3;
             int length = 10;
@@ -34,9 +76,9 @@ namespace BEPUphysicsDemos.Demos.Tests
 
             for (int q = 0; q < 1; q++)
             {
-                List<CompoundShapeEntry> shapes = new List<CompoundShapeEntry>();
-                float totalWeight = 0;
-                float density = 1;
+                shapes.Clear();
+                totalWeight = 0;
+                density = 1;
 
                 for (int i = 0; i < width; i++)
                 {
@@ -44,19 +86,22 @@ namespace BEPUphysicsDemos.Demos.Tests
                     {
                         for (int k = 0; k < length; k++)
                         {
-                            float weight = density * blockWidth * blockLength * blockHeight;
+                            weight = density * blockWidth * blockLength * blockHeight;
                             totalWeight += weight;
                             shapes.Add(new CompoundShapeEntry(
                                 new BoxShape(blockWidth, blockHeight, blockLength),
-                                new Vector3(5 + q * 20 + i * blockWidth, j * blockHeight, k * blockLength), weight));
+                                new RigidTransform(
+                                new Vector3(5 + q * 20 + i * blockWidth, j * blockHeight, k * blockLength),
+                                //Quaternion.CreateFromAxisAngle(Vector3.Forward, MathHelper.PiOver2))
+                                Quaternion.Identity)
+                                , weight));
                         }
                     }
                 }
 
-                var compound = new CompoundBody(shapes, totalWeight);
+                compound = new CompoundBody(shapes, totalWeight);
                 //compound.Orientation = Quaternion.CreateFromYawPitchRoll(1, 1, 1);
                 //compound.AngularVelocity = new Vector3(0, 1, 0);
-                Entity<CompoundCollidable> compound2, compound3;
                 CompoundHelper.SplitCompound(x => x.ShapeIndex >= shapes.Count / 2, compound, out compound2);
                 CompoundHelper.SplitCompound(x => x.ShapeIndex >= 3 * shapes.Count / 4, compound2, out compound3);
 
