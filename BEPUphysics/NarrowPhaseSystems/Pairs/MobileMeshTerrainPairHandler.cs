@@ -76,10 +76,6 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             return toReturn;
         }
 
-        protected override void CleanUpCollidable(TriangleCollidable collidable)
-        {
-            base.CleanUpCollidable(collidable);
-        }
 
         protected override void ConfigureCollidable(TriangleEntry entry, float dt)
         {

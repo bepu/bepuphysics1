@@ -65,7 +65,7 @@ namespace BEPUphysics.UpdateableSystems
         /// <summary>
         /// Gets or sets the user data associated with this object.
         /// </summary>
-        public object Tag { get; set; }
+        public new object Tag { get; set; }
 
         #endregion
 
