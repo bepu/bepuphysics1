@@ -46,7 +46,6 @@ namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
 
         
 
-        UnsafeResourcePool<GridCell2D> cellPool = new UnsafeResourcePool<GridCell2D>();
 
 
         internal SortedGrid2DSet cellSet = new SortedGrid2DSet();

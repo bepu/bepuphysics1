@@ -39,7 +39,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
                 throw new ArgumentException("Vertices list used to create a ConvexHullShape cannot be empty.");
 
             var surfaceVertices = Resources.GetVectorList();
-            Vector3 center = ComputeCenter(vertices, surfaceVertices);
+            ComputeCenter(vertices, surfaceVertices);
             this.vertices = new RawList<Vector3>(surfaceVertices);
             Resources.GiveBack(surfaceVertices);
 

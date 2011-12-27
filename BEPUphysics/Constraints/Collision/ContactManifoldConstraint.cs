@@ -181,13 +181,13 @@ namespace BEPUphysics.Constraints.Collision
         {
             if (materialA != null && materialB != null)
                 MaterialManager.GetInteractionProperties(materialA, materialB, out materialInteraction);
-            else if (materialA == null)
+            else if (materialA == null && materialB != null)
             {
                 materialInteraction.KineticFriction = materialB.kineticFriction;
                 materialInteraction.StaticFriction = materialB.staticFriction;
                 materialInteraction.Bounciness = materialB.bounciness;
             }
-            else if (materialB == null)
+            else if (materialB == null && materialA != null)
             {
                 materialInteraction.KineticFriction = materialA.kineticFriction;
                 materialInteraction.StaticFriction = materialA.staticFriction;

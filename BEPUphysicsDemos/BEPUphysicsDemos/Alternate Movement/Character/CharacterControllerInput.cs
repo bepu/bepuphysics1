@@ -169,7 +169,6 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                         Vector3 previousHorizontalError = horizontalError;
                         Vector3.Multiply(ref horizontalError, margin / (float)Math.Sqrt(horizontalErrorLength), out horizontalError);
                         Camera.Position -= horizontalError - previousHorizontalError;
-                        horizontalErrorLength = margin * margin;
                     }
                     //Now that the error/camera position is known to lie within the constraining cylinder, we can perform a smooth correction.
 

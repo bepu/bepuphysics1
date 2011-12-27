@@ -84,7 +84,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         ///<summary>
         /// Constructs a new compound-convex pair handler.
         ///</summary>
-        public MeshGroupPairHandler()
+        protected MeshGroupPairHandler()
         {
             manifoldConstraintGroup = new ContactManifoldConstraintGroup();
         }

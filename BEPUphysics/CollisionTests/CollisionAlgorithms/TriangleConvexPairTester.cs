@@ -826,9 +826,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
             //Check if it's outside BC.
             float va = BPdotAB * CPdotAC - CPdotAB * BPdotAC;
-            float d3d4;
-            float d6d5;
-            if (va <= 0f && (d3d4 = BPdotAC - BPdotAB) > 0f && (d6d5 = CPdotAB - CPdotAC) > 0f)//Note > instead of >= and < instead of <=; prevents bad denominator
+            if (va <= 0f && (BPdotAC - BPdotAB) > 0f && (CPdotAB - CPdotAC) > 0f)//Note > instead of >= and < instead of <=; prevents bad denominator
             {
                 return VoronoiRegion.BC;
             }
