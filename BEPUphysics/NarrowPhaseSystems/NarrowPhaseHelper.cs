@@ -365,7 +365,7 @@ namespace BEPUphysics.NarrowPhaseSystems
             bool toReturn = pairHandler.ContactCount > 0;
             pairHandler.SuppressEvents = false;
             pairHandler.CleanUp();
-            (pairHandler as NarrowPhasePair).Factory.GiveBack(pairHandler);
+            pairHandler.Factory.GiveBack(pairHandler);
             return toReturn;
         }
     }

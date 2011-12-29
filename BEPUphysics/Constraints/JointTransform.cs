@@ -32,10 +32,7 @@ namespace BEPUphysics.Constraints
         {
             get
             {
-                var toReturn = new Matrix3X3();
-                toReturn.Right = localXAxis;
-                toReturn.Up = localYAxis;
-                toReturn.Backward = localPrimaryAxis;
+                var toReturn = new Matrix3X3 {Right = localXAxis, Up = localYAxis, Backward = localPrimaryAxis};
                 return toReturn;
             }
             set { SetLocalAxes(value); }
@@ -85,10 +82,7 @@ namespace BEPUphysics.Constraints
         {
             get
             {
-                var toReturn = new Matrix3X3();
-                toReturn.Right = xAxis;
-                toReturn.Up = yAxis;
-                toReturn.Backward = primaryAxis;
+                var toReturn = new Matrix3X3 {Right = xAxis, Up = yAxis, Backward = primaryAxis};
                 return toReturn;
             }
             set { SetWorldAxes(value); }

@@ -264,9 +264,7 @@ namespace BEPUphysics.Collidables
                         tri.maximumRadius = radius;
                     tri.maximumRadius = (float)Math.Sqrt(tri.maximumRadius);
                     tri.collisionMargin = 0;
-                    var triangleTransform = new RigidTransform();
-                    triangleTransform.Orientation = Quaternion.Identity;
-                    triangleTransform.Position = center;
+                    var triangleTransform = new RigidTransform {Orientation = Quaternion.Identity, Position = center};
                     RayHit tempHit;
                     if (MPRToolbox.Sweep(castShape, tri, ref sweep, ref Toolbox.ZeroVector, ref startingTransform, ref triangleTransform, out tempHit) && tempHit.T < hit.T)
                     {

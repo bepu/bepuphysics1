@@ -154,8 +154,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         ///<param name="extremePoint">Extreme point on the shape.</param>
         public override void GetLocalExtremePointWithoutMargin(ref Vector3 direction, out Vector3 extremePoint)
         {
-            RigidTransform transform = new RigidTransform();
-            transform.Orientation = shapes.list.Elements[0].Orientation;
+            var transform = new RigidTransform {Orientation = shapes.list.Elements[0].Orientation};
             shapes.list.Elements[0].CollisionShape.GetExtremePoint(direction, ref transform, out extremePoint);
             for (int i = 1; i < shapes.list.count; i++)
             {

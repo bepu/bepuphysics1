@@ -30,6 +30,8 @@ namespace BEPUphysics.Collidables.MobileCollidables
         /// fire any shape-changed events.
         ///</summary>
         ///<param name="a">First vertex in the triangle.</param>
+        ///<param name="b">Second vertex in the triangle. </param>
+        ///<param name="c">Third vertex in the triangle. </param>
         public void Initialize(ref Vector3 a, ref Vector3 b, ref Vector3 c)
         {
             var shape = Shape;

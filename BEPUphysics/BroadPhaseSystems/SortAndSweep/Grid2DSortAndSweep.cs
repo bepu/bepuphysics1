@@ -95,9 +95,7 @@ namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
             {
                 for (int j = newEntry.previousMin.Z; j <= newEntry.previousMax.Z; j++)
                 {
-                    var index = new Int2();
-                    index.Y = i;
-                    index.Z = j;
+                    var index = new Int2 {Y = i, Z = j};
                     cellSet.Add(ref index, newEntry);
                 }
             }
@@ -120,9 +118,7 @@ namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
                     {
                         for (int k = gridEntry.previousMin.Z; k <= gridEntry.previousMax.Z; k++)
                         {
-                            var index = new Int2();
-                            index.Y = j;
-                            index.Z = k;
+                            var index = new Int2 {Y = j, Z = k};
                             cellSet.Remove(ref index, gridEntry);
                         }
                     }
@@ -166,9 +162,7 @@ namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
                         {
                             if (j >= min.Y && j <= max.Y && k >= min.Z && k <= max.Z)
                                 continue; //This cell is currently occupied, do not remove.
-                            var index = new Int2();
-                            index.Y = j;
-                            index.Z = k;
+                            var index = new Int2 {Y = j, Z = k};
                             cellSet.Remove(ref index, entry);
                         }
                     }
@@ -180,9 +174,7 @@ namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
                         {
                             if (j >= entry.previousMin.Y && j <= entry.previousMax.Y && k >= entry.previousMin.Z && k <= entry.previousMax.Z)
                                 continue; //This cell is already occupied, do not add.
-                            var index = new Int2();
-                            index.Y = j;
-                            index.Z = k;
+                            var index = new Int2 {Y = j, Z = k};
                             cellSet.Add(ref index, entry);
                         }
                     }
@@ -220,9 +212,7 @@ namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
                 {
                     if (j >= min.Y && j <= max.Y && k >= min.Z && k <= max.Z)
                         continue; //This cell is currently occupied, do not remove.
-                    var index = new Int2();
-                    index.Y = j;
-                    index.Z = k;
+                    var index = new Int2 {Y = j, Z = k};
                     cellSetLocker.Enter();
                     cellSet.Remove(ref index, entry);
                     cellSetLocker.Exit();
@@ -236,9 +226,7 @@ namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
                 {
                     if (j >= entry.previousMin.Y && j <= entry.previousMax.Y && k >= entry.previousMin.Z && k <= entry.previousMax.Z)
                         continue; //This cell is already occupied, do not add.
-                    var index = new Int2();
-                    index.Y = j;
-                    index.Z = k;
+                    var index = new Int2 {Y = j, Z = k};
                     cellSetLocker.Enter();
                     cellSet.Add(ref index, entry);
                     cellSetLocker.Exit();

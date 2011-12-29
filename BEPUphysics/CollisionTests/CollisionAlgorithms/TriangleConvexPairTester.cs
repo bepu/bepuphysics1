@@ -250,9 +250,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             Vector3.Add(ref triangleCentroid, ref triangle.vC, out triangleCentroid);
             Vector3.Multiply(ref triangleCentroid, .33333333f, out triangleCentroid);
 
-            var initialSimplex = new CachedSimplex();
-            initialSimplex.State = SimplexState.Point;
-            initialSimplex.LocalSimplexB.A = triangleCentroid;
+            var initialSimplex = new CachedSimplex {State = SimplexState.Point, LocalSimplexB = {A = triangleCentroid}};
             if (GJKToolbox.GetClosestPoints(convex, triangle, ref Toolbox.RigidIdentity, ref Toolbox.RigidIdentity, ref initialSimplex, out closestA, out closestB))
             {
                 state = CollisionState.Deep;

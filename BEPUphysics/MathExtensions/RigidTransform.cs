@@ -82,9 +82,7 @@ namespace BEPUphysics.MathExtensions
         {
             get
             {
-                var t = new RigidTransform();
-                t.Orientation = Quaternion.Identity;
-                t.Position = new Vector3();
+                var t = new RigidTransform {Orientation = Quaternion.Identity, Position = new Vector3()};
                 return t;
             }
         }
@@ -118,9 +116,9 @@ namespace BEPUphysics.MathExtensions
         ///<summary>
         /// Transforms a rigid transform by another rigid transform's inverse.
         ///</summary>
-        ///<param name="local">The first rigid transform.</param>
-        ///<param name="world">The second rigid transform, to be inverted.</param>
-        ///<param name="combined">Combined rigid transform.</param>
+        ///<param name="a">The first rigid transform.</param>
+        ///<param name="b">The second rigid transform, to be inverted.</param>
+        ///<param name="combinedTransform">Combined rigid transform.</param>
         public static void TransformByInverse(ref RigidTransform a, ref RigidTransform b, out RigidTransform combinedTransform)
         {
             Invert(ref b, out combinedTransform);

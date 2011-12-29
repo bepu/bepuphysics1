@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
@@ -458,7 +459,7 @@ namespace BEPUphysics.DataStructures
 
             public override string ToString()
             {
-                return LeafIndex.ToString();
+                return LeafIndex.ToString(CultureInfo.InvariantCulture);
             }
 
             internal override void Analyze(List<int> depths, int depth, ref int nodeCount)

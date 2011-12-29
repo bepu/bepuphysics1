@@ -26,8 +26,7 @@ namespace BEPUphysics.Threading
 
             getToWork = new AutoResetEvent(false);
 
-            thread = new Thread(Work);
-            thread.IsBackground = true;
+            thread = new Thread(Work) {IsBackground = true};
             thread.Start();
         }
 

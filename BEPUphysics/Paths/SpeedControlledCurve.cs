@@ -153,7 +153,7 @@ namespace BEPUphysics.Paths
         /// </summary>
         /// <param name="time">Time to evaluate the curve at.</param>
         /// <param name="value">Value of the curve at the given time.</param>
-        /// <param name="innerTime">Time at which the internal curve was evaluated to get the value.</returns>
+        /// <param name="innerTime">Time at which the internal curve was evaluated to get the value.</param>
         public void Evaluate(double time, out TValue value, out double innerTime)
         {
             Curve.Evaluate(innerTime = GetInnerTime(time), out value);

@@ -2860,7 +2860,6 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             if (a <= Toolbox.Epsilon && e <= Toolbox.Epsilon)
             {
                 //These segments are more like points.
-                s = t = 0.0f;
                 c1 = p1;
                 c2 = p2;
                 return false;
@@ -3485,12 +3484,14 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 }
             }
 
-            output = new BoxContactDataCache();
-            output.Count = 4;
-            output.D1 = data[deepestIndex];
-            output.D2 = data[furthestIndex];
-            output.D3 = data[minYindex];
-            output.D4 = data[maxYindex];
+            output = new BoxContactDataCache
+                         {
+                             Count = 4,
+                             D1 = data[deepestIndex],
+                             D2 = data[furthestIndex],
+                             D3 = data[minYindex],
+                             D4 = data[maxYindex]
+                         };
 
 
             //Vector3 v;
@@ -4061,7 +4062,6 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             #endregion
 
             //Compute depths.
-            byte postClipCount = contactData.Count;
             tempData = contactData;
             contactData.Count = previousCount;
 

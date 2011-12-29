@@ -124,7 +124,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             //Sample the local directions from the orientation matrix, implicitly transposed.
 
             Vector3 right;
-            Vector3 direction = new Vector3(o.M11, o.M21, o.M31);
+            var direction = new Vector3(o.M11, o.M21, o.M31);
             GetLocalExtremePointWithoutMargin(ref direction, out right);
 
             Vector3 left;
@@ -299,7 +299,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             //Sample the local directions from the orientation matrix, implicitly transposed.
 
             Vector3 right;
-            Vector3 direction = new Vector3(transform.LinearTransform.M11, transform.LinearTransform.M21, transform.LinearTransform.M31);
+            var direction = new Vector3(transform.LinearTransform.M11, transform.LinearTransform.M21, transform.LinearTransform.M31);
             GetLocalExtremePoint(direction, out right);
 
             Vector3 left;

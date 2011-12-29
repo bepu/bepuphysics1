@@ -23,7 +23,6 @@ namespace BEPUphysics.Collidables.Events
         /// Fires the event manager's pair removal events.
         /// </summary>
         /// <param name="other">Other entry involved in the pair.</param>
-        /// <param name="collisionPair">Narrow phase pair governing the two objects.</param>
         void OnPairRemoved(BroadPhaseEntry other);
 
         /// <summary>

@@ -39,13 +39,6 @@ namespace BEPUphysics.CollisionTests.Manifolds
         }
 
         //Expand the convex's bounding box to include the mobile mesh's movement.
-        BoundingBox expandedConvexBoundingBox;
-        public override void Update(float dt)
-        {
-            expandedConvexBoundingBox = convex.boundingBox;
-
-            base.Update(dt);
-        }
 
         protected internal override int FindOverlappingTriangles(float dt)
         {
@@ -189,8 +182,8 @@ namespace BEPUphysics.CollisionTests.Manifolds
                 RayHit hit;
                 if (mesh.Shape.IsLocalRayOriginInMesh(ref ray, out hit))
                 {
-                    ContactData newContact = new ContactData();
-                    newContact.Id = 2; //Give it a special id so that we know that it came from the inside.
+                    ContactData newContact = new ContactData {Id = 2};
+                    //Give it a special id so that we know that it came from the inside.
                     Matrix3X3.Transform(ref ray.Position, ref orientation, out newContact.Position);
                     Vector3.Add(ref newContact.Position, ref mesh.worldTransform.Position, out newContact.Position);
 

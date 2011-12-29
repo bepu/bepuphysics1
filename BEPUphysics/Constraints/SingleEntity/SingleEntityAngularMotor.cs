@@ -36,9 +36,8 @@ namespace BEPUphysics.Constraints.SingleEntity
         {
             Entity = entity;
 
-            settings = new MotorSettingsOrientation(this);
+            settings = new MotorSettingsOrientation(this) {servo = {goal = base.entity.orientation}};
             //Since no target relative orientation was specified, just use the current relative orientation.  Prevents any nasty start-of-sim 'snapping.'
-            settings.servo.goal = base.entity.orientation;
 
             //mySettings.myServo.springSettings.stiffnessConstant *= .5f;
         }

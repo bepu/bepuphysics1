@@ -62,10 +62,14 @@ namespace BEPUphysics.Materials
             {
                 return;
             }
-            properties = new InteractionProperties();
-            properties.StaticFriction = FrictionBlender(materialA.staticFriction, materialB.staticFriction, null);
-            properties.KineticFriction = FrictionBlender(materialA.kineticFriction, materialB.kineticFriction, null);
-            properties.Bounciness = BouncinessBlender(materialA.bounciness, materialB.bounciness, null);
+            properties = new InteractionProperties
+                             {
+                                 StaticFriction =
+                                     FrictionBlender(materialA.staticFriction, materialB.staticFriction, null),
+                                 KineticFriction =
+                                     FrictionBlender(materialA.kineticFriction, materialB.kineticFriction, null),
+                                 Bounciness = BouncinessBlender(materialA.bounciness, materialB.bounciness, null)
+                             };
 
         }
 

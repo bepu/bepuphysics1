@@ -48,7 +48,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             Matrix3X3.CreateFromQuaternion(ref shapeTransform.Orientation, out o);
             //Sample the local directions from the orientation matrix, implicitly transposed.
             //Notice only three directions are used.  Due to box symmetry, 'left' is just -right.
-            Vector3 direction = new Vector3(o.M11, o.M21, o.M31);
+            var direction = new Vector3(o.M11, o.M21, o.M31);
             Vector3 right;
             GetLocalExtremePointWithoutMargin(ref direction, out right);
 

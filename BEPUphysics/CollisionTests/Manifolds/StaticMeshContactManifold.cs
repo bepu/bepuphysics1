@@ -41,10 +41,12 @@ namespace BEPUphysics.CollisionTests.Manifolds
             mesh.Mesh.Data.GetTriangle(triangleIndex, out localTriangleShape.vA, out localTriangleShape.vB, out localTriangleShape.vC);
             localTriangleShape.sidedness = mesh.sidedness;
             localTriangleShape.collisionMargin = 0;
-            indices = new TriangleIndices();
-            indices.A = mesh.Mesh.Data.indices[triangleIndex];
-            indices.B = mesh.Mesh.Data.indices[triangleIndex + 1];
-            indices.C = mesh.Mesh.Data.indices[triangleIndex + 2];
+            indices = new TriangleIndices
+                          {
+                              A = mesh.Mesh.Data.indices[triangleIndex],
+                              B = mesh.Mesh.Data.indices[triangleIndex + 1],
+                              C = mesh.Mesh.Data.indices[triangleIndex + 2]
+                          };
             return true;
         }
 

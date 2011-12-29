@@ -99,11 +99,13 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     //Add new contacts.
                     for (int i = 0; i < manifold.Count; i++)
                     {
-                        var newContact = new ContactData();
-                        newContact.Position = manifoldPointer[i].Position;
-                        newContact.PenetrationDepth = -manifoldPointer[i].Depth;
-                        newContact.Normal = axis;
-                        newContact.Id = manifoldPointer[i].Id;
+                        var newContact = new ContactData
+                                             {
+                                                 Position = manifoldPointer[i].Position,
+                                                 PenetrationDepth = -manifoldPointer[i].Depth,
+                                                 Normal = axis,
+                                                 Id = manifoldPointer[i].Id
+                                             };
 
                         Add(ref newContact);
                     }

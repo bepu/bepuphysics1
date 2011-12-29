@@ -69,8 +69,8 @@ namespace BEPUphysics.Constraints.SingleEntity
             Entity = entity;
             Point = point;
 
-            settings = new MotorSettings3D(this);
-            settings.servo.goal = point; //Not really necessary, just helps prevent 'snapping'.
+            settings = new MotorSettings3D(this) {servo = {goal = point}};
+            //Not really necessary, just helps prevent 'snapping'.
         }
 
 

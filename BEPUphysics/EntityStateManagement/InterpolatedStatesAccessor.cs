@@ -94,9 +94,11 @@ namespace BEPUphysics.EntityStateManagement
             {
                 if (IsBufferAccessible())
                     return bufferedStates.BufferedStatesManager.InterpolatedStates.GetState(bufferedStates.motionStateIndex);
-                var toReturn = new RigidTransform();
-                toReturn.Position = bufferedStates.Entity.position;
-                toReturn.Orientation = bufferedStates.Entity.orientation;
+                var toReturn = new RigidTransform
+                                   {
+                                       Position = bufferedStates.Entity.position,
+                                       Orientation = bufferedStates.Entity.orientation
+                                   };
                 return toReturn;
             }
 

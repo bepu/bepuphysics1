@@ -78,7 +78,6 @@ namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
             cell.Add(entry);
             cells.Insert(cellIndex, cell);
             count++;
-            return;
 
             ////Take an index.  See if it's taken in the set.
             ////If it's already there, then add the entry to the cell.
@@ -136,7 +135,6 @@ namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
                     cellPool.GiveBack(toRemove);
                     count--;
                 }
-                return;
             }
 
 

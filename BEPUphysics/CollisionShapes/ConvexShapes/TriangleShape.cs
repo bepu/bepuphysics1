@@ -239,14 +239,14 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             float j = vA.Y - center.Y;
             float k = vA.Z - center.Z;
             //localInertiaTensor += new Matrix(j * j + k * k, -j * j, -j * k, 0, -j * j, j * j + k * k, -j * k, 0, -j * k, -j * k, j * j + j * j, 0, 0, 0, 0, 0); //No mass per point.
-            Matrix3X3 volumeDistribution = new Matrix3X3(massPerPoint * (j * j + k * k), massPerPoint * (-i * j), massPerPoint * (-i * k),
+            var volumeDistribution = new Matrix3X3(massPerPoint * (j * j + k * k), massPerPoint * (-i * j), massPerPoint * (-i * k),
                                                          massPerPoint * (-i * j), massPerPoint * (i * i + k * k), massPerPoint * (-j * k),
                                                          massPerPoint * (-i * k), massPerPoint * (-j * k), massPerPoint * (i * i + j * j));
 
             i = vB.X - center.X;
             j = vB.Y - center.Y;
             k = vB.Z - center.Z;
-            Matrix3X3 pointContribution = new Matrix3X3(massPerPoint * (j * j + k * k), massPerPoint * (-i * j), massPerPoint * (-i * k),
+            var pointContribution = new Matrix3X3(massPerPoint * (j * j + k * k), massPerPoint * (-i * j), massPerPoint * (-i * k),
                                                         massPerPoint * (-i * j), massPerPoint * (i * i + k * k), massPerPoint * (-j * k),
                                                         massPerPoint * (-i * k), massPerPoint * (-j * k), massPerPoint * (i * i + j * j));
             Matrix3X3.Add(ref volumeDistribution, ref pointContribution, out volumeDistribution);

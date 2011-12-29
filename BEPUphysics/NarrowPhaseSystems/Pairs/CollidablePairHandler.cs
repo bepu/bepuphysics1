@@ -170,8 +170,8 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
 
 
             broadPhaseOverlap = new BroadPhaseOverlap();
-            (this as NarrowPhasePair).NeedsUpdate = false;
-            (this as NarrowPhasePair).NarrowPhase = null;
+            this.NeedsUpdate = false;
+            this.NarrowPhase = null;
             suppressEvents = false;
             timeOfImpact = 1;
             Parent = null;

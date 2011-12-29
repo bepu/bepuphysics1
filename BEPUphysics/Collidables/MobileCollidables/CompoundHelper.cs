@@ -63,8 +63,7 @@ namespace BEPUphysics.Collidables.MobileCollidables
                         Entity<CompoundCollidable> a, out Entity<CompoundCollidable> b,
                         out ShapeDistributionInformation distributionInfoA, out ShapeDistributionInformation distributionInfoB)
         {
-            CompoundCollidable bCollidable = new CompoundCollidable();
-            bCollidable.Shape = a.CollisionInformation.Shape;
+            var bCollidable = new CompoundCollidable {Shape = a.CollisionInformation.Shape};
             b = new Entity<CompoundCollidable>();
 
 

@@ -81,8 +81,8 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         public override void UpdateMaterialProperties(Material a, Material b)
         {
             ContactConstraint.UpdateMaterialProperties(
-                a == null ? EntityA == null ? null : EntityA.material : a,
-                b == null ? EntityB == null ? null : EntityB.material : b);
+                a ?? (EntityA == null ? null : EntityA.material),
+                b ?? (EntityB == null ? null : EntityB.material));
         }
 
         /// <summary>

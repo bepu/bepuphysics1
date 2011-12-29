@@ -106,9 +106,9 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             float minX, maxX;
             float minY, maxY;
             float minZ, maxZ;
-            Vector3 right = new Vector3(o.M11, o.M21, o.M31);
-            Vector3 up = new Vector3(o.M12, o.M22, o.M32);
-            Vector3 backward = new Vector3(o.M13, o.M23, o.M33);
+            var right = new Vector3(o.M11, o.M21, o.M31);
+            var up = new Vector3(o.M12, o.M22, o.M32);
+            var backward = new Vector3(o.M13, o.M23, o.M33);
             Vector3.Dot(ref vertices.Elements[0], ref right, out maxX);
             minX = maxX;
             Vector3.Dot(ref vertices.Elements[0], ref up, out maxY);
@@ -237,7 +237,8 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         /// Computes the center, volume, and surface triangles of the convex hull shape.
         ///</summary>
         ///<param name="volume">Volume of the hull.</param>
-        ///<param name="outputLocalSurfaceTriangles">Surface triangles of the hull.</param>
+        ///<param name="outputSurfaceTriangles">Surface triangles of the hull.</param>
+        ///<param name="outputLocalSurfaceVertices">Surface vertices recentered on the center of volume. </param>
         ///<returns>Center of the hull.</returns>
         public Vector3 ComputeCenter(out float volume, IList<int> outputSurfaceTriangles, IList<Vector3> outputLocalSurfaceVertices)
         {
@@ -418,7 +419,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             ao *= offFactor;
             bo *= offFactor;
             co *= offFactor;
-            Matrix3X3 distribution = new Matrix3X3(a, bo, co,
+            var distribution = new Matrix3X3(a, bo, co,
                                                    bo, b, ao,
                                                    co, ao, c);
 

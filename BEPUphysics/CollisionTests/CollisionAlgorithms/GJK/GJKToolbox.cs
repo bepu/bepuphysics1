@@ -107,8 +107,8 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms.GJK
             RigidTransform localtransformB;
             MinkowskiToolbox.GetLocalTransform(ref transformA, ref transformB, out localtransformB);
 
-            var simplex = new CachedSimplex();// new CachedSimplex(shapeA, shapeB, ref localtransformB);
-            simplex.State = SimplexState.Point;
+            var simplex = new CachedSimplex {State = SimplexState.Point};
+                // new CachedSimplex(shapeA, shapeB, ref localtransformB);
             bool toReturn = GetClosestPoints(shapeA, shapeB, ref localtransformB, ref simplex, out closestPointA, out closestPointB);
 
             RigidTransform.Transform(ref closestPointA, ref transformA, out closestPointA);

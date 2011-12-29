@@ -261,8 +261,7 @@ namespace BEPUphysics.CollisionShapes
             if (triangleMesh.Tree.GetOverlaps(ray, overlapList))
             {
                 var hits = Resources.GetRayHitList();
-                hit = new RayHit();
-                hit.T = float.MaxValue;
+                hit = new RayHit {T = float.MaxValue};
                 for (int i = 0; i < overlapList.Count; i++)
                 {
                     Vector3 vA, vB, vC;
@@ -317,7 +316,7 @@ namespace BEPUphysics.CollisionShapes
 
             //Pick a ray direction that goes to a random location on the mesh.  
             //A vertex would work, but targeting the middle of a triangle avoids some edge cases.
-            Ray ray = new Ray();
+            var ray = new Ray();
             Vector3 vA, vB, vC;
             triangleMesh.Data.GetTriangle(((triangleMesh.Data.indices.Length / 3) / 2) * 3, out vA, out vB, out vC);
             ray.Direction = (vA + vB + vC) / 3;
@@ -658,9 +657,9 @@ namespace BEPUphysics.CollisionShapes
             boundingBox = new BoundingBox();
 #endif
             //Sample the local directions from the matrix, implicitly transposed.
-            Vector3 rightDirection = new Vector3(o.M11, o.M21, o.M31);
-            Vector3 upDirection = new Vector3(o.M12, o.M22, o.M32);
-            Vector3 backDirection = new Vector3(o.M13, o.M23, o.M33);
+            var rightDirection = new Vector3(o.M11, o.M21, o.M31);
+            var upDirection = new Vector3(o.M12, o.M22, o.M32);
+            var backDirection = new Vector3(o.M13, o.M23, o.M33);
 
             int right = 0, left = 0, up = 0, down = 0, backward = 0, forward = 0;
             float minX = float.MaxValue, maxX = -float.MaxValue, minY = float.MaxValue, maxY = -float.MaxValue, minZ = float.MaxValue, maxZ = -float.MaxValue;

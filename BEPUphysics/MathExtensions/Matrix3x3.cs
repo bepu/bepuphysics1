@@ -435,10 +435,7 @@ namespace BEPUphysics.MathExtensions
         /// <param name="matrix">Scaling matrix.</param>
         public static void CreateScale(float scale, out Matrix3X3 matrix)
         {
-            matrix = new Matrix3X3();
-            matrix.M11 = scale;
-            matrix.M22 = scale;
-            matrix.M33 = scale;
+            matrix = new Matrix3X3 {M11 = scale, M22 = scale, M33 = scale};
         }
 
         /// <summary>
@@ -448,10 +445,7 @@ namespace BEPUphysics.MathExtensions
         /// <returns>Scaling matrix.</returns>
         public static Matrix3X3 CreateScale(float scale)
         {
-            var matrix = new Matrix3X3();
-            matrix.M11 = scale;
-            matrix.M22 = scale;
-            matrix.M33 = scale;
+            var matrix = new Matrix3X3 {M11 = scale, M22 = scale, M33 = scale};
             return matrix;
         }
 
@@ -462,10 +456,7 @@ namespace BEPUphysics.MathExtensions
         /// <param name="matrix">Scaling matrix.</param>
         public static void CreateScale(ref Vector3 scale, out Matrix3X3 matrix)
         {
-            matrix = new Matrix3X3();
-            matrix.M11 = scale.X;
-            matrix.M22 = scale.Y;
-            matrix.M33 = scale.Z;
+            matrix = new Matrix3X3 {M11 = scale.X, M22 = scale.Y, M33 = scale.Z};
         }
 
         /// <summary>
@@ -475,10 +466,7 @@ namespace BEPUphysics.MathExtensions
         /// <returns>Scaling matrix.</returns>
         public static Matrix3X3 CreateScale(ref Vector3 scale)
         {
-            var matrix = new Matrix3X3();
-            matrix.M11 = scale.X;
-            matrix.M22 = scale.Y;
-            matrix.M33 = scale.Z;
+            var matrix = new Matrix3X3 {M11 = scale.X, M22 = scale.Y, M33 = scale.Z};
             return matrix;
         }
 
@@ -492,10 +480,7 @@ namespace BEPUphysics.MathExtensions
         /// <param name="matrix">Scaling matrix.</param>
         public static void CreateScale(float x, float y, float z, out Matrix3X3 matrix)
         {
-            matrix = new Matrix3X3();
-            matrix.M11 = x;
-            matrix.M22 = y;
-            matrix.M33 = z;
+            matrix = new Matrix3X3 {M11 = x, M22 = y, M33 = z};
         }
 
         /// <summary>
@@ -507,10 +492,7 @@ namespace BEPUphysics.MathExtensions
         /// <returns>Scaling matrix.</returns>
         public static Matrix3X3 CreateScale(float x, float y, float z)
         {
-            var matrix = new Matrix3X3();
-            matrix.M11 = x;
-            matrix.M22 = y;
-            matrix.M33 = z;
+            var matrix = new Matrix3X3 {M11 = x, M22 = y, M33 = z};
             return matrix;
         }
 

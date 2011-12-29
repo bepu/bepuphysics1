@@ -135,8 +135,6 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
         /// </summary>
         /// <param name="shapeA">First shape in the pair.</param>
         /// <param name="shapeB">Second shape in the pair.</param>
-        /// <param name="transformA">Transformation to apply to the first shape.</param>
-        /// <param name="transformB">Transformation to apply to the second shape.</param>
         /// <param name="position">Position within the overlapped volume of the two shapes in shape A's local space, if any.</param>
         /// <returns>Whether or not the two shapes overlap.</returns>
         public static bool GetLocalOverlapPosition(ConvexShape shapeA, ConvexShape shapeB, ref RigidTransform localTransformB, out Vector3 position)

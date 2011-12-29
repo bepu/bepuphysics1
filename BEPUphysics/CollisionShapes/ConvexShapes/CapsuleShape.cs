@@ -50,8 +50,8 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
 #if !WINDOWS
             boundingBox = new BoundingBox();
 #endif
-            Vector3 upExtreme = new Vector3(0, halfLength, 0);
-            Vector3 downExtreme = new Vector3(0, -halfLength, 0);
+            var upExtreme = new Vector3(0, halfLength, 0);
+            var downExtreme = new Vector3(0, -halfLength, 0);
 
             Vector3.Transform(ref upExtreme, ref shapeTransform.Orientation, out upExtreme);
             Vector3.Transform(ref downExtreme, ref shapeTransform.Orientation, out downExtreme);

@@ -133,7 +133,6 @@ namespace BEPUphysics.Collidables.MobileCollidables
                     case MobileMeshSolidity.Counterclockwise:
                         sidedness = TriangleSidedness.Counterclockwise;
                         break;
-                    case MobileMeshSolidity.DoubleSided:
                     default:
                         sidedness = TriangleSidedness.DoubleSided;
                         break;
@@ -204,8 +203,7 @@ namespace BEPUphysics.Collidables.MobileCollidables
             }
             hit = new RayHit();
             BoundingBox boundingBox;
-            AffineTransform transform = new AffineTransform();
-            transform.Translation = worldTransform.Position;
+            var transform = new AffineTransform {Translation = worldTransform.Position};
             Matrix3X3.CreateFromQuaternion(ref worldTransform.Orientation, out transform.LinearTransform);
             castShape.GetSweptLocalBoundingBox(ref startingTransform, ref transform, ref sweep, out boundingBox);
             var tri = Resources.GetTriangle();
@@ -235,9 +233,7 @@ namespace BEPUphysics.Collidables.MobileCollidables
                         tri.maximumRadius = radius;
                     tri.maximumRadius = (float)Math.Sqrt(tri.maximumRadius);
                     tri.collisionMargin = 0;
-                    var triangleTransform = new RigidTransform();
-                    triangleTransform.Orientation = Quaternion.Identity;
-                    triangleTransform.Position = center;
+                    var triangleTransform = new RigidTransform {Orientation = Quaternion.Identity, Position = center};
                     RayHit tempHit;
                     if (MPRToolbox.Sweep(castShape, tri, ref sweep, ref Toolbox.ZeroVector, ref startingTransform, ref triangleTransform, out tempHit) && tempHit.T < hit.T)
                     {

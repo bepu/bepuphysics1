@@ -99,11 +99,11 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             Matrix3X3.CreateFromQuaternion(ref shapeTransform.Orientation, out o);
             //Sample the local directions from the orientation matrix, implicitly transposed.
             //Notice only three directions are used.  Due to box symmetry, 'left' is just -right.
-            Vector3 right = new Vector3(Math.Sign(o.M11) * halfWidth, Math.Sign(o.M21) * halfHeight, Math.Sign(o.M31) * halfLength);
+            var right = new Vector3(Math.Sign(o.M11) * halfWidth, Math.Sign(o.M21) * halfHeight, Math.Sign(o.M31) * halfLength);
 
-            Vector3 up = new Vector3(Math.Sign(o.M12) * halfWidth, Math.Sign(o.M22) * halfHeight, Math.Sign(o.M32) * halfLength);
+            var up = new Vector3(Math.Sign(o.M12) * halfWidth, Math.Sign(o.M22) * halfHeight, Math.Sign(o.M32) * halfLength);
 
-            Vector3 backward = new Vector3(Math.Sign(o.M13) * halfWidth, Math.Sign(o.M23) * halfHeight, Math.Sign(o.M33) * halfLength);
+            var backward = new Vector3(Math.Sign(o.M13) * halfWidth, Math.Sign(o.M23) * halfHeight, Math.Sign(o.M33) * halfLength);
 
             Matrix3X3.Transform(ref right, ref o, out right);
             Matrix3X3.Transform(ref up, ref o, out up);

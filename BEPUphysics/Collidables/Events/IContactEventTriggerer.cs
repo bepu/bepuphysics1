@@ -32,6 +32,7 @@ namespace BEPUphysics.Collidables.Events
         /// </summary>
         /// <param name="other">Other collidable involved in the pair.</param>
         /// <param name="collisionPair">Collidable pair handler that manages the two objects.</param>
+        /// <param name="contact">Contact point of collision.</param>
         void OnContactCreated(Collidable other, CollidablePairHandler collisionPair, Contact contact);
 
         /// <summary>
@@ -39,6 +40,7 @@ namespace BEPUphysics.Collidables.Events
         /// </summary>
         /// <param name="other">Other collidable involved in the pair.</param>
         /// <param name="collisionPair">Collidable pair handler that manages the two objects.</param>
+        /// <param name="contact">Contact point of collision.</param>
         void OnContactRemoved(Collidable other, CollidablePairHandler collisionPair, Contact contact);
 
         /// <summary>

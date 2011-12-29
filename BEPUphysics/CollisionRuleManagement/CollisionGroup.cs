@@ -44,7 +44,6 @@ namespace BEPUphysics.CollisionRuleManagement
         /// <param name="aGroups">First set of groups.</param>
         /// <param name="bGroups">Second set of groups.</param>
         /// <param name="rule">Collision rule to define between the sets.</param>
-        /// <param name="space">Space to add the rules to.</param>
         public static void DefineCollisionRulesBetweenSets(List<CollisionGroup> aGroups, List<CollisionGroup> bGroups, CollisionRule rule)
         {
             foreach (CollisionGroup group in aGroups)

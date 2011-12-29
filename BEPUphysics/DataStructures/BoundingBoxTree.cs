@@ -453,7 +453,7 @@ namespace BEPUphysics.DataStructures
 
             public override string ToString()
             {
-                return "{" + childA.ToString() + ", " + childB.ToString() + "}";
+                return "{" + childA + ", " + childB + "}";
 
             }
 
