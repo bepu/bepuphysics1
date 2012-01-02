@@ -77,6 +77,17 @@ namespace BEPUphysics.Collidables
             {
                 return events;
             }
+            set
+            {
+                if (value.Owner != null && //Can't use a manager which is owned by a different entity.
+                    value != events) //Stay quiet if for some reason the same event manager is being set.
+                    throw new Exception("Event manager is already owned by a Terrain; event managers cannot be shared.");
+                if (events != null)
+                    events.Owner = null;
+                events = value;
+                if (events != null)
+                    events.Owner = this;
+            }
         }
 
         protected internal override IContactEventTriggerer EventTriggerer
@@ -169,7 +180,7 @@ namespace BEPUphysics.Collidables
             materialChangedDelegate = OnMaterialChanged;
             material.MaterialChanged += materialChangedDelegate;
 
-            events = new ContactEventManager<Terrain>(this);
+            Events = new ContactEventManager<Terrain>();
         }
 
 

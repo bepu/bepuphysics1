@@ -73,6 +73,7 @@
     <Compile Include="Collidables\CollidablePair.cs" />
     <Compile Include="Collidables\EntityCollidableCollection.cs" />
     <Compile Include="Collidables\Events\CollisionEventTypes.cs" />
+    <Compile Include="Collidables\Events\CompoundEventManager.cs" />
     <Compile Include="Collidables\Events\ContactEventManager.cs" />
     <Compile Include="Collidables\Events\EntryEventManager.cs" />
     <Compile Include="Collidables\Events\IContactEventTriggerer.cs" />

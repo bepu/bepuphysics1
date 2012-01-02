@@ -38,6 +38,7 @@ namespace BEPUphysics.Collidables.MobileCollidables
         public MobileMeshCollidable(MobileMeshShape shape)
             : base(shape)
         {
+            Events = new ContactEventManager<EntityCollidable>();
         }
 
 

@@ -11,23 +11,6 @@ namespace BEPUphysics.Collidables.Events
     ///<typeparam name="T">Some Collidable subclass.</typeparam>
     public class ContactEventManager<T> : EntryEventManager<T>, IContactEventTriggerer where T : Collidable
     {
-        ///<summary>
-        /// Constructs a new event manager.
-        ///</summary>
-        ///<param name="owner">Owner of the event manager.</param>
-        public ContactEventManager(T owner)
-            : base(owner)
-        {
-        }
-
-        ///<summary>
-        /// Constructs a new event manager.
-        ///</summary>
-        public ContactEventManager()
-            : base(null)
-        {
-
-        }
 
         #region Events
 
