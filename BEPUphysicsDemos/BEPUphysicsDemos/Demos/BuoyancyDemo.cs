@@ -39,9 +39,9 @@ namespace BEPUphysicsDemos.Demos
             var fluid = new FluidVolume(Vector3.Up, -9.81f, tris, waterHeight, .8f, .8f, .7f, Space.BroadPhase.QueryAccelerator, Space.ThreadManager);
 
 
-            //fluid.flowDirection = Vector3.Right;
-            //fluid.flowForce = 80;
-            //fluid.maxFlowSpeed = 50;
+            //fluid.FlowDirection = Vector3.Right;
+            //fluid.FlowForce = 80;
+            //fluid.MaxFlowSpeed = 50;
             Space.Add(fluid);
             game.ModelDrawer.Add(fluid);
             //Create the container.
