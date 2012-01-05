@@ -18,6 +18,31 @@ namespace BEPUphysics.Collidables.MobileCollidables
     ///</summary>
     public class CompoundCollidable : EntityCollidable
     {
+        /// <summary>
+        /// Gets or sets the event manager for the collidable.
+        /// Compound collidables must use a special CompoundEventManager in order for the deferred events created
+        /// by child collidables to be dispatched.
+        /// If this method is bypassed and a different event manager is used, this method will return null and 
+        /// deferred events from children will fail.
+        /// </summary>
+        public new CompoundEventManager Events
+        {
+            get
+            {
+                return events as CompoundEventManager;
+            }
+            set
+            {
+                var compoundEvents = events as CompoundEventManager;
+                //Tell every child to update their parent references to the new object.
+                foreach (var child in children)
+                {
+                    child.CollisionInformation.events.Parent = value;
+                }
+                base.Events = value;
+            }
+        }
+
         ///<summary>
         /// Gets the shape of the collidable.
         ///</summary>
@@ -64,26 +89,38 @@ namespace BEPUphysics.Collidables.MobileCollidables
         private CompoundChild GetChild(CompoundChildData data, int index)
         {
             var instance = data.Entry.Shape.GetCollidableInstance();
+
             if (data.Events != null)
-                instance.events = data.Events;
+                instance.Events = data.Events;
+            //Establish the link between the child event manager and our event manager.
+            instance.events.Parent = Events;
+
             if (data.CollisionRules != null)
-                instance.collisionRules = data.CollisionRules;
+                instance.CollisionRules = data.CollisionRules;
+
             instance.Tag = data.Tag;
+
             if (data.Material == null)
                 data.Material = new Material();
+
             return new CompoundChild(Shape, instance, data.Material, index);
         }
 
         private CompoundChild GetChild(CompoundShapeEntry entry, int index)
         {
             var instance = entry.Shape.GetCollidableInstance();
+            //Establish the link between the child event manager and our event manager.
+            instance.events.Parent = Events;
             return new CompoundChild(Shape, instance, index);
         }
 
         //Used to efficiently split compounds.
         internal CompoundCollidable()
         {
+            Events = new CompoundEventManager();
+
             hierarchy = new CompoundHierarchy(this);
+
         }
 
         ///<summary>
@@ -92,6 +129,8 @@ namespace BEPUphysics.Collidables.MobileCollidables
         ///<param name="children">Data representing the children of the compound collidable.</param>
         public CompoundCollidable(IList<CompoundChildData> children)
         {
+            Events = new CompoundEventManager();
+
             var shapeList = new RawList<CompoundShapeEntry>();
             //Create the shape first.
             for (int i = 0; i < children.Count; i++)
@@ -115,6 +154,8 @@ namespace BEPUphysics.Collidables.MobileCollidables
         ///<param name="center">Location computed to be the center of the compound object.</param>
         public CompoundCollidable(IList<CompoundChildData> children, out Vector3 center)
         {
+            Events = new CompoundEventManager();
+
             var shapeList = new RawList<CompoundShapeEntry>();
             //Create the shape first.
             for (int i = 0; i < children.Count; i++)
@@ -139,12 +180,15 @@ namespace BEPUphysics.Collidables.MobileCollidables
         public CompoundCollidable(CompoundShape compoundShape)
             : base(compoundShape)
         {
+            Events = new CompoundEventManager();
+
             for (int i = 0; i < compoundShape.shapes.count; i++)
             {
                 CompoundChild child = GetChild(compoundShape.shapes.Elements[i], i);
                 this.children.Add(child);
             }
             hierarchy = new CompoundHierarchy(this);
+
 
         }
 

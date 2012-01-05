@@ -4,6 +4,7 @@ using System;
 using BEPUphysics.PositionUpdating;
 using BEPUphysics.Settings;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
+using BEPUphysics.Collidables.Events;
 
 namespace BEPUphysics.Collidables.MobileCollidables
 {
@@ -16,7 +17,7 @@ namespace BEPUphysics.Collidables.MobileCollidables
         protected ConvexCollidable(ConvexShape shape)
             : base(shape)
         {
-
+            Events = new ContactEventManager<EntityCollidable>();
         }
 
         ///<summary>
