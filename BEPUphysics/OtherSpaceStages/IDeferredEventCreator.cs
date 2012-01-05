@@ -20,5 +20,10 @@
         /// Dispatches the events created by this creator.
         ///</summary>
         void DispatchEvents();
+
+        /// <summary>
+        /// Gets or sets the number of child deferred event creators.
+        /// </summary>
+        int ChildDeferredEventCreators { get; set; }
     }
 }

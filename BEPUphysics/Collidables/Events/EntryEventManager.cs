@@ -2,6 +2,7 @@
 using BEPUphysics.NarrowPhaseSystems.Pairs;
 using BEPUphysics.OtherSpaceStages;
 using BEPUphysics.Threading;
+using System;
 
 namespace BEPUphysics.Collidables.Events
 {
@@ -12,6 +13,63 @@ namespace BEPUphysics.Collidables.Events
     ///<typeparam name="T">Some BroadPhaseEntry subclass.</typeparam>
     public class EntryEventManager<T> : IDeferredEventCreator, IEntryEventTriggerer where T : BroadPhaseEntry
     {
+        protected internal int childDeferredEventCreators;
+        /// <summary>
+        /// Number of child deferred event creators.
+        /// </summary>
+        int IDeferredEventCreator.ChildDeferredEventCreators
+        {
+            get
+            {
+                return childDeferredEventCreators;
+            }
+            set
+            {
+                int previousValue = childDeferredEventCreators;
+                childDeferredEventCreators = value;
+                if (childDeferredEventCreators == 0 && previousValue != 0)
+                {
+                    //Deactivate!
+                    if (EventsAreInactive())
+                    {
+                        //The events are inactive method tests to see if this event manager
+                        //has any events that need to be deferred.
+                        //If we get here, that means that there's zero children active, and we aren't active...
+                        ((IDeferredEventCreator)this).IsActive = false;
+                    }
+                }
+                else if (childDeferredEventCreators != 0 && previousValue == 0)
+                {
+                    //Activate!
+                    //It doesn't matter if there are any events active in this instance, just try to activate anyway.
+                    //If it is already active, nothing will happen.
+                    ((IDeferredEventCreator)this).IsActive = true;
+                }
+            }
+        }
+
+        private CompoundEventManager parent;
+        /// <summary>
+        /// The parent of the event manager, if any.
+        /// </summary>
+        protected internal CompoundEventManager Parent
+        {
+            get
+            {
+                return parent;
+            }
+            set
+            {
+                //The child deferred event creator links must be maintained.
+                if (parent != null && isActive)
+                    ((IDeferredEventCreator)parent).ChildDeferredEventCreators--;
+                parent = value;
+                if (parent != null && isActive)
+                    ((IDeferredEventCreator)parent).ChildDeferredEventCreators++;
+            }
+
+        }
+
         protected internal T owner;
         ///<summary>
         /// Owner of the event manager.
@@ -22,16 +80,12 @@ namespace BEPUphysics.Collidables.Events
             {
                 return owner;
             }
+            protected internal set
+            {
+                owner = value;
+            }
         }
 
-        ///<summary>
-        /// Constructs a new event manager.
-        ///</summary>
-        ///<param name="owner">Owner of the event manager.</param>
-        public EntryEventManager(T owner)
-        {
-            this.owner = owner;
-        }
 
         #region Events
         /// <summary>
@@ -121,7 +175,7 @@ namespace BEPUphysics.Collidables.Events
         /// </summary>
         protected void VerifyEventStatus()
         {
-            if (EventsAreInactive())
+            if (EventsAreInactive() && childDeferredEventCreators == 0)
             {
                 ((IDeferredEventCreator)this).IsActive = false;
             }
@@ -140,7 +194,7 @@ namespace BEPUphysics.Collidables.Events
             ((IDeferredEventCreator)this).IsActive = true;
         }
 
-        
+
         private DeferredEventDispatcher deferredEventDispatcher;
         DeferredEventDispatcher IDeferredEventCreator.DeferredEventDispatcher
         {
@@ -208,7 +262,7 @@ namespace BEPUphysics.Collidables.Events
                 PairUpdating(owner, other, collisionPair);
         }
 
-        
+
         private bool isActive;
         //IsActive is enabled whenever this collision information can dispatch events.
         bool IDeferredEventCreator.IsActive
@@ -222,12 +276,20 @@ namespace BEPUphysics.Collidables.Events
                 if (!isActive && value)
                 {
                     isActive = true;
+                    //Notify the parent that it needs to activate.
+                    if (parent != null)
+                        ((IDeferredEventCreator)parent).ChildDeferredEventCreators++;
+
                     if (deferredEventDispatcher != null)
                         deferredEventDispatcher.CreatorActivityChanged(this);
                 }
                 else if (isActive && !value)
                 {
                     isActive = false;
+                    //Notify the parent that it can deactivate.
+                    if (parent != null)
+                        ((IDeferredEventCreator)parent).ChildDeferredEventCreators--;
+
                     if (deferredEventDispatcher != null)
                         deferredEventDispatcher.CreatorActivityChanged(this);
                 }

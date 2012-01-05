@@ -17,11 +17,9 @@ namespace BEPUphysics.Collidables.MobileCollidables
         protected EntityCollidable()
         {
             //This constructor is used when the subclass is going to set the shape after doing some extra initialization.
-            Events = new ContactEventManager<EntityCollidable>(this);
         }
 
         protected EntityCollidable(EntityShape shape)
-            : this()
         {
             base.Shape = shape;
         }
@@ -248,7 +246,23 @@ namespace BEPUphysics.Collidables.MobileCollidables
             }
             set
             {
+                if (value.Owner != null && //Can't use a manager which is owned by a different entity.
+                    value != events) //Stay quiet if for some reason the same event manager is being set.
+                    throw new Exception("Event manager is already owned by an entity; event managers cannot be shared.");
+                //Must pass on the link to the parent event manager to the new event manager in case we are the child of a compound.
+                CompoundEventManager oldParent = null;
+                if (events != null)
+                {
+                    events.Owner = null;
+                    oldParent = events.Parent;
+                    events.Parent = null;
+                }
                 events = value;
+                if (events != null)
+                {
+                    events.Owner = this;
+                    events.Parent = oldParent;
+                }
             }
         }
         protected internal override IContactEventTriggerer EventTriggerer
