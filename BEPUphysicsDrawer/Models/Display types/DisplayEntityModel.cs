@@ -27,7 +27,7 @@ namespace BEPUphysicsDrawer.Models
         public DisplayEntityModel(Entity entity, Model model, ModelDrawer modelDrawer)
             : base(modelDrawer)
         {
-            OffsetTransform = Matrix.Identity;
+            LocalTransform = Matrix.Identity;
             Entity = entity;
             Model = model;
         }
@@ -89,10 +89,9 @@ namespace BEPUphysicsDrawer.Models
         }
 
         /// <summary>
-        /// Gets and sets the extra world transform of the model.
-        /// This transform acts as an offset from the entity's world transform.
+        /// Gets and sets the local transform to apply to the model prior to transforming it by the entity's world matrix.
         /// </summary>
-        public Matrix OffsetTransform { get; set; }
+        public Matrix LocalTransform { get; set; }
 
         /// <summary>
         /// Gets the world transformation applied to the model.
@@ -104,7 +103,7 @@ namespace BEPUphysicsDrawer.Models
         /// </summary>
         public override void Update()
         {
-            WorldTransform = OffsetTransform * Entity.WorldTransform;
+            WorldTransform = LocalTransform * Entity.WorldTransform;
         }
 
         /// <summary>

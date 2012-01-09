@@ -135,6 +135,7 @@
     <Compile Include="Demos\Tests\TerrainTesting.cs" />
     <Compile Include="Demos\Tests\ThreadingTestDemo.cs" />
     <Compile Include="Demos\Tests\ThreadManagerTestDemo.cs" />
+    <Compile Include="Demos\Tests\GraphicMatchingDemo.cs" />
     <Compile Include="Demos\TornadoDemo.cs" />
     <Compile Include="Demos\UnfortunateGuyDemo.cs" />
     <Compile Include="Demos\WallDemo.cs" />
