@@ -35,7 +35,7 @@ namespace BEPUphysicsDemos.Demos
             //Create an entity based on the model.
             ConvexHull hull = new ConvexHull(vertices, 10);
             Space.Add(hull);
-            //Create a graphic for the hull.  The BEPUphysicsDrawer will also automatically receive a visualization of the convex hull.
+            //Create a graphic for the hull.  The BEPUphysicsDrawer will also automatically receive a visualization of the convex hull which we can compare our graphic against.
             //The graphic will be offset from the collision shape because we have not attempted to offset it to match the collision shape's origin.
             var graphic = new DisplayEntityModel(hull, model, game.ModelDrawer);
             game.ModelDrawer.Add(graphic);
