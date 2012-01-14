@@ -26,15 +26,26 @@ namespace BEPUphysics.Entities
         }
 
         ///<summary>
-        /// Constructs an Entity.
+        /// Constructs a kinematic Entity.
         ///</summary>
         ///<param name="collisionInformation">Collidable for the entity.</param>
         public Entity(T collisionInformation)
         {
             Initialize(collisionInformation);
         }
+
         ///<summary>
-        /// Constructs an Entity.
+        /// Constructs a kinematic Entity.
+        ///</summary>
+        ///<param name="collisionInformation">Collidable for the entity.</param>
+        public Entity(T collisionInformation, bool computeVolume)
+        {
+            Initialize(collisionInformation);
+        }
+
+
+        ///<summary>
+        /// Constructs a dynamic Entity.
         ///</summary>
         ///<param name="collisionInformation">Collidable for the entity.</param>
         /// <param name="mass">Mass of the entity.</param>
@@ -43,7 +54,7 @@ namespace BEPUphysics.Entities
             Initialize(collisionInformation, mass);
         }
         ///<summary>
-        /// Constructs an Entity.
+        /// Constructs a dynamic Entity.
         ///</summary>
         ///<param name="collisionInformation">Collidable for the entity.</param>
         /// <param name="mass">Mass of the entity.</param>
@@ -54,7 +65,7 @@ namespace BEPUphysics.Entities
         }
 
         ///<summary>
-        /// Constructs an Entity.
+        /// Constructs a dynamic Entity.
         ///</summary>
         ///<param name="collisionInformation">Collidable for the entity.</param>
         /// <param name="mass">Mass of the entity.</param>
