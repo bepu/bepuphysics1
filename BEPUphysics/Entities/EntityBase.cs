@@ -512,7 +512,7 @@ namespace BEPUphysics.Entities
         }
 
         ///<summary>
-        /// Constructs a new entity.
+        /// Constructs a new kinematic entity.
         ///</summary>
         ///<param name="collisionInformation">Collidable to use with the entity.</param>
         public Entity(EntityCollidable collisionInformation)
@@ -522,22 +522,7 @@ namespace BEPUphysics.Entities
         }
 
         ///<summary>
-        /// Constructs a new kinematic entity.
-        ///</summary>
-        ///<param name="collisionInformation">Collidable to use with the entity.</param>
-        /// <param name="computeVolume">Whether or not the constructor for this kinematic entity should compute the volume.  
-        /// This can be an expensive process.
-        /// If the volume has already been computed externally, consider passing false and setting the Volume property directly.</param>
-        public Entity(EntityCollidable collisionInformation, bool computeVolume)
-            : this()
-        {
-            Initialize(collisionInformation);
-            if (computeVolume)
-                volume = collisionInformation.Shape.ComputeVolume();
-        }
-
-        ///<summary>
-        /// Constructs a new entity.
+        /// Constructs a new dynamic entity.
         ///</summary>
         ///<param name="collisionInformation">Collidable to use with the entity.</param>
         ///<param name="mass">Mass of the entity.</param>
@@ -548,7 +533,7 @@ namespace BEPUphysics.Entities
         }
 
         ///<summary>
-        /// Constructs a new entity.
+        /// Constructs a new dynamic entity.
         ///</summary>
         ///<param name="collisionInformation">Collidable to use with the entity.</param>
         ///<param name="mass">Mass of the entity.</param>
@@ -559,7 +544,7 @@ namespace BEPUphysics.Entities
             Initialize(collisionInformation, mass, inertiaTensor);
         }
         ///<summary>
-        /// Constructs a new entity.
+        /// Constructs a new dynamic entity.
         ///</summary>
         ///<param name="collisionInformation">Collidable to use with the entity.</param>
         ///<param name="mass">Mass of the entity.</param>
@@ -572,7 +557,7 @@ namespace BEPUphysics.Entities
         }
 
         ///<summary>
-        /// Constructs a new entity.
+        /// Constructs a new kinematic entity.
         ///</summary>
         ///<param name="shape">Shape to use with the entity.</param>
         public Entity(EntityShape shape)
@@ -582,23 +567,7 @@ namespace BEPUphysics.Entities
         }
 
         ///<summary>
-        /// Constructs a new kinematic entity.
-        ///</summary>
-        ///<param name="shape">Shape to use with the entity.</param>
-        /// <param name="computeVolume">Whether or not the constructor for this kinematic entity should compute the volume.  
-        /// This can be an expensive process.
-        /// If the volume has already been computed externally, consider passing false and setting the Volume property directly.</param>
-        public Entity(EntityShape shape, bool computeVolume)
-            : this()
-        {
-            Initialize(shape.GetCollidableInstance());
-            if (computeVolume)
-                volume = shape.ComputeVolume();
-        }
-
-
-        ///<summary>
-        /// Constructs a new entity.
+        /// Constructs a new dynamic entity.
         ///</summary>
         ///<param name="shape">Shape to use with the entity.</param>
         ///<param name="mass">Mass of the entity.</param>
@@ -609,7 +578,7 @@ namespace BEPUphysics.Entities
         }
 
         ///<summary>
-        /// Constructs a new entity.
+        /// Constructs a new dynamic entity.
         ///</summary>
         ///<param name="shape">Shape to use with the entity.</param>
         ///<param name="mass">Mass of the entity.</param>
@@ -619,8 +588,9 @@ namespace BEPUphysics.Entities
         {
             Initialize(shape.GetCollidableInstance(), mass, inertiaTensor);
         }
+
         ///<summary>
-        /// Constructs a new entity.
+        /// Constructs a new dynamic entity.
         ///</summary>
         ///<param name="shape">Shape to use with the entity.</param>
         ///<param name="mass">Mass of the entity.</param>
