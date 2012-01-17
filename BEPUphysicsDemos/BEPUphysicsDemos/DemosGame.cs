@@ -179,7 +179,7 @@ namespace BEPUphysicsDemos
                                                     .Invoke(new object[] { this });
 
 #else
-            currentSimulation = new GraphicMatchingDemo(this);// (Demo)Activator.CreateInstance(demoType, new object[] { this });
+            currentSimulation = (Demo)Activator.CreateInstance(demoType, new object[] { this });
 #endif
             #region DisplayObject creation
 
