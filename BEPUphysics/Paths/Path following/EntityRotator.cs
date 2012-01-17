@@ -99,7 +99,7 @@ namespace BEPUphysics.Paths.PathFollowing
         /// </summary>
         public override void OnAdditionToSpace(ISpace newSpace)
         {
-                newSpace.Add(AngularMotor);
+            newSpace.Add(AngularMotor);
         }
 
         /// <summary>
