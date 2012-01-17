@@ -3,7 +3,7 @@
     ///<summary>
     /// Update modes for position updateables.
     ///</summary>
-    public enum PositionUpdateMode
+    public enum PositionUpdateMode : byte
     {
         /// <summary>
         /// Updates position discretely regardless of its collision pairs.

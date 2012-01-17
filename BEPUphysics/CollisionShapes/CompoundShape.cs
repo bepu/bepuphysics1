@@ -159,9 +159,9 @@ namespace BEPUphysics.CollisionShapes
         /// <param name="center">Computed center of the compound shape, using the entry weights.</param>
         public CompoundShape(IList<CompoundShapeEntry> shapes, out Vector3 center)
         {
-            center = ComputeCenter(shapes);
             if (shapes.Count > 0)
             {
+                center = ComputeCenter(shapes);
                 this.shapes = new RawList<CompoundShapeEntry>(shapes);
                 for (int i = 0; i < this.shapes.count; i++)
                 {
@@ -180,9 +180,9 @@ namespace BEPUphysics.CollisionShapes
         ///<param name="shapes">Shape entries used to create the compound.</param>
         public CompoundShape(IList<CompoundShapeEntry> shapes)
         {
-            Vector3 center = ComputeCenter(shapes);
             if (shapes.Count > 0)
             {
+                Vector3 center = ComputeCenter(shapes);
                 this.shapes = new RawList<CompoundShapeEntry>(shapes);
                 for (int i = 0; i < this.shapes.count; i++)
                 {
