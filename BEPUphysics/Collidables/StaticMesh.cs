@@ -10,6 +10,7 @@ using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.ResourceManagement;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
 using BEPUphysics.CollisionTests.CollisionAlgorithms.GJK;
+using BEPUphysics.OtherSpaceStages;
 
 namespace BEPUphysics.Collidables
 {
@@ -21,7 +22,7 @@ namespace BEPUphysics.Collidables
     /// StaticMesh; if you want to create many meshes of the same model, consider using the
     /// InstancedMesh.
     /// </remarks>
-    public class StaticMesh : Collidable, ISpaceObject, IMaterialOwner
+    public class StaticMesh : Collidable, ISpaceObject, IMaterialOwner, IDeferredEventCreatorOwner
     {
 
         TriangleMesh mesh;
@@ -186,8 +187,11 @@ namespace BEPUphysics.Collidables
 
         protected override void OnShapeChanged(CollisionShape collisionShape)
         {
-            mesh = new TriangleMesh(Shape.TriangleMeshData);
-            UpdateBoundingBox();
+            if (!IgnoreShapeChanges)
+            {
+                mesh = new TriangleMesh(Shape.TriangleMeshData);
+                UpdateBoundingBox();
+            }
         }
 
         /// <summary>
@@ -322,7 +326,10 @@ namespace BEPUphysics.Collidables
         {
         }
 
-
+        IDeferredEventCreator IDeferredEventCreatorOwner.EventCreator
+        {
+            get { return Events; }
+        }
 
     }
 }

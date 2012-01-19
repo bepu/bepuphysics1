@@ -776,7 +776,7 @@ namespace BEPUphysics.Entities
         }
 
         /// <summary>
-        /// Gets or sets whether or not to ignore shape changes.  When true, changing the entity's collision shape will not update the maximum radius, volume, density, or inertia tensor. 
+        /// Gets or sets whether or not to ignore shape changes.  When true, changing the entity's collision shape will not update the volume, density, or inertia tensor. 
         /// </summary>
         public bool IgnoreShapeChanges { get; set; }
 
