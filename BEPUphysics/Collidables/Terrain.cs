@@ -8,13 +8,14 @@ using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.ResourceManagement;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
+using BEPUphysics.OtherSpaceStages;
 
 namespace BEPUphysics.Collidables
 {
     ///<summary>
     /// Heightfield-based, unmovable collidable object.
     ///</summary>
-    public class Terrain : Collidable, ISpaceObject, IMaterialOwner
+    public class Terrain : Collidable, ISpaceObject, IMaterialOwner, IDeferredEventCreatorOwner
     {
         ///<summary>
         /// Gets the shape of this collidable.
@@ -47,7 +48,7 @@ namespace BEPUphysics.Collidables
                 worldTransform = value;
             }
         }
-        
+
 
         internal bool improveBoundaryBehavior = true;
         /// <summary>
@@ -196,7 +197,8 @@ namespace BEPUphysics.Collidables
 
         protected override void OnShapeChanged(CollisionShape collisionShape)
         {
-            UpdateBoundingBox();
+            if (!IgnoreShapeChanges)
+                UpdateBoundingBox();
         }
 
         ///<summary>
@@ -275,7 +277,7 @@ namespace BEPUphysics.Collidables
                         tri.maximumRadius = radius;
                     tri.maximumRadius = (float)Math.Sqrt(tri.maximumRadius);
                     tri.collisionMargin = 0;
-                    var triangleTransform = new RigidTransform {Orientation = Quaternion.Identity, Position = center};
+                    var triangleTransform = new RigidTransform { Orientation = Quaternion.Identity, Position = center };
                     RayHit tempHit;
                     if (MPRToolbox.Sweep(castShape, tri, ref sweep, ref Toolbox.ZeroVector, ref startingTransform, ref triangleTransform, out tempHit) && tempHit.T < hit.T)
                     {
@@ -346,6 +348,11 @@ namespace BEPUphysics.Collidables
 
         void ISpaceObject.OnRemovalFromSpace(ISpace oldSpace)
         {
+        }
+
+        IDeferredEventCreator IDeferredEventCreatorOwner.EventCreator
+        {
+            get { return Events; }
         }
 
     }

@@ -10,6 +10,7 @@ using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.MathExtensions;
 using Microsoft.Xna.Framework;
 using BEPUphysics.DataStructures;
+using BEPUphysics.OtherSpaceStages;
 
 namespace BEPUphysics.Collidables
 {
@@ -54,7 +55,7 @@ namespace BEPUphysics.Collidables
 
 
         /// <summary>
-        /// Gets or sets whether or not to ignore shape changes.  When true, changing the collision shape will not force an update of maximum or minimum radii.
+        /// Gets or sets whether or not to ignore shape changes.  When true, changing the collision shape will not force the collidable to perform any updates.
         /// </summary>
         public bool IgnoreShapeChanges { get; set; }
 
@@ -96,6 +97,8 @@ namespace BEPUphysics.Collidables
                 pairs[i].CollisionRule = CollisionRules.CollisionRuleCalculator(pairs[i].BroadPhaseOverlap.entryA.collisionRules, pairs[i].BroadPhaseOverlap.entryB.collisionRules);
             }
         }
+
+
 
 
     }

@@ -8,6 +8,7 @@ using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.MathExtensions;
 using BEPUphysics.ResourceManagement;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
+using BEPUphysics.OtherSpaceStages;
 
 namespace BEPUphysics.Collidables
 {
@@ -17,7 +18,7 @@ namespace BEPUphysics.Collidables
     /// a complicated mesh to be repeated many times.  Since the hierarchy used to accelerate
     /// collisions is purely local, it may be marginally slower than an individual StaticMesh.
     ///</summary>
-    public class InstancedMesh : Collidable, ISpaceObject, IMaterialOwner
+    public class InstancedMesh : Collidable, ISpaceObject, IMaterialOwner, IDeferredEventCreatorOwner
     {
 
         internal AffineTransform worldTransform;
@@ -47,7 +48,8 @@ namespace BEPUphysics.Collidables
 
         protected override void OnShapeChanged(CollisionShape collisionShape)
         {
-            UpdateBoundingBox();
+            if (!IgnoreShapeChanges)
+                UpdateBoundingBox();
         }
 
         ///<summary>
@@ -268,7 +270,7 @@ namespace BEPUphysics.Collidables
                         tri.maximumRadius = radius;
                     tri.maximumRadius = (float)Math.Sqrt(tri.maximumRadius);
                     tri.collisionMargin = 0;
-                    var triangleTransform = new RigidTransform {Orientation = Quaternion.Identity, Position = center};
+                    var triangleTransform = new RigidTransform { Orientation = Quaternion.Identity, Position = center };
                     RayHit tempHit;
                     if (MPRToolbox.Sweep(castShape, tri, ref sweep, ref Toolbox.ZeroVector, ref startingTransform, ref triangleTransform, out tempHit) && tempHit.T < hit.T)
                     {
@@ -316,5 +318,9 @@ namespace BEPUphysics.Collidables
         {
         }
 
+        IDeferredEventCreator IDeferredEventCreatorOwner.EventCreator
+        {
+            get { return Events; }
+        }
     }
 }
