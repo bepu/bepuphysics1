@@ -9,7 +9,7 @@ using BEPUphysics.Entities;
 using System;
 using System.Diagnostics;
 
-namespace BEPUphysicsDemos.Demos.Tests
+namespace BEPUphysicsDemos.Demos.Extras
 {
     /// <summary>
     /// Demo showing a wall of blocks stacked up.

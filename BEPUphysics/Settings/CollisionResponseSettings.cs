@@ -19,8 +19,7 @@
         public static float MaximumPositionCorrectionSpeed = 2;
 
         /// <summary>
-        /// Fraction of position error to convert into corrective momentum when using the Baumgarte position correction method,
-        /// active when useSplitImpulsePositionCorrection is set to false.
+        /// Fraction of position error to convert into corrective momentum.
         /// Defaults to .2.
         /// </summary>
         public static float PenetrationRecoveryStiffness = .2f;

@@ -27,7 +27,7 @@ using BEPUphysics.EntityStateManagement;
 using BEPUphysics.ResourceManagement;
 using BEPUphysics.NarrowPhaseSystems;
 
-namespace BEPUphysicsDemos.Demos.Tests
+namespace BEPUphysicsDemos.Demos.Extras
 {
     /// <summary>
     /// Demo showing a wall of blocks stacked up.

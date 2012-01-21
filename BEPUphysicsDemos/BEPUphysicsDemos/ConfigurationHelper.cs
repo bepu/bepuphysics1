@@ -21,7 +21,10 @@ namespace BEPUphysicsDemos
     /// When using a non-60hz update rate it's a good idea to pass the elapsed gametime into the Space.Update method (you can find
     /// the demos's space update call in the Demo.cs Update function).  This will allow the engine to take as many timesteps are 
     /// necessary to keep up with passing time.  Just remember that if the simulation gets too hectic and the engine falls behind,
-    /// performance will suffer a lot as it takes multiple expensive steps in a single frame trying to catch up.
+    /// performance will suffer a lot as it takes multiple expensive steps in a single frame trying to catch up.  In addition,
+    /// since the number of time steps per frame isn't fixed when using internal time stepping, subtle unsmooth motion may creep in.
+    /// This can be addressed by using the interpolation buffers.  Check out the Updating Asynchronously documentation for more information.
+    /// [Asynchronous updating isn't needed to use internal time stepping, it's just a common use case.]
     /// </summary>
     public static class ConfigurationHelper
     {
@@ -40,6 +43,16 @@ namespace BEPUphysicsDemos
             space.Solver.IterationLimit = 10;
             GeneralConvexPairTester.UseSimplexCaching = false;
             MotionSettings.UseExtraExpansionForContinuousBoundingBoxes = false;
+
+            //Set all the scaling settings back to their defaults.
+            CollisionResponseSettings.MaximumPositionCorrectionSpeed = 2;
+            CollisionResponseSettings.BouncinessVelocityThreshold = 1;
+            CollisionResponseSettings.StaticFrictionVelocityThreshold = .2f;
+            CollisionDetectionSettings.ContactInvalidationLength = .1f;
+            CollisionDetectionSettings.ContactMinimumSeparationDistance = .1f;
+            CollisionDetectionSettings.MaximumContactDistance = .1f;
+            CollisionDetectionSettings.DefaultMargin = .04f;
+            CollisionDetectionSettings.AllowedPenetration = .01f;
         }
 
         /// <summary>
@@ -113,6 +126,24 @@ namespace BEPUphysicsDemos
             SolverSettings.DefaultMinimumIterations = 5;
             space.Solver.IterationLimit = 50;
 
+        }
+
+        /// <summary>
+        /// Scales the configuration settings for collision detection and response to handle
+        /// a different scale interpretation.  For example, if you want to increase your gravity to -100 from -10 and consider a 5 unit wide box to be tiny,
+        /// apply a scale of 10 to get the collision response and detection systems to match expectations.
+        /// </summary>
+        /// <param name="scale">Scale to apply to relevant configuration settings.</param>
+        public static void ApplyScale(float scale)
+        { 
+            CollisionResponseSettings.MaximumPositionCorrectionSpeed *= scale;
+            CollisionResponseSettings.BouncinessVelocityThreshold *= scale;
+            CollisionResponseSettings.StaticFrictionVelocityThreshold *= scale;
+            CollisionDetectionSettings.ContactInvalidationLength *= scale;
+            CollisionDetectionSettings.ContactMinimumSeparationDistance *= scale;
+            CollisionDetectionSettings.MaximumContactDistance *= scale;
+            CollisionDetectionSettings.DefaultMargin *= scale;
+            CollisionDetectionSettings.AllowedPenetration *= scale;
         }
     }
 }

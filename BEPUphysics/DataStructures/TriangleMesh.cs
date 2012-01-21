@@ -190,7 +190,7 @@ namespace BEPUphysics.DataStructures
             return hits.Count > 0;
         }
 
-        #region Saving/loading
+        #region Vertex extraction helpers
 
 
         /// <summary>

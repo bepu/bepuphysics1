@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using BEPUphysics.MathExtensions;
 using BEPUphysics.Collidables;
-namespace BEPUphysicsDemos.Demos.Tests
+namespace BEPUphysicsDemos.Demos.Extras
 {
     /// <summary>
     /// For random tests and general fiddling.

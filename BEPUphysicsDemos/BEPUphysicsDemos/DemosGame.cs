@@ -15,7 +15,7 @@ using Microsoft.Xna.Framework.Input;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
 using BEPUphysics.Settings;
 using BEPUphysics.DataStructures;
-using BEPUphysicsDemos.Demos.Tests;
+using BEPUphysicsDemos.Demos.Extras;
 
 #endregion
 
