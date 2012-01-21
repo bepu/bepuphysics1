@@ -59,9 +59,10 @@ namespace BEPUphysics.Threading
                 }
 
 
-                int newLastIndex = (lastIndex + 1) % array.Length;
-                array[newLastIndex] = item;
-                lastIndex = newLastIndex;
+                lastIndex++;
+                if (lastIndex == array.Length)
+                    lastIndex = 0;
+                array[lastIndex] = item;
                 count++;
             }
             finally
@@ -83,7 +84,9 @@ namespace BEPUphysics.Threading
                 {
                     item = array[firstIndex];
                     array[firstIndex] = default(T);
-                    firstIndex = (firstIndex + 1) % array.Length;
+                    firstIndex++;
+                    if (firstIndex == array.Length)
+                        firstIndex = 0;
                     count--;
                     return true;
                 }
@@ -131,7 +134,9 @@ namespace BEPUphysics.Threading
             {
                 item = array[firstIndex];
                 array[firstIndex] = default(T);
-                firstIndex = (firstIndex + 1) % array.Length;
+                firstIndex++;
+                if (firstIndex == array.Length)
+                    firstIndex = 0;
                 count--;
                 return true;
             }
@@ -175,9 +180,10 @@ namespace BEPUphysics.Threading
             }
 
 
-            int newLastIndex = (lastIndex + 1) % array.Length;
-            array[newLastIndex] = item;
-            lastIndex = newLastIndex;
+            lastIndex++;
+            if (lastIndex == array.Length)
+                lastIndex = 0;
+            array[lastIndex] = item;
             count++;
         }
     }
