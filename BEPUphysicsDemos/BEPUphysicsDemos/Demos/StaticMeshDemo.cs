@@ -25,7 +25,7 @@ namespace BEPUphysicsDemos.Demos
         public StaticMeshDemo(DemosGame game)
             : base(game)
         {
-            //Load in mesh data and create the group.
+            //Load in mesh data and create the collision mesh.
             Vector3[] staticTriangleVertices;
             int[] staticTriangleIndices;
 
