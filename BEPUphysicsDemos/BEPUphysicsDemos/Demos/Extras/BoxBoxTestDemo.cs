@@ -4,10 +4,10 @@ using BEPUphysics.Entities.Prefabs;
 using Microsoft.Xna.Framework;
 using System.Diagnostics;
 
-namespace BEPUphysicsDemos.Demos
+namespace BEPUphysicsDemos.Demos.Extras
 {
     /// <summary>
-    /// Ring-shaped structure made of blocks.
+    /// Demo designed to focus on box-box collision detection.
     /// </summary>
     public class BoxBoxTestDemo : StandardDemo
     {

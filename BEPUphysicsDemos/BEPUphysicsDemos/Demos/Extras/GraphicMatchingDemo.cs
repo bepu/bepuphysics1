@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.Entities;
 
-namespace BEPUphysicsDemos.Demos
+namespace BEPUphysicsDemos.Demos.Extras
 {
     /// <summary>
     /// Demo showing how a shape can be constructed from a model and then how to align the graphic with the collision shape.

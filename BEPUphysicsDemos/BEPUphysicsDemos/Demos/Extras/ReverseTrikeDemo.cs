@@ -10,7 +10,7 @@ using Microsoft.Xna.Framework.Input;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.Materials;
 
-namespace BEPUphysicsDemos.Demos.Tests
+namespace BEPUphysicsDemos.Demos.Extras
 {
     /// <summary>
     /// For random tests and general fiddling.

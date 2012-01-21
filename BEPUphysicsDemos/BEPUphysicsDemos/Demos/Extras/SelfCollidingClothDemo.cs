@@ -6,7 +6,7 @@ using BEPUphysics.MathExtensions;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.NarrowPhaseSystems;
 
-namespace BEPUphysicsDemos.Demos.Tests
+namespace BEPUphysicsDemos.Demos.Extras
 {
     /// <summary>
     /// A basic lattice of constraints acting like cloth.

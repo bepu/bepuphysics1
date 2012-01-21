@@ -15,7 +15,7 @@ using System.Collections.Generic;
 using System;
 using BEPUphysicsDemos.AlternateMovement.Character;
 
-namespace BEPUphysicsDemos.Demos
+namespace BEPUphysicsDemos.Demos.Extras
 {
     /// <summary>
     /// A nice driveble landscape.
