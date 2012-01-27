@@ -623,14 +623,18 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     Vector3.Negate(ref earliestHit.Normal, out earliestHit.Normal);
                     dot = -dot;
                 }
+                //This down cast is only used for finding supports and traction, not for finding side contacts.
+                //If the detected normal is too steep, toss it out.
                 if (dot > cosMaximumSlope)
                 {
                     //It has traction!
                     hasTraction = true;
                     supportRayData = new SupportRayData() { HitData = earliestHit, HitObject = earliestHitObject, HasTraction = true };
                 }
-                else
+                else if (dot > SideContactThreshold)
                     supportRayData = new SupportRayData() { HitData = earliestHit, HitObject = earliestHitObject };
+                else
+                    return false; //Too steep! Toss it out.
                 return true;
             }
             return false;
