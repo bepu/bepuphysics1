@@ -313,7 +313,7 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
                     Vector3 lineStart = new Vector3(movementDirection.X, 0, movementDirection.Y);
                     Vector3 lineEnd;
                     Vector3.Add(ref lineStart, ref downDirection, out lineEnd);
-                    Plane plane = new Plane(character.SupportFinder.HasTraction ? supportData.Normal : supportData.Normal, 0);
+                    Plane plane = new Plane(supportData.Normal, 0);
                     float t;
                     //This method can return false when the line is parallel to the plane, but previous tests and the slope limit guarantee that it won't happen.
                     Toolbox.GetLinePlaneIntersection(ref lineStart, ref lineEnd, ref plane, out t, out velocityDirection);

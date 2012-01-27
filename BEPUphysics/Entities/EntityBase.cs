@@ -389,7 +389,7 @@ namespace BEPUphysics.Entities
 
 
         ///<summary>
-        /// Fires when the entity's position is updated.
+        /// Fires when the entity's position and orientation is updated.
         ///</summary>
         public event Action<Entity> PositionUpdated;
 
