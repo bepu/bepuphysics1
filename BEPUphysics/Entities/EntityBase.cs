@@ -292,7 +292,7 @@ namespace BEPUphysics.Entities
             set
             {
                 localInertiaTensor = value;
-                Matrix3X3.Invert(ref localInertiaTensor, out localInertiaTensorInverse);
+                Matrix3X3.AdaptiveInvert(ref localInertiaTensor, out localInertiaTensorInverse);
                 Matrix3X3 multiplied;
                 Matrix3X3.MultiplyTransposed(ref orientationMatrix, ref localInertiaTensorInverse, out multiplied);
                 Matrix3X3.Multiply(ref multiplied, ref orientationMatrix, out inertiaTensorInverse);
