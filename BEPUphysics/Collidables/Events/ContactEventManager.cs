@@ -165,25 +165,33 @@ namespace BEPUphysics.Collidables.Events
             //Note: Deferred event creation should be performed sequentially with dispatching.
             //This means a event creation from this creator cannot occur ASYNCHRONOUSLY while DispatchEvents is running.
 
+            //Note: If the deferred event handler is removed during the execution of the engine, the handler may be null.
+            //In this situation, ignore the event.
+            //This is not a particularly clean behavior, but it's better than just crashing.
             EventStorageContactCreated contactCreated;
             while (eventStorageContactCreated.TryUnsafeDequeueFirst(out contactCreated))
-                InternalContactCreated(owner, contactCreated.other, contactCreated.pair, contactCreated.contactData);
+                if (InternalContactCreated != null)
+                    InternalContactCreated(owner, contactCreated.other, contactCreated.pair, contactCreated.contactData);
 
             EventStorageInitialCollisionDetected initialCollisionDetected;
             while (eventStorageInitialCollisionDetected.TryUnsafeDequeueFirst(out initialCollisionDetected))
-                InternalInitialCollisionDetected(owner, initialCollisionDetected.other, initialCollisionDetected.pair);
+                if (InternalInitialCollisionDetected != null)
+                    InternalInitialCollisionDetected(owner, initialCollisionDetected.other, initialCollisionDetected.pair);
 
             EventStorageContactRemoved contactRemoved;
             while (eventStorageContactRemoved.TryUnsafeDequeueFirst(out contactRemoved))
-                InternalContactRemoved(owner, contactRemoved.other, contactRemoved.pair, contactRemoved.contactData);
+                if (InternalContactRemoved != null)
+                    InternalContactRemoved(owner, contactRemoved.other, contactRemoved.pair, contactRemoved.contactData);
 
             EventStorageCollisionEnded collisionEnded;
             while (eventStorageCollisionEnded.TryUnsafeDequeueFirst(out collisionEnded))
-                InternalCollisionEnded(owner, collisionEnded.other, collisionEnded.pair);
+                if (InternalCollisionEnded != null)
+                    InternalCollisionEnded(owner, collisionEnded.other, collisionEnded.pair);
 
             EventStoragePairTouched collisionPairTouched;
             while (eventStoragePairTouched.TryUnsafeDequeueFirst(out collisionPairTouched))
-                InternalPairTouched(owner, collisionPairTouched.other, collisionPairTouched.pair);
+                if (InternalPairTouched != null)
+                    InternalPairTouched(owner, collisionPairTouched.other, collisionPairTouched.pair);
 
             base.DispatchEvents();
         }

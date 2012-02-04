@@ -35,6 +35,9 @@ namespace BEPUphysicsDrawer.Models
 
         public override void Update()
         {
+            //The reason for this complexity is that we're drawing the shape's location directly and interpolated buffers might be active.
+            //That means we can't rely solely on the collidable's world transform or the entity's world transform alone;
+            //we must rebuild it from the entity's world transform and the collidable's local position.
             //TODO: This is awfully annoying.  Could use some built-in convenience methods to ease the usage.
             Vector3 translation = Matrix3X3.Transform(DisplayedObject.CollisionInformation.LocalPosition, DisplayedObject.BufferedStates.InterpolatedStates.OrientationMatrix);
             translation += DisplayedObject.BufferedStates.InterpolatedStates.Position;
