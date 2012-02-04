@@ -220,15 +220,22 @@ namespace BEPUphysics.Collidables.Events
         {
             //Note: Deferred event creation should be performed sequentially with dispatching.
             //This means a event creation from this creator cannot occur ASYNCHRONOUSLY while DispatchEvents is running.
+
+            //Note: If the deferred event handler is removed during the execution of the engine, the handler may be null.
+            //In this situation, ignore the event.
+            //This is not a particularly clean behavior, but it's better than just crashing.
             EventStoragePairCreated collisionPairCreated;
             while (eventStoragePairCreated.TryUnsafeDequeueFirst(out collisionPairCreated))
-                InternalPairCreated(owner, collisionPairCreated.other, collisionPairCreated.pair);
+                if (InternalPairCreated != null)
+                    InternalPairCreated(owner, collisionPairCreated.other, collisionPairCreated.pair);
             EventStoragePairRemoved collisionPairRemoved;
             while (eventStoragePairRemoved.TryUnsafeDequeueFirst(out collisionPairRemoved))
-                InternalPairRemoved(owner, collisionPairRemoved.other);
+                if (InternalPairRemoved != null)
+                    InternalPairRemoved(owner, collisionPairRemoved.other);
             EventStoragePairUpdated collisionPairUpdated;
             while (eventStoragePairUpdated.TryUnsafeDequeueFirst(out collisionPairUpdated))
-                InternalPairUpdated(owner, collisionPairUpdated.other, collisionPairUpdated.pair);
+                if (InternalPairUpdated != null)
+                    InternalPairUpdated(owner, collisionPairUpdated.other, collisionPairUpdated.pair);
 
 
         }
