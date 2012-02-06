@@ -39,7 +39,7 @@ namespace BEPUphysics.Vehicle
 
 
         /// <summary>
-        /// Constructs a new wheel.
+        /// Constructs a new wheel.  The WheelSlidingFriction, WheelBrake, WheelSuspension, and WheelDrivingMotor should be configured prior to using this wheel.
         /// </summary>
         /// <param name="shape">Shape of the wheel.</param>
         public Wheel(WheelShape shape)
