@@ -121,7 +121,8 @@ namespace BEPUphysics.Collidables
 
         internal float thickness;
         /// <summary>
-        /// Gets or sets the thickness of the terrain.  The thickness 
+        /// Gets or sets the thickness of the terrain.  This defines how far below the triangles of the terrain's surface the terrain 'body' extends.
+        /// Anything within the body of the terrain will be pulled back up to the surface.
         /// </summary>
         public float Thickness
         {
