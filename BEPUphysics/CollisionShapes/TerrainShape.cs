@@ -330,6 +330,7 @@ namespace BEPUphysics.CollisionShapes
                         Vector3.Add(ref hit.Location, ref ray.Position, out hit.Location);
                         Matrix3X3.TransformTranspose(ref hit2.Normal, ref inverse.LinearTransform, out hit.Normal);
                         hit.T = hit2.T;
+                        return true;
                     }
                     else if (didHit1)
                     {
@@ -698,7 +699,7 @@ namespace BEPUphysics.CollisionShapes
             }
         }
 
-        
+
     }
 
     /// <summary>
