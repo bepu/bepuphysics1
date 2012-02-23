@@ -39,7 +39,7 @@ namespace BEPUphysicsDemos.Demos
             Space.Add(staticMesh);
             game.ModelDrawer.Add(staticMesh);
 
-      
+
 
 
             //Dump some boxes on top of it for fun.
@@ -57,14 +57,20 @@ namespace BEPUphysicsDemos.Demos
                             separation * i - numRows * separation / 2,
                             30f + k * separation,
                             separation * j - numColumns * separation / 2),
-                            2, 2, 2, 15);
-
+                            .2f, .2f, .2f, 15);
+                        toAdd.PositionUpdateMode = BEPUphysics.PositionUpdating.PositionUpdateMode.Continuous;
                         Space.Add(toAdd);
                     }
 
+            Cylinder cylinder = new Cylinder(new Vector3(0, 400, 0), 1.7f, .2f, 10);
+            cylinder.CollisionInformation.Shape.CollisionMargin = .1f;
+            cylinder.PositionUpdateMode = BEPUphysics.PositionUpdating.PositionUpdateMode.Continuous;
+            cylinder.LocalInertiaTensorInverse = new Matrix3X3();
+
+            Space.Add(cylinder);
 
 
-            game.Camera.Position = new Vector3(0, 10, 40);
+            game.Camera.Position = new Vector3(0, 20, 3);
 
 
         }
