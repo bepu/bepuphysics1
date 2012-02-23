@@ -250,7 +250,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             Vector3.Add(ref triangleCentroid, ref triangle.vC, out triangleCentroid);
             Vector3.Multiply(ref triangleCentroid, .33333333f, out triangleCentroid);
 
-            var initialSimplex = new CachedSimplex {State = SimplexState.Point, LocalSimplexB = {A = triangleCentroid}};
+            var initialSimplex = new CachedSimplex { State = SimplexState.Point, LocalSimplexB = { A = triangleCentroid } };
             if (GJKToolbox.GetClosestPoints(convex, triangle, ref Toolbox.RigidIdentity, ref Toolbox.RigidIdentity, ref initialSimplex, out closestA, out closestB))
             {
                 state = CollisionState.Deep;
@@ -605,7 +605,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                         }
                     }
 
-                   
+
 
 
                 }
@@ -613,41 +613,20 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
 
                 MPRToolbox.RefinePenetration(convex, triangle, ref Toolbox.RigidIdentity, contact.PenetrationDepth, ref contact.Normal, out contact.PenetrationDepth, out contact.Normal, out contact.Position);
-                
+
                 //It's possible for the normal to still face the 'wrong' direction according to one sided triangles.
                 if (triangle.sidedness != TriangleSidedness.DoubleSided)
                 {
                     Vector3.Dot(ref triangleNormal, ref contact.Normal, out dot);
                     if (dot < 0)
-                        return false;
+                    {
+                        //Skip the add process.
+                        goto InnerSphere;
+                    }
                 }
-          
-
-                ////The local casting can optionally continue.  Eventually, it will converge to the local minimum.
-                //int optimizingCount = 0;
-                //while (true)
-                //{
-
-                //    MPRTesting.LocalSurfaceCast(convex, triangle, ref Toolbox.RigidIdentity, ref contact.Normal, out candidateDepth, out candidateNormal);
-                //    if (contact.PenetrationDepth - candidateDepth <= Toolbox.BigEpsilon || 
-                //        ++optimizingCount < 4)
-                //    {
-                //        //If we've reached the end due to convergence, the normal will be extremely close to correct (if not 100% correct).
-                //        //The candidateDepth computed is the previous contact normal's depth.
-                //        //The reason why the previous normal is kept is that the last raycast computed the depth for that normal, not the new normal.
-                //        contact.PenetrationDepth = candidateDepth;
-                //        break;
-                //    }
 
 
-                //    contact.PenetrationDepth = candidateDepth;
-                //    contact.Normal = candidateNormal;
-                //}
-
-                //Correct the penetration depth.
-                //MPRTesting.LocalSurfaceCast(convex, triangle, ref Toolbox.RigidIdentity, ref contact.Normal, out contact.PenetrationDepth, out center); //Center is just a trash variable now.
-
-                contact.Id = -1;
+               contact.Id = -1;
 
                 if (contact.PenetrationDepth < convex.collisionMargin + triangle.collisionMargin)
                 {
@@ -656,7 +635,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 contactList.Add(ref contact);
             }
 
-
+        InnerSphere:
 
             if (TryInnerSphereContact(out contact))
             {
@@ -750,7 +729,8 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                     }
                 }
 
-                contact.PenetrationDepth = convex.minimumRadius - length;
+                //Compute the actual depth of the contact.
+                MPRToolbox.LocalSurfaceCast(convex, triangle, ref Toolbox.RigidIdentity, ref contact.Normal, out contact.PenetrationDepth, out triangleNormal); //Trash the 'corrected' normal.  We want to use the spherical normal.
                 contact.Id = -1;
                 return true;
             }
