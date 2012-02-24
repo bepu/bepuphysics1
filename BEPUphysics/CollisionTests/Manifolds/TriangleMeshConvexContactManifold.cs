@@ -153,10 +153,11 @@ namespace BEPUphysics.CollisionTests.Manifolds
             }
 
 
- 
+
 
             if (UseImprovedBoundaryHandling)
             {
+
                 //If there were no face contacts that absolutely must be included, we may get into a very rare situation
                 //where absolutely no contacts get created.  For example, a sphere falling directly on top of a vertex in a flat terrain.
                 //It will generally get locked out of usage by belonging only to restricted regions (numerical issues make it visible by both edges and vertices).
@@ -166,6 +167,99 @@ namespace BEPUphysics.CollisionTests.Manifolds
                 //TODO: There is another option: Changing restricted regions so that a vertex only restricts the other two vertices and the far edge,
                 //and an edge only restricts the far vertex and other two edges.  This introduces an occasional bump though...
                 int guaranteedContacts = candidatesToAdd.count;
+
+                //It's possible, in very specific instances, for an object to wedge itself between two adjacent triangles.
+                //For this state to continue beyond a brief instant generally requires the object be orientation locked and slender.
+                //However, some characters fit this description, so it can't be ignored!
+
+                //Conceptually, this issue can occur at either a vertex junction or a shared edge (usually on extremely flat surfaces only).
+                //However, an object stuck between multiple triangles is not in a stable state.  In the edge case, the object gets shoved to one side
+                //as one contact 'wins' the solver war.  That's not enough to escape, unfortunately.
+                //The vertex case, on the other hand, is degenerate and decays into an edge case rapidly thanks to this lack of stability.
+                //So, we don't have to explicitly handle the somewhat more annoying and computationally expensive vertex unstucking case, because the edge case handles both! :)
+
+                //This isn't a completely free operation, but it's guarded behind pretty rare conditions.
+                //Essentially, we will check to see if there's just edge contacts fighting against each other.
+                //If they are, then we will correct any stuck-contributing normals to the triangle normal.
+                if (vertexContacts.count == 0 && guaranteedContacts == 0 && edgeContacts.count > 1)
+                {
+                    //There are only edge contacts, check to see if:
+                    //all normals are coplanar, and
+                    //at least one normal faces against the other normals (meaning it's probably stuck, as opposed to just colliding on a corner).
+
+                    bool allNormalsInSamePlane = true;
+                    bool atLeastOneNormalAgainst = false;
+
+                    var firstNormal = edgeContacts.Elements[0].ContactData.Normal;
+                    edgeContacts.Elements[0].CorrectedNormal.Normalize();
+                    float dot;
+                    Vector3.Dot(ref firstNormal, ref edgeContacts.Elements[0].CorrectedNormal, out dot);
+                    if (Math.Abs(dot) > .01f)
+                    {
+                        //Go ahead and test the first contact separately, since we're using its contact normal to determine coplanarity.
+                        allNormalsInSamePlane = false;
+                    }
+                    else
+                    {
+                        //TODO: Note that we're only checking the new edge contacts, not the existing contacts.
+                        //It's possible that some existing contacts could interfere and cause issues, but for the sake of simplicity and due to rarity
+                        //we'll ignore that possibility for now.
+                        for (int i = 1; i < edgeContacts.count; i++)
+                        {
+                            Vector3.Dot(ref edgeContacts.Elements[i].ContactData.Normal, ref firstNormal, out dot);
+                            if (dot < 0)
+                            {
+                                atLeastOneNormalAgainst = true;
+                            }
+                            //Check to see if the normal is outside the plane.
+                            Vector3.Dot(ref edgeContacts.Elements[i].ContactData.Normal, ref edgeContacts.Elements[0].CorrectedNormal, out dot);
+
+                            if (Math.Abs(dot) > .01f)
+                            {
+
+                                //We are not stuck!
+                                allNormalsInSamePlane = false;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (allNormalsInSamePlane && atLeastOneNormalAgainst)
+                    {
+                        //Uh oh! all the normals are parallel... The object is probably in a weird situation.
+                        //Let's correct the normals!
+
+                        //Already normalized the first contact above.
+                        //We don't need to perform the perpendicularity test here- we did that before! We know it's perpendicular already.
+                        edgeContacts.Elements[0].ContactData.Normal = edgeContacts.Elements[0].CorrectedNormal;
+                        edgeContacts.Elements[0].ShouldCorrect = true;
+
+                        for (int i = 1; i < edgeContacts.count; i++)
+                        {
+                            //Must normalize the corrected normal before using it.
+                            edgeContacts.Elements[i].CorrectedNormal.Normalize();
+                            Vector3.Dot(ref edgeContacts.Elements[i].CorrectedNormal, ref edgeContacts.Elements[i].ContactData.Normal, out dot);
+                            if (dot < .01)
+                            {
+                                //Only bother doing the correction if the normal appears to be pointing nearly horizontally- implying that it's a contributor to the stuckness!
+                                //If it's blocked, the next section will use the corrected normal- if it's not blocked, the next section will use the direct normal.
+                                //Make them the same thing :)
+                                edgeContacts.Elements[i].ContactData.Normal = edgeContacts.Elements[i].CorrectedNormal;
+                                edgeContacts.Elements[i].ShouldCorrect = true;
+                                //Note that the penetration depth is NOT corrected.  The contact's depth no longer represents the true depth.
+                                //However, we only need to have some penetration depth to get the object to escape the rut.
+                                //Furthermore, the depth computed from the horizontal opposing contacts is known to be less than the depth in the perpendicular direction.
+                                //If the current depth was NOT less than the true depth along the corrected normal, then the collision detection system 
+                                //would have picked a different depth, as it finds a reasonable approximation of the minimum penetration!
+                                //As a consequence, this contact will not be active beyond the object's destuckification, because its contact depth will be negative (or very close to it).
+                                
+                            }
+                        }
+                    }
+                }
+
+
+
                 for (int i = 0; i < edgeContacts.count; i++)
                 {
                     //Only correct if it's allowed AND it's blocked.
@@ -192,7 +286,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     //If it's blocked AND it doesn't allow correction, ignore its existence.
 
 
-    
+
                 }
                 for (int i = 0; i < vertexContacts.count; i++)
                 {
@@ -214,14 +308,14 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     }
                     //If it's blocked AND it doesn't allow correction, ignore its existence.
 
- 
+
                 }
                 blockedEdgeRegions.Clear();
                 blockedVertexRegions.Clear();
                 vertexContacts.Clear();
                 edgeContacts.Clear();
 
-  
+
             }
 
 
@@ -277,7 +371,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                 }
             }
 
-        
+
 
             candidatesToAdd.Clear();
 
@@ -340,7 +434,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     vertexContact.Vertex = indices.A;
                     vertexContact.ShouldCorrect = pairTester.ShouldCorrectContactNormal;
                     //if (vertexContact.ShouldCorrect)
-                        GetNormal(ref contact.Normal, out vertexContact.CorrectedNormal);
+                    GetNormal(ref contact.Normal, out vertexContact.CorrectedNormal);
                     //else
                     //    vertexContact.CorrectedNormal = contact.Normal;
                     vertexContacts.Add(ref vertexContact);
@@ -358,7 +452,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     vertexContact.Vertex = indices.B;
                     vertexContact.ShouldCorrect = pairTester.ShouldCorrectContactNormal;
                     //if (vertexContact.ShouldCorrect)
-                        GetNormal(ref contact.Normal, out vertexContact.CorrectedNormal);
+                    GetNormal(ref contact.Normal, out vertexContact.CorrectedNormal);
                     //else
                     //    vertexContact.CorrectedNormal = contact.Normal;
                     vertexContacts.Add(ref vertexContact);
@@ -376,7 +470,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     vertexContact.Vertex = indices.C;
                     vertexContact.ShouldCorrect = pairTester.ShouldCorrectContactNormal;
                     //if (vertexContact.ShouldCorrect)
-                        GetNormal(ref contact.Normal, out vertexContact.CorrectedNormal);
+                    GetNormal(ref contact.Normal, out vertexContact.CorrectedNormal);
                     //else
                     //    vertexContact.CorrectedNormal = contact.Normal;
                     vertexContacts.Add(ref vertexContact);
@@ -395,7 +489,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     edgeContact.ContactData = contact;
                     edgeContact.ShouldCorrect = pairTester.ShouldCorrectContactNormal;
                     //if (edgeContact.ShouldCorrect)
-                        GetNormal(ref contact.Normal, out edgeContact.CorrectedNormal);
+                    GetNormal(ref contact.Normal, out edgeContact.CorrectedNormal);
                     //else
                     //    edgeContact.CorrectedNormal = contact.Normal;
                     edgeContacts.Add(ref edgeContact);
@@ -413,7 +507,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     edgeContact.ContactData = contact;
                     edgeContact.ShouldCorrect = pairTester.ShouldCorrectContactNormal;
                     //if (edgeContact.ShouldCorrect)
-                        GetNormal(ref contact.Normal, out edgeContact.CorrectedNormal);
+                    GetNormal(ref contact.Normal, out edgeContact.CorrectedNormal);
                     //else
                     //    edgeContact.CorrectedNormal = contact.Normal;
                     edgeContacts.Add(ref edgeContact);
@@ -431,7 +525,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     edgeContact.ContactData = contact;
                     edgeContact.ShouldCorrect = pairTester.ShouldCorrectContactNormal;
                     //if (edgeContact.ShouldCorrect)
-                        GetNormal(ref contact.Normal, out edgeContact.CorrectedNormal);
+                    GetNormal(ref contact.Normal, out edgeContact.CorrectedNormal);
                     //else
                     //    edgeContact.CorrectedNormal = contact.Normal;
                     edgeContacts.Add(ref edgeContact);
