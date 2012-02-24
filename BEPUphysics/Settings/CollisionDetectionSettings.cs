@@ -31,11 +31,11 @@ namespace BEPUphysics.Settings
         }
 
 
-        internal static float ContactMinimumSeparationDistanceSquared = .01f;
+        internal static float ContactMinimumSeparationDistanceSquared = .0009f;
         /// <summary>
         /// In persistent manifolds, if two contacts are too close together, then 
         /// the system will not use one of them.  This avoids redundant constraints.
-        /// Defaults to .1f.
+        /// Defaults to .03f.
         /// </summary>
         public static float ContactMinimumSeparationDistance
         {

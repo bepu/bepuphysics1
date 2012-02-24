@@ -17,10 +17,16 @@ namespace BEPUphysicsDemos.Demos
         public CoefficientsDemo(DemosGame game)
             : base(game)
         {
-            //The combine method changes how the properties of each entity in a collision are factored together.
-            //Change them around a bit to alter the simulation.
-            MaterialManager.FrictionBlendMethod = PropertyBlendMethod.Min; //Defaults to average
-            MaterialManager.BouncinessBlendMethod = PropertyBlendMethod.Max;
+            //The material blender defines how the friction and bounciness values are computed between objects.
+            //It defaults to multiplicative, but for the purposes of this demo, we'll switch it to use the smaller friction and the larger bounciness.
+            MaterialManager.MaterialBlender = delegate(Material a, Material b, out InteractionProperties properties)
+                {
+                    properties.KineticFriction = MathHelper.Min(a.KineticFriction, b.KineticFriction);
+                    properties.StaticFriction = MathHelper.Min(a.StaticFriction, b.StaticFriction);
+                    properties.Bounciness = MathHelper.Max(a.Bounciness, b.Bounciness);
+                };
+            //Special blenders can be defined between specific Material instances by adding entries to the MaterialManager.MaterialInteractions dictionary.
+
             //Create the ground
             Entity toAdd = new Box(new Vector3(0, -.5f, 0), 20f, 1f, 20f);
             Space.Add(toAdd);
@@ -36,7 +42,7 @@ namespace BEPUphysicsDemos.Demos
             Space.Add(toAdd);
             //Slide-y boxes
             toAdd = new Box(new Vector3(9, 1, 9), 1, 1, 1, 1);
-            toAdd.Material = new Material(0,0,0);
+            toAdd.Material = new Material(0, 0, 0);
             toAdd.LinearVelocity = new Vector3(-5, 0, 0);
             Space.Add(toAdd);
             toAdd = new Box(new Vector3(9, 1, 5), 1, 1, 1, 1);

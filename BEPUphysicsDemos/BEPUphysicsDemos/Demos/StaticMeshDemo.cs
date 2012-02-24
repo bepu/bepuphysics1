@@ -10,6 +10,7 @@ using System.Diagnostics;
 using BEPUphysics.Settings;
 using BEPUphysics.Materials;
 using BEPUphysics.Constraints.SingleEntity;
+using Microsoft.Xna.Framework.Input;
 
 namespace BEPUphysicsDemos.Demos
 {
@@ -42,27 +43,28 @@ namespace BEPUphysicsDemos.Demos
 
 
 
-            //Dump some boxes on top of it for fun.
-            int numColumns = 8;
-            int numRows = 8;
-            int numHigh = 1;
-            float separation = 8;
-            Entity toAdd;
-            for (int i = 0; i < numRows; i++)
-                for (int j = 0; j < numColumns; j++)
-                    for (int k = 0; k < numHigh; k++)
-                    {
-                        toAdd = new Box(
-                            new Vector3(
-                            separation * i - numRows * separation / 2,
-                            30f + k * separation,
-                            separation * j - numColumns * separation / 2),
-                            .2f, .2f, .2f, 15);
-                        toAdd.PositionUpdateMode = BEPUphysics.PositionUpdating.PositionUpdateMode.Continuous;
-                        Space.Add(toAdd);
-                    }
+            ////Dump some boxes on top of it for fun.
+            //int numColumns = 8;
+            //int numRows = 8;
+            //int numHigh = 1;
+            //float separation = 8;
+            //Entity toAdd;
+            //for (int i = 0; i < numRows; i++)
+            //    for (int j = 0; j < numColumns; j++)
+            //        for (int k = 0; k < numHigh; k++)
+            //        {
+            //            toAdd = new Box(
+            //                new Vector3(
+            //                separation * i - numRows * separation / 2,
+            //                30f + k * separation,
+            //                separation * j - numColumns * separation / 2),
+            //                2, 2, 2, 15);
+            //            Space.Add(toAdd);
+            //        }
 
-            Cylinder cylinder = new Cylinder(new Vector3(0, 400, 0), 1.7f, .2f, 10);
+            //CollisionDetectionSettings.ContactMinimumSeparationDistance = 0;
+
+            Cylinder cylinder = new Cylinder(new Vector3(-.2f, 400, 0), 1.7f, .2f, 10);
             cylinder.CollisionInformation.Shape.CollisionMargin = .1f;
             cylinder.PositionUpdateMode = BEPUphysics.PositionUpdating.PositionUpdateMode.Continuous;
             cylinder.LocalInertiaTensorInverse = new Matrix3X3();
@@ -73,6 +75,16 @@ namespace BEPUphysicsDemos.Demos
             game.Camera.Position = new Vector3(0, 20, 3);
 
 
+        }
+
+        public override void Update(float dt)
+        {
+            if (Keyboard.GetState().IsKeyDown(Keys.P))
+            {
+                Debug.WriteLine("asdf");
+            }
+            else
+                base.Update(dt);
         }
 
 
