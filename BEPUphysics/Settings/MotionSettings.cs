@@ -1,6 +1,10 @@
 ﻿using BEPUphysics.PositionUpdating;
 using System;
 using Microsoft.Xna.Framework;
+using BEPUphysics.NarrowPhaseSystems.Pairs;
+using BEPUphysics.Entities;
+using BEPUphysics.CollisionRuleManagement;
+using BEPUphysics.Collidables;
 
 namespace BEPUphysics.Settings
 {
@@ -59,12 +63,33 @@ namespace BEPUphysics.Settings
         public static bool UseExtraExpansionForContinuousBoundingBoxes;
 
         /// <summary>
-        /// When this is set to false, collision pairs with a CollisionRule of NoSolver or more restrictive will not 
-        /// be tested with continuous collision detection.  This avoids jerky motion when passing through a trigger volume, for example.
-        /// On the other hand, an entity may pass completely through a trigger volume without being noticed.  When set to true, objects will
-        /// stop on the boundary of NoSolver-ruled objects briefly, ensuring detection but introducing discontinuous motion.
-        /// Defaults to false.
+        /// Delegate which determines if a given pair should be allowed to run continuous collision detection.
+        /// This is only called for entities which are continuous and colliding with other objects.
+        /// By default, this prevents CCD from being used in any pair where the pair's CollisionRule stops collision response.
         /// </summary>
-        public static bool UseCCDForNoSolverPairs;
+        public static CCDFilter CCDFilter;
+
+        internal static bool PairAllowsCCD(Entity entity, CollidablePairHandler pair)
+        {
+            var other = (pair.broadPhaseOverlap.entryA == entity.CollisionInformation ? pair.broadPhaseOverlap.entryB : pair.broadPhaseOverlap.entryA) as Collidable;
+            return CCDFilter(entity, other, pair);
+        }
+
+        static bool DefaultCCDFilter(Entity entity, Collidable other, CollidablePairHandler pair)
+        {
+            return pair.broadPhaseOverlap.collisionRule < CollisionRule.NoSolver;
+        }
+
+        static MotionSettings()
+        {
+            CCDFilter = DefaultCCDFilter;
+        }
+
     }
+
+    /// <summary>
+    /// Delegate which determines if a given pair should be allowed to run continuous collision detection.
+    /// This is only called for entities which are continuous and colliding with other objects.
+    /// </summary>
+    public delegate bool CCDFilter(Entity entity, Collidable other, CollidablePairHandler pair);
 }
