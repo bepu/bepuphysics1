@@ -37,6 +37,7 @@ namespace BEPUphysicsDemos.AlternateMovement
         /// </summary>
         public float BaseSlidingFriction;
 
+
         /// <summary>
         /// Camera to use for input.
         /// </summary>
@@ -82,6 +83,13 @@ namespace BEPUphysicsDemos.AlternateMovement
         /// </summary>
         public List<DisplayModel> WheelModels;
 
+        float FrictionBlender(float wheelFriction, float supportFriction, bool isKineticFriction, Wheel wheel)
+        {
+            //The default friction blender is multiplicative.  This tank had its coefficients designed for averaged coefficients.
+            //So, let's average the friction coefficients!
+            //Try to fiddle with the configuration and this blender to see how you like other approaches.
+            return (wheelFriction + supportFriction) / 2;
+        }
 
         /// <summary>
         /// Constructs the front end and the internal physics representation of the vehicle.
@@ -108,7 +116,8 @@ namespace BEPUphysicsDemos.AlternateMovement
 
             //The wheel model used is not aligned initially with how a wheel would normally look, so rotate them.
             MaximumDriveForce = 1800;
-            BaseSlidingFriction = 7;
+            BaseSlidingFriction = 3;
+
             Matrix wheelGraphicRotation = Matrix.CreateFromAxisAngle(Vector3.Forward, MathHelper.PiOver2);
             for (int i = 0; i < 6; i++)
             {
@@ -116,8 +125,11 @@ namespace BEPUphysicsDemos.AlternateMovement
                     new RaycastWheelShape(.375f, wheelGraphicRotation),
                     new WheelSuspension(2000, 300f, Vector3.Down, 1.3f, new Vector3(-1.9f, 0, -2.9f + i * 1.15f)),
                     new WheelDrivingMotor(10, MaximumDriveForce, MaximumDriveForce),
-                    new WheelBrake(BaseSlidingFriction, BaseSlidingFriction, 1.0f),
-                    new WheelSlidingFriction(3.5f, 3.5f));
+                    new WheelBrake(7, 7, 1.0f),
+                    new WheelSlidingFriction(BaseSlidingFriction, BaseSlidingFriction));
+                toAdd.DrivingMotor.GripFrictionBlender = FrictionBlender;
+                toAdd.Brake.FrictionBlender = FrictionBlender;
+                toAdd.SlidingFriction.FrictionBlender = FrictionBlender;
                 Vehicle.AddWheel(toAdd);
                 leftTrack.Add(toAdd);
             }
@@ -127,8 +139,11 @@ namespace BEPUphysicsDemos.AlternateMovement
                     new RaycastWheelShape(.375f, wheelGraphicRotation),
                     new WheelSuspension(2000, 300f, Vector3.Down, 1.3f, new Vector3(1.9f, 0, -2.9f + i * 1.15f)),
                     new WheelDrivingMotor(10, 2000, 1000),
-                    new WheelBrake(BaseSlidingFriction, BaseSlidingFriction, 1.0f),
-                    new WheelSlidingFriction(3.5f, 3.5f));
+                    new WheelBrake(7, 7, 1.0f),
+                    new WheelSlidingFriction(BaseSlidingFriction, BaseSlidingFriction));
+                toAdd.DrivingMotor.GripFrictionBlender = FrictionBlender;
+                toAdd.Brake.FrictionBlender = FrictionBlender;
+                toAdd.SlidingFriction.FrictionBlender = FrictionBlender;
                 Vehicle.AddWheel(toAdd);
                 rightTrack.Add(toAdd);
             }
@@ -363,7 +378,7 @@ namespace BEPUphysicsDemos.AlternateMovement
                             //run at full force.  This helps prevents wild spinouts and encourages
                             //more 'tanky' movement.
                             wheel.DrivingMotor.TargetSpeed = BackwardSpeed;
-                            wheel.DrivingMotor.MaximumBackwardForce = MaximumDriveForce / 2;
+                            wheel.DrivingMotor.MaximumBackwardForce = MaximumDriveForce / 3;
                         }
                         //It's possible to configure the tank in such a way
                         //that you won't have to use separate sliding frictions while turning,
@@ -377,7 +392,7 @@ namespace BEPUphysicsDemos.AlternateMovement
                         foreach (Wheel wheel in rightTrack)
                         {
                             wheel.DrivingMotor.TargetSpeed = BackwardSpeed;
-                            wheel.DrivingMotor.MaximumBackwardForce = MaximumDriveForce / 2;
+                            wheel.DrivingMotor.MaximumBackwardForce = MaximumDriveForce / 3;
                         }
                         ReduceSlidingFriction();
                     }
@@ -401,7 +416,7 @@ namespace BEPUphysicsDemos.AlternateMovement
                         foreach (Wheel wheel in leftTrack)
                         {
                             wheel.DrivingMotor.TargetSpeed = ForwardSpeed;
-                            wheel.DrivingMotor.MaximumForwardForce = MaximumDriveForce / 2;
+                            wheel.DrivingMotor.MaximumForwardForce = MaximumDriveForce / 3;
                         }
                         ReduceSlidingFriction();
                     }
@@ -412,7 +427,7 @@ namespace BEPUphysicsDemos.AlternateMovement
                         foreach (Wheel wheel in rightTrack)
                         {
                             wheel.DrivingMotor.TargetSpeed = ForwardSpeed;
-                            wheel.DrivingMotor.MaximumForwardForce = MaximumDriveForce / 2;
+                            wheel.DrivingMotor.MaximumForwardForce = MaximumDriveForce / 3;
                         }
                         ReduceSlidingFriction();
                     }
@@ -486,11 +501,13 @@ namespace BEPUphysicsDemos.AlternateMovement
 
         private void ReduceSlidingFriction()
         {
-            foreach (Wheel wheel in Vehicle.Wheels)
-            {
-                wheel.SlidingFriction.StaticCoefficient = BaseSlidingFriction * .8f;
-                wheel.SlidingFriction.KineticCoefficient = BaseSlidingFriction * .8f;
-            }
+            ////If you want to make turning while moving faster, you can enable this.
+            ////Careful- with sliding friction reduction, the tank can twirl pretty fast!
+            //foreach (Wheel wheel in Vehicle.Wheels)
+            //{
+            //    wheel.SlidingFriction.StaticCoefficient = BaseSlidingFriction * .8f;
+            //    wheel.SlidingFriction.KineticCoefficient = BaseSlidingFriction * .8f;
+            //}
         }
     }
 }
