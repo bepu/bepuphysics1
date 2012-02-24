@@ -134,7 +134,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     Camera.Position = Camera.Position + CharacterController.Body.LinearVelocity * dt;
                     //Now compute where it should be according the physical body of the character.
                     Vector3 up = CharacterController.Body.OrientationMatrix.Up;
-                    Vector3 bodyPosition = CharacterController.Body.Position;
+                    Vector3 bodyPosition = CharacterController.Body.BufferedStates.InterpolatedStates.Position;
                     Vector3 goalPosition = bodyPosition + up * (CharacterController.StanceManager.CurrentStance == Stance.Standing ? StandingCameraOffset : CrouchingCameraOffset);
 
                     //Usually, the camera position and the goal will be very close, if not matching completely.
