@@ -16,26 +16,26 @@ namespace BEPUphysics.Vehicle
         /// <summary>
         /// Default blender used by WheelRollingFriction constraints.
         /// </summary>
-        public static PropertyBlender DefaultRollingFrictionBlender;
+        public static WheelFrictionBlender DefaultRollingFrictionBlender;
 
         static WheelBrake()
         {
-            DefaultRollingFrictionBlender = new PropertyBlender(BlendFriction);
+            DefaultRollingFrictionBlender = BlendFriction;
         }
 
         /// <summary>
-        /// Computes the friction to use between the vehicle and support for a wheel.
+        /// Function which takes the friction values from a wheel and a supporting material and computes the blended friction.
         /// </summary>
-        /// <param name="wheelFriction">Friction coefficient of the wheel.</param>
-        /// <param name="supportFriction">Friction coefficient of the supporting entity.</param>
-        /// <param name="extraInfo">Any extra information to be considered.</param>
+        /// <param name="wheelFriction">Friction coefficient associated with the wheel.</param>
+        /// <param name="materialFriction">Friction coefficient associated with the support material.</param>
+        /// <param name="usingKineticFriction">True if the friction coefficients passed into the blender are kinetic coefficients, false otherwise.</param>
+        /// <param name="wheel">Wheel being blended.</param>
         /// <returns>Blended friction coefficient.</returns>
-        public static float BlendFriction(float wheelFriction, float supportFriction, object extraInfo)
+        public static float BlendFriction(float wheelFriction, float materialFriction, bool usingKinematicFriction, Wheel wheel)
         {
-            var brake = extraInfo as WheelBrake;
-            if (brake != null && brake.IsBraking)
+            if (wheel.brake.isBraking)
             {
-                return (wheelFriction + supportFriction) / 2;
+                return wheelFriction * materialFriction;
             }
             return wheelFriction;
         }
@@ -50,8 +50,8 @@ namespace BEPUphysics.Vehicle
         internal bool isActive = true;
         private float linearAX, linearAY, linearAZ;
         private float blendedCoefficient;
-        private float dynamicBrakingFrictionCoefficient;
-        private PropertyBlender frictionBlender = DefaultRollingFrictionBlender;
+        private float kineticBrakingFrictionCoefficient;
+        private WheelFrictionBlender frictionBlender = DefaultRollingFrictionBlender;
         private bool isBraking;
         private float rollingFrictionCoefficient;
         internal SolverSettings solverSettings = new SolverSettings();
@@ -74,7 +74,7 @@ namespace BEPUphysics.Vehicle
         /// <param name="rollingFrictionCoefficient">Coefficient of friction of the wheel for rolling friction when the brake isn't active.</param>
         public WheelBrake(float dynamicBrakingFrictionCoefficient, float staticBrakingFrictionCoefficient, float rollingFrictionCoefficient)
         {
-            DynamicBrakingFrictionCoefficient = dynamicBrakingFrictionCoefficient;
+            KineticBrakingFrictionCoefficient = dynamicBrakingFrictionCoefficient;
             StaticBrakingFrictionCoefficient = staticBrakingFrictionCoefficient;
             RollingFrictionCoefficient = rollingFrictionCoefficient;
         }
@@ -100,10 +100,10 @@ namespace BEPUphysics.Vehicle
         /// This coefficient is used instead of the rollingFrictionCoefficient when 
         /// isBraking is true.
         /// </summary>
-        public float DynamicBrakingFrictionCoefficient
+        public float KineticBrakingFrictionCoefficient
         {
-            get { return dynamicBrakingFrictionCoefficient; }
-            set { dynamicBrakingFrictionCoefficient = MathHelper.Max(value, 0); }
+            get { return kineticBrakingFrictionCoefficient; }
+            set { kineticBrakingFrictionCoefficient = MathHelper.Max(value, 0); }
         }
 
         /// <summary>
@@ -117,7 +117,7 @@ namespace BEPUphysics.Vehicle
         /// <summary>
         /// Gets or sets the function used to blend the supporting entity's friction and the wheel's friction.
         /// </summary>
-        public PropertyBlender FrictionBlender
+        public WheelFrictionBlender FrictionBlender
         {
             get { return frictionBlender; }
             set { frictionBlender = value; }
@@ -283,9 +283,9 @@ namespace BEPUphysics.Vehicle
             //Which coefficient? Check velocity.
             if (isBraking)
                 if (Math.Abs(RelativeVelocity) < staticFrictionVelocityThreshold)
-                    blendedCoefficient = frictionBlender(staticBrakingFrictionCoefficient, wheel.supportMaterial.staticFriction, null);
+                    blendedCoefficient = frictionBlender(staticBrakingFrictionCoefficient, wheel.supportMaterial.staticFriction, false, wheel);
                 else
-                    blendedCoefficient = frictionBlender(dynamicBrakingFrictionCoefficient, wheel.supportMaterial.kineticFriction, null);
+                    blendedCoefficient = frictionBlender(kineticBrakingFrictionCoefficient, wheel.supportMaterial.kineticFriction, true, wheel);
             else
                 blendedCoefficient = rollingFrictionCoefficient;
 

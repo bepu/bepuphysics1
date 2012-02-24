@@ -16,23 +16,24 @@ namespace BEPUphysics.Vehicle
         /// <summary>
         /// Default blender used by WheelSlidingFriction constraints.
         /// </summary>
-        public static PropertyBlender DefaultSlidingFrictionBlender;
+        public static WheelFrictionBlender DefaultSlidingFrictionBlender;
 
         static WheelSlidingFriction()
         {
-            DefaultSlidingFrictionBlender = new PropertyBlender(BlendFriction);
+            DefaultSlidingFrictionBlender = BlendFriction;
         }
 
         /// <summary>
-        /// Computes the friction to use between the vehicle and support for a wheel.
+        /// Function which takes the friction values from a wheel and a supporting material and computes the blended friction.
         /// </summary>
-        /// <param name="wheelFriction">Friction coefficient of the wheel.</param>
-        /// <param name="supportFriction">Friction coefficient of the supporting entity.</param>
-        /// <param name="extraInfo">Any extra information to be considered.</param>
+        /// <param name="wheelFriction">Friction coefficient associated with the wheel.</param>
+        /// <param name="materialFriction">Friction coefficient associated with the support material.</param>
+        /// <param name="usingKineticFriction">True if the friction coefficients passed into the blender are kinetic coefficients, false otherwise.</param>
+        /// <param name="wheel">Wheel being blended.</param>
         /// <returns>Blended friction coefficient.</returns>
-        public static float BlendFriction(float wheelFriction, float supportFriction, object extraInfo)
+        public static float BlendFriction(float wheelFriction, float materialFriction, bool usingKinematicFriction, Wheel wheel)
         {
-            return (wheelFriction + supportFriction) / 2;
+            return wheelFriction * materialFriction;
         }
 
         #endregion
@@ -45,8 +46,8 @@ namespace BEPUphysics.Vehicle
         internal bool isActive = true;
         private float linearAX, linearAY, linearAZ;
         private float blendedCoefficient;
-        private float dynamicCoefficient;
-        private PropertyBlender frictionBlender = DefaultSlidingFrictionBlender;
+        private float kineticCoefficient;
+        private WheelFrictionBlender frictionBlender = DefaultSlidingFrictionBlender;
         internal Vector3 slidingFrictionAxis;
         internal SolverSettings solverSettings = new SolverSettings();
         private float staticCoefficient;
@@ -65,7 +66,7 @@ namespace BEPUphysics.Vehicle
         /// <param name="staticCoefficient">Coefficient of static sliding friction to be blended with the supporting entity's friction.</param>
         public WheelSlidingFriction(float dynamicCoefficient, float staticCoefficient)
         {
-            DynamicCoefficient = dynamicCoefficient;
+            KineticCoefficient = dynamicCoefficient;
             StaticCoefficient = staticCoefficient;
         }
 
@@ -88,16 +89,16 @@ namespace BEPUphysics.Vehicle
         /// This coefficient and the supporting entity's coefficient of friction will be 
         /// taken into account to determine the used coefficient at any given time.
         /// </summary>
-        public float DynamicCoefficient
+        public float KineticCoefficient
         {
-            get { return dynamicCoefficient; }
-            set { dynamicCoefficient = MathHelper.Max(value, 0); }
+            get { return kineticCoefficient; }
+            set { kineticCoefficient = MathHelper.Max(value, 0); }
         }
 
         /// <summary>
         /// Gets or sets the function used to blend the supporting entity's friction and the wheel's friction.
         /// </summary>
-        public PropertyBlender FrictionBlender
+        public WheelFrictionBlender FrictionBlender
         {
             get { return frictionBlender; }
             set { frictionBlender = value; }
@@ -286,9 +287,9 @@ namespace BEPUphysics.Vehicle
             //Compute friction.
             //Which coefficient? Check velocity.
             if (Math.Abs(RelativeVelocity) < staticFrictionVelocityThreshold)
-                blendedCoefficient = frictionBlender(staticCoefficient, wheel.supportMaterial.staticFriction, null);
+                blendedCoefficient = frictionBlender(staticCoefficient, wheel.supportMaterial.staticFriction, false, wheel);
             else
-                blendedCoefficient = frictionBlender(dynamicCoefficient, wheel.supportMaterial.kineticFriction, null);
+                blendedCoefficient = frictionBlender(kineticCoefficient, wheel.supportMaterial.kineticFriction, true, wheel);
 
 
 

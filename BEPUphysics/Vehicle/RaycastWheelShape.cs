@@ -92,18 +92,20 @@ namespace BEPUphysics.Vehicle
         /// <param name="location">Contact point between the wheel and the support.</param>
         /// <param name="normal">Contact normal between the wheel and the support.</param>
         /// <param name="suspensionLength">Length of the suspension at the contact.</param>
+        /// <param name="supportingCollidable">Collidable supporting the wheel, if any.</param>
         /// <param name="entity">Supporting object.</param>
         /// <param name="material">Material of the wheel.</param>
         /// <returns>Whether or not any support was found.</returns>
-        protected internal override bool FindSupport(out Vector3 location, out Vector3 normal, out float suspensionLength, out Entity entity, out Material material)
+        protected internal override bool FindSupport(out Vector3 location, out Vector3 normal, out float suspensionLength, out Collidable supportingCollidable, out Entity entity, out Material material)
         {
             suspensionLength = float.MaxValue;
             location = Toolbox.NoVector;
+            supportingCollidable = null;
             entity = null;
             normal = Toolbox.NoVector;
             material = null;
 
-            Collidable testCollider;
+            Collidable testCollidable;
             RayHit rayHit;
 
             bool hit = false;
@@ -111,25 +113,25 @@ namespace BEPUphysics.Vehicle
             for (int i = 0; i < detector.CollisionInformation.pairs.Count; i++)
             {
                 NarrowPhasePair pair = detector.CollisionInformation.pairs[i];
-                testCollider = (pair.BroadPhaseOverlap.entryA == detector.CollisionInformation ? pair.BroadPhaseOverlap.entryB : pair.BroadPhaseOverlap.entryA) as Collidable;
-                if (testCollider != null)
+                testCollidable = (pair.BroadPhaseOverlap.entryA == detector.CollisionInformation ? pair.BroadPhaseOverlap.entryB : pair.BroadPhaseOverlap.entryA) as Collidable;
+                if (testCollidable != null)
                 {
-                    if (CollisionRules.CollisionRuleCalculator(CollisionRules, testCollider.collisionRules) == CollisionRule.Normal &&
-                        testCollider.RayCast(new Ray(wheel.suspension.worldAttachmentPoint, wheel.suspension.worldDirection), wheel.suspension.restLength,
-                                             out rayHit) &&
+                    if (CollisionRules.CollisionRuleCalculator(CollisionRules, testCollidable.collisionRules) == CollisionRule.Normal &&
+                        testCollidable.RayCast(new Ray(wheel.suspension.worldAttachmentPoint, wheel.suspension.worldDirection), wheel.suspension.restLength, out rayHit) &&
                         rayHit.T < suspensionLength)
                     {
                         suspensionLength = rayHit.T;
-                        EntityCollidable entityCollisionInfo;
-                        if ((entityCollisionInfo = testCollider as EntityCollidable) != null)
+                        EntityCollidable entityCollidable;
+                        if ((entityCollidable = testCollidable as EntityCollidable) != null)
                         {
-                            entity = entityCollisionInfo.Entity;
-                            material = entityCollisionInfo.Entity.Material;
+                            entity = entityCollidable.Entity;
+                            material = entityCollidable.Entity.Material;
                         }
                         else
                         {
                             entity = null;
-                            var materialOwner = testCollider as IMaterialOwner;
+                            supportingCollidable = testCollidable;
+                            var materialOwner = testCollidable as IMaterialOwner;
                             if (materialOwner != null)
                                 material = materialOwner.Material;
                         }

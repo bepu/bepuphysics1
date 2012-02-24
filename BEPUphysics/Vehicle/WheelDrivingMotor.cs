@@ -15,23 +15,24 @@ namespace BEPUphysics.Vehicle
         /// <summary>
         /// Default blender used by WheelSlidingFriction constraints.
         /// </summary>
-        public static PropertyBlender DefaultGripFrictionBlender;
+        public static WheelFrictionBlender DefaultGripFrictionBlender;
 
         static WheelDrivingMotor()
         {
-            DefaultGripFrictionBlender = new PropertyBlender(BlendFriction);
+            DefaultGripFrictionBlender = BlendFriction;
         }
 
         /// <summary>
-        /// Computes the friction to use between the vehicle and support for a wheel.
+        /// Function which takes the friction values from a wheel and a supporting material and computes the blended friction.
         /// </summary>
-        /// <param name="wheelFriction">Friction coefficient of the wheel.</param>
-        /// <param name="supportFriction">Friction coefficient of the supporting entity.</param>
-        /// <param name="extraInfo">Any extra information to be considered.</param>
+        /// <param name="wheelFriction">Friction coefficient associated with the wheel.</param>
+        /// <param name="materialFriction">Friction coefficient associated with the support material.</param>
+        /// <param name="usingKineticFriction">True if the friction coefficients passed into the blender are kinetic coefficients, false otherwise.</param>
+        /// <param name="wheel">Wheel being blended.</param>
         /// <returns>Blended friction coefficient.</returns>
-        public static float BlendFriction(float wheelFriction, float supportFriction, object extraInfo)
+        public static float BlendFriction(float wheelFriction, float materialFriction, bool usingKinematicFriction, Wheel wheel)
         {
-            return (wheelFriction + supportFriction) / 2;
+            return wheelFriction * materialFriction;
         }
 
         #endregion
@@ -46,7 +47,7 @@ namespace BEPUphysics.Vehicle
         private float currentFrictionCoefficient;
         internal Vector3 forceAxis;
         private float gripFriction;
-        private PropertyBlender gripFrictionBlender = DefaultGripFrictionBlender;
+        private WheelFrictionBlender gripFrictionBlender = DefaultGripFrictionBlender;
         private float maxMotorForceDt;
         private float maximumBackwardForce = float.MaxValue;
         private float maximumForwardForce = float.MaxValue;
@@ -109,7 +110,7 @@ namespace BEPUphysics.Vehicle
         /// <summary>
         /// Gets or sets the function used to blend the supporting entity's friction and the wheel's friction.
         /// </summary>
-        public PropertyBlender GripFrictionBlender
+        public WheelFrictionBlender GripFrictionBlender
         {
             get { return gripFrictionBlender; }
             set { gripFrictionBlender = value; }
@@ -298,7 +299,7 @@ namespace BEPUphysics.Vehicle
 
             velocityToImpulse = -1 / (entryA + entryB); //Softness?
 
-            currentFrictionCoefficient = gripFrictionBlender(gripFriction, wheel.supportMaterial.kineticFriction, null);
+            currentFrictionCoefficient = gripFrictionBlender(gripFriction, wheel.supportMaterial.kineticFriction, true, wheel);
 
             //Compute the maximum force
             if (targetSpeed > 0)

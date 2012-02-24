@@ -333,7 +333,6 @@
     <Compile Include="Materials\MaterialManager.cs" />
     <Compile Include="Materials\MaterialPair.cs" />
     <Compile Include="Materials\InteractionProperties.cs" />
-    <Compile Include="Materials\PropertyCombiners.cs" />
     <Compile Include="MathExtensions\Matrix2x2.cs" />
     <Compile Include="MathExtensions\Matrix2x3.cs" />
     <Compile Include="MathExtensions\Matrix3x2.cs" />
@@ -436,6 +435,7 @@
     <Compile Include="Vehicle\Wheel.cs" />
     <Compile Include="Vehicle\WheelBrake.cs" />
     <Compile Include="Vehicle\WheelDrivingMotor.cs" />
+    <Compile Include="Vehicle\WheelFrictionBlender.cs" />
     <Compile Include="Vehicle\WheelShape.cs" />
     <Compile Include="Vehicle\WheelSlidingFriction.cs" />
     <Compile Include="Vehicle\WheelSuspension.cs" />
