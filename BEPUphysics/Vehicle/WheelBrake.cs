@@ -33,11 +33,7 @@ namespace BEPUphysics.Vehicle
         /// <returns>Blended friction coefficient.</returns>
         public static float BlendFriction(float wheelFriction, float materialFriction, bool usingKinematicFriction, Wheel wheel)
         {
-            if (wheel.brake.isBraking)
-            {
-                return wheelFriction * materialFriction;
-            }
-            return wheelFriction;
+            return wheelFriction * materialFriction;
         }
 
         #endregion
@@ -217,7 +213,7 @@ namespace BEPUphysics.Vehicle
         internal float ApplyImpulse()
         {
             //Compute relative velocity and convert to impulse
-            float lambda = RelativeVelocity* velocityToImpulse; 
+            float lambda = RelativeVelocity * velocityToImpulse;
 
 
             //Clamp accumulated impulse
