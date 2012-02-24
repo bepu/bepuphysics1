@@ -1053,8 +1053,7 @@ namespace BEPUphysics.Entities
             for (int i = 0; i < collisionInformation.pairs.count; i++)
             {
                 //Only perform CCD if we're either supposed to test against no solver pairs or if this isn't a no solver pair.
-                if (MotionSettings.UseCCDForNoSolverPairs ||
-                    collisionInformation.pairs.Elements[i].broadPhaseOverlap.collisionRule < CollisionRule.NoSolver)
+                if (MotionSettings.PairAllowsCCD(this, collisionInformation.pairs.Elements[i]))
                     collisionInformation.pairs.Elements[i].UpdateTimeOfImpact(collisionInformation, dt);
             }
         }
