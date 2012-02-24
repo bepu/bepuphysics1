@@ -4,6 +4,7 @@ using BEPUphysics.UpdateableSystems;
 using Microsoft.Xna.Framework;
 using BEPUphysics.MathExtensions;
 using BEPUphysics.Materials;
+using BEPUphysics.Collidables;
 
 namespace BEPUphysics.Vehicle
 {
@@ -30,6 +31,7 @@ namespace BEPUphysics.Vehicle
         internal WheelShape shape;
         internal WheelSlidingFriction slidingFriction;
 
+        internal Collidable supportingCollidable;
         internal Material supportMaterial;
         internal Vector3 supportLocation;
         internal Entity supportingEntity;
@@ -207,11 +209,33 @@ namespace BEPUphysics.Vehicle
         }
 
         /// <summary>
-        /// Gets the entity currently supporting the wheel.
+        /// Gets the entity supporting the wheel, if any.
         /// </summary>
         public Entity SupportingEntity
         {
             get { return supportingEntity; }
+        }
+
+        /// <summary>
+        /// Gets the collidable supporting the wheel, if any.
+        /// </summary>
+        public Collidable SupportingCollidable
+        {
+            get
+            {
+                return supportingCollidable;
+            }
+        }
+
+        /// <summary>
+        /// Gets the material associated with the support, if any.
+        /// </summary>
+        public Material SupportMaterial
+        {
+            get
+            {
+                return supportMaterial;
+            }
         }
 
         /// <summary>
@@ -427,7 +451,7 @@ namespace BEPUphysics.Vehicle
 
         internal void FindSupport()
         {
-            if (!(isSupported = shape.FindSupport(out supportLocation, out normal, out suspension.currentLength, out supportingEntity, out supportMaterial)))
+            if (!(isSupported = shape.FindSupport(out supportLocation, out normal, out suspension.currentLength, out supportingCollidable, out supportingEntity, out supportMaterial)))
                 suspension.currentLength = suspension.restLength;
         }
 

@@ -366,7 +366,7 @@
     <Compile Include="Materials\InteractionProperties.cs" />
     <Compile Include="Collidables\Events\CollisionEventTypes.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\CollidablePairHandler.cs" />
-    <Compile Include="Materials\PropertyCombiners.cs" />
+    <Compile Include="Vehicle\WheelFrictionBlender.cs" />
     <Compile Include="Settings\CollisionDetectionSettings.cs" />
     <Compile Include="SolverSystems\SolverUpdateable.cs" />
     <Compile Include="ISpace.cs" />

@@ -346,7 +346,7 @@ namespace BEPUphysicsDemos.AlternateMovement
                     wheel.Brake.IsBraking = false;
                     wheel.DrivingMotor.MaximumForwardForce = MaximumDriveForce;
                     wheel.DrivingMotor.MaximumBackwardForce = MaximumDriveForce;
-                    wheel.SlidingFriction.DynamicCoefficient = BaseSlidingFriction;
+                    wheel.SlidingFriction.KineticCoefficient = BaseSlidingFriction;
                     wheel.SlidingFriction.StaticCoefficient = BaseSlidingFriction;
                 }
 
@@ -489,7 +489,7 @@ namespace BEPUphysicsDemos.AlternateMovement
             foreach (Wheel wheel in Vehicle.Wheels)
             {
                 wheel.SlidingFriction.StaticCoefficient = BaseSlidingFriction * .8f;
-                wheel.SlidingFriction.DynamicCoefficient = BaseSlidingFriction * .8f;
+                wheel.SlidingFriction.KineticCoefficient = BaseSlidingFriction * .8f;
             }
         }
     }
