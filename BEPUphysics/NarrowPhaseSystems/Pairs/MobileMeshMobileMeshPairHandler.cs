@@ -29,7 +29,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         }
         protected override Entities.Entity EntityB
         {
-            get { return null; }
+            get { return mesh.entity; }
         }
         protected override Materials.Material MaterialB
         {
