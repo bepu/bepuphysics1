@@ -19,6 +19,7 @@ using BEPUphysics.Collidables;
 using Microsoft.Xna.Framework.Input;
 using BEPUphysics.Entities;
 using BEPUphysics.Threading;
+using System.Threading;
 
 namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
 {
@@ -101,7 +102,7 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
         /// If other parts of the program are modifying simulation islands during the IBeforeSolverUpdateable.Update stage, the synchronization
         /// umbrella will need to be widened.
         /// </summary>
-        private static SpinLock ConstraintAccessLocker = new SpinLock();
+        private static BEPUphysics.Threading.SpinLock ConstraintAccessLocker = new BEPUphysics.Threading.SpinLock();
 
         /// <summary>
         /// Gets the support finder used by the character.
@@ -133,10 +134,62 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
             //See the bottom of the Update method for more information about using multithreading with this character.
             IsUpdatedSequentially = false;
 
+            Body.CollisionInformation.Tag = this;
 
 
 
         }
+
+        List<SphereCharacterController> involvedCharacters = new List<SphereCharacterController>();
+        public void LockCharacterPairs()
+        {
+            //If this character is colliding with another character, there's a significant danger of the characters
+            //changing the same collision pair handlers.  Rather than infect every character system with micro-locks,
+            //we lock the entirety of a character update.
+
+            foreach (var pair in Body.CollisionInformation.Pairs)
+            {
+                //Is this a pair with another character?
+                var other = pair.BroadPhaseOverlap.EntryA == Body.CollisionInformation ? pair.BroadPhaseOverlap.EntryB : pair.BroadPhaseOverlap.EntryA;
+                var otherCharacter = other.Tag as SphereCharacterController; //Note that this does NOT check for CharacterControllers.  That means it's not safe to multithread with both SphereCharacterControllers and CharacterControllers active.
+                if (otherCharacter != null)
+                {
+                    involvedCharacters.Add(otherCharacter);
+                }
+            }
+            if (involvedCharacters.Count > 0)
+            {
+                //If there were any other characters, we also need to lock ourselves!
+                involvedCharacters.Add(this);
+            }
+            //If there's no characters, then there won't be any locking to do.
+
+            //However, the characters cannot be locked willy-nilly.  There needs to be some defined order in which pairs are locked to avoid deadlocking.
+            involvedCharacters.Sort((x, y) =>
+            {
+                if (x.Body.InstanceId < y.Body.InstanceId)
+                    return -1;
+                if (x.Body.InstanceId > y.Body.InstanceId)
+                    return 1;
+                return 0;
+            });
+
+            for (int i = 0; i < involvedCharacters.Count; ++i)
+            {
+                Monitor.Enter(involvedCharacters[i]);
+            }
+        }
+
+        public void UnlockCharacterPairs()
+        {
+            //Unlock the pairs, LIFO.
+            for (int i = involvedCharacters.Count - 1; i >= 0; i--)
+            {
+                Monitor.Exit(involvedCharacters[i]);
+            }
+            involvedCharacters.Clear();
+        }
+
 
         void RemoveFriction(EntityCollidable sender, BroadPhaseEntry other, NarrowPhasePair pair)
         {
@@ -196,71 +249,80 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
         SupportData supportData;
 
         void IBeforeSolverUpdateable.Update(float dt)
-        {
-            bool hadTraction = SupportFinder.HasTraction;
-
-            CollectSupportData();
-
-            //Compute the initial velocities relative to the support.
-            Vector3 relativeVelocity;
-            ComputeRelativeVelocity(ref supportData, out relativeVelocity);
-            float verticalVelocity = Vector3.Dot(supportData.Normal, relativeVelocity);
-            Vector3 horizontalVelocity = relativeVelocity - supportData.Normal * verticalVelocity;
-
-
-
-            //Don't attempt to use an object as support if we are flying away from it (and we were never standing on it to begin with).
-            if (SupportFinder.HasTraction && !hadTraction && verticalVelocity < 0)
+        {           
+            //We can't let multiple characters manage the same pairs simultaneously.  Lock it up!
+            LockCharacterPairs();
+            try
             {
-                SupportFinder.ClearSupportData();
-                supportData = new SupportData();
-            }
+                bool hadTraction = SupportFinder.HasTraction;
 
-            //If we can compute that we're separating faster than we can handle, take off.
-            if (SupportFinder.HasTraction && verticalVelocity < -VerticalMotionConstraint.MaximumGlueForce * dt / VerticalMotionConstraint.EffectiveMass)
-            {
-                SupportFinder.ClearSupportData();
-                supportData = new SupportData();
-            }
+                CollectSupportData();
+
+                //Compute the initial velocities relative to the support.
+                Vector3 relativeVelocity;
+                ComputeRelativeVelocity(ref supportData, out relativeVelocity);
+                float verticalVelocity = Vector3.Dot(supportData.Normal, relativeVelocity);
+                Vector3 horizontalVelocity = relativeVelocity - supportData.Normal * verticalVelocity;
 
 
-            //Attempt to jump.
-            if (tryToJump) //Jumping while crouching would be a bit silly.
-            {
-                //In the following, note that the jumping velocity changes are computed such that the separating velocity is specifically achieved,
-                //rather than just adding some speed along an arbitrary direction.  This avoids some cases where the character could otherwise increase
-                //the jump speed, which may not be desired.
-                if (SupportFinder.HasTraction)
+
+                //Don't attempt to use an object as support if we are flying away from it (and we were never standing on it to begin with).
+                if (SupportFinder.HasTraction && !hadTraction && verticalVelocity < 0)
                 {
-                    //The character has traction, so jump straight up.
-                    float currentUpVelocity = Vector3.Dot(Body.OrientationMatrix.Up, relativeVelocity);
-                    //Target velocity is JumpSpeed.
-                    float velocityChange = Math.Max(jumpSpeed - currentUpVelocity, 0);
-                    ApplyJumpVelocity(ref supportData, Body.OrientationMatrix.Up * velocityChange, ref relativeVelocity);
-
-
-                    //Prevent any old contacts from hanging around and coming back with a negative depth.
-                    foreach (var pair in Body.CollisionInformation.Pairs)
-                        pair.ClearContacts();
                     SupportFinder.ClearSupportData();
                     supportData = new SupportData();
                 }
-                else if (SupportFinder.HasSupport)
-                {
-                    //The character does not have traction, so jump along the surface normal instead.
-                    float currentNormalVelocity = Vector3.Dot(supportData.Normal, relativeVelocity);
-                    //Target velocity is JumpSpeed.
-                    float velocityChange = Math.Max(slidingJumpSpeed - currentNormalVelocity, 0);
-                    ApplyJumpVelocity(ref supportData, supportData.Normal * -velocityChange, ref relativeVelocity);
 
-                    //Prevent any old contacts from hanging around and coming back with a negative depth.
-                    foreach (var pair in Body.CollisionInformation.Pairs)
-                        pair.ClearContacts();
+                //If we can compute that we're separating faster than we can handle, take off.
+                if (SupportFinder.HasTraction && verticalVelocity < -VerticalMotionConstraint.MaximumGlueForce * dt / VerticalMotionConstraint.EffectiveMass)
+                {
                     SupportFinder.ClearSupportData();
                     supportData = new SupportData();
                 }
+
+
+                //Attempt to jump.
+                if (tryToJump) //Jumping while crouching would be a bit silly.
+                {
+                    //In the following, note that the jumping velocity changes are computed such that the separating velocity is specifically achieved,
+                    //rather than just adding some speed along an arbitrary direction.  This avoids some cases where the character could otherwise increase
+                    //the jump speed, which may not be desired.
+                    if (SupportFinder.HasTraction)
+                    {
+                        //The character has traction, so jump straight up.
+                        float currentUpVelocity = Vector3.Dot(Body.OrientationMatrix.Up, relativeVelocity);
+                        //Target velocity is JumpSpeed.
+                        float velocityChange = Math.Max(jumpSpeed - currentUpVelocity, 0);
+                        ApplyJumpVelocity(ref supportData, Body.OrientationMatrix.Up * velocityChange, ref relativeVelocity);
+
+
+                        //Prevent any old contacts from hanging around and coming back with a negative depth.
+                        foreach (var pair in Body.CollisionInformation.Pairs)
+                            pair.ClearContacts();
+                        SupportFinder.ClearSupportData();
+                        supportData = new SupportData();
+                    }
+                    else if (SupportFinder.HasSupport)
+                    {
+                        //The character does not have traction, so jump along the surface normal instead.
+                        float currentNormalVelocity = Vector3.Dot(supportData.Normal, relativeVelocity);
+                        //Target velocity is JumpSpeed.
+                        float velocityChange = Math.Max(slidingJumpSpeed - currentNormalVelocity, 0);
+                        ApplyJumpVelocity(ref supportData, supportData.Normal * -velocityChange, ref relativeVelocity);
+
+                        //Prevent any old contacts from hanging around and coming back with a negative depth.
+                        foreach (var pair in Body.CollisionInformation.Pairs)
+                            pair.ClearContacts();
+                        SupportFinder.ClearSupportData();
+                        supportData = new SupportData();
+                    }
+                }
+                tryToJump = false;
             }
-            tryToJump = false;
+            finally
+            {
+                UnlockCharacterPairs();
+            }
 
 
             //if (SupportFinder.HasTraction && SupportFinder.Supports.Count == 0)
@@ -342,11 +404,25 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
             relativeVelocity = Body.LinearVelocity;
             if (SupportFinder.HasSupport)
             {
-                //Only entities has velocity.
+                //Only entities have velocity.
                 var entityCollidable = supportData.SupportObject as EntityCollidable;
                 if (entityCollidable != null)
                 {
-                    Vector3 entityVelocity = Toolbox.GetVelocityOfPoint(supportData.Position, entityCollidable.Entity);
+                    //It's possible for the support's velocity to change due to another character jumping if the support is dynamic.
+                    //Don't let that happen while the character is computing a relative velocity!
+                    Vector3 entityVelocity;
+                    bool locked;
+                    if (locked = entityCollidable.Entity.IsDynamic)
+                        entityCollidable.Entity.Locker.Enter();
+                    try
+                    {
+                        entityVelocity = Toolbox.GetVelocityOfPoint(supportData.Position, entityCollidable.Entity);
+                    }
+                    finally
+                    {
+                        if (locked)
+                            entityCollidable.Entity.Locker.Exit();
+                    }
                     Vector3.Subtract(ref relativeVelocity, ref entityVelocity, out relativeVelocity);
                 }
             }
@@ -361,7 +437,6 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
         /// <param name="relativeVelocity">Relative velocity to update.</param>
         void ApplyJumpVelocity(ref SupportData supportData, Vector3 velocityChange, ref Vector3 relativeVelocity)
         {
-
             Body.LinearVelocity += velocityChange;
             var entityCollidable = supportData.SupportObject as EntityCollidable;
             if (entityCollidable != null)
@@ -369,7 +444,16 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
                 if (entityCollidable.Entity.IsDynamic)
                 {
                     Vector3 change = velocityChange * jumpForceFactor;
-                    entityCollidable.Entity.LinearMomentum += change * -Body.Mass;
+                    //Multiple characters cannot attempt to modify another entity's velocity at the same time.
+                    entityCollidable.Entity.Locker.Enter();
+                    try
+                    {
+                        entityCollidable.Entity.LinearMomentum += change * -Body.Mass;
+                    }
+                    finally
+                    {
+                        entityCollidable.Entity.Locker.Exit();
+                    }
                     velocityChange += change;
                 }
             }

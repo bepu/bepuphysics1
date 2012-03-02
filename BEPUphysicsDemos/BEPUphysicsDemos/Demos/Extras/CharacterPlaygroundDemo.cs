@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using BEPUphysicsDemos.AlternateMovement.Character;
 using Microsoft.Xna.Framework.Input;
 using System;
+using BEPUphysicsDemos.AlternateMovement.SphereCharacter;
 
 namespace BEPUphysicsDemos.Demos.Extras
 {
@@ -25,7 +26,7 @@ namespace BEPUphysicsDemos.Demos.Extras
     /// </summary>
     public class CharacterPlaygroundTestDemo : StandardDemo
     {
-		protected CharacterControllerInput[] characters;
+        protected SphereCharacterControllerInput[] characters;
 		const int characterCount = 400;
 
         /// <summary>
@@ -43,10 +44,10 @@ namespace BEPUphysicsDemos.Demos.Extras
             //Having the character body visible would be a bit distracting.
             character.CharacterController.Body.Tag = "noDisplayObject";
 
-			characters = new CharacterControllerInput[characterCount];
+            characters = new SphereCharacterControllerInput[characterCount];
 			for (int i = 0; i < characterCount; i++)
 			{
-				characters[i] = new CharacterControllerInput(Space, character.Camera);
+                characters[i] = new SphereCharacterControllerInput(Space, character.Camera);
 				characters[i].Activate();
 			}
 

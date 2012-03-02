@@ -162,7 +162,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             {
                 //Is this a pair with another character?
                 var other = pair.BroadPhaseOverlap.EntryA == Body.CollisionInformation ? pair.BroadPhaseOverlap.EntryB : pair.BroadPhaseOverlap.EntryA;
-                var otherCharacter = other.Tag as CharacterController;
+                var otherCharacter = other.Tag as CharacterController; //Note that this does NOT check for SphereCharacterControllers.  That means it's not safe to multithread with both SphereCharacterControllers and CharacterControllers active.
                 if (otherCharacter != null)
                 {
                     involvedCharacters.Add(otherCharacter);
@@ -226,7 +226,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 #if WINDOWS
                 Vector3 offset;
 #else
-            Vector3 offset = new Vector3();
+                Vector3 offset = new Vector3();
 #endif
                 offset.X = radius;
                 offset.Y = StepManager.MaximumStepHeight;
@@ -527,11 +527,25 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             relativeVelocity = Body.LinearVelocity;
             if (SupportFinder.HasSupport)
             {
-                //Only entities has velocity.
+                //Only entities have velocity.
                 var entityCollidable = supportData.SupportObject as EntityCollidable;
                 if (entityCollidable != null)
                 {
-                    Vector3 entityVelocity = Toolbox.GetVelocityOfPoint(supportData.Position, entityCollidable.Entity);
+                    //It's possible for the support's velocity to change due to another character jumping if the support is dynamic.
+                    //Don't let that happen while the character is computing a relative velocity!
+                    Vector3 entityVelocity;
+                    bool locked;
+                    if (locked = entityCollidable.Entity.IsDynamic)
+                        entityCollidable.Entity.Locker.Enter();
+                    try
+                    {
+                        entityVelocity = Toolbox.GetVelocityOfPoint(supportData.Position, entityCollidable.Entity);
+                    }
+                    finally
+                    {
+                        if (locked)
+                            entityCollidable.Entity.Locker.Exit();
+                    }
                     Vector3.Subtract(ref relativeVelocity, ref entityVelocity, out relativeVelocity);
                 }
             }
@@ -546,7 +560,6 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         /// <param name="relativeVelocity">Relative velocity to update.</param>
         void ApplyJumpVelocity(ref SupportData supportData, Vector3 velocityChange, ref Vector3 relativeVelocity)
         {
-
             Body.LinearVelocity += velocityChange;
             var entityCollidable = supportData.SupportObject as EntityCollidable;
             if (entityCollidable != null)
@@ -554,7 +567,16 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 if (entityCollidable.Entity.IsDynamic)
                 {
                     Vector3 change = velocityChange * jumpForceFactor;
-                    entityCollidable.Entity.LinearMomentum += change * -Body.Mass;
+                    //Multiple characters cannot attempt to modify another entity's velocity at the same time.
+                    entityCollidable.Entity.Locker.Enter();
+                    try
+                    {
+                        entityCollidable.Entity.LinearMomentum += change * -Body.Mass;
+                    }
+                    finally
+                    {
+                        entityCollidable.Entity.Locker.Exit();
+                    }
                     velocityChange += change;
                 }
             }
