@@ -1575,6 +1575,25 @@ namespace BEPUphysics
         /// Each group of 3 indices represents a triangle on the surface of the hull.</param>
         public static void GetConvexHull(RawList<Vector3> points, RawList<int> indices)
         {
+            ////TESTING:
+            
+            ////Remove all coincident points.
+            //for (int i = points.count - 1; i >= 0 ; --i)
+            //{
+            //    for (int j = 0; j < i; ++j)
+            //    {
+            //        var a = points[i];
+            //        var b = points[j];
+            //        if ((a - b).LengthSquared() < .00001)
+            //        {
+            //            points.RemoveAt(i);
+            //            break;
+            //        }
+            //    }
+            //}
+            
+            ////ENDTESTING
+
             //Points is what will be used as a vertex buffer.
             var outsidePoints = Resources.GetIntList();
             var edges = Resources.GetIntList();

@@ -252,9 +252,9 @@ namespace BEPUphysics.Constraints
 
             int IComparer<Entity>.Compare(Entity x, Entity y)
             {
-                if (x.GetHashCode() > y.GetHashCode())
+                if (x.InstanceId > y.InstanceId)
                     return 1;
-                if (x.GetHashCode() < y.GetHashCode())
+                if (x.InstanceId < y.InstanceId)
                     return -1;
                 return 0;
             }

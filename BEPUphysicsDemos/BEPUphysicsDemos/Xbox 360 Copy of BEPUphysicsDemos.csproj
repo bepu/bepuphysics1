@@ -103,6 +103,7 @@
     <Compile Include="Demos\Extras\AddRemoveStressDemo.cs" />
     <Compile Include="Demos\Extras\BoxBoxTestDemo.cs" />
     <Compile Include="Demos\Extras\BroadPhasesTestDemo.cs" />
+    <Compile Include="Demos\Extras\CharacterPlaygroundDemo.cs" />
     <Compile Include="Demos\Extras\CharacterStressTestDemo.cs" />
     <Compile Include="Demos\Extras\DeterminismTestDemo.cs" />
     <Compile Include="Demos\Extras\GraphicMatchingDemo.cs" />
