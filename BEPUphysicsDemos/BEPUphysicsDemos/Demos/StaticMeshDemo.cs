@@ -12,6 +12,9 @@ using BEPUphysics.Materials;
 using BEPUphysics.Constraints.SingleEntity;
 using Microsoft.Xna.Framework.Input;
 using BEPUphysics.CollisionShapes;
+using BEPUphysics.CollisionRuleManagement;
+using System.Collections.Generic;
+using BEPUphysics;
 
 namespace BEPUphysicsDemos.Demos
 {
@@ -84,27 +87,70 @@ namespace BEPUphysicsDemos.Demos
             cylinder.LocalInertiaTensorInverse = new Matrix3X3();
             //Space.Add(cylinder);
 
-            int numColumns = 4;
-            int numRows = 4;
-            int numHigh = 1;
-            float separation = 8;
+            int numColumns = 3;
+            int numRows = 3;
+            int numHigh = 3;
+            float separation = 1f;
 
-            var ball = game.Content.Load<Model>("360 thick Sphere");
-            TriangleMesh.GetVerticesAndIndicesFromModel(ball, out staticTriangleVertices, out staticTriangleIndices);
+            staticTriangleVertices = new Vector3[] 
+            {
+                new Vector3(-1, -1, -1),
+                new Vector3(-1, -1, 1),
+                new Vector3(1, -1, -1),
+                new Vector3(1, -1, 1),
+                new Vector3(-1, 1, -1),
+                new Vector3(-1, 1, 1),
+                new Vector3(1, 1, -1),
+                new Vector3(1, 1, 1),
+                new Vector3(0, 1, 0),
+                new Vector3(0, 1, 0),
+                new Vector3(0, 1, 0),
+                new Vector3(0, 1, 0),
+                new Vector3(0, 1, 0),
+                new Vector3(0, 1, 0),
+                new Vector3(0, 1, 0),
+            };
 
-            MobileMesh toAdd;
+            List<Vector3> verts = new List<Vector3>();
+            for (int q = 0; q < 3; q++)
+                for (int i = 0; i < numRows; i++)
+                    for (int j = 0; j < numColumns; j++)
+                        for (int k = 0; k < numHigh; k++)
+                        {
+
+                            verts.Add(new Vector3(
+                                (separation * i - numRows * separation / 2),
+                                30f + k * separation,
+                                separation * j - numColumns * separation / 2));
+
+                        }
+            staticTriangleVertices = verts.ToArray();
+
+            var indices = new List<int>();
+            Toolbox.GetConvexHull(staticTriangleVertices, indices);
+
+
+            numColumns = 1;
+            numRows = 1;
+            numHigh = 1;
+            separation = 3;
+
+            //var ball = game.Content.Load<Model>("Ball");
+            //TriangleMesh.GetVerticesAndIndicesFromModel(ball, out staticTriangleVertices, out staticTriangleIndices);
+            ConvexHullShape cvh = new ConvexHullShape(staticTriangleVertices);
+            var c = new Entity(cvh, 10);
+            Entity toAdd;
             for (int i = 0; i < numRows; i++)
                 for (int j = 0; j < numColumns; j++)
                     for (int k = 0; k < numHigh; k++)
                     {
-                        toAdd = new MobileMesh(staticTriangleVertices, staticTriangleIndices,
-                        new AffineTransform(new Vector3(0.01f, 0.01f, 0.01f),
-                         Quaternion.Identity,
-                         new Vector3(
-                            (separation * i - numRows * separation / 2) - 200,
+
+                        toAdd = new Entity(cvh, 10.0f, c.LocalInertiaTensor, c.Volume);
+                        toAdd.Position = new Vector3(
+                            (separation * i - numRows * separation / 2),
                             30f + k * separation,
-                            separation * j - numColumns * separation / 2)),
-                         MobileMeshSolidity.Counterclockwise, 10);
+                            separation * j - numColumns * separation / 2);
+
                         Space.Add(toAdd);
                     }
 
@@ -113,6 +159,7 @@ namespace BEPUphysicsDemos.Demos
 
 
         }
+
 
         public override void Update(float dt)
         {

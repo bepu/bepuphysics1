@@ -12,7 +12,7 @@ namespace BEPUphysicsDrawer.Models
     public class DisplayEntity : ModelDisplayObject<Entity>
     {
         /// <summary>
-        /// Constructs a new 
+        /// Constructs a new display entity.
         /// </summary>
         /// <param name="drawer">Drawer to use.</param>
         /// <param name="entity">Entity to draw.</param>
@@ -23,7 +23,7 @@ namespace BEPUphysicsDrawer.Models
 
         public override int GetTriangleCountEstimate()
         {
-            return 100;
+            return 50000;
         }
 
 

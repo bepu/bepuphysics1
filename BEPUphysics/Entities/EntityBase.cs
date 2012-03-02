@@ -499,6 +499,8 @@ namespace BEPUphysics.Entities
 
         protected Entity()
         {
+            InitializeId();
+
             BufferedStates = new EntityBufferedStates(this);
 
             material = new Material();
@@ -508,6 +510,7 @@ namespace BEPUphysics.Entities
             shapeChangedDelegate = OnShapeChanged;
 
             activityInformation = new SimulationIslandMember(this);
+
 
         }
 
@@ -1217,6 +1220,20 @@ namespace BEPUphysics.Entities
                 return base.ToString() + ", " + Tag;
         }
 
+
+        static long idCounter;
+        void InitializeId()
+        {
+            InstanceId = System.Threading.Interlocked.Increment(ref idCounter);
+            hashCode = (int)((((ulong)InstanceId) * 4294967311UL) % 4294967296UL);
+        }
+        
+        public long InstanceId { get; set; }
+        int hashCode;
+        public override int GetHashCode()
+        {
+            return hashCode;
+        }
 
     }
 }
