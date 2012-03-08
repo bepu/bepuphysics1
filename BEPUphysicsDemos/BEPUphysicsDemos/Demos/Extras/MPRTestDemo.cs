@@ -293,7 +293,7 @@ namespace BEPUphysicsDemos.Demos.Extras
 
 
             var indices = new List<int>();
-            Toolbox.GetConvexHull(vertices, indices);
+            ConvexHullHelper.GetConvexHull(vertices, indices);
             #endregion
 
             minkowskiLines.Clear();

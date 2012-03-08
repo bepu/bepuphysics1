@@ -25,7 +25,7 @@ namespace BEPUphysicsDrawer.Models
 
             var hullTriangleVertices = new List<Vector3>();
             var hullTriangleIndices = new List<int>();
-            Toolbox.GetConvexHull(convexHullShape.Vertices, hullTriangleIndices, hullTriangleVertices);
+            ConvexHullHelper.GetConvexHull(convexHullShape.Vertices, hullTriangleIndices, hullTriangleVertices);
             //The hull triangle vertices are used as a dummy to get the unnecessary hull vertices, which are cleared afterwards.
             hullTriangleVertices.Clear();
             foreach (int i in hullTriangleIndices)

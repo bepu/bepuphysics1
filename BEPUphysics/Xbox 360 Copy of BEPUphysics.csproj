@@ -194,6 +194,8 @@
     <Compile Include="Constraints\TwoEntity\Motors\MotorSettings.cs" />
     <Compile Include="Constraints\TwoEntity\Motors\RevoluteMotor.cs" />
     <Compile Include="Constraints\TwoEntity\Motors\TwistMotor.cs" />
+    <Compile Include="ConvexHullHelper.cs" />
+    <Compile Include="ConvexHullHelper.Pruning.cs" />
     <Compile Include="DataStructures\BoundingBoxTree.cs" />
     <Compile Include="DataStructures\MeshBoundingBoxTree.cs" />
     <Compile Include="DataStructures\ReadOnlyList.cs" />
