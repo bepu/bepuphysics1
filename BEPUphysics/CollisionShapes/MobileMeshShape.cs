@@ -418,13 +418,6 @@ namespace BEPUphysics.CollisionShapes
 
         void ComputeShapeInformation(TransformableMeshData data, out ShapeDistributionInformation shapeInformation)
         {
-            var indices = Resources.GetIntList();
-            surfaceVertices.Clear();
-            ConvexHullHelper.GetConvexHull(data.vertices, indices, surfaceVertices);
-            for (int i = 0; i < surfaceVertices.count; i++)
-            {
-                AffineTransform.Transform(ref surfaceVertices.Elements[i], ref data.worldTransform, out surfaceVertices.Elements[i]);
-            }
             shapeInformation.Center = new Vector3();
 
             if (solidity == MobileMeshSolidity.Solid)
