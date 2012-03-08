@@ -151,6 +151,8 @@
     <Compile Include="Constraints\TwoEntity\Joints\RevoluteAngularJoint.cs" />
     <Compile Include="Constraints\TwoEntity\Joints\SwivelHingeAngularJoint.cs" />
     <Compile Include="Constraints\TwoEntity\Joints\TwistJoint.cs" />
+    <Compile Include="ConvexHullHelper.cs" />
+    <Compile Include="ConvexHullHelper.Pruning.cs" />
     <Compile Include="DataStructures\BoundingBoxTree.cs" />
     <Compile Include="DataStructures\MeshBoundingBoxTree.cs" />
     <Compile Include="DataStructures\MeshBoundingBoxTreeData.cs" />

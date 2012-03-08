@@ -420,7 +420,7 @@ namespace BEPUphysics.CollisionShapes
         {
             var indices = Resources.GetIntList();
             surfaceVertices.Clear();
-            Toolbox.GetConvexHull(data.vertices, indices, surfaceVertices);
+            ConvexHullHelper.GetConvexHull(data.vertices, indices, surfaceVertices);
             for (int i = 0; i < surfaceVertices.count; i++)
             {
                 AffineTransform.Transform(ref surfaceVertices.Elements[i], ref data.worldTransform, out surfaceVertices.Elements[i]);

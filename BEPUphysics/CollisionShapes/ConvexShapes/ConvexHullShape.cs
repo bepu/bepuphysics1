@@ -318,7 +318,8 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             }
             centroid /= vertices.Count;
 
-            Toolbox.GetConvexHull(vertices, outputSurfaceTriangles, outputLocalSurfaceVertices);
+            //Toolbox.GetConvexHull(vertices, outputSurfaceTriangles, outputLocalSurfaceVertices);
+            ConvexHullHelper.GetConvexHull(vertices, outputSurfaceTriangles, outputLocalSurfaceVertices);
 
             volume = 0;
             var volumes = Resources.GetFloatList();
