@@ -1,0 +1,51 @@
+﻿using BEPUphysics.Entities;
+using Microsoft.Xna.Framework;
+using BEPUphysics.MathExtensions;
+using Microsoft.Xna.Framework.Graphics;
+using System.Collections.Generic;
+
+namespace BEPUphysicsDrawer.Models
+{
+    /// <summary>
+    /// Superclass of display objects that follow entities.
+    /// </summary>
+    public class DisplayEntity : ModelDisplayObject<Entity>
+    {
+        /// <summary>
+        /// Constructs a new display entity.
+        /// </summary>
+        /// <param name="drawer">Drawer to use.</param>
+        /// <param name="entity">Entity to draw.</param>
+        public DisplayEntity(ModelDrawer drawer, Entity entity)
+            : base(drawer, entity)
+        {
+        }
+
+        public override int GetTriangleCountEstimate()
+        {
+            return 50000;
+        }
+
+
+        public override void GetMeshData(List<VertexPositionNormalTexture> vertices, List<ushort> indices)
+        {
+            ModelDrawer.ShapeMeshGetters[DisplayedObject.CollisionInformation.GetType()](DisplayedObject.CollisionInformation, vertices, indices);
+        }
+
+
+        public override void Update()
+        {
+            //The reason for this complexity is that we're drawing the shape's location directly and interpolated buffers might be active.
+            //That means we can't rely solely on the collidable's world transform or the entity's world transform alone;
+            //we must rebuild it from the entity's world transform and the collidable's local position.
+            //TODO: This is awfully annoying.  Could use some built-in convenience methods to ease the usage.
+            Vector3 translation = Matrix3X3.Transform(DisplayedObject.CollisionInformation.LocalPosition, DisplayedObject.BufferedStates.InterpolatedStates.OrientationMatrix);
+            translation += DisplayedObject.BufferedStates.InterpolatedStates.Position;
+            Matrix worldTransform = Matrix3X3.ToMatrix4X4(DisplayedObject.BufferedStates.InterpolatedStates.OrientationMatrix);
+            worldTransform.Translation = translation;
+
+            WorldTransform = worldTransform;
+
+        }
+    }
+}
