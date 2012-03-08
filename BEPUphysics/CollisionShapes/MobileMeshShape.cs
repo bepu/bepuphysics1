@@ -418,6 +418,49 @@ namespace BEPUphysics.CollisionShapes
 
         void ComputeShapeInformation(TransformableMeshData data, out ShapeDistributionInformation shapeInformation)
         {
+            //Compute the surface vertices of the shape.
+            surfaceVertices.Clear();
+            try
+            {
+                ConvexHullHelper.GetConvexHull(data.vertices, surfaceVertices);
+                for (int i = 0; i < surfaceVertices.count; i++)
+                {
+                    AffineTransform.Transform(ref surfaceVertices.Elements[i], ref data.worldTransform, out surfaceVertices.Elements[i]);
+                }
+            }
+            catch
+            {
+                surfaceVertices.Clear();
+                //If the convex hull failed, then the point set has no volume.  A mobile mesh is allowed to have zero volume, however.
+                //In this case, compute the bounding box of all points.
+                BoundingBox box = new BoundingBox();
+                for (int i = 0; i < data.vertices.Length; i++)
+                {
+                    Vector3 v;
+                    data.GetVertexPosition(i, out v);
+                    if (v.X > box.Max.X)
+                        box.Max.X = v.X;
+                    if (v.X < box.Min.X)
+                        box.Min.X = v.X;
+                    if (v.Y > box.Max.Y)
+                        box.Max.Y = v.Y;
+                    if (v.Y < box.Min.Y)
+                        box.Min.Y = v.Y;
+                    if (v.Z > box.Max.Z)
+                        box.Max.Z = v.Z;
+                    if (v.Z < box.Min.Z)
+                        box.Min.Z = v.Z;
+                }
+                //Add the corners.  This will overestimate the size of the surface a bit.
+                surfaceVertices.Add(box.Min);
+                surfaceVertices.Add(box.Max);
+                surfaceVertices.Add(new Vector3(box.Min.X, box.Min.Y, box.Max.Z));
+                surfaceVertices.Add(new Vector3(box.Min.X, box.Max.Y, box.Min.Z));
+                surfaceVertices.Add(new Vector3(box.Max.X, box.Min.Y, box.Min.Z));
+                surfaceVertices.Add(new Vector3(box.Min.X, box.Max.Y, box.Max.Z));
+                surfaceVertices.Add(new Vector3(box.Max.X, box.Max.Y, box.Min.Z));
+                surfaceVertices.Add(new Vector3(box.Max.X, box.Min.Y, box.Max.Z));
+            }
             shapeInformation.Center = new Vector3();
 
             if (solidity == MobileMeshSolidity.Solid)

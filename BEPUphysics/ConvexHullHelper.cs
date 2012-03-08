@@ -52,7 +52,7 @@ namespace BEPUphysics
         /// </summary>
         /// <param name="points">List of points in the set.</param>
         /// <param name="outputSurfacePoints">Unique points on the surface of the convex hull.</param>
-        public static void GetConvexHull(RawList<Vector3> points, RawList<Vector3> outputSurfacePoints)
+        public static void GetConvexHull(RawList<Vector3> points, IList<Vector3> outputSurfacePoints)
         {
             var indices = Resources.GetIntList();
             GetConvexHull(points, indices, outputSurfacePoints);
