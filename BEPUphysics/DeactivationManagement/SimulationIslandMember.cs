@@ -112,14 +112,14 @@ namespace BEPUphysics.DeactivationManagement
                     else if (velocityTimeBelowLimit < 0)
                         velocityTimeBelowLimit = 0;
 
-                    //If it's not dynamic, then deactivation candidacy is based entirely on whether or not the object has velocity.
-                    if (velocity == 0)
+                    //If it's not dynamic, then deactivation candidacy is based entirely on whether or not the object has velocity (and the IsAlwaysActive state).
+                    if (velocity == 0 && !IsAlwaysActive)
                     {
                         IsDeactivationCandidate = true;
                     }
                     else
                     {
-                        //Alright, so it's moving.
+                        //Alright, so it's moving (or forced active).
                         IsDeactivationCandidate = false;
                         //There's a single oddity we need to worry about in this case.
                         //An active kinematic object has no simulation island.  Without intervention,
@@ -150,9 +150,8 @@ namespace BEPUphysics.DeactivationManagement
                                 connectedMembers.Elements[j].simulationIslandChangeLocker.Exit();
                             }
                         }
-
-
                     }
+
                 }
             }
             previousVelocity = velocity;
@@ -242,7 +241,7 @@ namespace BEPUphysics.DeactivationManagement
                     //Kinematic objects use the time as a flag- if it's greater than zero,
                     //then the entity's been awake for at least a frame and go to sleep.
                     //If it is zero, though, then the kinematic needs to be considered awake.
-                    return previousVelocity > 0 || velocityTimeBelowLimit <= 0;
+                    return previousVelocity > 0 || velocityTimeBelowLimit <= 0 || IsAlwaysActive;
                 }
             }
 

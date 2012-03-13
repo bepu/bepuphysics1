@@ -1221,14 +1221,27 @@ namespace BEPUphysics.Entities
         }
 
 
+#if WINDOWS_PHONE
+        static int idCounter;
+        /// <summary>
+        /// Gets the entity's unique instance id.
+        /// </summary>
+        public int InstanceId { get; private set; }
+#else
         static long idCounter;
+        /// <summary>
+        /// Gets the entity's unique instance id.
+        /// </summary>
+        public long InstanceId { get; private set; }
+#endif
         void InitializeId()
         {
             InstanceId = System.Threading.Interlocked.Increment(ref idCounter);
+
             hashCode = (int)((((ulong)InstanceId) * 4294967311UL) % 4294967296UL);
         }
-        
-        public long InstanceId { get; set; }
+
+
         int hashCode;
         public override int GetHashCode()
         {
