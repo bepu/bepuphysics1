@@ -101,26 +101,29 @@ namespace BEPUphysics.DeactivationManagement
                 }
                 else
                 {
-                    //Update the flagging system.
-                    //If time <= 0, the entity is considered active.
-                    //Forcing a kinematic active needs to allow the system to run for a whole frame.
-                    //This means that in here, if it is < 0, we set it to zero.  It will still update for the rest of the frame.
-                    //Then, next frame, when its == 0, set it to 1.  It will be considered inactive unless it was activated manually again.
-
-                    if (velocityTimeBelowLimit == 0)
-                        velocityTimeBelowLimit = 1;
-                    else if (velocityTimeBelowLimit < 0)
-                        velocityTimeBelowLimit = 0;
-
                     //If it's not dynamic, then deactivation candidacy is based entirely on whether or not the object has velocity (and the IsAlwaysActive state).
-                    if (velocity == 0 && !IsAlwaysActive)
+                    IsDeactivationCandidate = velocity == 0 && !IsAlwaysActive;
+
+                    if (IsDeactivationCandidate)
                     {
-                        IsDeactivationCandidate = true;
+                        //Update the flagging system.
+                        //If time <= 0, the entity is considered active.
+                        //Forcing a kinematic active needs to allow the system to run for a whole frame.
+                        //This means that in here, if it is < 0, we set it to zero.  It will still update for the rest of the frame.
+                        //Then, next frame, when its == 0, set it to 1.  It will be considered inactive unless it was activated manually again.
+                        if (velocityTimeBelowLimit == 0)
+                            velocityTimeBelowLimit = 1;
+                        else if (velocityTimeBelowLimit < 0)
+                            velocityTimeBelowLimit = 0;
                     }
                     else
                     {
-                        //Alright, so it's moving (or forced active).
-                        IsDeactivationCandidate = false;
+                        //If velocity is not zero, then the flag is set to 'this is active.'
+                        velocityTimeBelowLimit = -1;
+                    }
+                    
+                    if (velocityTimeBelowLimit <= 0)
+                    {
                         //There's a single oddity we need to worry about in this case.
                         //An active kinematic object has no simulation island.  Without intervention,
                         //an active kinematic object will not keep an island awake.
@@ -237,11 +240,14 @@ namespace BEPUphysics.DeactivationManagement
                     //then this member has either not been added to a deactivation manager,
                     //or it is a kinematic entity.
                     //In either case, using the previous velocity is a reasonable approach.
+                    //This previous velocity is represented here by a flagging system that uses the velocityTimeBelowLimit.
 
-                    //Kinematic objects use the time as a flag- if it's greater than zero,
-                    //then the entity's been awake for at least a frame and go to sleep.
-                    //If it is zero, though, then the kinematic needs to be considered awake.
-                    return previousVelocity > 0 || velocityTimeBelowLimit <= 0 || IsAlwaysActive;
+                    //-A kinematic entity with a velocityTimeBelowLimit of -1 was found to be active during the last deactivation candidacy analysis due to its velocity,
+                    //or it was recently activated, or IsAlwaysActive is set to true.
+                    //-A kinematic entity with a velocityTimeBelowLimit of 0 did not have its activity refreshed during the deactivation candidacy, 
+                    //but we still consider it active so that a full frame can complete.
+                    //-A kinematic entity with a velocityTimeBelowLimit of 1 did not have its activity refreshed in the last two frames so we can consider it inactive.
+                    return velocityTimeBelowLimit <= 0;
                 }
             }
 
@@ -274,10 +280,23 @@ namespace BEPUphysics.DeactivationManagement
 
         }
 
+        bool isAlwaysActive;
         /// <summary>
         /// Gets or sets whether or not this member is always active.
         /// </summary>
-        public bool IsAlwaysActive { get; set; }
+        public bool IsAlwaysActive
+        {
+            get
+            {
+                return isAlwaysActive;
+            }
+            set
+            {
+                isAlwaysActive = value;
+                if (isAlwaysActive)
+                    Activate();
+            }
+        }
 
 
 
