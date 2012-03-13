@@ -261,13 +261,15 @@ namespace BEPUphysics
 
         private static void GetExtremePoints(ref Vector3 direction, RawList<Vector3> points, out float maximumDot, out float minimumDot, out int maximumIndex, out int minimumIndex)
         {
-            maximumDot = -float.MaxValue;
-            minimumDot = float.MaxValue;
             maximumIndex = 0;
             minimumIndex = 0;
-            for (int i = 0; i < points.count; ++i)
+
+            float dot;
+            Vector3.Dot(ref points.Elements[0], ref direction, out dot);
+            minimumDot = dot;
+            maximumDot = dot;
+            for (int i = 1; i < points.count; ++i)
             {
-                float dot;
                 Vector3.Dot(ref points.Elements[i], ref direction, out dot);
                 if (dot > maximumDot)
                 {
