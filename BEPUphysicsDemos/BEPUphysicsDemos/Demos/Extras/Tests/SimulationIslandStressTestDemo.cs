@@ -12,7 +12,7 @@ using System.Diagnostics;
 using BEPUphysics.BroadPhaseSystems.SortAndSweep;
 using BEPUphysics.NarrowPhaseSystems;
 
-namespace BEPUphysicsDemos.Demos.Extras
+namespace BEPUphysicsDemos.Demos.Extras.Tests
 {
     /// <summary>
     /// Spheres fall onto a large terrain.  Try driving around on it!

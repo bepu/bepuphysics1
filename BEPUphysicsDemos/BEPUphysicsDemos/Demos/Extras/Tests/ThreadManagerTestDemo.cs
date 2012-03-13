@@ -29,7 +29,7 @@
 //using System.Threading;
 //using BEPUphysics.Threading;
 
-//namespace BEPUphysicsDemos.Demos.Extras
+//namespace BEPUphysicsDemos.Demos.Extras.Tests
 //{
 //    /// <summary>
 //    /// Demo showing a wall of blocks stacked up.

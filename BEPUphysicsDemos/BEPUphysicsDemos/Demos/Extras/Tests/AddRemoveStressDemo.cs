@@ -6,7 +6,7 @@ using BEPUphysics.CollisionShapes.ConvexShapes;
 using System.Collections.Generic;
 using BEPUphysics.NarrowPhaseSystems;
 
-namespace BEPUphysicsDemos.Demos.Extras
+namespace BEPUphysicsDemos.Demos.Extras.Tests
 {
     /// <summary>
     /// Demo showing a wall of blocks stacked up.

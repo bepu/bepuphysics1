@@ -4,7 +4,7 @@ using BEPUphysics.Entities.Prefabs;
 using Microsoft.Xna.Framework;
 using System.Diagnostics;
 
-namespace BEPUphysicsDemos.Demos.Extras
+namespace BEPUphysicsDemos.Demos.Extras.Tests
 {
     /// <summary>
     /// Demo designed to focus on box-box collision detection.

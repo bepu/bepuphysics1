@@ -29,7 +29,7 @@ using BEPUphysics.BroadPhaseSystems.Hierarchies;
 using BEPUphysics.BroadPhaseSystems.SortAndSweep;
 //using BEPUphysics.BroadPhaseSystems.Hierarchies.Testing.Old;
 
-namespace BEPUphysicsDemos.Demos.Extras
+namespace BEPUphysicsDemos.Demos.Extras.Tests
 {
     /// <summary>
     /// Benchmarks and verifies various broad phases against each other.
