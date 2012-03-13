@@ -22,6 +22,15 @@ namespace BEPUphysics.BroadPhaseSystems
         }
 
         /// <summary>
+        /// Gets the broad phase to which this broad phase entry belongs.
+        /// </summary>
+        public BroadPhase BroadPhase
+        {
+            get;
+            internal set;
+        }
+
+        /// <summary>
         /// Gets the object's hash code.
         /// </summary>
         /// <returns>Hash code for the object.</returns>

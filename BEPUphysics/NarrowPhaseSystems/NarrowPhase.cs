@@ -233,10 +233,27 @@ namespace BEPUphysics.NarrowPhaseSystems
             for (int i = narrowPhasePairs.count - 1; i >= 0; i--)
             {
                 var pair = narrowPhasePairs.Elements[i];
-                if (pair.NeedsUpdate &&
-                    //Overlap will not be refreshed if entries are inactive, but shouldn't remove narrow phase pair.
-                    (pair.BroadPhaseOverlap.entryA.IsActive || pair.BroadPhaseOverlap.entryB.IsActive))
+
+                //A stale overlap is a pair which has not been updated, but not because of inactivity.
+                
+                //Pairs between two inactive shapes are not updated because the broad phase does not output overlaps
+                //between inactive entries.  We need to keep such pairs around, otherwise when they wake up, lots of extra work
+                //will be needed and quality will suffer.
+
+                //The classic stale overlap is two objects which have moved apart.  Because the bounding boxes no longer overlap,
+                //the broad phase does not generate an overlap for them.  Obviously, we should get rid of such a pair.  
+                //Any such pair will have at least one active member.  Having velocity requires activity and teleportation will activate the object.
+
+                //There's another sneaky kind of stale overlap.  Consider a sleeping dynamic object on a Terrain.  The Terrain, being a static object,
+                //is considered inactive.  The sleeping dynamic object is also inactive.  Now, remove the sleeping dynamic object.
+                //Both objects are still considered inactive.  But the pair is clearly stale- one of its members doesn't even exist anymore!
+                //This has nasty side effects, like retaining memory.  To solve this, also check to see if either member does not belong to the simulation.
+
+                if (pair.NeedsUpdate && //If we didn't receive an update in the previous narrow phase run and...
+                    (pair.broadPhaseOverlap.entryA.IsActive || pair.broadPhaseOverlap.entryB.IsActive || //one of us is active or..
+                    pair.broadPhaseOverlap.entryA.BroadPhase == null || pair.broadPhaseOverlap.entryB.BroadPhase == null)) //one of us doesn't exist anymore...
                 {
+                    //Get rid of the pair!
                     narrowPhasePairs.FastRemoveAt(i);
                     OnRemovePair(pair);
                 }
