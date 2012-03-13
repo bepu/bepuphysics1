@@ -15,6 +15,7 @@ namespace BEPUphysics.BroadPhaseSystems.SortAndSweep.Testing
 
         public override void Add(BroadPhaseEntry entry)
         {
+            base.Add(entry);
             //binary search for the approximately correct location.  This helps prevent large first-frame sort times.
             //X Axis:
             int minIndex = 0; //inclusive
@@ -65,6 +66,7 @@ namespace BEPUphysics.BroadPhaseSystems.SortAndSweep.Testing
 
         public override void Remove(BroadPhaseEntry entry)
         {
+            base.Remove(entry);
             entriesX.Remove(entry);
             entriesY.Remove(entry);
             entriesZ.Remove(entry);
