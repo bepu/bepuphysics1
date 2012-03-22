@@ -182,23 +182,11 @@ namespace BEPUphysics.NarrowPhaseSystems
         {
             ThreadManager.ForLoop(0, broadPhaseOverlaps.Count, updateBroadPhaseOverlapDelegate);
 
-            //Remove stale objects.
-            //TODO: This could benefit from a custom data structure (a tiny amount).
-            //TODO: This could possibly be done with a computation spreading approach.
-            //Problem: Consider a collision pair that has contacts one frame, and in the next, no longer even has a broad phase overlap.
-            //It will receive no update, and the collision pair will still have a contact in it.
-            //Collision solver will operate on permanently out of date information.
-            //One possible solution requires that the user of the narrow phase object checks its age, and if it's out of date, ignore it.
-            //In a subsequent frame, the system will get rid of it.  This has an advantage of lowering the (somewhat tiny) per frame cost of removal management.
-            //Additionally, in highly chaotic situations where collisions are constantly being created/destroyed, spreading out the computations
-            //smooths the work out a bit.
+            //Flush away every change accumulated since the last flush.
+            FlushGeneratedSolverUpdateables();
 
-
-            //TODO:
-            //Flush here?
-            //Maybe, but not *only* here.
-            //Character controller can fiddle with things in a later stage.
-
+            //By the time we get here, there's no more pending items in the queue, so the overlaps
+            //can be removed directly by the stale loop.
             RemoveStaleOverlaps();
 
             AddNewNarrowPhaseObjects();
@@ -213,6 +201,8 @@ namespace BEPUphysics.NarrowPhaseSystems
                 UpdateBroadPhaseOverlap(i);
             }
 
+
+
             //Flush away every change accumulated since the last flush.
             FlushGeneratedSolverUpdateables();
 
@@ -220,9 +210,8 @@ namespace BEPUphysics.NarrowPhaseSystems
             //can be removed directly by the stale loop.
             RemoveStaleOverlaps();
 
+
             AddNewNarrowPhaseObjects();
-
-
         }
 
 
