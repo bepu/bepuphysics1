@@ -207,18 +207,17 @@ namespace BEPUphysics.NarrowPhaseSystems
 
         protected override void UpdateSingleThreaded()
         {
-
             int count = broadPhaseOverlaps.Count;
             for (int i = 0; i < count; i++)
             {
                 UpdateBroadPhaseOverlap(i);
             }
 
-            //TODO:
-            //Flush here?
-            //Maybe, but not *only* here.
-            //Character controller can fiddle with things in a later stage.
+            //Flush away every change accumulated since the last flush.
+            FlushGeneratedSolverUpdateables();
 
+            //By the time we get here, there's no more pending items in the queue, so the overlaps
+            //can be removed directly by the stale loop.
             RemoveStaleOverlaps();
 
             AddNewNarrowPhaseObjects();
@@ -229,13 +228,16 @@ namespace BEPUphysics.NarrowPhaseSystems
 
         void RemoveStaleOverlaps()
         {
+            //We don't need to do any synchronization or queueing here; just remove everything directly.
+            ApplySolverUpdateableChangesDirectly = true;
+
             //Remove stale objects.
             for (int i = narrowPhasePairs.count - 1; i >= 0; i--)
             {
                 var pair = narrowPhasePairs.Elements[i];
 
                 //A stale overlap is a pair which has not been updated, but not because of inactivity.
-                
+
                 //Pairs between two inactive shapes are not updated because the broad phase does not output overlaps
                 //between inactive entries.  We need to keep such pairs around, otherwise when they wake up, lots of extra work
                 //will be needed and quality will suffer.
@@ -254,14 +256,24 @@ namespace BEPUphysics.NarrowPhaseSystems
                     pair.broadPhaseOverlap.entryA.BroadPhase == null || pair.broadPhaseOverlap.entryB.BroadPhase == null)) //one of us doesn't exist anymore...
                 {
                     //Get rid of the pair!
+                    if (RemovingPair != null)
+                        RemovingPair(pair);
                     narrowPhasePairs.FastRemoveAt(i);
-                    OnRemovePair(pair);
+                    overlapMapping.Remove(pair.BroadPhaseOverlap);
+                    //The clean up will issue an order to get rid of the solver updateable if it is active.
+                    //To avoid a situation where the solver updateable outlives the pair but is available for re-use
+                    //because of the factory giveback here, the updateable is removed directly (ApplySolverUpdateableChangesDirectly = true).
+                    pair.CleanUp();
+                    pair.Factory.GiveBack(pair);
+
+
                 }
                 else
                     pair.NeedsUpdate = true;
 
             }
 
+            ApplySolverUpdateableChangesDirectly = false;
 
 
         }
@@ -298,14 +310,7 @@ namespace BEPUphysics.NarrowPhaseSystems
             if (CreatingPair != null)
                 CreatingPair(pair);
         }
-        protected void OnRemovePair(NarrowPhasePair pair)
-        {
-            overlapMapping.Remove(pair.BroadPhaseOverlap);
-            pair.CleanUp();
-            pair.Factory.GiveBack(pair);
-            if (RemovingPair != null)
-                RemovingPair(pair);
-        }
+
         ///<summary>
         /// Fires when the narrow phase creates a pair.
         ///</summary>
@@ -316,13 +321,27 @@ namespace BEPUphysics.NarrowPhaseSystems
         public event Action<NarrowPhasePair> RemovingPair;
 
         ConcurrentDeque<SolverUpdateableChange> solverUpdateableChanges = new ConcurrentDeque<SolverUpdateableChange>();
+
+        /// <summary>
+        /// If true, solver updateables added and removed from narrow phase pairs will be added directly to the solver
+        /// without any synchronization or queueing.
+        /// </summary>
+        bool ApplySolverUpdateableChangesDirectly { get; set; }
+
         ///<summary>
         /// Enqueues a solver updateable created by some pair for flushing into the solver later.
         ///</summary>
         ///<param name="addedItem">Updateable to add.</param>
         public void NotifyUpdateableAdded(SolverUpdateable addedItem)
         {
-            solverUpdateableChanges.Enqueue(new SolverUpdateableChange(true, addedItem));
+            if (ApplySolverUpdateableChangesDirectly)
+            {
+                Solver.Add(addedItem);
+            }
+            else
+            {
+                solverUpdateableChanges.Enqueue(new SolverUpdateableChange(true, addedItem));
+            }
         }
         ///<summary>
         /// Enqueues a solver updateable removed by some pair for flushing into the solver later.
@@ -330,7 +349,14 @@ namespace BEPUphysics.NarrowPhaseSystems
         ///<param name="removedItem">Solver updateable to remove.</param>
         public void NotifyUpdateableRemoved(SolverUpdateable removedItem)
         {
-            solverUpdateableChanges.Enqueue(new SolverUpdateableChange(false, removedItem));
+            if (ApplySolverUpdateableChangesDirectly)
+            {
+                Solver.Remove(removedItem);
+            }
+            else
+            {
+                solverUpdateableChanges.Enqueue(new SolverUpdateableChange(false, removedItem));
+            }
         }
 
 
@@ -363,7 +389,6 @@ namespace BEPUphysics.NarrowPhaseSystems
             }
 
         }
-
 
 
 

@@ -481,6 +481,7 @@ namespace BEPUphysics
 
         void DoTimeStep()
         {
+
             SpaceObjectBuffer.Update();
             EntityStateWriteBuffer.Update();
             DeactivationManager.Update();
@@ -491,7 +492,6 @@ namespace BEPUphysics
             BeforeNarrowPhaseUpdateables.Update();
             NarrowPhase.Update();
             BeforeSolverUpdateables.Update();
-            NarrowPhase.FlushGeneratedSolverUpdateables();
             Solver.Update();
             BeforePositionUpdateUpdateables.Update();
             PositionUpdater.Update();

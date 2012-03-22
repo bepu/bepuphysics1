@@ -150,11 +150,11 @@ namespace BEPUphysics.Constraints
             {
                 entitiesChanged = true;
             }
-            
+
             if (entitiesChanged)
             {
                 //Probably need to wake things up given that such a significant change was made.
-                
+
                 for (int i = 0; i < involvedEntities.count; i++)
                 {
                     Entity e = involvedEntities.Elements[i];
@@ -218,9 +218,12 @@ namespace BEPUphysics.Constraints
 
         void UpdateConnectedMembers()
         {
+
             //Since we're about to change this updateable's connections, make sure the 
             //simulation islands hear about it.  This is NOT thread safe.
             var deactivationManager = simulationIslandConnection.DeactivationManager;
+
+
             if (deactivationManager != null)
             {
                 simulationIslandConnection.Owner = null; //Orphan the simulation island connection.
@@ -228,6 +231,7 @@ namespace BEPUphysics.Constraints
             }
             else if (!simulationIslandConnection.SlatedForRemoval) //If it's not already going to be cleaned up, then we need to do it here.
                 Resources.GiveBack(simulationIslandConnection); //Well, since we're going to orphan the connection, we'll need to take care of its trash.
+
 
             //The SimulationIslandConnection is immutable.
             //So create a new one!
@@ -239,9 +243,11 @@ namespace BEPUphysics.Constraints
             }
             simulationIslandConnection.Owner = this;
 
+
             //Add the new reference back.
             if (deactivationManager != null)
                 deactivationManager.Add(simulationIslandConnection);
+
         }
 
 

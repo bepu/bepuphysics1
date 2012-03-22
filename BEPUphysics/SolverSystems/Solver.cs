@@ -5,6 +5,8 @@ using BEPUphysics.DeactivationManagement;
 using BEPUphysics.Threading;
 using BEPUphysics.Constraints;
 using BEPUphysics.DataStructures;
+using System.Diagnostics;
+using BEPUphysics.NarrowPhaseSystems;
 
 namespace BEPUphysics.SolverSystems
 {
@@ -104,8 +106,10 @@ namespace BEPUphysics.SolverSystems
         ///<exception cref="ArgumentException">Thrown when the item does not belong to the solver.</exception>
         public void Remove(SolverUpdateable item)
         {
+
             if (item.Solver == this)
             {
+
                 item.Solver = null;
                 solverUpdateables.count--;
                 if (item.solverIndex < solverUpdateables.count)
@@ -116,11 +120,15 @@ namespace BEPUphysics.SolverSystems
                     solverUpdateables.Elements[item.solverIndex].solverIndex = item.solverIndex;
                 }
                 solverUpdateables.Elements[solverUpdateables.count] = null;
+
+
                 DeactivationManager.Remove(item.simulationIslandConnection);
                 item.OnRemovalFromSolver(this);
             }
+
             else
                 throw new ArgumentException("Solver updateable doesn't belong to this solver; it can't be removed.", "item");
+
         }
 
 

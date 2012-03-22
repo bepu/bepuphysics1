@@ -96,6 +96,7 @@ namespace BEPUphysics.ResourceManagement
             {
                 return toTake;
             }
+
             return CreateNewResource();
         }
 
