@@ -185,19 +185,27 @@ namespace BEPUphysicsDrawer.Models
         /// Removes an object from the drawer.
         /// </summary>
         /// <param name="objectToRemove">Object to remove.</param>
-        public void Remove(object objectToRemove)
+        /// <returns>Whether or not the object was present.</returns>
+        public bool Remove(object objectToRemove)
         {
-            Remove(displayObjects[objectToRemove]);
-            displayObjects.Remove(objectToRemove);
+            ModelDisplayObjectBase displayObject;
+            if (displayObjects.TryGetValue(objectToRemove, out displayObject))
+            {
+                Remove(displayObject);
+                displayObjects.Remove(objectToRemove);
+                return true;
+            }
+            return false;
         }
 
         /// <summary>
         /// Removes an object from the drawer.
         /// </summary>
         /// <param name="displayObject">Display object to remove.</param>
-        public void Remove(SelfDrawingModelDisplayObject displayObject)
+        /// <returns>Whether or not the object was present.</returns>
+        public bool Remove(SelfDrawingModelDisplayObject displayObject)
         {
-            selfDrawingDisplayObjects.Remove(displayObject);
+            return selfDrawingDisplayObjects.Remove(displayObject);
         }
 
 
