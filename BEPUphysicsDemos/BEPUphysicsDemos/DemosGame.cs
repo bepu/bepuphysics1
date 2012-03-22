@@ -123,7 +123,7 @@ namespace BEPUphysicsDemos
 
             Graphics.PreferredBackBufferWidth = 1280;
             Graphics.PreferredBackBufferHeight = 720;
-            Camera = new Camera(Vector3.Zero, 10, 0, 0, Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, Graphics.PreferredBackBufferWidth / (float)Graphics.PreferredBackBufferHeight, .1f, 10000));
+            Camera = new Camera(this, Vector3.Zero, 10, 0, 0, Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, Graphics.PreferredBackBufferWidth / (float)Graphics.PreferredBackBufferHeight, .1f, 10000));
 
 
             Exiting += DemosGameExiting;
@@ -158,7 +158,7 @@ namespace BEPUphysicsDemos
         /// Manages the switch to a new physics engine simulation.
         /// </summary>
         /// <param name="sim">Index of the simulation to switch to.</param>
-        private void SwitchSimulation(int sim)
+        public void SwitchSimulation(int sim)
         {
             currentSimulationIndex = sim;
 
@@ -176,8 +176,7 @@ namespace BEPUphysicsDemos
 
 #if !WINDOWS
 
-            currentSimulation = (Demo)demoType.GetConstructor(new[] { typeof(DemosGame) })
-                                                    .Invoke(new object[] { this });
+            currentSimulation = (Demo)demoType.GetConstructor(new[] { typeof(DemosGame) }).Invoke(new object[] { this });
 
 #else
             currentSimulation = (Demo)Activator.CreateInstance(demoType, new object[] { this });
@@ -264,7 +263,8 @@ namespace BEPUphysicsDemos
             MouseInput = Mouse.GetState();
 
             //Keep the mouse within the screen
-            Mouse.SetPosition(200, 200);
+            if (!IsMouseVisible)
+                Mouse.SetPosition(200, 200);
 #endif
             PreviousGamePadInput = GamePadInput;
             for (int i = 0; i < 4; i++)
@@ -277,6 +277,10 @@ namespace BEPUphysicsDemos
             // Allows the default game to exit on Xbox 360 and Windows
             if (KeyboardInput.IsKeyDown(Keys.Escape) || GamePadInput.Buttons.Back == ButtonState.Pressed)
                 Exit();
+
+            //Toggle mouse control.  The camera will look to the IsMouseVisible to determine if it should turn.
+            if (WasKeyPressed(Keys.Tab))
+                IsMouseVisible = !IsMouseVisible;
 
             #region Camera
 

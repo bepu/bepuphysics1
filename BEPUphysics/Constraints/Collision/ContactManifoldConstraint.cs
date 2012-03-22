@@ -111,6 +111,7 @@ namespace BEPUphysics.Constraints.Collision
         {
             entityA = null;
             entityB = null;
+
             OnInvolvedEntitiesChanged();
         }
 

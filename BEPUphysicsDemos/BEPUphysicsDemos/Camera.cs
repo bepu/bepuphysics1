@@ -15,6 +15,15 @@ namespace BEPUphysicsDemos
     public class Camera
     {
         /// <summary>
+        /// Gets the game associated with the camera.
+        /// </summary>
+        public DemosGame Game
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
         /// Gets or sets the position of the camera.
         /// </summary>
         public Vector3 Position { get; set; }
@@ -130,18 +139,19 @@ namespace BEPUphysicsDemos
         /// <summary>
         /// Creates a camera.
         /// </summary>
-        /// <param name="pos">Initial position of the camera.</param>
-        /// <param name="s">Speed of the camera per second.</param>
-        /// <param name="p">Initial pitch angle of the camera.</param>
-        /// <param name="y">Initial yaw value of the camera.</param>
-        /// <param name="projMatrix">Projection matrix used.</param>
-        public Camera(Vector3 pos, float s, float p, float y, Matrix projMatrix)
+        /// <param name="position">Initial position of the camera.</param>
+        /// <param name="speed">Speed of the camera per second.</param>
+        /// <param name="pitch">Initial pitch angle of the camera.</param>
+        /// <param name="yaw">Initial yaw value of the camera.</param>
+        /// <param name="projectionMatrix">Projection matrix used.</param>
+        public Camera(DemosGame game, Vector3 position, float speed, float pitch, float yaw, Matrix projectionMatrix)
         {
-            Position = pos;
-            Speed = s;
-            Yaw = y;
-            Pitch = p;
-            ProjectionMatrix = projMatrix;
+            this.Game = game;
+            Position = position;
+            Speed = speed;
+            Yaw = yaw;
+            Pitch = pitch;
+            ProjectionMatrix = projectionMatrix;
 
             rayCastFilter = RayCastFilter;
         }
@@ -197,8 +207,12 @@ namespace BEPUphysicsDemos
 #else
         public void Update(float dt, KeyboardState keyboardInput, MouseState mouseInput, GamePadState gamePadInput)
         {
-            Yaw += (200 - mouseInput.X) * dt * .12f;
-            Pitch += (200 - mouseInput.Y) * dt * .12f;
+            //Only turn if the mouse is controlled by the game.
+            if (!Game.IsMouseVisible)
+            {
+                Yaw += (200 - mouseInput.X) * dt * .12f;
+                Pitch += (200 - mouseInput.Y) * dt * .12f;
+            }
 #endif
 
             WorldMatrix = Matrix.CreateFromAxisAngle(Vector3.Right, Pitch) * Matrix.CreateFromAxisAngle(Vector3.Up, Yaw);

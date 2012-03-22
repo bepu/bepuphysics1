@@ -318,6 +318,7 @@ namespace BEPUphysics.DeactivationManagement
                 }
 
             }
+
         }
 
 
@@ -449,7 +450,9 @@ namespace BEPUphysics.DeactivationManagement
                 connection.SlatedForRemoval = true;
                 //Don't immediately do the removal.
                 //Defer them!
+
                 splitAttempts.Enqueue(connection);
+
                 //connection.RemoveReferencesFromConnectedMembers();
                 //for (int i = 0; i < connection.members.count; i++)
                 //{

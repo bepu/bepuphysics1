@@ -57,5 +57,6 @@ namespace BEPUphysics.ResourceManagement
         /// Removes all elements from the pool.
         /// </summary>
         public abstract void Clear();
+
     }
 }

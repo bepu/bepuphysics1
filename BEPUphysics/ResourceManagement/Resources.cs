@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.DataStructures;
 using BEPUphysics.DeactivationManagement;
+using System.Diagnostics;
 
 namespace BEPUphysics.ResourceManagement
 {
@@ -139,16 +140,16 @@ namespace BEPUphysics.ResourceManagement
         //        }
 
         //#else
-        static ResourcePool<RawList<RayHit>> SubPoolRayHitList;// = new LockingResourcePool<RawList<RayHit>>();
-        static ResourcePool<RawList<RayCastResult>> SubPoolRayCastResultList;// = new LockingResourcePool<RawList<RayCastResult>>();
-        static ResourcePool<RawList<BroadPhaseEntry>> SubPoolCollisionEntryList;// = new LockingResourcePool<RawList<BroadPhaseEntry>>();
-        static ResourcePool<RawList<int>> SubPoolIntList;// = new LockingResourcePool<List<int>>();
+        static ResourcePool<RawList<RayHit>> SubPoolRayHitList;
+        static ResourcePool<RawList<RayCastResult>> SubPoolRayCastResultList;
+        static ResourcePool<RawList<BroadPhaseEntry>> SubPoolCollisionEntryList;
+        static ResourcePool<RawList<int>> SubPoolIntList;
         static ResourcePool<HashSet<int>> SubPoolIntSet;
-        static ResourcePool<RawList<float>> SubPoolFloatList;// = new LockingResourcePool<List<float>>();
-        static ResourcePool<RawList<Vector3>> SubPoolVectorList;// = new LockingResourcePool<List<Vector3>>();;
-        static ResourcePool<RawList<Entity>> SubPoolEntityRawList;//= new LockingResourcePool<RawList<Entity>>(16);
-        static ResourcePool<TriangleShape> SubPoolTriangleShape;// = new LockingResourcePool<TriangleShape>();
-        static ResourcePool<RawList<CompoundChild>> SubPoolCompoundChildList;//= new LockingResourcePool<RawList<CompoundChild>>();
+        static ResourcePool<RawList<float>> SubPoolFloatList;
+        static ResourcePool<RawList<Vector3>> SubPoolVectorList;
+        static ResourcePool<RawList<Entity>> SubPoolEntityRawList;
+        static ResourcePool<TriangleShape> SubPoolTriangleShape;
+        static ResourcePool<RawList<CompoundChild>> SubPoolCompoundChildList;
         static ResourcePool<TriangleCollidable> SubPoolTriangleCollidables;
         static ResourcePool<RawList<BEPUphysics.CollisionTests.Manifolds.TriangleMeshConvexContactManifold.TriangleIndices>> SubPoolTriangleIndicesList;
         static ResourcePool<SimulationIslandConnection> SimulationIslandConnections;
@@ -416,7 +417,7 @@ namespace BEPUphysics.ResourceManagement
             triangleIndices.Clear();
             SubPoolTriangleIndicesList.GiveBack(triangleIndices);
         }
-        
+
         /// <summary>
         /// Retrieves a simulation island connection from the resource pool.
         /// </summary>
@@ -424,6 +425,7 @@ namespace BEPUphysics.ResourceManagement
         public static SimulationIslandConnection GetSimulationIslandConnection()
         {
             return SimulationIslandConnections.Take();
+
         }
 
         /// <summary>
@@ -434,6 +436,7 @@ namespace BEPUphysics.ResourceManagement
         {
             connection.CleanUp();
             SimulationIslandConnections.GiveBack(connection);
+
         }
     }
 }
