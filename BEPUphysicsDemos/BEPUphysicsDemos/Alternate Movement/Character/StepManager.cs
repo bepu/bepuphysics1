@@ -51,13 +51,13 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         {
             get
             {
-                return maximumStepHeight;
+                return minimumDownStepHeight;
             }
             set
             {
-                if (maximumStepHeight < 0)
+                if (minimumDownStepHeight < 0)
                     throw new Exception("Value must be nonnegative.");
-                maximumStepHeight = value;
+                minimumDownStepHeight = value;
             }
         }
         float minimumUpStepHeight;

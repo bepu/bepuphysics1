@@ -1127,7 +1127,7 @@ namespace BEPUphysics.Entities
         float linearDamping = .03f;
         ///<summary>
         /// Gets or sets the angular damping of the entity.
-        /// Values range from 0 to 1, correspondong to a fraction of angular momentum removed
+        /// Values range from 0 to 1, corresponding to a fraction of angular momentum removed
         /// from the entity over a unit of time.
         ///</summary>
         public float AngularDamping
