@@ -227,6 +227,15 @@ namespace BEPUphysics.Constraints.SingleEntity
                                             separationDistance * errorReduction;
 
                     Vector3.Multiply(ref error, correctionSpeed / separationDistance, out biasVelocity);
+                    //Ensure that the corrective velocity doesn't exceed the max.
+                    float length = biasVelocity.LengthSquared();
+                    if (length > settings.servo.maxCorrectiveVelocitySquared)
+                    {
+                        float multiplier = settings.servo.maxCorrectiveVelocity / (float)Math.Sqrt(length);
+                        biasVelocity.X *= multiplier;
+                        biasVelocity.Y *= multiplier;
+                        biasVelocity.Z *= multiplier;
+                    }
                 }
                 else
                 {
