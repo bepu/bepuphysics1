@@ -78,7 +78,8 @@ namespace BEPUphysics.Threading
         /// <summary>
         /// Adds a new worker thread to the engine.
         /// </summary>
-        /// <param name="initialization">Function that the new thread will call before entering its work loop.</param>
+        /// <param name="initialization">Function that each of the new threads will call before entering its work loop.  Note that this type of thread manager spawns two worker threads for each given thread;
+        /// the initializer will run twice.</param>
         /// <param name="initializationInformation">Data to give the initializer.</param>
         public void AddThread(Action<object> initialization, object initializationInformation)
         {
