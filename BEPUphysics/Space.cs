@@ -193,21 +193,24 @@ namespace BEPUphysics
             get { return BufferedStates.Entities; }
         }
 
+        ///<summary>
+        /// Constructs a new space for things to live in.
+        /// Uses the SpecializedThreadManager.
+        ///</summary>
+        public Space()
+            : this(new SpecializedThreadManager())
+        {
+        }
 
         ///<summary>
         /// Constructs a new space for things to live in.
         ///</summary>
-        public Space()
+        ///<param name="threadManager">Thread manager to use with the space.</param>
+        public Space(IThreadManager threadManager)
         {
-            NarrowPhaseHelper.CollisionManagers = NarrowPhaseHelper.CollisionManagers; //Forces the NarrowPhaseHelper to run the static constructor.  Better to do it now instead of mid-simulation.
-
             timeStepSettings = new TimeStepSettings();
 
-#if !WINDOWS
-            threadManager = new SpecializedThreadManager();
-#else
-            threadManager = new SpecializedThreadManager();
-#endif
+            this.threadManager = threadManager;
 
             SpaceObjectBuffer = new SpaceObjectBuffer(this);
             EntityStateWriteBuffer = new EntityStateWriteBuffer();
