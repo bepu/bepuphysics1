@@ -25,7 +25,7 @@ namespace BEPUphysics.Entities.Prefabs
         /// Constructs a physically simulated box.
         /// </summary>
         /// <param name="pos">Position of the box.</param>
-        /// <param name="width">Height of the box.</param>
+        /// <param name="width">Width of the box.</param>
         /// <param name="length">Length of the box.</param>
         /// <param name="height">Height of the box.</param>
         /// <param name="mass">Mass of the object.</param>
@@ -39,7 +39,7 @@ namespace BEPUphysics.Entities.Prefabs
         /// Constructs a nondynamic box.
         /// </summary>
         /// <param name="pos">Position of the box.</param>
-        /// <param name="width">Height of the box.</param>
+        /// <param name="width">Width of the box.</param>
         /// <param name="length">Length of the box.</param>
         /// <param name="height">Height of the box.</param>
         public Box(Vector3 pos, float width, float height, float length)
@@ -68,7 +68,7 @@ namespace BEPUphysics.Entities.Prefabs
         /// Constructs a nondynamic box.
         /// </summary>
         /// <param name="motionState">Motion state specifying the entity's initial state.</param>
-        /// <param name="width">Height of the box.</param>
+        /// <param name="width">Width of the box.</param>
         /// <param name="length">Length of the box.</param>
         /// <param name="height">Height of the box.</param>
         public Box(MotionState motionState, float width, float height, float length)

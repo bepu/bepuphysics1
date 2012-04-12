@@ -70,7 +70,7 @@ namespace BEPUphysics.Constraints.SolverGroups
                 }
             }
             Limit.Basis.SetWorldAxes(freeAxis, baseAxis, connectionA.orientationMatrix);
-            Motor.Basis.SetWorldAxes(freeAxis, baseAxis, Vector3.Cross(freeAxis, baseAxis), connectionA.orientationMatrix);
+            Motor.Basis.SetWorldAxes(freeAxis, baseAxis, connectionA.orientationMatrix);
 
             baseAxis = connectionB.position - anchor;
             baseAxis -= Vector3.Dot(baseAxis, freeAxis) * freeAxis;

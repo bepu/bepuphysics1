@@ -231,7 +231,7 @@ namespace BEPUphysics.Constraints
         internal Vector3 localPrimaryAxis = Vector3.Backward;
         internal Vector3 localXAxis = Vector3.Right;
         internal Vector3 primaryAxis = Vector3.Backward;
-        internal Matrix3X3 rotationMatrix;
+        internal Matrix3X3 rotationMatrix = Matrix3X3.Identity;
         internal Vector3 xAxis = Vector3.Right;
 
         /// <summary>

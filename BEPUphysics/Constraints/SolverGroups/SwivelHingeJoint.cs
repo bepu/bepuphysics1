@@ -75,7 +75,7 @@ namespace BEPUphysics.Constraints.SolverGroups
                 }
             }
             HingeLimit.Basis.SetWorldAxes(hingeAxis, baseAxis, connectionA.orientationMatrix);
-            HingeMotor.Basis.SetWorldAxes(hingeAxis, baseAxis, Vector3.Cross(hingeAxis, baseAxis), connectionA.orientationMatrix);
+            HingeMotor.Basis.SetWorldAxes(hingeAxis, baseAxis, connectionA.orientationMatrix);
 
             baseAxis = connectionB.position - anchor;
             baseAxis -= Vector3.Dot(baseAxis, hingeAxis) * hingeAxis;

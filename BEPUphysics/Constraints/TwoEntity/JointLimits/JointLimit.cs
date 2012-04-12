@@ -45,9 +45,10 @@ namespace BEPUphysics.Constraints.TwoEntity.JointLimits
         }
 
         /// <summary>
-        /// Gets whether or not the limit is currently working.
+        /// Gets whether or not the limit is currently exceeded.  While violated, the constraint will apply impulses in an attempt to stop further violation and to correct any current error.
+        /// This is true whenever the limit is touched.
         /// </summary>
-        public bool IsLimitActive
+        public bool IsLimitExceeded
         {
             get { return isLimitActive; }
         }

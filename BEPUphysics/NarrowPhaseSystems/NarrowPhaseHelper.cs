@@ -362,6 +362,10 @@ namespace BEPUphysics.NarrowPhaseSystems
             var pairHandler = GetPairHandler(ref pair);
             pairHandler.SuppressEvents = true;
             pairHandler.UpdateCollision(0);
+            //Technically, contacts with negative depth do not count.
+            //The current implementation of collision detection does not generate
+            //negative depths on the first execution of UpdateCollision, though,
+            //so we don't need to worry about that- yet.
             bool toReturn = pairHandler.ContactCount > 0;
             pairHandler.SuppressEvents = false;
             pairHandler.CleanUp();

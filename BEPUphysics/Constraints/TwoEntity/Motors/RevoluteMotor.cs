@@ -10,7 +10,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
     /// </summary>
     public class RevoluteMotor : Motor, I1DImpulseConstraintWithError, I1DJacobianConstraint
     {
-        private readonly JointBasis3D basis = new JointBasis3D();
+        private readonly JointBasis2D basis = new JointBasis2D();
         private readonly MotorSettings1D settings;
         private float accumulatedImpulse;
         protected float biasVelocity;
@@ -52,10 +52,10 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
 
         /// <summary>
         /// Gets the basis attached to entity A.
-        /// The primary axis represents the motorized axis.
-        /// The x axis and y axis represent a plane against which entity B's attached test axis is project to determine the hinge angle.
+        /// The primary axis represents the limited axis of rotation.  The 'measurement plane' which the test axis is tested against is based on this primary axis.
+        /// The x axis defines the 'base' direction on the measurement plane corresponding to 0 degrees of relative rotation.
         /// </summary>
-        public JointBasis3D Basis
+        public JointBasis2D Basis
         {
             get { return basis; }
         }
@@ -84,7 +84,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
 
         /// <summary>
         /// Gets or sets the axis attached to entity B in world space.
-        /// This axis is projected onto the x and y axes of transformA to determine the hinge angle.
+        /// This axis is projected onto the x and y axes of the Basis attached to entity A to determine the hinge angle.
         /// </summary>
         public Vector3 TestAxis
         {
@@ -183,24 +183,21 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
         /// <summary>
         /// Sets up the joint transforms by automatically creating perpendicular vectors to complete the bases.
         /// </summary>
-        /// <param name="freeAxis">Axis around which rotation is allowed.</param>
-        public void SetupJointTransforms(Vector3 freeAxis)
+        /// <param name="motorizedAxis">Axis around which the motor acts.</param>
+        public void SetupJointTransforms(Vector3 motorizedAxis)
         {
             //Compute a vector which is perpendicular to the axis.  It'll be added in local space to both connections.
             Vector3 xAxis;
-            Vector3.Cross(ref freeAxis, ref Toolbox.UpVector, out xAxis);
+            Vector3.Cross(ref motorizedAxis, ref Toolbox.UpVector, out xAxis);
             float length = xAxis.LengthSquared();
             if (length < Toolbox.Epsilon)
             {
-                Vector3.Cross(ref freeAxis, ref Toolbox.RightVector, out xAxis);
+                Vector3.Cross(ref motorizedAxis, ref Toolbox.RightVector, out xAxis);
             }
-
-            Vector3 yAxis;
-            Vector3.Cross(ref freeAxis, ref xAxis, out yAxis);
 
             //Put the axes into the joint transform of A.
             basis.rotationMatrix = connectionA.orientationMatrix;
-            basis.SetWorldAxes(freeAxis, xAxis, yAxis);
+            basis.SetWorldAxes(motorizedAxis, xAxis);
 
 
             //Put the axes into the 'joint transform' of B too.
@@ -254,7 +251,9 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
             if (settings.mode == MotorMode.Servomechanism)
             {
                 float y, x;
-                Vector3.Dot(ref worldTestAxis, ref basis.yAxis, out y);
+                Vector3 yAxis;
+                Vector3.Cross(ref basis.primaryAxis, ref basis.xAxis, out yAxis);
+                Vector3.Dot(ref worldTestAxis, ref yAxis, out y);
                 Vector3.Dot(ref worldTestAxis, ref basis.xAxis, out x);
                 var angle = (float) Math.Atan2(y, x);
 
@@ -342,6 +341,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
 
         private float GetDistanceFromGoal(float angle)
         {
+
             float forwardDistance;
             float goalAngle = MathHelper.WrapAngle(settings.servo.goal);
             if (goalAngle > 0)
