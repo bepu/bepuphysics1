@@ -129,7 +129,7 @@ namespace BEPUphysicsDemos.Demos.Extras
             //The current world test axis is dotted against the two plane axes (Right and Forward here).
             //This gives an x and y value.  These can be plugged into Atan2 just like when
             //you compute an angle on a normal 2d graph.
-            steeringMotor.Basis.SetWorldAxes(Vector3.Up, Vector3.Right, Vector3.Forward);
+            steeringMotor.Basis.SetWorldAxes(Vector3.Up, Vector3.Right);
             steeringMotor.TestAxis = Vector3.Right;
 
 

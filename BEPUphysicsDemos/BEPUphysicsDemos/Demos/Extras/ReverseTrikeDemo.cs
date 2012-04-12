@@ -81,7 +81,7 @@ namespace BEPUphysicsDemos.Demos.Extras
             //The current world test axis is dotted against the two plane axes (Right and Forward here).
             //This gives an x and y value.  These can be plugged into Atan2 just like when
             //you compute an angle on a normal 2d graph.
-            steeringMotor1.Basis.SetWorldAxes(Vector3.Up, Vector3.Right, Vector3.Forward);
+            steeringMotor1.Basis.SetWorldAxes(Vector3.Up, Vector3.Right);
             steeringMotor1.TestAxis = Vector3.Right;
 
 
@@ -115,7 +115,7 @@ namespace BEPUphysicsDemos.Demos.Extras
             steeringMotor2 = new RevoluteMotor(body, wheel, Vector3.Up);
             steeringMotor2.Settings.Mode = MotorMode.Servomechanism;
             //Configure the motor.  See wheel 1 for more description.
-            steeringMotor2.Basis.SetWorldAxes(Vector3.Up, Vector3.Right, Vector3.Forward);
+            steeringMotor2.Basis.SetWorldAxes(Vector3.Up, Vector3.Right);
             steeringMotor2.TestAxis = Vector3.Right;
 
 
