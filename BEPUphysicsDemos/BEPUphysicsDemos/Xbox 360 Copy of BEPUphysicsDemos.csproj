@@ -110,6 +110,7 @@
     <Compile Include="Demos\Extras\Tests\BroadPhasesTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\CharacterStressTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\ConvexHullTestDemo.cs" />
+    <Compile Include="Demos\Extras\Tests\MobileMeshSolidityTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\ParallelSpaceTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\DeterminismTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\KinematicActivityTestDemo.cs" />

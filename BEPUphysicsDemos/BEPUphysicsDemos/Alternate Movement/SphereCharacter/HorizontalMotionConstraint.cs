@@ -234,7 +234,6 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
         bool wasTryingToMove = false;
         bool hadTraction = false;
         Entity previousSupportEntity;
-        float tractionDecelerationTime;
         float timeSinceTransition;
 
         /// <summary>
@@ -245,8 +244,6 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
         {
             this.character = characterController;
             CollectInvolvedEntities();
-            //Compute the time it usually takes for the character to slow down while it has traction.
-            tractionDecelerationTime = speed / (maximumForce * character.Body.InverseMass);
         }
 
 
@@ -464,6 +461,9 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
             //The state is now up to date.  Compute an error and velocity bias, if needed.
             if (!isTryingToMove && supportData.HasTraction && supportEntity != null)
             {
+                //Compute the time it usually takes for the character to slow down while it has traction.
+                var tractionDecelerationTime = speed / (maximumForce * character.Body.InverseMass);
+
                 if (timeSinceTransition >= 0 && timeSinceTransition < tractionDecelerationTime)
                     timeSinceTransition += dt;
                 if (timeSinceTransition >= tractionDecelerationTime)
