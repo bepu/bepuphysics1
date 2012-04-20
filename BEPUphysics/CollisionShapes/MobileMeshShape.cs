@@ -372,12 +372,12 @@ namespace BEPUphysics.CollisionShapes
                         if (hit.T < minimumT)
                         {
                             minimumT = hit.T;
-                            minimum = hits.count - 1;
+                            minimum = hitList[i];
                         }
                         if (hit.T > maximumT)
                         {
                             maximumT = hit.T;
-                            maximum = hits.count - 1;
+                            maximum = hitList[i];
                         }
                     }
                 }

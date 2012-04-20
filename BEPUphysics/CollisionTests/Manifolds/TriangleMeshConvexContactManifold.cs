@@ -655,7 +655,10 @@ namespace BEPUphysics.CollisionTests.Manifolds
             base.CleanUp();
         }
 
-        struct Edge : IEquatable<Edge>
+        /// <summary>
+        /// Edge of a triangle in a mesh in terms of vertex indices.
+        /// </summary>
+        public struct Edge : IEquatable<Edge>
         {
             private int A;
             private int B;
