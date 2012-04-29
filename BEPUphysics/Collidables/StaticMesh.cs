@@ -22,7 +22,7 @@ namespace BEPUphysics.Collidables
     /// StaticMesh; if you want to create many meshes of the same model, consider using the
     /// InstancedMesh.
     /// </remarks>
-    public class StaticMesh : Collidable, ISpaceObject, IMaterialOwner, IDeferredEventCreatorOwner
+    public class StaticMesh : StaticCollidable
     {
 
         TriangleMesh mesh;
@@ -62,12 +62,8 @@ namespace BEPUphysics.Collidables
         public StaticMesh(Vector3[] vertices, int[] indices)
         {
             base.Shape = new StaticMeshShape(vertices, indices);
-            collisionRules.group = CollisionRules.DefaultKinematicCollisionGroup;
             Events = new ContactEventManager<StaticMesh>();
 
-            material = new Material();
-            materialChangedDelegate = OnMaterialChanged;
-            material.MaterialChanged += materialChangedDelegate;
         }
 
         ///<summary>
@@ -79,14 +75,7 @@ namespace BEPUphysics.Collidables
         public StaticMesh(Vector3[] vertices, int[] indices, AffineTransform worldTransform)
         {
             base.Shape = new StaticMeshShape(vertices, indices, worldTransform);
-            collisionRules.group = CollisionRules.DefaultKinematicCollisionGroup;
             Events = new ContactEventManager<StaticMesh>();
-
-
-
-            material = new Material();
-            materialChangedDelegate = OnMaterialChanged;
-            material.MaterialChanged += materialChangedDelegate;
         }
 
         ///<summary>
@@ -162,27 +151,9 @@ namespace BEPUphysics.Collidables
         {
             get { return events; }
         }
-
-        internal Material material;
-        //NOT thread safe due to material change pair update.
-        ///<summary>
-        /// Gets or sets the material used by the mesh.
-        ///</summary>
-        public Material Material
+        protected override IDeferredEventCreator EventCreator
         {
-            get
-            {
-                return material;
-            }
-            set
-            {
-                if (material != null)
-                    material.MaterialChanged -= materialChangedDelegate;
-                material = value;
-                if (material != null)
-                    material.MaterialChanged += materialChangedDelegate;
-                OnMaterialChanged(material);
-            }
+            get { return events; }
         }
 
         protected override void OnShapeChanged(CollisionShape collisionShape)
@@ -200,20 +171,6 @@ namespace BEPUphysics.Collidables
         public override void UpdateBoundingBox()
         {
             boundingBox = mesh.Tree.BoundingBox;
-        }
-
-        Action<Material> materialChangedDelegate;
-        void OnMaterialChanged(Material newMaterial)
-        {
-            for (int i = 0; i < pairs.Count; i++)
-            {
-                pairs[i].UpdateMaterialProperties();
-            }
-        }
-
-        protected internal override bool IsActive
-        {
-            get { return false; }
         }
 
         /// <summary>
@@ -295,41 +252,7 @@ namespace BEPUphysics.Collidables
             return mesh.RayCast(ray, maximumLength, sidedness, out rayHit);
         }
 
-        ISpace space;
-        ISpace ISpaceObject.Space
-        {
-            get
-            {
-                return space;
-            }
-            set
-            {
-                space = value;
-            }
-        }
-        ///<summary>
-        /// Gets the space that owns the mesh.
-        ///</summary>
-        public ISpace Space
-        {
-            get
-            {
-                return space;
-            }
-        }
 
-        void ISpaceObject.OnAdditionToSpace(ISpace newSpace)
-        {
-        }
-
-        void ISpaceObject.OnRemovalFromSpace(ISpace oldSpace)
-        {
-        }
-
-        IDeferredEventCreator IDeferredEventCreatorOwner.EventCreator
-        {
-            get { return Events; }
-        }
 
     }
 }
