@@ -13,9 +13,9 @@ using BEPUphysics.OtherSpaceStages;
 namespace BEPUphysics.Collidables
 {
     ///<summary>
-    /// Heightfield-based, unmovable collidable object.
+    /// Heightfield-based unmovable collidable object.
     ///</summary>
-    public class Terrain : Collidable, ISpaceObject, IMaterialOwner, IDeferredEventCreatorOwner
+    public class Terrain : StaticCollidable
     {
         ///<summary>
         /// Gets the shape of this collidable.
@@ -96,26 +96,9 @@ namespace BEPUphysics.Collidables
             get { return events; }
         }
 
-        internal Material material;
-        //NOT thread safe due to material change pair update.
-        ///<summary>
-        /// Gets or sets the material of the terrain.
-        ///</summary>
-        public Material Material
+        protected override IDeferredEventCreator EventCreator
         {
-            get
-            {
-                return material;
-            }
-            set
-            {
-                if (material != null)
-                    material.MaterialChanged -= materialChangedDelegate;
-                material = value;
-                if (material != null)
-                    material.MaterialChanged += materialChangedDelegate;
-                OnMaterialChanged(material);
-            }
+            get { return events; }
         }
 
 
@@ -158,14 +141,6 @@ namespace BEPUphysics.Collidables
             }
         }
 
-        readonly Action<Material> materialChangedDelegate;
-        void OnMaterialChanged(Material newMaterial)
-        {
-            for (int i = 0; i < pairs.Count; i++)
-            {
-                pairs[i].UpdateMaterialProperties();
-            }
-        }
 
         ///<summary>
         /// Constructs a new Terrain.
@@ -176,11 +151,6 @@ namespace BEPUphysics.Collidables
         {
             this.worldTransform = worldTransform;
             Shape = shape;
-            collisionRules.group = CollisionRules.DefaultKinematicCollisionGroup;
-
-            material = new Material();
-            materialChangedDelegate = OnMaterialChanged;
-            material.MaterialChanged += materialChangedDelegate;
 
             Events = new ContactEventManager<Terrain>();
         }
@@ -196,11 +166,6 @@ namespace BEPUphysics.Collidables
         {
         }
 
-        protected override void OnShapeChanged(CollisionShape collisionShape)
-        {
-            if (!IgnoreShapeChanges)
-                UpdateBoundingBox();
-        }
 
         ///<summary>
         /// Updates the bounding box of the terrain.
@@ -224,10 +189,7 @@ namespace BEPUphysics.Collidables
                 boundingBox.Max.Z += thicknessOffset.Z;
         }
 
-        protected internal override bool IsActive
-        {
-            get { return false; }
-        }
+   
 
         /// <summary>
         /// Tests a ray against the entry.
@@ -320,41 +282,6 @@ namespace BEPUphysics.Collidables
 
 
 
-        ISpace space;
-        ISpace ISpaceObject.Space
-        {
-            get
-            {
-                return space;
-            }
-            set
-            {
-                space = value;
-            }
-        }
-        /// <summary>
-        /// Gets the space that owns this terrain.
-        /// </summary>
-        public ISpace Space
-        {
-            get
-            {
-                return space;
-            }
-        }
-
-        void ISpaceObject.OnAdditionToSpace(ISpace newSpace)
-        {
-        }
-
-        void ISpaceObject.OnRemovalFromSpace(ISpace oldSpace)
-        {
-        }
-
-        IDeferredEventCreator IDeferredEventCreatorOwner.EventCreator
-        {
-            get { return Events; }
-        }
 
     }
 }

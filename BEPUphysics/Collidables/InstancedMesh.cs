@@ -18,7 +18,7 @@ namespace BEPUphysics.Collidables
     /// a complicated mesh to be repeated many times.  Since the hierarchy used to accelerate
     /// collisions is purely local, it may be marginally slower than an individual StaticMesh.
     ///</summary>
-    public class InstancedMesh : Collidable, ISpaceObject, IMaterialOwner, IDeferredEventCreatorOwner
+    public class InstancedMesh : StaticCollidable
     {
 
         internal AffineTransform worldTransform;
@@ -46,11 +46,6 @@ namespace BEPUphysics.Collidables
             Shape.ComputeBoundingBox(ref worldTransform, out boundingBox);
         }
 
-        protected override void OnShapeChanged(CollisionShape collisionShape)
-        {
-            if (!IgnoreShapeChanges)
-                UpdateBoundingBox();
-        }
 
         ///<summary>
         /// Constructs a new InstancedMesh.
@@ -70,12 +65,8 @@ namespace BEPUphysics.Collidables
         {
             this.worldTransform = worldTransform;
             base.Shape = meshShape;
-            collisionRules.group = CollisionRules.DefaultKinematicCollisionGroup;
             Events = new ContactEventManager<InstancedMesh>();
 
-            material = new Material();
-            materialChangedDelegate = OnMaterialChanged;
-            material.MaterialChanged += materialChangedDelegate;
 
         }
 
@@ -152,40 +143,12 @@ namespace BEPUphysics.Collidables
             get { return events; }
         }
 
-        internal Material material;
-        //NOT thread safe due to material change pair update.
-        ///<summary>
-        /// Gets or sets the material of the mesh.
-        ///</summary>
-        public Material Material
+        protected override IDeferredEventCreator EventCreator
         {
             get
             {
-                return material;
+                return events;
             }
-            set
-            {
-                if (material != null)
-                    material.MaterialChanged -= materialChangedDelegate;
-                material = value;
-                if (material != null)
-                    material.MaterialChanged += materialChangedDelegate;
-                OnMaterialChanged(material);
-            }
-        }
-
-        readonly Action<Material> materialChangedDelegate;
-        void OnMaterialChanged(Material newMaterial)
-        {
-            for (int i = 0; i < pairs.Count; i++)
-            {
-                pairs[i].UpdateMaterialProperties();
-            }
-        }
-
-        protected internal override bool IsActive
-        {
-            get { return false; }
         }
 
 
@@ -287,40 +250,6 @@ namespace BEPUphysics.Collidables
             return false;
         }
 
-        ISpace space;
-        ISpace ISpaceObject.Space
-        {
-            get
-            {
-                return space;
-            }
-            set
-            {
-                space = value;
-            }
-        }
-        ///<summary>
-        /// Gets the Space to which the instance belongs.
-        ///</summary>
-        public ISpace Space
-        {
-            get
-            {
-                return space;
-            }
-        }
-
-        void ISpaceObject.OnAdditionToSpace(ISpace newSpace)
-        {
-        }
-
-        void ISpaceObject.OnRemovalFromSpace(ISpace oldSpace)
-        {
-        }
-
-        IDeferredEventCreator IDeferredEventCreatorOwner.EventCreator
-        {
-            get { return Events; }
-        }
+    
     }
 }
