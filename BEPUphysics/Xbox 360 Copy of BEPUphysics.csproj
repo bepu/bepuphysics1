@@ -87,6 +87,8 @@
     <Compile Include="Collidables\MobileCollidables\MobileCollidable.cs" />
     <Compile Include="Collidables\MobileCollidables\MobileMeshCollidable.cs" />
     <Compile Include="Collidables\MobileCollidables\TriangleCollidable.cs" />
+    <Compile Include="Collidables\StaticCollidable.cs" />
+    <Compile Include="Collidables\StaticGroup.cs" />
     <Compile Include="Collidables\StaticMesh.cs" />
     <Compile Include="Collidables\Terrain.cs" />
     <Compile Include="CollisionShapes\ConvexShapes\BoxShape.cs" />
@@ -103,6 +105,7 @@
     <Compile Include="CollisionShapes\InstancedMeshShape.cs" />
     <Compile Include="CollisionShapes\MobileMeshShape.cs" />
     <Compile Include="CollisionShapes\ShapeDistributionInformation.cs" />
+    <Compile Include="CollisionShapes\StaticGroupShape.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\BoxBoxCollider.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\BoxSphereTester.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\GJK\GJKToolbox.cs" />

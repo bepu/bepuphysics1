@@ -19,12 +19,12 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
 
         CompoundCollidable compoundInfoB;
 
-        protected override Collidable CollidableB
+        public override Collidable CollidableB
         {
             get { return compoundInfoB; }
         }
 
-        protected override Entities.Entity EntityB
+        public override Entities.Entity EntityB
         {
             get { return compoundInfoB.entity; }
         }

@@ -8,6 +8,7 @@ using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.DataStructures;
 using BEPUphysics.DeactivationManagement;
 using System.Diagnostics;
+using BEPUphysics.Collidables;
 
 namespace BEPUphysics.ResourceManagement
 {
@@ -25,7 +26,8 @@ namespace BEPUphysics.ResourceManagement
         {
             SubPoolRayHitList = new LockingResourcePool<RawList<RayHit>>();
             SubPoolRayCastResultList = new LockingResourcePool<RawList<RayCastResult>>();
-            SubPoolCollisionEntryList = new LockingResourcePool<RawList<BroadPhaseEntry>>();
+            SubPoolBroadPhaseEntryList = new LockingResourcePool<RawList<BroadPhaseEntry>>();
+            SubPoolCollidableList = new LockingResourcePool<RawList<Collidable>>();
             SubPoolCompoundChildList = new LockingResourcePool<RawList<CompoundChild>>();
             SubPoolIntList = new LockingResourcePool<RawList<int>>();
             SubPoolIntSet = new LockingResourcePool<HashSet<int>>();
@@ -142,7 +144,8 @@ namespace BEPUphysics.ResourceManagement
         //#else
         static ResourcePool<RawList<RayHit>> SubPoolRayHitList;
         static ResourcePool<RawList<RayCastResult>> SubPoolRayCastResultList;
-        static ResourcePool<RawList<BroadPhaseEntry>> SubPoolCollisionEntryList;
+        static ResourcePool<RawList<BroadPhaseEntry>> SubPoolBroadPhaseEntryList;
+        static ResourcePool<RawList<Collidable>> SubPoolCollidableList;
         static ResourcePool<RawList<int>> SubPoolIntList;
         static ResourcePool<HashSet<int>> SubPoolIntSet;
         static ResourcePool<RawList<float>> SubPoolFloatList;
@@ -193,12 +196,12 @@ namespace BEPUphysics.ResourceManagement
         }
 
         /// <summary>
-        /// Retrieves an CollisionEntry list from the resource pool.
+        /// Retrieves an BroadPhaseEntry list from the resource pool.
         /// </summary>
-        /// <returns>Empty CollisionEntry list.</returns>
-        public static RawList<BroadPhaseEntry> GetCollisionEntryList()
+        /// <returns>Empty BroadPhaseEntry list.</returns>
+        public static RawList<BroadPhaseEntry> GetBroadPhaseEntryList()
         {
-            return SubPoolCollisionEntryList.Take();
+            return SubPoolBroadPhaseEntryList.Take();
         }
 
         /// <summary>
@@ -208,7 +211,26 @@ namespace BEPUphysics.ResourceManagement
         public static void GiveBack(RawList<BroadPhaseEntry> list)
         {
             list.Clear();
-            SubPoolCollisionEntryList.GiveBack(list);
+            SubPoolBroadPhaseEntryList.GiveBack(list);
+        }
+
+        /// <summary>
+        /// Retrieves a Collidable list from the resource pool.
+        /// </summary>
+        /// <returns>Empty Collidable list.</returns>
+        public static RawList<Collidable> GetCollidableList()
+        {
+            return SubPoolCollidableList.Take();
+        }
+
+        /// <summary>
+        /// Returns a resource to the pool.
+        /// </summary>
+        /// <param name="list">List to return.</param>
+        public static void GiveBack(RawList<Collidable> list)
+        {
+            list.Clear();
+            SubPoolCollidableList.GiveBack(list);
         }
 
         /// <summary>

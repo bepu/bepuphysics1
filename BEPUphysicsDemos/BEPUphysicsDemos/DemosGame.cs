@@ -17,6 +17,7 @@ using BEPUphysics.Settings;
 using BEPUphysics.DataStructures;
 using BEPUphysicsDemos.Demos.Extras;
 using BEPUphysicsDemos.Demos.Extras.Tests;
+using BEPUphysicsDemos.Demos.Tests;
 
 #endregion
 

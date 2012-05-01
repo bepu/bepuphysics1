@@ -69,7 +69,7 @@ namespace BEPUphysics.DataStructures
             {
                 //Use a permuted version of the triangles instead of the actual triangle list.
                 //Permuting makes the input basically random, improving the quality of the tree.
-                Insert((int)(((1208299L * (i / 3)) % (data.indices.Length / 3)) * 3));
+                Insert((int)(((982451653L * (i / 3)) % (data.indices.Length / 3)) * 3));
             }
         }
 

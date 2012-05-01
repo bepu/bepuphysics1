@@ -618,7 +618,7 @@ namespace BEPUphysics
         /// <returns>Whether or not the ray hit anything.</returns>
         public bool RayCast(Ray ray, float maximumLength, IList<RayCastResult> outputRayCastResults)
         {
-            var outputIntersections = Resources.GetCollisionEntryList();
+            var outputIntersections = Resources.GetBroadPhaseEntryList();
             if (BroadPhase.QueryAccelerator.RayCast(ray, maximumLength, outputIntersections))
             {
 
@@ -646,7 +646,7 @@ namespace BEPUphysics
         /// <returns>Whether or not the ray hit anything.</returns>
         public bool RayCast(Ray ray, float maximumLength, Func<BroadPhaseEntry, bool> filter, IList<RayCastResult> outputRayCastResults)
         {
-            var outputIntersections = Resources.GetCollisionEntryList();
+            var outputIntersections = Resources.GetBroadPhaseEntryList();
             if (BroadPhase.QueryAccelerator.RayCast(ray, maximumLength, outputIntersections))
             {
 
