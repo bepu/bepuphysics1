@@ -24,19 +24,19 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         NonConvexContactManifoldConstraint contactConstraint = new NonConvexContactManifoldConstraint();
 
 
-        protected override Collidable CollidableA
+        public override Collidable CollidableA
         {
             get { return convex; }
         }
-        protected override Collidable CollidableB
+        public override Collidable CollidableB
         {
             get { return terrain; }
         }
-        protected override Entities.Entity EntityA
+        public override Entities.Entity EntityA
         {
             get { return convex.entity; }
         }
-        protected override Entities.Entity EntityB
+        public override Entities.Entity EntityB
         {
             get { return null; }
         }

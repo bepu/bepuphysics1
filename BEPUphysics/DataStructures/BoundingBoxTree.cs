@@ -51,7 +51,7 @@ namespace BEPUphysics.DataStructures
             {
                 //Use a permuted version of the elements instead of the actual elements list.
                 //Permuting makes the input basically random, improving the quality of the tree.
-                Add(elements[(int)((1208299L * i) % count)]);
+                Add(elements[(int)((982451653L * i) % count)]);
             }
         }
 

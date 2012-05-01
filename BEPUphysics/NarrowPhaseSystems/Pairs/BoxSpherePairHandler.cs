@@ -26,12 +26,12 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         BoxSphereContactManifold contactManifold = new BoxSphereContactManifold();
         NonConvexContactManifoldConstraint contactConstraint = new NonConvexContactManifoldConstraint();
 
-        protected override Collidable CollidableA
+        public override Collidable CollidableA
         {
             get { return box; }
         }
 
-        protected override Collidable CollidableB
+        public override Collidable CollidableB
         {
             get { return sphere; }
         }
@@ -54,12 +54,12 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             get { return contactManifold; }
         }
 
-        protected override Entities.Entity EntityA
+        public override Entities.Entity EntityA
         {
             get { return box.entity; }
         }
 
-        protected override Entities.Entity EntityB
+        public override Entities.Entity EntityB
         {
             get { return sphere.entity; }
         }

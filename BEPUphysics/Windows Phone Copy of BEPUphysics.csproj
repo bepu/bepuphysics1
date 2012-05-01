@@ -110,8 +110,11 @@
     <Compile Include="Collidables\MobileCollidables\CompoundHelper.cs" />
     <Compile Include="Collidables\MobileCollidables\MobileCollidable.cs" />
     <Compile Include="Collidables\MobileCollidables\MobileMeshCollidable.cs" />
+    <Compile Include="Collidables\StaticCollidable.cs" />
+    <Compile Include="Collidables\StaticGroup.cs" />
     <Compile Include="CollisionShapes\ConvexShapes\InertiaHelper.cs" />
     <Compile Include="CollisionShapes\MobileMeshShape.cs" />
+    <Compile Include="CollisionShapes\StaticGroupShape.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\GJK\GJKToolbox.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\GJK\PairSimplex.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\GJK\RaySimplex.cs" />

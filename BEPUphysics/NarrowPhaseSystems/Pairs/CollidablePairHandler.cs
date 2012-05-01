@@ -16,11 +16,23 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
     ///</summary>
     public abstract class CollidablePairHandler : NarrowPhasePair
     {
-        protected abstract Collidable CollidableA { get; }
-        protected abstract Collidable CollidableB { get; }
+        /// <summary>
+        /// Gets the first collidable associated with the pair.
+        /// </summary>
+        public abstract Collidable CollidableA { get; }
+        /// <summary>
+        /// Gets the second collidable associated with the pair.
+        /// </summary>
+        public abstract Collidable CollidableB { get; }
         //Entities could be null!
-        protected abstract Entity EntityA { get; }
-        protected abstract Entity EntityB { get; }
+        /// <summary>
+        /// Gets the first entity associated with the pair.  This could be null if no entity is associated with CollidableA.
+        /// </summary>
+        public abstract Entity EntityA { get; }        
+        /// <summary>
+        /// Gets the second entity associated with the pair.  This could be null if no entity is associated with CollidableB.
+        /// </summary>
+        public abstract Entity EntityB { get; }
 
         protected internal abstract int ContactCount { get; }
 
@@ -186,7 +198,6 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         /// Forces an update of the pair's material properties.
         ///</summary>
         /// <param name="properties">Properties to use in the collision.</param>
-
         public abstract void UpdateMaterialProperties(InteractionProperties properties);
 
         ///<summary>

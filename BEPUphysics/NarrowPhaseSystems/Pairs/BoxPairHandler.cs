@@ -23,22 +23,22 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
 
         BoxContactManifold contactManifold = new BoxContactManifold();
 
-        protected override Collidable CollidableA
+        public override Collidable CollidableA
         {
             get { return boxA; }
         }
 
-        protected override Collidable CollidableB
+        public override Collidable CollidableB
         {
             get { return boxB; }
         }
 
-        protected override Entities.Entity EntityA
+        public override Entities.Entity EntityA
         {
             get { return boxA.entity; }
         }
 
-        protected override Entities.Entity EntityB
+        public override Entities.Entity EntityB
         {
             get { return boxB.entity; }
         }

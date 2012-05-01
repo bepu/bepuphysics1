@@ -17,13 +17,13 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
     ///</summary>
     public abstract class MobileMeshMeshPairHandler : MeshGroupPairHandler
     {
-        protected MobileMeshCollidable mobileMesh;
+        public MobileMeshCollidable mobileMesh;
 
-        protected override Collidable CollidableA
+        public override Collidable CollidableA
         {
             get { return mobileMesh; }
         }
-        protected override Entities.Entity EntityA
+        public override Entities.Entity EntityA
         {
             get { return mobileMesh.entity; }
         }

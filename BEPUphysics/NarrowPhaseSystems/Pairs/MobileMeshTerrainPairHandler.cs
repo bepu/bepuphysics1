@@ -25,11 +25,11 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
 
         Terrain mesh;
 
-        protected override Collidable CollidableB
+        public override Collidable CollidableB
         {
             get { return mesh; }
         }
-        protected override Entities.Entity EntityB
+        public override Entities.Entity EntityB
         {
             get { return null; }
         }
