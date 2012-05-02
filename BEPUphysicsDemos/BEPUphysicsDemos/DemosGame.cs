@@ -92,6 +92,7 @@ namespace BEPUphysicsDemos
                                                     typeof (StaticMeshDemo),
                                                     typeof (InstancedMeshDemo),
                                                     typeof (MobileMeshDemo),
+                                                    typeof (StaticGroupDemo),
                                                     typeof (EntityConstructionDemo),
                                                     typeof (MultipendulumDemo),
                                                     typeof (ClothDemo),

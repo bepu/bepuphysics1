@@ -68,6 +68,9 @@ namespace BEPUphysics.Collidables.MobileCollidables
         protected internal RigidTransform worldTransform;
         ///<summary>
         /// Gets or sets the world transform of the collidable.
+        /// The EntityCollidable's LocalPosition is ignored for this process; the shape will end up
+        /// centered exactly on the world transform.
+        /// Setting this property also updates the bounding box.
         ///</summary>
         public RigidTransform WorldTransform
         {
@@ -77,7 +80,13 @@ namespace BEPUphysics.Collidables.MobileCollidables
             }
             set
             {
-                UpdateWorldTransform(ref value.Position, ref value.Orientation);
+                //Remove the local position.  The UpdateBoundingBoxForTransform will reintroduce it; we want the final result to put the shape (i.e. the WorldTransform) right where defined.
+                Quaternion conjugate;
+                Quaternion.Conjugate(ref value.Orientation, out conjugate);
+                Vector3 worldOffset;
+                Vector3.Transform(ref localPosition, ref conjugate, out worldOffset);
+                Vector3.Subtract(ref value.Position, ref worldOffset, out value.Position);
+                UpdateBoundingBoxForTransform(ref value);
             }
         }
 
@@ -107,16 +116,20 @@ namespace BEPUphysics.Collidables.MobileCollidables
             }
         }
 
-        /// <summary>
-        /// Updates the bounding box to the current state of the entry.
-        /// </summary>
+        ///<summary>
+        /// Updates the bounding box of the mobile collidable according to the associated entity's current state.
+        /// Do not use this if the EntityCollidable does not have an associated entity; consider using
+        /// UpdateBoundingBoxForTransform instead.
+        ///</summary>
         public override void UpdateBoundingBox()
         {
             UpdateBoundingBox(0);
         }
 
         ///<summary>
-        /// Updates the bounding box of the mobile collidable.
+        /// Updates the bounding box of the mobile collidable according to the associated entity's current state.
+        /// Do not use this if the EntityCollidable does not have an associated entity; consider using
+        /// UpdateBoundingBoxForTransform instead.
         ///</summary>
         ///<param name="dt">Timestep with which to update the bounding box.</param>
         public override void UpdateBoundingBox(float dt)
@@ -130,7 +143,8 @@ namespace BEPUphysics.Collidables.MobileCollidables
         }
 
         ///<summary>
-        /// Updates the world transform of the collidable.
+        /// Updates the world transform of the shape using the given position and orientation.
+        /// The world transform of the shape is offset from the given position and orientation by the collidable's LocalPosition.
         ///</summary>
         ///<param name="position">Position to use for the calculation.</param>
         ///<param name="orientation">Orientation to use for the calculation.</param>
@@ -142,7 +156,8 @@ namespace BEPUphysics.Collidables.MobileCollidables
         }
 
         /// <summary>
-        /// Updates the collidable's world transform and bounding box.
+        /// Updates the collidable's world transform and bounding box.  The transform provided
+        /// will be offset by the collidable's LocalPosition to get the shape transform.
         /// This is a convenience method for external modification of the collidable's data.
         /// </summary>
         /// <param name="transform">Transform to use for the collidable.</param>
@@ -151,11 +166,20 @@ namespace BEPUphysics.Collidables.MobileCollidables
         /// does not have an owning entity, this must be zero.</param>
         public void UpdateBoundingBoxForTransform(ref RigidTransform transform, float dt)
         {
-            worldTransform = transform;
+            UpdateWorldTransform(ref transform.Position, ref transform.Orientation);
             UpdateBoundingBoxInternal(dt);
         }
 
 
+        /// <summary>
+        /// Updates the collidable's world transform and bounding box.
+        /// This is a convenience method for external modification of the collidable's data.
+        /// </summary>
+        /// <param name="transform">Transform to use for the collidable.</param>
+        public void UpdateBoundingBoxForTransform(ref RigidTransform transform)
+        {
+            UpdateBoundingBoxForTransform(ref transform, 0);
+        }
 
 
         protected internal abstract void UpdateBoundingBoxInternal(float dt);

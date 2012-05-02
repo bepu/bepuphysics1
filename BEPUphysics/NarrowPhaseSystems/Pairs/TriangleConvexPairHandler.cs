@@ -100,31 +100,43 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         ///<param name="dt">Timestep duration.</param>
         public override void UpdateTimeOfImpact(Collidable requester, float dt)
         {
-            //TODO: This conditional early outing stuff could be pulled up into a common system, along with most of the pair handler.
             var overlap = BroadPhaseOverlap;
+            var triangleMode = triangle.entity == null ? PositionUpdateMode.Discrete : triangle.entity.PositionUpdateMode;
+            var convexMode = convex.entity == null ? PositionUpdateMode.Discrete : convex.entity.PositionUpdateMode;
             if (
                     (overlap.entryA.IsActive || overlap.entryB.IsActive) && //At least one has to be active.
                     (
                         (
-                            convex.entity.PositionUpdateMode == PositionUpdateMode.Continuous &&   //If both are continuous, only do the process for A.
-                            triangle.entity.PositionUpdateMode == PositionUpdateMode.Continuous &&
+                            convexMode == PositionUpdateMode.Continuous &&   //If both are continuous, only do the process for A.
+                            triangleMode == PositionUpdateMode.Continuous &&
                             overlap.entryA == requester
                         ) ||
                         (
-                            convex.entity.PositionUpdateMode == PositionUpdateMode.Continuous ^   //If only one is continuous, then we must do it.
-                            triangle.entity.PositionUpdateMode == PositionUpdateMode.Continuous
+                            convexMode == PositionUpdateMode.Continuous ^   //If only one is continuous, then we must do it.
+                            triangleMode == PositionUpdateMode.Continuous
                         )
                     )
                 )
             {
 
 
-
-
-
                 //Only perform the test if the minimum radii are small enough relative to the size of the velocity.
                 Vector3 velocity;
-                Vector3.Subtract(ref triangle.entity.linearVelocity, ref convex.entity.linearVelocity, out velocity);
+                if (convexMode == PositionUpdateMode.Discrete)
+                {
+                    //Triangle is static for the purposes of this continuous test.
+                    velocity = triangle.entity.linearVelocity;
+                }
+                else if (triangleMode == PositionUpdateMode.Discrete)
+                {
+                    //Convex is static for the purposes of this continuous test.
+                    Vector3.Negate(ref convex.entity.linearVelocity, out velocity);
+                }
+                else
+                {
+                    //Both objects are moving.
+                    Vector3.Subtract(ref triangle.entity.linearVelocity, ref convex.entity.linearVelocity, out velocity);
+                }
                 Vector3.Multiply(ref velocity, dt, out velocity);
                 float velocitySquared = velocity.LengthSquared();
 

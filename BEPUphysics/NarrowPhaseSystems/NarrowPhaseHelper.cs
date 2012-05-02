@@ -110,6 +110,18 @@ namespace BEPUphysics.NarrowPhaseSystems
         /// Gets the factory for the mobile mesh-mobile mesh case.
         /// </summary>
         public NarrowPhasePairFactory<MobileMeshMobileMeshPairHandler> MobileMeshMobileMesh { get; private set; }
+        /// <summary>
+        /// Gets the factory for the static group-convex case.
+        /// </summary>
+        public NarrowPhasePairFactory<StaticGroupConvexPairHandler> StaticGroupConvex { get; private set; }
+        /// <summary>
+        /// Gets the factory for the static group-compound case.
+        /// </summary>
+        public NarrowPhasePairFactory<StaticGroupCompoundPairHandler> StaticGroupCompound { get; private set; }
+        /// <summary>
+        /// Gets the factory for the static group-mobile mesh case.
+        /// </summary>
+        public NarrowPhasePairFactory<StaticGroupMobileMeshPairHandler> StaticGroupMobileMesh { get; private set; }
 
         RawList<NarrowPhasePairFactory> factories = new RawList<NarrowPhasePairFactory>();
         /// <summary>
@@ -152,6 +164,9 @@ namespace BEPUphysics.NarrowPhaseSystems
             factories.Add(MobileMeshInstancedMesh = new NarrowPhasePairFactory<MobileMeshInstancedMeshPairHandler>());
             factories.Add(MobileMeshTerrain = new NarrowPhasePairFactory<MobileMeshTerrainPairHandler>());
             factories.Add(MobileMeshMobileMesh = new NarrowPhasePairFactory<MobileMeshMobileMeshPairHandler>());
+            factories.Add(StaticGroupConvex = new NarrowPhasePairFactory<StaticGroupConvexPairHandler>());
+            factories.Add(StaticGroupCompound = new NarrowPhasePairFactory<StaticGroupCompoundPairHandler>());
+            factories.Add(StaticGroupMobileMesh = new NarrowPhasePairFactory<StaticGroupMobileMeshPairHandler>());
         }
 
 
@@ -258,6 +273,21 @@ namespace BEPUphysics.NarrowPhaseSystems
             collisionManagers.Add(new TypePair(typeof(MobileMeshCollidable), typeof(Terrain)), Factories.MobileMeshTerrain);
             collisionManagers.Add(new TypePair(typeof(MobileMeshCollidable), typeof(MobileMeshCollidable)), Factories.MobileMeshMobileMesh);
             collisionManagers.Add(new TypePair(typeof(MobileMeshCollidable), typeof(TriangleCollidable)), Factories.MobileMeshTriangle);
+
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<BoxShape>), typeof(StaticGroup)), Factories.StaticGroupConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<SphereShape>), typeof(StaticGroup)), Factories.StaticGroupConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<CapsuleShape>), typeof(StaticGroup)), Factories.StaticGroupConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<TriangleShape>), typeof(StaticGroup)), Factories.StaticGroupConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<CylinderShape>), typeof(StaticGroup)), Factories.StaticGroupConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<ConeShape>), typeof(StaticGroup)), Factories.StaticGroupConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<TransformableShape>), typeof(StaticGroup)), Factories.StaticGroupConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<MinkowskiSumShape>), typeof(StaticGroup)), Factories.StaticGroupConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<WrappedShape>), typeof(StaticGroup)), Factories.StaticGroupConvex);
+            collisionManagers.Add(new TypePair(typeof(ConvexCollidable<ConvexHullShape>), typeof(StaticGroup)), Factories.StaticGroupConvex);
+
+            collisionManagers.Add(new TypePair(typeof(CompoundCollidable), typeof(StaticGroup)), Factories.StaticGroupCompound);
+            collisionManagers.Add(new TypePair(typeof(MobileMeshCollidable), typeof(StaticGroup)), Factories.StaticGroupMobileMesh);
+
         }
 
         internal static Dictionary<TypePair, NarrowPhasePairFactory> collisionManagers;

@@ -6,27 +6,28 @@ using BEPUphysics.Collidables.MobileCollidables;
 using BEPUphysics.Constraints;
 using BEPUphysics.Constraints.Collision;
 using BEPUphysics.DataStructures;
+using BEPUphysics.ResourceManagement;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.CollisionTests;
 
 namespace BEPUphysics.NarrowPhaseSystems.Pairs
 {
     ///<summary>
-    /// Handles a compound-compound collision pair.
+    /// Handles a compound-instanced mesh collision pair.
     ///</summary>
-    public class CompoundPairHandler : CompoundGroupPairHandler
+    public class StaticGroupMobileMeshPairHandler : StaticGroupPairHandler
     {
 
-        CompoundCollidable compoundInfoB;
+        MobileMeshCollidable mesh;
 
         public override Collidable CollidableB
         {
-            get { return compoundInfoB; }
+            get { return mesh; }
         }
 
         public override Entities.Entity EntityB
         {
-            get { return compoundInfoB.entity; }
+            get { return mesh.entity; }
         }
 
 
@@ -37,11 +38,16 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         ///<param name="entryB">Second entry in the pair.</param>
         public override void Initialize(BroadPhaseEntry entryA, BroadPhaseEntry entryB)
         {
-            compoundInfoB = entryB as CompoundCollidable;
-            if (compoundInfoB == null)
+            mesh = entryA as MobileMeshCollidable;
+            if (mesh == null)
             {
-                throw new Exception("Inappropriate types used to initialize pair.");
+                mesh = entryB as MobileMeshCollidable;
+                if (mesh == null)
+                {
+                    throw new Exception("Inappropriate types used to initialize pair.");
+                }
             }
+
 
             base.Initialize(entryA, entryB);
         }
@@ -52,28 +58,29 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         ///</summary>
         public override void CleanUp()
         {
-
             base.CleanUp();
-            compoundInfoB = null;
 
-
+            mesh = null;
         }
 
-        //Some danger of unintuitive-to-address allocations here.  If these lists get huge, the user will see some RawList<<>> goofiness in the profiler.
-        //They can still address it by clearing out the cached pair factories though.
-        RawList<TreeOverlapPair<CompoundChild, CompoundChild>> overlappedElements = new RawList<TreeOverlapPair<CompoundChild, CompoundChild>>();
+
+
+    
+
+
         protected override void UpdateContainedPairs()
         {
-            compoundInfo.hierarchy.Tree.GetOverlaps(compoundInfoB.hierarchy.Tree, overlappedElements);
+            var overlappedElements = Resources.GetCollidableList();
+            staticGroup.Shape.CollidableTree.GetOverlaps(mesh.boundingBox, overlappedElements);
             for (int i = 0; i < overlappedElements.count; i++)
             {
-                var element = overlappedElements.Elements[i];
-                TryToAdd(element.OverlapA.CollisionInformation, element.OverlapB.CollisionInformation,
-                         element.OverlapA.Material, element.OverlapB.Material);
+                var staticCollidable = overlappedElements.Elements[i] as StaticCollidable;
+                TryToAdd(overlappedElements.Elements[i], mesh, staticCollidable != null ? staticCollidable.Material : null);
             }
-            overlappedElements.Clear();
-        }
 
+            Resources.GiveBack(overlappedElements);
+
+        }
 
     }
 }

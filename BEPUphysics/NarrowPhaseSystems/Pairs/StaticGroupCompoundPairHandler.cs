@@ -14,7 +14,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
     ///<summary>
     /// Handles a compound-compound collision pair.
     ///</summary>
-    public class CompoundPairHandler : CompoundGroupPairHandler
+    public class StaticGroupCompoundPairHandler : StaticGroupPairHandler
     {
 
         CompoundCollidable compoundInfoB;
@@ -61,15 +61,16 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
 
         //Some danger of unintuitive-to-address allocations here.  If these lists get huge, the user will see some RawList<<>> goofiness in the profiler.
         //They can still address it by clearing out the cached pair factories though.
-        RawList<TreeOverlapPair<CompoundChild, CompoundChild>> overlappedElements = new RawList<TreeOverlapPair<CompoundChild, CompoundChild>>();
+        RawList<TreeOverlapPair<Collidable, CompoundChild>> overlappedElements = new RawList<TreeOverlapPair<Collidable, CompoundChild>>();
         protected override void UpdateContainedPairs()
         {
-            compoundInfo.hierarchy.Tree.GetOverlaps(compoundInfoB.hierarchy.Tree, overlappedElements);
+            staticGroup.Shape.CollidableTree.GetOverlaps(compoundInfoB.hierarchy.Tree, overlappedElements);
             for (int i = 0; i < overlappedElements.count; i++)
             {
                 var element = overlappedElements.Elements[i];
-                TryToAdd(element.OverlapA.CollisionInformation, element.OverlapB.CollisionInformation,
-                         element.OverlapA.Material, element.OverlapB.Material);
+                var staticCollidable = element.OverlapA as StaticCollidable;
+                TryToAdd(element.OverlapA, element.OverlapB.CollisionInformation,
+                    staticCollidable != null ? staticCollidable.Material : null, element.OverlapB.Material);
             }
             overlappedElements.Clear();
         }
