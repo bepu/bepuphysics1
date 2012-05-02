@@ -122,7 +122,6 @@ namespace BEPUphysicsDrawer.Models
             Type displayType;
             if (!displayObjects.ContainsKey(objectToDisplay))
             {
-                Entity e;
                 if (displayTypes.TryGetValue(objectToDisplay.GetType(), out displayType))
                 {
 #if !WINDOWS
@@ -133,9 +132,15 @@ namespace BEPUphysicsDrawer.Models
                     return (ModelDisplayObjectBase)Activator.CreateInstance(displayType, new[] { this, objectToDisplay });
 #endif
                 }
-                else if ((e = objectToDisplay as Entity) != null)
+                Entity e;
+                if ((e = objectToDisplay as Entity) != null)
                 {
-                    return new DisplayEntity(this, e);
+                    return new DisplayEntityCollidable(this, e.CollisionInformation);
+                }
+                EntityCollidable entityCollidable;
+                if ((entityCollidable = objectToDisplay as EntityCollidable) != null)
+                {
+                    return new DisplayEntityCollidable(this, entityCollidable);
                 }
 
             }

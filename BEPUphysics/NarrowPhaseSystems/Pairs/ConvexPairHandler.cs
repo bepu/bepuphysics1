@@ -35,31 +35,44 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         {
             var collidableA = CollidableA as ConvexCollidable;
             var collidableB = CollidableB as ConvexCollidable;
+            var modeA = collidableA.entity == null ? PositionUpdateMode.Discrete : collidableA.entity.PositionUpdateMode;
+            var modeB = collidableB.entity == null ? PositionUpdateMode.Discrete : collidableB.entity.PositionUpdateMode;
+
             var overlap = BroadPhaseOverlap;
             if (
                     (overlap.entryA.IsActive || overlap.entryB.IsActive) && //At least one has to be active.
                     (
                         (
-                            collidableA.entity.PositionUpdateMode == PositionUpdateMode.Continuous &&   //If both are continuous, only do the process for A.
-                            collidableB.entity.PositionUpdateMode == PositionUpdateMode.Continuous &&
+                            modeA == PositionUpdateMode.Continuous &&   //If both are continuous, only do the process for A.
+                            modeB == PositionUpdateMode.Continuous &&
                             overlap.entryA == requester
                         ) ||
                         (
-                            collidableA.entity.PositionUpdateMode == PositionUpdateMode.Continuous ^   //If only one is continuous, then we must do it.
-                            collidableB.entity.PositionUpdateMode == PositionUpdateMode.Continuous
+                            modeA == PositionUpdateMode.Continuous ^   //If only one is continuous, then we must do it.
+                            modeB == PositionUpdateMode.Continuous
                         )
+
                     )
                 )
             {
                 //Only perform the test if the minimum radii are small enough relative to the size of the velocity.
                 //Discrete objects have already had their linear motion integrated, so don't use their velocity.
                 Vector3 velocity;
-                if (collidableA.entity.PositionUpdateMode == PositionUpdateMode.Discrete)
+                if (modeA == PositionUpdateMode.Discrete)
+                {
+                    //CollidableA is static for the purposes of this continuous test.
                     velocity = collidableB.entity.linearVelocity;
-                else if (collidableB.entity.PositionUpdateMode == PositionUpdateMode.Discrete)
+                }
+                else if (modeB == PositionUpdateMode.Discrete)
+                {
+                    //CollidableB is static for the purposes of this continuous test.
                     Vector3.Negate(ref collidableA.entity.linearVelocity, out velocity);
+                }
                 else
+                {
+                    //Both objects are moving.
                     Vector3.Subtract(ref collidableB.entity.linearVelocity, ref collidableA.entity.linearVelocity, out velocity);
+                }
                 Vector3.Multiply(ref velocity, dt, out velocity);
                 float velocitySquared = velocity.LengthSquared();
 

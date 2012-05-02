@@ -114,7 +114,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         ///<param name="dt">Timestep duration.</param>
         public override void UpdateTimeOfImpact(Collidable requester, float dt)
         {
-            //TODO: This conditional early outing stuff could be pulled up into a common system, along with most of the pair handler.
+            //Notice that we don't test for convex entity null explicitly.  The convex.IsActive property does that for us.
             if (convex.IsActive && convex.entity.PositionUpdateMode == PositionUpdateMode.Continuous)
             {
                 //TODO: This system could be made more robust by using a similar region-based rejection of edges.

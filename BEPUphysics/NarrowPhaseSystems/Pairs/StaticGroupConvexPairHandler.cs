@@ -6,28 +6,31 @@ using BEPUphysics.Collidables.MobileCollidables;
 using BEPUphysics.Constraints;
 using BEPUphysics.Constraints.Collision;
 using BEPUphysics.DataStructures;
+using BEPUphysics.ResourceManagement;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.CollisionTests;
+using Microsoft.Xna.Framework;
 
 namespace BEPUphysics.NarrowPhaseSystems.Pairs
 {
     ///<summary>
-    /// Handles a compound-compound collision pair.
+    /// Handles a compound and convex collision pair.
     ///</summary>
-    public class CompoundPairHandler : CompoundGroupPairHandler
+    public class StaticGroupConvexPairHandler : StaticGroupPairHandler
     {
+        ConvexCollidable convexInfo;
 
-        CompoundCollidable compoundInfoB;
 
         public override Collidable CollidableB
         {
-            get { return compoundInfoB; }
+            get { return convexInfo; }
         }
 
         public override Entities.Entity EntityB
         {
-            get { return compoundInfoB.entity; }
+            get { return convexInfo.entity; }
         }
+
 
 
         ///<summary>
@@ -37,10 +40,14 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         ///<param name="entryB">Second entry in the pair.</param>
         public override void Initialize(BroadPhaseEntry entryA, BroadPhaseEntry entryB)
         {
-            compoundInfoB = entryB as CompoundCollidable;
-            if (compoundInfoB == null)
+            convexInfo = entryA as ConvexCollidable;
+            if (convexInfo == null)
             {
-                throw new Exception("Inappropriate types used to initialize pair.");
+                convexInfo = entryB as ConvexCollidable;
+                if (convexInfo == null)
+                {
+                    throw new Exception("Inappropriate types used to initialize pair.");
+                }
             }
 
             base.Initialize(entryA, entryB);
@@ -52,28 +59,26 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         ///</summary>
         public override void CleanUp()
         {
-
             base.CleanUp();
-            compoundInfoB = null;
-
-
+            convexInfo = null;
         }
 
-        //Some danger of unintuitive-to-address allocations here.  If these lists get huge, the user will see some RawList<<>> goofiness in the profiler.
-        //They can still address it by clearing out the cached pair factories though.
-        RawList<TreeOverlapPair<CompoundChild, CompoundChild>> overlappedElements = new RawList<TreeOverlapPair<CompoundChild, CompoundChild>>();
+
+
         protected override void UpdateContainedPairs()
         {
-            compoundInfo.hierarchy.Tree.GetOverlaps(compoundInfoB.hierarchy.Tree, overlappedElements);
+            var overlappedElements = Resources.GetCollidableList();
+            staticGroup.Shape.CollidableTree.GetOverlaps(convexInfo.boundingBox, overlappedElements);
             for (int i = 0; i < overlappedElements.count; i++)
             {
-                var element = overlappedElements.Elements[i];
-                TryToAdd(element.OverlapA.CollisionInformation, element.OverlapB.CollisionInformation,
-                         element.OverlapA.Material, element.OverlapB.Material);
+                var staticCollidable = overlappedElements.Elements[i] as StaticCollidable;
+                TryToAdd(overlappedElements.Elements[i], CollidableB, staticCollidable != null ? staticCollidable.Material : null);
             }
-            overlappedElements.Clear();
-        }
 
+            Resources.GiveBack(overlappedElements);
+
+
+        }
 
     }
 }

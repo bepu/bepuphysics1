@@ -270,6 +270,10 @@
     <Compile Include="NarrowPhaseSystems\Pairs\MobileMeshTrianglePairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\NarrowPhasePair.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\StandardPairHandler.cs" />
+    <Compile Include="NarrowPhaseSystems\Pairs\StaticGroupCompoundPairHandler.cs" />
+    <Compile Include="NarrowPhaseSystems\Pairs\StaticGroupConvexPairHandler.cs" />
+    <Compile Include="NarrowPhaseSystems\Pairs\StaticGroupMobileMeshPairHandler.cs" />
+    <Compile Include="NarrowPhaseSystems\Pairs\StaticGroupPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\StaticMeshPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\StaticMeshSpherePairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\TerrainConvexPairHandler.cs" />
