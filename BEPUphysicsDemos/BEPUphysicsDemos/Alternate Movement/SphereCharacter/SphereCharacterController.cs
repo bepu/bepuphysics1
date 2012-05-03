@@ -97,12 +97,6 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
             }
         }
 
-        /// <summary>
-        /// This is used to control the access to simulation islands when there are multiple character controllers updating in parallel.
-        /// If other parts of the program are modifying simulation islands during the IBeforeSolverUpdateable.Update stage, the synchronization
-        /// umbrella will need to be widened.
-        /// </summary>
-        private static BEPUphysics.Threading.SpinLock ConstraintAccessLocker = new BEPUphysics.Threading.SpinLock();
 
         /// <summary>
         /// Gets the support finder used by the character.
@@ -134,13 +128,15 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
             //See the bottom of the Update method for more information about using multithreading with this character.
             IsUpdatedSequentially = false;
 
-            Body.CollisionInformation.Tag = this;
+            //Link the character body to the character controller so that it can be identified by the locker.
+            //Any object which replaces this must implement the ICharacterTag for locking to work properly.
+            Body.CollisionInformation.Tag = new CharacterSynchronizer(Body);
 
 
 
         }
 
-        List<SphereCharacterController> involvedCharacters = new List<SphereCharacterController>();
+        List<ICharacterTag> involvedCharacters = new List<ICharacterTag>();
         public void LockCharacterPairs()
         {
             //If this character is colliding with another character, there's a significant danger of the characters
@@ -151,7 +147,7 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
             {
                 //Is this a pair with another character?
                 var other = pair.BroadPhaseOverlap.EntryA == Body.CollisionInformation ? pair.BroadPhaseOverlap.EntryB : pair.BroadPhaseOverlap.EntryA;
-                var otherCharacter = other.Tag as SphereCharacterController; //Note that this does NOT check for CharacterControllers.  That means it's not safe to multithread with both SphereCharacterControllers and CharacterControllers active.
+                var otherCharacter = other.Tag as ICharacterTag; 
                 if (otherCharacter != null)
                 {
                     involvedCharacters.Add(otherCharacter);
@@ -160,23 +156,22 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
             if (involvedCharacters.Count > 0)
             {
                 //If there were any other characters, we also need to lock ourselves!
-                involvedCharacters.Add(this);
-            }
-            //If there's no characters, then there won't be any locking to do.
+                involvedCharacters.Add((ICharacterTag)Body.CollisionInformation.Tag);
 
-            //However, the characters cannot be locked willy-nilly.  There needs to be some defined order in which pairs are locked to avoid deadlocking.
-            involvedCharacters.Sort((x, y) =>
-            {
-                if (x.Body.InstanceId < y.Body.InstanceId)
-                    return -1;
-                if (x.Body.InstanceId > y.Body.InstanceId)
-                    return 1;
-                return 0;
-            });
+                //However, the characters cannot be locked willy-nilly.  There needs to be some defined order in which pairs are locked to avoid deadlocking.
+                involvedCharacters.Sort((x, y) =>
+                {
+                    if (x.InstanceId < y.InstanceId)
+                        return -1;
+                    if (x.InstanceId > y.InstanceId)
+                        return 1;
+                    return 0;
+                });
 
-            for (int i = 0; i < involvedCharacters.Count; ++i)
-            {
-                Monitor.Enter(involvedCharacters[i]);
+                for (int i = 0; i < involvedCharacters.Count; ++i)
+                {
+                    Monitor.Enter(involvedCharacters[i]);
+                }
             }
         }
 
@@ -249,7 +244,12 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
         SupportData supportData;
 
         void IBeforeSolverUpdateable.Update(float dt)
-        {           
+        {
+            //Someone may want to use the Body.CollisionInformation.Tag for their own purposes.
+            //That could screw up the locking mechanism above and would be tricky to track down.
+            //Consider using the making the custom tag implement ICharacterTag, modifying LockCharacterPairs to analyze the different Tag type, or using the Entity.Tag for the custom data instead.
+            Debug.Assert(Body.CollisionInformation.Tag is ICharacterTag, "The character.Body.CollisionInformation.Tag must implement ICharacterTag to link the SphereCharacterController and its body together for character-related locking to work in multithreaded simulations.");
+
             //We can't let multiple characters manage the same pairs simultaneously.  Lock it up!
             LockCharacterPairs();
             try
@@ -362,12 +362,21 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
 
             //Warning:
             //Changing a constraint's support data is not thread safe; it modifies simulation islands!
-            //If something other than the SphereCharacterController can modify simulation islands is running
+            //If something other than a CharacterController can modify simulation islands is running
             //simultaneously (in the IBeforeSolverUpdateable.Update stage), it will need to be synchronized.
-            ConstraintAccessLocker.Enter();
+
+            //We don't need to synchronize this all the time- only when the support object changes.
+            bool needToLock = HorizontalMotionConstraint.SupportData.SupportObject != supportData.SupportObject ||
+                              VerticalMotionConstraint.SupportData.SupportObject != verticalSupportData.SupportObject;
+
+            if (needToLock)
+                CharacterSynchronizer.ConstraintAccessLocker.Enter();
+
             HorizontalMotionConstraint.SupportData = supportData;
             VerticalMotionConstraint.SupportData = verticalSupportData;
-            ConstraintAccessLocker.Exit();
+
+            if (needToLock)
+                CharacterSynchronizer.ConstraintAccessLocker.Exit();
 
 
 

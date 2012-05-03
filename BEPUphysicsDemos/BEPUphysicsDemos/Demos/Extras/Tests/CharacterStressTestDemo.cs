@@ -45,31 +45,14 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
 
 
 
-            ////Dump some boxes on top of it for fun.
-            int numColumns = 8;
-            int numRows = 8;
-            int numHigh = 1;
-            float separation = 8;
-            //Entity toAdd;
-            //for (int i = 0; i < numRows; i++)
-            //    for (int j = 0; j < numColumns; j++)
-            //        for (int k = 0; k < numHigh; k++)
-            //        {
-            //            toAdd = new Box(
-            //                new Vector3(
-            //                separation * i - numRows * separation / 2,
-            //                30f + k * separation,
-            //                separation * j - numColumns * separation / 2),
-            //                2, 2, 2, 15);
 
-            //            Space.Add(toAdd);
-            //        }
 
             //Now drop the characters on it!
-            numColumns = 8;
-            numRows = 8;
-            numHigh = 16;
-            separation = 8;
+            var numColumns = 8;
+            var numRows = 8;
+            var numHigh = 8;
+            float separation = 5;
+
             for (int i = 0; i < numRows; i++)
                 for (int j = 0; j < numColumns; j++)
                     for (int k = 0; k < numHigh; k++)
@@ -86,13 +69,52 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                         Space.Add(character);
                     }
 
+            //Now drop the ball-characters on it!
+            numColumns = 8;
+            numRows = 8;
+            numHigh = 8;
+            separation = 5;
+            for (int i = 0; i < numRows; i++)
+                for (int j = 0; j < numColumns; j++)
+                    for (int k = 0; k < numHigh; k++)
+                    {
+                        var character = new SphereCharacterController();
+                        character.Body.Position =
+                            new Vector3(
+                            separation * i - numRows * separation / 2,
+                            48f + k * separation,
+                            separation * j - numColumns * separation / 2);
+
+                        sphereCharacters.Add(character);
+
+                        Space.Add(character);
+                    }
+
 
             game.Camera.Position = new Vector3(0, 10, 40);
 
+            //Dump some boxes on top of the characters for fun.
+            numColumns = 16;
+            numRows = 16;
+            numHigh = 1;
+            separation = 8;
+            for (int i = 0; i < numRows; i++)
+                for (int j = 0; j < numColumns; j++)
+                    for (int k = 0; k < numHigh; k++)
+                    {
+                        var toAdd = new Box(
+                            new Vector3(
+                            separation * i - numRows * separation / 2,
+                            150f + k * separation,
+                            separation * j - numColumns * separation / 2),
+                            2, 2, 2, 15);
 
+                        Space.Add(toAdd);
+                    }
         }
 
         List<CharacterController> characters = new List<CharacterController>();
+        List<SphereCharacterController> sphereCharacters = new List<SphereCharacterController>();
         Random random = new Random();
 
         /// <summary>
@@ -121,6 +143,14 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                     else
                         characters[i].StanceManager.DesiredStance = Stance.Standing;
                 }
+            }
+
+            //Tell the sphere characters to run around too.
+            for (int i = 0; i < sphereCharacters.Count; i++)
+            {
+                sphereCharacters[i].HorizontalMotionConstraint.MovementDirection = new Vector2((float)(random.NextDouble() * 2 - 1), (float)(random.NextDouble() * 2 - 1));
+                if (random.NextDouble() < .01f)
+                    sphereCharacters[i].Jump();
             }
             base.Update(dt);
         }

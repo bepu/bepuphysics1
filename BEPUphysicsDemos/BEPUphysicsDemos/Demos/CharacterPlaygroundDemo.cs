@@ -245,6 +245,7 @@ namespace BEPUphysicsDemos.Demos
                 Space.Add(a);
                 Space.Add(b);
             }
+
         }
 
         EntityMover elevatorMover;

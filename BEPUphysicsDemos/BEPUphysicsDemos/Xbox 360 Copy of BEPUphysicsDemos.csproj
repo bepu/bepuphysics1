@@ -67,6 +67,7 @@
     <Compile Include="Alternate Movement\Character\StepManager.cs" />
     <Compile Include="Alternate Movement\Character\SupportFinder.cs" />
     <Compile Include="Alternate Movement\Character\VerticalMotionConstraint.cs" />
+    <Compile Include="Alternate Movement\ICharacterTag.cs" />
     <Compile Include="Alternate Movement\SimpleCharacter\SimpleCharacterController.cs" />
     <Compile Include="Alternate Movement\SimpleCharacter\SimpleCharacterControllerInput.cs" />
     <Compile Include="Alternate Movement\SphereCharacter\HorizontalMotionConstraint.cs">

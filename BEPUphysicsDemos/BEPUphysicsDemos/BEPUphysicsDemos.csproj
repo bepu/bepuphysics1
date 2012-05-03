@@ -90,6 +90,7 @@
     <Compile Include="Alternate Movement\Character\VerticalMotionConstraint.cs" />
     <Compile Include="Alternate Movement\Character\HorizontalMotionConstraint.cs" />
     <Compile Include="Alternate Movement\Character\StepManager.cs" />
+    <Compile Include="Alternate Movement\ICharacterTag.cs" />
     <Compile Include="Alternate Movement\SphereCharacter\HorizontalMotionConstraint.cs" />
     <Compile Include="Alternate Movement\SphereCharacter\QueryManager.cs" />
     <Compile Include="Alternate Movement\SphereCharacter\SphereCharacterControllerInput.cs" />
