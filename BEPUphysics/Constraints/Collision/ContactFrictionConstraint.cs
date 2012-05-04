@@ -72,8 +72,6 @@ namespace BEPUphysics.Constraints.Collision
 
             entityA = contactManifoldConstraint.EntityA;
             entityB = contactManifoldConstraint.EntityB;
-            entityAIsDynamic = entityA != null && entityA.isDynamic;
-            entityBIsDynamic = entityB != null && entityB.isDynamic;
         }
 
         ///<summary>
@@ -181,6 +179,8 @@ namespace BEPUphysics.Constraints.Collision
         {
 
 
+            entityAIsDynamic = entityA != null && entityA.isDynamic;
+            entityBIsDynamic = entityB != null && entityB.isDynamic;
 
             //Compute the three dimensional relative velocity at the point.
 

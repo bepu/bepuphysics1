@@ -17,6 +17,7 @@ using BEPUphysics.ResourceManagement;
 using System.Collections.ObjectModel;
 using BEPUphysics.BroadPhaseSystems.SortAndSweep;
 using BEPUphysics.DataStructures;
+using BEPUphysics.MathExtensions;
 
 namespace BEPUphysics
 {

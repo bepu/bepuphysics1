@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using BEPUphysics.Collidables.MobileCollidables;
 using BEPUphysics.Threading;
+using BEPUphysics.MathExtensions;
+using BEPUphysics.DataStructures;
 
 namespace BEPUphysics.OtherSpaceStages
 {
@@ -12,7 +14,7 @@ namespace BEPUphysics.OtherSpaceStages
     {
 
         //TODO: should the Entries field be publicly accessible since there's not any custom add/remove logic?
-        List<MobileCollidable> entries = new List<MobileCollidable>();
+        RawList<MobileCollidable> entries = new RawList<MobileCollidable>();
         TimeStepSettings timeStepSettings;
         ///<summary>
         /// Gets or sets the time step settings used by the updater.
@@ -24,7 +26,7 @@ namespace BEPUphysics.OtherSpaceStages
         ///<param name="timeStepSettings">Time step setttings to be used by the updater.</param>
         public BoundingBoxUpdater(TimeStepSettings timeStepSettings)
         {
-            multithreadedLoopBodyDelegate = MultithreadedLoopBody;
+            multithreadedLoopBodyDelegate = LoopBody;
             Enabled = true;
             this.timeStepSettings = timeStepSettings;
         }
@@ -41,10 +43,15 @@ namespace BEPUphysics.OtherSpaceStages
 
         }
         Action<int> multithreadedLoopBodyDelegate;
-        void MultithreadedLoopBody(int i)
+        void LoopBody(int i)
         {
-            if (entries[i].IsActive)
-                entries[i].UpdateBoundingBox(timeStepSettings.TimeStepDuration);
+            var entry = entries.Elements[i];
+            if (entry.IsActive)
+            {
+                entry.UpdateBoundingBox(timeStepSettings.TimeStepDuration);
+                entry.boundingBox.Validate();
+            }
+
         }
 
         ///<summary>
@@ -71,9 +78,10 @@ namespace BEPUphysics.OtherSpaceStages
 
         protected override void UpdateSingleThreaded()
         {
-            foreach (MobileCollidable entry in entries)
-                if (entry.IsActive)
-                    entry.UpdateBoundingBox(timeStepSettings.TimeStepDuration);
+            for (int i = 0; i < entries.count; ++i)
+            {
+                LoopBody(i);
+            }
         }
     }
 }

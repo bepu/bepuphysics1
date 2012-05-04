@@ -113,6 +113,8 @@ namespace BEPUphysics.Collidables.MobileCollidables
             set
             {
                 localPosition = value;
+
+                localPosition.Validate();
             }
         }
 
@@ -153,6 +155,8 @@ namespace BEPUphysics.Collidables.MobileCollidables
             Vector3.Transform(ref localPosition, ref orientation, out worldTransform.Position);
             Vector3.Add(ref worldTransform.Position, ref position, out worldTransform.Position);
             worldTransform.Orientation = orientation;
+
+            worldTransform.Validate();
         }
 
         /// <summary>
@@ -245,6 +249,8 @@ namespace BEPUphysics.Collidables.MobileCollidables
                 //TODO: consider using minimum radius 
 
             }
+
+            boundingBox.Validate();
         }
 
 

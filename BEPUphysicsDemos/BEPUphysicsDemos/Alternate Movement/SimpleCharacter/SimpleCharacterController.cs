@@ -11,6 +11,11 @@ using BEPUphysics.MathExtensions;
 
 namespace BEPUphysicsDemos.AlternateMovement.SimpleCharacter
 {
+    /// <summary>
+    /// A single-class implementation of a fairly restricted character controller.  It can discontinuously step, but it does so unsafely.
+    /// This simple character is an interesting thing to fiddle with, but if you want lots of robust features, use the CharacterController.
+    /// If you don't need discontinuous stepping and want a bit more speed, go with the SphereCharacterController.
+    /// </summary>
     public class SimpleCharacterController : Updateable, IEndOfTimeStepUpdateable
     {
         /// <summary>
@@ -111,6 +116,8 @@ namespace BEPUphysicsDemos.AlternateMovement.SimpleCharacter
             //on a blending of the two objects' materials.
             Body.Material.KineticFriction = 0;
             Body.Material.StaticFriction = 0;
+            
+            IsUpdating = false;
         }
 
         /// <summary>

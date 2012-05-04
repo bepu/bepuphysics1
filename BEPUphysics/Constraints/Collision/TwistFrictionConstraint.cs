@@ -112,6 +112,8 @@ namespace BEPUphysics.Constraints.Collision
         public override void Update(float dt)
         {
 
+            entityADynamic = entityA != null && entityA.isDynamic;
+            entityBDynamic = entityB != null && entityB.isDynamic;
 
             //Compute the jacobian......  Real hard!
             Vector3 normal = contactManifoldConstraint.penetrationConstraints.Elements[0].contact.Normal;
@@ -206,8 +208,6 @@ namespace BEPUphysics.Constraints.Collision
 
             entityA = contactManifoldConstraint.EntityA;
             entityB = contactManifoldConstraint.EntityB;
-            entityADynamic = entityA != null && entityA.isDynamic;
-            entityBDynamic = entityB != null && entityB.isDynamic;
         }
 
         internal void CleanUp()

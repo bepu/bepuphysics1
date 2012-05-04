@@ -9,6 +9,7 @@ using BEPUphysics.CollisionRuleManagement;
 using System.Collections.ObjectModel;
 using BEPUphysics.DataStructures;
 using System.Diagnostics;
+using BEPUphysics.Collidables.MobileCollidables;
 
 namespace BEPUphysics.NarrowPhaseSystems
 {
@@ -145,31 +146,35 @@ namespace BEPUphysics.NarrowPhaseSystems
         void UpdateBroadPhaseOverlap(int i)
         {
             BroadPhaseOverlap overlap = broadPhaseOverlaps.Elements[i];
+
             if (overlap.collisionRule < CollisionRule.NoNarrowPhasePair)
             {
-                NarrowPhasePair narrowPhaseObject;
+
+                NarrowPhasePair pair;
                 //see if the overlap is already present in the narrow phase.
-                if (!overlapMapping.TryGetValue(overlap, out narrowPhaseObject))
+                if (!overlapMapping.TryGetValue(overlap, out pair))
                 {
                     //Create/enqueue based on collision table
-                    narrowPhaseObject = NarrowPhaseHelper.GetPair(ref overlap);
-                    if (narrowPhaseObject != null)
+                    pair = NarrowPhaseHelper.GetPair(ref overlap);
+                    if (pair != null)
                     {
-                        narrowPhaseObject.NarrowPhase = this;
+                        pair.NarrowPhase = this;
                         //Add the new object to the 'todo' list.
                         //Technically, this doesn't need to be thread-safe when this is called from the sequential context.
                         //It's just bunched together for maintainability despite the slight performance hit.
-                        newNarrowPhasePairs.Enqueue(narrowPhaseObject);
+                        newNarrowPhasePairs.Enqueue(pair);
                     }
-                }
-                if (narrowPhaseObject != null)
-                {
 
-                    if (narrowPhaseObject.BroadPhaseOverlap.collisionRule < CollisionRule.NoNarrowPhaseUpdate)
+                }
+                if (pair != null)
+                {
+                    //Update the collision rule.
+                    pair.CollisionRule = overlap.collisionRule;
+                    if (pair.BroadPhaseOverlap.collisionRule < CollisionRule.NoNarrowPhaseUpdate)
                     {
-                        narrowPhaseObject.UpdateCollision(TimeStepSettings.TimeStepDuration);
+                        pair.UpdateCollision(TimeStepSettings.TimeStepDuration);
                     }
-                    narrowPhaseObject.NeedsUpdate = false;
+                    pair.NeedsUpdate = false;
                 }
 
 
@@ -182,6 +187,9 @@ namespace BEPUphysics.NarrowPhaseSystems
         {
             ThreadManager.ForLoop(0, broadPhaseOverlaps.Count, updateBroadPhaseOverlapDelegate);
 
+            //The new narrow phase objects should be flushed before we get to the stale overlaps, or else the NeedsUpdate property might get into an invalid state.
+            AddNewNarrowPhaseObjects();
+
             //Flush away every change accumulated since the last flush.
             FlushGeneratedSolverUpdateables();
 
@@ -189,7 +197,7 @@ namespace BEPUphysics.NarrowPhaseSystems
             //can be removed directly by the stale loop.
             RemoveStaleOverlaps();
 
-            AddNewNarrowPhaseObjects();
+
         }
 
 
@@ -201,7 +209,8 @@ namespace BEPUphysics.NarrowPhaseSystems
                 UpdateBroadPhaseOverlap(i);
             }
 
-
+            //The new narrow phase objects should be flushed before we get to the stale overlaps, or else the NeedsUpdate property might get into an invalid state.
+            AddNewNarrowPhaseObjects();
 
             //Flush away every change accumulated since the last flush.
             FlushGeneratedSolverUpdateables();
@@ -211,7 +220,6 @@ namespace BEPUphysics.NarrowPhaseSystems
             RemoveStaleOverlaps();
 
 
-            AddNewNarrowPhaseObjects();
         }
 
 
@@ -240,6 +248,7 @@ namespace BEPUphysics.NarrowPhaseSystems
                 //Both objects are still considered inactive.  But the pair is clearly stale- one of its members doesn't even exist anymore!
                 //This has nasty side effects, like retaining memory.  To solve this, also check to see if either member does not belong to the simulation.
 
+
                 if (pair.NeedsUpdate && //If we didn't receive an update in the previous narrow phase run and...
                     (pair.broadPhaseOverlap.entryA.IsActive || pair.broadPhaseOverlap.entryB.IsActive || //one of us is active or..
                     pair.broadPhaseOverlap.entryA.BroadPhase == null || pair.broadPhaseOverlap.entryB.BroadPhase == null)) //one of us doesn't exist anymore...
@@ -258,7 +267,10 @@ namespace BEPUphysics.NarrowPhaseSystems
 
                 }
                 else
+                {
                     pair.NeedsUpdate = true;
+
+                }
 
             }
 

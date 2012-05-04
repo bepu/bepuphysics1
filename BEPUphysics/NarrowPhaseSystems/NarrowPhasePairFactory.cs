@@ -84,8 +84,9 @@ namespace BEPUphysics.NarrowPhaseSystems
         {
             if (!allowOnDemandConstruction && pool.Count == 0)
                 throw new Exception("Cannot request additional resources from this factory; it is exhausted.  Consider specifying a greater number of initial resources or setting AllowOnDemandConstruction to true.");
-            return pool.Take();
-            //TODO: Could a bit more initialization be frontloaded into here?
+            var pair = pool.Take();
+            pair.NeedsUpdate = true;
+            return pair;
         }
 
         /// <summary>
@@ -94,6 +95,7 @@ namespace BEPUphysics.NarrowPhaseSystems
         /// <param name="pair">Pair to return.</param>
         public override void GiveBack(NarrowPhasePair pair)
         {
+            pair.NarrowPhase = null;
             pool.GiveBack((T)pair);
         }
 

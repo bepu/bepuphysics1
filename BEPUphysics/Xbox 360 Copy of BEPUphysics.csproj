@@ -235,6 +235,7 @@
     <Compile Include="ISpace.cs" />
     <Compile Include="ISpaceObject.cs" />
     <Compile Include="MathExtensions\AffineTransform.cs" />
+    <Compile Include="MathExtensions\MathChecker.cs" />
     <Compile Include="MultithreadedProcessingStage.cs" />
     <Compile Include="NarrowPhaseSystems\NarrowPhaseHelper.cs" />
     <Compile Include="NarrowPhaseSystems\NarrowPhasePairFactory.cs" />

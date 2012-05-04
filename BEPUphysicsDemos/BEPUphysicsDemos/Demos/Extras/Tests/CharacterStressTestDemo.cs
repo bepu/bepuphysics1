@@ -14,6 +14,7 @@ using BEPUphysicsDemos.AlternateMovement.SphereCharacter;
 using System.Collections.Generic;
 using System;
 using BEPUphysicsDemos.AlternateMovement.Character;
+using BEPUphysicsDemos.AlternateMovement.SimpleCharacter;
 
 namespace BEPUphysicsDemos.Demos.Extras.Tests
 {
@@ -51,7 +52,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             var numColumns = 8;
             var numRows = 8;
             var numHigh = 8;
-            float separation = 5;
+            float separation = 16;
 
             for (int i = 0; i < numRows; i++)
                 for (int j = 0; j < numColumns; j++)
@@ -73,7 +74,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             numColumns = 8;
             numRows = 8;
             numHigh = 8;
-            separation = 5;
+            separation = 16;
             for (int i = 0; i < numRows; i++)
                 for (int j = 0; j < numColumns; j++)
                     for (int k = 0; k < numHigh; k++)
@@ -105,7 +106,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                         var toAdd = new Box(
                             new Vector3(
                             separation * i - numRows * separation / 2,
-                            150f + k * separation,
+                            52f + k * separation,
                             separation * j - numColumns * separation / 2),
                             2, 2, 2, 15);
 
