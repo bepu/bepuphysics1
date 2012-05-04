@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using BEPUphysics.CollisionTests;
 using BEPUphysics.Settings;
+using BEPUphysics.MathExtensions;
 using System;
 
 namespace BEPUphysics.Constraints.Collision
@@ -55,8 +56,6 @@ namespace BEPUphysics.Constraints.Collision
 
             entityA = contactManifoldConstraint.EntityA;
             entityB = contactManifoldConstraint.EntityB;
-            entityADynamic = entityA != null && entityA.isDynamic;
-            entityBDynamic = entityB != null && entityB.isDynamic;
 
         }
 
@@ -114,23 +113,10 @@ namespace BEPUphysics.Constraints.Collision
         ///<param name="dt">Timestep duration.</param>
         public override void Update(float dt)
         {
-            ////TODO: Instead of deactivating a contact which is in 'negative depth,'
-            ////a better approach would be to modify the target velocity.
-            ////Instead of targeting 0 always, it would target the velocity that allows
-            ////the objects to come into contact.
-            //if (contact.PenetrationDepth < 0)
-            //{
-            //    //The contact is currently in a limbo state.
-            //    //It is too far away to be used for penetration solving, but isn't far enough away
-            //    //to remove.  Keeping slightly-too-far contacts around helps with stability.
-            //    //Note that this contact can still be used for friction!
-            //    //That's a bit odd, considering we aren't applying any impulses with this constraint.
-            //    //But, in practice, it doesn't really cause any problems.
-            //    //Considering the contact was most likely beginning to separate, the normal force is
-            //    //*probably* low, and the difference is negligible.
-            //    isActiveInSolver = false;
-            //    return;
-            //}
+
+            entityADynamic = entityA != null && entityA.isDynamic;
+            entityBDynamic = entityB != null && entityB.isDynamic;
+
             //Set up the jacobians.
             linearAX = -contact.Normal.X;
             linearAY = -contact.Normal.Y;
@@ -138,6 +124,8 @@ namespace BEPUphysics.Constraints.Collision
             //linearBX = -linearAX;
             //linearBY = -linearAY;
             //linearBZ = -linearAZ;
+
+
 
             //angular A = Ra x N
             if (entityA != null)
@@ -148,6 +136,7 @@ namespace BEPUphysics.Constraints.Collision
                 angularAZ = (ra.X * linearAY) - (ra.Y * linearAX);
             }
 
+
             //Angular B = N x Rb
             if (entityB != null)
             {
@@ -156,6 +145,7 @@ namespace BEPUphysics.Constraints.Collision
                 angularBY = (linearAZ * rb.X) - (linearAX * rb.Z);
                 angularBZ = (linearAX * rb.Y) - (linearAY * rb.X);
             }
+
 
             //Compute inverse effective mass matrix
             float entryA, entryB;
@@ -183,6 +173,7 @@ namespace BEPUphysics.Constraints.Collision
                 entryB = 0;
 
             velocityToImpulse = -1 / (entryA + entryB); //Softness?
+
 
             //Bounciness and bias (penetration correction)
             if (contact.PenetrationDepth >= 0)
@@ -273,12 +264,10 @@ namespace BEPUphysics.Constraints.Collision
             //Compute relative velocity
             float lambda = (RelativeVelocity - bias) * velocityToImpulse; //convert to impulse
 
-
             //Clamp accumulated impulse
             float previousAccumulatedImpulse = accumulatedImpulse;
             accumulatedImpulse = MathHelper.Max(0, accumulatedImpulse + lambda);
             lambda = accumulatedImpulse - previousAccumulatedImpulse;
-
  
 
             //Apply the impulse

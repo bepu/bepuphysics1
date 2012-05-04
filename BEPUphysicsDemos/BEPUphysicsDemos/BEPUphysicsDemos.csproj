@@ -128,6 +128,7 @@
     <Compile Include="Demos\Extras\GraphicMatchingDemo.cs" />
     <Compile Include="Demos\Extras\ReverseTrikeDemo.cs" />
     <Compile Include="Demos\Extras\SelfCollidingClothDemo.cs" />
+    <Compile Include="Demos\Extras\Tests\AccumulationTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\MobileMeshSolidityTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\KinematicActivityTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\ParallelSpaceTestDemo.cs" />

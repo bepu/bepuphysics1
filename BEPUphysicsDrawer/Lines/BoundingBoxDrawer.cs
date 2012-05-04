@@ -20,7 +20,7 @@ namespace BEPUphysicsDrawer.Lines
         {
             this.game = game;
         }
-        
+
         RawList<VertexPositionColor> boundingBoxLines = new RawList<VertexPositionColor>();
 
         public void Draw(Effect effect, Space space)
@@ -31,41 +31,42 @@ namespace BEPUphysicsDrawer.Lines
                 foreach (var e in space.Entities)
                 {
                     Vector3[] boundingBoxCorners = e.CollisionInformation.BoundingBox.GetCorners();
-                    boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[0], Color.DarkRed));
-                    boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[1], Color.DarkRed));
+                    var color = e.ActivityInformation.IsActive ? Color.DarkRed : new Color(150, 100, 100);
+                    boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[0], color));
+                    boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[1], color));
 
-                    boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[0], Color.DarkRed));
-                    boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[3], Color.DarkRed));
+                    boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[0], color));
+                    boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[3], color));
 
-                    boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[0], Color.DarkRed));
-                    boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[4], Color.DarkRed));
+                    boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[0], color));
+                    boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[4], color));
 
-                    boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[1], Color.DarkRed));
-                    boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[2], Color.DarkRed));
+                    boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[1], color));
+                    boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[2], color));
 
-                    boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[1], Color.DarkRed));
-                    boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[5], Color.DarkRed));
+                    boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[1], color));
+                    boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[5], color));
 
-                    boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[2], Color.DarkRed));
-                    boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[3], Color.DarkRed));
+                    boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[2], color));
+                    boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[3], color));
 
-                    boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[2], Color.DarkRed));
-                    boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[6], Color.DarkRed));
+                    boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[2], color));
+                    boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[6], color));
 
-                    boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[3], Color.DarkRed));
-                    boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[7], Color.DarkRed));
+                    boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[3], color));
+                    boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[7], color));
 
-                    boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[4], Color.DarkRed));
-                    boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[5], Color.DarkRed));
+                    boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[4], color));
+                    boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[5], color));
 
-                    boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[4], Color.DarkRed));
-                    boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[7], Color.DarkRed));
+                    boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[4], color));
+                    boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[7], color));
 
-                    boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[5], Color.DarkRed));
-                    boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[6], Color.DarkRed));
+                    boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[5], color));
+                    boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[6], color));
 
-                    boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[6], Color.DarkRed));
-                    boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[7], Color.DarkRed));
+                    boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[6], color));
+                    boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[7], color));
                 }
                 foreach (var pass in effect.CurrentTechnique.Passes)
                 {

@@ -60,6 +60,8 @@ namespace BEPUphysics.Entities
             {
                 position = value;
                 activityInformation.Activate();
+
+                position.Validate();
             }
         }
         ///<summary>
@@ -82,6 +84,8 @@ namespace BEPUphysics.Entities
                 Matrix3X3.MultiplyTransposed(ref orientationMatrix, ref localInertiaTensor, out multiplied);
                 Matrix3X3.Multiply(ref multiplied, ref orientationMatrix, out inertiaTensor);
                 activityInformation.Activate();
+
+                orientation.Validate();
             }
         }
         /// <summary>
@@ -120,6 +124,8 @@ namespace BEPUphysics.Entities
                 Orientation = orientation; //normalizes and sets.
                 position = value.Translation;
                 activityInformation.Activate();
+
+                position.Validate();
             }
 
         }
@@ -137,6 +143,9 @@ namespace BEPUphysics.Entities
                 angularVelocity = value;
                 Matrix3X3.Transform(ref value, ref inertiaTensor, out angularMomentum);
                 activityInformation.Activate();
+
+                angularVelocity.Validate();
+                angularMomentum.Validate();
             }
         }
         /// <summary>
@@ -160,6 +169,9 @@ namespace BEPUphysics.Entities
                 angularMomentum = value;
                 Matrix3X3.Transform(ref value, ref inertiaTensorInverse, out angularVelocity);
                 activityInformation.Activate();
+
+                angularVelocity.Validate();
+                angularMomentum.Validate();
             }
         }
         /// <summary>
@@ -176,6 +188,9 @@ namespace BEPUphysics.Entities
                 linearVelocity = value;
                 Vector3.Multiply(ref linearVelocity, mass, out linearMomentum);
                 activityInformation.Activate();
+
+                linearVelocity.Validate();
+                linearMomentum.Validate();
             }
         }
         /// <summary>
@@ -192,6 +207,9 @@ namespace BEPUphysics.Entities
                 linearMomentum = value;
                 Vector3.Multiply(ref linearMomentum, inverseMass, out linearVelocity);
                 activityInformation.Activate();
+
+                linearVelocity.Validate();
+                linearMomentum.Validate();
             }
         }
         /// <summary>
@@ -298,6 +316,9 @@ namespace BEPUphysics.Entities
                 Matrix3X3.Multiply(ref multiplied, ref orientationMatrix, out inertiaTensorInverse);
                 Matrix3X3.MultiplyTransposed(ref orientationMatrix, ref localInertiaTensor, out multiplied);
                 Matrix3X3.Multiply(ref multiplied, ref orientationMatrix, out inertiaTensor);
+
+                localInertiaTensor.Validate();
+                localInertiaTensorInverse.Validate();
             }
         }
         internal Matrix3X3 localInertiaTensorInverse;
@@ -320,6 +341,9 @@ namespace BEPUphysics.Entities
                 Matrix3X3.Multiply(ref multiplied, ref orientationMatrix, out inertiaTensorInverse);
                 Matrix3X3.MultiplyTransposed(ref orientationMatrix, ref localInertiaTensor, out multiplied);
                 Matrix3X3.Multiply(ref multiplied, ref orientationMatrix, out inertiaTensor);
+
+                localInertiaTensor.Validate();
+                localInertiaTensorInverse.Validate();
             }
         }
 
@@ -384,7 +408,7 @@ namespace BEPUphysics.Entities
         /// but it's only used for auxiliary systems like the FluidVolume.
         /// Changing this can tune behavior of those systems.
         /// </summary>
-        public float Volume { get { return volume; } set { volume = value; } }
+        public float Volume { get { return volume; } set { volume = value; volume.Validate(); } }
 
 
 
@@ -749,6 +773,8 @@ namespace BEPUphysics.Entities
             linearVelocity.Y = linearMomentum.Y * inverseMass;
             linearVelocity.Z = linearMomentum.Z * inverseMass;
 #endif
+            linearVelocity.Validate();
+            linearMomentum.Validate();
 
         }
         /// <summary>
@@ -776,6 +802,9 @@ namespace BEPUphysics.Entities
                 angularVelocity.Y += impulse.X * inertiaTensorInverse.M12 + impulse.Y * inertiaTensorInverse.M22 + impulse.Z * inertiaTensorInverse.M32;
                 angularVelocity.Z += impulse.X * inertiaTensorInverse.M13 + impulse.Y * inertiaTensorInverse.M23 + impulse.Z * inertiaTensorInverse.M33;
             }
+
+            angularVelocity.Validate();
+            angularMomentum.Validate();
         }
 
         /// <summary>
@@ -813,7 +842,7 @@ namespace BEPUphysics.Entities
             bool previousState = isDynamic;
             isDynamic = false;
             LocalInertiaTensorInverse = new Matrix3X3();
-            mass = float.MaxValue;
+            mass = 0;
             inverseMass = 0;
 
             //Notify simulation island of the change.
@@ -952,6 +981,11 @@ namespace BEPUphysics.Entities
                 Matrix3X3.Transform(ref angularVelocity, ref inertiaTensor, out angularMomentum);
             }
 
+            linearVelocity.Validate();
+            linearMomentum.Validate();
+            angularVelocity.Validate();
+            angularMomentum.Validate();
+
 
         }
 
@@ -1082,6 +1116,13 @@ namespace BEPUphysics.Entities
 
             if (PositionUpdated != null)
                 PositionUpdated(this);
+
+            linearMomentum.Validate();
+            linearVelocity.Validate();
+            angularMomentum.Validate();
+            angularVelocity.Validate();
+            position.Validate();
+            orientation.Validate();
         }
 
         void IPositionUpdateable.PreUpdatePosition(float dt)
@@ -1113,6 +1154,13 @@ namespace BEPUphysics.Entities
                     PositionUpdated(this);
             }
             collisionInformation.UpdateWorldTransform(ref position, ref orientation);
+
+            linearMomentum.Validate();
+            linearVelocity.Validate();
+            angularMomentum.Validate();
+            angularVelocity.Validate();
+            position.Validate();
+            orientation.Validate();
 
         }
 
@@ -1155,7 +1203,7 @@ namespace BEPUphysics.Entities
 
             set
             {
-                linearDamping = value;
+                linearDamping = MathHelper.Clamp(value, 0, 1);
             }
         }
 

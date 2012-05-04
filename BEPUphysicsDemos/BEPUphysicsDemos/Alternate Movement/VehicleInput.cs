@@ -93,7 +93,7 @@ namespace BEPUphysicsDemos.AlternateMovement
             };
             var body = new CompoundBody(bodies, 61);
             body.CollisionInformation.LocalPosition = new Vector3(0, .5f, 0);
-            body.Position = (position); //At first, just keep it out of the way.
+            body.Position = position; //At first, just keep it out of the way.
             Vehicle = new Vehicle(body);
 
             #region RaycastWheelShapes
