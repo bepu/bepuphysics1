@@ -42,22 +42,22 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             info.Contact = ContactManifold.contacts.Elements[index];
             //Find the contact's normal force.
             float totalNormalImpulse = 0;
-            info.NormalForce = 0;
+            info.NormalImpulse = 0;
             for (int i = 0; i < contactConstraint.penetrationConstraints.count; i++)
             {
                 totalNormalImpulse += contactConstraint.penetrationConstraints.Elements[i].accumulatedImpulse;
                 if (contactConstraint.penetrationConstraints.Elements[i].contact == info.Contact)
                 {
-                    info.NormalForce = contactConstraint.penetrationConstraints.Elements[i].accumulatedImpulse;
+                    info.NormalImpulse = contactConstraint.penetrationConstraints.Elements[i].accumulatedImpulse;
                 }
             }
             //Compute friction force.  Since we are using central friction, this is 'faked.'
             float radius;
             Vector3.Distance(ref contactConstraint.slidingFriction.manifoldCenter, ref info.Contact.Position, out radius);
             if (totalNormalImpulse > 0)
-                info.FrictionForce = (info.NormalForce / totalNormalImpulse) * (contactConstraint.slidingFriction.accumulatedImpulse.Length() + contactConstraint.twistFriction.accumulatedImpulse * radius);
+                info.FrictionImpulse = (info.NormalImpulse / totalNormalImpulse) * (contactConstraint.slidingFriction.accumulatedImpulse.Length() + contactConstraint.twistFriction.accumulatedImpulse * radius);
             else
-                info.FrictionForce = 0;
+                info.FrictionImpulse = 0;
             //Compute relative velocity
             Vector3 velocity;
             //If the pair is handling some type of query and does not actually have supporting entities, then consider the velocity contribution to be zero.
