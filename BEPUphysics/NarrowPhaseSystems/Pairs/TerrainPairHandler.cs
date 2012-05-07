@@ -183,14 +183,14 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         {
             info.Contact = TerrainManifold.contacts.Elements[index];
             //Find the contact's normal and friction forces.
-            info.FrictionForce = 0;
-            info.NormalForce = 0;
+            info.FrictionImpulse = 0;
+            info.NormalImpulse = 0;
             for (int i = 0; i < contactConstraint.frictionConstraints.count; i++)
             {
                 if (contactConstraint.frictionConstraints.Elements[i].PenetrationConstraint.contact == info.Contact)
                 {
-                    info.FrictionForce = contactConstraint.frictionConstraints.Elements[i].accumulatedImpulse;
-                    info.NormalForce = contactConstraint.frictionConstraints.Elements[i].PenetrationConstraint.accumulatedImpulse;
+                    info.FrictionImpulse = contactConstraint.frictionConstraints.Elements[i].accumulatedImpulse;
+                    info.NormalImpulse = contactConstraint.frictionConstraints.Elements[i].PenetrationConstraint.accumulatedImpulse;
                     break;
                 }
             }

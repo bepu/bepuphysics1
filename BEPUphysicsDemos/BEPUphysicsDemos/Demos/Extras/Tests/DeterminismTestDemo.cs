@@ -185,8 +185,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                                         c.data.Normal = contact.Contact.Normal;
                                         c.data.PenetrationDepth = contact.Contact.PenetrationDepth;
                                         c.data.Position = contact.Contact.Position;
-                                        c.frictionForce = contact.FrictionForce;
-                                        c.normalForce = contact.NormalForce;
+                                        c.frictionForce = contact.FrictionImpulse;
+                                        c.normalForce = contact.NormalImpulse;
                                         c.velocity = contact.RelativeVelocity;
                                         contactDataList.Add(c);
                                     }
@@ -257,8 +257,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                                     c.data.Normal = contact.Contact.Normal;
                                     c.data.PenetrationDepth = contact.Contact.PenetrationDepth;
                                     c.data.Position = contact.Contact.Position;
-                                    c.frictionForce = contact.FrictionForce;
-                                    c.normalForce = contact.NormalForce;
+                                    c.frictionForce = contact.FrictionImpulse;
+                                    c.normalForce = contact.NormalImpulse;
                                     c.velocity = contact.RelativeVelocity;
                                     contactDataList.Add(c);
                                 }

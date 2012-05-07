@@ -21,16 +21,16 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         public CollidablePairHandler Pair;
 
         /// <summary>
-        /// Normal force applied between the objects at the contact point.
+        /// Normal impulse applied between the objects at the contact point.
         /// </summary>
-        public float NormalForce;
+        public float NormalImpulse;
 
         /// <summary>
-        /// Friction force applied between the objects at the contact point.
+        /// Friction impulse applied between the objects at the contact point.
         /// This is sometimes an approximation due to the varying ways in which
         /// friction is calculated.
         /// </summary>
-        public float FrictionForce;
+        public float FrictionImpulse;
         
         ///<summary>
         /// Relative velocity of the colliding objects at the position of the contact.
@@ -40,7 +40,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
 
         public override string ToString()
         {
-            return Contact + " NormalForce: " + NormalForce + " FrictionForce: " + FrictionForce + " RelativeVelocity: " + RelativeVelocity;
+            return Contact + " NormalForce: " + NormalImpulse + " FrictionForce: " + FrictionImpulse + " RelativeVelocity: " + RelativeVelocity;
         }
 
 
