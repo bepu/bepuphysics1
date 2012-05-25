@@ -19,8 +19,8 @@ namespace BEPUphysicsDemos.SampleCode
         /// <param name="origin">Location that entities will be pushed toward.</param>
         /// <param name="multiplier">Represents the gravitational constant of the field times the effective mass at the center of the field.</param>
         /// <param name="maxAcceleration">Maximum acceleration the field can apply.</param>
-        public GravitationalField(ForceFieldShape shape, Vector3 origin, float multiplier, float maxAcceleration, IQueryAccelerator accelerator)
-            : base(shape, accelerator)
+        public GravitationalField(ForceFieldShape shape, Vector3 origin, float multiplier, float maxAcceleration)
+            : base(shape)
         {
             this.Multiplier = multiplier;
             this.Origin = origin;

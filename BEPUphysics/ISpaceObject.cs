@@ -12,11 +12,12 @@
         /// <summary>
         /// Called after the object is added to a space.
         /// </summary>
-        /// <param name="newSpace"></param>
+        /// <param name="newSpace">Space to which the object was added.</param>
         void OnAdditionToSpace(ISpace newSpace);
         /// <summary>
         /// Called before an object is removed from its space.
         /// </summary>
+        /// <param name="oldSpace">Space from which the object was removed.</param>
         void OnRemovalFromSpace(ISpace oldSpace);
         /// <summary>
         /// Gets or sets the user data associated with this object.

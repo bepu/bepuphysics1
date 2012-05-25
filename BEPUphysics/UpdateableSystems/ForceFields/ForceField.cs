@@ -37,18 +37,10 @@ namespace BEPUphysics.UpdateableSystems.ForceFields
         /// Constructs a force field.
         /// </summary>
         /// <param name="shape">Shape to use for the force field.</param>
-        /// <param name="queryAccelerator">Query accelerator used to find entities.</param>
-        protected ForceField(ForceFieldShape shape, IQueryAccelerator queryAccelerator)
+        protected ForceField(ForceFieldShape shape)
         {
             Shape = shape;
-            QueryAccelerator = queryAccelerator;
             subfunction = new Action<int>(CalculateImpulsesSubfunction);
-        }
-
-        protected ForceField(ForceFieldShape shape, IQueryAccelerator queryAccelerator, IThreadManager threadManager)
-            : this(shape, queryAccelerator)
-        {
-            ThreadManager = threadManager;
             AllowMultithreading = true;
         }
 
@@ -134,6 +126,32 @@ namespace BEPUphysics.UpdateableSystems.ForceFields
                 CalculateImpulse(e, currentTimestep, out impulse);
                 e.ApplyLinearImpulse(ref impulse);
             }
+        }
+
+        /// <summary>
+        /// Called after the object is added to a space.
+        /// </summary>
+        /// <param name="newSpace">Space to which the field has been added.</param>
+        public override void OnAdditionToSpace(ISpace newSpace)
+        {
+            base.OnAdditionToSpace(newSpace);
+            var space = newSpace as Space;
+            if(space != null)
+            {
+                ThreadManager = space.ThreadManager;
+                QueryAccelerator = space.BroadPhase.QueryAccelerator;
+            }
+        }
+
+        /// <summary>
+        /// Called before an object is removed from its space.
+        /// </summary>
+        /// <param name="oldSpace">Space from which the object has been removed.</param>
+        public override void OnRemovalFromSpace(ISpace oldSpace)
+        {
+            base.OnRemovalFromSpace(oldSpace);
+            ThreadManager = null;
+            QueryAccelerator = null;
         }
 
     }

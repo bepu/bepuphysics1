@@ -60,8 +60,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             BoundingBox box = new BoundingBox(new Vector3(-500, -500, -500), new Vector3(500, 500, 500));
 
             var threadManager = new SpecializedThreadManager();
-            int numThreads = 3;
-            int splitDepth = 3 + (int)Math.Ceiling(Math.Log(numThreads, 2));
+            int numThreads = 8;
+            int splitDepth = 0 + (int)Math.Ceiling(Math.Log(numThreads, 2));
             for (int i = 0; i < numThreads; i++)
             {
                 threadManager.AddThread();
@@ -90,7 +90,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             int numRuns = 30000;
             //Prime the system.
             dh.Update();
-            var testType = Test.Overlap;
+            var testType = Test.Update;
 
             BroadPhaseOverlap[] overlapBasis = new BroadPhaseOverlap[dh.Overlaps.Count];
             dh.Overlaps.CopyTo(overlapBasis, 0);

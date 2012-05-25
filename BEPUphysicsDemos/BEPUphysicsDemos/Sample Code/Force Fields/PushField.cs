@@ -20,8 +20,8 @@ namespace BEPUphysicsDemos.SampleCode
         /// <param name="shape">Shape representing the volume of the force field.</param>
         /// <param name="forceToApply">Force to apply to entities within the field.  Magnitude of the vector represents the magnitude of the force.</param>
         /// <param name="maxPushSpeed">Maximum speed that the field will accelerate objects to, regardless of force applied. Set to a non-positive for infinite.</param>
-        public PushField(ForceFieldShape shape, Vector3 forceToApply, float maxPushSpeed, IQueryAccelerator accelerator)
-            : base(shape, accelerator)
+        public PushField(ForceFieldShape shape, Vector3 forceToApply, float maxPushSpeed)
+            : base(shape)
         {
             Force = forceToApply;
             MaximumPushSpeed = maxPushSpeed;
