@@ -3,15 +3,7 @@ using BEPUphysics.Collidables;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.MathExtensions;
 using Microsoft.Xna.Framework;
-using BEPUphysics.Settings;
-using BEPUphysics.CollisionTests.CollisionAlgorithms;
 using BEPUphysics.CollisionRuleManagement;
-using BEPUphysics.NarrowPhaseSystems.Pairs;
-using BEPUphysics.CollisionTests.Manifolds;
-using System.Diagnostics;
-using BEPUphysics.BroadPhaseSystems.SortAndSweep;
-using BEPUphysics.CollisionShapes;
-using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.Collidables.Events;
 using BEPUphysics.Collidables.MobileCollidables;
 
@@ -102,7 +94,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
         /// </summary>
         public override string Name
         {
-            get { return "Terrain"; }
+            get { return "Accumulation Test"; }
         }
     }
 }

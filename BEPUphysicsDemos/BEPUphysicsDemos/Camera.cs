@@ -1,4 +1,5 @@
 using BEPUphysics;
+using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.Entities;
 using Microsoft.Xna.Framework;

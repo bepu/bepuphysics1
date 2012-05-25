@@ -1,4 +1,6 @@
-﻿namespace BEPUphysics.BroadPhaseSystems
+﻿using BEPUphysics.BroadPhaseEntries;
+
+namespace BEPUphysics.BroadPhaseSystems
 {
     ///<summary>
     /// Requires that a class own a BroadPhaseEntry.

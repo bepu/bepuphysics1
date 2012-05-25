@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.Collidables;
 using BEPUphysics.Collidables.MobileCollidables;
@@ -6,6 +7,7 @@ using BEPUphysics.NarrowPhaseSystems.Pairs;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.DataStructures;
+using BEPUphysics.UpdateableSystems;
 
 namespace BEPUphysics.NarrowPhaseSystems
 {
@@ -122,6 +124,18 @@ namespace BEPUphysics.NarrowPhaseSystems
         /// Gets the factory for the static group-mobile mesh case.
         /// </summary>
         public NarrowPhasePairFactory<StaticGroupMobileMeshPairHandler> StaticGroupMobileMesh { get; private set; }
+        /// <summary>
+        /// Gets the factory for the detector volume-convex case.
+        /// </summary>
+        public NarrowPhasePairFactory<DetectorVolumeConvexPairHandler> DetectorVolumeConvex { get; private set; }
+        /// <summary>
+        /// Gets the factory for the detector volume-mobile mesh case.
+        /// </summary>
+        public NarrowPhasePairFactory<DetectorVolumeMobileMeshPairHandler> DetectorVolumeMobileMesh { get; private set; }
+        /// <summary>
+        /// Gets the factory for the detector volume-compound case.
+        /// </summary>
+        public NarrowPhasePairFactory<DetectorVolumeCompoundPairHandler> DetectorVolumeCompound { get; private set; }
 
         RawList<NarrowPhasePairFactory> factories = new RawList<NarrowPhasePairFactory>();
         /// <summary>
@@ -167,6 +181,9 @@ namespace BEPUphysics.NarrowPhaseSystems
             factories.Add(StaticGroupConvex = new NarrowPhasePairFactory<StaticGroupConvexPairHandler>());
             factories.Add(StaticGroupCompound = new NarrowPhasePairFactory<StaticGroupCompoundPairHandler>());
             factories.Add(StaticGroupMobileMesh = new NarrowPhasePairFactory<StaticGroupMobileMeshPairHandler>());
+            factories.Add(DetectorVolumeConvex = new NarrowPhasePairFactory<DetectorVolumeConvexPairHandler>());
+            factories.Add(DetectorVolumeMobileMesh = new NarrowPhasePairFactory<DetectorVolumeMobileMeshPairHandler>());
+            factories.Add(DetectorVolumeCompound = new NarrowPhasePairFactory<DetectorVolumeCompoundPairHandler>());
         }
 
 
@@ -217,6 +234,7 @@ namespace BEPUphysics.NarrowPhaseSystems
             collisionManagers.Add(new TypePair(typeof(ConvexCollidable<MinkowskiSumShape>), typeof(StaticMesh)), Factories.StaticMeshConvex);
             collisionManagers.Add(new TypePair(typeof(ConvexCollidable<WrappedShape>), typeof(StaticMesh)), Factories.StaticMeshConvex);
             collisionManagers.Add(new TypePair(typeof(ConvexCollidable<ConvexHullShape>), typeof(StaticMesh)), Factories.StaticMeshConvex);
+            collisionManagers.Add(new TypePair(typeof(TriangleCollidable), typeof(StaticMesh)), Factories.StaticMeshConvex);
 
             collisionManagers.Add(new TypePair(typeof(ConvexCollidable<BoxShape>), typeof(Terrain)), Factories.TerrainConvex);
             collisionManagers.Add(new TypePair(typeof(ConvexCollidable<SphereShape>), typeof(Terrain)), Factories.TerrainSphere);
@@ -228,6 +246,7 @@ namespace BEPUphysics.NarrowPhaseSystems
             collisionManagers.Add(new TypePair(typeof(ConvexCollidable<MinkowskiSumShape>), typeof(Terrain)), Factories.TerrainConvex);
             collisionManagers.Add(new TypePair(typeof(ConvexCollidable<WrappedShape>), typeof(Terrain)), Factories.TerrainConvex);
             collisionManagers.Add(new TypePair(typeof(ConvexCollidable<ConvexHullShape>), typeof(Terrain)), Factories.TerrainConvex);
+            collisionManagers.Add(new TypePair(typeof(TriangleCollidable), typeof(Terrain)), Factories.TerrainConvex);
 
             collisionManagers.Add(new TypePair(typeof(ConvexCollidable<BoxShape>), typeof(InstancedMesh)), Factories.InstancedMeshConvex);
             collisionManagers.Add(new TypePair(typeof(ConvexCollidable<SphereShape>), typeof(InstancedMesh)), Factories.InstancedMeshSphere);
@@ -239,6 +258,7 @@ namespace BEPUphysics.NarrowPhaseSystems
             collisionManagers.Add(new TypePair(typeof(ConvexCollidable<MinkowskiSumShape>), typeof(InstancedMesh)), Factories.InstancedMeshConvex);
             collisionManagers.Add(new TypePair(typeof(ConvexCollidable<WrappedShape>), typeof(InstancedMesh)), Factories.InstancedMeshConvex);
             collisionManagers.Add(new TypePair(typeof(ConvexCollidable<ConvexHullShape>), typeof(InstancedMesh)), Factories.InstancedMeshConvex);
+            collisionManagers.Add(new TypePair(typeof(TriangleCollidable), typeof(InstancedMesh)), Factories.InstancedMeshConvex);
 
             collisionManagers.Add(new TypePair(typeof(ConvexCollidable<BoxShape>), typeof(CompoundCollidable)), Factories.CompoundConvex);
             collisionManagers.Add(new TypePair(typeof(ConvexCollidable<SphereShape>), typeof(CompoundCollidable)), Factories.CompoundConvex);
@@ -250,6 +270,7 @@ namespace BEPUphysics.NarrowPhaseSystems
             collisionManagers.Add(new TypePair(typeof(ConvexCollidable<MinkowskiSumShape>), typeof(CompoundCollidable)), Factories.CompoundConvex);
             collisionManagers.Add(new TypePair(typeof(ConvexCollidable<WrappedShape>), typeof(CompoundCollidable)), Factories.CompoundConvex);
             collisionManagers.Add(new TypePair(typeof(ConvexCollidable<ConvexHullShape>), typeof(CompoundCollidable)), Factories.CompoundConvex);
+            collisionManagers.Add(new TypePair(typeof(TriangleCollidable), typeof(CompoundCollidable)), Factories.CompoundConvex);
 
             collisionManagers.Add(new TypePair(typeof(CompoundCollidable), typeof(CompoundCollidable)), Factories.CompoundCompound);
             collisionManagers.Add(new TypePair(typeof(CompoundCollidable), typeof(StaticMesh)), Factories.CompoundStaticMesh);
@@ -284,9 +305,25 @@ namespace BEPUphysics.NarrowPhaseSystems
             collisionManagers.Add(new TypePair(typeof(ConvexCollidable<MinkowskiSumShape>), typeof(StaticGroup)), Factories.StaticGroupConvex);
             collisionManagers.Add(new TypePair(typeof(ConvexCollidable<WrappedShape>), typeof(StaticGroup)), Factories.StaticGroupConvex);
             collisionManagers.Add(new TypePair(typeof(ConvexCollidable<ConvexHullShape>), typeof(StaticGroup)), Factories.StaticGroupConvex);
+            collisionManagers.Add(new TypePair(typeof(TriangleCollidable), typeof(StaticGroup)), Factories.StaticGroupConvex);
 
             collisionManagers.Add(new TypePair(typeof(CompoundCollidable), typeof(StaticGroup)), Factories.StaticGroupCompound);
             collisionManagers.Add(new TypePair(typeof(MobileMeshCollidable), typeof(StaticGroup)), Factories.StaticGroupMobileMesh);
+
+            collisionManagers.Add(new TypePair(typeof(DetectorVolume), typeof(ConvexCollidable<BoxShape>)), Factories.DetectorVolumeConvex);
+            collisionManagers.Add(new TypePair(typeof(DetectorVolume), typeof(ConvexCollidable<SphereShape>)), Factories.DetectorVolumeConvex);
+            collisionManagers.Add(new TypePair(typeof(DetectorVolume), typeof(ConvexCollidable<CapsuleShape>)), Factories.DetectorVolumeConvex);
+            collisionManagers.Add(new TypePair(typeof(DetectorVolume), typeof(ConvexCollidable<TriangleShape>)), Factories.DetectorVolumeConvex);
+            collisionManagers.Add(new TypePair(typeof(DetectorVolume), typeof(ConvexCollidable<CylinderShape>)), Factories.DetectorVolumeConvex);
+            collisionManagers.Add(new TypePair(typeof(DetectorVolume), typeof(ConvexCollidable<ConeShape>)), Factories.DetectorVolumeConvex);
+            collisionManagers.Add(new TypePair(typeof(DetectorVolume), typeof(ConvexCollidable<TransformableShape>)), Factories.DetectorVolumeConvex);
+            collisionManagers.Add(new TypePair(typeof(DetectorVolume), typeof(ConvexCollidable<MinkowskiSumShape>)), Factories.DetectorVolumeConvex);
+            collisionManagers.Add(new TypePair(typeof(DetectorVolume), typeof(ConvexCollidable<WrappedShape>)), Factories.DetectorVolumeConvex);
+            collisionManagers.Add(new TypePair(typeof(DetectorVolume), typeof(ConvexCollidable<ConvexHullShape>)), Factories.DetectorVolumeConvex);
+            collisionManagers.Add(new TypePair(typeof(DetectorVolume), typeof(TriangleCollidable)), Factories.DetectorVolumeConvex);
+
+            collisionManagers.Add(new TypePair(typeof(DetectorVolume), typeof(MobileMeshCollidable)), Factories.DetectorVolumeMobileMesh);
+            collisionManagers.Add(new TypePair(typeof(DetectorVolume), typeof(CompoundCollidable)), Factories.DetectorVolumeCompound);
 
         }
 
@@ -311,12 +348,12 @@ namespace BEPUphysics.NarrowPhaseSystems
         ///</summary>
         ///<param name="pair">Overlap to use to create the pair.</param>
         ///<returns>A INarrowPhasePair for the overlap.</returns>
-        public static NarrowPhasePair GetPair(ref BroadPhaseOverlap pair)
+        public static NarrowPhasePair GetPairHandler(ref BroadPhaseOverlap pair)
         {
             NarrowPhasePairFactory factory;
             if (collisionManagers.TryGetValue(new TypePair(pair.entryA.GetType(), pair.entryB.GetType()), out factory))
             {
-                NarrowPhasePair toReturn = factory.GetNarrowPhasePair();
+                var toReturn = factory.GetNarrowPhasePair();
                 toReturn.BroadPhaseOverlap = pair;
                 toReturn.Factory = factory;
                 return toReturn;
@@ -340,11 +377,11 @@ namespace BEPUphysics.NarrowPhaseSystems
         ///<param name="entryA">First entry in the pair.</param>
         /// <param name="entryB">Second entry in the pair.</param>
         /// <param name="rule">Collision rule governing the pair.</param>
-        ///<returns>A INarrowPhasePair for the overlap.</returns>
-        public static NarrowPhasePair GetPair(BroadPhaseEntry entryA, BroadPhaseEntry entryB, CollisionRule rule)
+        ///<returns>A NarrowPhasePair for the overlap.</returns>
+        public static NarrowPhasePair GetPairHandler(BroadPhaseEntry entryA, BroadPhaseEntry entryB, CollisionRule rule)
         {
-            BroadPhaseOverlap overlap = new BroadPhaseOverlap(entryA, entryB, rule);
-            return GetPair(ref overlap);
+            var overlap = new BroadPhaseOverlap(entryA, entryB, rule);
+            return GetPairHandler(ref overlap);
         }
 
         ///<summary>
@@ -352,11 +389,11 @@ namespace BEPUphysics.NarrowPhaseSystems
         ///</summary>
         ///<param name="entryA">First entry in the pair.</param>
         /// <param name="entryB">Second entry in the pair.</param>
-        ///<returns>A INarrowPhasePair for the overlap.</returns>
-        public static NarrowPhasePair GetPair(BroadPhaseEntry entryA, BroadPhaseEntry entryB)
+        ///<returns>AINarrowPhasePair for the overlap.</returns>
+        public static NarrowPhasePair GetPairHandler(BroadPhaseEntry entryA, BroadPhaseEntry entryB)
         {
-            BroadPhaseOverlap overlap = new BroadPhaseOverlap(entryA, entryB);
-            return GetPair(ref overlap);
+            var overlap = new BroadPhaseOverlap(entryA, entryB);
+            return GetPairHandler(ref overlap);
         }
 
         /// <summary>
@@ -367,8 +404,8 @@ namespace BEPUphysics.NarrowPhaseSystems
         /// <returns>CollidablePairHandler for the pair.</returns>
         public static CollidablePairHandler GetPairHandler(ref CollidablePair pair, CollisionRule rule)
         {
-            BroadPhaseOverlap overlap = new BroadPhaseOverlap(pair.collidableA, pair.collidableB, rule);
-            return GetPair(ref overlap) as CollidablePairHandler;
+            var overlap = new BroadPhaseOverlap(pair.collidableA, pair.collidableB, rule);
+            return GetPairHandler(ref overlap) as CollidablePairHandler;
         }
         /// <summary>
         /// Gets a collidable pair handler for a pair of collidables.
@@ -377,11 +414,10 @@ namespace BEPUphysics.NarrowPhaseSystems
         /// <returns>CollidablePairHandler for the pair.</returns>
         public static CollidablePairHandler GetPairHandler(ref CollidablePair pair)
         {
-            BroadPhaseOverlap overlap = new BroadPhaseOverlap(pair.collidableA, pair.collidableB);
-            return GetPair(ref overlap) as CollidablePairHandler;
+            var overlap = new BroadPhaseOverlap(pair.collidableA, pair.collidableB);
+            return GetPairHandler(ref overlap) as CollidablePairHandler;
         }
 
-        //Note that this does not check collision rules.
         /// <summary>
         /// Tests the pair of collidables for intersection without regard for collision rules.
         /// </summary>

@@ -45,7 +45,7 @@ namespace BEPUphysicsDemos
             MotionSettings.UseExtraExpansionForContinuousBoundingBoxes = false;
 
             //Set all the scaling settings back to their defaults.
-            CollisionResponseSettings.MaximumPositionCorrectionSpeed = 2;
+            CollisionResponseSettings.MaximumPenetrationCorrectionSpeed = 2;
             CollisionResponseSettings.BouncinessVelocityThreshold = 1;
             CollisionResponseSettings.StaticFrictionVelocityThreshold = .2f;
             CollisionDetectionSettings.ContactInvalidationLength = .1f;
@@ -136,7 +136,7 @@ namespace BEPUphysicsDemos
         /// <param name="scale">Scale to apply to relevant configuration settings.</param>
         public static void ApplyScale(float scale)
         { 
-            CollisionResponseSettings.MaximumPositionCorrectionSpeed *= scale;
+            CollisionResponseSettings.MaximumPenetrationCorrectionSpeed *= scale;
             CollisionResponseSettings.BouncinessVelocityThreshold *= scale;
             CollisionResponseSettings.StaticFrictionVelocityThreshold *= scale;
             CollisionDetectionSettings.ContactInvalidationLength *= scale;

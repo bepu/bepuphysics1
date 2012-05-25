@@ -1,16 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.CollisionShapes;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
 using BEPUphysics.CollisionRuleManagement;
 using System;
 using BEPUphysics.Collidables.Events;
-using BEPUphysics.CollisionShapes.ConvexShapes;
-using BEPUphysics.MathExtensions;
-using Microsoft.Xna.Framework;
 using BEPUphysics.DataStructures;
-using BEPUphysics.OtherSpaceStages;
 
 namespace BEPUphysics.Collidables
 {
@@ -94,11 +89,34 @@ namespace BEPUphysics.Collidables
         {
             for (int i = 0; i < pairs.Count; i++)
             {
-                pairs[i].CollisionRule = CollisionRules.CollisionRuleCalculator(pairs[i].BroadPhaseOverlap.entryA.collisionRules, pairs[i].BroadPhaseOverlap.entryB.collisionRules);
+                pairs[i].CollisionRule = CollisionRules.CollisionRuleCalculator(pairs[i].BroadPhaseOverlap.entryA, pairs[i].BroadPhaseOverlap.entryB);
             }
         }
 
 
+
+        internal void AddPair(CollidablePairHandler pair, ref int index)
+        {
+            index = pairs.count;
+            pairs.Add(pair);
+        }
+
+        internal void RemovePair(CollidablePairHandler pair, ref int index)
+        {
+            if (pairs.count > index)
+            {
+                pairs.FastRemoveAt(index);
+                if (pairs.count > index)
+                {
+                    var endPair = pairs.Elements[index];
+                    if (endPair.CollidableA == this)
+                        endPair.listIndexA = index;
+                    else
+                        endPair.listIndexB = index;
+                }
+            }
+            index = -1;
+        }
 
 
     }

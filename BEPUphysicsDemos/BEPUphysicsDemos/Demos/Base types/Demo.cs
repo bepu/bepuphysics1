@@ -1,9 +1,7 @@
 ﻿
 using System;
 using System.Diagnostics;
-using System.Threading;
 using BEPUphysics;
-using BEPUphysics.Settings;
 
 namespace BEPUphysicsDemos.Demos
 {

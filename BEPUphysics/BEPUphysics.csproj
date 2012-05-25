@@ -102,7 +102,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BroadPhaseSystems\BroadPhase.cs" />
-    <Compile Include="BroadPhaseSystems\BroadPhaseEntry.cs" />
+    <Compile Include="BroadPhaseEntries\BroadPhaseEntry.cs" />
     <Compile Include="BroadPhaseSystems\BroadPhaseOverlap.cs" />
     <Compile Include="BroadPhaseSystems\BruteForce.cs" />
     <Compile Include="BroadPhaseSystems\Hierarchies\DynamicHierarchy.cs" />
@@ -118,13 +118,14 @@
     <Compile Include="BroadPhaseSystems\SortAndSweep\SortAndSweep1D.cs" />
     <Compile Include="BroadPhaseSystems\SortAndSweep\Testing\SortAndSweep3D.cs" />
     <Compile Include="BroadPhaseSystems\SortAndSweep\SortedGrid2DSet.cs" />
-    <Compile Include="Collidables\StaticGroup.cs" />
-    <Compile Include="Collidables\StaticCollidable.cs" />
-    <Compile Include="Collidables\Events\CompoundEventManager.cs" />
-    <Compile Include="Collidables\Events\IContactEventTriggerer.cs" />
-    <Compile Include="Collidables\Events\IEntryEventTriggerer.cs" />
-    <Compile Include="Collidables\MobileCollidables\CompoundHelper.cs" />
-    <Compile Include="Collidables\MobileCollidables\MobileMeshCollidable.cs" />
+    <Compile Include="BroadPhaseEntries\StaticGroup.cs" />
+    <Compile Include="BroadPhaseEntries\StaticCollidable.cs" />
+    <Compile Include="BroadPhaseEntries\Events\CompoundEventManager.cs" />
+    <Compile Include="BroadPhaseEntries\Events\IContactEventTriggerer.cs" />
+    <Compile Include="BroadPhaseEntries\Events\IEntryEventTriggerer.cs" />
+    <Compile Include="BroadPhaseEntries\MobileCollidables\CompoundHelper.cs" />
+    <Compile Include="BroadPhaseEntries\MobileCollidables\MobileMeshCollidable.cs" />
+    <Compile Include="CollisionRuleManagement\ICollisionRulesOwner.cs" />
     <Compile Include="CollisionShapes\StaticGroupShape.cs" />
     <Compile Include="CollisionShapes\MobileMeshShape.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\TrianglePairTester.cs" />
@@ -153,15 +154,15 @@
     <Compile Include="DataStructures\StaticMeshData.cs" />
     <Compile Include="DataStructures\TransformableMeshData.cs" />
     <Compile Include="DataStructures\TreeOverlapPair.cs" />
-    <Compile Include="Collidables\CollidableCollection.cs" />
-    <Compile Include="Collidables\CollidablePair.cs" />
-    <Compile Include="Collidables\EntityCollidableCollection.cs" />
-    <Compile Include="Collidables\InstancedMesh.cs" />
-    <Compile Include="Collidables\MobileCollidables\CompoundCollidable.cs" />
-    <Compile Include="Collidables\MobileCollidables\CompoundHierarchy.cs" />
-    <Compile Include="Collidables\MobileCollidables\ConvexCollidable.cs" />
-    <Compile Include="Collidables\MobileCollidables\EntityCollidable.cs" />
-    <Compile Include="Collidables\MobileCollidables\TriangleCollidable.cs" />
+    <Compile Include="BroadPhaseEntries\CollidableCollection.cs" />
+    <Compile Include="BroadPhaseEntries\CollidablePair.cs" />
+    <Compile Include="BroadPhaseEntries\EntityCollidableCollection.cs" />
+    <Compile Include="BroadPhaseEntries\InstancedMesh.cs" />
+    <Compile Include="BroadPhaseEntries\MobileCollidables\CompoundCollidable.cs" />
+    <Compile Include="BroadPhaseEntries\MobileCollidables\CompoundHierarchy.cs" />
+    <Compile Include="BroadPhaseEntries\MobileCollidables\ConvexCollidable.cs" />
+    <Compile Include="BroadPhaseEntries\MobileCollidables\EntityCollidable.cs" />
+    <Compile Include="BroadPhaseEntries\MobileCollidables\TriangleCollidable.cs" />
     <Compile Include="CollisionShapes\ConvexShapes\BoxShape.cs" />
     <Compile Include="CollisionShapes\ConvexShapes\CapsuleShape.cs" />
     <Compile Include="CollisionShapes\ConvexShapes\ConeShape.cs" />
@@ -250,6 +251,7 @@
     <Compile Include="DeactivationManagement\SimulationIsland.cs" />
     <Compile Include="DeactivationManagement\SimulationIslandConnection.cs" />
     <Compile Include="DeactivationManagement\SimulationIslandMember.cs" />
+    <Compile Include="DeactivationManagement\SimulationIslandMemberList.cs" />
     <Compile Include="Entities\EntitySolverUpdateableCollection.cs" />
     <Compile Include="Entities\EntityConstraintCollection.cs" />
     <Compile Include="Entities\Prefabs\Box.cs" />
@@ -271,6 +273,12 @@
     <Compile Include="NarrowPhaseSystems\Pairs\ConvexPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\CompoundGroupPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\ConvexConstraintPairHandler.cs" />
+    <Compile Include="NarrowPhaseSystems\Pairs\DetectorVolumeMobileMeshPairHandler.cs" />
+    <Compile Include="NarrowPhaseSystems\Pairs\DetectorVolumeCompoundPairHandler.cs" />
+    <Compile Include="NarrowPhaseSystems\Pairs\DetectorVolumeGroupPairHandler.cs" />
+    <Compile Include="NarrowPhaseSystems\Pairs\DetectorVolumeConvexPairHandler.cs" />
+    <Compile Include="NarrowPhaseSystems\Pairs\DetectorVolumePairHandler.cs" />
+    <Compile Include="NarrowPhaseSystems\Pairs\IDetectorVolumePairHandlerParent.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\StaticGroupCompoundPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\StaticGroupMobileMeshPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\StaticGroupConvexPairHandler.cs" />
@@ -296,9 +304,9 @@
     <Compile Include="PositionUpdating\ContinuousPositionUpdater.cs" />
     <Compile Include="PositionUpdating\DiscretePositionUpdater.cs" />
     <Compile Include="MathExtensions\AffineTransform.cs" />
-    <Compile Include="Collidables\Events\ContactEventManager.cs" />
-    <Compile Include="Collidables\Events\EntryEventManager.cs" />
-    <Compile Include="Collidables\Terrain.cs" />
+    <Compile Include="BroadPhaseEntries\Events\ContactEventManager.cs" />
+    <Compile Include="BroadPhaseEntries\Events\EntryEventManager.cs" />
+    <Compile Include="BroadPhaseEntries\Terrain.cs" />
     <Compile Include="Settings\CollisionResponseSettings.cs" />
     <Compile Include="Settings\MotionSettings.cs" />
     <Compile Include="NarrowPhaseSystems\NarrowPhaseHelper.cs" />
@@ -328,7 +336,6 @@
     <Compile Include="CollisionRuleManagement\CollisionGroupPair.cs" />
     <Compile Include="CollisionRuleManagement\CollisionRule.cs" />
     <Compile Include="CollisionRuleManagement\CollisionRules.cs" />
-    <Compile Include="CollisionRuleManagement\ICollisionRulesOwner.cs" />
     <Compile Include="CollisionShapes\CollisionShape.cs" />
     <Compile Include="CollisionShapes\CompoundShape.cs" />
     <Compile Include="CollisionShapes\ConvexShapes\TriangleShape.cs" />
@@ -368,7 +375,7 @@
     <Compile Include="OtherSpaceStages\IDeferredEventCreator.cs" />
     <Compile Include="OtherSpaceStages\IDeferredEventCreatorOwner.cs" />
     <Compile Include="PositionUpdating\IPositionUpdateable.cs" />
-    <Compile Include="Collidables\MobileCollidables\MobileCollidable.cs" />
+    <Compile Include="BroadPhaseEntries\MobileCollidables\MobileCollidable.cs" />
     <Compile Include="PositionUpdating\PositionUpdater.cs" />
     <Compile Include="EntityStateManagement\InterpolatedStatesManager.cs" />
     <Compile Include="MultithreadedProcessingStage.cs" />
@@ -377,8 +384,9 @@
     <Compile Include="Materials\MaterialManager.cs" />
     <Compile Include="Materials\MaterialPair.cs" />
     <Compile Include="Materials\InteractionProperties.cs" />
-    <Compile Include="Collidables\Events\CollisionEventTypes.cs" />
+    <Compile Include="BroadPhaseEntries\Events\CollisionEventTypes.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\CollidablePairHandler.cs" />
+    <Compile Include="BroadPhaseEntries\DetectorVolume.cs" />
     <Compile Include="Vehicle\WheelFrictionBlender.cs" />
     <Compile Include="Settings\CollisionDetectionSettings.cs" />
     <Compile Include="SolverSystems\SolverUpdateable.cs" />
@@ -389,7 +397,7 @@
     <Compile Include="MathExtensions\Matrix2x3.cs" />
     <Compile Include="MathExtensions\Matrix3x2.cs" />
     <Compile Include="MathExtensions\Matrix3x3.cs" />
-    <Compile Include="Collidables\Collidable.cs" />
+    <Compile Include="BroadPhaseEntries\Collidable.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\NarrowPhasePair.cs" />
     <Compile Include="NarrowPhaseSystems\NarrowPhase.cs" />
     <Compile Include="NarrowPhaseSystems\NarrowPhasePairFactory.cs" />
@@ -422,7 +430,7 @@
     <Compile Include="SolverSystems\SolverUpdateableChange.cs" />
     <Compile Include="Space.cs" />
     <Compile Include="OtherSpaceStages\SpaceObjectBuffer.cs" />
-    <Compile Include="Collidables\StaticMesh.cs" />
+    <Compile Include="BroadPhaseEntries\StaticMesh.cs" />
     <Compile Include="Threading\ConcurrentDeque.cs" />
     <Compile Include="Threading\IThreadManager.cs" />
     <Compile Include="Threading\Modified Pool\ParallelLoopManager.cs" />
@@ -436,7 +444,6 @@
     <Compile Include="Toolbox.cs" />
     <Compile Include="Materials\IMaterialOwner.cs" />
     <Compile Include="UpdateableSystems\CombinedUpdateable.cs" />
-    <Compile Include="UpdateableSystems\DetectorVolume.cs" />
     <Compile Include="UpdateableSystems\FluidVolume.cs" />
     <Compile Include="UpdateableSystems\ForceFields\BoundingBoxForceFieldShape.cs" />
     <Compile Include="UpdateableSystems\ForceFields\ForceField.cs" />

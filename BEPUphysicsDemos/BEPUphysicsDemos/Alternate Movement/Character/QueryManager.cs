@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.Collidables.MobileCollidables;
 using BEPUphysics.DataStructures;
 using BEPUphysics.CollisionTests;
@@ -66,7 +67,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         bool SupportRayFilterFunction(BroadPhaseEntry entry)
         {
             //Only permit an object to be used as a support if it fully collides with the character.
-            return CollisionRules.CollisionRuleCalculator(entry.CollisionRules, character.Body.CollisionInformation.CollisionRules) == CollisionRule.Normal;
+            return CollisionRules.CollisionRuleCalculator(entry, character.Body.CollisionInformation) == CollisionRule.Normal;
         }
 
         /// <summary>

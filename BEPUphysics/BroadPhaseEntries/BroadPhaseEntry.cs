@@ -1,16 +1,17 @@
 ﻿using System;
+using BEPUphysics.BroadPhaseSystems;
 using Microsoft.Xna.Framework;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.MathExtensions;
 
-namespace BEPUphysics.BroadPhaseSystems
+namespace BEPUphysics.BroadPhaseEntries
 {
     /// <summary>
     /// Superclass of all objects which live inside the broad phase.
     /// The BroadPhase will generate pairs between BroadPhaseEntries.
     /// </summary>
-    public abstract class BroadPhaseEntry : ICollisionRulesOwner, IBoundingBoxOwner
+    public abstract class BroadPhaseEntry : IBoundingBoxOwner, ICollisionRulesOwner
     {
         internal int hashCode;
         protected BroadPhaseEntry()

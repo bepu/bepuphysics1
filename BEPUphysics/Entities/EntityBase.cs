@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.Collidables.MobileCollidables;
 using BEPUphysics.CollisionShapes.ConvexShapes;
@@ -1237,9 +1238,6 @@ namespace BEPUphysics.Entities
         /// detection pipeline, consider using the entity.CollisionInformation.Tag.
         /// </summary>
         public object Tag { get; set; }
-
-
-
 
 
 

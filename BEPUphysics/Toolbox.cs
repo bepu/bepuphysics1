@@ -90,6 +90,64 @@ namespace BEPUphysics
         /// </summary>
         /// <param name="ray">Ray to test.</param>
         /// <param name="maximumLength">Maximum length to travel in units of the direction's length.</param>
+        /// <param name="a">First vertex of the triangle.</param>
+        /// <param name="b">Second vertex of the triangle.</param>
+        /// <param name="c">Third vertex of the triangle.</param>
+        /// <param name="hitClockwise">True if the the triangle was hit on the clockwise face, false otherwise.</param>
+        /// <param name="hit">Hit data of the ray, if any</param>
+        /// <returns>Whether or not the ray and triangle intersect.</returns>
+        public static bool FindRayTriangleIntersection(ref Ray ray, float maximumLength, ref Vector3 a, ref Vector3 b, ref Vector3 c, out bool hitClockwise, out RayHit hit)
+        {
+            hitClockwise = false;
+            hit = new RayHit();
+            Vector3 ab, ac;
+            Vector3.Subtract(ref b, ref a, out ab);
+            Vector3.Subtract(ref c, ref a, out ac);
+
+            Vector3.Cross(ref ab, ref ac, out hit.Normal);
+            if (hit.Normal.LengthSquared() < Epsilon)
+                return false; //Degenerate triangle!
+
+            float d;
+            Vector3.Dot(ref ray.Direction, ref hit.Normal, out d);
+            d = -d;
+
+            hitClockwise = d >= 0;
+
+            Vector3 ap;
+            Vector3.Subtract(ref ray.Position, ref a, out ap);
+
+            Vector3.Dot(ref ap, ref hit.Normal, out hit.T);
+            hit.T /= d;
+            if (hit.T < 0 || hit.T > maximumLength)
+                return false;//Hit is behind origin, or too far away.
+
+            Vector3.Multiply(ref ray.Direction, hit.T, out hit.Location);
+            Vector3.Add(ref ray.Position, ref hit.Location, out hit.Location);
+
+            // Compute barycentric coordinates
+            Vector3.Subtract(ref hit.Location, ref a, out ap);
+            float ABdotAB, ABdotAC, ABdotAP;
+            float ACdotAC, ACdotAP;
+            Vector3.Dot(ref ab, ref ab, out ABdotAB);
+            Vector3.Dot(ref ab, ref ac, out ABdotAC);
+            Vector3.Dot(ref ab, ref ap, out ABdotAP);
+            Vector3.Dot(ref ac, ref ac, out ACdotAC);
+            Vector3.Dot(ref ac, ref ap, out ACdotAP);
+
+            float denom = 1 / (ABdotAB * ACdotAC - ABdotAC * ABdotAC);
+            float u = (ACdotAC * ABdotAP - ABdotAC * ACdotAP) * denom;
+            float v = (ABdotAB * ACdotAP - ABdotAC * ABdotAP) * denom;
+
+            return (u >= -Toolbox.BigEpsilon) && (v >= -Toolbox.BigEpsilon) && (u + v <= 1 + Toolbox.BigEpsilon);
+
+        }
+
+        /// <summary>
+        /// Determines the intersection between a ray and a triangle.
+        /// </summary>
+        /// <param name="ray">Ray to test.</param>
+        /// <param name="maximumLength">Maximum length to travel in units of the direction's length.</param>
         /// <param name="sidedness">Sidedness of the triangle to test.</param>
         /// <param name="a">First vertex of the triangle.</param>
         /// <param name="b">Second vertex of the triangle.</param>

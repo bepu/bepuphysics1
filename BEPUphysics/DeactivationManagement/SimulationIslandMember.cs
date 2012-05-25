@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using BEPUphysics.DataStructures;
 using BEPUphysics.Entities;
-using System.Threading;
 
 namespace BEPUphysics.DeactivationManagement
 {
@@ -121,7 +117,7 @@ namespace BEPUphysics.DeactivationManagement
                         //If velocity is not zero, then the flag is set to 'this is active.'
                         velocityTimeBelowLimit = -1;
                     }
-                    
+
                     if (velocityTimeBelowLimit <= 0)
                     {
                         //There's a single oddity we need to worry about in this case.
@@ -132,14 +128,14 @@ namespace BEPUphysics.DeactivationManagement
 
                         for (int i = 0; i < connections.count; i++)
                         {
-                            var connectedMembers = connections.Elements[i].members;
+                            var connectedMembers = connections.Elements[i].entries;
                             for (int j = connectedMembers.count - 1; j >= 0; j--)
                             {
                                 //The change locker must be obtained before attempting to access the SimulationIsland.
                                 //Path compression can force the simulation island to evaluate to null briefly.
                                 //Do not permit the object to undergo path compression during this (brief) operation.
-                                connectedMembers.Elements[j].simulationIslandChangeLocker.Enter();
-                                var island = connectedMembers.Elements[j].SimulationIsland;
+                                connectedMembers.Elements[j].Member.simulationIslandChangeLocker.Enter();
+                                var island = connectedMembers.Elements[j].Member.SimulationIsland;
                                 if (island != null)
                                 {
                                     //It's possible a kinematic entity to go inactive for one frame, allowing nearby entities to go to sleep.
@@ -150,7 +146,7 @@ namespace BEPUphysics.DeactivationManagement
                                     island.Activate();
                                     island.allowDeactivation = false;
                                 }
-                                connectedMembers.Elements[j].simulationIslandChangeLocker.Exit();
+                                connectedMembers.Elements[j].Member.simulationIslandChangeLocker.Exit();
                             }
                         }
                     }
@@ -406,17 +402,26 @@ namespace BEPUphysics.DeactivationManagement
         /// Removes a connection reference from the member.
         ///</summary>
         ///<param name="connection">Reference to remove.</param>
-        internal void RemoveConnectionReference(SimulationIslandConnection connection)
+        ///<param name="index">Index of the connection in this member's list</param>
+        internal void RemoveConnectionReference(SimulationIslandConnection connection, int index)
         {
-            connections.FastRemove(connection);
+            if (connections.count > index)
+            {
+                connections.FastRemoveAt(index);
+                if (connections.count > index)
+                    connections.Elements[index].SetListIndex(this, index);
+            }
         }
+
         ///<summary>
         /// Adds a connection reference to the member.
         ///</summary>
         ///<param name="connection">Reference to add.</param>
-        internal void AddConnectionReference(SimulationIslandConnection connection)
+        ///<returns>Index of the connection in the member's list.</returns>
+        internal int AddConnectionReference(SimulationIslandConnection connection)
         {
             connections.Add(connection);
+            return connections.count - 1;
         }
 
 

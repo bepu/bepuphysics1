@@ -84,9 +84,6 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             Vector3 sweepA = new Vector3(0, 10, 0);
             Vector3 sweepB = new Vector3(0, -10, 0);
 
-            if (Game.KeyboardInput.IsKeyDown(Keys.P))
-                Debug.WriteLine("Breka.");
-
             if (hit = MPRToolbox.Sweep(aShape, bShape, ref sweepA, ref sweepB, ref aTransform, ref bTransform, out hitData))
             //if (hit = OldGJKVerifier.ConvexCast(a.CollisionInformation.Shape, b.CollisionInformation.Shape, ref sweepA, ref sweepB, ref aTransform, ref bTransform, out hitData))
             {

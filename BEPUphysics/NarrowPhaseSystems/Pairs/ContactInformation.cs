@@ -40,7 +40,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
 
         public override string ToString()
         {
-            return Contact + " NormalForce: " + NormalImpulse + " FrictionForce: " + FrictionImpulse + " RelativeVelocity: " + RelativeVelocity;
+            return Contact + " NormalImpulse: " + NormalImpulse + " FrictionImpulse: " + FrictionImpulse + " RelativeVelocity: " + RelativeVelocity;
         }
 
 

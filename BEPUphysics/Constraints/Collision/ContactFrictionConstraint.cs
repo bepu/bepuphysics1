@@ -96,9 +96,9 @@ namespace BEPUphysics.Constraints.Collision
         }
 
         /// <summary>
-        /// Gets the total force applied by this friction constraint.
+        /// Gets the total impulse applied by this friction constraint in the last time step.
         /// </summary>
-        public float TotalForce
+        public float TotalImpulse
         {
             get { return accumulatedImpulse; }
         }

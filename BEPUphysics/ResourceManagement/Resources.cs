@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.Collidables.MobileCollidables;
 using BEPUphysics.Entities;
@@ -9,6 +10,7 @@ using BEPUphysics.DataStructures;
 using BEPUphysics.DeactivationManagement;
 using System.Diagnostics;
 using BEPUphysics.Collidables;
+using BEPUphysics.MathExtensions;
 
 namespace BEPUphysics.ResourceManagement
 {
@@ -398,6 +400,8 @@ namespace BEPUphysics.ResourceManagement
             shape.vA = a;
             shape.vB = b;
             shape.vC = c;
+            var identity = RigidTransform.Identity;
+            tri.UpdateBoundingBoxForTransform(ref identity);
             return tri;
 
         }

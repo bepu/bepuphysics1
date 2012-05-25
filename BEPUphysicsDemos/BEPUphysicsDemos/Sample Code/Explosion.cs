@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using BEPUphysics;
+using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.Collidables.MobileCollidables;
 using Microsoft.Xna.Framework;

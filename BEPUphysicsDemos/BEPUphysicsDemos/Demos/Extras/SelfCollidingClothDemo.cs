@@ -45,10 +45,7 @@ namespace BEPUphysicsDemos.Demos.Extras
                             2 + zSpacing * j - (numColumns - 1) * zSpacing / 2f),
                         xSpacing, .1f, zSpacing, 1);
 
-                    //latticePiece.LocalInertiaTensorInverse = new Matrix3X3();
-                    //latticePiece.Tag = "noDisplayObject"; //The joint lines are visible enough; don't add a sphere model for this sphere.
                     lattice[i, j] = latticePiece;
-                    latticePiece.Material.KineticFriction = 0;
 
                     Space.Add(latticePiece);
                 }
@@ -154,7 +151,9 @@ namespace BEPUphysicsDemos.Demos.Extras
 
 
             //Add some ground.
-            Space.Add(new Sphere(new Vector3(7, 0, 0), 10));
+            var sphere = new Sphere(new Vector3(7, 0, 0), 10);
+            sphere.Material.KineticFriction = .2f;
+            Space.Add(sphere);
             Space.Add(new Box(new Vector3(0, -20.5f, 0), 100f, 10, 100f));
 
             game.Camera.Position = new Vector3(0, 5, 25);

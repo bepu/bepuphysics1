@@ -198,10 +198,10 @@ namespace BEPUphysics.DeactivationManagement
                     //We need to notify its connections directly.
                     foreach (var connection in simulationIslandMember.connections)
                     {
-                        foreach (var member in connection.members)
+                        foreach (var entry in connection.entries)
                         {
-                            if (member != simulationIslandMember)
-                                member.Activate();
+                            if (entry.Member != simulationIslandMember)
+                                entry.Member.Activate();
                         }
                     }
                 }
@@ -294,11 +294,11 @@ namespace BEPUphysics.DeactivationManagement
                     attempt.SlatedForRemoval = false; //Reset the removal state so that future adds will add back references, since we're about to remove them.
                     attempt.RemoveReferencesFromConnectedMembers();
                     bool triedToSplit = false;
-                    for (int i = 0; i < attempt.members.count; i++)
+                    for (int i = 0; i < attempt.entries.count; i++)
                     {
-                        for (int j = i + 1; j < attempt.members.count; j++)
+                        for (int j = i + 1; j < attempt.entries.count; j++)
                         {
-                            triedToSplit |= TryToSplit(attempt.members.Elements[i], attempt.members.Elements[j]);
+                            triedToSplit |= TryToSplit(attempt.entries.Elements[i].Member, attempt.entries.Elements[j].Member);
                         }
                     }
                     //Only count the split if it does any work.
@@ -359,13 +359,13 @@ namespace BEPUphysics.DeactivationManagement
             if (connection.DeactivationManager == null)
             {
                 connection.DeactivationManager = this;
-                if (connection.members.count > 0)
+                if (connection.entries.count > 0)
                 {
-                    var island = connection.members.Elements[0].SimulationIsland;
-                    for (int i = 1; i < connection.members.count; i++)
+                    var island = connection.entries.Elements[0].Member.SimulationIsland;
+                    for (int i = 1; i < connection.entries.count; i++)
                     {
                         SimulationIsland opposingIsland;
-                        if (island != (opposingIsland = connection.members.Elements[i].SimulationIsland))
+                        if (island != (opposingIsland = connection.entries.Elements[i].Member.SimulationIsland))
                         {
                             //Need to do a merge between the two islands.
                             //Note that this merge may eliminate the need for a merge with subsequent connection if they belong to the same island.
@@ -512,10 +512,10 @@ namespace BEPUphysics.DeactivationManagement
                 SimulationIslandMember currentNode = member1Friends.Dequeue();
                 for (int i = 0; i < currentNode.connections.count; i++)
                 {
-                    for (int j = 0; j < currentNode.connections.Elements[i].members.count; j++)
+                    for (int j = 0; j < currentNode.connections.Elements[i].entries.count; j++)
                     {
                         SimulationIslandMember connectedNode;
-                        if ((connectedNode = currentNode.connections.Elements[i].members.Elements[j]) != currentNode &&
+                        if ((connectedNode = currentNode.connections.Elements[i].entries.Elements[j].Member) != currentNode &&
                             connectedNode.SimulationIsland != null) //The connection could be connected to something that isn't in the Space and has no island, or it's not dynamic.
                         {
                             switch (connectedNode.searchState)
@@ -540,10 +540,10 @@ namespace BEPUphysics.DeactivationManagement
                 currentNode = member2Friends.Dequeue();
                 for (int i = 0; i < currentNode.connections.count; i++)
                 {
-                    for (int j = 0; j < currentNode.connections.Elements[i].members.count; j++)
+                    for (int j = 0; j < currentNode.connections.Elements[i].entries.count; j++)
                     {
                         SimulationIslandMember connectedNode;
-                        if ((connectedNode = currentNode.connections.Elements[i].members.Elements[j]) != currentNode &&
+                        if ((connectedNode = currentNode.connections.Elements[i].entries.Elements[j].Member) != currentNode &&
                             connectedNode.SimulationIsland != null) //The connection could be connected to something that isn't in the Space and has no island, or it's not dynamic.
                         {
                             switch (connectedNode.searchState)
@@ -656,9 +656,9 @@ namespace BEPUphysics.DeactivationManagement
                 {
                     //Find a member with a non-null island to represent connection i.
                     SimulationIslandMember representativeA = null;
-                    for (int j = 0; j < member.connections.Elements[i].members.count; j++)
+                    for (int j = 0; j < member.connections.Elements[i].entries.count; j++)
                     {
-                        if (member.connections.Elements[i].members.Elements[j].SimulationIsland != null)
+                        if (member.connections.Elements[i].entries.Elements[j].Member.SimulationIsland != null)
                         {
                             representativeA = member;
                             break;
@@ -678,9 +678,9 @@ namespace BEPUphysics.DeactivationManagement
                     {
                         //Find a representative for another connection.
                         SimulationIslandMember representativeB = null;
-                        for (int k = 0; k < member.connections.Elements[j].members.count; k++)
+                        for (int k = 0; k < member.connections.Elements[j].entries.count; k++)
                         {
-                            if (member.connections.Elements[j].members.Elements[k].SimulationIsland != null)
+                            if (member.connections.Elements[j].entries.Elements[k].Member.SimulationIsland != null)
                             {
                                 representativeB = member;
                                 break;
@@ -724,9 +724,9 @@ namespace BEPUphysics.DeactivationManagement
                 //Find a simulation starting island to live in.
                 for (int i = 0; i < member.Connections.Count; i++)
                 {
-                    for (int j = 0; j < member.connections.Elements[i].members.count; j++)
+                    for (int j = 0; j < member.connections.Elements[i].entries.count; j++)
                     {
-                        island = member.connections.Elements[i].members.Elements[j].SimulationIsland;
+                        island = member.connections.Elements[i].entries.Elements[j].Member.SimulationIsland;
                         if (island != null)
                         {
                             island.Add(member);
@@ -754,11 +754,11 @@ namespace BEPUphysics.DeactivationManagement
                 //Merges must be attempted between its connected members.
                 for (int i = 0; i < member.connections.count; i++)
                 {
-                    for (int j = 0; j < member.connections.Elements[i].members.count; j++)
+                    for (int j = 0; j < member.connections.Elements[i].entries.count; j++)
                     {
-                        if (member.connections.Elements[i].members.Elements[j] == member)
+                        if (member.connections.Elements[i].entries.Elements[j].Member == member)
                             continue; //Don't bother trying to compare against ourselves.  That would cause an erroneous early-out sometimes.
-                        SimulationIsland opposingIsland = member.connections.Elements[i].members.Elements[j].SimulationIsland;
+                        SimulationIsland opposingIsland = member.connections.Elements[i].entries.Elements[j].Member.SimulationIsland;
                         if (opposingIsland != null)
                         {
                             if (island != opposingIsland)
