@@ -87,8 +87,8 @@ namespace BEPUphysicsDemos.SampleCode
                        float height, bool spinClockwise, float horizontalWindSpeed,
                        float upwardSuctionSpeed, float inwardSuctionSpeed,
                        float horizontalForce, float upwardForce, float inwardForce,
-                       float topRadius, float bottomRadius, IQueryAccelerator accelerator)
-            : base(shape, accelerator)
+                       float topRadius, float bottomRadius)
+            : base(shape)
         {
             Axis = Vector3.Normalize(axis);
             Position = position;

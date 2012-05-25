@@ -71,6 +71,7 @@ namespace BEPUphysicsDemos
         //Display Booleans        
         private bool displayEntities = true;
         private bool displayUI = true;
+        private bool displayActiveEntityCount = true;
         private bool displayConstraints = true;
         private bool displayMenu;
         private bool displayContacts;
@@ -311,7 +312,10 @@ namespace BEPUphysicsDemos
 #endif
             if (WasKeyPressed(Keys.I))
             {
-                displayUI = !displayUI;
+                if (KeyboardInput.IsKeyDown(Keys.RightShift) || KeyboardInput.IsKeyDown(Keys.LeftShift))
+                    displayActiveEntityCount = !displayActiveEntityCount;
+                else
+                    displayUI = !displayUI;
             }
             if (WasKeyPressed(Keys.J))
             {
@@ -450,14 +454,16 @@ namespace BEPUphysicsDemos
                 DataTextDrawer.Draw("FPS: ", FPStoDisplay, new Vector2(50, bottom - 150));
                 DataTextDrawer.Draw("Physics Time (ms): ", averagePhysicsTime, new Vector2(50, bottom - 133));
                 DataTextDrawer.Draw("Collision Pairs: ", currentSimulation.Space.NarrowPhase.Pairs.Count, new Vector2(50, bottom - 116));
-                int countActive = 0;
-
-                for (int i = 0; i < currentSimulation.Space.Entities.Count; i++)
+                if (displayActiveEntityCount)
                 {
-                    if (currentSimulation.Space.Entities[i].ActivityInformation.IsActive)
-                        countActive++;
+                    int countActive = 0;
+                    for (int i = 0; i < currentSimulation.Space.Entities.Count; i++)
+                    {
+                        if (currentSimulation.Space.Entities[i].ActivityInformation.IsActive)
+                            countActive++;
+                    }
+                    DataTextDrawer.Draw("Active Objects: ", countActive, new Vector2(50, bottom - 99));
                 }
-                DataTextDrawer.Draw("Active Objects: ", countActive, new Vector2(50, bottom - 99));
 #if !WINDOWS
                 DataTextDrawer.Draw("Press Start for Controls", new Vector2(50, bottom - 82));
 #else

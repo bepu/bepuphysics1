@@ -13,7 +13,7 @@ namespace BEPUphysics.Vehicle
     /// Responsible for figuring out where the wheel touches the ground and
     /// managing graphical properties.
     /// </summary>
-    public abstract class WheelShape
+    public abstract class WheelShape : ICollisionRulesOwner
     {
         private float airborneWheelAcceleration = 40;
 
@@ -37,6 +37,16 @@ namespace BEPUphysics.Vehicle
         protected internal Wheel wheel;
 
         protected internal Matrix worldTransform;
+
+        CollisionRules collisionRules = new CollisionRules() { Group = CollisionRules.DefaultDynamicCollisionGroup};
+        /// <summary>
+        /// Gets or sets the collision rules used by the wheel.
+        /// </summary>
+        public CollisionRules CollisionRules
+        {
+            get { return collisionRules; }
+            set { collisionRules = value; }
+        }
 
         /// <summary>
         /// Gets or sets the graphical radius of the wheel.

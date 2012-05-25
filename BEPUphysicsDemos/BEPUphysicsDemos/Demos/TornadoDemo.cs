@@ -26,7 +26,7 @@ namespace BEPUphysicsDemos.Demos
         {
             shape = new BoundingBoxForceFieldShape(new BoundingBox(new Vector3(-100, -20, -40), new Vector3(-20, 120, 40)));
             tornado = new Tornado(shape, (shape.BoundingBox.Min + shape.BoundingBox.Max) / 2, new Vector3(0, 1, 0),
-                                  150, false, 50, 10, 200, 200, 80, 2000, 40, 10, Space.BroadPhase.QueryAccelerator);
+                                  150, false, 50, 10, 200, 200, 80, 2000, 40, 10);
             tornado.ForceWakeUp = true; //The tornado will be moving, so it should wake up things that it comes into contact with.
             Space.Add(tornado);
 

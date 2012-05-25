@@ -116,7 +116,7 @@ namespace BEPUphysics.Vehicle
                 testCollidable = (pair.BroadPhaseOverlap.entryA == detector.CollisionInformation ? pair.BroadPhaseOverlap.entryB : pair.BroadPhaseOverlap.entryA) as Collidable;
                 if (testCollidable != null)
                 {
-                    if (pair.CollisionRule == CollisionRule.Normal &&
+                    if (CollisionRules.CollisionRuleCalculator(this, testCollidable) == CollisionRule.Normal &&
                         testCollidable.RayCast(new Ray(wheel.suspension.worldAttachmentPoint, wheel.suspension.worldDirection), wheel.suspension.restLength, out rayHit) &&
                         rayHit.T < suspensionLength)
                     {
