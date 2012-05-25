@@ -61,7 +61,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                 new Vector3(0.5f ,0.5f ,0.5f)
             };
 
-            indices = new int[] 
+            indices = new[] 
             {
                 2, 1, 0,
                 3, 2, 0,
@@ -104,9 +104,22 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             mesh.Position = new Vector3(0, 0, -10);
             Space.Add(mesh);
 
+            //FloaterTube
+            TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("tube"), out vertices, out indices);
+            mesh = new MobileMesh(vertices, indices, new AffineTransform(new Vector3(1, 1, 1), Quaternion.Identity, new Vector3(0, 0, 0)), MobileMeshSolidity.Solid);
+            mesh.Position = new Vector3(5, 18, 0);
+            Space.Add(mesh);
+
+            //Float a box through the last mesh to check contact generation controllably.
+            var solidityTester = new Box(new Vector3(5, 8, 0), 1, 1, 1);
+            solidityTester.LinearVelocity = new Vector3(0, 1, 0);
+            CollisionRules.AddRule(solidityTester, mesh, CollisionRule.NoSolver);
+            Space.Add(solidityTester);
+
+
             Space.Add(new Box(new Vector3(0, -5, 0), 50, 1, 50));
 
-            game.Camera.Position = new Vector3(0, 30, 20);
+            game.Camera.Position = new Vector3(0, 10, 20);
 
         }
 

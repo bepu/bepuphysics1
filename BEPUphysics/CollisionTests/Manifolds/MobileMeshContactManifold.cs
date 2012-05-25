@@ -10,6 +10,7 @@ using BEPUphysics.ResourceManagement;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
 using System.Diagnostics;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
+using Microsoft.Xna.Framework.Input;
 
 namespace BEPUphysics.CollisionTests.Manifolds
 {
@@ -140,12 +141,10 @@ namespace BEPUphysics.CollisionTests.Manifolds
             get { return mesh.improveBoundaryBehavior; }
         }
 
-        float previousDepth = 0;
+        float previousDepth;
         Vector3 lastValidConvexPosition;
-        bool wasInside;
         protected override void ProcessCandidates(RawValueList<ContactData> candidates)
         {
-            wasInside = false;
             if (candidates.count == 0 && parentContactCount == 0 && Mesh.Shape.solidity == MobileMeshSolidity.Solid)
             {
 
@@ -181,6 +180,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     }
                 }
                 Vector3.Divide(ref ray.Direction, (float)Math.Sqrt(rayDirectionLength), out ray.Direction);
+
 
                 RayHit hit;
                 if (mesh.Shape.IsLocalRayOriginInMesh(ref ray, out hit))
@@ -218,7 +218,6 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     if (addContact && contacts.count == 0)
                         Add(ref newContact);
                     previousDepth = newContact.PenetrationDepth;
-                    wasInside = true;
                 }
                 else
                 {
