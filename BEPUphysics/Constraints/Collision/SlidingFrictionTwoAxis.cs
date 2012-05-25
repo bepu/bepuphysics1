@@ -52,11 +52,11 @@ namespace BEPUphysics.Constraints.Collision
         }
 
         /// <summary>
-        /// Gets the total force applied by sliding friction.
+        /// Gets the total impulse applied by sliding friction in the last time step.
         /// The X component of this vector is the force applied along the frictionDirectionX,
         /// while the Y component is the force applied along the frictionDirectionY.
         /// </summary>
-        public Vector2 TotalForce
+        public Vector2 TotalImpulse
         {
             get { return accumulatedImpulse; }
         }

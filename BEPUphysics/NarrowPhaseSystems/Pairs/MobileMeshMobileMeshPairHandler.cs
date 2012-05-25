@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using BEPUphysics.BroadPhaseSystems;
+﻿using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.Collidables;
 using BEPUphysics.Collidables.MobileCollidables;
-using BEPUphysics.Constraints;
-using BEPUphysics.Constraints.Collision;
-using BEPUphysics.DataStructures;
 using BEPUphysics.ResourceManagement;
-using BEPUphysics.CollisionRuleManagement;
-using BEPUphysics.CollisionTests;
 using Microsoft.Xna.Framework;
 using BEPUphysics.MathExtensions;
 

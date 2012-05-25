@@ -1,4 +1,5 @@
 ﻿using System;
+using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.Collidables;
 using BEPUphysics.Collidables.MobileCollidables;
@@ -58,6 +59,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         {
             get { return contactConstraint; }
         }
+
         protected internal abstract MobileMeshContactManifold MeshManifold { get; }
 
         ///<summary>

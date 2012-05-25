@@ -1,4 +1,5 @@
-﻿using BEPUphysics.BroadPhaseSystems;
+﻿using BEPUphysics.BroadPhaseEntries;
+using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.CollisionRuleManagement;
 
 namespace BEPUphysics.NarrowPhaseSystems.Pairs

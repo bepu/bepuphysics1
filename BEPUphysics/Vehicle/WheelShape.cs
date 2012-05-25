@@ -13,14 +13,13 @@ namespace BEPUphysics.Vehicle
     /// Responsible for figuring out where the wheel touches the ground and
     /// managing graphical properties.
     /// </summary>
-    public abstract class WheelShape : ICollisionRulesOwner
+    public abstract class WheelShape
     {
         private float airborneWheelAcceleration = 40;
 
 
         private float airborneWheelDeceleration = 4;
         private float brakeFreezeWheelDeceleration = 40;
-        private CollisionRules collisionRules = new CollisionRules();
 
         /// <summary>
         /// Collects collision pairs from the environment.
@@ -72,15 +71,6 @@ namespace BEPUphysics.Vehicle
         {
             get { return brakeFreezeWheelDeceleration; }
             set { brakeFreezeWheelDeceleration = Math.Abs(value); }
-        }
-
-        /// <summary>
-        /// Gets or sets the collision rules used to filter wheel supports.
-        /// </summary>
-        public CollisionRules CollisionRules
-        {
-            get { return collisionRules; }
-            set { collisionRules = value; }
         }
 
         /// <summary>
@@ -166,9 +156,9 @@ namespace BEPUphysics.Vehicle
 
         internal void OnAdditionToSpace(ISpace space)
         {
-            detector.CollisionInformation.CollisionRules.Specific.Add(wheel.vehicle.Body.CollisionInformation.collisionRules, CollisionRule.NoBroadPhase);
-            detector.CollisionInformation.CollisionRules.Personal = CollisionRule.NoNarrowPhaseUpdate;
-            collisionRules.group = CollisionRules.DefaultDynamicCollisionGroup;
+            detector.CollisionInformation.collisionRules.Specific.Add(wheel.vehicle.Body.CollisionInformation.collisionRules, CollisionRule.NoBroadPhase);
+            detector.CollisionInformation.collisionRules.Personal = CollisionRule.NoNarrowPhaseUpdate;
+            detector.CollisionInformation.collisionRules.group = CollisionRules.DefaultDynamicCollisionGroup;
 
         }
 

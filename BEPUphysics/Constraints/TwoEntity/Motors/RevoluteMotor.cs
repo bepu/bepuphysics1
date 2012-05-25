@@ -40,12 +40,12 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
         /// </summary>
         /// <param name="connectionA">First connection of the pair.</param>
         /// <param name="connectionB">Second connection of the pair.</param>
-        /// <param name="freeAxis">Allowed rotation axis of the hinge in world space.</param>
-        public RevoluteMotor(Entity connectionA, Entity connectionB, Vector3 freeAxis)
+        /// <param name="motorizedAxis">Rotation axis to control world space.</param>
+        public RevoluteMotor(Entity connectionA, Entity connectionB, Vector3 motorizedAxis)
         {
             ConnectionA = connectionA;
             ConnectionB = connectionB;
-            SetupJointTransforms(freeAxis);
+            SetupJointTransforms(motorizedAxis);
 
             settings = new MotorSettings1D(this);
         }

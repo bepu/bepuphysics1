@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.Collidables;
 using BEPUphysics.Collidables.MobileCollidables;
@@ -158,7 +159,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
 
         protected void TryToAdd(int index)
         {
-            var entry = new TriangleEntry() { Index = index };
+            var entry = new TriangleEntry { Index = index };
             if (!subPairs.ContainsKey(entry))
             {
                 var collidablePair = new CollidablePair(CollidableA, entry.Collidable = GetOpposingCollidable(index));

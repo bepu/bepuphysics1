@@ -239,7 +239,7 @@ namespace BEPUphysics.Constraints
             simulationIslandConnection = Resources.GetSimulationIslandConnection();
             for (int i = 0; i < involvedEntities.count; i++)
             {
-                simulationIslandConnection.members.Add(involvedEntities.Elements[i].activityInformation);
+                simulationIslandConnection.Add(involvedEntities.Elements[i].activityInformation);
             }
             simulationIslandConnection.Owner = this;
 

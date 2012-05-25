@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.ResourceManagement;
 using BEPUphysics.DataStructures;
 using Microsoft.Xna.Framework;

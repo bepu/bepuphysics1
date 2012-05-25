@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using BEPUphysics.BroadPhaseEntries;
 using Microsoft.Xna.Framework;
 
 namespace BEPUphysics.BroadPhaseSystems.Hierarchies

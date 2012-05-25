@@ -75,9 +75,9 @@ namespace BEPUphysics.Constraints.Collision
         }
 
         /// <summary>
-        /// Gets the total normal force applied by this penetration constraint to maintain the separation of the involved entities.
+        /// Gets the total normal impulse applied by this penetration constraint to maintain the separation of the involved entities.
         /// </summary>
-        public float NormalForce
+        public float NormalImpulse
         {
             get { return accumulatedImpulse; }
         }
@@ -181,7 +181,7 @@ namespace BEPUphysics.Constraints.Collision
                 bias = MathHelper.Min(
                     MathHelper.Max(0, contact.PenetrationDepth - CollisionDetectionSettings.AllowedPenetration) *
                     CollisionResponseSettings.PenetrationRecoveryStiffness / dt,
-                    CollisionResponseSettings.MaximumPositionCorrectionSpeed);
+                    CollisionResponseSettings.MaximumPenetrationCorrectionSpeed);
 
                 if (contactManifoldConstraint.materialInteraction.Bounciness > 0)
                 {

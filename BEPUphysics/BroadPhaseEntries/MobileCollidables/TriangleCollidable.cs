@@ -43,7 +43,7 @@ namespace BEPUphysics.Collidables.MobileCollidables
         }
 
         ///<summary>
-        /// Cleans up the collidable by removing all events and setting the shape to null.
+        /// Cleans up the collidable by removing all events.
         ///</summary>
         public void CleanUp()
         {

@@ -73,7 +73,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
         /// </summary>
         public override string Name
         {
-            get { return "Wall"; }
+            get { return "Add-remove Stress Test"; }
         }
     }
 }

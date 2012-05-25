@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.Collidables;
 using BEPUphysics.Collidables.MobileCollidables;
@@ -56,7 +57,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         ///<param name="b">Material of the second member of the pair.</param>
         public override void UpdateMaterialProperties(Material a, Material b)
         {
-            foreach (CollidablePairHandler pairHandler in subPairs.Values)
+            foreach (var pairHandler in subPairs.Values)
             {
                 pairHandler.UpdateMaterialProperties(a, b);
             }
@@ -68,7 +69,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         /// <param name="properties">Properties to use.</param>
         public override void UpdateMaterialProperties(InteractionProperties properties)
         {
-            foreach (CollidablePairHandler pairHandler in subPairs.Values)
+            foreach (var pairHandler in subPairs.Values)
             {
                 pairHandler.UpdateMaterialProperties(properties);
             }
@@ -96,7 +97,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         {
 
             //The pair handler cleanup will get rid of contacts.
-            foreach (CollidablePairHandler pairHandler in subPairs.Values)
+            foreach (var pairHandler in subPairs.Values)
             {
                 pairHandler.CleanUp();
                 //Don't forget to give the pair back to the factory!
@@ -127,7 +128,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         protected void TryToAdd(Collidable a, Collidable b, Material materialA, Material materialB)
         {
             CollisionRule rule;
-            if ((rule = CollisionRules.collisionRuleCalculator(a.collisionRules, b.collisionRules)) < CollisionRule.NoNarrowPhasePair)
+            if ((rule = CollisionRules.collisionRuleCalculator(a, b)) < CollisionRule.NoNarrowPhasePair)
             {
                 //Clamp the rule to the parent's rule.  Always use the more restrictive option.
                 //Don't have to test for NoNarrowPhasePair rule on the parent's rule because then the parent wouldn't exist!
@@ -136,7 +137,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                 var pair = new CollidablePair(a, b);
                 if (!subPairs.ContainsKey(pair))
                 {
-                    CollidablePairHandler newPair = NarrowPhaseHelper.GetPairHandler(ref pair, rule);
+                    var newPair = NarrowPhaseHelper.GetPairHandler(ref pair, rule);
                     if (newPair != null)
                     {
                         newPair.UpdateMaterialProperties(materialA, materialB);  //Override the materials, if necessary.

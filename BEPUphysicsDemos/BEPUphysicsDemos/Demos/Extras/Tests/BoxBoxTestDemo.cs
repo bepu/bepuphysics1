@@ -62,7 +62,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
         /// </summary>
         public override string Name
         {
-            get { return "Colosseum"; }
+            get { return "Box-box test"; }
         }
     }
 }

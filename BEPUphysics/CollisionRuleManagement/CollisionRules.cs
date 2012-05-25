@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using BEPUphysics.DataStructures;
 
@@ -82,7 +82,7 @@ namespace BEPUphysics.CollisionRuleManagement
         }
 
 
-        
+
         internal ObservableDictionary<CollisionRules, CollisionRule> specific = new ObservableDictionary<CollisionRules, CollisionRule>();
         /// <summary>
         /// Specifies how the object owning this instance should react to other individual objects.
@@ -177,12 +177,12 @@ namespace BEPUphysics.CollisionRuleManagement
             CollisionGroupRules.Add(new CollisionGroupPair(DefaultKinematicCollisionGroup, DefaultKinematicCollisionGroup), CollisionRule.NoBroadPhase);
         }
 
-        internal static Func<CollisionRules, CollisionRules, CollisionRule> collisionRuleCalculator = GetCollisionRuleDefault;
+        internal static Func<ICollisionRulesOwner, ICollisionRulesOwner, CollisionRule> collisionRuleCalculator = GetCollisionRuleDefault;
         ///<summary>
         /// Gets or sets the delegate used to calculate collision rules.
         /// Defaults to CollisionRules.GetCollisionRuleDefault.
         ///</summary>
-        public static Func<CollisionRules, CollisionRules, CollisionRule> CollisionRuleCalculator
+        public static Func<ICollisionRulesOwner, ICollisionRulesOwner, CollisionRule> CollisionRuleCalculator
         {
             get
             {
@@ -202,7 +202,7 @@ namespace BEPUphysics.CollisionRuleManagement
         /// <returns>CollisionRule between the pair, according to the CollisionRuleCalculator.</returns>
         public static CollisionRule GetCollisionRule(ICollisionRulesOwner ownerA, ICollisionRulesOwner ownerB)
         {
-            return collisionRuleCalculator(ownerA.CollisionRules, ownerB.CollisionRules);
+            return collisionRuleCalculator(ownerA, ownerB);
         }
 
 
@@ -235,11 +235,13 @@ namespace BEPUphysics.CollisionRuleManagement
         /// <summary>
         /// Determines what collision rule governs the interaction between the two objects.
         /// </summary>
-        /// <param name="a">First ruleset in the pair.  This entity's space is used to determine the collision detection settings that contain special collision group interaction rules.</param>
-        /// <param name="b">Second ruleset in the pair.</param>
+        /// <param name="aOwner">First ruleset owner in the pair.  This entity's space is used to determine the collision detection settings that contain special collision group interaction rules.</param>
+        /// <param name="bOwner">Second ruleset owner in the pair.</param>
         /// <returns>Collision rule governing the interaction between the pair.</returns>
-        public static CollisionRule GetCollisionRuleDefault(CollisionRules a, CollisionRules b)
+        public static CollisionRule GetCollisionRuleDefault(ICollisionRulesOwner aOwner, ICollisionRulesOwner bOwner)
         {
+            var a = aOwner.CollisionRules;
+            var b = bOwner.CollisionRules;
             CollisionRule pairRule = GetSpecificCollisionRuleDefault(a, b);
             if (pairRule == CollisionRule.Defer)
             {

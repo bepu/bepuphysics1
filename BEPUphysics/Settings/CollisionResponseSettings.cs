@@ -12,11 +12,10 @@
         public static float BouncinessVelocityThreshold = 1;
 
         /// <summary>
-        /// Maximum speed at which interpenetrating objects or out of alignment joints will attempt to correct.
-        /// Only applies when the Baumgarte method is used when useSplitImpulsePositionCorrection is set to false for contacts.
+        /// Maximum speed at which interpenetrating objects will attempt to undo any overlap.
         /// Defaults to 2.
         /// </summary>
-        public static float MaximumPositionCorrectionSpeed = 2;
+        public static float MaximumPenetrationCorrectionSpeed = 2;
 
         /// <summary>
         /// Fraction of position error to convert into corrective momentum.

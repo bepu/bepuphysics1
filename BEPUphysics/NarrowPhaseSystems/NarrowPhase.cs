@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.Constraints;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
@@ -155,7 +156,7 @@ namespace BEPUphysics.NarrowPhaseSystems
                 if (!overlapMapping.TryGetValue(overlap, out pair))
                 {
                     //Create/enqueue based on collision table
-                    pair = NarrowPhaseHelper.GetPair(ref overlap);
+                    pair = NarrowPhaseHelper.GetPairHandler(ref overlap);
                     if (pair != null)
                     {
                         pair.NarrowPhase = this;

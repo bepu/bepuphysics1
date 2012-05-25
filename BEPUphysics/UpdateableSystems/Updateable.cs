@@ -10,7 +10,6 @@ namespace BEPUphysics.UpdateableSystems
     ///</summary>
     public abstract class Updateable : ISpaceUpdateable
     {
-        private bool isSequentiallyUpdated = true;
 
         protected Updateable()
         {
@@ -27,6 +26,7 @@ namespace BEPUphysics.UpdateableSystems
             }
         }
 
+        private bool isSequentiallyUpdated = true;
         /// <summary>
         /// Gets and sets whether or not the updateable should be updated sequentially even in a multithreaded space.
         /// If this is true, the updateable can make use of the space's ThreadManager for internal multithreading.

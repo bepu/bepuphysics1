@@ -9,6 +9,7 @@ using BEPUphysics.CollisionShapes;
 using BEPUphysics.ResourceManagement;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
 using System.Diagnostics;
+using BEPUphysics.NarrowPhaseSystems.Pairs;
 
 namespace BEPUphysics.CollisionTests.Manifolds
 {
@@ -141,8 +142,10 @@ namespace BEPUphysics.CollisionTests.Manifolds
 
         float previousDepth = 0;
         Vector3 lastValidConvexPosition;
+        bool wasInside;
         protected override void ProcessCandidates(RawValueList<ContactData> candidates)
         {
+            wasInside = false;
             if (candidates.count == 0 && parentContactCount == 0 && Mesh.Shape.solidity == MobileMeshSolidity.Solid)
             {
 
@@ -215,6 +218,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     if (addContact && contacts.count == 0)
                         Add(ref newContact);
                     previousDepth = newContact.PenetrationDepth;
+                    wasInside = true;
                 }
                 else
                 {
@@ -264,15 +268,17 @@ namespace BEPUphysics.CollisionTests.Manifolds
         }
 
         UnsafeResourcePool<TriangleConvexPairTester> testerPool = new UnsafeResourcePool<TriangleConvexPairTester>();
-        protected override void GiveBackTester(CollisionAlgorithms.TrianglePairTester tester)
+        protected override void GiveBackTester(TrianglePairTester tester)
         {
             testerPool.GiveBack((TriangleConvexPairTester)tester);
         }
 
-        protected override CollisionAlgorithms.TrianglePairTester GetTester()
+        protected override TrianglePairTester GetTester()
         {
             return testerPool.Take();
         }
+
+
 
     }
 }

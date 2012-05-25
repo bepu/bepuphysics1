@@ -1,4 +1,5 @@
-﻿using BEPUphysics.Threading;
+﻿using BEPUphysics.BroadPhaseEntries;
+using BEPUphysics.Threading;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.DataStructures;
 using System;
@@ -95,7 +96,7 @@ namespace BEPUphysics.BroadPhaseSystems
         protected internal CollisionRule GetCollisionRule(BroadPhaseEntry entryA, BroadPhaseEntry entryB)
         {
             if (entryA.IsActive || entryB.IsActive)
-                return CollisionRules.collisionRuleCalculator(entryA.collisionRules, entryB.collisionRules);
+                return CollisionRules.collisionRuleCalculator(entryA, entryB);
             return CollisionRule.NoBroadPhase;
         }
 

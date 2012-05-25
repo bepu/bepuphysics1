@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.DataStructures;
 using Microsoft.Xna.Framework;
 using System.Runtime.InteropServices;
@@ -45,34 +46,66 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
 
         #region Multithreading
 
+        public bool ROOTEXISTS
+        {
+            get
+            {
+                return root != null;
+            }
+        }
+
+        public void MultithreadedRefitPhase(int splitDepth)
+        {
+            if (splitDepth > 0)
+            {
+                root.CollectMultithreadingNodes(splitDepth, 1, multithreadingSourceNodes);
+                //Go through every node and refit it.
+                ThreadManager.ForLoop(0, multithreadingSourceNodes.count, multithreadedRefit);
+                multithreadingSourceNodes.Clear();
+                //Now that the subtrees belonging to the source nodes are refit, refit the top nodes.
+                //Sometimes, this will go deeper than necessary because the refit process may require an extremely high level (nonmultithreaded) revalidation.
+                //The waste cost is a matter of nanoseconds due to the simplicity of the operations involved.
+                root.PostRefit(splitDepth, 1);
+            }
+            else
+            {
+                SingleThreadedRefitPhase();
+            }
+        }
+
+        public void MultithreadedOverlapPhase(int splitDepth)
+        {
+            if (splitDepth > 0)
+            {
+                //The trees are now fully refit (and revalidated, if the refit process found it to be necessary).
+                //The overlap traversal is conceptually similar to the multithreaded refit, but is a bit easier since there's no need to go back up the stack.
+                if (!root.IsLeaf) //If the root is a leaf, it's alone- nothing to collide against! This test is required by the assumptions of the leaf-leaf test.
+                {
+                    root.GetMultithreadedOverlaps(root, splitDepth, 1, this, multithreadingSourceOverlaps);
+                    ThreadManager.ForLoop(0, multithreadingSourceOverlaps.count, multithreadedOverlap);
+                    multithreadingSourceOverlaps.Clear();
+                }
+            }
+            else
+            {
+                SingleThreadedOverlapPhase();
+            }
+        }
+
         protected override void UpdateMultithreaded()
         {
             lock (Locker)
             {
                 Overlaps.Clear();
                 if (root != null)
-                {
+                {            
                     //To multithread the tree traversals, we have to do a little single threaded work.
                     //Dive down into the tree far enough that there are enough nodes to split amongst all the threads in the thread manager.
                     int splitDepth = (int)Math.Ceiling(Math.Log(ThreadManager.ThreadCount, 2));
 
-                    root.CollectMultithreadingNodes(splitDepth, 1, multithreadingSourceNodes);
-                    //Go through every node and refit it.
-                    ThreadManager.ForLoop(0, multithreadingSourceNodes.count, multithreadedRefit);
-                    multithreadingSourceNodes.Clear();
-                    //Now that the subtrees belonging to the source nodes are refit, refit the top nodes.
-                    //Sometimes, this will go deeper than necessary because the refit process may require an extremely high level (nonmultithreaded) revalidation.
-                    //The waste cost is a matter of nanoseconds due to the simplicity of the operations involved.
-                    root.PostRefit(splitDepth, 1);
+                    MultithreadedRefitPhase(splitDepth);
 
-                    //The trees are now fully refit (and revalidated, if the refit process found it to be necessary).
-                    //The overlap traversal is conceptually similar to the multithreaded refit, but is a bit easier since there's no need to go back up the stack.
-                    if (!root.IsLeaf) //If the root is a leaf, it's alone- nothing to collide against! This test is required by the assumptions of the leaf-leaf test.
-                    {
-                        root.GetMultithreadedOverlaps(root, splitDepth, 1, this, multithreadingSourceOverlaps);
-                        ThreadManager.ForLoop(0, multithreadingSourceOverlaps.count, multithreadedOverlap);
-                        multithreadingSourceOverlaps.Clear();
-                    }
+                    MultithreadedOverlapPhase(splitDepth);
                 }
             }
 
@@ -102,6 +135,17 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
 
         #endregion
 
+        public void SingleThreadedRefitPhase()
+        {
+            root.Refit();
+        }
+
+        public void SingleThreadedOverlapPhase()
+        {
+            if (!root.IsLeaf) //If the root is a leaf, it's alone- nothing to collide against! This test is required by the assumptions of the leaf-leaf test.
+                root.GetOverlaps(root, this);
+        }
+
         protected override void UpdateSingleThreaded()
         {
             lock (Locker)
@@ -109,10 +153,8 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
                 Overlaps.Clear();
                 if (root != null)
                 {
-                    root.Refit();
-
-                    if (!root.IsLeaf) //If the root is a leaf, it's alone- nothing to collide against! This test is required by the assumptions of the leaf-leaf test.
-                        root.GetOverlaps(root, this);
+                    SingleThreadedRefitPhase();
+                    SingleThreadedOverlapPhase();                    
                 }
             }
         }

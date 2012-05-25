@@ -112,11 +112,11 @@ namespace BEPUphysics.Vehicle
 
             for (int i = 0; i < detector.CollisionInformation.pairs.Count; i++)
             {
-                NarrowPhasePair pair = detector.CollisionInformation.pairs[i];
+                var pair = detector.CollisionInformation.pairs[i];
                 testCollidable = (pair.BroadPhaseOverlap.entryA == detector.CollisionInformation ? pair.BroadPhaseOverlap.entryB : pair.BroadPhaseOverlap.entryA) as Collidable;
                 if (testCollidable != null)
                 {
-                    if (CollisionRules.CollisionRuleCalculator(CollisionRules, testCollidable.collisionRules) == CollisionRule.Normal &&
+                    if (pair.CollisionRule == CollisionRule.Normal &&
                         testCollidable.RayCast(new Ray(wheel.suspension.worldAttachmentPoint, wheel.suspension.worldDirection), wheel.suspension.restLength, out rayHit) &&
                         rayHit.T < suspensionLength)
                     {

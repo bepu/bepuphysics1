@@ -5,7 +5,7 @@
     <ProjectTypeGuids>{6D335F3A-9D43-41b4-9D22-F6F17C4BE596};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>BEPUphysicsDemos</RootNamespace>
     <AssemblyName>BEPUphysicsDemos</AssemblyName>
@@ -129,6 +129,8 @@
     <Compile Include="Demos\Extras\ReverseTrikeDemo.cs" />
     <Compile Include="Demos\Extras\SelfCollidingClothDemo.cs" />
     <Compile Include="Demos\Extras\Tests\AccumulationTestDemo.cs" />
+    <Compile Include="Demos\Extras\Tests\BroadPhaseMultithreadingTestDemo.cs" />
+    <Compile Include="Demos\Extras\Tests\BooleanConvexTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\MobileMeshSolidityTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\KinematicActivityTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\ParallelSpaceTestDemo.cs" />
