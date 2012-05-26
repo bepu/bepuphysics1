@@ -1248,44 +1248,44 @@ namespace BEPUphysics.MathExtensions
         /// <param name="q">Quaternion based on the rotation matrix.</param>
         public static void CreateQuaternion(ref Matrix3X3 r, out Quaternion q)
         {
-            float tr = r.M11 + r.M22 + r.M33;
+            float trace = r.M11 + r.M22 + r.M33;
 #if !WINDOWS
             q = new Quaternion();
 #endif
-            if (tr > 0)
+            if (trace >= 0)
             {
-                var S = (float)Math.Sqrt(tr + 1.0) * 2; // S=4*qw 
+                var S = (float)Math.Sqrt(trace + 1.0) * 2; // S=4*qw 
                 var inverseS = 1 / S;
                 q.W = 0.25f * S;
-                q.X = (r.M32 - r.M23) * inverseS;
-                q.Y = (r.M13 - r.M31) * inverseS;
-                q.Z = (r.M21 - r.M12) * inverseS;
+                q.X = (r.M23 - r.M32) * inverseS;
+                q.Y = (r.M31 - r.M13) * inverseS;
+                q.Z = (r.M12 - r.M21) * inverseS;
             }
             else if ((r.M11 > r.M22) & (r.M11 > r.M33))
             {
                 var S = (float)Math.Sqrt(1.0 + r.M11 - r.M22 - r.M33) * 2; // S=4*qx 
                 var inverseS = 1 / S;
-                q.W = (r.M32 - r.M23) * inverseS;
+                q.W = (r.M23 - r.M32) * inverseS;
                 q.X = 0.25f * S;
-                q.Y = (r.M12 + r.M21) * inverseS;
-                q.Z = (r.M13 + r.M31) * inverseS;
+                q.Y = (r.M21 + r.M12) * inverseS;
+                q.Z = (r.M31 + r.M13) * inverseS;
             }
             else if (r.M22 > r.M33)
             {
                 var S = (float)Math.Sqrt(1.0 + r.M22 - r.M11 - r.M33) * 2; // S=4*qy
                 var inverseS = 1 / S;
-                q.W = (r.M13 - r.M31) * inverseS;
-                q.X = (r.M12 + r.M21) * inverseS;
+                q.W = (r.M31 - r.M13) * inverseS;
+                q.X = (r.M21 + r.M12) * inverseS;
                 q.Y = 0.25f * S;
-                q.Z = (r.M23 + r.M32) * inverseS;
+                q.Z = (r.M32 + r.M23) * inverseS;
             }
             else
             {
                 var S = (float)Math.Sqrt(1.0 + r.M33 - r.M11 - r.M22) * 2; // S=4*qz
                 var inverseS = 1 / S;
-                q.W = (r.M21 - r.M12) * inverseS;
-                q.X = (r.M13 + r.M31) * inverseS;
-                q.Y = (r.M23 + r.M32) * inverseS;
+                q.W = (r.M12 - r.M21) * inverseS;
+                q.X = (r.M31 + r.M13) * inverseS;
+                q.Y = (r.M32 + r.M23) * inverseS;
                 q.Z = 0.25f * S;
             }
         }
