@@ -59,8 +59,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             Space.Solver.IterationLimit = 0;
 
 
-            var threadManager = new SpecializedThreadManager();
 #if WINDOWS
+            var threadManager = new SpecializedThreadManager();
             int coreCountMax = 8;
             int splitOffsetMax = 6;
 
@@ -82,29 +82,44 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
 
             testResults = new double[4, splitOffsetMax + 1];
 
-            threadManager.AddThread(delegate { Thread.CurrentThread.SetProcessorAffinity(new[] { 1 }); }, null);
-            for (int j = 0; j <= splitOffsetMax; j++)
+            int reruns = 10;
+            for (int i = 0; i < reruns; i++)
             {
-                testResults[0, j] = RunTest(j, threadManager);
+                var threadManager = new SpecializedThreadManager();
                 GC.Collect();
+
+                threadManager.AddThread(delegate { Thread.CurrentThread.SetProcessorAffinity(new[] { 1 }); }, null);
+                for (int j = 0; j <= splitOffsetMax; j++)
+                {
+                    testResults[0, j] += RunTest(j, threadManager);
+                    GC.Collect();
+                }
+                threadManager.AddThread(delegate { Thread.CurrentThread.SetProcessorAffinity(new[] { 3 }); }, null);
+                for (int j = 0; j <= splitOffsetMax; j++)
+                {
+                    testResults[1, j] += RunTest(j, threadManager);
+                    GC.Collect();
+                }
+                threadManager.AddThread(delegate { Thread.CurrentThread.SetProcessorAffinity(new[] { 5 }); }, null);
+                for (int j = 0; j <= splitOffsetMax; j++)
+                {
+                    testResults[2, j] += RunTest(j, threadManager);
+                    GC.Collect();
+                }
+                threadManager.AddThread(delegate { Thread.CurrentThread.SetProcessorAffinity(new[] { 4 }); }, null);
+                for (int j = 0; j <= splitOffsetMax; j++)
+                {
+                    testResults[3, j] += RunTest(j, threadManager);
+                    GC.Collect();
+                }
             }
-            threadManager.AddThread(delegate { Thread.CurrentThread.SetProcessorAffinity(new[] { 3 }); }, null);
-            for (int j = 0; j <= splitOffsetMax; j++)
+
+            for (int i = 0; i < testResults.GetLength(0); i++)
             {
-                testResults[1, j] = RunTest(j, threadManager);
-                GC.Collect();
-            }
-            threadManager.AddThread(delegate { Thread.CurrentThread.SetProcessorAffinity(new[] { 5 }); }, null);
-            for (int j = 0; j <= splitOffsetMax; j++)
-            {
-                testResults[2, j] = RunTest(j, threadManager);
-                GC.Collect();
-            }
-            threadManager.AddThread(delegate { Thread.CurrentThread.SetProcessorAffinity(new[] { 4 }); }, null);
-            for (int j = 0; j <= splitOffsetMax; j++)
-            {
-                testResults[3, j] = RunTest(j, threadManager);
-                GC.Collect();
+                for (int j = 0; j < testResults.GetLength(1); j++)
+                {
+                    testResults[i,j] /= reruns;
+                }
             }
 #endif
 
@@ -115,7 +130,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
         {
             Entity toAdd;
             //BoundingBox box = new BoundingBox(new Vector3(-5, 1, 1), new Vector3(5, 7, 7));
-            BoundingBox box = new BoundingBox(new Vector3(-500, -500, -500), new Vector3(500, 500, 500));
+            BoundingBox box = new BoundingBox(new Vector3(-23, -23, -23), new Vector3(23, 23, 23));
 
             int splitDepth = splitOffset + (int)Math.Ceiling(Math.Log(threadManager.ThreadCount, 2));
 

@@ -22,9 +22,6 @@ namespace BEPUphysicsDemos.Demos
             //This section lets the engine know that it can make use of multithreaded systems
             //by adding threads to its thread pool.
 #if XBOX360
-            //Note that not all four available hardware threads are used.
-            //Currently, BEPUphysics will allocate an equal amount of work to each thread on the xbox360.
-            //If two threads are put on one core, it will bottleneck the engine and run significantly slower than using 3 hardware threads.
             Space.ThreadManager.AddThread(delegate { Thread.CurrentThread.SetProcessorAffinity(new[] { 1 }); }, null);
             Space.ThreadManager.AddThread(delegate { Thread.CurrentThread.SetProcessorAffinity(new[] { 3 }); }, null);
             Space.ThreadManager.AddThread(delegate { Thread.CurrentThread.SetProcessorAffinity(new[] { 5 }); }, null);
