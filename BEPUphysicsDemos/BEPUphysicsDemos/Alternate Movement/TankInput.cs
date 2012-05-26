@@ -255,7 +255,7 @@ namespace BEPUphysicsDemos.AlternateMovement
                     wheel.DrivingMotor.TargetSpeed = speed;
                     wheel.DrivingMotor.MaximumForwardForce = MaximumDriveForce;
                     wheel.DrivingMotor.MaximumBackwardForce = MaximumDriveForce;
-                    wheel.SlidingFriction.DynamicCoefficient = BaseSlidingFriction;
+                    wheel.SlidingFriction.KineticCoefficient = BaseSlidingFriction;
                     wheel.SlidingFriction.StaticCoefficient = BaseSlidingFriction;
                 }
                 //Thumbsticks can have small values even when left alone, so allow a little margin.

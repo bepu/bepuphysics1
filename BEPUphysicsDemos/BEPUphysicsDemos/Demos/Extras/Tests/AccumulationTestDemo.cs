@@ -82,7 +82,11 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
 
         public override void Update(float dt)
         {
+#if XBOX360
+            if(Game.GamePadInput.Triggers.Left > .5f)
+#else
             if (Game.MouseInput.RightButton == Microsoft.Xna.Framework.Input.ButtonState.Pressed)
+#endif
                 Launch();
             base.Update(dt);
 

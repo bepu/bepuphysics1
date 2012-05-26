@@ -2,6 +2,7 @@
 using System;
 using System.Diagnostics;
 using BEPUphysics;
+using System.Threading;
 
 namespace BEPUphysicsDemos.Demos
 {

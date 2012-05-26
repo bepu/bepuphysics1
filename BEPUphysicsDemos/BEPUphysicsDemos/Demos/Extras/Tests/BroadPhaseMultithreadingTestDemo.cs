@@ -1,4 +1,5 @@
-﻿using BEPUphysics.BroadPhaseEntries;
+﻿using System.Threading;
+using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.Collidables;
 using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
@@ -45,7 +46,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             RayCast,
             BoundingBoxQuery
         }
-        Random rand = new Random(0);
+
+        double[,] testResults;
 
         /// <summary>
         /// Constructs a new demo.
@@ -55,21 +57,74 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             : base(game)
         {
             Space.Solver.IterationLimit = 0;
+
+
+            var threadManager = new SpecializedThreadManager();
+#if WINDOWS
+            int coreCountMax = 8;
+            int splitOffsetMax = 6;
+
+            testResults = new double[coreCountMax, splitOffsetMax + 1];
+
+            //Try different thread counts.
+            for (int i = 0; i < coreCountMax; i++)
+            {
+                threadManager.AddThread();
+                //Try different split levels.);
+                for (int j = 0; j <= splitOffsetMax; j++)
+                {
+                    testResults[i, j] = RunTest(j, threadManager);
+                    GC.Collect();
+                }
+            }
+#else
+            int splitOffsetMax = 6;
+
+            testResults = new double[4, splitOffsetMax + 1];
+
+            threadManager.AddThread(delegate { Thread.CurrentThread.SetProcessorAffinity(new[] { 1 }); }, null);
+            for (int j = 0; j <= splitOffsetMax; j++)
+            {
+                testResults[0, j] = RunTest(j, threadManager);
+                GC.Collect();
+            }
+            threadManager.AddThread(delegate { Thread.CurrentThread.SetProcessorAffinity(new[] { 3 }); }, null);
+            for (int j = 0; j <= splitOffsetMax; j++)
+            {
+                testResults[1, j] = RunTest(j, threadManager);
+                GC.Collect();
+            }
+            threadManager.AddThread(delegate { Thread.CurrentThread.SetProcessorAffinity(new[] { 5 }); }, null);
+            for (int j = 0; j <= splitOffsetMax; j++)
+            {
+                testResults[2, j] = RunTest(j, threadManager);
+                GC.Collect();
+            }
+            threadManager.AddThread(delegate { Thread.CurrentThread.SetProcessorAffinity(new[] { 4 }); }, null);
+            for (int j = 0; j <= splitOffsetMax; j++)
+            {
+                testResults[3, j] = RunTest(j, threadManager);
+                GC.Collect();
+            }
+#endif
+
+
+        }
+
+        double RunTest(int splitOffset, IThreadManager threadManager)
+        {
             Entity toAdd;
             //BoundingBox box = new BoundingBox(new Vector3(-5, 1, 1), new Vector3(5, 7, 7));
             BoundingBox box = new BoundingBox(new Vector3(-500, -500, -500), new Vector3(500, 500, 500));
 
-            var threadManager = new SpecializedThreadManager();
-            int numThreads = 8;
-            int splitDepth = 0 + (int)Math.Ceiling(Math.Log(numThreads, 2));
-            for (int i = 0; i < numThreads; i++)
-            {
-                threadManager.AddThread();
-            }
+            int splitDepth = splitOffset + (int)Math.Ceiling(Math.Log(threadManager.ThreadCount, 2));
+
             DynamicHierarchy dh = new DynamicHierarchy(threadManager);
 
+            Random rand = new Random(0);
+
             RawList<Entity> entities = new RawList<Entity>();
-            for (int k = 0; k < 10000; k++)
+            for (int k = 0; k < 1000; k++)
             {
                 Vector3 position = new Vector3((float)(rand.NextDouble() * (box.Max.X - box.Min.X) + box.Min.X),
                                                (float)(rand.NextDouble() * (box.Max.Y - box.Min.Y) + box.Min.Y),
@@ -87,7 +142,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
 
             Space.ForceUpdater.Gravity = new Vector3();
 
-            int numRuns = 30000;
+            int numRuns = 3000;
             //Prime the system.
             dh.Update();
             var testType = Test.Update;
@@ -96,7 +151,9 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             dh.Overlaps.CopyTo(overlapBasis, 0);
 
 
+            double time = 0;
             double startTime, endTime;
+
 
             switch (testType)
             {
@@ -134,7 +191,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                         //}
 
                         endTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
-                        DHtime += endTime - startTime;
+                        time += endTime - startTime;
 
                         //if (dh.Overlaps.Count != overlapBasis.Length)
                         //    Debug.WriteLine("Failed Update.");
@@ -161,7 +218,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                         dh.MultithreadedRefitPhase(splitDepth);
                         //dh.SingleThreadedRefitPhase();
                         endTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
-                        DHtime += endTime - startTime;
+                        time += endTime - startTime;
 
                         //dh.SingleThreadedOverlapPhase();
 
@@ -188,7 +245,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                         dh.MultithreadedOverlapPhase(splitDepth);
                         //dh.SingleThreadedOverlapPhase();
                         endTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
-                        DHtime += endTime - startTime;
+                        time += endTime - startTime;
 
 
                         //if (dh.Overlaps.Count != overlapBasis.Length)
@@ -230,7 +287,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                     }
 
                     endTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
-                    DHtime = endTime - startTime;
+                    time = endTime - startTime;
 
 
                     break;
@@ -264,7 +321,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                     }
 
                     endTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
-                    DHtime = endTime - startTime;
+                    time = endTime - startTime;
 
 
                     break;
@@ -272,9 +329,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             }
 
 
-            DHtime /= numRuns;
-
-
+            return time / numRuns;
         }
 
         void MoveEntities(RawList<Entity> entities)
@@ -294,7 +349,35 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
         public override void DrawUI()
         {
             base.DrawUI();
-            Game.DataTextDrawer.Draw("Time per DH:    ", DHtime * 1e6f, new Vector2(50, 80));
+            //Game.DataTextDrawer.Draw("Time per DH:    ", DHtime * 1e6f, new Vector2(50, 80));
+
+            Vector2 origin = new Vector2(100, 50);
+            Vector2 spacing = new Vector2(120, 50);
+            //Draw the horizontal core counts.
+            for (int i = 0; i < testResults.GetLength(0); i++)
+            {
+                Game.DataTextDrawer.Draw(i + 1, origin + new Vector2(spacing.X * i, -30));
+            }
+            for (int i = 0; i < testResults.GetLength(1); i++)
+            {
+                Game.DataTextDrawer.Draw(i, origin + new Vector2(-30, spacing.Y * i));
+            }
+
+            for (int i = 0; i < testResults.GetLength(0); i++)
+            {
+                int lowestTime = 0;
+                for (int j = 0; j < testResults.GetLength(1); j++)
+                {
+                    Game.DataTextDrawer.Draw(testResults[i, j] * 1e6, 0, origin + new Vector2(spacing.X * i, spacing.Y * j));
+                    if (testResults[i, j] < testResults[i, lowestTime])
+                        lowestTime = j;
+                }
+
+                Game.DataTextDrawer.Draw(testResults[i, lowestTime] * 1e6, 0, origin + new Vector2(spacing.X * i, spacing.Y * (testResults.GetLength(1))));
+                Game.DataTextDrawer.Draw(lowestTime, 0, origin + new Vector2(spacing.X * i, spacing.Y * (testResults.GetLength(1) + 1)));
+            }
+
+
         }
 
 

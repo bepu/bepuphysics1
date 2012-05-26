@@ -138,6 +138,9 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
 
         void GetRandomPointInBoundingBox(Random random, ref BoundingBox box, out Vector3 point)
         {
+#if XBOX360
+            point = new Vector3();
+#endif
             point.X = (float)(random.NextDouble() * (box.Max.X - box.Min.X) + box.Min.X);
             point.Y = (float)(random.NextDouble() * (box.Max.Y - box.Min.Y) + box.Min.Y);
             point.Z = (float)(random.NextDouble() * (box.Max.Z - box.Min.Z) + box.Min.Z);
