@@ -12,7 +12,8 @@ using BEPUphysics.Collidables;
 namespace BEPUphysicsDemos.Demos.Extras
 {
     /// <summary>
-    /// For random tests and general fiddling.
+    /// A car built from constraints and entities (as opposed to using the Vehicle class) drives around on a terrain and 
+    /// sometimes a box.
     /// </summary>
     /// <remarks>
     /// This demo type is initially excluded from the main list in the DemosGame.
@@ -24,7 +25,7 @@ namespace BEPUphysicsDemos.Demos.Extras
         private readonly RevoluteMotor drivingMotor2;
         private readonly RevoluteMotor steeringMotor1;
         private readonly RevoluteMotor steeringMotor2;
-        private float driveSpeed = 40;
+        private float driveSpeed = 70;
         private float maximumTurnAngle = MathHelper.Pi * .2f;
 
         /// <summary>
@@ -41,14 +42,17 @@ namespace BEPUphysicsDemos.Demos.Extras
             Space.Add(new Box(new Vector3(0, -5, 0), 20, 1, 20));
 
             var body = new Box(new Vector3(0, 0, 0), 4, .5f, 5, 20);
-            //body.CenterOfMassOffset = new Vector3(0, -.8f, 0);
+            body.CollisionInformation.LocalPosition = new Vector3(0, .8f, 0);
             Space.Add(body);
 
-            AddWheel(new Vector3(-1.8f, -1, 2.1f), body, out drivingMotor1, out steeringMotor1);
-            AddWheel(new Vector3(1.8f, -1, 2.1f), body, out drivingMotor1, out  steeringMotor1);
-            //Just overwrite the driving motor/steering motor from the previous ones, these last two are the real ones we want.
-            AddWheel(new Vector3(-1.8f, -1, -2.1f), body, out drivingMotor1, out steeringMotor1);
-            AddWheel(new Vector3(1.8f, -1, -2.1f), body, out drivingMotor2, out steeringMotor2);
+            AddBackWheel(new Vector3(-1.8f, -.2f, 2.1f), body);
+            AddBackWheel(new Vector3(1.8f, -.2f, 2.1f), body);
+            var wheel1 = AddDriveWheel(new Vector3(-1.8f, -.2f, -2.1f), body, out drivingMotor1, out steeringMotor1);
+            var wheel2 = AddDriveWheel(new Vector3(1.8f, -.2f, -2.1f), body, out drivingMotor2, out steeringMotor2);
+
+            //Add a stabilizer so that the wheels can't point different directions.
+            var steeringStabilizer = new RevoluteAngularJoint(wheel1, wheel2, Vector3.Right);
+            Space.Add(steeringStabilizer);
 
             //x and y, in terms of heightmaps, refer to their local x and y coordinates.  In world space, they correspond to x and z.
             //Setup the heights of the terrain.
@@ -83,9 +87,39 @@ namespace BEPUphysicsDemos.Demos.Extras
             game.ModelDrawer.Add(terrain);
         }
 
-        void AddWheel(Vector3 wheelOffset, Entity body, out RevoluteMotor drivingMotor, out RevoluteMotor steeringMotor)
+        void AddBackWheel(Vector3 wheelOffset, Entity body)
         {
-            var wheel = new Cylinder(body.Position + wheelOffset, .2f, .5f, 10);
+            var wheel = new Cylinder(body.Position + wheelOffset, .2f, .5f, 5f);
+            wheel.Material.KineticFriction = 2.5f;
+            wheel.Material.StaticFriction = 2.5f;
+            wheel.Orientation = Quaternion.CreateFromAxisAngle(Vector3.Forward, MathHelper.PiOver2);
+
+            //Preventing the occasional pointless collision pair can speed things up.
+            CollisionRules.AddRule(wheel, body, CollisionRule.NoBroadPhase);
+
+            //Connect the wheel to the body.
+            var pointOnLineJoint = new PointOnLineJoint(body, wheel, wheel.Position, Vector3.Down, wheel.Position);
+            var suspensionLimit = new LinearAxisLimit(body, wheel, wheel.Position, wheel.Position, Vector3.Down, -1, 0);
+            //This linear axis motor will give the suspension its springiness by pushing the wheels outward.
+            var suspensionSpring = new LinearAxisMotor(body, wheel, wheel.Position, wheel.Position, Vector3.Down);
+            suspensionSpring.Settings.Mode = MotorMode.Servomechanism;
+            suspensionSpring.Settings.Servo.Goal = 0;
+            suspensionSpring.Settings.Servo.SpringSettings.StiffnessConstant = 300;
+            suspensionSpring.Settings.Servo.SpringSettings.DampingConstant = 70;
+
+            var revoluteAngularJoint = new RevoluteAngularJoint(body, wheel, Vector3.Right);
+
+            //Add the wheel and connection to the space.
+            Space.Add(wheel);
+            Space.Add(pointOnLineJoint);
+            Space.Add(suspensionLimit);
+            Space.Add(suspensionSpring);
+            Space.Add(revoluteAngularJoint);
+        }
+
+        Entity AddDriveWheel(Vector3 wheelOffset, Entity body, out RevoluteMotor drivingMotor, out RevoluteMotor steeringMotor)
+        {
+            var wheel = new Cylinder(body.Position + wheelOffset, .2f, .5f, 5f);
             wheel.Material.KineticFriction = 2.5f;
             wheel.Material.StaticFriction = 2.5f;
             wheel.Orientation = Quaternion.CreateFromAxisAngle(Vector3.Forward, MathHelper.PiOver2);
@@ -104,10 +138,14 @@ namespace BEPUphysicsDemos.Demos.Extras
             suspensionSpring.Settings.Servo.SpringSettings.DampingConstant = 70;
 
             var swivelHingeAngularJoint = new SwivelHingeAngularJoint(body, wheel, Vector3.Up, Vector3.Right);
+            //Make the swivel hinge extremely rigid.  There are going to be extreme conditions when the wheels get up to speed;
+            //we don't want the forces involved to torque the wheel off the frame!
+            swivelHingeAngularJoint.SpringSettings.DampingConstant *= 1000;
+            swivelHingeAngularJoint.SpringSettings.StiffnessConstant *= 1000;
             //Motorize the wheel.
             drivingMotor = new RevoluteMotor(body, wheel, Vector3.Left);
-            drivingMotor.Settings.VelocityMotor.Softness = .2f;
-            drivingMotor.Settings.MaximumForce = 150;
+            drivingMotor.Settings.VelocityMotor.Softness = .3f;
+            drivingMotor.Settings.MaximumForce = 100;
             //Let it roll when the user isn't giving specific commands.
             drivingMotor.IsActive = false;
             steeringMotor = new RevoluteMotor(body, wheel, Vector3.Up);
@@ -132,6 +170,17 @@ namespace BEPUphysicsDemos.Demos.Extras
             steeringMotor.Basis.SetWorldAxes(Vector3.Up, Vector3.Right);
             steeringMotor.TestAxis = Vector3.Right;
 
+            //Disable the steering motor's spring effects.  Set it to maximum rigidity (0 softness)
+            //and use the base corrective speed to control its direction.
+            steeringMotor.Settings.Servo.SpringSettings.Advanced.UseAdvancedSettings = true;
+            steeringMotor.Settings.Servo.SpringSettings.Advanced.Softness = 0;
+            steeringMotor.Settings.Servo.SpringSettings.Advanced.ErrorReductionFactor = 0f;
+
+
+            //The revolute motor is weaker than some other types of constraints and maintaining a goal in the presence of extremely fast rotation and integration issues.
+            //Laying a revolute limit on top of it can help mitigate the problem.
+            var steeringConstraint = new RevoluteLimit(body, wheel, Vector3.Up, Vector3.Right, -maximumTurnAngle, maximumTurnAngle);
+
 
             //Add the wheel and connection to the space.
             Space.Add(wheel);
@@ -140,8 +189,10 @@ namespace BEPUphysicsDemos.Demos.Extras
             Space.Add(suspensionSpring);
             Space.Add(swivelHingeAngularJoint);
             Space.Add(drivingMotor);
-            Space.Add(steeringMotor);
+            Space.Add(steeringMotor); 
+            Space.Add(steeringConstraint);
 
+            return wheel;
         }
 
         /// <summary>
@@ -154,6 +205,10 @@ namespace BEPUphysicsDemos.Demos.Extras
 
         public override void Update(float dt)
         {
+            //Scale the corrective velocity by the wheel angular velocity to compensate for a long time step duration.
+            //If the simulation is running at a fast time step, this is probably not necessary.
+            steeringMotor1.Settings.Servo.BaseCorrectiveSpeed = 3 + 7 * Math.Min(steeringMotor1.ConnectionB.AngularVelocity.Length() / 100, 1);
+            steeringMotor2.Settings.Servo.BaseCorrectiveSpeed = 3 + 7 * Math.Min(steeringMotor2.ConnectionB.AngularVelocity.Length() / 100, 1);
 
             if (Game.KeyboardInput.IsKeyDown(Keys.NumPad8))
             {
@@ -202,9 +257,6 @@ namespace BEPUphysicsDemos.Demos.Extras
             base.Update(dt);
         }
 
-        public override void DrawUI()
-        {
-            base.DrawUI();
-        }
+
     }
 }

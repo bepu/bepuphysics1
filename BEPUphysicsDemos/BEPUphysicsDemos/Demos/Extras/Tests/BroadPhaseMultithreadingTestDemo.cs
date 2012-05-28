@@ -60,21 +60,28 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
 
 
 #if WINDOWS
-            var threadManager = new SpecializedThreadManager();
             int coreCountMax = 8;
             int splitOffsetMax = 6;
-
             testResults = new double[coreCountMax, splitOffsetMax + 1];
 
-            //Try different thread counts.
-            for (int i = 0; i < coreCountMax; i++)
+            int reruns = 10;
+            for (int i = 0; i < reruns; i++)
             {
-                threadManager.AddThread();
-                //Try different split levels.);
-                for (int j = 0; j <= splitOffsetMax; j++)
+                GC.Collect();
+                var threadManager = new SpecializedThreadManager();
+
+
+
+                //Try different thread counts.
+                for (int j = 0; j < coreCountMax; j++)
                 {
-                    testResults[i, j] = RunTest(j, threadManager);
-                    GC.Collect();
+                    threadManager.AddThread();
+                    //Try different split levels.);
+                    for (int k = 0; k <= splitOffsetMax; k++)
+                    {
+                        testResults[j, k] = RunTest(k, threadManager);
+                        GC.Collect();
+                    }
                 }
             }
 #else
@@ -130,7 +137,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
         {
             Entity toAdd;
             //BoundingBox box = new BoundingBox(new Vector3(-5, 1, 1), new Vector3(5, 7, 7));
-            BoundingBox box = new BoundingBox(new Vector3(-23, -23, -23), new Vector3(23, 23, 23));
+            BoundingBox box = new BoundingBox(new Vector3(-500, -500, -500), new Vector3(500, 500, 500));
 
             int splitDepth = splitOffset + (int)Math.Ceiling(Math.Log(threadManager.ThreadCount, 2));
 
@@ -139,7 +146,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             Random rand = new Random(0);
 
             RawList<Entity> entities = new RawList<Entity>();
-            for (int k = 0; k < 1000; k++)
+            for (int k = 0; k < 10000; k++)
             {
                 Vector3 position = new Vector3((float)(rand.NextDouble() * (box.Max.X - box.Min.X) + box.Min.X),
                                                (float)(rand.NextDouble() * (box.Max.Y - box.Min.Y) + box.Min.Y),
