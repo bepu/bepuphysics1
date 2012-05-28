@@ -1,6 +1,9 @@
 ﻿using BEPUphysics;
+using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.NarrowPhaseSystems;
+using BEPUphysics.UpdateableSystems.ForceFields;
+using BEPUphysicsDemos.SampleCode;
 using Microsoft.Xna.Framework;
 using System.Diagnostics;
 using System;
@@ -26,7 +29,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             simulationBuilders = new Func<Space, int>[]
                                      {
                                          BuildPileSimulation,
-                                         BuildWallSimulation
+                                         BuildWallSimulation,
+                                         BuildPlanetSimulation
                                      };
 
             int coreCountMax = Environment.ProcessorCount;
@@ -113,6 +117,39 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             space.Add(ground);
 
             return 800;
+        }
+
+        int BuildPlanetSimulation(Space space)
+        {
+            space.ForceUpdater.Gravity = Vector3.Zero;
+
+            //By pre-allocating a bunch of box-box pair handlers, the simulation will avoid having to allocate new ones at runtime.
+            NarrowPhaseHelper.Factories.BoxBox.EnsureCount(30000);
+
+            var planet = new Sphere(new Vector3(0, 0, 0), 30);
+            space.Add(planet);
+
+            var field = new GravitationalField(new InfiniteForceFieldShape(), planet.Position, 66730 / 2f, 100);
+            space.Add(field);
+
+            //Drop the "meteorites" on the planet.
+            Entity toAdd;
+            int numColumns = 25;
+            int numRows = 25;
+            int numHigh = 25;
+            float separation = 5;
+            for (int i = 0; i < numRows; i++)
+                for (int j = 0; j < numColumns; j++)
+                    for (int k = 0; k < numHigh; k++)
+                    {
+                        toAdd = new Box(new Vector3(separation * i - numRows * separation / 2, 40 + k * separation, separation * j - numColumns * separation / 2), 1f, 1f, 1f, 5);
+                        toAdd.LinearVelocity = new Vector3(30, 0, 0);
+                        toAdd.LinearDamping = 0;
+                        toAdd.AngularDamping = 0;
+                        space.Add(toAdd);
+                    }
+
+            return 3000;
         }
 
         double RunTest(IThreadManager threadManager, Func<Space, int> simulationBuilder)

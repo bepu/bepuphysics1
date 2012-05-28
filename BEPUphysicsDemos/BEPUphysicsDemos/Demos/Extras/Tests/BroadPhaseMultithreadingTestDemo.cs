@@ -79,9 +79,17 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                     //Try different split levels.);
                     for (int k = 0; k <= splitOffsetMax; k++)
                     {
-                        testResults[j, k] = RunTest(k, threadManager);
+                        testResults[j, k] += RunTest(k, threadManager);
                         GC.Collect();
                     }
+                }
+            }
+
+            for (int i = 0; i < testResults.GetLength(0); i++)
+            {
+                for (int j = 0; j < testResults.GetLength(1); j++)
+                {
+                    testResults[i, j] /= reruns;
                 }
             }
 #else
