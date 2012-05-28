@@ -53,8 +53,8 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         /// Constructs the character and internal physics character controller.
         /// </summary>
         /// <param name="owningSpace">Space to add the character to.</param>
-        /// <param name="CameraToUse">Camera to attach to the character.</param>
-        public CharacterControllerInput(Space owningSpace, Camera CameraToUse)
+        /// <param name="cameraToUse">Camera to attach to the character.</param>
+        public CharacterControllerInput(Space owningSpace, Camera cameraToUse)
         {
             CharacterController = new CharacterController();
 
@@ -62,7 +62,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             Space.Add(CharacterController);
 
 
-            Camera = CameraToUse;
+            Camera = cameraToUse;
             Deactivate();
         }
 

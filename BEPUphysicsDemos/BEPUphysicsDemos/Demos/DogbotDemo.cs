@@ -24,7 +24,7 @@ namespace BEPUphysicsDemos.Demos
             Space.Add(body);
 
             Entity head = new Cone(body.Position + new Vector3(3.2f, .3f, 0), 1.5f, .7f, 4);
-            head.OrientationMatrix = Matrix3X3.CreateFromAxisAngle(Vector3.Forward, -MathHelper.PiOver2);
+            head.OrientationMatrix = Matrix3X3.CreateFromAxisAngle(Vector3.Forward, MathHelper.PiOver2);
             Space.Add(head);
 
             //Attach the head to the body
