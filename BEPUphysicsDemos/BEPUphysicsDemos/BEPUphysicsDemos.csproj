@@ -131,6 +131,7 @@
     <Compile Include="Demos\Extras\Tests\AccumulationTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\BroadPhaseMultithreadingTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\BooleanConvexTestDemo.cs" />
+    <Compile Include="Demos\Extras\Tests\MultithreadedScalingTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\MobileMeshSolidityTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\KinematicActivityTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\ParallelSpaceTestDemo.cs" />

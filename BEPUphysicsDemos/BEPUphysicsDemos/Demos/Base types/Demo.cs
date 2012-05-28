@@ -73,6 +73,7 @@ namespace BEPUphysicsDemos.Demos
             //Check out the asynchronous updating documentation for an example (though you don't have to use a separate thread to use interpolation).
             Space.Update();
 
+
             long endTime = Stopwatch.GetTimestamp();
             accumulatedPhysicsTime += (endTime - startTime) / (double)Stopwatch.Frequency;
             accumulatedPhysicsFrames++;
