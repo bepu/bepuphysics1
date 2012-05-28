@@ -250,6 +250,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             }
             else
                 supportData = new SupportData();
+
         }
 
         SupportData supportData;
@@ -277,8 +278,6 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 Vector3 relativeVelocity;
                 ComputeRelativeVelocity(ref supportData, out relativeVelocity);
                 float verticalVelocity = Vector3.Dot(supportData.Normal, relativeVelocity);
-                Vector3 horizontalVelocity = relativeVelocity - supportData.Normal * verticalVelocity;
-
 
 
                 //Don't attempt to use an object as support if we are flying away from it (and we were never standing on it to begin with).
@@ -288,12 +287,6 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     supportData = new SupportData();
                 }
 
-                //If we can compute that we're separating faster than we can handle, take off.
-                if (SupportFinder.HasTraction && verticalVelocity < -VerticalMotionConstraint.MaximumGlueForce * dt / VerticalMotionConstraint.EffectiveMass)
-                {
-                    SupportFinder.ClearSupportData();
-                    supportData = new SupportData();
-                }
 
                 //Attempt to jump.
                 if (tryToJump && StanceManager.CurrentStance != Stance.Crouching) //Jumping while crouching would be a bit silly.
@@ -378,7 +371,6 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
 
 
-
             //Vertical support data is different because it has the capacity to stop the character from moving unless
             //contacts are pruned appropriately.
             SupportData verticalSupportData;
@@ -403,9 +395,6 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
             if (needToLock)
                 CharacterSynchronizer.ConstraintAccessLocker.Exit();
-
-
-
 
 
 

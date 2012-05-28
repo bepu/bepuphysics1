@@ -219,8 +219,8 @@ namespace BEPUphysicsDemos.Demos
 
             base.Update(dt); //Base.update updates the space, which needs to be done before the character or vehicle are updated.
 
-            character.Update(Space.TimeStepSettings.TimeStepDuration, Game.PreviousKeyboardInput, Game.KeyboardInput, Game.PreviousGamePadInput, Game.GamePadInput);
-            vehicle.Update(Space.TimeStepSettings.TimeStepDuration, Game.KeyboardInput, Game.GamePadInput);
+            character.Update(dt, Game.PreviousKeyboardInput, Game.KeyboardInput, Game.PreviousGamePadInput, Game.GamePadInput);
+            vehicle.Update(dt, Game.KeyboardInput, Game.GamePadInput);
         }
 
         public override void CleanUp()

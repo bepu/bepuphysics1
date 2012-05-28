@@ -217,8 +217,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
             basis.ComputeWorldSpaceAxes();
             Matrix3X3.Transform(ref localTestAxis, ref connectionB.orientationMatrix, out worldTestAxis);
 
-            if (Keyboard.GetState().IsKeyDown(Keys.P))
-                Debug.WriteLine("break.");
+
             if (settings.mode == MotorMode.Servomechanism)
             {
                 float y, x;
