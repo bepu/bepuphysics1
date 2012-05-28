@@ -44,6 +44,18 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
             QueryAccelerator = new DynamicHierarchyQueryAccelerator(this);
         }
 
+        /// <summary>
+        /// This is a few test-based values which help threaded scaling.
+        /// By going deeper into the trees, a better distribution of work is achieved.
+        /// Going above the tested core count theoretically benefits from a '0 if power of 2, 3 otherwise' rule of thumb.
+        /// </summary>
+        private int[] threadSplitOffsets = new[]
+#if !XBOX360
+        { 0, 0, 4, 1, 3, 3, 3, 0 };
+#else
+        { 2, 2, 2, 1};
+#endif
+
         #region Multithreading
 
         public bool ROOTEXISTS
@@ -98,10 +110,16 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
             {
                 Overlaps.Clear();
                 if (root != null)
-                {            
+                {
                     //To multithread the tree traversals, we have to do a little single threaded work.
                     //Dive down into the tree far enough that there are enough nodes to split amongst all the threads in the thread manager.
-                    int splitDepth = (int)Math.Ceiling(Math.Log(ThreadManager.ThreadCount, 2));
+                    //The depth to which we dive is offset by some precomputed values (when available) or a guess based on whether or not the 
+                    //thread count is a power of 2.  Thread counts which are a power of 2 match well to the binary tree, while other thread counts
+                    //require going deeper for better distributions.
+                    int offset = ThreadManager.ThreadCount <= threadSplitOffsets.Length
+                                     ? threadSplitOffsets[ThreadManager.ThreadCount - 1]
+                                     : (ThreadManager.ThreadCount & (ThreadManager.ThreadCount - 1)) == 0 ? 0 : 3; 
+                    int splitDepth = offset + (int)Math.Ceiling(Math.Log(ThreadManager.ThreadCount, 2));
 
                     MultithreadedRefitPhase(splitDepth);
 
@@ -135,12 +153,12 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
 
         #endregion
 
-        public void SingleThreadedRefitPhase()
+        private void SingleThreadedRefitPhase()
         {
             root.Refit();
         }
 
-        public void SingleThreadedOverlapPhase()
+        private void SingleThreadedOverlapPhase()
         {
             if (!root.IsLeaf) //If the root is a leaf, it's alone- nothing to collide against! This test is required by the assumptions of the leaf-leaf test.
                 root.GetOverlaps(root, this);
@@ -154,7 +172,7 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
                 if (root != null)
                 {
                     SingleThreadedRefitPhase();
-                    SingleThreadedOverlapPhase();                    
+                    SingleThreadedOverlapPhase();
                 }
             }
         }
