@@ -60,7 +60,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
 
 
 #if WINDOWS
-            int coreCountMax = 8;
+            int coreCountMax = Environment.ProcessorCount;
             int splitOffsetMax = 6;
             testResults = new double[coreCountMax, splitOffsetMax + 1];
 
@@ -190,10 +190,6 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                             dh.Overlaps.Clear();
                             if (dh.ROOTEXISTS)
                             {
-                                //To multithread the tree traversals, we have to do a little single threaded work.
-                                //Dive down into the tree far enough that there are enough nodes to split amongst all the threads in the thread manager.
-                                //splitDepth = (int)Math.Ceiling(Math.Log(threadManager.ThreadCount, 2));
-
                                 dh.MultithreadedRefitPhase(splitDepth);
 
                                 dh.MultithreadedOverlapPhase(splitDepth);
