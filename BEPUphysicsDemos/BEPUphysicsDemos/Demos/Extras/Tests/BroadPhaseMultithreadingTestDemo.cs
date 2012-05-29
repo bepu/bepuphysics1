@@ -193,16 +193,17 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                     {
                         //DH4
                         startTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
-                        lock (dh.Locker)
-                        {
-                            dh.Overlaps.Clear();
-                            if (dh.ROOTEXISTS)
-                            {
-                                dh.MultithreadedRefitPhase(splitDepth);
+                        //dh.Update();
+                        //lock (dh.Locker)
+                        //{
+                        //    dh.Overlaps.Clear();
+                        //    if (dh.ROOTEXISTS)
+                        //    {
+                        //        dh.MultithreadedRefitPhase(splitDepth);
 
-                                dh.MultithreadedOverlapPhase(splitDepth);
-                            }
-                        }
+                        //        dh.MultithreadedOverlapPhase(splitDepth);
+                        //    }
+                        //}
 
                         //dh.Update();
 
@@ -241,7 +242,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
 
                         //DH4
                         startTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
-                        dh.MultithreadedRefitPhase(splitDepth);
+                        //dh.MultithreadedRefitPhase(splitDepth);
                         //dh.SingleThreadedRefitPhase();
                         endTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
                         time += endTime - startTime;
@@ -268,7 +269,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                         //dh.MultithreadedRefitPhase(splitDepth);
                         //DH4
                         startTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
-                        dh.MultithreadedOverlapPhase(splitDepth);
+                        //dh.MultithreadedOverlapPhase(splitDepth);
                         //dh.SingleThreadedOverlapPhase();
                         endTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
                         time += endTime - startTime;
@@ -378,7 +379,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             //Game.DataTextDrawer.Draw("Time per DH:    ", DHtime * 1e6f, new Vector2(50, 80));
 
             Vector2 origin = new Vector2(100, 50);
-            Vector2 spacing = new Vector2(120, 50);
+            Vector2 spacing = new Vector2(80, 50);
             //Draw the horizontal core counts.
             for (int i = 0; i < testResults.GetLength(0); i++)
             {
