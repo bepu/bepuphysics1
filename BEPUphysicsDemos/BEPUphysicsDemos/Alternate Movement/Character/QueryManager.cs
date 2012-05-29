@@ -37,9 +37,9 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         public RawList<ContactData> SideContacts { get { return sideContacts; } }
         public RawList<ContactData> HeadContacts { get { return headContacts; } }
 
-        EntityCollidable standingQueryObject;
-        EntityCollidable crouchingQueryObject;
-        EntityCollidable currentQueryObject;
+        ConvexCollidable<CylinderShape> standingQueryObject;
+        ConvexCollidable<CylinderShape> crouchingQueryObject;
+        ConvexCollidable<CylinderShape> currentQueryObject;
         CharacterController character;
 
         /// <summary>
@@ -60,6 +60,17 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
 
             SupportRayFilter = SupportRayFilterFunction;
+        }
+
+        /// <summary>
+        /// Updates the query objects to match the character controller's current state.  Called when BodyRadius, StanceManager.StandingHeight, or StanceManager.CrouchingHeight is set.
+        /// </summary>
+        internal void UpdateQueryShapes()
+        {
+            standingQueryObject.Shape.Radius = character.Body.CollisionInformation.Shape.Radius;
+            standingQueryObject.Shape.Height = character.StanceManager.StandingHeight;
+            crouchingQueryObject.Shape.Radius = character.Body.CollisionInformation.Shape.Radius;
+            crouchingQueryObject.Shape.Height = character.StanceManager.CrouchingHeight;
         }
 
 
@@ -345,6 +356,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             return true;
 
         }
+
     }
 
 

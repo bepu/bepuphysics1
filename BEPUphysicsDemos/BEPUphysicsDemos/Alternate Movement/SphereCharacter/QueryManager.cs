@@ -35,7 +35,7 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
         public RawList<ContactData> SupportContacts { get { return supportContacts; } }
         public RawList<ContactData> TractionContacts { get { return tractionContacts; } }
 
-        EntityCollidable queryObject;
+        ConvexCollidable<SphereShape> queryObject;
         SphereCharacterController character;
 
         /// <summary>
@@ -53,7 +53,6 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
 
             SupportRayFilter = SupportRayFilterFunction;
         }
-
 
         Func<BroadPhaseEntry, bool> SupportRayFilter;
         bool SupportRayFilterFunction(BroadPhaseEntry entry)
@@ -327,6 +326,7 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
             return true;
 
         }
+
     }
 
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using BEPUphysics.CollisionShapes.ConvexShapes;
 using Microsoft.Xna.Framework;
 using BEPUphysics.CollisionTests;
 using BEPUphysics.DataStructures;
@@ -15,22 +16,50 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
     /// </summary>
     public class StanceManager
     {
+        private float standingHeight;
         /// <summary>
-        /// Gets the height of the character while standing.
+        /// Gets or sets the height of the character while standing.  To avoid resizing-related problems, use this only when the character is not being actively simulated or is not currently standing.
         /// </summary>
         public float StandingHeight
         {
-            get;
-            private set;
+            get { return standingHeight; }
+            set
+            {
+                if (value <= 0 || value < CrouchingHeight)
+                    throw new Exception("Standing height must be positive and greater than the crouching height.");
+                standingHeight = value;
+                //Notify the query manager of the change.
+                character.QueryManager.UpdateQueryShapes();
+                if (CurrentStance == Stance.Standing)
+                {
+                    //If we're currently standing, then the current shape must be modified as well.
+                    //This isn't entirely safe, but dynamic resizing generally isn't.
+                    character.Body.CollisionInformation.Shape.Height = standingHeight;
+                }
+            }
         }
 
+        private float crouchingHeight;
         /// <summary>
-        /// Gets the height of the character while crouching.
+        /// Gets or sets the height of the character while crouching.  Must be less than the standing height.  To avoid resizing-related problems, use this only when the character is not being actively simulated or is not currently crouching.
         /// </summary>
         public float CrouchingHeight
         {
-            get;
-            private set;
+            get { return crouchingHeight; }
+            set
+            {
+                if (value <= 0 || value > StandingHeight)
+                    throw new Exception("Crouching height must be positive and less than the standing height.");
+                crouchingHeight = value;
+                character.QueryManager.UpdateQueryShapes();
+
+                if (CurrentStance == Stance.Crouching)
+                {
+                    //If we're currently crouching, then the current shape must be modified as well.
+                    //This isn't entirely safe, but dynamic resizing generally isn't.
+                    character.Body.CollisionInformation.Shape.Height = crouchingHeight;
+                }
+            }
         }
 
         /// <summary>
@@ -56,11 +85,15 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         /// Constructs a stance manager for a character.
         /// </summary>
         /// <param name="character">Character governed by the manager.</param>
-        public StanceManager(CharacterController character)
+        /// <param name="crouchingHeight">Crouching height of the character.</param>
+        public StanceManager(CharacterController character, float crouchingHeight)
         {
             this.character = character;
-            StandingHeight = character.Body.Height;
-            CrouchingHeight = StandingHeight * .7f;
+            standingHeight = character.Body.Height;
+            if (crouchingHeight < standingHeight)
+                this.crouchingHeight = StandingHeight * .7f;
+            else
+                throw new Exception("Crouching height must be less than standing height.");
         }
 
         /// <summary>
@@ -251,6 +284,8 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 return PositionState.NoHit;
             }
         }
+
+
 
     }
 
