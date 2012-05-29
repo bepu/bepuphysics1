@@ -118,7 +118,7 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
                 //}
 
 
-                Camera.Position = CharacterController.Body.Position + CameraOffset * CharacterController.Body.OrientationMatrix.Up * 10;
+                Camera.Position = CharacterController.Body.Position + CameraOffset * CharacterController.Body.OrientationMatrix.Up;
 
 
                 Vector2 totalMovement = Vector2.Zero;
