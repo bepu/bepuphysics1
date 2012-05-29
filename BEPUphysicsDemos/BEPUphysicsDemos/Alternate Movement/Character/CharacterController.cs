@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using BEPUphysics.BroadPhaseEntries;
+using BEPUphysics.CollisionShapes;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.UpdateableSystems;
 using BEPUphysics;
@@ -31,7 +32,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
     public class CharacterController : Updateable, IBeforeSolverUpdateable
     {
         /// <summary>
-        /// Gets the physical body of the character.
+        /// Gets the physical body of the character.  Do not use this reference to modify the character's height and radius.  Instead, use the BodyRadius property and the StanceManager's StandingHeight and CrouchingHeight properties.
         /// </summary>
         public Cylinder Body { get; private set; }
 
@@ -62,6 +63,9 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         public VerticalMotionConstraint VerticalMotionConstraint { get; private set; }
 
         private float jumpSpeed = 4.5f;
+        /// <summary>
+        /// Gets or sets the speed at which the character leaves the ground when it jumps.
+        /// </summary>
         public float JumpSpeed
         {
             get
@@ -76,6 +80,9 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             }
         }
         float slidingJumpSpeed = 3;
+        /// <summary>
+        /// Gets or sets the speed at which the character leaves the ground when it jumps without traction.
+        /// </summary>
         public float SlidingJumpSpeed
         {
             get
@@ -107,6 +114,21 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             }
         }
 
+        /// <summary>
+        /// Gets or sets the radius of the body cylinder.  To change the height, use the StanceManager.StandingHeight and StanceManager.CrouchingHeight.
+        /// </summary>
+        public float BodyRadius
+        {
+            get { return Body.CollisionInformation.Shape.Radius; }
+            set
+            {
+                if (value <= 0)
+                    throw new Exception("Radius must be positive.");
+                Body.CollisionInformation.Shape.Radius = value;
+                //Tell the query manager to update its representation.
+                QueryManager.UpdateQueryShapes();
+            }
+        }
 
         /// <summary>
         /// Gets the support finder used by the character.
@@ -120,8 +142,23 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         /// Constructs a new character controller with the default configuration.
         /// </summary>
         public CharacterController()
+            : this(new Vector3(), 1.7f, 1.7f * .7f, .6f, 10)
         {
-            Body = new Cylinder(Vector3.Zero, 1.7f, .6f, 10);
+
+        }
+
+
+        /// <summary>
+        /// Constructs a new character controller with the most common configuration options.
+        /// </summary>
+        /// <param name="position">Initial position of the character.</param>
+        /// <param name="height">Height of the character body while standing.</param>
+        /// <param name="crouchingHeight">Height of the character body while crouching.</param>
+        /// <param name="radius">Radius of the character body.</param>
+        /// <param name="mass">Mass of the character body.</param>
+        public CharacterController(Vector3 position, float height, float crouchingHeight, float radius, float mass)
+        {
+            Body = new Cylinder(position, height, radius, mass);
             Body.IgnoreShapeChanges = true; //Wouldn't want inertia tensor recomputations to occur when crouching and such.
             Body.CollisionInformation.Shape.CollisionMargin = .1f;
             //Making the character a continuous object prevents it from flying through walls which would be pretty jarring from a player's perspective.
@@ -135,7 +172,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             HorizontalMotionConstraint = new HorizontalMotionConstraint(this);
             VerticalMotionConstraint = new VerticalMotionConstraint(this);
             StepManager = new StepManager(this);
-            StanceManager = new StanceManager(this);
+            StanceManager = new StanceManager(this, crouchingHeight);
             QueryManager = new QueryManager(this);
 
             //Enable multithreading for the characters.  

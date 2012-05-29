@@ -13,7 +13,7 @@ namespace BEPUphysicsDemos.AlternateMovement.SimpleCharacter
 {
     /// <summary>
     /// A single-class implementation of a fairly restricted character controller.  It can discontinuously step, but it does so unsafely.
-    /// This simple character is an interesting thing to fiddle with, but if you want lots of robust features, use the CharacterController.
+    /// While this simple character is an interesting thing to fiddle with, it's not very robust.  If you want lots of robust features, use the CharacterController.
     /// If you don't need discontinuous stepping and want a bit more speed, go with the SphereCharacterController.
     /// </summary>
     public class SimpleCharacterController : Updateable, IEndOfTimeStepUpdateable

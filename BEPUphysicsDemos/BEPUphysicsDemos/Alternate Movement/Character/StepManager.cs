@@ -779,7 +779,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         }
 
 
- 
+
 
     }
 }

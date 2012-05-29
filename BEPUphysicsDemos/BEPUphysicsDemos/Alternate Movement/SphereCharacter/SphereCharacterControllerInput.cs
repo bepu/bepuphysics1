@@ -44,8 +44,8 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
         /// Constructs the character and internal physics character controller.
         /// </summary>
         /// <param name="owningSpace">Space to add the character to.</param>
-        /// <param name="CameraToUse">Camera to attach to the character.</param>
-        public SphereCharacterControllerInput(Space owningSpace, Camera CameraToUse)
+        /// <param name="cameraToUse">Camera to attach to the character.</param>
+        public SphereCharacterControllerInput(Space owningSpace, Camera cameraToUse)
         {
             CharacterController = new SphereCharacterController();
 
@@ -53,7 +53,7 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
             Space.Add(CharacterController);
 
 
-            Camera = CameraToUse;
+            Camera = cameraToUse;
             Deactivate();
         }
 
@@ -118,7 +118,7 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
                 //}
 
 
-                Camera.Position = CharacterController.Body.Position + CameraOffset * CharacterController.Body.OrientationMatrix.Up;
+                Camera.Position = CharacterController.Body.Position + CameraOffset * CharacterController.Body.OrientationMatrix.Up * 10;
 
 
                 Vector2 totalMovement = Vector2.Zero;

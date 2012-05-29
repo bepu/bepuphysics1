@@ -41,6 +41,7 @@ namespace BEPUphysicsDemos.Demos
         {
             //Creates the player character (C).
             character = new CharacterControllerInput(Space, game.Camera);
+
             //Creates the drivable vehicle (V).
             var wheelModel = game.Content.Load<Model>("carWheel");
             var wheelTexture = game.Content.Load<Texture2D>("wheel");

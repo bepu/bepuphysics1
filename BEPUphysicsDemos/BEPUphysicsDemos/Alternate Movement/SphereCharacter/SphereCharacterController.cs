@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.UpdateableSystems;
@@ -9,25 +7,17 @@ using BEPUphysics;
 using Microsoft.Xna.Framework;
 using BEPUphysics.MathExtensions;
 using BEPUphysics.Collidables.MobileCollidables;
-using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
 using BEPUphysics.Materials;
 using BEPUphysics.PositionUpdating;
-using BEPUphysics.DataStructures;
 using System.Diagnostics;
-using BEPUphysics.CollisionShapes.ConvexShapes;
-using BEPUphysics.Collidables;
-using Microsoft.Xna.Framework.Input;
-using BEPUphysics.Entities;
-using BEPUphysics.Threading;
 using System.Threading;
 
 namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
 {
     /// <summary>
     /// Gives a physical object simple and cheap FPS-like control.
-    /// This character has less features than the full CharacterController but offers
-    /// an alternative to the SimpleCharacterController.
+    /// This character has less features than the full CharacterController but is a little bit faster.
     /// </summary>
     public class SphereCharacterController : Updateable, IBeforeSolverUpdateable
     {
@@ -53,6 +43,9 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
         public VerticalMotionConstraint VerticalMotionConstraint { get; private set; }
 
         private float jumpSpeed = 4.5f;
+        /// <summary>
+        /// Gets or sets the speed at which the character leaves the ground when it jumps.
+        /// </summary>
         public float JumpSpeed
         {
             get
@@ -67,6 +60,9 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
             }
         }
         float slidingJumpSpeed = 3;
+        /// <summary>
+        /// Gets or sets the speed at which the character leaves the ground when it jumps without traction.
+        /// </summary>
         public float SlidingJumpSpeed
         {
             get
@@ -106,13 +102,25 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
         public SupportFinder SupportFinder { get; private set; }
 
 
-
         /// <summary>
         /// Constructs a new character controller with the default configuration.
         /// </summary>
         public SphereCharacterController()
+            : this(new Vector3(), 1, 10)
         {
-            Body = new Sphere(Vector3.Zero, 1, 10);
+
+        }
+
+        /// <summary>
+        /// Constructs a new character controller with the most common configuration options.
+        /// </summary>
+        /// <param name="position">Initial position of the character.</param>
+        /// <param name="radius">Radius of the character body.</param>
+        /// <param name="mass">Mass of the character body.</param>
+        public SphereCharacterController(Vector3 position, float radius, float mass)
+        {
+            Body = new Sphere(position, radius, mass);
+            Body.IgnoreShapeChanges = true; //Wouldn't want inertia tensor recomputations to occur if the shape changes.
             //Making the character a continuous object prevents it from flying through walls which would be pretty jarring from a player's perspective.
             Body.PositionUpdateMode = PositionUpdateMode.Continuous;
             Body.LocalInertiaTensorInverse = new Matrix3X3();
@@ -148,7 +156,7 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
             {
                 //Is this a pair with another character?
                 var other = pair.BroadPhaseOverlap.EntryA == Body.CollisionInformation ? pair.BroadPhaseOverlap.EntryB : pair.BroadPhaseOverlap.EntryA;
-                var otherCharacter = other.Tag as ICharacterTag; 
+                var otherCharacter = other.Tag as ICharacterTag;
                 if (otherCharacter != null)
                 {
                     involvedCharacters.Add(otherCharacter);
