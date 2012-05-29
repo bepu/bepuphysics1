@@ -47,26 +47,18 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
         /// <summary>
         /// This is a few test-based values which help threaded scaling.
         /// By going deeper into the trees, a better distribution of work is achieved.
-        /// Going above the tested core count theoretically benefits from a '0 if power of 2, 3 otherwise' rule of thumb.
+        /// Going above the tested core count theoretically benefits from a '0 if power of 2, 2 otherwise' rule of thumb.
         /// </summary>
         private int[] threadSplitOffsets = new[]
 #if !XBOX360
-        { 0, 0, 4, 1, 3, 3, 3, 0 };
+        { 0, 0, 4, 1, 2, 2, 2, 0, 2, 2, 2, 2 };
 #else
         { 2, 2, 2, 1};
 #endif
 
         #region Multithreading
 
-        public bool ROOTEXISTS
-        {
-            get
-            {
-                return root != null;
-            }
-        }
-
-        public void MultithreadedRefitPhase(int splitDepth)
+        private void MultithreadedRefitPhase(int splitDepth)
         {
             if (splitDepth > 0)
             {
@@ -85,7 +77,7 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
             }
         }
 
-        public void MultithreadedOverlapPhase(int splitDepth)
+        private void MultithreadedOverlapPhase(int splitDepth)
         {
             if (splitDepth > 0)
             {
@@ -118,7 +110,7 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
                     //require going deeper for better distributions.
                     int offset = ThreadManager.ThreadCount <= threadSplitOffsets.Length
                                      ? threadSplitOffsets[ThreadManager.ThreadCount - 1]
-                                     : (ThreadManager.ThreadCount & (ThreadManager.ThreadCount - 1)) == 0 ? 0 : 3; 
+                                     : (ThreadManager.ThreadCount & (ThreadManager.ThreadCount - 1)) == 0 ? 0 : 2; 
                     int splitDepth = offset + (int)Math.Ceiling(Math.Log(ThreadManager.ThreadCount, 2));
 
                     MultithreadedRefitPhase(splitDepth);

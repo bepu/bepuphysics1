@@ -1,4 +1,5 @@
-﻿using BEPUphysics;
+﻿using System.Threading;
+using BEPUphysics;
 using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.NarrowPhaseSystems;
@@ -33,11 +34,12 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                                          BuildPlanetSimulation
                                      };
 
+#if WINDOWS
             int coreCountMax = Environment.ProcessorCount;
+
             testResults = new double[coreCountMax, simulationBuilders.Length];
 
-
-            int reruns = 10;
+            int reruns = 1;
             for (int i = 0; i < reruns; i++)
             {
                 GC.Collect();
@@ -55,6 +57,36 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
 
                 }
             }
+#else
+            testResults = new double[4, simulationBuilders.Length];
+            int reruns = 10;
+            for (int i = 0; i < reruns; i++)
+            {
+                GC.Collect();
+                var threadManager = new SpecializedThreadManager();
+
+                threadManager.AddThread(delegate { Thread.CurrentThread.SetProcessorAffinity(new[] { 1 }); }, null);
+
+                for (int k = 0; k < simulationBuilders.Length; k++)
+                    testResults[0, k] += RunTest(threadManager, simulationBuilders[k]);
+                GC.Collect();
+
+                threadManager.AddThread(delegate { Thread.CurrentThread.SetProcessorAffinity(new[] { 3 }); }, null);
+                for (int k = 0; k < simulationBuilders.Length; k++)
+                    testResults[1, k] += RunTest(threadManager, simulationBuilders[k]);
+                GC.Collect();
+                threadManager.AddThread(delegate { Thread.CurrentThread.SetProcessorAffinity(new[] { 5 }); }, null);
+                for (int k = 0; k < simulationBuilders.Length; k++)
+                    testResults[2, k] += RunTest(threadManager, simulationBuilders[k]);
+                GC.Collect();
+                threadManager.AddThread(delegate { Thread.CurrentThread.SetProcessorAffinity(new[] { 4 }); }, null);
+                for (int k = 0; k < simulationBuilders.Length; k++)
+                    testResults[3, k] += RunTest(threadManager, simulationBuilders[k]);
+                GC.Collect();
+            }
+#endif
+
+
 
 
 
@@ -64,10 +96,15 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
         {
             Random rand = new Random(0);
 
+#if WINDOWS
             NarrowPhaseHelper.Factories.BoxBox.EnsureCount(30000);
-
             BoundingBox box = new BoundingBox(new Vector3(-5, 10, -5), new Vector3(5, 300, 5));
             for (int k = 0; k < 5000; k++)
+#else        
+            NarrowPhaseHelper.Factories.BoxBox.EnsureCount(1500);
+            BoundingBox box = new BoundingBox(new Vector3(-5, 10, -5), new Vector3(5, 20, 5));
+            for (int k = 0; k < 250; k++)
+#endif
             {
                 Vector3 position = new Vector3((float)(rand.NextDouble() * (box.Max.X - box.Min.X) + box.Min.X),
                                                (float)(rand.NextDouble() * (box.Max.Y - box.Min.Y) + box.Min.Y),
@@ -83,18 +120,28 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             Box ground = new Box(new Vector3(0, 0, 0), 300, 10, 300);
             space.Add(ground);
 
+#if WINDOWS
             return 700;
+#else
+            return 350;
+#endif
         }
 
         int BuildWallSimulation(Space space)
         {
+#if WINDOWS
             int width = 100;
             int height = 40;
+            NarrowPhaseHelper.Factories.BoxBox.EnsureCount(20000);
+#else
+            NarrowPhaseHelper.Factories.BoxBox.EnsureCount(2000);
+            int width = 25;
+            int height = 15;
+#endif
             float blockWidth = 2f;
             float blockHeight = 1f;
             float blockLength = 3f;
 
-            NarrowPhaseHelper.Factories.BoxBox.EnsureCount(20000);
 
             for (int i = 0; i < width; i++)
             {
@@ -115,16 +162,17 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
 
             Box ground = new Box(new Vector3(0, -5f, 0), 500, 10, 500);
             space.Add(ground);
-
+#if WINDOWS
             return 800;
+#else
+            return 400;
+#endif
         }
 
         int BuildPlanetSimulation(Space space)
         {
             space.ForceUpdater.Gravity = Vector3.Zero;
 
-            //By pre-allocating a bunch of box-box pair handlers, the simulation will avoid having to allocate new ones at runtime.
-            NarrowPhaseHelper.Factories.BoxBox.EnsureCount(30000);
 
             var planet = new Sphere(new Vector3(0, 0, 0), 30);
             space.Add(planet);
@@ -134,9 +182,19 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
 
             //Drop the "meteorites" on the planet.
             Entity toAdd;
+#if WINDOWS
+            //By pre-allocating a bunch of box-box pair handlers, the simulation will avoid having to allocate new ones at runtime.
+            NarrowPhaseHelper.Factories.BoxBox.EnsureCount(30000);
+
             int numColumns = 25;
             int numRows = 25;
             int numHigh = 25;
+#else
+            NarrowPhaseHelper.Factories.BoxBox.EnsureCount(2000);
+            int numColumns = 10;
+            int numRows = 10;
+            int numHigh = 10;
+#endif
             float separation = 5;
             for (int i = 0; i < numRows; i++)
                 for (int j = 0; j < numColumns; j++)
@@ -148,8 +206,11 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                         toAdd.AngularDamping = 0;
                         space.Add(toAdd);
                     }
-
+#if WINDOWS
             return 3000;
+#else
+            return 1000;
+#endif
         }
 
         double RunTest(IThreadManager threadManager, Func<Space, int> simulationBuilder)
@@ -188,7 +249,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             //Game.DataTextDrawer.Draw("Time steps elapsed: ", timeStepsElapsed, new Vector2(600, 600));
             //return;
             Vector2 origin = new Vector2(100, 50);
-            Vector2 spacing = new Vector2(120, 50);
+            Vector2 spacing = new Vector2(80, 50);
             //Draw the horizontal core counts.
             for (int i = 0; i < testResults.GetLength(0); i++)
             {
