@@ -34,7 +34,7 @@ using BEPUphysics.Threading;
 namespace BEPUphysicsDemos.Demos.Extras.Tests
 {
     /// <summary>
-    /// Benchmarks and verifies various broad phases against each other.
+    /// Benchmarks dynamic hierarchy performance under different multithreading conditions.
     /// </summary>
     public class BroadPhaseMultithreadingTestDemo : StandardDemo
     {

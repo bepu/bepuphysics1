@@ -51,7 +51,7 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
         /// </summary>
         private int[] threadSplitOffsets = new[]
 #if !XBOX360
-        { 0, 0, 4, 1, 2, 2, 2, 0, 2, 2, 2, 2 };
+ { 0, 0, 4, 1, 2, 2, 2, 0, 2, 2, 2, 2 };
 #else
         { 2, 2, 2, 1};
 #endif
@@ -110,7 +110,7 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
                     //require going deeper for better distributions.
                     int offset = ThreadManager.ThreadCount <= threadSplitOffsets.Length
                                      ? threadSplitOffsets[ThreadManager.ThreadCount - 1]
-                                     : (ThreadManager.ThreadCount & (ThreadManager.ThreadCount - 1)) == 0 ? 0 : 2; 
+                                     : (ThreadManager.ThreadCount & (ThreadManager.ThreadCount - 1)) == 0 ? 0 : 2;
                     int splitDepth = offset + (int)Math.Ceiling(Math.Log(ThreadManager.ThreadCount, 2));
 
                     MultithreadedRefitPhase(splitDepth);
@@ -214,17 +214,46 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
         /// <param name="entry">Entry to remove.</param>
         public override void Remove(BroadPhaseEntry entry)
         {
-            base.Remove(entry);
             if (root == null)
                 throw new InvalidOperationException("Entry not present in the hierarchy.");
+            //Attempt to search for the entry with a boundingbox lookup first.
+            if (!RemoveFast(entry))
+            {
+                //Oof, could not locate it with the fast method; it must have been force-moved or something.
+                //Fall back to a slow brute force approach.
+                if (!RemoveBrute(entry))
+                {
+                    throw new InvalidOperationException("Entry not present in the hierarchy.");
+                }
+            }
+        }
+
+        internal bool RemoveFast(BroadPhaseEntry entry)
+        {
             LeafNode leafNode;
+            //Update the root with the replacement just in case the removal triggers a root change.
+            if (root.RemoveFast(entry, out leafNode, out root))
+            {
+                leafNode.CleanUp();
+                leafNodes.GiveBack(leafNode);
+                base.Remove(entry);
+                return true;
+            }
+            return false;
+        }
+
+        internal bool RemoveBrute(BroadPhaseEntry entry)
+        {
+            LeafNode leafNode;
+            //Update the root with the replacement just in case the removal triggers a root change.
             if (root.Remove(entry, out leafNode, out root))
             {
                 leafNode.CleanUp();
                 leafNodes.GiveBack(leafNode);
+                base.Remove(entry);
+                return true;
             }
-            else
-                throw new InvalidOperationException("Entry not present in the hierarchy.");
+            return false;
         }
 
         #region Debug

@@ -111,6 +111,7 @@
     <Compile Include="Demos\Extras\Tests\BooleanConvexTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\BoxBoxTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\BroadPhaseMultithreadingTestDemo.cs" />
+    <Compile Include="Demos\Extras\Tests\BroadPhaseRemovalTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\BroadPhasesTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\CharacterStressTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\ConvexHullTestDemo.cs" />
