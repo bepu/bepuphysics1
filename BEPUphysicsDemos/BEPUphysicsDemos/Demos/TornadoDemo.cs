@@ -50,8 +50,10 @@ namespace BEPUphysicsDemos.Demos
 
             //x and y, in terms of heightmaps, refer to their local x and y coordinates.  In world space, they correspond to x and z.
             //Setup the heights of the terrain.
-            int xLength = 256;
-            int zLength = 256;
+            //[The size here is limited by the Reach profile the demos use- the drawer draws the terrain as a big block and runs into primitive drawing limits.
+            //The physics can support far larger terrains!]
+            int xLength = 180;
+            int zLength = 180;
 
             float xSpacing = 8f;
             float zSpacing = 8f;

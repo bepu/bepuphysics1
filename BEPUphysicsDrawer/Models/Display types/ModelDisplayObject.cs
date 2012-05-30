@@ -4,7 +4,7 @@
     /// Model-based graphical representation of an object.
     /// </summary>
     /// <typeparam name="T">Type of the object to be displayed.</typeparam>
-    public abstract class ModelDisplayObject<T> : ModelDisplayObjectBase
+    public abstract class ModelDisplayObject<T> : ModelDisplayObject
     {
         protected ModelDisplayObject(ModelDrawer drawer, T displayedObject)
             : base(drawer)

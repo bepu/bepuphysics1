@@ -18,7 +18,7 @@ namespace BEPUphysicsDemos.Demos
     public class DetectorVolumeDemo : StandardDemo
     {
         //Box to change colors when it hits the detector volume.
-        private readonly ModelDisplayObjectBase displayBox;
+        private ModelDisplayObject displayBox;
         private DetectorVolume detectorVolume;
         private Entity testEntity;
 
@@ -58,7 +58,7 @@ namespace BEPUphysicsDemos.Demos
 
             testEntity.Tag = "noDisplayObject";
             displayBox = game.ModelDrawer.Add(testEntity);
-            displayBox.TextureIndex = 0;
+            SetColor(0);
             game.ModelDrawer.IsWireframe = true;
             testEntity.LinearVelocity = new Vector3(0, 1, 0);
             Space.Add(testEntity);
@@ -84,22 +84,31 @@ namespace BEPUphysicsDemos.Demos
 
         private void StoppedContaining(DetectorVolume volume, Entity entity)
         {
-            displayBox.TextureIndex = 3;
+            SetColor(3);
         }
 
         private void BeganContaining(DetectorVolume volume, Entity entity)
         {
-            displayBox.TextureIndex = 2;
+            SetColor(2);
         }
 
         private void StoppedTouching(DetectorVolume volume, Entity toucher)
         {
-            displayBox.TextureIndex = 0;
+            SetColor(0);
         }
 
         private void BeganTouching(DetectorVolume volume, Entity toucher)
         {
-            displayBox.TextureIndex = 1;
+            SetColor(1);
+        }
+
+        void SetColor(int index)
+        {
+            //The model drawer requires a reset to change the color.
+            Game.ModelDrawer.Remove(testEntity);
+            displayBox = Game.ModelDrawer.GetDisplayObject(testEntity);
+            displayBox.TextureIndex = index;
+            Game.ModelDrawer.Add(displayBox);
         }
 
         public override void DrawUI()
