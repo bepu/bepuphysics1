@@ -42,6 +42,7 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
         internal abstract void GetMultithreadedOverlaps(Node opposingNode, int splitDepth, int currentDepth, DynamicHierarchy owner, RawList<DynamicHierarchy.NodePair> multithreadingSourceOverlaps);
 
         internal abstract bool Remove(BroadPhaseEntry entry, out LeafNode leafNode, out Node replacementNode);
+        internal abstract bool RemoveFast(BroadPhaseEntry entry, out LeafNode leafNode, out Node replacementNode);
     }
 
     internal sealed class InternalNode : Node
@@ -560,23 +561,58 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
                 return true;
 
             }
-            else
+            if (childB.Remove(entry, out leafNode, out replacementNode))
             {
-                if (childB.Remove(entry, out leafNode, out replacementNode))
+                if (childB.IsLeaf)
+                    replacementNode = childA;
+                else
                 {
-                    if (childB.IsLeaf)
-                        replacementNode = childA;
-                    else
-                    {
-                        //It was not a leaf node, but a child found the leaf.
-                        //Change the child to the replacement node.
-                        childB = replacementNode;
-                        replacementNode = this; //We don't need to be replaced!
-                    }
-                    return true;
+                    //It was not a leaf node, but a child found the leaf.
+                    //Change the child to the replacement node.
+                    childB = replacementNode;
+                    replacementNode = this; //We don't need to be replaced!
                 }
+                return true;
             }
             replacementNode = this;
+            return false;
+        }
+
+        internal override bool RemoveFast(BroadPhaseEntry entry, out LeafNode leafNode, out Node replacementNode)
+        {
+            //Only bother checking deeper in the path if the entry and child have overlapping bounding boxes.
+            bool intersects;
+            childA.BoundingBox.Intersects(ref entry.boundingBox, out intersects);
+            if (intersects && childA.RemoveFast(entry, out leafNode, out replacementNode))
+            {
+                if (childA.IsLeaf)
+                    replacementNode = childB;
+                else
+                {
+                    //It was not a leaf node, but a child found the leaf.
+                    //Change the child to the replacement node.
+                    childA = replacementNode;
+                    replacementNode = this; //We don't need to be replaced!
+                }
+                return true;
+
+            }
+            childB.BoundingBox.Intersects(ref entry.boundingBox, out intersects);
+            if (intersects && childB.RemoveFast(entry, out leafNode, out replacementNode))
+            {
+                if (childB.IsLeaf)
+                    replacementNode = childA;
+                else
+                {
+                    //It was not a leaf node, but a child found the leaf.
+                    //Change the child to the replacement node.
+                    childB = replacementNode;
+                    replacementNode = this; //We don't need to be replaced!
+                }
+                return true;
+            }
+            replacementNode = this;
+            leafNode = null;
             return false;
         }
 
@@ -783,6 +819,19 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
 
         internal override bool Remove(BroadPhaseEntry entry, out LeafNode leafNode, out Node replacementNode)
         {
+            replacementNode = null;
+            if (element == entry)
+            {
+                leafNode = this;
+                return true;
+            }
+            leafNode = null;
+            return false;
+        }
+        internal override bool RemoveFast(BroadPhaseEntry entry, out LeafNode leafNode, out Node replacementNode)
+        {
+            //The fastremove leaf node procedure is identical to the brute force approach.
+            //We don't need to perform any bounding box test here; if they're equal, they're equal!
             replacementNode = null;
             if (element == entry)
             {

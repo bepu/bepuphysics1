@@ -34,7 +34,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             for (int i = 0; i < 1000; i++)
             {
                 var toAdd =
-                    new CompoundBody(new List<CompoundShapeEntry>() 
+                    new CompoundBody(new List<CompoundShapeEntry>
                     {
                         new CompoundShapeEntry(new BoxShape(1,1,1), 
                         new Vector3(
