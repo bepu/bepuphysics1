@@ -22,7 +22,6 @@ namespace BEPUphysicsDrawer.Models
         private readonly EffectParameter textureIndicesParameter;
         private readonly EffectParameter viewParameter;
         private readonly EffectParameter worldTransformsParameter;
-        internal VertexDeclaration instancingVertexDeclaration;
 
         public InstancedModelDrawer(Game game)
             : base(game)
@@ -40,20 +39,13 @@ namespace BEPUphysicsDrawer.Models
             instancingEffect.Parameters["DiffuseColor2"].SetValue(new Vector3(.3f, .3f, .5f));
             instancingEffect.Parameters["AmbientAmount"].SetValue(.5f);
 
-            instancingEffect.Parameters["Texture0"].SetValue(textures[0]);
-            instancingEffect.Parameters["Texture1"].SetValue(textures[1]);
-            instancingEffect.Parameters["Texture2"].SetValue(textures[2]);
-            instancingEffect.Parameters["Texture3"].SetValue(textures[3]);
-            instancingEffect.Parameters["Texture4"].SetValue(textures[4]);
-            instancingEffect.Parameters["Texture5"].SetValue(textures[5]);
-            instancingEffect.Parameters["Texture6"].SetValue(textures[6]);
-            instancingEffect.Parameters["Texture7"].SetValue(textures[7]);
+            instancingEffect.Parameters["Colors"].SetValue(colors);
 
-            //This vertex declaration could be compressed or made more efficient, but such optimizations weren't critical.
-            instancingVertexDeclaration = new VertexDeclaration(new[] {new VertexElement(0, VertexElementFormat.Single, VertexElementUsage.TextureCoordinate, 1)});
         }
 
-        protected override void Add(ModelDisplayObjectBase displayObject)
+
+
+        public override void Add(ModelDisplayObject displayObject)
         {
             foreach (ModelDisplayObjectBatch batch in batches)
             {
@@ -74,7 +66,7 @@ namespace BEPUphysicsDrawer.Models
             batchToAdd.Add(displayObject, this);
         }
 
-        protected override void Remove(ModelDisplayObjectBase displayObject)
+        public override void Remove(ModelDisplayObject displayObject)
         {
             ModelDisplayObjectBatch batch = displayObject.BatchInformation.Batch;
             batch.Remove(displayObject, this);

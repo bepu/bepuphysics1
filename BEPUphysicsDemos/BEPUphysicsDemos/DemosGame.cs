@@ -140,10 +140,7 @@ namespace BEPUphysicsDemos
 
         protected override void Initialize()
         {
-            if (GraphicsDevice.GraphicsProfile == GraphicsProfile.HiDef)
-                ModelDrawer = new InstancedModelDrawer(this);
-            else
-                ModelDrawer = new BruteModelDrawer(this);
+            ModelDrawer = new InstancedModelDrawer(this);
 
             ConstraintDrawer = new LineDrawer(this);
             ConstraintDrawer.DisplayTypes.Add(typeof(GrabSpring), typeof(DisplayGrabSpring));
@@ -182,7 +179,7 @@ namespace BEPUphysicsDemos
             currentSimulation = (Demo)demoType.GetConstructor(new[] { typeof(DemosGame) }).Invoke(new object[] { this });
 
 #else
-            currentSimulation = (Demo)Activator.CreateInstance(demoType, new object[] { this });
+            currentSimulation = new DetectorVolumeDemo((this));// (Demo)Activator.CreateInstance(demoType, new object[] { this });
 #endif
             #region DisplayObject creation
 

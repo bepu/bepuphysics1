@@ -18,12 +18,12 @@ namespace BEPUphysicsDrawer.Models
     /// </summary>
     public abstract class ModelDrawer
     {
-        private readonly Dictionary<object, ModelDisplayObjectBase> displayObjects = new Dictionary<object, ModelDisplayObjectBase>();
+        private readonly Dictionary<object, ModelDisplayObject> displayObjects = new Dictionary<object, ModelDisplayObject>();
         private readonly RasterizerState fillState;
 
         private readonly List<SelfDrawingModelDisplayObject> selfDrawingDisplayObjects = new List<SelfDrawingModelDisplayObject>();
         private readonly RasterizerState wireframeState;
-        protected Texture2D[] textures = new Texture2D[8];
+        protected Texture2D colors;
 
 
 
@@ -76,23 +76,19 @@ namespace BEPUphysicsDrawer.Models
         protected ModelDrawer(Game game)
         {
             Game = game;
-            Color[][] colours = new Color[][] 
-            { 
-                new Color[1]{new Color(255, 216, 0)},
-                new Color[1]{new Color(79, 200, 255)},
-                new Color[1]{new Color(255, 0, 0)},
-                new Color[1]{new Color(177, 0, 254)},
-                new Color[1]{new Color(255, 130, 151)},
-                new Color[1]{new Color(254, 106, 0)},
-                new Color[1]{new Color(168, 165, 255)},
-                new Color[1]{new Color(0, 254, 33)}
-            };
 
-            for (int i = 0; i < 8; i++)
-            {
-                textures[i] = new Texture2D(Game.GraphicsDevice, 1, 1);
-                textures[i].SetData<Color>(colours[i]);
-            }
+            colors = new Texture2D(game.GraphicsDevice, 8, 1);
+            colors.SetData(new[] 
+            { 
+                new Color(255, 216, 0),
+                new Color(79, 200, 255),
+                new Color(255, 0, 0),
+                new Color(177, 0, 254),
+                new Color(255, 130, 151),
+                new Color(254, 106, 0),
+                new Color(168, 165, 255),
+                new Color(0, 254, 33)
+            });
 
 
             fillState = new RasterizerState();
@@ -117,7 +113,7 @@ namespace BEPUphysicsDrawer.Models
         /// </summary>
         /// <param name="objectToDisplay">Object to create a display object for.</param>
         /// <returns>Display object for an object.</returns>
-        internal ModelDisplayObjectBase GetDisplayObject(object objectToDisplay)
+        public ModelDisplayObject GetDisplayObject(object objectToDisplay)
         {
             Type displayType;
             if (!displayObjects.ContainsKey(objectToDisplay))
@@ -129,7 +125,7 @@ namespace BEPUphysicsDrawer.Models
                                                      new Type[] { typeof(ModelDrawer), objectToDisplay.GetType() })
                                                      .Invoke(new object[] { this, objectToDisplay });
 #else
-                    return (ModelDisplayObjectBase)Activator.CreateInstance(displayType, new[] { this, objectToDisplay });
+                    return (ModelDisplayObject)Activator.CreateInstance(displayType, new[] { this, objectToDisplay });
 #endif
                 }
                 Entity e;
@@ -153,9 +149,9 @@ namespace BEPUphysicsDrawer.Models
         /// </summary>
         /// <param name="objectToDisplay">Object to be added to the model drawer.</param>
         /// <returns>ModelDisplayObject created for the object.  Null if it couldn't be added.</returns>
-        public ModelDisplayObjectBase Add(object objectToDisplay)
+        public ModelDisplayObject Add(object objectToDisplay)
         {
-            ModelDisplayObjectBase displayObject = GetDisplayObject(objectToDisplay);
+            ModelDisplayObject displayObject = GetDisplayObject(objectToDisplay);
             if (displayObject != null)
             {
                 Add(displayObject);
@@ -181,10 +177,10 @@ namespace BEPUphysicsDrawer.Models
         }
 
         /// <summary>
-        /// Adds a display object to the drawer.
+        /// Adds a display object directly to the drawer without being linked to a source.
         /// </summary>
         /// <param name="displayObject">Display object to add.</param>
-        protected abstract void Add(ModelDisplayObjectBase displayObject);
+        public abstract void Add(ModelDisplayObject displayObject);
 
         /// <summary>
         /// Removes an object from the drawer.
@@ -193,7 +189,7 @@ namespace BEPUphysicsDrawer.Models
         /// <returns>Whether or not the object was present.</returns>
         public bool Remove(object objectToRemove)
         {
-            ModelDisplayObjectBase displayObject;
+            ModelDisplayObject displayObject;
             if (displayObjects.TryGetValue(objectToRemove, out displayObject))
             {
                 Remove(displayObject);
@@ -215,10 +211,10 @@ namespace BEPUphysicsDrawer.Models
 
 
         /// <summary>
-        /// Removes a display object from the drawer.
+        /// Removes a display object from the drawer.  Only use this if display object was added directly.
         /// </summary>
         /// <param name="displayObject">Object to remove.</param>
-        protected abstract void Remove(ModelDisplayObjectBase displayObject);
+        public abstract void Remove(ModelDisplayObject displayObject);
 
         /// <summary>
         /// Cleans out the model drawer of any existing display objects.

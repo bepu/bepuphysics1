@@ -1,18 +1,11 @@
 float4x4 View;
 float4x4 Projection;
 #define NUM_TEXTURES 8
-#define MAX_OBJECTS 61
-float4x4 WorldTransforms[MAX_OBJECTS];
+#define MAX_OBJECTS 82
+float4x3 WorldTransforms[MAX_OBJECTS];
 float TextureIndices[MAX_OBJECTS];
 
-texture Texture0;
-texture Texture1;
-texture Texture2;
-texture Texture3;
-texture Texture4;
-texture Texture5;
-texture Texture6;
-texture Texture7;
+texture Colors;
 
 float3 LightDirection1;
 float3 DiffuseColor1;
@@ -21,122 +14,34 @@ float3 DiffuseColor2;
 float AmbientAmount;
 
 
-sampler TextureSamplers[NUM_TEXTURES] = 
+sampler ColorSampler = sampler_state
 {
-
-sampler_state
-{
-    Texture = (Texture0);
+    Texture = (Colors);
     
-    MinFilter = Linear;
-    MagFilter = Linear;
-    MipFilter = Linear;
+    MinFilter = Point;
+    MagFilter = Point;
+    MipFilter = Point;
     
-    AddressU = Wrap;
-    AddressV = Wrap;
-},
-
-sampler_state
-{
-    Texture = (Texture1);
-    
-    MinFilter = Linear;
-    MagFilter = Linear;
-    MipFilter = Linear;
-    
-    AddressU = Wrap;
-    AddressV = Wrap;
-},
-
-sampler_state
-{
-    Texture = (Texture2);
-    
-    MinFilter = Linear;
-    MagFilter = Linear;
-    MipFilter = Linear;
-    
-    AddressU = Wrap;
-    AddressV = Wrap;
-},
-
-sampler_state
-{
-    Texture = (Texture3);
-    
-    MinFilter = Linear;
-    MagFilter = Linear;
-    MipFilter = Linear;
-    
-    AddressU = Wrap;
-    AddressV = Wrap;
-},
-
-sampler_state
-{
-    Texture = (Texture4);
-    
-    MinFilter = Linear;
-    MagFilter = Linear;
-    MipFilter = Linear;
-    
-    AddressU = Wrap;
-    AddressV = Wrap;
-},
-
-sampler_state
-{
-    Texture = (Texture5);
-    
-    MinFilter = Linear;
-    MagFilter = Linear;
-    MipFilter = Linear;
-    
-    AddressU = Wrap;
-    AddressV = Wrap;
-},
-
-sampler_state
-{
-    Texture = (Texture6);
-    
-    MinFilter = Linear;
-    MagFilter = Linear;
-    MipFilter = Linear;
-    
-    AddressU = Wrap;
-    AddressV = Wrap;
-},
-
-sampler_state
-{
-    Texture = (Texture7);
-    
-    MinFilter = Linear;
-    MagFilter = Linear;
-    MipFilter = Linear;
-    
-    AddressU = Wrap;
-    AddressV = Wrap;
-}
-
+    AddressU = Clamp;
+    AddressV = Clamp;
 };
 
 
+//The texture coordinates aren't actually used in this shader but it makes things marginally simpler outside.  Not exactly optimized!
 struct VertexShaderInput
 {
     float4 Position : POSITION0;
     float3 Normal : NORMAL0;
     float2 TextureCoordinates : TEXCOORD0;
     float Index : TEXCOORD1;
+	float TextureIndex : TEXCOORD2;
 };
 
 struct VertexShaderOutput
 {
     float4 Position : POSITION0;
-    float3 Normal : NORMAL0;
-    float2 TextureCoordinates : TEXCOORD0;
-    float Index : TEXCOORD1;
+    float3 Normal : TEXCOORD0;
+	float TextureIndex : TEXCOORD1;
 };
 
 
@@ -145,37 +50,22 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
 {
     VertexShaderOutput output;
     int index = (int)round(input.Index);
-    float4 worldPosition = mul(input.Position, WorldTransforms[index]);
-    output.Position = mul(mul(worldPosition, View), Projection);
-    output.TextureCoordinates = input.TextureCoordinates;
+    float3 worldPosition = mul(input.Position, WorldTransforms[index]);
+    output.Position = mul(mul(float4(worldPosition, 1), View), Projection);
     output.Normal = mul(input.Normal, WorldTransforms[index]);
-    output.Index = input.Index;	
+	output.TextureIndex = input.TextureIndex;
 
     return output;
 }
 
 float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 {
-    float index = round(input.Index);
-    int x = TextureIndices[index];
     float4 surfaceColor;
+
+	float halfPixel = .5f / NUM_TEXTURES;
     
-    if(x == 7)
-		surfaceColor = tex2D(TextureSamplers[0], input.TextureCoordinates);
-	else if(x == 6)
-		surfaceColor = tex2D(TextureSamplers[1], input.TextureCoordinates);
-	else if(x == 5)
-		surfaceColor = tex2D(TextureSamplers[2], input.TextureCoordinates);
-	else if(x == 4)
-		surfaceColor = tex2D(TextureSamplers[3], input.TextureCoordinates);
-	else if(x == 3)
-		surfaceColor = tex2D(TextureSamplers[4], input.TextureCoordinates);
-	else if(x == 2)
-		surfaceColor = tex2D(TextureSamplers[5], input.TextureCoordinates);
-	else if(x == 1)
-		surfaceColor = tex2D(TextureSamplers[6], input.TextureCoordinates);
-	else
-		surfaceColor = tex2D(TextureSamplers[7], input.TextureCoordinates);
+	surfaceColor = tex2D(ColorSampler, float2(halfPixel + halfPixel * 2 * input.TextureIndex, halfPixel));
+
 		
 	float3 normal = normalize(input.Normal);
     float diffuseAmount1 = saturate(-dot(normal, LightDirection1));
@@ -190,7 +80,7 @@ technique Technique1
 {
     pass Pass1
     {
-        VertexShader = compile vs_3_0 VertexShaderFunction();
-        PixelShader = compile ps_3_0 PixelShaderFunction();
+        VertexShader = compile vs_2_0 VertexShaderFunction();
+        PixelShader = compile ps_2_0 PixelShaderFunction();
     }
 }

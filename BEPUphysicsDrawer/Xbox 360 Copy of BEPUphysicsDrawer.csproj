@@ -70,8 +70,6 @@
     <Compile Include="Lines\LineDisplayObjectBase.cs" />
     <Compile Include="Lines\LineDrawer.cs" />
     <Compile Include="Models\BatchInformation.cs" />
-    <Compile Include="Models\BruteModelDrawer.cs" />
-    <Compile Include="Models\Display types\BruteDisplayObjectEntry.cs" />
     <Compile Include="Models\Display types\DisplayInstancedMesh.cs" />
     <Compile Include="Models\Display types\DisplayEntityModel.cs" />
     <Compile Include="Models\Display types\DisplayFluid.cs" />
