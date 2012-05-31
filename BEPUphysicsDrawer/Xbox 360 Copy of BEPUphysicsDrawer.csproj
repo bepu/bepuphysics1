@@ -49,6 +49,11 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DrawerResource.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DrawerResource.resx</DependentUpon>
+    </Compile>
     <Compile Include="Font\TextDrawer.cs" />
     <Compile Include="Lines\BoundingBoxDrawer.cs" />
     <Compile Include="Lines\ContactDrawer.cs" />
@@ -98,7 +103,6 @@
     <Compile Include="Models\ModelDrawer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <Reference Include="Microsoft.Xna.Framework">
       <Private>False</Private>
@@ -124,6 +128,16 @@
     <Reference Include="System.Xml.Linq">
       <Private>False</Private>
     </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="DrawerResource.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>DrawerResource.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\InstancedEffect.xnb" />
+    <None Include="Resources\InstancedEffectXbox.xnb" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\Microsoft.Xna.GameStudio.targets" />

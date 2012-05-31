@@ -121,7 +121,7 @@ namespace BEPUphysicsDrawer.Models
                 if (displayTypes.TryGetValue(objectToDisplay.GetType(), out displayType))
                 {
 #if !WINDOWS
-                    return (ModelDisplayObjectBase)displayType.GetConstructor(
+                    return (ModelDisplayObject)displayType.GetConstructor(
                                                      new Type[] { typeof(ModelDrawer), objectToDisplay.GetType() })
                                                      .Invoke(new object[] { this, objectToDisplay });
 #else
