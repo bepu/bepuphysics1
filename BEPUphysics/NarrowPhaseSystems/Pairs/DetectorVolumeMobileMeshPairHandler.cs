@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using BEPUphysics.CollisionShapes;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
 using BEPUphysics.DataStructures;
 using BEPUphysics.Collidables.MobileCollidables;
 using BEPUphysics.MathExtensions;
-using BEPUphysics.ResourceManagement;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 
 namespace BEPUphysics.NarrowPhaseSystems.Pairs
 {

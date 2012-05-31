@@ -2,10 +2,10 @@
 using BEPUphysics;
 using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
+using BEPUphysics.MathExtensions;
 using BEPUphysics.NarrowPhaseSystems;
 using BEPUphysics.UpdateableSystems.ForceFields;
 using BEPUphysicsDemos.SampleCode;
-using Microsoft.Xna.Framework;
 using System.Diagnostics;
 using System;
 using BEPUphysics.Threading;
@@ -248,16 +248,16 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             base.DrawUI();
             //Game.DataTextDrawer.Draw("Time steps elapsed: ", timeStepsElapsed, new Vector2(600, 600));
             //return;
-            Vector2 origin = new Vector2(100, 50);
-            Vector2 spacing = new Vector2(80, 50);
+            Microsoft.Xna.Framework.Vector2 origin = new Microsoft.Xna.Framework.Vector2(100, 50);
+            Microsoft.Xna.Framework.Vector2 spacing = new Microsoft.Xna.Framework.Vector2(80, 50);
             //Draw the horizontal core counts.
             for (int i = 0; i < testResults.GetLength(0); i++)
             {
-                Game.DataTextDrawer.Draw(i + 1, origin + new Vector2(spacing.X * i, -30));
+                Game.DataTextDrawer.Draw(i + 1, origin + new Microsoft.Xna.Framework.Vector2(spacing.X * i, -30));
             }
             for (int i = 0; i < testResults.GetLength(1); i++)
             {
-                Game.DataTextDrawer.Draw(i, origin + new Vector2(-30, spacing.Y * i));
+                Game.DataTextDrawer.Draw(i, origin + new Microsoft.Xna.Framework.Vector2(-30, spacing.Y * i));
             }
 
             for (int i = 0; i < testResults.GetLength(0); i++)
@@ -265,7 +265,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                 int lowestTime = 0;
                 for (int j = 0; j < testResults.GetLength(1); j++)
                 {
-                    Game.DataTextDrawer.Draw(testResults[i, j] * 1e3, 0, origin + new Vector2(spacing.X * i, spacing.Y * j));
+                    Game.DataTextDrawer.Draw(testResults[i, j] * 1e3, 0, origin + new Microsoft.Xna.Framework.Vector2(spacing.X * i, spacing.Y * j));
                     if (testResults[i, j] < testResults[i, lowestTime])
                         lowestTime = j;
                 }

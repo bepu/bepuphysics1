@@ -1,5 +1,4 @@
 ﻿using BEPUphysics.MathExtensions;
-using Microsoft.Xna.Framework;
 using BEPUphysics.DataStructures;
 using System.Collections.Generic;
 using BEPUphysics.Collidables;

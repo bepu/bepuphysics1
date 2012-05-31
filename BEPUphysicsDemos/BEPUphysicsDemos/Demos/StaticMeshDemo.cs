@@ -1,9 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
-using BEPUphysics.DataStructures;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.MathExtensions;
-using BEPUphysics.Entities;
 using BEPUphysics.Collidables;
 using BEPUphysics.Entities.Prefabs;
 

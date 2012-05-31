@@ -1,8 +1,6 @@
 ﻿using BEPUphysics.Entities.Prefabs;
-using Microsoft.Xna.Framework;
 using BEPUphysics.MathExtensions;
 using BEPUphysics.CollisionShapes;
-using BEPUphysics.DataStructures;
 using Microsoft.Xna.Framework.Graphics;
 using BEPUphysics.Collidables;
 using System;
@@ -89,7 +87,7 @@ namespace BEPUphysicsDemos.Demos
 
             Vector3[] vertices;
             int[] indices;
-            TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("fish"), out vertices, out indices);
+            ModelDataExtractor.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("fish"), out vertices, out indices);
             var meshShape = new InstancedMeshShape(vertices, indices);
 
             for (int i = 0; i < xCount; i++)
@@ -140,7 +138,7 @@ namespace BEPUphysicsDemos.Demos
             Space.Add(ground);
 
 
-            game.Camera.Position = new Vector3(0, 60, 90);
+            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(0, 60, 90);
         }
 
         /// <summary>

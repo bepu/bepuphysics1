@@ -1,4 +1,5 @@
 ﻿using System;
+using BEPUphysics.Collidables;
 using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
  

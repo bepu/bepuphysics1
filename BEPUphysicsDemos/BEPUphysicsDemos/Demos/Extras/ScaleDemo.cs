@@ -1,15 +1,8 @@
 ﻿using BEPUphysics.Collidables;
-using BEPUphysics.DataStructures;
 using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using BEPUphysics.MathExtensions;
 using BEPUphysics.CollisionShapes.ConvexShapes;
-using System.Diagnostics;
-using BEPUphysics.Settings;
-using BEPUphysics.Materials;
-using BEPUphysics.Constraints.SingleEntity;
 
 namespace BEPUphysicsDemos.Demos.Extras
 {
@@ -118,7 +111,7 @@ namespace BEPUphysicsDemos.Demos.Extras
 
 
 
-            game.Camera.Position = scale * new Vector3(0, 4, 10);
+            game.Camera.Position = scale * new Microsoft.Xna.Framework.Vector3(0, 4, 10);
 
 
         }

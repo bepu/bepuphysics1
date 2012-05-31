@@ -1,34 +1,13 @@
-﻿using System.Threading;
-using BEPUphysics.BroadPhaseEntries;
-using BEPUphysics.Collidables;
+﻿using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
-using BEPUphysics.PositionUpdating;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 using System.Diagnostics;
-using System.Collections.Generic;
 using System;
-using BEPUphysics.MathExtensions;
-using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.DataStructures;
-using Microsoft.Xna.Framework.Graphics;
-using BEPUphysics.Collidables.MobileCollidables;
-using BEPUphysics.CollisionShapes;
-using BEPUphysics.Settings;
-using BEPUphysics.NarrowPhaseSystems.Pairs;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.BroadPhaseSystems;
-using BEPUphysics.Constraints;
-using BEPUphysics.CollisionTests.CollisionAlgorithms.GJK;
-using BEPUphysics.Constraints.SolverGroups;
-using BEPUphysics.CollisionTests.CollisionAlgorithms;
-using BEPUphysics.CollisionTests;
-using BEPUphysics;
-using BEPUphysics.EntityStateManagement;
-using BEPUphysics.ResourceManagement;
 using BEPUphysics.BroadPhaseSystems.Hierarchies;
-using BEPUphysics.BroadPhaseSystems.SortAndSweep;
+using BEPUphysics.MathExtensions;
 using BEPUphysics.Threading;
 
 namespace BEPUphysicsDemos.Demos.Extras.Tests
@@ -378,16 +357,16 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             base.DrawUI();
             //Game.DataTextDrawer.Draw("Time per DH:    ", DHtime * 1e6f, new Vector2(50, 80));
 
-            Vector2 origin = new Vector2(100, 50);
-            Vector2 spacing = new Vector2(80, 50);
+            var origin = new Microsoft.Xna.Framework.Vector2(100, 50);
+            var spacing = new Microsoft.Xna.Framework.Vector2(80, 50);
             //Draw the horizontal core counts.
             for (int i = 0; i < testResults.GetLength(0); i++)
             {
-                Game.DataTextDrawer.Draw(i + 1, origin + new Vector2(spacing.X * i, -30));
+                Game.DataTextDrawer.Draw(i + 1, origin + new Microsoft.Xna.Framework.Vector2(spacing.X * i, -30));
             }
             for (int i = 0; i < testResults.GetLength(1); i++)
             {
-                Game.DataTextDrawer.Draw(i, origin + new Vector2(-30, spacing.Y * i));
+                Game.DataTextDrawer.Draw(i, origin + new Microsoft.Xna.Framework.Vector2(-30, spacing.Y * i));
             }
 
             for (int i = 0; i < testResults.GetLength(0); i++)
@@ -395,13 +374,13 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                 int lowestTime = 0;
                 for (int j = 0; j < testResults.GetLength(1); j++)
                 {
-                    Game.DataTextDrawer.Draw(testResults[i, j] * 1e6, 0, origin + new Vector2(spacing.X * i, spacing.Y * j));
+                    Game.DataTextDrawer.Draw(testResults[i, j] * 1e6, 0, origin + new Microsoft.Xna.Framework.Vector2(spacing.X * i, spacing.Y * j));
                     if (testResults[i, j] < testResults[i, lowestTime])
                         lowestTime = j;
                 }
 
-                Game.DataTextDrawer.Draw(testResults[i, lowestTime] * 1e6, 0, origin + new Vector2(spacing.X * i, spacing.Y * (testResults.GetLength(1))));
-                Game.DataTextDrawer.Draw(lowestTime, 0, origin + new Vector2(spacing.X * i, spacing.Y * (testResults.GetLength(1) + 1)));
+                Game.DataTextDrawer.Draw(testResults[i, lowestTime] * 1e6, 0, origin + new Microsoft.Xna.Framework.Vector2(spacing.X * i, spacing.Y * (testResults.GetLength(1))));
+                Game.DataTextDrawer.Draw(lowestTime, 0, origin + new Microsoft.Xna.Framework.Vector2(spacing.X * i, spacing.Y * (testResults.GetLength(1) + 1)));
             }
 
 

@@ -1,17 +1,11 @@
-﻿using System.Threading;
-using BEPUphysics;
-using BEPUphysics.BroadPhaseSystems.Hierarchies;
-using BEPUphysics.CollisionRuleManagement;
+﻿using BEPUphysics.BroadPhaseSystems.Hierarchies;
 using BEPUphysics.DataStructures;
 using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
-using BEPUphysics.NarrowPhaseSystems;
-using BEPUphysics.UpdateableSystems.ForceFields;
-using BEPUphysicsDemos.SampleCode;
+using ConversionHelper;
 using Microsoft.Xna.Framework;
 using System.Diagnostics;
 using System;
-using BEPUphysics.Threading;
 
 namespace BEPUphysicsDemos.Demos.Extras.Tests
 {
@@ -43,7 +37,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                 Vector3 position = new Vector3((float)(rand.NextDouble() * (box.Max.X - box.Min.X) + box.Min.X),
                                                (float)(rand.NextDouble() * (box.Max.Y - box.Min.Y) + box.Min.Y),
                                                (float)(rand.NextDouble() * (box.Max.Z - box.Min.Z) + box.Min.Z));
-                toAdd = new Box(position, 1, 1, 1, 1);
+                toAdd = new Box(MathConverter.Convert(position), 1, 1, 1, 1);
 
                 entities.Add(toAdd);
 

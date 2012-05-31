@@ -104,7 +104,7 @@ namespace BEPUphysicsDrawer.Models
         /// </summary>
         public override void Update()
         {
-            WorldTransform = OffsetTransform * MathConverter.Convert(Entity.WorldTransform);
+            WorldTransform = LocalTransform * MathConverter.Convert(Entity.WorldTransform);
         }
 
         /// <summary>

@@ -62,8 +62,7 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="BEPUphysics, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31f6a8732a21de19, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="BEPUphysics">
       <HintPath>..\..\BEPUphysics\bin\Release\BEPUphysics.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Xna.Framework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
@@ -161,7 +160,6 @@
     <Compile Include="Demos\StaticMeshDemo.cs" />
     <Compile Include="Demos\InstancedMeshDemo.cs" />
     <Compile Include="Demos\PyramidDemo.cs" />
-    <Compile Include="Demos\Tests\ReverseTrikeDemo.cs" />
     <Compile Include="Demos\RobotArmDemo.cs" />
     <Compile Include="Demos\SawContraptionDemo.cs" />
     <Compile Include="Demos\SleepModeDemo.cs" />

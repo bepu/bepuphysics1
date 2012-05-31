@@ -1,20 +1,10 @@
 ﻿using BEPUphysics.CollisionTests.CollisionAlgorithms.GJK;
 using BEPUphysics.DataStructures;
-using BEPUphysics.Entities;
-using BEPUphysics.Entities.Prefabs;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 using System.Diagnostics;
-using System.Collections.Generic;
 using System;
 using BEPUphysics.MathExtensions;
 using BEPUphysics.CollisionShapes.ConvexShapes;
-using Microsoft.Xna.Framework.Graphics;
-using BEPUphysics.Settings;
-using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
-using BEPUphysics.CollisionTests;
-using BEPUphysics;
 
 namespace BEPUphysicsDemos.Demos.Extras.Tests
 {
@@ -158,13 +148,13 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
 
         public override void DrawUI()
         {
-            Game.DataTextDrawer.Draw("MPR Time (ns): ", timeMPR * 1e9, 0, new Vector2(40, 40));
-            Game.DataTextDrawer.Draw("GJK Time (ns): ", timeGJK * 1e9, 0, new Vector2(40, 70));
-            Game.DataTextDrawer.Draw("GJK Separating Axis Time (ns): ", timeGJKSeparatingAxis * 1e9, 0, new Vector2(40, 100));
+            Game.DataTextDrawer.Draw("MPR Time (ns): ", timeMPR * 1e9, 0, new Microsoft.Xna.Framework.Vector2(40, 40));
+            Game.DataTextDrawer.Draw("GJK Time (ns): ", timeGJK * 1e9, 0, new Microsoft.Xna.Framework.Vector2(40, 70));
+            Game.DataTextDrawer.Draw("GJK Separating Axis Time (ns): ", timeGJKSeparatingAxis * 1e9, 0, new Microsoft.Xna.Framework.Vector2(40, 100));
 
-            Game.DataTextDrawer.Draw("MPR overlaps: ", overlapsMPR, new Vector2(40, 150));
-            Game.DataTextDrawer.Draw("GJK overlaps: ", overlapsGJK, new Vector2(40, 180));
-            Game.DataTextDrawer.Draw("GJK Separating Axis overlaps: ", overlapsGJKSeparatingAxis, new Vector2(40, 210));
+            Game.DataTextDrawer.Draw("MPR overlaps: ", overlapsMPR, new Microsoft.Xna.Framework.Vector2(40, 150));
+            Game.DataTextDrawer.Draw("GJK overlaps: ", overlapsGJK, new Microsoft.Xna.Framework.Vector2(40, 180));
+            Game.DataTextDrawer.Draw("GJK Separating Axis overlaps: ", overlapsGJKSeparatingAxis, new Microsoft.Xna.Framework.Vector2(40, 210));
             base.DrawUI();
         }
 

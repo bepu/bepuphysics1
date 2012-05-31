@@ -1,17 +1,5 @@
-﻿using System;
-using BEPUphysics.Collidables;
-using BEPUphysics.Entities.Prefabs;
+﻿using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.MathExtensions;
-using Microsoft.Xna.Framework;
-using BEPUphysics.Settings;
-using BEPUphysics.CollisionTests.CollisionAlgorithms;
-using BEPUphysics.CollisionRuleManagement;
-using BEPUphysics.NarrowPhaseSystems.Pairs;
-using BEPUphysics.CollisionTests.Manifolds;
-using System.Diagnostics;
-using BEPUphysics.BroadPhaseSystems.SortAndSweep;
-using BEPUphysics.CollisionShapes;
-using BEPUphysics.CollisionShapes.ConvexShapes;
 
 namespace BEPUphysicsDemos.Demos.Extras.Tests
 {
@@ -107,7 +95,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             Space.Add(alwaysActiveBox);
 
 
-            game.Camera.Position = new Vector3(0, 7, 30);
+            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(0, 7, 30);
 
         }
 
@@ -153,9 +141,9 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
         {
             base.DrawUI();
             if (teleportingBox.ActivityInformation.IsActive)
-                Game.DataTextDrawer.Draw("Teleporting box is active.", new Vector2(10, 10));
+                Game.DataTextDrawer.Draw("Teleporting box is active.", new Microsoft.Xna.Framework.Vector2(10, 10));
             else
-                Game.DataTextDrawer.Draw("Teleporting box is NOT active.", new Vector2(10, 10));
+                Game.DataTextDrawer.Draw("Teleporting box is NOT active.", new Microsoft.Xna.Framework.Vector2(10, 10));
         }
         /// <summary>
         /// Gets the name of the simulation.
