@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using BEPUphysics.DataStructures;
-using Microsoft.Xna.Framework;
+ 
 using System.Diagnostics;
 
 namespace BEPUphysics.BroadPhaseSystems.SortAndSweep

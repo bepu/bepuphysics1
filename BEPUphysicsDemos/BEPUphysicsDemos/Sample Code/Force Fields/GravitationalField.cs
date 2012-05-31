@@ -2,8 +2,8 @@ using System;
 using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.Entities;
 using BEPUphysics.UpdateableSystems.ForceFields;
-using Microsoft.Xna.Framework;
 using BEPUphysics;
+using BEPUphysics.MathExtensions;
 
 namespace BEPUphysicsDemos.SampleCode
 {

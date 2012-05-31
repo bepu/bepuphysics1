@@ -4,11 +4,11 @@ using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.Collidables.MobileCollidables;
 using BEPUphysics.Entities;
-using Microsoft.Xna.Framework;
+ 
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.DataStructures;
 using BEPUphysics.DeactivationManagement;
-using System.Diagnostics;
+using BEPUphysics.MathExtensions;
 using BEPUphysics.Collidables;
 using BEPUphysics.MathExtensions;
 

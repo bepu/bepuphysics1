@@ -5,9 +5,10 @@ using System.Text;
 using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.ResourceManagement;
 using BEPUphysics.DataStructures;
-using Microsoft.Xna.Framework;
+ 
 using System.Diagnostics;
 using BEPUphysics.Threading;
+using BEPUphysics.MathExtensions;
 
 namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
 {

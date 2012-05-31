@@ -4,7 +4,7 @@ using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.Collidables.Events;
 using BEPUphysics.CollisionShapes;
 using BEPUphysics.MathExtensions;
-using Microsoft.Xna.Framework;
+ 
 using BEPUphysics.ResourceManagement;
 using BEPUphysics.DataStructures;
 using BEPUphysics.Materials;

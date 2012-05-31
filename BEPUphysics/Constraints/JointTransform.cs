@@ -1,6 +1,6 @@
 ﻿using System;
 using BEPUphysics.MathExtensions;
-using Microsoft.Xna.Framework;
+ 
 
 namespace BEPUphysics.Constraints
 {

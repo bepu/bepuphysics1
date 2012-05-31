@@ -3,8 +3,9 @@ using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.Collidables.MobileCollidables;
 using BEPUphysics.Entities;
-using Microsoft.Xna.Framework;
+ 
 using BEPUphysics.DataStructures;
+using BEPUphysics.MathExtensions;
 
 namespace BEPUphysics.UpdateableSystems.ForceFields
 {

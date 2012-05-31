@@ -1,10 +1,11 @@
 ﻿using BEPUphysics.CollisionShapes.ConvexShapes;
-using Microsoft.Xna.Framework;
+ 
 using System;
 using BEPUphysics.PositionUpdating;
 using BEPUphysics.Settings;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
 using BEPUphysics.Collidables.Events;
+using BEPUphysics.MathExtensions;
 
 namespace BEPUphysics.Collidables.MobileCollidables
 {

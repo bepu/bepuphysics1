@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using BEPUphysics.DataStructures;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using ConversionHelper;
 
 namespace BEPUphysicsDrawer.Models
 {
@@ -30,9 +31,9 @@ namespace BEPUphysicsDrawer.Models
             var tempVertices = new VertexPositionNormalTexture[mesh.Data.Vertices.Length];
             for (int i = 0; i < mesh.Data.Vertices.Length; i++)
             {
-                Vector3 v;
+                BEPUphysics.MathExtensions.Vector3 v;
                 mesh.Data.GetVertexPosition(i, out v);
-                tempVertices[i] = new VertexPositionNormalTexture(v, Vector3.Zero, Vector2.Zero);
+                tempVertices[i] = new VertexPositionNormalTexture(MathConverter.Convert(v), Vector3.Zero, Vector2.Zero);
             }
 
             for (int i = 0; i < mesh.Data.Indices.Length; i++)

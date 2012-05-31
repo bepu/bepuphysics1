@@ -2,7 +2,7 @@
 using BEPUphysics.Collidables;
 using BEPUphysics.Collidables.MobileCollidables;
 using BEPUphysics.ResourceManagement;
-using Microsoft.Xna.Framework;
+ 
 using BEPUphysics.MathExtensions;
 
 namespace BEPUphysics.NarrowPhaseSystems.Pairs

@@ -10,7 +10,7 @@ using BEPUphysics.Constraints.Collision;
 using BEPUphysics.DataStructures;
 using BEPUphysics.PositionUpdating;
 using BEPUphysics.Settings;
-using Microsoft.Xna.Framework;
+ 
 using BEPUphysics.MathExtensions;
 using BEPUphysics.ResourceManagement;
 using BEPUphysics.CollisionShapes.ConvexShapes;

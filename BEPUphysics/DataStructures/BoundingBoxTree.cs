@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Microsoft.Xna.Framework;
 using BEPUphysics.ResourceManagement;
 using BEPUphysics.BroadPhaseSystems;
+using BEPUphysics.MathExtensions;
 
 namespace BEPUphysics.DataStructures
 {
@@ -148,23 +148,23 @@ namespace BEPUphysics.DataStructures
             }
             return outputOverlappedElements.Count > 0;
         }
-        /// <summary>
-        /// Gets the triangles whose bounding boxes are overlapped by the query.
-        /// </summary>
-        /// <param name="boundingFrustum">Shape to query against the tree.</param>
-        /// <param name="outputOverlappedElements">Indices of triangles in the index buffer with bounding boxes which are overlapped by the query.</param>
-        /// <returns>Whether or not any elements were overlapped.</returns>
-        public bool GetOverlaps(BoundingFrustum boundingFrustum, IList<T> outputOverlappedElements)
-        {
-            if (root != null)
-            {
-                bool intersects;
-                boundingFrustum.Intersects(ref root.BoundingBox, out intersects);
-                if (intersects)
-                    root.GetOverlaps(ref boundingFrustum, outputOverlappedElements);
-            }
-            return outputOverlappedElements.Count > 0;
-        }
+        ///// <summary>
+        ///// Gets the triangles whose bounding boxes are overlapped by the query.
+        ///// </summary>
+        ///// <param name="boundingFrustum">Shape to query against the tree.</param>
+        ///// <param name="outputOverlappedElements">Indices of triangles in the index buffer with bounding boxes which are overlapped by the query.</param>
+        ///// <returns>Whether or not any elements were overlapped.</returns>
+        //public bool GetOverlaps(BoundingFrustum boundingFrustum, IList<T> outputOverlappedElements)
+        //{
+        //    if (root != null)
+        //    {
+        //        bool intersects;
+        //        boundingFrustum.Intersects(ref root.BoundingBox, out intersects);
+        //        if (intersects)
+        //            root.GetOverlaps(ref boundingFrustum, outputOverlappedElements);
+        //    }
+        //    return outputOverlappedElements.Count > 0;
+        //}
         /// <summary>
         /// Gets the triangles whose bounding boxes are overlapped by the query.
         /// </summary>
@@ -225,7 +225,7 @@ namespace BEPUphysics.DataStructures
             internal BoundingBox BoundingBox;
             internal abstract void GetOverlaps(ref BoundingBox boundingBox, IList<T> outputOverlappedElements);
             internal abstract void GetOverlaps(ref BoundingSphere boundingSphere, IList<T> outputOverlappedElements);
-            internal abstract void GetOverlaps(ref BoundingFrustum boundingFrustum, IList<T> outputOverlappedElements);
+            //internal abstract void GetOverlaps(ref BoundingFrustum boundingFrustum, IList<T> outputOverlappedElements);
             internal abstract void GetOverlaps(ref Ray ray, float maximumLength, IList<T> outputOverlappedElements);
             internal abstract void GetOverlaps<TElement>(BoundingBoxTree<TElement>.Node opposingNode, IList<TreeOverlapPair<T, TElement>> outputOverlappedElements) where TElement : IBoundingBoxOwner;
 
@@ -302,16 +302,16 @@ namespace BEPUphysics.DataStructures
                     childB.GetOverlaps(ref boundingSphere, outputOverlappedElements);
             }
 
-            internal override void GetOverlaps(ref BoundingFrustum boundingFrustum, IList<T> outputOverlappedElements)
-            {
-                bool intersects;
-                boundingFrustum.Intersects(ref childA.BoundingBox, out intersects);
-                if (intersects)
-                    childA.GetOverlaps(ref boundingFrustum, outputOverlappedElements);
-                boundingFrustum.Intersects(ref childB.BoundingBox, out intersects);
-                if (intersects)
-                    childB.GetOverlaps(ref boundingFrustum, outputOverlappedElements);
-            }
+            //internal override void GetOverlaps(ref BoundingFrustum boundingFrustum, IList<T> outputOverlappedElements)
+            //{
+            //    bool intersects;
+            //    boundingFrustum.Intersects(ref childA.BoundingBox, out intersects);
+            //    if (intersects)
+            //        childA.GetOverlaps(ref boundingFrustum, outputOverlappedElements);
+            //    boundingFrustum.Intersects(ref childB.BoundingBox, out intersects);
+            //    if (intersects)
+            //        childB.GetOverlaps(ref boundingFrustum, outputOverlappedElements);
+            //}
 
             internal override void GetOverlaps(ref Ray ray, float maximumLength, IList<T> outputOverlappedElements)
             {
@@ -531,10 +531,10 @@ namespace BEPUphysics.DataStructures
                 outputOverlappedElements.Add(element);
             }
 
-            internal override void GetOverlaps(ref BoundingFrustum boundingFrustum, IList<T> outputOverlappedElements)
-            {
-                outputOverlappedElements.Add(element);
-            }
+            //internal override void GetOverlaps(ref BoundingFrustum boundingFrustum, IList<T> outputOverlappedElements)
+            //{
+            //    outputOverlappedElements.Add(element);
+            //}
 
             internal override void GetOverlaps(ref Ray ray, float maximumLength, IList<T> outputOverlappedElements)
             {

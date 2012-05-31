@@ -1,6 +1,7 @@
 ﻿using BEPUphysics.Entities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using ConversionHelper;
 
 namespace BEPUphysicsDrawer.Models
 {
@@ -103,7 +104,7 @@ namespace BEPUphysicsDrawer.Models
         /// </summary>
         public override void Update()
         {
-            WorldTransform = LocalTransform * Entity.WorldTransform;
+            WorldTransform = OffsetTransform * MathConverter.Convert(Entity.WorldTransform);
         }
 
         /// <summary>

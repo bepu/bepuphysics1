@@ -109,6 +109,7 @@ using BEPUphysics.NarrowPhaseSystems.Pairs;
 using Microsoft.Xna.Framework;
 using BEPUphysics.Entities;
 using BEPUphysics.DeactivationManagement;
+using ConversionHelper;
 
 namespace BEPUphysicsDrawer.Lines
 {
@@ -138,12 +139,12 @@ namespace BEPUphysicsDrawer.Lines
                     {
                         if (islandBoundingBoxes.TryGetValue(island, out box))
                         {
-                            box = BoundingBox.CreateMerged(entity.CollisionInformation.BoundingBox, box);
+                            box = BoundingBox.CreateMerged(MathConverter.Convert(entity.CollisionInformation.BoundingBox), box);
                             islandBoundingBoxes[island] = box;
                         }
                         else
                         {
-                            islandBoundingBoxes.Add(island, entity.CollisionInformation.BoundingBox);
+                            islandBoundingBoxes.Add(island, MathConverter.Convert(entity.CollisionInformation.BoundingBox));
                         }
                     }
                 }

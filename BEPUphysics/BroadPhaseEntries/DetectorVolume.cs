@@ -8,11 +8,11 @@ using BEPUphysics.Entities;
 using BEPUphysics.MathExtensions;
 using BEPUphysics.OtherSpaceStages;
 using BEPUphysics.ResourceManagement;
-using BEPUphysics.Threading;
-using Microsoft.Xna.Framework;
+ 
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
+using BEPUphysics.MathExtensions;
 
 namespace BEPUphysics.Collidables
 {

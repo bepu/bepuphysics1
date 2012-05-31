@@ -1,10 +1,10 @@
 ﻿using System;
 using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
-using Microsoft.Xna.Framework;
+ 
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.Materials;
-using BEPUphysics.Collidables;
+using BEPUphysics.MathExtensions;
 
 namespace BEPUphysics.Vehicle
 {

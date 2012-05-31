@@ -6,7 +6,6 @@ using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.Collidables.MobileCollidables;
 using BEPUphysics.DataStructures;
 using BEPUphysics.CollisionTests;
-using Microsoft.Xna.Framework;
 using BEPUphysics.MathExtensions;
 using BEPUphysics.Collidables;
 using BEPUphysics.NarrowPhaseSystems;

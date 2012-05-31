@@ -1,7 +1,8 @@
 ﻿using System.Runtime.InteropServices;
 using BEPUphysics.Entities;
 using BEPUphysics.Threading;
-using Microsoft.Xna.Framework;
+using BEPUphysics.MathExtensions;
+ 
 
 namespace BEPUphysics.EntityStateManagement
 {

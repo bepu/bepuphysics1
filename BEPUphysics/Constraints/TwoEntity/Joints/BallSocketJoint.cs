@@ -1,7 +1,7 @@
 using System;
 using BEPUphysics.Entities;
 using BEPUphysics.MathExtensions;
-using Microsoft.Xna.Framework;
+ 
 using System.Diagnostics;
 
 namespace BEPUphysics.Constraints.TwoEntity.Joints

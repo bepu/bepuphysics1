@@ -1,5 +1,5 @@
 ﻿using BEPUphysics.MathExtensions;
-using Microsoft.Xna.Framework;
+ 
 using BEPUphysics.DataStructures;
 
 namespace BEPUphysics.CollisionShapes

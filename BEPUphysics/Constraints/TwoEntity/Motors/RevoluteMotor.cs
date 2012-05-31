@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using BEPUphysics.Entities;
-using Microsoft.Xna.Framework;
+ 
 using BEPUphysics.MathExtensions;
 using Microsoft.Xna.Framework.Input;
 
