@@ -3,8 +3,6 @@ using BEPUphysics.Collidables;
 using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.PositionUpdating;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System;
@@ -77,7 +75,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
 
             Vector3[] vertices;
             int[] indices;
-            TriangleMesh.GetVerticesAndIndicesFromModel(Game.Content.Load<Model>("playground"), out vertices, out indices);
+            ModelDataExtractor.GetVerticesAndIndicesFromModel(Game.Content.Load<Model>("playground"), out vertices, out indices);
             var mesh = new StaticMesh(vertices, indices, new AffineTransform(new Vector3(50, -20, 0)));
             Space.Add(mesh);
             game.ModelDrawer.Add(mesh);

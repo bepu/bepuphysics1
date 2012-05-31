@@ -1,5 +1,5 @@
 ﻿using BEPUphysics.MathExtensions;
-using Microsoft.Xna.Framework;
+ 
 
 namespace BEPUphysics.DataStructures
 {

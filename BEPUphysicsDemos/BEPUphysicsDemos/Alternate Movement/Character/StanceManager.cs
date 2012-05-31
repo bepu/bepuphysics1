@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using BEPUphysics.CollisionShapes.ConvexShapes;
-using Microsoft.Xna.Framework;
 using BEPUphysics.CollisionTests;
 using BEPUphysics.DataStructures;
 using BEPUphysics.Settings;
 using BEPUphysics;
+using BEPUphysics.MathExtensions;
 
 namespace BEPUphysicsDemos.AlternateMovement.Character
 {

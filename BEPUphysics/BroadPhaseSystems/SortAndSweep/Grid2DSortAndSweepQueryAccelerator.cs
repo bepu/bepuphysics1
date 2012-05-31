@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using BEPUphysics.MathExtensions;
 using BEPUphysics.BroadPhaseEntries;
-using Microsoft.Xna.Framework;
+ 
 
 namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
 {
@@ -26,12 +27,12 @@ namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
             }
         }
 
-        public bool RayCast(Microsoft.Xna.Framework.Ray ray, IList<BroadPhaseEntry> outputIntersections)
+        public bool RayCast(Ray ray, IList<BroadPhaseEntry> outputIntersections)
         {
-            throw new NotSupportedException("The Grid2DSortAndSweep broad phase cannot accelerate infinite ray casts.  Consider specifying a maximum length or using a broad phase which supports infinite ray casts.");
+            throw new NotSupportedException("The Grid2DSortAndSweep broad phase cannot accelerate infinite ray casts.  Consider using a broad phase which supports infinite tests, using a custom solution, or using a finite ray.");
         }
 
-        public bool RayCast(Microsoft.Xna.Framework.Ray ray, float maximumLength, IList<BroadPhaseEntry> outputIntersections)
+        public bool RayCast(Ray ray, float maximumLength, IList<BroadPhaseEntry> outputIntersections)
         {
             if (maximumLength == float.MaxValue) 
                 throw new NotSupportedException("The Grid2DSortAndSweep broad phase cannot accelerate infinite ray casts.  Consider specifying a maximum length or using a broad phase which supports infinite ray casts.");
@@ -119,7 +120,7 @@ namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
         }
 
 
-        public void GetEntries(Microsoft.Xna.Framework.BoundingBox boundingShape, IList<BroadPhaseEntry> overlaps)
+        public void GetEntries(BoundingBox boundingShape, IList<BroadPhaseEntry> overlaps)
         {
             //Compute the min and max of the bounding box.
             //Loop through the cells and select bounding boxes which overlap the x axis.
@@ -158,7 +159,7 @@ namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
             }
         }
 
-        public void GetEntries(Microsoft.Xna.Framework.BoundingSphere boundingShape, IList<BroadPhaseEntry> overlaps)
+        public void GetEntries(BoundingSphere boundingShape, IList<BroadPhaseEntry> overlaps)
         {
             //Create a bounding box based on the bounding sphere.
             //Compute the min and max of the bounding box.
@@ -198,7 +199,7 @@ namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
                         {
                             bool intersects;
                             var item = cell.entries.Elements[k].item;
-                            boundingShape.Intersects(ref item.boundingBox, out intersects);
+                            item.boundingBox.Intersects(ref boundingShape, out intersects);
                             if (intersects && !overlaps.Contains(item))
                             {
                                 overlaps.Add(item);
@@ -209,9 +210,12 @@ namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
             }
         }
 
-        public void GetEntries(Microsoft.Xna.Framework.BoundingFrustum boundingShape, IList<BroadPhaseEntry> overlaps)
-        {
-            throw new NotSupportedException("The Grid2DSortAndSweep broad phase cannot accelerate frustum tests.  Consider using a broad phase which supports frustum tests or using a custom solution.");
-        }
+        //public void GetEntries(BoundingFrustum boundingShape, IList<BroadPhaseEntry> overlaps)
+        //{
+        //    throw new NotSupportedException("The Grid2DSortAndSweep broad phase cannot accelerate frustum tests.  Consider using a broad phase which supports frustum tests or using a custom solution.");
+        //}
+
+
+
     }
 }

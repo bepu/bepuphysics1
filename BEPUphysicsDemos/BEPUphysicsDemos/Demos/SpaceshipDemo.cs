@@ -3,10 +3,10 @@ using System;
 using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysicsDemos.SampleCode;
-using Microsoft.Xna.Framework;
 using BEPUphysics.CollisionShapes;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using System.Collections.Generic;
+using BEPUphysics.MathExtensions;
 
 namespace BEPUphysicsDemos.Demos
 {
@@ -59,7 +59,7 @@ namespace BEPUphysicsDemos.Demos
             Space.Add(ship);
 
 
-            game.Camera.Position = new Vector3(-14, 12, 25);
+            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(-14, 12, 25);
             game.Camera.Yaw = (float)Math.PI / -4;
         }
 

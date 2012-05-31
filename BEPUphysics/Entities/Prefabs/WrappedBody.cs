@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using BEPUphysics.Collidables.MobileCollidables;
 using BEPUphysics.DataStructures;
 using BEPUphysics.EntityStateManagement;
-using Microsoft.Xna.Framework;
+ 
 using BEPUphysics.CollisionShapes.ConvexShapes;
+using BEPUphysics.MathExtensions;
 
 namespace BEPUphysics.Entities.Prefabs
 {

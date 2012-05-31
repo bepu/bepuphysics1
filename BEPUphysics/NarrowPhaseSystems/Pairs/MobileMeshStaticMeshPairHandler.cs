@@ -10,7 +10,8 @@ using BEPUphysics.DataStructures;
 using BEPUphysics.ResourceManagement;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.CollisionTests;
-using Microsoft.Xna.Framework;
+using BEPUphysics.MathExtensions;
+ 
 
 namespace BEPUphysics.NarrowPhaseSystems.Pairs
 {

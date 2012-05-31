@@ -3,7 +3,6 @@ using BEPUphysics.Constraints.TwoEntity.JointLimits;
 using BEPUphysics.Constraints.TwoEntity.Joints;
 using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
-using Microsoft.Xna.Framework;
 using BEPUphysics.MathExtensions;
 
 namespace BEPUphysicsDemos.Demos
@@ -168,7 +167,7 @@ namespace BEPUphysicsDemos.Demos
             //Add some ground.
             Space.Add(new Box(new Vector3(0, -3.5f, 0), 20f, 1, 20f));
 
-            game.Camera.Position = new Vector3(0, 2, 20);
+            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(0, 2, 20);
         }
 
         /// <summary>

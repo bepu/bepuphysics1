@@ -1,7 +1,6 @@
 using System;
 using BEPUphysics.Entities;
 using BEPUphysics.UpdateableSystems;
-using Microsoft.Xna.Framework;
 using BEPUphysics.MathExtensions;
 
 namespace BEPUphysicsDemos.SampleCode

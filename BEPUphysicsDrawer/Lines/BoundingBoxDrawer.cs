@@ -7,6 +7,7 @@ using BEPUphysics.DataStructures;
 using BEPUphysics;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
 using Microsoft.Xna.Framework;
+using ConversionHelper;
 
 namespace BEPUphysicsDrawer.Lines
 {
@@ -30,7 +31,7 @@ namespace BEPUphysicsDrawer.Lines
 
                 foreach (var e in space.Entities)
                 {
-                    Vector3[] boundingBoxCorners = e.CollisionInformation.BoundingBox.GetCorners();
+                    Vector3[] boundingBoxCorners = MathConverter.Convert(e.CollisionInformation.BoundingBox.GetCorners());
                     var color = e.ActivityInformation.IsActive ? Color.DarkRed : new Color(150, 100, 100);
                     boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[0], color));
                     boundingBoxLines.Add(new VertexPositionColor(boundingBoxCorners[1], color));

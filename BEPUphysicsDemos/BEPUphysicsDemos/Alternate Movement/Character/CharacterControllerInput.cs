@@ -1,9 +1,10 @@
 using BEPUphysics;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Diagnostics;
 using BEPUphysics.Collidables.MobileCollidables;
+using ConversionHelper;
+using BEPUphysics.MathExtensions;
 
 namespace BEPUphysicsDemos.AlternateMovement.Character
 {
@@ -76,7 +77,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 IsActive = true;
                 Camera.UseMovementControls = false;
                 Space.Add(CharacterController);
-                CharacterController.Body.Position = (Camera.Position - new Vector3(0, StandingCameraOffset, 0));
+                CharacterController.Body.Position = MathConverter.Convert(Camera.Position) - new Vector3(0, StandingCameraOffset, 0);
             }
         }
 
@@ -131,7 +132,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     //First, find where the camera is expected to be based on the last position and the current velocity.
                     //Note: if the character were a free-floating 6DOF character, this would need to include an angular velocity contribution.
                     //And of course, the camera orientation would be based on the character's orientation.
-                    Camera.Position = Camera.Position + CharacterController.Body.LinearVelocity * dt;
+                    Camera.Position = Camera.Position + MathConverter.Convert(CharacterController.Body.LinearVelocity * dt);
                     //Now compute where it should be according the physical body of the character.
                     Vector3 up = CharacterController.Body.OrientationMatrix.Up;
                     Vector3 bodyPosition = CharacterController.Body.BufferedStates.InterpolatedStates.Position;
@@ -147,18 +148,18 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     //In upstepping, the character can teleport up to the character's MaximumStepHeight upwards, and the body's CollisionMargin horizontally.
                     //Picking those as bounds creates a constraining cylinder.
 
-                    Vector3 error = goalPosition - Camera.Position;
+                    Vector3 error = goalPosition - MathConverter.Convert(Camera.Position);
                     float verticalError = Vector3.Dot(error, up);
                     Vector3 horizontalError = error - verticalError * up;
                     //Clamp the vertical component of the camera position within the bounding cylinder.
                     if (verticalError > CharacterController.StepManager.MaximumStepHeight)
                     {
-                        Camera.Position -= up * (CharacterController.StepManager.MaximumStepHeight - verticalError);
+                        Camera.Position -= MathConverter.Convert(up * (CharacterController.StepManager.MaximumStepHeight - verticalError));
                         verticalError = CharacterController.StepManager.MaximumStepHeight;
                     }
                     else if (verticalError < -CharacterController.StepManager.MaximumStepHeight)
                     {
-                        Camera.Position -= up * (-CharacterController.StepManager.MaximumStepHeight - verticalError);
+                        Camera.Position -= MathConverter.Convert(up * (-CharacterController.StepManager.MaximumStepHeight - verticalError));
                         verticalError = -CharacterController.StepManager.MaximumStepHeight;
                     }
                     //Clamp the horizontal distance too.
@@ -168,7 +169,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     {
                         Vector3 previousHorizontalError = horizontalError;
                         Vector3.Multiply(ref horizontalError, margin / (float)Math.Sqrt(horizontalErrorLength), out horizontalError);
-                        Camera.Position -= horizontalError - previousHorizontalError;
+                        Camera.Position -= MathConverter.Convert(horizontalError - previousHorizontalError);
                     }
                     //Now that the error/camera position is known to lie within the constraining cylinder, we can perform a smooth correction.
 
@@ -179,14 +180,14 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
                     //This version is framerate independent, although it is more expensive.
                     float errorCorrectionFactor = (float)(1 - Math.Pow(.000000001, dt));
-                    Camera.Position += up * (verticalError * errorCorrectionFactor);
-                    Camera.Position += horizontalError * errorCorrectionFactor;
+                    Camera.Position += MathConverter.Convert(up * (verticalError * errorCorrectionFactor));
+                    Camera.Position += MathConverter.Convert(horizontalError * errorCorrectionFactor);
 
 
                 }
                 else
                 {
-                    Camera.Position = CharacterController.Body.Position + (CharacterController.StanceManager.CurrentStance == Stance.Standing ? StandingCameraOffset : CrouchingCameraOffset) * CharacterController.Body.OrientationMatrix.Up;
+                    Camera.Position = MathConverter.Convert(CharacterController.Body.Position + (CharacterController.StanceManager.CurrentStance == Stance.Standing ? StandingCameraOffset : CrouchingCameraOffset) * CharacterController.Body.OrientationMatrix.Up);
                 }
 
                 Vector2 totalMovement = Vector2.Zero;
@@ -215,22 +216,22 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
                 if (keyboardInput.IsKeyDown(Keys.E))
                 {
-                    movementDir = Camera.WorldMatrix.Forward;
+                    movementDir = MathConverter.Convert(Camera.WorldMatrix.Forward);
                     totalMovement += Vector2.Normalize(new Vector2(movementDir.X, movementDir.Z));
                 }
                 if (keyboardInput.IsKeyDown(Keys.D))
                 {
-                    movementDir = Camera.WorldMatrix.Forward;
+                    movementDir = MathConverter.Convert(Camera.WorldMatrix.Forward);
                     totalMovement -= Vector2.Normalize(new Vector2(movementDir.X, movementDir.Z));
                 }
                 if (keyboardInput.IsKeyDown(Keys.S))
                 {
-                    movementDir = Camera.WorldMatrix.Left;
+                    movementDir = MathConverter.Convert(Camera.WorldMatrix.Left);
                     totalMovement += Vector2.Normalize(new Vector2(movementDir.X, movementDir.Z));
                 }
                 if (keyboardInput.IsKeyDown(Keys.F))
                 {
-                    movementDir = Camera.WorldMatrix.Right;
+                    movementDir = MathConverter.Convert(Camera.WorldMatrix.Right);
                     totalMovement += Vector2.Normalize(new Vector2(movementDir.X, movementDir.Z));
                 }
                 if (totalMovement == Vector2.Zero)

@@ -4,13 +4,11 @@ using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.UpdateableSystems;
 using BEPUphysics;
-using Microsoft.Xna.Framework;
 using BEPUphysics.MathExtensions;
 using BEPUphysics.Collidables.MobileCollidables;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
 using BEPUphysics.Materials;
 using BEPUphysics.PositionUpdating;
-using System.Diagnostics;
 using System.Threading;
 
 namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter

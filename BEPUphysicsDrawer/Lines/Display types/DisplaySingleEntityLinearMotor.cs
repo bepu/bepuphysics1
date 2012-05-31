@@ -1,6 +1,7 @@
 ﻿using BEPUphysics.Constraints.SingleEntity;
 using BEPUphysics.Constraints.TwoEntity.Motors;
 using Microsoft.Xna.Framework;
+using ConversionHelper;
 
 namespace BEPUphysicsDrawer.Lines
 {
@@ -30,13 +31,13 @@ namespace BEPUphysicsDrawer.Lines
             //Move lines around
             if (LineObject.IsActive)
             {
-                toPoint.PositionA = LineObject.Entity.Position;
-                toPoint.PositionB = LineObject.Point;
+                toPoint.PositionA = MathConverter.Convert(LineObject.Entity.Position);
+                toPoint.PositionB = MathConverter.Convert(LineObject.Point);
 
                 if (LineObject.Settings.Mode == MotorMode.Servomechanism)
                 {
                     error.PositionA = toPoint.PositionB;
-                    error.PositionB = LineObject.Settings.Servo.Goal;
+                    error.PositionB = MathConverter.Convert(LineObject.Settings.Servo.Goal);
                 }
                 else
                 {

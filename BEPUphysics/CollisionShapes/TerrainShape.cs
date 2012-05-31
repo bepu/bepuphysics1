@@ -1,6 +1,6 @@
 ﻿using System;
 using BEPUphysics.CollisionTests.Manifolds;
-using Microsoft.Xna.Framework;
+ 
 using BEPUphysics.MathExtensions;
 using BEPUphysics.DataStructures;
 using BEPUphysics.CollisionShapes.ConvexShapes;

@@ -2,11 +2,12 @@
 using BEPUphysics.Collidables;
 using BEPUphysics.Collidables.MobileCollidables;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
-using Microsoft.Xna.Framework;
+ 
 using BEPUphysics.DataStructures;
 using BEPUphysics.ResourceManagement;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using System.Diagnostics;
+using BEPUphysics.MathExtensions;
 
 namespace BEPUphysics.CollisionTests.Manifolds
 {

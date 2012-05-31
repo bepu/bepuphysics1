@@ -1,7 +1,8 @@
 ﻿using System;
-using Microsoft.Xna.Framework;
+ 
 using BEPUphysics.DataStructures;
 using BEPUphysics.Threading;
+using BEPUphysics.MathExtensions;
 
 namespace BEPUphysics.OtherSpaceStages
 {

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using BEPUphysics.Collidables.MobileCollidables;
-using Microsoft.Xna.Framework;
+ 
 using BEPUphysics.DataStructures;
 using BEPUphysics.CollisionShapes;
 using BEPUphysics.MathExtensions;

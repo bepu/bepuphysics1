@@ -4,7 +4,8 @@ using System.Linq;
 using System.Text;
 using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.DataStructures;
-using Microsoft.Xna.Framework;
+using BEPUphysics.MathExtensions;
+ 
 
 namespace BEPUphysics.BroadPhaseSystems.SortAndSweep.Testing
 {

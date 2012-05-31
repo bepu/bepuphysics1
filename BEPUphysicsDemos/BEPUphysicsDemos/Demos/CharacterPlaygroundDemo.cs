@@ -1,11 +1,9 @@
 ﻿using BEPUphysics.Entities.Prefabs;
-using Microsoft.Xna.Framework;
 using BEPUphysics.DataStructures;
 using BEPUphysics.MathExtensions;
 using BEPUphysics.Collidables;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.Entities;
-using Microsoft.Xna.Framework.Graphics;
 using BEPUphysics.Constraints.TwoEntity.Joints;
 using BEPUphysics.Constraints.SolverGroups;
 using BEPUphysics.Paths;
@@ -14,6 +12,7 @@ using BEPUphysics.Constraints.TwoEntity.Motors;
 using BEPUphysics.Constraints;
 using BEPUphysics.CollisionShapes;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace BEPUphysicsDemos.Demos
 {
@@ -30,7 +29,7 @@ namespace BEPUphysicsDemos.Demos
             : base(game)
         {
 
-            game.Camera.Position = new Vector3(-10, 7, 5);
+            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(-10, 7, 5);
             game.Camera.Yaw = MathHelper.Pi;
             //Since this is the character playground, turn on the character by default.
             character.Activate();
@@ -45,7 +44,7 @@ namespace BEPUphysicsDemos.Demos
             var playgroundModel = game.Content.Load<Model>("CharacterControllerTestTerrain");
             //This is a little convenience method used to extract vertices and indices from a model.
             //It doesn't do anything special; any approach that gets valid vertices and indices will work.
-            TriangleMesh.GetVerticesAndIndicesFromModel(playgroundModel, out staticTriangleVertices, out staticTriangleIndices);
+            ModelDataExtractor.GetVerticesAndIndicesFromModel(playgroundModel, out staticTriangleVertices, out staticTriangleIndices);
             var staticMesh = new StaticMesh(staticTriangleVertices, staticTriangleIndices, new AffineTransform(new Vector3(.01f, .01f, .01f), Quaternion.Identity, new Vector3(0, 0, 0)));
             staticMesh.Sidedness = TriangleSidedness.Counterclockwise;
 
@@ -276,9 +275,9 @@ namespace BEPUphysicsDemos.Demos
         public override void DrawUI()
         {
 #if XBOX360
-            Game.DataTextDrawer.Draw("Press \"A\" to toggle the character.", new Vector2(50, 50));
+            Game.DataTextDrawer.Draw("Press \"A\" to toggle the character.", new Microsoft.Xna.Framework.(50, 50));
 #else
-            Game.DataTextDrawer.Draw("Press \"C\" to toggle the character.", new Vector2(50, 50));
+            Game.DataTextDrawer.Draw("Press \"C\" to toggle the character.", new Microsoft.Xna.Framework.Vector2(50, 50));
 #endif
             base.DrawUI();
         }

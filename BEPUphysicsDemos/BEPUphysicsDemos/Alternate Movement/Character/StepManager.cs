@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using BEPUphysics.Collidables.MobileCollidables;
 using BEPUphysics.CollisionShapes.ConvexShapes;
-using Microsoft.Xna.Framework;
 using BEPUphysics.MathExtensions;
 using BEPUphysics.NarrowPhaseSystems;
 using BEPUphysics.Collidables;

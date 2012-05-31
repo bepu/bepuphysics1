@@ -7,8 +7,8 @@ using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
 using BEPUphysicsDrawer.Models;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using BEPUphysics.MathExtensions;
 
 namespace BEPUphysicsDemos.Demos
 {
@@ -32,7 +32,7 @@ namespace BEPUphysicsDemos.Demos
             var model = game.Content.Load<Model>("tube");
             Vector3[] modelVertices;
             int[] modelIndices;
-            TriangleMesh.GetVerticesAndIndicesFromModel(model, out modelVertices, out modelIndices);
+            ModelDataExtractor.GetVerticesAndIndicesFromModel(tubeModel, out modelVertices, out modelIndices);
             detectorVolume = new DetectorVolume(new TriangleMesh(new StaticMeshData(modelVertices, modelIndices)));
             Space.Add(detectorVolume);
 
@@ -70,8 +70,8 @@ namespace BEPUphysicsDemos.Demos
             detectorVolume.VolumeBeganContainingEntity += BeganContaining;
             detectorVolume.VolumeStoppedContainingEntity += StoppedContaining;
 
+            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(0, 0, 22);
             Space.ForceUpdater.Gravity = new Vector3();
-            game.Camera.Position = new Vector3(0, 0, 22);
         }
 
         /// <summary>

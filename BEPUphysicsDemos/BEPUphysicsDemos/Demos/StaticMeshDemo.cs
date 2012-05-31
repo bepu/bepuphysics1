@@ -28,7 +28,7 @@ namespace BEPUphysicsDemos.Demos
             var playgroundModel = game.Content.Load<Model>("playground");
             //This is a little convenience method used to extract vertices and indices from a model.
             //It doesn't do anything special; any approach that gets valid vertices and indices will work.
-            TriangleMesh.GetVerticesAndIndicesFromModel(playgroundModel, out staticTriangleVertices, out staticTriangleIndices);
+            ModelDataExtractor.GetVerticesAndIndicesFromModel(playgroundModel, out staticTriangleVertices, out staticTriangleIndices);
             var staticMesh = new StaticMesh(staticTriangleVertices, staticTriangleIndices, new AffineTransform(Matrix3X3.CreateFromAxisAngle(Vector3.Up, MathHelper.Pi), new Vector3(0, -10, 0)));
             staticMesh.Sidedness = TriangleSidedness.Counterclockwise;
 
@@ -55,7 +55,8 @@ namespace BEPUphysicsDemos.Demos
                     }
 
 
-            game.Camera.Position = new Vector3(0, 10, 15);
+
+            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(0, 10, 40);
 
 
         }

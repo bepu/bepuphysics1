@@ -1,6 +1,7 @@
 ﻿using System;
 using BEPUphysics.Constraints.TwoEntity.JointLimits;
 using Microsoft.Xna.Framework;
+using ConversionHelper;
 
 namespace BEPUphysicsDrawer.Lines
 {
@@ -40,8 +41,8 @@ namespace BEPUphysicsDrawer.Lines
         public override void Update()
         {
             //Move lines around
-            axis.PositionA = LineObject.ConnectionB.Position;
-            axis.PositionB = LineObject.ConnectionB.Position + LineObject.TwistAxisB * 1.5f;
+            axis.PositionA = MathConverter.Convert(LineObject.ConnectionB.Position);
+            axis.PositionB = MathConverter.Convert(LineObject.ConnectionB.Position + LineObject.TwistAxisB * 1.5f);
 
 
             float angleIncrement = 4 * MathHelper.Pi / limitLines.Length; //Each loop iteration moves this many radians forward.
@@ -53,17 +54,17 @@ namespace BEPUphysicsDrawer.Lines
                 float currentAngle = i * angleIncrement;
 
                 //Using the parametric equation for an ellipse, compute the axis of rotation and angle.
-                Vector3 rotationAxis = LineObject.Basis.XAxis * LineObject.MaximumAngleX * (float) Math.Cos(currentAngle) +
-                                       LineObject.Basis.YAxis * LineObject.MaximumAngleY * (float) Math.Sin(currentAngle);
+                Vector3 rotationAxis = MathConverter.Convert(LineObject.Basis.XAxis * LineObject.MaximumAngleX * (float) Math.Cos(currentAngle) +
+                                                             LineObject.Basis.YAxis * LineObject.MaximumAngleY * (float) Math.Sin(currentAngle));
                 float angle = rotationAxis.Length();
                 rotationAxis /= angle;
 
-                pointToPreviousPoint.PositionA = LineObject.ConnectionB.Position +
+                pointToPreviousPoint.PositionA = MathConverter.Convert(LineObject.ConnectionB.Position) +
                                                  //Rotate the primary axis to the ellipse boundary...
-                                                 Vector3.TransformNormal(LineObject.Basis.PrimaryAxis, Matrix.CreateFromAxisAngle(rotationAxis, angle));
+                                                 Vector3.TransformNormal(MathConverter.Convert(LineObject.Basis.PrimaryAxis), Matrix.CreateFromAxisAngle(rotationAxis, angle));
 
                 centerToPoint.PositionA = pointToPreviousPoint.PositionA;
-                centerToPoint.PositionB = LineObject.ConnectionB.Position;
+                centerToPoint.PositionB = MathConverter.Convert(LineObject.ConnectionB.Position);
             }
             for (int i = 0; i < limitLines.Length / 2; i++)
             {

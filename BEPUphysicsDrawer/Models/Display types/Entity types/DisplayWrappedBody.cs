@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.CollisionShapes;
 using BEPUphysics.Collidables.MobileCollidables;
+using ConversionHelper;
 
 namespace BEPUphysicsDrawer.Models
 {
@@ -25,9 +26,9 @@ namespace BEPUphysicsDrawer.Models
             var wrappedShape = collidable.Shape as WrappedShape;
             if (wrappedShape == null)
                 throw new ArgumentException("Wrong shape type");
-            var points = new List<Vector3>();
-            Vector3 max;
-            var direction = new Vector3();
+            var points = new List<BEPUphysics.MathExtensions.Vector3>();
+            BEPUphysics.MathExtensions.Vector3 max;
+            var direction = new BEPUphysics.MathExtensions.Vector3();
             float angleChange = MathHelper.TwoPi / NumSamples;
 
             for (int i = 1; i < NumSamples / 2 - 1; i++)
@@ -52,7 +53,7 @@ namespace BEPUphysicsDrawer.Models
             wrappedShape.GetLocalExtremePoint(Toolbox.DownVector, out max);
             points.Add(max);
 
-            var hullTriangleVertices = new List<Vector3>();
+            var hullTriangleVertices = new List<BEPUphysics.MathExtensions.Vector3>();
             var hullTriangleIndices = new List<int>();
             ConvexHullHelper.GetConvexHull(points, hullTriangleIndices, hullTriangleVertices);
             //The hull triangle vertices are used as a dummy to get the unnecessary hull vertices, which are cleared afterwards.
@@ -64,10 +65,10 @@ namespace BEPUphysicsDrawer.Models
 
             for (ushort i = 0; i < hullTriangleVertices.Count; i += 3)
             {
-                Vector3 normal = Vector3.Normalize(Vector3.Cross(hullTriangleVertices[i + 2] - hullTriangleVertices[i], hullTriangleVertices[i + 1] - hullTriangleVertices[i]));
-                vertices.Add(new VertexPositionNormalTexture(hullTriangleVertices[i], normal, new Vector2(0, 0)));
-                vertices.Add(new VertexPositionNormalTexture(hullTriangleVertices[i + 1], normal, new Vector2(1, 0)));
-                vertices.Add(new VertexPositionNormalTexture(hullTriangleVertices[i + 2], normal, new Vector2(0, 1)));
+                Vector3 normal = MathConverter.Convert(BEPUphysics.MathExtensions.Vector3.Normalize(BEPUphysics.MathExtensions.Vector3.Cross(hullTriangleVertices[i + 2] - hullTriangleVertices[i], hullTriangleVertices[i + 1] - hullTriangleVertices[i])));
+                vertices.Add(new VertexPositionNormalTexture(MathConverter.Convert(hullTriangleVertices[i]), normal, new Vector2(0, 0)));
+                vertices.Add(new VertexPositionNormalTexture(MathConverter.Convert(hullTriangleVertices[i + 1]), normal, new Vector2(1, 0)));
+                vertices.Add(new VertexPositionNormalTexture(MathConverter.Convert(hullTriangleVertices[i + 2]), normal, new Vector2(0, 1)));
                 indices.Add(i);
                 indices.Add((ushort)(i + 1));
                 indices.Add((ushort)(i + 2));

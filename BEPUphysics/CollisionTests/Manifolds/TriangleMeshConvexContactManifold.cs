@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using BEPUphysics.Collidables.MobileCollidables;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
-using Microsoft.Xna.Framework;
+ 
 using BEPUphysics.DataStructures;
 using BEPUphysics.Settings;
 using BEPUphysics.ResourceManagement;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.MathExtensions;
 using System.Diagnostics;
-using Microsoft.Xna.Framework.Input;
 
 namespace BEPUphysics.CollisionTests.Manifolds
 {

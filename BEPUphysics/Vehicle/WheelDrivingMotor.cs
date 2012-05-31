@@ -1,7 +1,8 @@
 ﻿using BEPUphysics.Constraints;
 using BEPUphysics.Entities;
-using Microsoft.Xna.Framework;
+ 
 using BEPUphysics.Materials;
+using BEPUphysics.MathExtensions;
 
 namespace BEPUphysics.Vehicle
 {
