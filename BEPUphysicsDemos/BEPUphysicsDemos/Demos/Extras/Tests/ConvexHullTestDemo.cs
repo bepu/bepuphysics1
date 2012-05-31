@@ -1,9 +1,8 @@
 ﻿using BEPUphysics.Entities.Prefabs;
-using Microsoft.Xna.Framework;
+using BEPUphysics.MathExtensions;
 using BEPUphysics;
 using BEPUphysics.DataStructures;
 using BEPUphysics.CollisionShapes;
-using BEPUphysics.Materials;
 
 namespace BEPUphysicsDemos.Demos.Tests
 {
@@ -37,7 +36,7 @@ namespace BEPUphysicsDemos.Demos.Tests
 
             Box ground = new Box(new Vector3(0, -.5f, 0), 50, 1, 50);
             Space.Add(ground);
-            game.Camera.Position = new Vector3(0, 6, 15);
+            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(0, 6, 15);
         }
 
         /// <summary>

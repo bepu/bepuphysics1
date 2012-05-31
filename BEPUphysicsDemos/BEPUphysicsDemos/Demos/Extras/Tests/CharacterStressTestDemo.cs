@@ -1,20 +1,13 @@
 ﻿using BEPUphysics.Collidables;
 using BEPUphysics.DataStructures;
-using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using BEPUphysics.MathExtensions;
 using BEPUphysics.CollisionShapes.ConvexShapes;
-using System.Diagnostics;
-using BEPUphysics.Settings;
-using BEPUphysics.Materials;
-using BEPUphysics.Constraints.SingleEntity;
 using BEPUphysicsDemos.AlternateMovement.SphereCharacter;
 using System.Collections.Generic;
 using System;
 using BEPUphysicsDemos.AlternateMovement.Character;
-using BEPUphysicsDemos.AlternateMovement.SimpleCharacter;
 
 namespace BEPUphysicsDemos.Demos.Extras.Tests
 {
@@ -37,7 +30,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             var playgroundModel = game.Content.Load<Model>("playground");
             //This is a little convenience method used to extract vertices and indices from a model.
             //It doesn't do anything special; any approach that gets valid vertices and indices will work.
-            TriangleMesh.GetVerticesAndIndicesFromModel(playgroundModel, out staticTriangleVertices, out staticTriangleIndices);
+            ModelDataExtractor.GetVerticesAndIndicesFromModel(playgroundModel, out staticTriangleVertices, out staticTriangleIndices);
             var staticMesh = new StaticMesh(staticTriangleVertices, staticTriangleIndices, new AffineTransform(Matrix3X3.CreateFromAxisAngle(Vector3.Up, MathHelper.Pi), new Vector3(0, -10, 0)));
             staticMesh.Sidedness = TriangleSidedness.Counterclockwise;
 
@@ -92,7 +85,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                     }
 
 
-            game.Camera.Position = new Vector3(0, 10, 40);
+            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(0, 10, 40);
 
             //Dump some boxes on top of the characters for fun.
             numColumns = 16;

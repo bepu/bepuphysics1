@@ -13,6 +13,7 @@ using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
 using BEPUphysics.MathExtensions;
+using BEPUphysics.Threading;
 
 namespace BEPUphysics.Collidables
 {

@@ -1,10 +1,8 @@
 ﻿using BEPUphysics.Entities.Prefabs;
+using ConversionHelper;
 using Microsoft.Xna.Framework;
 using BEPUphysicsDrawer.Models;
-using BEPUphysics.DataStructures;
 using Microsoft.Xna.Framework.Graphics;
-using BEPUphysics.CollisionShapes.ConvexShapes;
-using BEPUphysics.Entities;
 
 namespace BEPUphysicsDemos.Demos.Extras
 {
@@ -28,9 +26,9 @@ namespace BEPUphysicsDemos.Demos.Extras
             //http://bepuphysics.codeplex.com/wikipage?title=Shape%20Recentering
 
             var model = game.Content.Load<Model>("guy");
-            Vector3[] vertices;
+            BEPUphysics.MathExtensions.Vector3[] vertices;
             int[] indices;
-            TriangleMesh.GetVerticesAndIndicesFromModel(model, out vertices, out indices);
+            ModelDataExtractor.GetVerticesAndIndicesFromModel(model, out vertices, out indices);
 
             //Create an entity based on the model.
             ConvexHull hull = new ConvexHull(vertices, 10);
@@ -57,17 +55,17 @@ namespace BEPUphysicsDemos.Demos.Extras
             //Space.Add(entity);
 
             //For more information about constructing entities, check out the EntityConstructionDemo.
-            
+
             //But for now, let's just use the prefab entity type.  As mentioned earlier, the constructor set the entity's Position using the computed center.
             //Since we didn't overwrite it with some other position yet, we can still use it.
             graphic = new DisplayEntityModel(hull, model, game.ModelDrawer);
-            graphic.LocalTransform = Matrix.CreateTranslation(-hull.Position);
+            graphic.LocalTransform = Matrix.CreateTranslation(-MathConverter.Convert(hull.Position));
             game.ModelDrawer.Add(graphic);
 
             //This graphic is perfectly aligned with the collision shape!  Hooray!
 
 
-            Box ground = new Box(new Vector3(0, -1.5f, 0), 50, 1, 50);
+            Box ground = new Box(new BEPUphysics.MathExtensions.Vector3(0, -1.5f, 0), 50, 1, 50);
             Space.Add(ground);
             game.Camera.Position = new Vector3(0, 6, 15);
         }

@@ -43,7 +43,7 @@
     <XnaCompressContent>true</XnaCompressContent>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="BEPUphysics, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31f6a8732a21de19, processorArchitecture=x86">
+    <Reference Include="BEPUphysics, Version=1.2.0.0, Culture=neutral, PublicKeyToken=31f6a8732a21de19, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\BEPUphysics\bin\Release\BEPUphysics.dll</HintPath>
     </Reference>

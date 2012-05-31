@@ -1,18 +1,7 @@
-﻿using System;
-using BEPUphysics.Collidables;
-using BEPUphysics.Entities.Prefabs;
+﻿using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.MathExtensions;
-using Microsoft.Xna.Framework;
-using BEPUphysics.Settings;
-using BEPUphysics.CollisionTests.CollisionAlgorithms;
 using BEPUphysics.CollisionRuleManagement;
-using BEPUphysics.NarrowPhaseSystems.Pairs;
-using BEPUphysics.CollisionTests.Manifolds;
-using System.Diagnostics;
-using BEPUphysics.BroadPhaseSystems.SortAndSweep;
 using BEPUphysics.CollisionShapes;
-using BEPUphysics.CollisionShapes.ConvexShapes;
-using BEPUphysics.DataStructures;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace BEPUphysicsDemos.Demos.Extras.Tests
@@ -81,31 +70,31 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             Space.Add(mesh);
 
             //Tube
-            TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("tube"), out vertices, out indices);
+            ModelDataExtractor.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("tube"), out vertices, out indices);
             mesh = new MobileMesh(vertices, indices, AffineTransform.Identity, MobileMeshSolidity.Solid, 10);
             mesh.Position = new Vector3(-10, 10, 0);
             Space.Add(mesh);
 
             //Cube
-            TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("cube"), out vertices, out indices);
+            ModelDataExtractor.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("cube"), out vertices, out indices);
             mesh = new MobileMesh(vertices, indices, AffineTransform.Identity, MobileMeshSolidity.Solid, 10);
             mesh.Position = new Vector3(10, 0, 0);
             Space.Add(mesh);
 
             //Guy
-            TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("guy"), out vertices, out indices);
+            ModelDataExtractor.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("guy"), out vertices, out indices);
             mesh = new MobileMesh(vertices, indices, AffineTransform.Identity, MobileMeshSolidity.Solid, 10);
             mesh.Position = new Vector3(0, 0, 10);
             Space.Add(mesh);
 
             //Barrel Platform
-            TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("barrelandplatform"), out vertices, out indices);
+            ModelDataExtractor.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("barrelandplatform"), out vertices, out indices);
             mesh = new MobileMesh(vertices, indices, AffineTransform.Identity, MobileMeshSolidity.Solid, 10);
             mesh.Position = new Vector3(0, 0, -10);
             Space.Add(mesh);
 
             //FloaterTube
-            TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("tube"), out vertices, out indices);
+            ModelDataExtractor.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("tube"), out vertices, out indices);
             mesh = new MobileMesh(vertices, indices, new AffineTransform(new Vector3(1, 1, 1), Quaternion.Identity, new Vector3(0, 0, 0)), MobileMeshSolidity.Solid);
             mesh.Position = new Vector3(5, 18, 0);
             Space.Add(mesh);
@@ -119,7 +108,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
 
             Space.Add(new Box(new Vector3(0, -5, 0), 50, 1, 50));
 
-            game.Camera.Position = new Vector3(0, 10, 20);
+            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(0, 10, 20);
 
         }
 

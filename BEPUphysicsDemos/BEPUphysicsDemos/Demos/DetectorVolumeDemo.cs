@@ -32,7 +32,7 @@ namespace BEPUphysicsDemos.Demos
             var model = game.Content.Load<Model>("tube");
             Vector3[] modelVertices;
             int[] modelIndices;
-            ModelDataExtractor.GetVerticesAndIndicesFromModel(tubeModel, out modelVertices, out modelIndices);
+            ModelDataExtractor.GetVerticesAndIndicesFromModel(model, out modelVertices, out modelIndices);
             detectorVolume = new DetectorVolume(new TriangleMesh(new StaticMeshData(modelVertices, modelIndices)));
             Space.Add(detectorVolume);
 
@@ -119,14 +119,14 @@ namespace BEPUphysicsDemos.Demos
             if (detectorVolume.Pairs.TryGetValue(testEntity, out pair))
             {
                 if (pair.Containing)
-                    Game.DataTextDrawer.Draw("Contained", new Vector2(50, 50));
+                    Game.DataTextDrawer.Draw("Contained", new Microsoft.Xna.Framework.Vector2(50, 50));
                 else if (pair.Touching)
-                    Game.DataTextDrawer.Draw("Touching", new Vector2(50, 50));
+                    Game.DataTextDrawer.Draw("Touching", new Microsoft.Xna.Framework.Vector2(50, 50));
                 else
-                    Game.DataTextDrawer.Draw("Separated", new Vector2(50, 50));
+                    Game.DataTextDrawer.Draw("Separated", new Microsoft.Xna.Framework.Vector2(50, 50));
             }
             else
-                Game.DataTextDrawer.Draw("Separated", new Vector2(50, 50));
+                Game.DataTextDrawer.Draw("Separated", new Microsoft.Xna.Framework.Vector2(50, 50));
             base.DrawUI();
         }
 

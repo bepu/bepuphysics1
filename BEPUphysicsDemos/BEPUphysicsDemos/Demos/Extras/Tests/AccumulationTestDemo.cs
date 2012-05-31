@@ -2,10 +2,10 @@
 using BEPUphysics.Collidables;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.MathExtensions;
-using Microsoft.Xna.Framework;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.Collidables.Events;
 using BEPUphysics.Collidables.MobileCollidables;
+using ConversionHelper;
 
 namespace BEPUphysicsDemos.Demos.Extras.Tests
 {
@@ -64,7 +64,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                 }
             };
 
-            game.Camera.Position = new Vector3(0, 30, 20);
+            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(0, 30, 20);
 
         }
 
@@ -72,9 +72,9 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
 
         void Launch()
         {
-            Sphere sphere = new Sphere(Game.Camera.Position, 1, 10);
+            Sphere sphere = new Sphere(MathConverter.Convert(Game.Camera.Position), 1, 10);
             sphere.CollisionInformation.Events.InitialCollisionDetected += eventHandler;
-            sphere.LinearVelocity = Game.Camera.WorldMatrix.Forward * 30;
+            sphere.LinearVelocity = MathConverter.Convert(Game.Camera.WorldMatrix.Forward * 30);
             Space.Add(sphere);
             Game.ModelDrawer.Add(sphere);
         }

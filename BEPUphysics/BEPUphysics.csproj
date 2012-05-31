@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -102,16 +102,10 @@
     <Compile Include="BroadPhaseEntries\MobileCollidables\ConvexCollidable.cs" />
     <Compile Include="BroadPhaseEntries\MobileCollidables\EntityCollidable.cs" />
     <Compile Include="BroadPhaseEntries\MobileCollidables\TriangleCollidable.cs" />
-    <Compile Include="Collidables\MobileCollidables\CompoundHelper.cs" />
-    <Compile Include="Collidables\MobileCollidables\MobileCollidable.cs" />
-    <Compile Include="Collidables\MobileCollidables\MobileMeshCollidable.cs" />
-    <Compile Include="Collidables\StaticMesh.cs" />
-    <Compile Include="Collidables\Terrain.cs" />
     <Compile Include="CollisionRuleManagement\CollisionGroup.cs" />
     <Compile Include="CollisionRuleManagement\CollisionGroupPair.cs" />
     <Compile Include="CollisionRuleManagement\CollisionRule.cs" />
     <Compile Include="CollisionRuleManagement\CollisionRules.cs" />
-    <Compile Include="CollisionRuleManagement\ICollisionRulesOwner.cs" />
     <Compile Include="CollisionShapes\CollisionShape.cs" />
     <Compile Include="CollisionShapes\CompoundShape.cs" />
     <Compile Include="CollisionShapes\ConvexShapes\BoxShape.cs" />
@@ -282,7 +276,6 @@
     <Compile Include="Materials\Material.cs" />
     <Compile Include="Materials\MaterialManager.cs" />
     <Compile Include="Materials\MaterialPair.cs" />
-    <Compile Include="Materials\PropertyCombiners.cs" />
     <Compile Include="MathExtensions\AffineTransform.cs" />
     <Compile Include="MathExtensions\BoundingBox.cs" />
     <Compile Include="MathExtensions\BoundingSphere.cs" />
@@ -421,23 +414,23 @@
     <Compile Include="Threading\ThreadManagerTPL.cs" />
     <Compile Include="TimeStepSettings.cs" />
     <Compile Include="Toolbox.cs" />
-    <Compile Include="UpdateableSystems\CombinedUpdateable.cs" />
-    <Compile Include="UpdateableSystems\FluidVolume.cs" />
-    <Compile Include="UpdateableSystems\ForceFields\BoundingBoxForceFieldShape.cs" />
-    <Compile Include="UpdateableSystems\ForceFields\ForceField.cs" />
-    <Compile Include="UpdateableSystems\ForceFields\ForceFieldShape.cs" />
-    <Compile Include="UpdateableSystems\ForceFields\InfiniteForceFieldShape.cs" />
-    <Compile Include="UpdateableSystems\ForceFields\VolumeForceFieldShape.cs" />
-    <Compile Include="UpdateableSystems\IBeforeNarrowPhaseUpdateable.cs" />
-    <Compile Include="UpdateableSystems\IBeforePositionUpdateUpdateable.cs" />
-    <Compile Include="UpdateableSystems\IBeforeSolverUpdateable.cs" />
-    <Compile Include="UpdateableSystems\IDuringForcesUpdateable.cs" />
-    <Compile Include="UpdateableSystems\IEndOfFrameUpdateable.cs" />
-    <Compile Include="UpdateableSystems\IEndOfTimeStepUpdateable.cs" />
-    <Compile Include="UpdateableSystems\ISpaceUpdateable.cs" />
-    <Compile Include="UpdateableSystems\Updateable.cs" />
-    <Compile Include="UpdateableSystems\UpdateableManager.cs" />
-    <Compile Include="UpdateableSystems\UpdateableManagers.cs" />
+    <Compile Include="Vehicle\UpdateableSystems\CombinedUpdateable.cs" />
+    <Compile Include="Vehicle\UpdateableSystems\FluidVolume.cs" />
+    <Compile Include="Vehicle\UpdateableSystems\ForceFields\BoundingBoxForceFieldShape.cs" />
+    <Compile Include="Vehicle\UpdateableSystems\ForceFields\ForceField.cs" />
+    <Compile Include="Vehicle\UpdateableSystems\ForceFields\ForceFieldShape.cs" />
+    <Compile Include="Vehicle\UpdateableSystems\ForceFields\InfiniteForceFieldShape.cs" />
+    <Compile Include="Vehicle\UpdateableSystems\ForceFields\VolumeForceFieldShape.cs" />
+    <Compile Include="Vehicle\UpdateableSystems\IBeforeNarrowPhaseUpdateable.cs" />
+    <Compile Include="Vehicle\UpdateableSystems\IBeforePositionUpdateUpdateable.cs" />
+    <Compile Include="Vehicle\UpdateableSystems\IBeforeSolverUpdateable.cs" />
+    <Compile Include="Vehicle\UpdateableSystems\IDuringForcesUpdateable.cs" />
+    <Compile Include="Vehicle\UpdateableSystems\IEndOfFrameUpdateable.cs" />
+    <Compile Include="Vehicle\UpdateableSystems\IEndOfTimeStepUpdateable.cs" />
+    <Compile Include="Vehicle\UpdateableSystems\ISpaceUpdateable.cs" />
+    <Compile Include="Vehicle\UpdateableSystems\Updateable.cs" />
+    <Compile Include="Vehicle\UpdateableSystems\UpdateableManager.cs" />
+    <Compile Include="Vehicle\UpdateableSystems\UpdateableManagers.cs" />
     <Compile Include="Vehicle\RaycastWheelShape.cs" />
     <Compile Include="Vehicle\Vehicle.cs" />
     <Compile Include="Vehicle\Wheel.cs" />
