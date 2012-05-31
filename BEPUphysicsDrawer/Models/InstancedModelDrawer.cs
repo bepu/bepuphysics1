@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace BEPUphysicsDrawer.Models
@@ -26,7 +27,13 @@ namespace BEPUphysicsDrawer.Models
         public InstancedModelDrawer(Game game)
             : base(game)
         {
-            instancingEffect = game.Content.Load<Effect>("InstancedEffect");
+            var resourceContentManager = new ResourceContentManager(game.Services, DrawerResource.ResourceManager);
+#if WINDOWS
+            instancingEffect = resourceContentManager.Load<Effect>("InstancedEffect");
+#else
+            instancingEffect = resourceContentManager.Load<Effect>("InstancedEffectXbox");
+#endif
+            //instancingEffect = game.Content.Load<Effect>("InstancedEffect");
 
             worldTransformsParameter = instancingEffect.Parameters["WorldTransforms"];
             textureIndicesParameter = instancingEffect.Parameters["TextureIndices"];

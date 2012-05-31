@@ -14,7 +14,7 @@ namespace BEPUphysicsDrawer.Models
         /// <summary>
         /// Maximum number of display objects that can be lumped into a single display batch.
         /// </summary>
-        public const int MaximumObjectsPerBatch = 82;
+        public const int MaximumObjectsPerBatch = 81;
 
         /// <summary>
         /// Maximum number of primitives that can be batched together in a single draw call.

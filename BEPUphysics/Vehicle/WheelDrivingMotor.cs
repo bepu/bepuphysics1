@@ -308,10 +308,6 @@ namespace BEPUphysics.Vehicle
                 maxMotorForceDt = -maximumBackwardForce * dt;
 
 
-            //if (Keyboard.GetState().IsKeyDown(Keys.P))
-            //{
-            //    Debug.WriteLine("Break.");
-            //}
 
 
         }

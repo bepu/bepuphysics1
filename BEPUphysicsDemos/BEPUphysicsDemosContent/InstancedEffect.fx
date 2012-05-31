@@ -1,7 +1,7 @@
 float4x4 View;
 float4x4 Projection;
 #define NUM_TEXTURES 8
-#define MAX_OBJECTS 82
+#define MAX_OBJECTS 81
 float4x3 WorldTransforms[MAX_OBJECTS];
 float TextureIndices[MAX_OBJECTS];
 
