@@ -123,6 +123,7 @@
     <Compile Include="Demos\Extras\Tests\MPRCastingDemo.cs" />
     <Compile Include="Demos\Extras\Tests\MPRTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\MutableCompoundDemo.cs" />
+    <Compile Include="Demos\Extras\Tests\RayCastBugDemo.cs" />
     <Compile Include="Demos\Extras\Tests\SimulationIslandStressTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\TerrainTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\ThreadingTestDemo.cs" />

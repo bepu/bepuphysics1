@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics;
+using BEPUphysics.CollisionTests.CollisionAlgorithms;
 using BEPUphysics.CollisionTests.CollisionAlgorithms.GJK;
 using Microsoft.Xna.Framework;
 using BEPUphysics.MathExtensions;
@@ -164,7 +166,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             boundingBox.Min.X = shapeTransform.Position.X - collisionMargin + left.X;
             boundingBox.Min.Y = shapeTransform.Position.Y - collisionMargin + down.Y;
             boundingBox.Min.Z = shapeTransform.Position.Z - collisionMargin + forward.Z;
-            
+
         }
 
         /// <summary>
@@ -177,14 +179,31 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         /// <returns>Whether or not the ray hit the target.</returns>
         public virtual bool RayTest(ref Ray ray, ref RigidTransform transform, float maximumLength, out RayHit hit)
         {
-            //TODO:
+            //////TODO:
             //RayHit newHit;
             //bool newBool = GJKToolbox.RayCast(ray, this, ref transform, maximumLength, out newHit);
-            //bool oldBool = OldGJKVerifier.RayCastGJK(ray.Position, ray.Direction, maximumLength, this, transform, out hit.Location, out hit.Normal, out hit.T);
-            //if (newBool != oldBool || ((newBool && oldBool) && Vector3.DistanceSquared(newHit.Location, hit.Location) > .01f))
-            //    Debug.WriteLine("break.");
-            //return oldBool;
-            return GJKToolbox.RayCast(ray, this, ref transform, maximumLength, out hit);
+            //RayHit oldHit;
+            //bool oldBool = OldGJKVerifier.RayCastGJK(ray.Position, ray.Direction, maximumLength, this, transform, out oldHit.Location, out oldHit.Normal, out oldHit.T);
+            //bool mprBool = MPRToolbox.RayCast(ray, maximumLength, this, ref transform, out hit);
+            ////if (newBool != oldBool || ((newBool && oldBool) && Vector3.DistanceSquared(newHit.Location, hit.Location) > .01f))
+            ////    Debug.WriteLine("break.");
+            //return mprBool;
+
+            //if (GJKToolbox.RayCast(ray, this, ref transform, maximumLength, out hit))
+            //{
+            //    //GJK toolbox doesn't normalize the hit normal; it's unnecessary for some other systems so it just saves on time.
+            //    //It would be nice if ray tests always normalized it though.
+            //    float length = hit.Normal.LengthSquared();
+            //    if (length > Toolbox.Epsilon)
+            //        Vector3.Divide(ref hit.Normal, (float) Math.Sqrt(length), out hit.Normal);
+            //    else
+            //        hit.Normal = new Vector3();
+            //    return true;
+            //}
+
+            //return false;
+
+            return MPRToolbox.RayCast(ray, maximumLength, this, ref transform, out hit);
         }
 
         /// <summary>

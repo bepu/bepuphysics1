@@ -74,7 +74,8 @@ namespace BEPUphysics.Vehicle
 
             Matrix spinTransform;
 
-            Vector3 localSpinAxis = Vector3.Cross(wheel.localForwardDirection, wheel.suspension.localDirection);
+            Vector3 localSpinAxis;
+            Vector3.Cross(ref wheel.localForwardDirection, ref wheel.suspension.localDirection, out localSpinAxis);
             Matrix.CreateFromAxisAngle(ref localSpinAxis, spinAngle, out spinTransform);
 
 
