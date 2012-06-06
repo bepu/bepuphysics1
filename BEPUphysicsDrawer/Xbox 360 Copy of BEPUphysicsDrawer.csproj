@@ -1,0 +1,152 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{8A281807-5353-46C2-963E-3CFAF120AC83}</ProjectGuid>
+    <ProjectTypeGuids>{6D335F3A-9D43-41b4-9D22-F6F17C4BE596};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">Xbox 360</Platform>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>BEPUphysicsDrawer</RootNamespace>
+    <AssemblyName>BEPUphysicsDrawer</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <XnaFrameworkVersion>v4.0</XnaFrameworkVersion>
+    <XnaPlatform>Xbox 360</XnaPlatform>
+    <XnaProfile>HiDef</XnaProfile>
+    <XnaCrossPlatformGroupID>d4cf01b2-4562-411b-b563-ad8e4a909fcc</XnaCrossPlatformGroupID>
+    <XnaOutputType>Library</XnaOutputType>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|Xbox 360' ">
+    <OutputPath>bin\Xbox 360\Debug</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <NoStdLib>true</NoStdLib>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineConstants>DEBUG;TRACE;XBOX;XBOX360</DefineConstants>
+    <XnaCompressContent>true</XnaCompressContent>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|Xbox 360' ">
+    <OutputPath>bin\Xbox 360\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <NoStdLib>true</NoStdLib>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <DefineConstants>XBOX;XBOX360</DefineConstants>
+    <XnaCompressContent>true</XnaCompressContent>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DocumentationFile>bin\Xbox 360\Release\BEPUphysicsDrawer.XML</DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BEPUphysics\Xbox 360 Copy of BEPUphysics.csproj">
+      <Project>{B71CDDD4-5A86-4C46-9403-E58157736D13}</Project>
+      <Name>Xbox 360 Copy of BEPUphysics</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="DrawerResource.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DrawerResource.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Font\TextDrawer.cs" />
+    <Compile Include="Lines\BoundingBoxDrawer.cs" />
+    <Compile Include="Lines\ContactDrawer.cs" />
+    <Compile Include="Lines\SimulationIslandDrawer.cs" />
+    <Compile Include="Lines\SolverDisplayObject.cs" />
+    <Compile Include="Lines\Display types\DisplayBallSocketJoint.cs" />
+    <Compile Include="Lines\Display types\DisplayDistanceJoint.cs" />
+    <Compile Include="Lines\Display types\DisplayDistanceLimit.cs" />
+    <Compile Include="Lines\Display types\DisplayEllipseSwingLimit.cs" />
+    <Compile Include="Lines\Display types\DisplayLinearAxisLimit.cs" />
+    <Compile Include="Lines\Display types\DisplayPointOnLineJoint.cs" />
+    <Compile Include="Lines\Display types\DisplayPointOnPlaneJoint.cs" />
+    <Compile Include="Lines\Display types\DisplayRevoluteLimit.cs" />
+    <Compile Include="Lines\Display types\DisplaySingleEntityLinearMotor.cs" />
+    <Compile Include="Lines\Display types\DisplaySwivelHingeAngularJoint.cs" />
+    <Compile Include="Lines\Display types\DisplayTwistJoint.cs" />
+    <Compile Include="Lines\Line.cs" />
+    <Compile Include="Lines\LineDisplayObject.cs" />
+    <Compile Include="Lines\LineDisplayObjectBase.cs" />
+    <Compile Include="Lines\LineDrawer.cs" />
+    <Compile Include="Models\BatchInformation.cs" />
+    <Compile Include="Models\Display types\DisplayInstancedMesh.cs" />
+    <Compile Include="Models\Display types\DisplayEntityModel.cs" />
+    <Compile Include="Models\Display types\DisplayFluid.cs" />
+    <Compile Include="Models\Display types\DisplayModel.cs" />
+    <Compile Include="Models\Display types\DisplayStaticMesh.cs" />
+    <Compile Include="Models\Display types\DisplayTerrain.cs" />
+    <Compile Include="Models\Display types\DisplayTriangleMesh.cs" />
+    <Compile Include="Models\Display types\Entity types\DisplayEntityCollidable.cs" />
+    <Compile Include="Models\Display types\Entity types\DisplayMobileMesh.cs" />
+    <Compile Include="Models\Display types\Entity types\DisplayTransformable.cs" />
+    <Compile Include="Models\Display types\Entity types\DisplayBox.cs" />
+    <Compile Include="Models\Display types\Entity types\DisplayCapsule.cs" />
+    <Compile Include="Models\Display types\Entity types\DisplayCompoundBody.cs" />
+    <Compile Include="Models\Display types\Entity types\DisplayCone.cs" />
+    <Compile Include="Models\Display types\Entity types\DisplayConvexHull.cs" />
+    <Compile Include="Models\Display types\Entity types\DisplayCylinder.cs" />
+    <Compile Include="Models\Display types\Entity types\DisplayMinkowskiSum.cs" />
+    <Compile Include="Models\Display types\Entity types\DisplaySphere.cs" />
+    <Compile Include="Models\Display types\Entity types\DisplayTriangle.cs" />
+    <Compile Include="Models\Display types\Entity types\DisplayWrappedBody.cs" />
+    <Compile Include="Models\Display types\ModelDisplayObject.cs" />
+    <Compile Include="Models\Display types\ModelDisplayObjectBase.cs" />
+    <Compile Include="Models\Display types\SelfDrawingModelDisplayObject.cs" />
+    <Compile Include="Models\InstancedModelDrawer.cs" />
+    <Compile Include="Models\ModelDisplayObjectBatch.cs" />
+    <Compile Include="Models\ModelDrawer.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Xna.Framework">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.Xna.Framework.Game">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.Xna.Framework.Graphics">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="mscorlib">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Core">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Xml">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Xml.Linq">
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="DrawerResource.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>DrawerResource.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\InstancedEffect.xnb" />
+    <None Include="Resources\InstancedEffectXbox.xnb" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\Microsoft.Xna.GameStudio.targets" />
+  <!--
+      To modify your build process, add your task inside one of the targets below and uncomment it. 
+      Other similar extension points exist, see Microsoft.Common.targets.
+      <Target Name="BeforeBuild">
+      </Target>
+      <Target Name="AfterBuild">
+      </Target>
+    -->
+</Project>
