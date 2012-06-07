@@ -179,7 +179,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         /// <returns>Whether or not the ray hit the target.</returns>
         public virtual bool RayTest(ref Ray ray, ref RigidTransform transform, float maximumLength, out RayHit hit)
         {
-            //////TODO:
+            
             //RayHit newHit;
             //bool newBool = GJKToolbox.RayCast(ray, this, ref transform, maximumLength, out newHit);
             //RayHit oldHit;

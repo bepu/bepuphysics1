@@ -904,7 +904,8 @@ namespace BEPUphysics
             }
             else
             {
-                float c = Vector3.Dot(d1, r);
+                float c;
+                Vector3.Dot(ref d1, ref r, out c);
                 if (e <= Epsilon)
                 {
                     // Second segment is basically a point.
@@ -913,13 +914,14 @@ namespace BEPUphysics
                 }
                 else
                 {
-                    float b = Vector3.Dot(d1, d2);
+                    float b;
+                    Vector3.Dot(ref d1, ref d2, out b);
                     float denom = a * e - b * b;
 
                     // If segments not parallel, compute closest point on L1 to L2, and
                     // clamp to segment S1. Else pick some s (here .5f)
-                    if (denom != 0.0f)
-                        s = MathHelper.Clamp((b * f - c * e) / denom, 0.0f, 1.0f);
+                    if (Math.Abs(denom) > 1e-8)
+                        s = MathHelper.Clamp((b * f - c * e) / denom, 0, 1);
                     else //Parallel, just use .5f
                         s = .5f;
 
@@ -951,73 +953,49 @@ namespace BEPUphysics
         /// <summary>
         /// Computes closest points c1 and c2 betwen lines p1q1 and p2q2.
         /// </summary>
-        /// <param name="p1">First point of first segment.</param>
-        /// <param name="q1">Second point of first segment.</param>
-        /// <param name="p2">First point of second segment.</param>
-        /// <param name="q2">Second point of second segment.</param>
-        /// <param name="s">Distance along the line to the point for first segment.</param>
-        /// <param name="t">Distance along the line to the point for second segment.</param>
-        /// <param name="c1">Closest point on first segment.</param>
-        /// <param name="c2">Closest point on second segment.</param>
+        /// <param name="p1">First point of first line.</param>
+        /// <param name="q1">Second point of first line.</param>
+        /// <param name="p2">First point of second line.</param>
+        /// <param name="q2">Second point of second line.</param>
+        /// <param name="s">Distance along the line to the point for first line.</param>
+        /// <param name="t">Distance along the line to the point for second line.</param>
+        /// <param name="c1">Closest point on first line.</param>
+        /// <param name="c2">Closest point on second line.</param>
         public static void GetClosestPointsBetweenLines(ref Vector3 p1, ref Vector3 q1, ref Vector3 p2, ref Vector3 q2,
                                                            out float s, out float t, out Vector3 c1, out Vector3 c2)
         {
             //Segment direction vectors
-            Vector3 d1;
-            Vector3.Subtract(ref q1, ref p1, out d1);
-            Vector3 d2;
-            Vector3.Subtract(ref q2, ref p2, out d2);
-            Vector3 r;
-            Vector3.Subtract(ref p1, ref p2, out r);
+            Vector3 p1q1;
+            Vector3.Subtract(ref q1, ref p1, out p1q1);
+            Vector3 p2q2;
+            Vector3.Subtract(ref q2, ref p2, out p2q2);
+            Vector3 p2p1;
+            Vector3.Subtract(ref p1, ref p2, out p2p1);
             //distance
-            float a = d1.LengthSquared();
-            float e = d2.LengthSquared();
+            float firstSegmentLengthSquared = p1q1.LengthSquared();
+            float secondSegmentLengthSquared = p2q2.LengthSquared();
             float f;
-            Vector3.Dot(ref d2, ref r, out f);
-
-            if (a <= Epsilon && e <= Epsilon)
-            {
-                //These segments are more like points.
-                s = t = 0.0f;
-                c1 = p1;
-                c2 = p2;
-                return;
-            }
-            if (a <= Epsilon)
-            {
-                // First segment is basically a point.
-                s = 0.0f;
-                t = MathHelper.Clamp(f / e, 0.0f, 1.0f);
-            }
-            else
-            {
-                float c = Vector3.Dot(d1, r);
-                if (e <= Epsilon)
-                {
-                    // Second segment is basically a point.
-                    t = 0.0f;
-                    s = MathHelper.Clamp(-c / a, 0.0f, 1.0f);
-                }
-                else
-                {
-                    float b = Vector3.Dot(d1, d2);
-                    float denom = a * e - b * b;
-
-                    // If segments not parallel, compute closest point on L1 to L2, and
-                    // clamp to segment S1. Else pick some s (here .5f)
-                    if (denom != 0f)
-                        s = (b * f - c * e) / denom;
-                    else //Parallel, just use .5f
-                        s = .5f;
+            Vector3.Dot(ref p2q2, ref p2p1, out f);
 
 
-                    t = (b * s + f) / e;
-                }
-            }
+            float c = Vector3.Dot(p1q1, p2p1);
 
-            Vector3.Multiply(ref d1, s, out c1);
+            float directionsDot = Vector3.Dot(p1q1, p2q2);
+            float denom = firstSegmentLengthSquared * secondSegmentLengthSquared - directionsDot * directionsDot;
+
+            // If the segments are not parallel, compute the closest point on L1 to L2. Otherwise, just pick some arbitrary value (here 0)
+            if (Math.Abs(denom) > 1e-8f)
+                s = (directionsDot * f - c * secondSegmentLengthSquared) / denom;
+            else //Parallel, just use 0
+                s = 0;
+
+
+            t = (directionsDot * s + f) / secondSegmentLengthSquared;
+
+
+            Vector3.Multiply(ref p1q1, s, out c1);
             Vector3.Add(ref c1, ref p1, out c1);
-            Vector3.Multiply(ref d2, t, out c2);
+            Vector3.Multiply(ref p2q2, t, out c2);
             Vector3.Add(ref c2, ref p2, out c2);
         }
 
@@ -1413,7 +1391,7 @@ namespace BEPUphysics
 
 
 
-        
+
 
         #region Miscellaneous
 
@@ -1428,33 +1406,98 @@ namespace BEPUphysics
         ///<returns>Whether or not the ray hits the sphere.</returns>
         public static bool RayCastSphere(ref Ray ray, ref Vector3 spherePosition, float radius, float maximumLength, out RayHit hit)
         {
-            Vector3 normalizedDirection;
-            float length = ray.Direction.Length();
-            Vector3.Divide(ref ray.Direction, length, out normalizedDirection);
-            maximumLength *= length;
-            hit = new RayHit();
+
+            //Scoot the ray up for more robust testing
+            Vector3 offset;
+            Vector3.Subtract(ref spherePosition, ref ray.Position, out offset);
+
+            Vector3 normalizedRayDirection;
+            float originalRayDirectionLength = ray.Direction.Length();
+            Vector3.Divide(ref ray.Direction, originalRayDirectionLength, out normalizedRayDirection);
+            float scootT;
+            Vector3.Dot(ref normalizedRayDirection, ref offset, out scootT);
+            scootT -= radius * 1.1f;
+
+            if (scootT < 0)
+            {
+                scootT = 0;
+            }
+            Vector3 scootedOrigin;
+            Vector3.Multiply(ref normalizedRayDirection, scootT, out scootedOrigin);
+            Vector3.Add(ref scootedOrigin, ref ray.Position, out scootedOrigin);
+
             Vector3 m;
-            Vector3.Subtract(ref ray.Position, ref spherePosition, out m);
-            float b = Vector3.Dot(m, normalizedDirection);
+            Vector3.Subtract(ref scootedOrigin, ref spherePosition, out m);
+            float b;
+            Vector3.Dot(ref m, ref normalizedRayDirection, out b);
             float c = m.LengthSquared() - radius * radius;
 
+            //Exit if the ray's origin is outside the sphere and ray is pointing away from the center.
             if (c > 0 && b > 0)
+            {
+                hit = new RayHit();
                 return false;
+            }
             float discriminant = b * b - c;
+            //A negative discriminant corresponds to a ray miss
             if (discriminant < 0)
+            {
+                hit = new RayHit();
                 return false;
-
+            }
+            //The ray must intersect the sphere.  When?
             hit.T = -b - (float)Math.Sqrt(discriminant);
+            //If t is negative, the ray started inside the sphere.  Clamp the value.
             if (hit.T < 0)
-                hit.T = 0;
+                hit.T = 0; //Don't have to worry about scoot stuff here with clamping; the ray cannot start within the sphere if scooting did anything!
+            hit.T += scootT;
+
+            hit.T /= originalRayDirectionLength;
             if (hit.T > maximumLength)
+            {
+                hit = new RayHit();
                 return false;
-            hit.T /= length;
-            Vector3.Multiply(ref normalizedDirection, hit.T, out hit.Location);
-            Vector3.Add(ref hit.Location, ref ray.Position, out hit.Location);
+            }
+
+            Vector3.Multiply(ref ray.Direction, hit.T, out hit.Location);
+            Vector3.Add(ref ray.Position, ref hit.Location, out hit.Location);
             Vector3.Subtract(ref hit.Location, ref spherePosition, out hit.Normal);
-            hit.Normal.Normalize();
+            float normalLengthSquared = hit.Normal.LengthSquared();
+            if (normalLengthSquared > 1e-9f)
+                Vector3.Divide(ref hit.Normal, (float)Math.Sqrt(normalLengthSquared), out hit.Normal);
+
             return true;
+
+
+
+            //Vector3 normalizedDirection;
+            //float length = ray.Direction.Length();
+            //Vector3.Divide(ref ray.Direction, length, out normalizedDirection);
+            //maximumLength *= length;
+            //hit = new RayHit();
+            //Vector3 m;
+            //Vector3.Subtract(ref ray.Position, ref spherePosition, out m);
+            //float b;
+            //Vector3.Dot(ref m, ref normalizedDirection, out b);
+            //float c = m.LengthSquared() - radius * radius;
+
+            //if (c > 0 && b > 0)
+            //    return false;
+            //float discriminant = b * b - c;
+            //if (discriminant < 0)
+            //    return false;
+
+            //hit.T = -b - (float)Math.Sqrt(discriminant);
+            //if (hit.T < 0)
+            //    hit.T = 0;
+            //if (hit.T > maximumLength)
+            //    return false;
+            //hit.T /= length;
+            //Vector3.Multiply(ref ray.Direction, hit.T, out hit.Location);
+            //Vector3.Add(ref hit.Location, ref ray.Position, out hit.Location);
+            //Vector3.Subtract(ref hit.Location, ref spherePosition, out hit.Normal);
+            //hit.Normal.Normalize();
+            //return true;
         }
 
         /// <summary>
