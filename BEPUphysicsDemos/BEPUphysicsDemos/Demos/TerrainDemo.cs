@@ -74,7 +74,6 @@ namespace BEPUphysicsDemos.Demos
 
 
 
-
             game.ModelDrawer.Add(terrain);
 
             game.Camera.Position = new Vector3(0, 30, 20);

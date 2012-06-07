@@ -2267,16 +2267,15 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
             //Given that this is a ray cast, we can make some modifications.  Rays frequently traverse large distances, but stretching the swept volume
             //a huge amount to match could manifest numerical issues.  Instead, pull the ray up close to the object.
-            var sphere = new BoundingSphere { Center = transform.Position, Radius = shape.maximumRadius };
-            float? presphereT;
-            sphere.Intersects(ref ray, out presphereT);
-            if (presphereT != null)
+            RayHit sphereHit;
+
+            if (Toolbox.RayCastSphere(ref ray, ref transform.Position, shape.maximumRadius, maximumLength, out sphereHit))
             {
                 //We can scoot ourselves almost all the way up to the intersection with the outer sphere.
                 //Stop just short to prevent a possible erroneous 'just-barely-contained' result.
-                presphereT = Math.Max(presphereT.Value - .1f, 0);
+                sphereHit.T = Math.Max(sphereHit.T - .1f, 0);
                 Vector3 offset;
-                Vector3.Multiply(ref localRay.Direction, -presphereT.Value, out offset);
+                Vector3.Multiply(ref localRay.Direction, -sphereHit.T, out offset);
                 Vector3.Add(ref localRay.Position, ref offset, out localRay.Position);
             }
             else
@@ -2340,7 +2339,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             //OKAY! We've finally finished all the pre-testing.  Cast the ray!
             if (LocalSweepCast(shape, sweepLength, rayLengthSquared, ref localRay.Direction, ref sweep, ref localRay.Position, out hit))
             {
-                hit.T += presphereT.Value;
+                hit.T += sphereHit.T;
                 if (hit.T <= maximumLength)
                 {
                     //Get the world space hit location.
