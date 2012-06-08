@@ -2,10 +2,8 @@
 using System;
 using System.Collections.Generic;
 using BEPUphysics;
-using BEPUphysics.CollisionTests.CollisionAlgorithms.GJK;
 using BEPUphysics.Entities.Prefabs;
 using Microsoft.Xna.Framework;
-using BEPUphysics.Collidables.MobileCollidables;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 

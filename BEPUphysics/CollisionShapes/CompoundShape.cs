@@ -438,6 +438,26 @@ namespace BEPUphysics.CollisionShapes
             }
             return toReturn;
         }
+
+        /// <summary>
+        /// Computes a bounding box for the shape given the specified transform.
+        /// </summary>
+        /// <param name="transform">Transform to apply to the shape to compute the bounding box.</param>
+        /// <param name="boundingBox">Bounding box for the shape given the transform.</param>
+        public override void GetBoundingBox(ref RigidTransform transform, out BoundingBox boundingBox)
+        {
+            RigidTransform combinedTransform;
+            RigidTransform.Transform(ref shapes.Elements[0].LocalTransform, ref transform, out combinedTransform);
+            shapes.Elements[0].Shape.GetBoundingBox(ref combinedTransform, out boundingBox);
+
+            for (int i = 0; i < shapes.count; i++)
+            {
+                RigidTransform.Transform(ref shapes.Elements[i].LocalTransform, ref transform, out combinedTransform);
+                BoundingBox childBoundingBox;
+                shapes.Elements[i].Shape.GetBoundingBox(ref combinedTransform, out childBoundingBox);
+                BoundingBox.CreateMerged(ref boundingBox, ref childBoundingBox, out boundingBox);
+            }
+        }
     }
 
 

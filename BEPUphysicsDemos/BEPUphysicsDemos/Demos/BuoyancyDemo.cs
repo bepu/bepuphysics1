@@ -26,18 +26,31 @@ namespace BEPUphysicsDemos.Demos
             float waterHeight = 15;
 
             //Remember, the triangles composing the surface need to be coplanar with the surface.  In this case, this means they have the same height.
+            //tris.Add(new[]
+            //             {
+            //                 new Vector3(-basinWidth / 2, waterHeight, -basinLength / 2), new Vector3(basinWidth / 2, waterHeight, -basinLength / 2),
+            //                 new Vector3(-basinWidth / 2, waterHeight, basinLength / 2)
+            //             });
+            //tris.Add(new[]
+            //             {
+            //                 new Vector3(-basinWidth / 2, waterHeight, basinLength / 2), new Vector3(basinWidth / 2, waterHeight, -basinLength / 2),
+            //                 new Vector3(basinWidth / 2, waterHeight, basinLength / 2)
+            //             });
+            //var fluid = new FluidVolume(Vector3.Up, -9.81f, tris, waterHeight, .8f, .8f, .7f);
+            //Space.ForceUpdater.Gravity = new Vector3(0, -9.81f, 0);
+
             tris.Add(new[]
                          {
-                             new Vector3(-basinWidth / 2, -basinLength / 2, waterHeight), new Vector3(basinWidth / 2, -basinLength / 2, waterHeight),
-                             new Vector3(-basinWidth / 2, basinLength / 2, waterHeight)
+                             new Vector3(waterHeight, -basinWidth / 2, -basinLength / 2), new Vector3(waterHeight, basinWidth / 2, -basinLength / 2),
+                             new Vector3(waterHeight, -basinWidth / 2, basinLength / 2)
                          });
             tris.Add(new[]
                          {
-                             new Vector3(-basinWidth / 2, basinLength / 2, waterHeight), new Vector3(basinWidth / 2, -basinLength / 2, waterHeight),
-                             new Vector3(basinWidth / 2, basinLength / 2, waterHeight)
+                             new Vector3(waterHeight, -basinWidth / 2, basinLength / 2), new Vector3(waterHeight, basinWidth / 2, -basinLength / 2),
+                             new Vector3(waterHeight, basinWidth / 2, basinLength / 2)
                          });
-            var fluid = new FluidVolume(Vector3.Backward, -9.81f, tris, waterHeight, .8f, .8f, .7f, Space.BroadPhase.QueryAccelerator, Space.ThreadManager);
-            Space.ForceUpdater.Gravity = new Vector3(0, 0, -9.81f);
+            var fluid = new FluidVolume(Vector3.Right, -9.81f, tris, waterHeight, .8f, .8f, .7f);
+            Space.ForceUpdater.Gravity = new Vector3(-9.81f, 0, 0);
 
 
             //fluid.FlowDirection = Vector3.Right;
@@ -63,6 +76,7 @@ namespace BEPUphysicsDemos.Demos
                 space.Add(toAddBox);
             }*/
 
+
             //Create a tiled floor.
             Entity toAdd;
             float boxWidth = 10;
@@ -73,7 +87,7 @@ namespace BEPUphysicsDemos.Demos
                 {
                     toAdd = new Box(new Vector3(
                         -boxWidth * numBoxesWide / 2f + (boxWidth + .1f) * i,
-                        15,
+                        5,
                         -boxWidth * numBoxesWide / 2f + (boxWidth + .1f) * k),
                         boxWidth, 5, boxWidth, 300);
 
