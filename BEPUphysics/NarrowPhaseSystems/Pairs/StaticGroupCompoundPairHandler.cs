@@ -71,7 +71,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                 var element = overlappedElements.Elements[i];
                 var staticCollidable = element.OverlapA as StaticCollidable;
                 TryToAdd(element.OverlapA, element.OverlapB.CollisionInformation,
-                    staticCollidable != null ? staticCollidable.Material : null, element.OverlapB.Material);
+                    staticCollidable != null ? staticCollidable.Material : staticGroup.Material, element.OverlapB.Material);
             }
             overlappedElements.Clear();
         }
