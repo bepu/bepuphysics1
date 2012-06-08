@@ -415,10 +415,10 @@ namespace BEPUphysics.UpdateableSystems
             //Compute spacing and increment informaiton.
             float widthIncrement = (entityBoundingBox.Max.X - entityBoundingBox.Min.X) / samplePointsPerDimension;
             float lengthIncrement = (entityBoundingBox.Max.Z - entityBoundingBox.Min.Z) / samplePointsPerDimension;
-            Vector3 right = new Vector3(-toSurfaceRotationMatrix.M11, -toSurfaceRotationMatrix.M21, -toSurfaceRotationMatrix.M31);
-            Vector3.Multiply(ref right, widthIncrement, out xSpacing);
-            Vector3 backward = new Vector3(toSurfaceRotationMatrix.M13, toSurfaceRotationMatrix.M23, toSurfaceRotationMatrix.M33);
-            Vector3.Multiply(ref backward, lengthIncrement, out zSpacing);
+            xSpacing = new Vector3(widthIncrement, 0, 0);
+            zSpacing = new Vector3(0, 0, lengthIncrement);
+            Vector3.Transform(ref xSpacing, ref surfaceTransform.Orientation, out xSpacing);
+            Vector3.Transform(ref zSpacing, ref surfaceTransform.Orientation, out zSpacing);
             perColumnArea = widthIncrement * lengthIncrement;
 
 
