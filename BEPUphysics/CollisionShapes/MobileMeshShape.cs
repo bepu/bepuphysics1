@@ -712,7 +712,7 @@ namespace BEPUphysics.CollisionShapes
         ///</summary>
         ///<param name="shapeTransform">Transform to apply to the shape during the bounding box calculation.</param>
         ///<param name="boundingBox">Bounding box containing the transformed mesh shape.</param>
-        public void GetBoundingBox(ref RigidTransform shapeTransform, out BoundingBox boundingBox)
+        public override void GetBoundingBox(ref RigidTransform shapeTransform, out BoundingBox boundingBox)
         {
             ////TODO: Could use an approximate bounding volume.  Would be cheaper at runtime and use less memory, though the box would be bigger.
             //Matrix3X3 o;

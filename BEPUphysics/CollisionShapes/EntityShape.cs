@@ -84,5 +84,11 @@ namespace BEPUphysics.CollisionShapes
         /// <returns>EntityCollidable that uses this shape.</returns>
         public abstract EntityCollidable GetCollidableInstance();
 
+        /// <summary>
+        /// Computes a bounding box for the shape given the specified transform.
+        /// </summary>
+        /// <param name="transform">Transform to apply to the shape to compute the bounding box.</param>
+        /// <param name="boundingBox">Bounding box for the shape given the transform.</param>
+        public abstract void GetBoundingBox(ref RigidTransform transform, out BoundingBox boundingBox);
     }
 }

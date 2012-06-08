@@ -404,12 +404,11 @@ namespace BEPUphysics.Entities
 
         internal float volume;
         /// <summary>
-        /// Gets or sets the volume of the entity.
+        /// Gets the volume of the entity.
         /// This is computed along with other physical properties at initialization,
         /// but it's only used for auxiliary systems like the FluidVolume.
-        /// Changing this can tune behavior of those systems.
         /// </summary>
-        public float Volume { get { return volume; } set { volume = value; volume.Validate(); } }
+        public float Volume { get { return volume; } }
 
 
 

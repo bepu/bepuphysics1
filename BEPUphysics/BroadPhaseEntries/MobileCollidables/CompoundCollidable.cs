@@ -34,7 +34,6 @@ namespace BEPUphysics.Collidables.MobileCollidables
             }
             set
             {
-                var compoundEvents = events as CompoundEventManager;
                 //Tell every child to update their parent references to the new object.
                 foreach (var child in children)
                 {
