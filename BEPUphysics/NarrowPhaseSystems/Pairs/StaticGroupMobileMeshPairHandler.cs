@@ -76,7 +76,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             for (int i = 0; i < overlappedElements.count; i++)
             {
                 var staticCollidable = overlappedElements.Elements[i] as StaticCollidable;
-                TryToAdd(overlappedElements.Elements[i], mesh, staticCollidable != null ? staticCollidable.Material : null);
+                TryToAdd(overlappedElements.Elements[i], mesh, staticCollidable != null ? staticCollidable.Material : staticGroup.Material);
             }
 
             Resources.GiveBack(overlappedElements);

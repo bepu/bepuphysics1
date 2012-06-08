@@ -113,6 +113,11 @@ namespace BEPUphysicsDemos.Demos
                 }
             }
 
+            var ground = new ConvexCollidable<BoxShape>(new BoxShape(200, 1, 200));
+            ground.WorldTransform = new RigidTransform(new Vector3(0, -3, 0), Quaternion.Identity);
+            collidables.Add(ground);
+            game.ModelDrawer.Add(ground);
+
             StaticGroup group = new StaticGroup(collidables);
             Space.Add(group);
 
@@ -136,8 +141,6 @@ namespace BEPUphysicsDemos.Demos
                     }
 
 
-            Box ground = new Box(new Vector3(0, -3f, 0), 200, 1, 200);
-            Space.Add(ground);
 
 
             game.Camera.Position = new Vector3(0, 60, 90);

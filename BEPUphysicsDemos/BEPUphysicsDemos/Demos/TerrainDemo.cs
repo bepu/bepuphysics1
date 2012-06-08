@@ -55,6 +55,7 @@ namespace BEPUphysicsDemos.Demos
 
             //terrain.Thickness = 5; //Uncomment this and shoot some things at the bottom of the terrain! They'll be sucked up through the ground.
 
+
             Space.Add(terrain);
             for (int i = 0; i < 3; i++)
             {
