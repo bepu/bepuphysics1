@@ -105,6 +105,7 @@
     <Compile Include="Demos\Extras\ReverseTrikeDemo.cs" />
     <Compile Include="Demos\Extras\ScaleDemo.cs" />
     <Compile Include="Demos\Extras\SelfCollidingClothDemo.cs" />
+    <Compile Include="Demos\Extras\SpiderDemo.cs" />
     <Compile Include="Demos\Extras\SuspensionCarDemo.cs" />
     <Compile Include="Demos\Extras\Tests\AccumulationTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\AddRemoveStressDemo.cs" />

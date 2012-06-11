@@ -152,8 +152,8 @@ namespace BEPUphysicsDemos.Demos.Extras
 
             #endregion
 
-            int xLength = 256;
-            int zLength = 256;
+            int xLength = 180;
+            int zLength = 180;
 
             float xSpacing = 8f;
             float zSpacing = 8f;

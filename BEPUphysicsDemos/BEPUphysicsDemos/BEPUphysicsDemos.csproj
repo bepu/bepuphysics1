@@ -123,6 +123,7 @@
     <Compile Include="Demos\ColosseumDemo.cs" />
     <Compile Include="Demos\CompoundBodiesDemo.cs" />
     <Compile Include="Demos\EntityConstructionDemo.cs" />
+    <Compile Include="Demos\Extras\SpiderDemo.cs" />
     <Compile Include="Demos\Extras\Tests\BoxBoxTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\CharacterStressTestDemo.cs" />
     <Compile Include="Demos\Extras\GraphicMatchingDemo.cs" />
