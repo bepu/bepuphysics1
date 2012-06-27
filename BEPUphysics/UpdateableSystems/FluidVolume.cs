@@ -4,6 +4,7 @@ using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.Collidables;
 using BEPUphysics.Collidables.MobileCollidables;
+using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.Entities;
 using BEPUphysics.MathExtensions;
 using BEPUphysics.ResourceManagement;
@@ -16,7 +17,7 @@ namespace BEPUphysics.UpdateableSystems
     /// <summary>
     /// Volume in which physically simulated objects have a buoyancy force applied to them based on their density and volume.
     /// </summary>
-    public class FluidVolume : Updateable, IDuringForcesUpdateable
+    public class FluidVolume : Updateable, IDuringForcesUpdateable, ICollisionRulesOwner
     {
         //TODO: The current FluidVolume implementation is awfully awful.
         //It would be really nice if it was a bit more flexible and less clunktastic.
@@ -307,7 +308,7 @@ namespace BEPUphysics.UpdateableSystems
         void AnalyzeCollisionEntry(int i)
         {
             var entityCollidable = collisionEntries[i] as EntityCollidable;
-            if (entityCollidable != null && entityCollidable.IsActive && entityCollidable.entity.isDynamic)
+            if (entityCollidable != null && entityCollidable.IsActive && entityCollidable.entity.isDynamic && CollisionRules.collisionRuleCalculator(this, entityCollidable) <= CollisionRule.Normal)
             {
                 bool keepGoing = false;
                 foreach (var tri in surfaceTriangles)
@@ -531,6 +532,22 @@ namespace BEPUphysics.UpdateableSystems
             base.OnRemovalFromSpace(oldSpace);
             ThreadManager = null;
             QueryAccelerator = null;
+        }
+
+        private CollisionRules collisionRules = new CollisionRules();
+        /// <summary>
+        /// Gets or sets the collision rules associated with the fluid volume.
+        /// </summary>
+        public CollisionRules CollisionRules
+        {
+            get
+            {
+                return collisionRules;
+            }
+            set
+            {
+                collisionRules = value;
+            }
         }
     }
 }

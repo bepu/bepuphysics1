@@ -55,8 +55,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             Space.Add(b);
             a.Orientation = Quaternion.CreateFromAxisAngle(new Vector3(1, 0, 0), MathHelper.PiOver4);
             b.Orientation = Quaternion.Identity;
-            aTransform = new RigidTransform(new Vector3(0, 0, 0), a.Orientation);
-            bTransform = new RigidTransform(new Vector3(0, 10, 0), b.Orientation);
+            aTransform = new RigidTransform(new Vector3(-10, -10, -10), a.Orientation);
+            bTransform = new RigidTransform(new Vector3(10, 10, 10), b.Orientation);
 
             game.Camera.Position = new Vector3(0, 5, 17);
         }
@@ -81,8 +81,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             if (Game.KeyboardInput.IsKeyDown(Keys.NumPad5))
                 aTransform.Position += Vector3.Backward * dt;
 
-            Vector3 sweepA = new Vector3(0, 10, 0);
-            Vector3 sweepB = new Vector3(0, -10, 0);
+            Vector3 sweepA = new Vector3(20, 20, 20);
+            Vector3 sweepB = new Vector3(-20, -20, -20);
 
             if (hit = MPRToolbox.Sweep(aShape, bShape, ref sweepA, ref sweepB, ref aTransform, ref bTransform, out hitData))
             //if (hit = OldGJKVerifier.ConvexCast(a.CollisionInformation.Shape, b.CollisionInformation.Shape, ref sweepA, ref sweepB, ref aTransform, ref bTransform, out hitData))
