@@ -228,7 +228,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
         ///</summary>
         public override void CleanUp()
         {
-            contacts.Clear();
+
             boxA = null;
             boxB = null;
             base.CleanUp();

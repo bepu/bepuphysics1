@@ -206,19 +206,25 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 involvedCharacters.Add((ICharacterTag)Body.CollisionInformation.Tag);
 
                 //However, the characters cannot be locked willy-nilly.  There needs to be some defined order in which pairs are locked to avoid deadlocking.
-                involvedCharacters.Sort((x, y) =>
-                    {
-                        if (x.InstanceId < y.InstanceId)
-                            return -1;
-                        if (x.InstanceId > y.InstanceId)
-                            return 1;
-                        return 0;
-                    });
+                involvedCharacters.Sort(comparer);
 
                 for (int i = 0; i < involvedCharacters.Count; ++i)
                 {
                     Monitor.Enter(involvedCharacters[i]);
                 }
+            }
+        }
+
+        private static Comparer comparer = new Comparer();
+        class Comparer : IComparer<ICharacterTag>
+        {
+            public int Compare(ICharacterTag x, ICharacterTag y)
+            {
+                if (x.InstanceId < y.InstanceId)
+                    return -1;
+                if (x.InstanceId > y.InstanceId)
+                    return 1;
+                return 0;
             }
         }
 

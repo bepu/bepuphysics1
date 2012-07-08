@@ -89,6 +89,11 @@ namespace BEPUphysics.CollisionTests.Manifolds
         ///</summary>
         public virtual void CleanUp()
         {
+            for (int i = contacts.count - 1; i >= 0; --i)
+            {
+                unusedContacts.GiveBack(contacts.Elements[i]);
+                contacts.FastRemoveAt(i);
+            }
         }
 
         ///<summary>

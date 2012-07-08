@@ -176,7 +176,6 @@ namespace BEPUphysics.CollisionTests.Manifolds
         public override void CleanUp()
         {
             supplementData.Clear();
-            contacts.Clear();
             collidableA = null;
             collidableB = null;
             pairTester.CleanUp();

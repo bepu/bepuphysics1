@@ -127,11 +127,11 @@ namespace BEPUphysics.CollisionTests.Manifolds
         ///</summary>
         public override void CleanUp()
         {
-            contacts.Clear();
             box = null;
             sphere = null;
             previouslyColliding = false;
-            base.CleanUp();
+            //We don't have to worry about losing a reference to our contact- we keep it local!
+            contacts.Clear();
         }
 
         /// <summary>
