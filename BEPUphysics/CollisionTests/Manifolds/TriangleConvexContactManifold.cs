@@ -199,7 +199,6 @@ namespace BEPUphysics.CollisionTests.Manifolds
         public override void CleanUp()
         {
             supplementData.Clear();
-            contacts.Clear();
             convex = null;
             triangle = null;
             pairTester.CleanUp();

@@ -73,12 +73,13 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
         {
             base.Update(dt);
 
+#if WINDOWS
             if (Game.MouseInput.RightButton == ButtonState.Pressed)
             {
                 origin = Game.Camera.Position;
                 direction = Game.Camera.WorldMatrix.Forward;
             }
-
+#endif
             hitAnything = Space.RayCast(new Ray(origin, direction * 3), 10000, out result);
 
         }

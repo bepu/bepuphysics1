@@ -179,7 +179,7 @@ namespace BEPUphysicsDemos
             currentSimulation = (Demo)demoType.GetConstructor(new[] { typeof(DemosGame) }).Invoke(new object[] { this });
 
 #else
-            currentSimulation =  (Demo)Activator.CreateInstance(demoType, new object[] { this });
+            currentSimulation = (Demo)Activator.CreateInstance(demoType, new object[] { this });
 #endif
             #region DisplayObject creation
 

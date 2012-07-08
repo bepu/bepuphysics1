@@ -643,7 +643,6 @@ namespace BEPUphysics.CollisionTests.Manifolds
         public override void CleanUp()
         {
             supplementData.Clear();
-            contacts.Clear();
             convex = null;
             foreach (KeyValuePair<TriangleIndices, TrianglePairTester> pair in activePairTesters)
             {
