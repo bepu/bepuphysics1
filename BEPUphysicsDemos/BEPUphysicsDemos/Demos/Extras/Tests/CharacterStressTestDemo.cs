@@ -1,6 +1,9 @@
 ﻿using BEPUphysics.Collidables;
+using BEPUphysics.Constraints.TwoEntity.Joints;
 using BEPUphysics.DataStructures;
+using BEPUphysics.DeactivationManagement;
 using BEPUphysics.Entities.Prefabs;
+using BEPUphysics.NarrowPhaseSystems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using BEPUphysics.MathExtensions;
@@ -37,8 +40,6 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
 
             Space.Add(staticMesh);
             game.ModelDrawer.Add(staticMesh);
-
-
 
 
 
@@ -147,8 +148,11 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                 if (random.NextDouble() < .01f)
                     sphereCharacters[i].Jump();
             }
+
+
             base.Update(dt);
         }
+
 
 
 

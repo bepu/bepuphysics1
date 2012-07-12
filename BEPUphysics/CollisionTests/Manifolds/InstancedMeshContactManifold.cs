@@ -16,7 +16,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
     {
         protected InstancedMesh mesh;
 
-        internal RawList<int> overlappedTriangles = new RawList<int>(4);
+        internal RawList<int> overlappedTriangles = new RawList<int>(8);
 
         ///<summary>
         /// Gets the mesh of the pair.

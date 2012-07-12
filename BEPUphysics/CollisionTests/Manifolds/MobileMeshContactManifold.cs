@@ -22,7 +22,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
         protected MobileMeshCollidable mesh;
         internal int parentContactCount;
 
-        internal RawList<int> overlappedTriangles = new RawList<int>(4);
+        internal RawList<int> overlappedTriangles = new RawList<int>(8);
 
         ///<summary>
         /// Gets the mesh of the pair.

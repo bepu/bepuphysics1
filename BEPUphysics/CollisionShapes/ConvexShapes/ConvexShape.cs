@@ -253,9 +253,9 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
 
         protected override void OnShapeChanged()
         {
-            base.OnShapeChanged();
             minimumRadius = ComputeMinimumRadius();
             maximumRadius = ComputeMaximumRadius();
+            base.OnShapeChanged();
         }
 
         /// <summary>

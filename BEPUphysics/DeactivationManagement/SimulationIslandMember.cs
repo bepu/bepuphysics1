@@ -33,7 +33,7 @@ namespace BEPUphysics.DeactivationManagement
             this.owner = owner;
         }
 
-        internal RawList<SimulationIslandConnection> connections = new RawList<SimulationIslandConnection>(8);
+        internal RawList<SimulationIslandConnection> connections = new RawList<SimulationIslandConnection>(16);
         ///<summary>
         /// Gets the connections associated with this member.
         ///</summary>
