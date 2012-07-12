@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.Collidables.MobileCollidables;
@@ -38,7 +39,7 @@ namespace BEPUphysics.ResourceManagement
             SubPoolEntityRawList = new LockingResourcePool<RawList<Entity>>(16);
             SubPoolTriangleShape = new LockingResourcePool<TriangleShape>();
             SubPoolTriangleCollidables = new LockingResourcePool<TriangleCollidable>();
-            SubPoolTriangleIndicesList = new LockingResourcePool<RawList<BEPUphysics.CollisionTests.Manifolds.TriangleMeshConvexContactManifold.TriangleIndices>>();
+            SubPoolTriangleIndicesList = new LockingResourcePool<RawList<CollisionTests.Manifolds.TriangleMeshConvexContactManifold.TriangleIndices>>();
             SimulationIslandConnections = new LockingResourcePool<SimulationIslandConnection>();
         }
 
@@ -156,7 +157,7 @@ namespace BEPUphysics.ResourceManagement
         static ResourcePool<TriangleShape> SubPoolTriangleShape;
         static ResourcePool<RawList<CompoundChild>> SubPoolCompoundChildList;
         static ResourcePool<TriangleCollidable> SubPoolTriangleCollidables;
-        static ResourcePool<RawList<BEPUphysics.CollisionTests.Manifolds.TriangleMeshConvexContactManifold.TriangleIndices>> SubPoolTriangleIndicesList;
+        static ResourcePool<RawList<CollisionTests.Manifolds.TriangleMeshConvexContactManifold.TriangleIndices>> SubPoolTriangleIndicesList;
         static ResourcePool<SimulationIslandConnection> SimulationIslandConnections;
         //#endif
         /// <summary>
@@ -443,6 +444,7 @@ namespace BEPUphysics.ResourceManagement
             triangleIndices.Clear();
             SubPoolTriangleIndicesList.GiveBack(triangleIndices);
         }
+
 
         /// <summary>
         /// Retrieves a simulation island connection from the resource pool.

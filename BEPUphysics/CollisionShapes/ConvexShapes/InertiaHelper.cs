@@ -46,6 +46,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             GetPoints(shape, out volume, pointContributions);
             Vector3 center = AveragePoints(pointContributions);
             Resources.GiveBack(pointContributions);
+            MathChecker.Validate(center);
             return center;
         }
 

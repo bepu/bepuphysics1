@@ -229,7 +229,7 @@ namespace BEPUphysics.Constraints
                 simulationIslandConnection.Owner = null; //Orphan the simulation island connection.
                 deactivationManager.Remove(simulationIslandConnection);
             }
-            else if (!simulationIslandConnection.SlatedForRemoval) //If it's not already going to be cleaned up, then we need to do it here.
+            else
                 Resources.GiveBack(simulationIslandConnection); //Well, since we're going to orphan the connection, we'll need to take care of its trash.
 
 

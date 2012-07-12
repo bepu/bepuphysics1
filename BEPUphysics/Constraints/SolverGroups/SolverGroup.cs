@@ -45,6 +45,7 @@ namespace BEPUphysics.Constraints.SolverGroups
             }
         }
 
+
         /// <summary>
         /// Sets the activity state of the constraint based on the activity state of its connections.
         /// Called automatically by the space owning a constaint.  If a constraint is a sub-constraint that hasn't been directly added to the space,

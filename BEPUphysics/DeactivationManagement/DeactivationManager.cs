@@ -652,7 +652,7 @@ namespace BEPUphysics.DeactivationManagement
             }
             if (member.connections.count > 0)
             {
-                for (int i = 0; i < member.Connections.Count; i++)
+                for (int i = 0; i < member.connections.count; i++)
                 {
                     //Find a member with a non-null island to represent connection i.
                     SimulationIslandMember representativeA = null;
@@ -674,7 +674,7 @@ namespace BEPUphysics.DeactivationManagement
                         continue;
                     }
                     //Split the representative against representatives from other connections.
-                    for (int j = i + 1; j < member.Connections.Count; j++)
+                    for (int j = i + 1; j < member.connections.count; j++)
                     {
                         //Find a representative for another connection.
                         SimulationIslandMember representativeB = null;
@@ -718,11 +718,11 @@ namespace BEPUphysics.DeactivationManagement
             {
                 throw new Exception("Cannot initialize member's simulation island; it already has one.");
             }
-            if (member.Connections.Count > 0)
+            if (member.connections.count > 0)
             {
                 SimulationIsland island = null;
                 //Find a simulation starting island to live in.
-                for (int i = 0; i < member.Connections.Count; i++)
+                for (int i = 0; i < member.connections.count; i++)
                 {
                     for (int j = 0; j < member.connections.Elements[i].entries.count; j++)
                     {

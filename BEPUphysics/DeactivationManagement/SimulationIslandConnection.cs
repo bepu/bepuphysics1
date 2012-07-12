@@ -1,4 +1,5 @@
-﻿using BEPUphysics.DataStructures;
+﻿using System.Threading;
+using BEPUphysics.DataStructures;
 
 namespace BEPUphysics.DeactivationManagement
 {
@@ -46,6 +47,7 @@ namespace BEPUphysics.DeactivationManagement
         /// a member's 'real' connections.
         /// </summary>
         public bool SlatedForRemoval { get; internal set; }
+
 
 
         /// <summary>

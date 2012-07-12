@@ -19,9 +19,9 @@ namespace BEPUphysics.CollisionTests.Manifolds
     public abstract class TriangleMeshConvexContactManifold : ContactManifold
     {
         protected RawValueList<ContactSupplementData> supplementData = new RawValueList<ContactSupplementData>(4);
-        Dictionary<TriangleIndices, TrianglePairTester> activePairTesters = new Dictionary<TriangleIndices, TrianglePairTester>(4);
+        Dictionary<TriangleIndices, TrianglePairTester> activePairTesters = new Dictionary<TriangleIndices, TrianglePairTester>(8);
         RawValueList<ContactData> candidatesToAdd;
-        RawValueList<ContactData> reducedCandidates = new RawValueList<ContactData>();
+        RawValueList<ContactData> reducedCandidates = new RawValueList<ContactData>(4);
         protected TriangleShape localTriangleShape = new TriangleShape();
 
         protected abstract TrianglePairTester GetTester();
@@ -30,8 +30,8 @@ namespace BEPUphysics.CollisionTests.Manifolds
 
         HashSet<int> blockedVertexRegions = new HashSet<int>();
         HashSet<Edge> blockedEdgeRegions = new HashSet<Edge>();
-        RawValueList<EdgeContact> edgeContacts = new RawValueList<EdgeContact>();
-        RawValueList<VertexContact> vertexContacts = new RawValueList<VertexContact>();
+        RawValueList<EdgeContact> edgeContacts = new RawValueList<EdgeContact>(8);
+        RawValueList<VertexContact> vertexContacts = new RawValueList<VertexContact>(8);
 
         protected ConvexCollidable convex;
 
@@ -54,7 +54,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
             contacts = new RawList<Contact>(4);
             unusedContacts = new UnsafeResourcePool<Contact>(4);
             contactIndicesToRemove = new RawList<int>(4);
-            candidatesToAdd = new RawValueList<ContactData>(1);
+            candidatesToAdd = new RawValueList<ContactData>(8);
         }
 
         protected virtual RigidTransform MeshTransform
