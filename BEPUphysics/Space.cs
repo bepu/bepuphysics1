@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.BroadPhaseSystems.Hierarchies;
@@ -484,9 +485,23 @@ namespace BEPUphysics
             spaceObject.OnRemovalFromSpace(this);
         }
 
+#if PROFILE
+        /// <summary>
+        /// Gets the time it took to perform the previous time step.
+        /// </summary>
+        public double Time
+        {
+            get { return (end - start) / (double)Stopwatch.Frequency; }
+        }
+
+        private long start, end;
+#endif
+
         void DoTimeStep()
         {
-
+#if PROFILE
+            start = Stopwatch.GetTimestamp();
+#endif
             SpaceObjectBuffer.Update();
             EntityStateWriteBuffer.Update();
             DeactivationManager.Update();
@@ -503,6 +518,9 @@ namespace BEPUphysics
             BufferedStates.ReadBuffers.Update();
             DeferredEventDispatcher.Update();
             EndOfTimeStepUpdateables.Update();
+#if PROFILE
+            end = Stopwatch.GetTimestamp();
+#endif
 
 
         }

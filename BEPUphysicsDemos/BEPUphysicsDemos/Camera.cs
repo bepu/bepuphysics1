@@ -196,7 +196,6 @@ namespace BEPUphysicsDemos
         /// </summary>
         /// <param name="dt">Time since the last frame in seconds.</param>
         /// <param name="keyboardInput">Input for this frame from the keyboard.</param>
-        /// <param name="oldMouseInput">Input from the previous frame from the mouse.</param>
         /// <param name="mouseInput">Input for this frame from the mouse.</param>
         /// <param name="gamePadInput">Input for this frame from the game pad.</param>
 #if !WINDOWS
