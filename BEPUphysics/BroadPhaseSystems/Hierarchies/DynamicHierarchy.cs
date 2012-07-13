@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using BEPUphysics.BroadPhaseEntries;
@@ -54,6 +55,32 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
  { 0, 0, 4, 1, 2, 2, 2, 0, 2, 2, 2, 2 };
 #else
         { 2, 2, 2, 1};
+#endif
+#if PROFILE
+        /// <summary>
+        /// Gets the time used in refitting the acceleration structure and making any necessary incremental improvements.
+        /// </summary>
+        public double RefitTime
+        {
+            get
+            {
+                return (endRefit - startRefit) / (double)Stopwatch.Frequency;
+            }
+        }
+        /// <summary>
+        /// Gets the time used in testing the tree against itself to find overlapping pairs. 
+        /// </summary>
+        public double OverlapTime
+        {
+            get
+            {
+                return (endOverlap - endRefit) / (double)Stopwatch.Frequency;
+            }
+        }
+        long startRefit, endRefit;
+        long endOverlap;
+
+
 #endif
 
         #region Multithreading
@@ -112,10 +139,17 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
                                      ? threadSplitOffsets[ThreadManager.ThreadCount - 1]
                                      : (ThreadManager.ThreadCount & (ThreadManager.ThreadCount - 1)) == 0 ? 0 : 2;
                     int splitDepth = offset + (int)Math.Ceiling(Math.Log(ThreadManager.ThreadCount, 2));
-
+#if PROFILE
+                    startRefit = Stopwatch.GetTimestamp();
+#endif
                     MultithreadedRefitPhase(splitDepth);
-
+#if PROFILE
+                    endRefit = Stopwatch.GetTimestamp();
+#endif
                     MultithreadedOverlapPhase(splitDepth);
+#if PROFILE
+                    endOverlap = Stopwatch.GetTimestamp();
+#endif
                 }
             }
 
@@ -163,8 +197,17 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
                 Overlaps.Clear();
                 if (root != null)
                 {
+#if PROFILE
+                    startRefit = Stopwatch.GetTimestamp();
+#endif
                     SingleThreadedRefitPhase();
+#if PROFILE
+                    endRefit = Stopwatch.GetTimestamp();
+#endif
                     SingleThreadedOverlapPhase();
+#if PROFILE
+                    endOverlap = Stopwatch.GetTimestamp();
+#endif
                 }
             }
         }

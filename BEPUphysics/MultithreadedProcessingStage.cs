@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using BEPUphysics.Threading;
 
 namespace BEPUphysics
@@ -41,6 +42,30 @@ namespace BEPUphysics
             }
         }
 
+#if PROFILE
+        /// <summary>
+        /// Gets the time elapsed in the previous execution of this stage, not including any hooked Starting or Finishing events.
+        /// </summary>
+        public double Time
+        {
+            get
+            {
+                return (end - start) / (double)Stopwatch.Frequency;
+            }
+        }
+
+        long start, end;
+
+        private void StartClock()
+        {
+            start = Stopwatch.GetTimestamp();
+        }
+        private void StopClock()
+        {
+            end = Stopwatch.GetTimestamp();
+        }
+#endif
+
         ///<summary>
         /// Runs the processing stage.
         ///</summary>
@@ -50,6 +75,9 @@ namespace BEPUphysics
                 return;
             if (Starting != null)
                 Starting();
+#if PROFILE
+            StartClock();
+#endif
             if (ShouldUseMultithreading)
             {
                 UpdateMultithreaded();
@@ -58,6 +86,9 @@ namespace BEPUphysics
             {
                 UpdateSingleThreaded();
             }
+#if PROFILE
+            StopClock();
+#endif
             if (Finishing != null)
                 Finishing();
         }

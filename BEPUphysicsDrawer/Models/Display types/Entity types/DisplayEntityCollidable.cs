@@ -24,7 +24,7 @@ namespace BEPUphysicsDrawer.Models
 
         public override int GetTriangleCountEstimate()
         {
-            return 50;
+            return 1000;
         }
 
 
