@@ -97,7 +97,7 @@ namespace BEPUphysics.MathExtensions
                 result = null; 
                 return;
             }
-            if (Math.Abs(Direction.Z) < Toolbox.Epsilon && (Position.Z < -boundingBox.Min.Z || Position.Z > boundingBox.Max.Z))
+            if (Math.Abs(Direction.Z) < Toolbox.Epsilon && (Position.Z < boundingBox.Min.Z || Position.Z > boundingBox.Max.Z))
             {              
                 //If the ray isn't pointing along the axis at all, and is outside of the box's interval, then it
                 //can't be intersecting.
