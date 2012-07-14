@@ -113,8 +113,8 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             shapes.Add(firstShape);
             shapes.Add(secondShape);
             shapes.Changed += ShapesChanged;
-            localOffset = -ComputeCenter();
             OnShapeChanged();
+            localOffset = -ComputeCenter();
         }
 
         /// <summary>
@@ -131,8 +131,8 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
                 shapes.Add(shapeEntries[i]);
             }
             shapes.Changed += ShapesChanged;
-            localOffset = -ComputeCenter();
             OnShapeChanged();
+            localOffset = -ComputeCenter();
         }
 
         void ShapesChanged(ObservableList<OrientedConvexShapeEntry> list)
