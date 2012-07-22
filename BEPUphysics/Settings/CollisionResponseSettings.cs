@@ -19,16 +19,16 @@
 
         /// <summary>
         /// Fraction of position error to convert into corrective momentum.
-        /// Defaults to .2.
+        /// Defaults to 0.2.
         /// </summary>
-        public static float PenetrationRecoveryStiffness = .2f;
+        public static float PenetrationRecoveryStiffness = 0.2f;
 
         /// <summary>
         /// Magnitude of relative velocity at a contact point below which staticFriction is used.
         /// dynamicFriction is used when velocity exceeds this threshold.
-        /// Defaults to .2.
+        /// Defaults to 0.2.
         /// </summary>
-        public static float StaticFrictionVelocityThreshold = .2f;
+        public static float StaticFrictionVelocityThreshold = 0.2f;
 
         /// <summary>
         /// Value by which a collision pair's friction coefficient will be multiplied to get the twist friction coefficient.

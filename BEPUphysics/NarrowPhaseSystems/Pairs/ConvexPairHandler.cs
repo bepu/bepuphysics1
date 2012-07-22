@@ -27,6 +27,8 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             base.Initialize(entryA, entryB);
         }
 
+
+
         ///<summary>
         /// Updates the time of impact for the pair.
         ///</summary>

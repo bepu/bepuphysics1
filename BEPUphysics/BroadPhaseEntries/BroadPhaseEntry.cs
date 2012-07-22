@@ -101,11 +101,8 @@ namespace BEPUphysics.BroadPhaseEntries
         {
             if (filter(this))
                 return RayCast(ray, maximumLength, out rayHit);
-            else
-            {
-                rayHit = new RayHit();
-                return false;
-            }
+            rayHit = new RayHit();
+            return false;
         }
 
         /// <summary>

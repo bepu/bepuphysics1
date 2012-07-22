@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using BEPUphysics.ResourceManagement;
 using BEPUphysics.DataStructures;
 using System.Collections.Generic;
+using BEPUphysics.Settings;
 
 namespace BEPUphysics.Constraints.Collision
 {
@@ -57,7 +58,6 @@ namespace BEPUphysics.Constraints.Collision
         {
             //All of the constraints are always in the solver group.  Some of them are just deactivated sometimes.
             //This reduces some bookkeeping complications.
-
 
             penetrationConstraints = new RawList<ContactPenetrationConstraint>(4);
             frictionConstraints = new RawList<ContactFrictionConstraint>(4);
@@ -161,7 +161,6 @@ namespace BEPUphysics.Constraints.Collision
             }
 
         }
-
 
 
 

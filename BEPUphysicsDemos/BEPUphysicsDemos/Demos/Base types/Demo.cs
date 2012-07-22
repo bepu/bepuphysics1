@@ -72,7 +72,16 @@ namespace BEPUphysicsDemos.Demos
             //Pass in dt to the function to use internal timestepping, if desired.
             //Using internal time stepping usually works best when the interpolation is also used.
             //Check out the asynchronous updating documentation for an example (though you don't have to use a separate thread to use interpolation).
-            Space.Update();
+
+            if (Game.MouseInput.XButton1 == Microsoft.Xna.Framework.Input.ButtonState.Pressed)
+            {
+                //Interpolation isn't used in the demos by default, so passing in a really short time adds a lot of time between discretely visible time steps.
+                //Using a Space.TimeStepSettings.TimeStepDuration of 1/60f (the default), this will perform one time step every 20 frames (about three per second at the usual game update rate).
+                //This can make it easier to examine behavior frame-by-frame.
+                Space.Update(1 / 1200f); 
+            }
+            else
+                Space.Update();
 
 
             long endTime = Stopwatch.GetTimestamp();

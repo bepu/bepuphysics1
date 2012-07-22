@@ -79,9 +79,6 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         public abstract void UpdateTimeOfImpact(Collidable requester, float dt);
 
 
-
-
-
         protected bool suppressEvents;
         ///<summary>
         /// Gets or sets whether or not to suppress events from this pair handler.
@@ -161,6 +158,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                 Parent.OnContactRemoved(contact);
 
         }
+
 
         ///<summary>
         /// Cleans up the pair handler.

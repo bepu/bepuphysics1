@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using BEPUphysics.Settings;
 using Microsoft.Xna.Framework.Graphics;
 using BEPUphysics.DataStructures;
 using BEPUphysics;
@@ -20,7 +21,7 @@ namespace BEPUphysicsDrawer.Lines
         {
             this.game = game;
         }
-        
+
         RawList<VertexPositionColor> contactLines = new RawList<VertexPositionColor>();
 
         public void Draw(Effect effect, Space space)
@@ -35,10 +36,13 @@ namespace BEPUphysicsDrawer.Lines
                     foreach (ContactInformation information in pairHandler.Contacts)
                     {
                         contactCount++;
+
                         contactLines.Add(new VertexPositionColor(information.Contact.Position, Color.White));
                         contactLines.Add(new VertexPositionColor(information.Contact.Position + information.Contact.Normal * information.Contact.PenetrationDepth, Color.Red));
                         contactLines.Add(new VertexPositionColor(information.Contact.Position + information.Contact.Normal * information.Contact.PenetrationDepth, Color.White));
                         contactLines.Add(new VertexPositionColor(information.Contact.Position + information.Contact.Normal * (information.Contact.PenetrationDepth + .3f), Color.White));
+
+
                     }
                 }
             }

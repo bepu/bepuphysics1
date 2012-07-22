@@ -87,6 +87,7 @@ namespace BEPUphysics.Constraints.Collision
         ///<param name="contact">Contact to remove.</param>
         public abstract void RemoveContact(Contact contact);
 
+
         ///<summary>
         /// Initializes the constraint.
         ///</summary>
@@ -139,7 +140,6 @@ namespace BEPUphysics.Constraints.Collision
 
             if (isActive)
             {
-                var aValid = entityA != null && entityA.isDynamic;
                 isActiveInSolver = pair.BroadPhaseOverlap.collisionRule < CollisionRule.NoSolver &&
                                    ((entityA != null && entityA.isDynamic && entityA.activityInformation.IsActive) || //At least one of the objects must be an active dynamic entity.
                                    (entityB != null && entityB.isDynamic && entityB.activityInformation.IsActive));
@@ -182,6 +182,8 @@ namespace BEPUphysics.Constraints.Collision
                 materialInteraction.Bounciness = 0;
             }
         }
+
+
 
     }
 }

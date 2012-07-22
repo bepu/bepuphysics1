@@ -1,5 +1,7 @@
-﻿using BEPUphysics.BroadPhaseSystems.Hierarchies;
+﻿using BEPUphysics;
+using BEPUphysics.BroadPhaseSystems.Hierarchies;
 using BEPUphysics.Collidables;
+using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.CollisionShapes;
 using BEPUphysics.Constraints.TwoEntity.Joints;
 using BEPUphysics.DataStructures;
@@ -125,6 +127,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                     }
         }
 
+
         List<CharacterController> characters = new List<CharacterController>();
         List<SphereCharacterController> sphereCharacters = new List<SphereCharacterController>();
         Random random = new Random();
@@ -173,7 +176,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
         //{
         //    //Try compiling the library with the PROFILE symbol defined and using this!
         //    Game.DataTextDrawer.Draw("Time Step Stage Times: ", new Vector2(20, 10));
-            
+
         //    Game.TinyTextDrawer.Draw("SpaceObjectBuffer: ", Space.SpaceObjectBuffer.Time * 1000, 2, new Vector2(20, 35));
         //    Game.TinyTextDrawer.Draw("Entity State Write Buffer: ", Space.EntityStateWriteBuffer.Time * 1000, 2, new Vector2(20, 50));
         //    Game.TinyTextDrawer.Draw("Deactivation: ", Space.DeactivationManager.Time * 1000, 2, new Vector2(20, 65));

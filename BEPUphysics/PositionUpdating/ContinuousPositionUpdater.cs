@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using BEPUphysics.Settings;
 using BEPUphysics.Threading;
 using BEPUphysics.DataStructures;
 
@@ -80,7 +81,7 @@ namespace BEPUphysics.PositionUpdating
             //This should always execute, even if the updateable is not active.  This is because
             //a CCD object may be in a pair where the CCD object is resting, and another incoming object
             //is awake.
-            continuousUpdateables.Elements[i].UpdateTimeOfImpacts(timeStepSettings.TimeStepDuration);
+            continuousUpdateables.Elements[i].UpdateTimesOfImpact(timeStepSettings.TimeStepDuration);
         }
 
         Action<int> updateContinuous;
@@ -100,12 +101,14 @@ namespace BEPUphysics.PositionUpdating
 
         protected override void UpdateMultithreaded()
         {
+
             //Go through the list of all updateables which do not permit motion clamping.
             //Since these do not care about CCD, just update them as if they were discrete.
             //In addition, go through the remaining non-discrete objects and perform their prestep.
             //This usually involves updating their angular motion, but not their linear motion.
             int count = discreteUpdateables.count + passiveUpdateables.count + continuousUpdateables.count;
             ThreadManager.ForLoop(0, count, preUpdate);
+
             //Now go through the list of all full CCD objects.  These are responsible
             //for determining the TOI of collision pairs, if existent.
             if (continuousUpdateables.count > MultithreadingThreshold)
@@ -113,6 +116,7 @@ namespace BEPUphysics.PositionUpdating
             else
                 for (int i = 0; i < continuousUpdateables.count; i++)
                     UpdateTimeOfImpact(i);
+
             //The TOI's are now computed, so we can integrate all of the CCD or allow-motionclampers 
             //to their new positions.
             count = passiveUpdateables.count + continuousUpdateables.count;
@@ -126,6 +130,7 @@ namespace BEPUphysics.PositionUpdating
             //it doesn't always use multithreading.  Sometimes, a simulation can have
             //very few continuous objects.  In this case, there's no point in having the 
             //multithreaded overhead.
+
         }
 
         protected override void UpdateSingleThreaded()
@@ -137,10 +142,12 @@ namespace BEPUphysics.PositionUpdating
             int count = discreteUpdateables.count + passiveUpdateables.count + continuousUpdateables.count;
             for (int i = 0; i < count; i++)
                 PreUpdate(i);
+
             //Now go through the list of all full CCD objects.  These are responsible
             //for determining the TOI of collision pairs, if existent.
             for (int i = 0; i < continuousUpdateables.count; i++)
                 UpdateTimeOfImpact(i);
+
             //The TOI's are now computed, so we can integrate all of the CCD or allow-motionclampers 
             //to their new positions.
             count = passiveUpdateables.count + continuousUpdateables.count;

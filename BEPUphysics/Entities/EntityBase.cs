@@ -1081,7 +1081,7 @@ namespace BEPUphysics.Entities
             }
         }
 
-        void ICCDPositionUpdateable.UpdateTimeOfImpacts(float dt)
+        void ICCDPositionUpdateable.UpdateTimesOfImpact(float dt)
         {
             //I am a continuous object.  If I am in a pair with another object, even if I am inactive,
             //I must order the pairs to compute a time of impact.
@@ -1092,6 +1092,14 @@ namespace BEPUphysics.Entities
                 //Only perform CCD if we're either supposed to test against no solver pairs or if this isn't a no solver pair.
                 if (MotionSettings.PairAllowsCCD(this, collisionInformation.pairs.Elements[i]))
                     collisionInformation.pairs.Elements[i].UpdateTimeOfImpact(collisionInformation, dt);
+            }
+        }
+        void ICCDPositionUpdateable.ResetTimesOfImpact()
+        {
+            //Reset all of the times of impact to 1, allowing the entity to move all the way through its velocity-defined motion.
+            for (int i = 0; i < collisionInformation.pairs.count; i++)
+            {
+                collisionInformation.pairs.Elements[i].timeOfImpact = 1;
             }
         }
 

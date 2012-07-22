@@ -5,6 +5,7 @@ using BEPUphysics.DataStructures;
 using System.Diagnostics;
 using System.Collections;
 using System.Collections.Generic;
+using BEPUphysics.Settings;
 
 namespace BEPUphysics.Constraints.Collision
 {
@@ -78,7 +79,6 @@ namespace BEPUphysics.Constraints.Collision
             {
                 var penetrationConstraint = new ContactPenetrationConstraint();
                 Add(penetrationConstraint);
-                penetrationConstraint.Tag = i;
                 penetrationConstraintPool.Push(penetrationConstraint);
             }
             slidingFriction = new SlidingFrictionTwoAxis();
@@ -121,9 +121,9 @@ namespace BEPUphysics.Constraints.Collision
             var penetrationConstraint = penetrationConstraintPool.Pop();
             penetrationConstraint.Setup(this, contact);
             penetrationConstraints.Add(penetrationConstraint);
-            if (penetrationConstraints.count == 1)
+            if (!twistFriction.isActive)
             {
-                //This is the first contact.  All constraints need to become active.
+                //This is the first real contact.  All constraints need to become active.
                 twistFriction.Setup(this);
                 slidingFriction.Setup(this);
             }
@@ -149,10 +149,12 @@ namespace BEPUphysics.Constraints.Collision
             if (penetrationConstraints.count == 0)
             {
                 //No more contacts.  Disable everything.
+                //Don't have to worry about speculative contacts here; if there existed a regular manifold contact, there couldn't now exist a speculative contact.
                 twistFriction.CleanUp();
                 slidingFriction.CleanUp();
             }
         }
+
 
 
         //NOTE: Even though the order of addition to the solver group ensures penetration constraints come first, the
