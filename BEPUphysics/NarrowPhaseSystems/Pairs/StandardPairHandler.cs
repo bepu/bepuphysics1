@@ -58,6 +58,8 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
 
         }
 
+
+
         ///<summary>
         /// Initializes the pair handler.
         ///</summary>
@@ -201,6 +203,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                     triggerB.OnCollisionEnded(a, this);
                 }
             }
+
             previousContactCount = ContactManifold.contacts.count;
 
         }
@@ -219,7 +222,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         /// </summary>
         public override void ClearContacts()
         {
-             if (previousContactCount > 0)
+            if (previousContactCount > 0)
             {
                 //Just exited collision.
 

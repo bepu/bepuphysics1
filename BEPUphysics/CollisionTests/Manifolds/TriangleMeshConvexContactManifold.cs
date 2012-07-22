@@ -77,7 +77,6 @@ namespace BEPUphysics.CollisionTests.Manifolds
         ///<param name="dt">Timestep duration.</param>
         public override void Update(float dt)
         {
-
             //First, refresh all existing contacts.  This is an incremental manifold.
             var transform = MeshTransform;
             ContactRefresher.ContactRefresh(contacts, supplementData, ref convex.worldTransform, ref transform, contactIndicesToRemove);
@@ -91,6 +90,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
 
             Matrix3X3 orientation;
             Matrix3X3.CreateFromQuaternion(ref convex.worldTransform.Orientation, out orientation);
+            var guaranteedContacts = 0;
             for (int i = 0; i < triangleCount; i++)
             {
                 //Initialize the local triangle.
@@ -131,6 +131,8 @@ namespace BEPUphysics.CollisionTests.Manifolds
                             {
                                 if (AnalyzeCandidate(ref indices, pairTester, ref contact))
                                 {
+                                    //This is let through if there's a face contact. Face contacts cannot be blocked.
+                                    guaranteedContacts++;
                                     AddLocalContact(ref contact, ref orientation);
                                 }
                             }
@@ -166,7 +168,6 @@ namespace BEPUphysics.CollisionTests.Manifolds
                 //Sure, it might not be necessary under normal circumstances, but it's a better option than having no contacts.
                 //TODO: There is another option: Changing restricted regions so that a vertex only restricts the other two vertices and the far edge,
                 //and an edge only restricts the far vertex and other two edges.  This introduces an occasional bump though...
-                int guaranteedContacts = candidatesToAdd.count;
 
                 //It's possible, in very specific instances, for an object to wedge itself between two adjacent triangles.
                 //For this state to continue beyond a brief instant generally requires the object be orientation locked and slender.

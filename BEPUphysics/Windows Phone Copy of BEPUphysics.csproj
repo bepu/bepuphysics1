@@ -335,7 +335,6 @@
     <Compile Include="DataStructures\ObservableList.cs" />
     <Compile Include="DataStructures\TriangleMesh.cs" />
     <Compile Include="PositionUpdating\ContinuousPositionUpdater.cs" />
-    <Compile Include="PositionUpdating\DiscretePositionUpdater.cs" />
     <Compile Include="PositionUpdating\ICCDPositionUpdateable.cs" />
     <Compile Include="PositionUpdating\IPositionUpdateable.cs" />
     <Compile Include="PositionUpdating\PositionUpdater.cs" />

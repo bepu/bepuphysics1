@@ -302,7 +302,6 @@
     <Compile Include="NarrowPhaseSystems\Pairs\StandardPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\MobileMeshConvexPairHandler.cs" />
     <Compile Include="PositionUpdating\ContinuousPositionUpdater.cs" />
-    <Compile Include="PositionUpdating\DiscretePositionUpdater.cs" />
     <Compile Include="MathExtensions\AffineTransform.cs" />
     <Compile Include="BroadPhaseEntries\Events\ContactEventManager.cs" />
     <Compile Include="BroadPhaseEntries\Events\EntryEventManager.cs" />
