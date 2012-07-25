@@ -817,6 +817,8 @@ namespace BEPUphysics.Entities
         {
             if (!IgnoreShapeChanges)
             {
+                //When the shape changes, force the entity awake so that it performs any necessary updates.
+                activityInformation.Activate();
                 ShapeDistributionInformation shapeInfo;
                 collisionInformation.Shape.ComputeDistributionInformation(out shapeInfo);
                 volume = shapeInfo.Volume;
