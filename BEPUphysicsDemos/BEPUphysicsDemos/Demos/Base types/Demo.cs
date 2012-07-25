@@ -73,6 +73,7 @@ namespace BEPUphysicsDemos.Demos
             //Using internal time stepping usually works best when the interpolation is also used.
             //Check out the asynchronous updating documentation for an example (though you don't have to use a separate thread to use interpolation).
 
+#if WINDOWS
             if (Game.MouseInput.XButton1 == Microsoft.Xna.Framework.Input.ButtonState.Pressed)
             {
                 //Interpolation isn't used in the demos by default, so passing in a really short time adds a lot of time between discretely visible time steps.
@@ -81,6 +82,7 @@ namespace BEPUphysicsDemos.Demos
                 Space.Update(1 / 1200f); 
             }
             else
+#endif
                 Space.Update();
 
 

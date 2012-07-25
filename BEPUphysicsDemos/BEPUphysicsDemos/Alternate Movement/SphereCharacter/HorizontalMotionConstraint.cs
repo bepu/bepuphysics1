@@ -330,8 +330,6 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
                 }
                 else
                 {
-                    Vector3 previousLinearJacobianA1 = linearJacobianA1;
-                    Vector3 previousLinearJacobianA2 = linearJacobianA2;
                     //If the character isn't trying to move, then the velocity directions are not well defined.
                     //Instead, pick two arbitrary vectors on the support plane.
                     //First guess will be based on the previous jacobian.
@@ -387,9 +385,6 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
             }
             else
             {
-                Vector3 previousLinearJacobianA1 = linearJacobianA1;
-                Vector3 previousLinearJacobianA2 = linearJacobianA2;
-
                 //If the character is floating, then the jacobians are simply the movement direction.
                 //Note that in a 6DOF character, this will change- but it will still be trivial.
                 //In that case, the movement direction will be a 3d vector, and the A2 jacobian will just be
@@ -683,8 +678,7 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
                 Vector3 bodyVelocity = character.Body.LinearVelocity;
                 if (supportEntity != null)
                     return bodyVelocity - Toolbox.GetVelocityOfPoint(supportData.Position, supportEntity);
-                else
-                    return bodyVelocity;
+                return bodyVelocity;
             }
         }
 
