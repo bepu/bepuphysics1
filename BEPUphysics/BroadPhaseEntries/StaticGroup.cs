@@ -1,5 +1,5 @@
 ﻿using System;
-using BEPUphysics.Collidables.Events;
+using BEPUphysics.BroadPhaseEntries.Events;
 using BEPUphysics.CollisionShapes;
 using BEPUphysics.MathExtensions;
 using Microsoft.Xna.Framework;
@@ -13,7 +13,7 @@ using BEPUphysics.CollisionTests.CollisionAlgorithms.GJK;
 using BEPUphysics.OtherSpaceStages;
 using System.Collections.Generic;
 
-namespace BEPUphysics.Collidables
+namespace BEPUphysics.BroadPhaseEntries
 {
     ///<summary>
     /// Collection of unmoving collidable objects.

@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework;
 using BEPUphysics.DataStructures;
 using BEPUphysics.MathExtensions;
-using BEPUphysics.Collidables;
+using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.Entities;
 using Microsoft.Xna.Framework.Graphics;

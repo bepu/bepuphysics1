@@ -1,5 +1,5 @@
 ﻿using System;
-using BEPUphysics.Collidables.MobileCollidables;
+using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.Constraints.SolverGroups;
 using BEPUphysics.Constraints.TwoEntity.Motors;
 using BEPUphysics.Entities;

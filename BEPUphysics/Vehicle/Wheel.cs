@@ -4,7 +4,7 @@ using BEPUphysics.UpdateableSystems;
 using Microsoft.Xna.Framework;
 using BEPUphysics.MathExtensions;
 using BEPUphysics.Materials;
-using BEPUphysics.Collidables;
+using BEPUphysics.BroadPhaseEntries;
 
 namespace BEPUphysics.Vehicle
 {

@@ -1,7 +1,7 @@
 ﻿using System;
 using BEPUphysics;
-using BEPUphysics.Collidables;
-using BEPUphysics.Collidables.MobileCollidables;
+using BEPUphysics.BroadPhaseEntries;
+using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.UpdateableSystems;

@@ -1,5 +1,5 @@
 ﻿using System;
-using BEPUphysics.Collidables.Events;
+using BEPUphysics.BroadPhaseEntries.Events;
 using BEPUphysics.CollisionShapes;
 using BEPUphysics.MathExtensions;
 using Microsoft.Xna.Framework;
@@ -10,7 +10,7 @@ using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.ResourceManagement;
 using BEPUphysics.OtherSpaceStages;
 
-namespace BEPUphysics.Collidables
+namespace BEPUphysics.BroadPhaseEntries
 {
     ///<summary>
     /// Superclass of static collidable objects which can be added directly to a space.  Static objects cannot move.

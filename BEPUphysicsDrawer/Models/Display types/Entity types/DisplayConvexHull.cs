@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 using BEPUphysics.CollisionShapes;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using System;
-using BEPUphysics.Collidables.MobileCollidables;
+using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 
 namespace BEPUphysicsDrawer.Models
 {

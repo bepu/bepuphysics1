@@ -1,6 +1,6 @@
 ﻿using System;
-using BEPUphysics.Collidables;
-using BEPUphysics.Collidables.MobileCollidables;
+using BEPUphysics.BroadPhaseEntries;
+using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.DataStructures;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
 using BEPUphysics.ResourceManagement;

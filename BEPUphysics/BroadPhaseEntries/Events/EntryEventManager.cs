@@ -5,7 +5,7 @@ using BEPUphysics.OtherSpaceStages;
 using BEPUphysics.Threading;
 using System;
 
-namespace BEPUphysics.Collidables.Events
+namespace BEPUphysics.BroadPhaseEntries.Events
 {
 
     ///<summary>

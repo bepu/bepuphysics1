@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseSystems;
-using BEPUphysics.Collidables;
-using BEPUphysics.Collidables.MobileCollidables;
+using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.CollisionShapes.ConvexShapes;

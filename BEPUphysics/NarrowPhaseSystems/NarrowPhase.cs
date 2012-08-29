@@ -10,7 +10,7 @@ using BEPUphysics.CollisionRuleManagement;
 using System.Collections.ObjectModel;
 using BEPUphysics.DataStructures;
 using System.Diagnostics;
-using BEPUphysics.Collidables.MobileCollidables;
+using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 
 namespace BEPUphysics.NarrowPhaseSystems
 {

@@ -4,7 +4,7 @@ using System.Diagnostics;
 using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.BroadPhaseSystems.Hierarchies;
-using BEPUphysics.Collidables.MobileCollidables;
+using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.DeactivationManagement;
 using BEPUphysics.Entities;
 using BEPUphysics.EntityStateManagement;

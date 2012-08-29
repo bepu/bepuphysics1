@@ -1,11 +1,11 @@
 ﻿using System;
-using BEPUphysics.Collidables;
+using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.MathExtensions;
 using Microsoft.Xna.Framework;
 using BEPUphysics.CollisionRuleManagement;
-using BEPUphysics.Collidables.Events;
-using BEPUphysics.Collidables.MobileCollidables;
+using BEPUphysics.BroadPhaseEntries.Events;
+using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 
 namespace BEPUphysicsDemos.Demos.Extras.Tests
 {

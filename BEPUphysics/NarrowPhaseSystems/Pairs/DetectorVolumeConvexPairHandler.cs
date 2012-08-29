@@ -1,5 +1,5 @@
 ﻿using BEPUphysics.BroadPhaseEntries;
-using BEPUphysics.Collidables.MobileCollidables;
+using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using System;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
 using BEPUphysics.DataStructures;

@@ -1,13 +1,13 @@
 ﻿using BEPUphysics.BroadPhaseEntries;
+using BEPUphysics.BroadPhaseEntries.Events;
 using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.CollisionShapes;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
 using BEPUphysics.CollisionRuleManagement;
 using System;
-using BEPUphysics.Collidables.Events;
 using BEPUphysics.DataStructures;
 
-namespace BEPUphysics.Collidables
+namespace BEPUphysics.BroadPhaseEntries
 {
     ///<summary>
     /// Superclass of objects living in the collision detection pipeline

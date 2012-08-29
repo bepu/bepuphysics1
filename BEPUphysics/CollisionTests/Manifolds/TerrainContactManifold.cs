@@ -1,6 +1,6 @@
 ﻿using System;
-using BEPUphysics.Collidables;
-using BEPUphysics.Collidables.MobileCollidables;
+using BEPUphysics.BroadPhaseEntries;
+using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using Microsoft.Xna.Framework;
 using BEPUphysics.DataStructures;
 using BEPUphysics.CollisionShapes.ConvexShapes;

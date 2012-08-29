@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using BEPUphysics.Collidables.MobileCollidables;
+using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using Microsoft.Xna.Framework;
 using BEPUphysics.MathExtensions;
 using BEPUphysics.NarrowPhaseSystems;
-using BEPUphysics.Collidables;
+using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.CollisionTests;
 using BEPUphysics.DataStructures;
 using BEPUphysics.NarrowPhaseSystems.Pairs;

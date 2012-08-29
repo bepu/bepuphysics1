@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
-using BEPUphysics.Collidables;
+using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.Constraints.TwoEntity.Joints;
 using BEPUphysics.Constraints.TwoEntity.Motors;
 using BEPUphysics.Entities.Prefabs;

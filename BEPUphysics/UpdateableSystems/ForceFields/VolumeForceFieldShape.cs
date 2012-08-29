@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using BEPUphysics.Collidables;
+using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.Entities;
 using BEPUphysics.DataStructures;
 

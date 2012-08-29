@@ -1,7 +1,7 @@
 ﻿using BEPUphysics.CollisionShapes.ConvexShapes;
 using Microsoft.Xna.Framework;
 
-namespace BEPUphysics.Collidables.MobileCollidables
+namespace BEPUphysics.BroadPhaseEntries.MobileCollidables
 {
     ///<summary>
     /// Special case collidable for reuseable triangles.

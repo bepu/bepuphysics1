@@ -1,4 +1,4 @@
-﻿using BEPUphysics.Collidables;
+﻿using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.DataStructures;
 using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;

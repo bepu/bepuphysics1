@@ -1,7 +1,7 @@
 ﻿using System;
 using BEPUphysics.BroadPhaseSystems;
-using BEPUphysics.Collidables;
-using BEPUphysics.Collidables.MobileCollidables;
+using BEPUphysics.BroadPhaseEntries;
+using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.CollisionTests;
 using BEPUphysics.CollisionTests.CollisionAlgorithms.GJK;
 using BEPUphysics.CollisionTests.Manifolds;

@@ -10,7 +10,7 @@ using BEPUphysics.Constraints.TwoEntity.JointLimits;
 using Microsoft.Xna.Framework.Input;
 using System;
 using BEPUphysics.MathExtensions;
-using BEPUphysics.Collidables;
+using BEPUphysics.BroadPhaseEntries;
 namespace BEPUphysicsDemos.Demos.Extras
 {
     /// <summary>
