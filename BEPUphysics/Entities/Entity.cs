@@ -1,4 +1,4 @@
-﻿using BEPUphysics.Collidables.MobileCollidables;
+﻿using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.MathExtensions;
 
 namespace BEPUphysics.Entities

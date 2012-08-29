@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.Threading;
 using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseSystems;
-using BEPUphysics.Collidables.MobileCollidables;
+using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.Entities;
 using Microsoft.Xna.Framework;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.DataStructures;
 using BEPUphysics.DeactivationManagement;
 using System.Diagnostics;
-using BEPUphysics.Collidables;
 using BEPUphysics.MathExtensions;
 
 namespace BEPUphysics.ResourceManagement

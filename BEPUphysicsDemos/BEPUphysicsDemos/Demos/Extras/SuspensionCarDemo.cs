@@ -8,7 +8,7 @@ using BEPUphysics.Constraints.TwoEntity.JointLimits;
 using Microsoft.Xna.Framework.Input;
 using System;
 using BEPUphysics.MathExtensions;
-using BEPUphysics.Collidables;
+using BEPUphysics.BroadPhaseEntries;
 namespace BEPUphysicsDemos.Demos.Extras
 {
     /// <summary>
@@ -53,6 +53,7 @@ namespace BEPUphysicsDemos.Demos.Extras
             //Add a stabilizer so that the wheels can't point different directions.
             var steeringStabilizer = new RevoluteAngularJoint(wheel1, wheel2, Vector3.Right);
             Space.Add(steeringStabilizer);
+
 
             //x and y, in terms of heightmaps, refer to their local x and y coordinates.  In world space, they correspond to x and z.
             //Setup the heights of the terrain.

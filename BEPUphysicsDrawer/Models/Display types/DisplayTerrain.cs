@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using BEPUphysics.Collidables;
+using BEPUphysics.BroadPhaseEntries;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using BEPUphysics.CollisionShapes;

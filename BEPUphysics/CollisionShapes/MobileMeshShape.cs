@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using BEPUphysics.DataStructures;
 using BEPUphysics.MathExtensions;
-using BEPUphysics.Collidables.MobileCollidables;
+using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.ResourceManagement;
 using System.Collections.Generic;
@@ -827,7 +827,7 @@ namespace BEPUphysics.CollisionShapes
             ComputeShapeInformation(this.TriangleMesh.Data as TransformableMeshData, out shapeInfo);
         }
 
-        public override Collidables.MobileCollidables.EntityCollidable GetCollidableInstance()
+        public override BroadPhaseEntries.MobileCollidables.EntityCollidable GetCollidableInstance()
         {
             return new MobileMeshCollidable(this);
         }

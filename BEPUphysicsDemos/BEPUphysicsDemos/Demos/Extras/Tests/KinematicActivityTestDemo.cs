@@ -1,5 +1,5 @@
 ﻿using System;
-using BEPUphysics.Collidables;
+using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.MathExtensions;
 using Microsoft.Xna.Framework;

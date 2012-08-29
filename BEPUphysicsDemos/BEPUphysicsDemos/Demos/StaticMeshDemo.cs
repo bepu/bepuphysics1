@@ -4,7 +4,7 @@ using BEPUphysics.DataStructures;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.MathExtensions;
 using BEPUphysics.Entities;
-using BEPUphysics.Collidables;
+using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.Entities.Prefabs;
 
 namespace BEPUphysicsDemos.Demos

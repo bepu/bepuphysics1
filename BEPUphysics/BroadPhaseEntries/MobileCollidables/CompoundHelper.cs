@@ -8,7 +8,7 @@ using BEPUphysics.MathExtensions;
 using BEPUphysics.Entities;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 
-namespace BEPUphysics.Collidables.MobileCollidables
+namespace BEPUphysics.BroadPhaseEntries.MobileCollidables
 {
     /// <summary>
     /// Contains methods to help with splitting compound objects into multiple pieces.

@@ -1,6 +1,6 @@
 ﻿using BEPUphysics;
 using BEPUphysics.BroadPhaseSystems.Hierarchies;
-using BEPUphysics.Collidables;
+using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.CollisionShapes;
 using BEPUphysics.Constraints.TwoEntity.Joints;

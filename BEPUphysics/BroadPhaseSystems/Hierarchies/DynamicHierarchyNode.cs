@@ -345,17 +345,17 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
             if (offset.X > offset.Y && offset.X > offset.Z)
             {
                 //Maximum variance axis is X.
-                Array.Sort<LeafNode>(leafNodes.Elements, begin, end - begin, xComparer);
+                Array.Sort(leafNodes.Elements, begin, end - begin, xComparer);
             }
             else if (offset.Y > offset.Z)
             {
                 //Maximum variance axis is Y.  
-                Array.Sort<LeafNode>(leafNodes.Elements, begin, end - begin, yComparer);
+                Array.Sort(leafNodes.Elements, begin, end - begin, yComparer);
             }
             else
             {
                 //Maximum variance axis is Z.
-                Array.Sort<LeafNode>(leafNodes.Elements, begin, end - begin, zComparer);
+                Array.Sort(leafNodes.Elements, begin, end - begin, zComparer);
             }
 
             //Find the median index.

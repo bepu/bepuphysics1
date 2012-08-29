@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
 using BEPUphysics.Entities;
 using BEPUphysics.CollisionRuleManagement;
-using BEPUphysics.Collidables;
+using BEPUphysics.BroadPhaseEntries;
 
 namespace BEPUphysics.Settings
 {

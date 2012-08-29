@@ -1,5 +1,4 @@
 ﻿using BEPUphysics.BroadPhaseEntries;
-using BEPUphysics.Collidables;
 using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.PositionUpdating;
@@ -12,7 +11,7 @@ using BEPUphysics.MathExtensions;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.DataStructures;
 using Microsoft.Xna.Framework.Graphics;
-using BEPUphysics.Collidables.MobileCollidables;
+using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.CollisionShapes;
 using BEPUphysics.Settings;
 using BEPUphysics.NarrowPhaseSystems.Pairs;

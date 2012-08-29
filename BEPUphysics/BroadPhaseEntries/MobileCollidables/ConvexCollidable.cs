@@ -1,12 +1,12 @@
-﻿using BEPUphysics.CollisionShapes.ConvexShapes;
+﻿using BEPUphysics.BroadPhaseEntries.Events;
+using BEPUphysics.CollisionShapes.ConvexShapes;
 using Microsoft.Xna.Framework;
 using System;
 using BEPUphysics.PositionUpdating;
 using BEPUphysics.Settings;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
-using BEPUphysics.Collidables.Events;
 
-namespace BEPUphysics.Collidables.MobileCollidables
+namespace BEPUphysics.BroadPhaseEntries.MobileCollidables
 {
     ///<summary>
     /// Collidable with a convex shape.

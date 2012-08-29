@@ -6,7 +6,7 @@ using BEPUphysics.Constraints;
 using BEPUphysics.DataStructures;
 using BEPUphysics.Entities;
 using Microsoft.Xna.Framework;
-using BEPUphysics.Collidables.MobileCollidables;
+using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.MathExtensions;
 using BEPUphysics;
 using System.Diagnostics;

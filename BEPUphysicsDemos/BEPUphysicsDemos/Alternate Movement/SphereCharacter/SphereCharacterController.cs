@@ -6,7 +6,7 @@ using BEPUphysics.UpdateableSystems;
 using BEPUphysics;
 using Microsoft.Xna.Framework;
 using BEPUphysics.MathExtensions;
-using BEPUphysics.Collidables.MobileCollidables;
+using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
 using BEPUphysics.Materials;
 using BEPUphysics.PositionUpdating;

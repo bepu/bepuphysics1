@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
+using BEPUphysics.BroadPhaseEntries.Events;
 using BEPUphysics.BroadPhaseSystems;
-using BEPUphysics.Collidables.Events;
 using BEPUphysics.CollisionShapes;
 using BEPUphysics.MathExtensions;
 using Microsoft.Xna.Framework;
@@ -13,7 +13,7 @@ using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
 using System;
 
-namespace BEPUphysics.Collidables.MobileCollidables
+namespace BEPUphysics.BroadPhaseEntries.MobileCollidables
 {
     ///<summary>
     /// Collidable used by compound shapes.
