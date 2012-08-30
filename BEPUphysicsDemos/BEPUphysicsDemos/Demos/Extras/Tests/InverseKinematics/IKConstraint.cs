@@ -7,9 +7,6 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
 {
     public abstract class IKConstraint
     {
-        public Bone ConnectionA { get; protected set; }
-        public Bone ConnectionB { get; protected set; }
-
-
+        
     }
 }
