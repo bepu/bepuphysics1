@@ -27,6 +27,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             float angle;
             Vector3 angularError;
             Toolbox.GetAxisAngleFromQuaternion(ref errorQuaternion, out angularError, out angle);
+            Vector3.Multiply(ref angularError, angle, out angularError);
             ComputeVelocityBias(ref Toolbox.ZeroVector, ref angularError);
         }
 

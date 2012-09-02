@@ -5,7 +5,7 @@ using BEPUphysics.DataStructures;
 using BEPUphysics.CollisionShapes;
 using BEPUphysics.Materials;
 
-namespace BEPUphysicsDemos.Demos.Tests
+namespace BEPUphysicsDemos.Demos.Extras.Tests
 {
     /// <summary>
     /// Demo showing a wall of blocks stacked up.

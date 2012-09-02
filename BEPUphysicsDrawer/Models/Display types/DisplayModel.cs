@@ -9,7 +9,8 @@ namespace BEPUphysicsDrawer.Models
     public class DisplayModel : SelfDrawingModelDisplayObject
     {
         private Model model;
-        
+
+
         /// <summary>
         /// Bone transformations of meshes in the model.
         /// </summary>
