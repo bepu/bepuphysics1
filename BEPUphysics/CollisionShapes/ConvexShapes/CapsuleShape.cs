@@ -290,7 +290,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             Vector3.Add(ref hit.Location, ref localRay.Position, out hit.Location);
 
             //Is it intersecting the cylindrical portion of the capsule?
-            if (hit.Location.Y <= halfLength && hit.Location.Y >= -halfLength)
+            if (hit.Location.Y <= halfLength && hit.Location.Y >= -halfLength && hit.T < maximumLength)
             {
                 //Yup!
                 hit.Normal = new Vector3(hit.Location.X, 0, hit.Location.Z);

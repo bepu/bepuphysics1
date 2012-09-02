@@ -41,6 +41,24 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
 
         internal float inverseMass;
 
+        /// <summary>
+        /// Gets or sets the mass of the bone.
+        /// High mass bones resist motion more than those of small mass.
+        /// Setting the mass updates the inertia tensor of the bone.
+        /// </summary>
+        public float Mass
+        {
+            get { return 1 / inverseMass; }
+            set
+            {
+                if (value > 0)
+                    inverseMass = 1 / value;
+                else
+                    throw new Exception("Mass must be positive.");
+                ComputeLocalInertiaTensor();
+            }
+        }
+
         internal Matrix3X3 inertiaTensorInverse;
         internal Matrix3X3 localInertiaTensorInverse;
 
@@ -62,6 +80,80 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         /// Gets whether or not the bone is a member of the active set as determined by the last IK solver execution.
         /// </summary>
         public bool IsActive { get; internal set; }
+
+        private float radius;
+        /// <summary>
+        /// Gets or sets the radius of the bone.
+        /// Setting the radius changes the inertia tensor of the bone.
+        /// </summary>
+        public float Radius
+        {
+            get
+            { return radius; }
+            set
+            {
+                radius = value;
+                ComputeLocalInertiaTensor();
+            }
+        }
+
+        private float halfHeight;
+        /// <summary>
+        /// Gets or sets the height, divided by two, of the bone.
+        /// The half height extends both ways from the center position of the bone.
+        /// Setting the half height changes the inertia tensor of the bone.
+        /// </summary>
+        public float HalfHeight
+        {
+            get { return halfHeight; }
+            set
+            {
+                halfHeight = value;
+                ComputeLocalInertiaTensor();
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the height of the bone.
+        /// Setting the height changes the inertia tensor of the bone.
+        /// </summary>
+        public float Height
+        {
+            get { return halfHeight * 2; }
+            set
+            {
+                halfHeight = value / 2;
+                ComputeLocalInertiaTensor();
+            }
+        }
+
+        /// <summary>
+        /// Constructs a new bone.
+        /// </summary>
+        /// <param name="position">Initial position of the bone.</param>
+        /// <param name="orientation">Initial orientation of the bone.</param>
+        /// <param name="radius">Radius of the bone.</param>
+        /// <param name="height">Height of the bone.</param>
+        /// <param name="mass">Mass of the bone.</param>
+        public Bone(Vector3 position, Quaternion orientation, float radius, float height, float mass)
+        {
+            Position = position;
+            Orientation = orientation;
+            Mass = mass;
+            Radius = radius;
+            Height = height;
+        }
+
+
+        void ComputeLocalInertiaTensor()
+        {
+            var localInertiaTensor = new Matrix3X3();
+            float diagValue = (.0833333333f * Height * Height + .25f * Radius * Radius) * Mass;
+            localInertiaTensor.M11 = diagValue;
+            localInertiaTensor.M22 = .5f * Radius * Radius * Mass;
+            localInertiaTensor.M33 = diagValue;
+            Matrix3X3.Invert(ref localInertiaTensor, out localInertiaTensorInverse);
+        }
 
         /// <summary>
         /// Updates the world inertia tensor based upon the local inertia tensor and current orientation.

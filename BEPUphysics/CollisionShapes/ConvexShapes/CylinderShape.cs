@@ -267,7 +267,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             Vector3.Add(ref hit.Location, ref localRay.Position, out hit.Location);
 
             //Is it intersecting the cylindrical portion of the capsule?
-            if (hit.Location.Y <= halfHeight && hit.Location.Y >= -halfHeight)
+            if (hit.Location.Y <= halfHeight && hit.Location.Y >= -halfHeight && hit.T < maximumLength)
             {
                 //Yup!
                 hit.Normal = new Vector3(hit.Location.X, 0, hit.Location.Z);
@@ -297,7 +297,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             Vector3 planeIntersection;
             Vector3.Multiply(ref localRay.Direction, t, out planeIntersection);
             Vector3.Add(ref localRay.Position, ref planeIntersection, out planeIntersection);
-            if(planeIntersection.X * planeIntersection.X + planeIntersection.Z * planeIntersection.Z < radius * radius + 1e-9)
+            if(planeIntersection.X * planeIntersection.X + planeIntersection.Z * planeIntersection.Z < radius * radius + 1e-9 && t < maximumLength)
             {
                 //Pull the hit into world space.
                 Vector3.Transform(ref Toolbox.UpVector, ref transform.Orientation, out hit.Normal);
@@ -320,7 +320,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             t = (-halfHeight - localRay.Position.Y) / localRay.Direction.Y;
             Vector3.Multiply(ref localRay.Direction, t, out planeIntersection);
             Vector3.Add(ref localRay.Position, ref planeIntersection, out planeIntersection);
-            if (planeIntersection.X * planeIntersection.X + planeIntersection.Z * planeIntersection.Z < radius * radius + 1e-9)
+            if (planeIntersection.X * planeIntersection.X + planeIntersection.Z * planeIntersection.Z < radius * radius + 1e-9 && t < maximumLength)
             {
                 //Pull the hit into world space.
                 Vector3.Transform(ref Toolbox.DownVector, ref transform.Orientation, out hit.Normal);
