@@ -133,6 +133,7 @@
     <Compile Include="Demos\Extras\Tests\BroadPhaseMultithreadingTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\BooleanConvexTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\BroadPhaseRemovalTestDemo.cs" />
+    <Compile Include="Demos\Extras\Tests\InverseKinematicsTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\InverseKinematics\ActiveSet.cs" />
     <Compile Include="Demos\Extras\Tests\InverseKinematics\Bone.cs" />
     <Compile Include="Demos\Extras\Tests\InverseKinematics\Control.cs" />

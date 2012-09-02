@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using BEPUphysics;
 using BEPUphysics.DataStructures;
 using BEPUphysics.MathExtensions;
 using Microsoft.Xna.Framework;
@@ -109,5 +110,6 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             Matrix3X3.Transform(ref impulse, ref inertiaTensorInverse, out velocityChange);
             Vector3.Add(ref velocityChange, ref angularVelocity, out angularVelocity);
         }
+
     }
 }

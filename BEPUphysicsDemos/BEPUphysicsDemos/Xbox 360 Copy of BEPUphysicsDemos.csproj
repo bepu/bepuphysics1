@@ -116,6 +116,7 @@
     <Compile Include="Demos\Extras\Tests\BroadPhasesTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\CharacterStressTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\ConvexHullTestDemo.cs" />
+    <Compile Include="Demos\Extras\Tests\InverseKinematicsTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\InverseKinematics\ActiveSet.cs" />
     <Compile Include="Demos\Extras\Tests\InverseKinematics\Bone.cs" />
     <Compile Include="Demos\Extras\Tests\InverseKinematics\Control.cs" />
