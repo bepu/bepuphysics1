@@ -133,10 +133,13 @@
     <Compile Include="Demos\Extras\Tests\BroadPhaseMultithreadingTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\BooleanConvexTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\BroadPhaseRemovalTestDemo.cs" />
-    <Compile Include="Demos\Extras\Tests\InverseKinematics\ActiveJointSet.cs" />
-    <Compile Include="Demos\Extras\Tests\InverseKinematics\IKBone.cs" />
-    <Compile Include="Demos\Extras\Tests\InverseKinematics\IKControl.cs" />
+    <Compile Include="Demos\Extras\Tests\InverseKinematics\ActiveSet.cs" />
+    <Compile Include="Demos\Extras\Tests\InverseKinematics\Bone.cs" />
+    <Compile Include="Demos\Extras\Tests\InverseKinematics\Control.cs" />
     <Compile Include="Demos\Extras\Tests\InverseKinematics\IKConstraint.cs" />
+    <Compile Include="Demos\Extras\Tests\InverseKinematics\SingleBoneAngularMotor.cs" />
+    <Compile Include="Demos\Extras\Tests\InverseKinematics\SingleBoneConstraint.cs" />
+    <Compile Include="Demos\Extras\Tests\InverseKinematics\SingleBoneLinearMotor.cs" />
     <Compile Include="Demos\Extras\Tests\InverseKinematics\IKSolver.cs" />
     <Compile Include="Demos\Extras\Tests\InverseKinematics\IKJoint.cs" />
     <Compile Include="Demos\Extras\Tests\MultithreadedScalingTestDemo.cs" />

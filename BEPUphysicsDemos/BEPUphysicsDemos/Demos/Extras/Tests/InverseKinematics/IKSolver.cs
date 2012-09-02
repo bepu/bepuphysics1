@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using BEPUphysics.DataStructures;
+using Microsoft.Xna.Framework;
 
 namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
 {
@@ -12,44 +13,52 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
     /// to full body inverse kinematics subject to a variety of constraints.
     /// </para>
     /// <para>
-    /// It's currently separated from the BEPUphysics library internals because the immediate goal is to test out 
+    /// It's currently separated from the rest of BEPUphysics library internals because the immediate goal is to test out 
     /// features to be potentially integrated into a blender content pipeline. BEPUphysics interactions with this system
     /// will have to go through the interfaces like everything else for now.
     /// </para>
     /// </summary>
     public class IKSolver
     {
-        List<IKControl> controls = new List<IKControl>();
+        List<Control> controls = new List<Control>();
         /// <summary>
         /// Gets the list of controls used by the solver.
         /// </summary>
-        public ReadOnlyList<IKControl> Controls
+        public ReadOnlyList<Control> Controls
         {
-            get { return new ReadOnlyList<IKControl>(controls); }
+            get { return new ReadOnlyList<Control>(controls); }
         }
 
         /// <summary>
         /// Gets the active joint set associated with the solver.
         /// </summary>
-        public ActiveJointSet ActiveJointSet { get; private set; }
+        public ActiveSet ActiveSet { get; private set; }
 
         /// <summary>
         /// Gets or sets the number of solver iterations to perform in an attempt to reach specified goals.
         /// </summary>
-        public int ControlIterations { get; set; }
+        public int ControlIterationCount { get; set; }
         
         /// <summary>
         /// Gets or sets the number of solter iterations to perform after the control iterations in an attempt to minimize
         /// errors introduced by unreachable goals.
         /// </summary>
-        public int FixerIterations { get; set; }
+        public int FixerIterationCount { get; set; }
+
+        /// <summary>
+        /// Gets or sets the number of velocity iterations to perform per control or fixer iteration.
+        /// </summary>
+        public int VelocitySubiterationCount { get; set; }
 
         /// <summary>
         /// Constructs a new IKSolver.
         /// </summary>
         public IKSolver()
         {
-            ActiveJointSet = new ActiveJointSet();
+            ActiveSet = new ActiveSet();
+            ControlIterationCount = 10;
+            FixerIterationCount = 10;
+            VelocitySubiterationCount = 5;
         }
 
         /// <summary>
@@ -58,22 +67,60 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         public void Solve()
         {
             //Update the list of active joints.
-            ActiveJointSet.UpdateActiveSet(controls);
+            ActiveSet.UpdateActiveSet(controls);
+
 
             //Go through the set of controls and active joints, updating the state of bones.
-            for (int i = 0; i < ControlIterations; i++)
-            {
-                //Controls are updated first, and the active joint set is sorted from closest-to-control constraints to furthest-from-control constraints.
-                //This order allows the effect of controls to propagate through the graph quickly.
-                //In addition, the last constraints which update get the last word in the state of bones for a given iteration,
-                //so solving far constraints last means those constraints connected to the pin endpoint will always succeed in keeping a bone nearby.
-                for (int j = 0; j < controls.Count; j++)
+            for (int i = 0; i < ControlIterationCount; i++)
+            {    
+                //Update the world inertia tensors of objects for the latest position.
+                foreach (Bone bone in ActiveSet.bones)
                 {
-
+                    bone.UpdateInertiaTensor();
                 }
-                for (int j = 0; j < ActiveJointSet.Joints.Count; j++)
-                {
 
+                //Update the per-constraint jacobians and effective mass for the current bone orientations and positions.
+                foreach (IKJoint joint in ActiveSet.joints)
+                {
+                    joint.UpdateJacobiansAndVelocityBias();
+                    joint.ComputeEffectiveMass();
+                    joint.WarmStart();
+                }
+
+                foreach (var control in controls)
+                {
+                    if (control.TargetBone.Pinned)
+                        throw new Exception("Pinned objects cannot be moved by controls.");
+                    control.LinearMotor.UpdateJacobiansAndVelocityBias();
+                    control.LinearMotor.ComputeEffectiveMass();
+                    control.LinearMotor.WarmStart();
+
+                    control.AngularMotor.UpdateJacobiansAndVelocityBias();
+                    control.AngularMotor.ComputeEffectiveMass();
+                    control.AngularMotor.WarmStart();
+                }
+
+                for (int j = 0; j < VelocitySubiterationCount; j++)
+                {
+                    //Controls are updated first, and the active joint set is sorted from closest-to-control constraints to furthest-from-control constraints.
+                    //This order allows the effect of controls to propagate through the graph quickly.
+                    //In addition, the last constraints which update get the last word in the state of bones for a given iteration,
+                    //so solving far constraints last means those constraints connected to pin endpoints will always succeed in keeping a bone nearby.
+                    foreach (Control control in controls)
+                    {
+                        control.LinearMotor.SolveVelocityIteration();
+                        control.AngularMotor.SolveVelocityIteration();
+                    }
+                    foreach (IKJoint joint in ActiveSet.joints)
+                    {
+                        joint.SolveVelocityIteration();
+                    }
+                }
+
+                //Integrate the positions of the bones forward.
+                foreach (Bone bone in ActiveSet.bones)
+                {
+                    bone.UpdatePosition();
                 }
             }
 
@@ -82,14 +129,51 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             //fix the errors without interference from impossible goals
             //This can potentially cause the bones to move away from the control targets, but with a sufficient
             //number of control iterations, the result is generally a good approximation.
-            for (int i = 0; i < FixerIterations; i++)
+            for (int i = 0; i < FixerIterationCount; i++)
             {
-                for (int j = 0; j < ActiveJointSet.Joints.Count; j++)
+                //Update the world inertia tensors of objects for the latest position.
+                foreach (Bone bone in ActiveSet.bones)
                 {
+                    bone.UpdateInertiaTensor();
+                }
 
+                //Update the per-constraint jacobians and effective mass for the current bone orientations and positions.
+                foreach (IKJoint joint in ActiveSet.joints)
+                {
+                    joint.UpdateJacobiansAndVelocityBias();
+                    joint.ComputeEffectiveMass();
+                    joint.WarmStart();
+                }
+
+                for (int j = 0; j < VelocitySubiterationCount; j++)
+                {
+                    //Controls are updated first, and the active joint set is sorted from closest-to-control constraints to furthest-from-control constraints.
+                    //In addition, the last constraints which update get the last word in the state of bones for a given iteration,
+                    //so solving far constraints last means those constraints connected to pin endpoints will always succeed in keeping a bone nearby.
+                    foreach (IKJoint joint in ActiveSet.joints)
+                    {
+                        joint.SolveVelocityIteration();
+                    }
+                }
+
+                //Integrate the positions of the bones forward.
+                foreach (Bone bone in ActiveSet.bones)
+                {
+                    bone.UpdatePosition();
                 }
             }
 
+            //Clear out accumulated impulses; they should not persist through to another solving round because the state could be arbitrarily different.
+            for (int j = 0; j < ActiveSet.joints.Count; j++)
+            {
+                ActiveSet.joints[j].ClearAccumulatedImpulses();
+            }
+
+            foreach (Control control in controls)
+            {
+                control.LinearMotor.ClearAccumulatedImpulses();
+                control.AngularMotor.ClearAccumulatedImpulses();
+            }
         }
 
 
@@ -97,7 +181,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         /// Adds a control constraint to the solver.
         /// </summary>
         /// <param name="control">Control to add.</param>
-        public void Add(IKControl control)
+        public void Add(Control control)
         {
             if (control.solverIndex != -1)
                 throw new Exception("Cannot add the control; it already belongs to a solver.");
@@ -110,7 +194,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         /// Removes a control from the solver.
         /// </summary>
         /// <param name="control">Control to remove.</param>
-        public void Remove(IKControl control)
+        public void Remove(Control control)
         {
             if (controls[control.solverIndex] != control)
                 throw new Exception("Cannot remove the control; it does not belong to this solver.");
