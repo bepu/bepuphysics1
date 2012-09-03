@@ -105,6 +105,23 @@ namespace BEPUphysics.BroadPhaseEntries
         }
 
         /// <summary>
+        /// Tests a ray against the entry.
+        /// </summary>
+        /// <param name="ray">Ray to test.</param>
+        /// <param name="maximumLength">Maximum length, in units of the ray's direction's length, to test.</param>
+        /// <param name="filter">Test to apply to the entry. If it returns true, the entry is processed, otherwise the entry is ignored. If a collidable hierarchy is present
+        /// in the entry, this filter will be passed into inner ray casts.</param>
+        /// <param name="rayHit">Hit location of the ray on the entry, if any.</param>
+        /// <returns>Whether or not the ray hit the entry.</returns>
+        public override bool RayCast(Ray ray, float maximumLength, Func<BroadPhaseEntry, bool> filter, out RayHit rayHit)
+        {
+            RayCastResult result;
+            bool toReturn = Shape.RayCast(ray, maximumLength, filter, out result);
+            rayHit = result.HitData;
+            return toReturn;
+        }
+
+        /// <summary>
         /// Casts a convex shape against the collidable.
         /// </summary>
         /// <param name="castShape">Shape to cast.</param>
@@ -112,10 +129,28 @@ namespace BEPUphysics.BroadPhaseEntries
         /// <param name="sweep">Sweep to apply to the shape.</param>
         /// <param name="hit">Hit data, if any.</param>
         /// <returns>Whether or not the cast hit anything.</returns>
-        public override bool ConvexCast(CollisionShapes.ConvexShapes.ConvexShape castShape, ref RigidTransform startingTransform, ref Vector3 sweep, out RayHit hit)
+        public override bool ConvexCast(ConvexShape castShape, ref RigidTransform startingTransform, ref Vector3 sweep, out RayHit hit)
         {
             RayCastResult result;
             bool toReturn = Shape.ConvexCast(castShape, ref startingTransform, ref sweep, out result);
+            hit = result.HitData;
+            return toReturn;
+        }
+
+        /// <summary>
+        /// Casts a convex shape against the collidable.
+        /// </summary>
+        /// <param name="castShape">Shape to cast.</param>
+        /// <param name="startingTransform">Initial transform of the shape.</param>
+        /// <param name="sweep">Sweep to apply to the shape.</param>
+        /// <param name="filter">Test to apply to the entry. If it returns true, the entry is processed, otherwise the entry is ignored. If a collidable hierarchy is present
+        /// in the entry, this filter will be passed into inner ray casts.</param>
+        /// <param name="hit">Hit data, if any.</param>
+        /// <returns>Whether or not the cast hit anything.</returns>
+        public override bool ConvexCast(ConvexShape castShape, ref RigidTransform startingTransform, ref Vector3 sweep, Func<BroadPhaseEntry, bool> filter, out RayHit hit)
+        {
+            RayCastResult result;
+            bool toReturn = Shape.ConvexCast(castShape, ref startingTransform, ref sweep, filter, out result);
             hit = result.HitData;
             return toReturn;
         }

@@ -38,7 +38,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         /// Gets or sets the number of solver iterations to perform in an attempt to reach specified goals.
         /// </summary>
         public int ControlIterationCount { get; set; }
-        
+
         /// <summary>
         /// Gets or sets the number of solter iterations to perform after the control iterations in an attempt to minimize
         /// errors introduced by unreachable goals.
@@ -56,8 +56,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         public IKSolver()
         {
             ActiveSet = new ActiveSet();
-            ControlIterationCount = 10;
-            FixerIterationCount = 10;
+            ControlIterationCount = 1;
+            FixerIterationCount = 0;
             VelocitySubiterationCount = 5;
         }
 
@@ -72,7 +72,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
 
             //Go through the set of controls and active joints, updating the state of bones.
             for (int i = 0; i < ControlIterationCount; i++)
-            {    
+            {
                 //Update the world inertia tensors of objects for the latest position.
                 foreach (Bone bone in ActiveSet.bones)
                 {
@@ -91,13 +91,9 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
                 {
                     if (control.TargetBone.Pinned)
                         throw new Exception("Pinned objects cannot be moved by controls.");
-                    control.LinearMotor.UpdateJacobiansAndVelocityBias();
-                    control.LinearMotor.ComputeEffectiveMass();
-                    control.LinearMotor.WarmStart();
-
-                    control.AngularMotor.UpdateJacobiansAndVelocityBias();
-                    control.AngularMotor.ComputeEffectiveMass();
-                    control.AngularMotor.WarmStart();
+                    control.UpdateJacobiansAndVelocityBias();
+                    control.ComputeEffectiveMass();
+                    control.WarmStart();
                 }
 
                 for (int j = 0; j < VelocitySubiterationCount; j++)
@@ -108,8 +104,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
                     //so solving far constraints last means those constraints connected to pin endpoints will always succeed in keeping a bone nearby.
                     foreach (Control control in controls)
                     {
-                        control.LinearMotor.SolveVelocityIteration();
-                        control.AngularMotor.SolveVelocityIteration();
+                        control.SolveVelocityIteration();
+                        control.SolveVelocityIteration();
                     }
                     foreach (IKJoint joint in ActiveSet.joints)
                     {
@@ -171,8 +167,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
 
             foreach (Control control in controls)
             {
-                control.LinearMotor.ClearAccumulatedImpulses();
-                control.AngularMotor.ClearAccumulatedImpulses();
+                control.ClearAccumulatedImpulses();
             }
         }
 
@@ -181,29 +176,35 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         /// Adds a control constraint to the solver.
         /// </summary>
         /// <param name="control">Control to add.</param>
-        public void Add(Control control)
+        /// <returns>True if the control was added, or false otherwise.</returns>
+        public bool Add(Control control)
         {
             if (control.solverIndex != -1)
-                throw new Exception("Cannot add the control; it already belongs to a solver.");
+                return false;
             control.solverIndex = controls.Count;
             controls.Add(control);
-
+            return true;
         }
 
         /// <summary>
         /// Removes a control from the solver.
         /// </summary>
         /// <param name="control">Control to remove.</param>
-        public void Remove(Control control)
+        /// <returns>True if the control was present, or false otherwise.</returns>
+        public bool Remove(Control control)
         {
-            if (controls[control.solverIndex] != control)
-                throw new Exception("Cannot remove the control; it does not belong to this solver.");
+            if (control.solverIndex < 0 || control.solverIndex >= controls.Count || controls[control.solverIndex] != control)
+                return false;
 
             var lastControl = controls[controls.Count - 1];
             controls.RemoveAt(controls.Count - 1);
-            controls[control.solverIndex] = lastControl;
-            lastControl.solverIndex = control.solverIndex;
+            if (controls.Count > 0)
+            {
+                controls[control.solverIndex] = lastControl;
+                lastControl.solverIndex = control.solverIndex;
+            }
             control.solverIndex = -1;
+            return true;
         }
     }
 }
