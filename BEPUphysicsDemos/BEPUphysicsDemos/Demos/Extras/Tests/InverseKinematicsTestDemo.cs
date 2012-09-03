@@ -21,7 +21,16 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
         private bool usingIK;
 
         private IKSolver solver = new IKSolver();
-        private InstancedModelDrawer drawer;
+
+        private StateControl stateControl = new StateControl();
+        private DragControl dragControl = new DragControl();
+        private float distanceToGrabbedBone;
+        private Vector3 grabOffset;
+
+
+
+
+        private double elapsedTime;
 
         private struct BoneRelationship
         {
@@ -29,6 +38,9 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             public DisplayModel DisplayBone;
             public Entity Entity;
         }
+
+        private InstancedModelDrawer drawer;
+        private Texture2D whitePixel;
 
         private List<BoneRelationship> bones = new List<BoneRelationship>();
 
@@ -39,14 +51,21 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
         public InverseKinematicsTestDemo(DemosGame game)
             : base(game)
         {
+            whitePixel = game.Content.Load<Texture2D>("whitePixel");
+            game.Camera.Position = new Vector3(0, 3, 5);
             Box ground = new Box(new Vector3(0, 0, 0), 30, 1, 30);
             Space.Add(ground);
 
             drawer = new InstancedModelDrawer(game);
 
-            //Set up the 
+            //Set up some bones to play with.
+            Cylinder boneEntity = new Cylinder(new Vector3(0, 2, 0), 1, .2f, 1);
+            Bone bone = new Bone(boneEntity.Position, boneEntity.Orientation, boneEntity.Radius, boneEntity.Height, boneEntity.Mass);
+            bones.Add(new BoneRelationship { Bone = bone, Entity = boneEntity });
+            Space.Add(boneEntity);
 
-            //Create the display
+
+            //Create the display objects.
             Model cylinder = game.Content.Load<Model>("cylinder");
             for (int i = 0; i < bones.Count; i++)
             {
@@ -61,53 +80,99 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             if (Game.WasKeyPressed(Keys.T))
             {
                 usingIK = !usingIK;
-            }
-            if (usingIK)
-            {
-                //Try to grab a bone.
-                if (Game.MouseInput.RightButton == ButtonState.Pressed)
+                //Upon swapping, update the positions of the entities to the state of the IK or vice versa.
+                if (usingIK)
                 {
-                    Bone hitBone;
-                    Vector3 hitPosition;
-                    if(RayCastBones(new Ray(Game.Camera.Position, Game.Camera.WorldMatrix.Forward), out hitBone, out hitPosition))
+                    foreach (var bone in bones)
                     {
-                        //We grabbed a bone!
+                        bone.Bone.Position = bone.Entity.Position;
+                        bone.Bone.Orientation = bone.Entity.Orientation;
                     }
                 }
-                //Solve for the new bone positions and orientations.
-                solver.Solve();
-
-                //Update the positions of the bone graphics.
-                for (int i = 0; i < bones.Count; i++)
+                else
                 {
-                    Matrix transform;
-                    Matrix.CreateFromQuaternion(ref bones[i].Bone.Orientation, out transform);
-                    transform.Translation = bones[i].Bone.Position;
-                    bones[i].DisplayBone.WorldTransform = transform;
+                    foreach (var bone in bones)
+                    {
+                        bone.Entity.Position = bone.Bone.Position;
+                        bone.Entity.Orientation = bone.Bone.Orientation;
+                    }
                 }
+            }
+
+            if (usingIK)
+            {
+                //Manage bone grabbery.
+                if (Game.MouseInput.RightButton == ButtonState.Pressed)
+                {
+                    BoneRelationship hitBone;
+                    Vector3 hitPosition;
+                    if (!dragControl.IsActive && //Don't bother raycasting if we are holding a bone.
+                        RayCastBones(new Ray(Game.Camera.Position, Game.Camera.WorldMatrix.Forward), out hitBone, out hitPosition) &&
+                        !hitBone.Bone.Pinned) //Can't control pinned bones.
+                    {
+                        //We grabbed a bone!
+                        dragControl.TargetBone = hitBone.Bone;
+                        solver.Add(dragControl);
+                        var grabOffset = hitPosition - hitBone.Bone.Position;
+                        dragControl.LinearMotor.Offset = grabOffset;
+                        distanceToGrabbedBone = Vector3.Dot(Game.Camera.WorldMatrix.Forward, hitPosition - Game.Camera.Position);
+                    }
+
+                    if (dragControl.IsActive)
+                    {
+                        //If the mouse control is active, then update the mouse control's goal location.
+                        dragControl.LinearMotor.TargetPosition = Game.Camera.Position + Game.Camera.WorldMatrix.Forward * distanceToGrabbedBone + grabOffset;
+                        //TODO: Modify the control to support different grabbing styles, like grabbing a point and pulling without care for angular control.
+
+
+                        //Solve for the new bone positions and orientations.
+                        long start = Stopwatch.GetTimestamp();
+                        solver.Solve();
+                        long end = Stopwatch.GetTimestamp();
+                        elapsedTime = (end - start) / (double)Stopwatch.Frequency;
+
+                        //Update the positions of the bone graphics.
+                        for (int i = 0; i < bones.Count; i++)
+                        {
+                            Matrix localTransform;
+                            Matrix.CreateScale(bones[i].Bone.Radius, bones[i].Bone.Height, bones[i].Bone.Radius, out localTransform);
+                            Matrix transform;
+                            Matrix.CreateFromQuaternion(ref bones[i].Bone.Orientation, out transform);
+                            Matrix.Multiply(ref localTransform, ref transform, out transform);
+                            transform.Translation = bones[i].Bone.Position;
+                            bones[i].DisplayBone.WorldTransform = transform;
+                        }
+                    }
+                }
+                else
+                {
+                    elapsedTime = 0;
+                    solver.Remove(dragControl); //Disable the control if it's active.
+
+                    if (Game.MouseInput.LeftButton == ButtonState.Pressed && Game.PreviousMouseInput.LeftButton == ButtonState.Released)
+                    {
+                        //Try to pin a bone.
+                        BoneRelationship hitBone;
+                        Vector3 hitPosition;
+                        if (RayCastBones(new Ray(Game.Camera.Position, Game.Camera.WorldMatrix.Forward), out hitBone, out hitPosition)) //Can't control pinned bones.
+                        {
+                            //Found one!
+                            hitBone.Bone.Pinned = !hitBone.Bone.Pinned;
+                            if (hitBone.Bone.Pinned)
+                                hitBone.DisplayBone.Color = new Vector3(0, 0, 1);
+                            else
+                                hitBone.DisplayBone.Color = new Vector3(0, 0, 0);
+                        }
+                    }
+                }
+
+
             }
             else
                 base.Update(dt);
         }
 
-        private bool RayCastBones(Ray ray, out Bone hitBone, out Vector3 hitPosition)
-        {
-            float t = float.MaxValue;
-            hitBone = null;
-            hitPosition = new Vector3();
-            for (int i = 0; i < bones.Count; i++)
-            {
-                var bone = bones[i].Bone;
-                RayHit hit;
-                if (RayCast(bone, ray, out hit) && hit.T < t)
-                {
-                    t = hit.T;
-                    hitPosition = hit.Location;
-                    hitBone = bone;
-                }
-            }
-            return t < float.MaxValue;
-        }
+
 
 
         public override void DrawUI()
@@ -115,16 +180,18 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             Game.DataTextDrawer.Draw("IK Controls:", new Vector2(1000, 20));
             Game.TinyTextDrawer.Draw(" T: Toggle Dynamics/IK", new Vector2(1000, 43));
             Game.TinyTextDrawer.Draw(" Right click: Grab and pull", new Vector2(1000, 57));
-            Game.TinyTextDrawer.Draw(" W and move mouse: Rotate grabbed bone", new Vector2(1000, 71));
-            Game.TinyTextDrawer.Draw(" Left click: Pin/unpin bone", new Vector2(1000, 85));
+            Game.TinyTextDrawer.Draw(" Left click: Pin/unpin bone", new Vector2(1000, 71));
 
-            Game.DataTextDrawer.Draw("Current mode: ", new Vector2(1000, 113));
+            Game.DataTextDrawer.Draw("Current mode: ", new Vector2(1000, 99));
             if (usingIK)
-                Game.DataTextDrawer.Draw("IK", new Vector2(1140, 113));
+                Game.DataTextDrawer.Draw("IK", new Vector2(1140, 99));
             else
-                Game.DataTextDrawer.Draw("Dynamics", new Vector2(1140, 113));
+                Game.DataTextDrawer.Draw("Dynamics", new Vector2(1140, 99));
 
-            base.DrawUI();
+            if (usingIK)
+                Game.TinyTextDrawer.Draw("Solving time (ms): ", elapsedTime * 1000, 2, new Vector2(1000, 127));
+            Game.UIDrawer.Draw(whitePixel, new Rectangle(Game.Graphics.PreferredBackBufferWidth / 2, Game.Graphics.PreferredBackBufferHeight / 2, 3, 3), Color.LightBlue);
+
         }
 
         public override void Draw()
@@ -144,9 +211,27 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             get { return "Inverse Kinematics"; }
         }
 
-
-        public bool RayCast(Bone bone, Ray ray, ref RigidTransform transform, float maximumLength, out RayHit hit)
+        private bool RayCastBones(Ray ray, out BoneRelationship hitBone, out Vector3 hitPosition)
         {
+            float t = float.MaxValue;
+            hitBone = new BoneRelationship();
+            hitPosition = new Vector3();
+            for (int i = 0; i < bones.Count; i++)
+            {
+                var bone = bones[i].Bone;
+                RayHit hit;
+                if (RayCast(bone, ray, out hit) && hit.T < t)
+                {
+                    t = hit.T;
+                    hitPosition = hit.Location;
+                    hitBone = bones[i];
+                }
+            }
+            return t < float.MaxValue;
+        }
+        public bool RayCast(Bone bone, Ray ray, out RayHit hit)
+        {
+            var transform = new RigidTransform(bone.Position, bone.Orientation);
             //Put the ray into local space.
             Quaternion conjugate;
             Quaternion.Conjugate(ref transform.Orientation, out conjugate);

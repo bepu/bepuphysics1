@@ -1,0 +1,82 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using BEPUphysics.MathExtensions;
+using Microsoft.Xna.Framework;
+
+namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
+{
+    /// <summary>
+    /// Constrains an individual bone in an attempt to reach some position and orientatoin goal.
+    /// </summary>
+    public class StateControl : Control
+    {
+        /// <summary>
+        /// Gets or sets the controlled bone.
+        /// </summary>
+        public override Bone TargetBone
+        {
+            get { return LinearMotor.TargetBone; }
+            set
+            {
+                LinearMotor.TargetBone = value;
+                AngularMotor.TargetBone = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the linear motor used by the control.
+        /// </summary>
+        public SingleBoneLinearMotor LinearMotor
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets or sets the angular motor used by the control.
+        /// </summary>
+        public SingleBoneAngularMotor AngularMotor
+        {
+            get;
+            private set;
+        }
+
+        public StateControl()
+        {
+            LinearMotor = new SingleBoneLinearMotor();
+            AngularMotor = new SingleBoneAngularMotor();
+        }
+
+        protected internal override void UpdateJacobiansAndVelocityBias()
+        {
+            LinearMotor.UpdateJacobiansAndVelocityBias();
+            AngularMotor.UpdateJacobiansAndVelocityBias();
+        }
+
+        protected internal override void ComputeEffectiveMass()
+        {
+            LinearMotor.ComputeEffectiveMass();
+            AngularMotor.ComputeEffectiveMass();
+        }
+
+        protected internal override void WarmStart()
+        {
+            LinearMotor.WarmStart();
+            AngularMotor.WarmStart();
+        }
+
+        protected internal override void SolveVelocityIteration()
+        {
+            LinearMotor.SolveVelocityIteration();
+            AngularMotor.SolveVelocityIteration();
+        }
+
+        protected internal override void ClearAccumulatedImpulses()
+        {
+            LinearMotor.ClearAccumulatedImpulses();
+            AngularMotor.ClearAccumulatedImpulses();
+        }
+    }
+}

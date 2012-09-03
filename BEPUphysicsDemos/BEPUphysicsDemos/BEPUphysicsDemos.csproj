@@ -137,6 +137,8 @@
     <Compile Include="Demos\Extras\Tests\InverseKinematics\ActiveSet.cs" />
     <Compile Include="Demos\Extras\Tests\InverseKinematics\Bone.cs" />
     <Compile Include="Demos\Extras\Tests\InverseKinematics\Control.cs" />
+    <Compile Include="Demos\Extras\Tests\InverseKinematics\DragControl.cs" />
+    <Compile Include="Demos\Extras\Tests\InverseKinematics\StateControl.cs" />
     <Compile Include="Demos\Extras\Tests\InverseKinematics\IKConstraint.cs" />
     <Compile Include="Demos\Extras\Tests\InverseKinematics\SingleBoneAngularMotor.cs" />
     <Compile Include="Demos\Extras\Tests\InverseKinematics\SingleBoneConstraint.cs" />

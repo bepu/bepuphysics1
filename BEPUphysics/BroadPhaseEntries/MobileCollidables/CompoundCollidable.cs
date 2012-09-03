@@ -248,61 +248,10 @@ namespace BEPUphysics.BroadPhaseEntries.MobileCollidables
         /// <returns>Whether or not the ray hit the collidable.</returns>
         public override bool RayCast(Ray ray, float maximumLength, out RayHit rayHit)
         {
-            rayHit = new RayHit();
-            var hitElements = Resources.GetCompoundChildList();
-            if (hierarchy.Tree.GetOverlaps(ray, maximumLength, hitElements))
-            {
-                rayHit.T = float.MaxValue;
-                for (int i = 0; i < hitElements.count; i++)
-                {
-                    RayHit tempHit;
-                    if (hitElements.Elements[i].CollisionInformation.RayCast(ray, maximumLength, out tempHit) && tempHit.T < rayHit.T)
-                    {
-                        rayHit = tempHit;
-                    }
-                }
-                Resources.GiveBack(hitElements);
-                return rayHit.T != float.MaxValue;
-            }
-            Resources.GiveBack(hitElements);
-            return false;
+            CompoundChild hitChild;
+            bool hit = RayCast(ray, maximumLength, out rayHit, out hitChild);
+            return hit;
         }
-
-        //TODO: Substantial redundancy here.  If a change is ever needed, compress them down.
-
-        /// <summary>
-        /// Tests a ray against the collidable.
-        /// </summary>
-        /// <param name="ray">Ray to test.</param>
-        /// <param name="maximumLength">Maximum length, in units of the ray's direction's length, to test.</param>
-        /// <param name="filter">Can be used to filter sets of objects out of the raycasting.</param>
-        /// <param name="rayHit">Hit location of the ray on the collidable, if any.</param>
-        /// <returns>Whether or not the ray hit the collidable.</returns>
-        public override bool RayCast(Ray ray, float maximumLength, Func<BroadPhaseEntry, bool> filter, out RayHit rayHit)
-        {
-            rayHit = new RayHit();
-            if (filter(this))
-            {
-                var hitElements = Resources.GetCompoundChildList();
-                if (hierarchy.Tree.GetOverlaps(ray, maximumLength, hitElements))
-                {
-                    rayHit.T = float.MaxValue;
-                    for (int i = 0; i < hitElements.count; i++)
-                    {
-                        RayHit tempHit;
-                        if (hitElements.Elements[i].CollisionInformation.RayCast(ray, maximumLength, filter, out tempHit) && tempHit.T < rayHit.T)
-                        {
-                            rayHit = tempHit;
-                        }
-                    }
-                    Resources.GiveBack(hitElements);
-                    return rayHit.T != float.MaxValue;
-                }
-                Resources.GiveBack(hitElements);
-            }
-            return false;
-        }
-
 
         /// <summary>
         /// Tests a ray against the compound.
@@ -313,26 +262,11 @@ namespace BEPUphysics.BroadPhaseEntries.MobileCollidables
         /// <returns>Whether or not the ray hit the entry.</returns>
         public bool RayCast(Ray ray, float maximumLength, out RayCastResult rayHit)
         {
-            rayHit = new RayCastResult();
-            var hitElements = Resources.GetCompoundChildList();
-            if (hierarchy.Tree.GetOverlaps(ray, maximumLength, hitElements))
-            {
-                rayHit.HitData.T = float.MaxValue;
-                for (int i = 0; i < hitElements.count; i++)
-                {
-                    EntityCollidable candidate = hitElements.Elements[i].CollisionInformation;
-                    RayHit tempHit;
-                    if (candidate.RayCast(ray, maximumLength, out tempHit) && tempHit.T < rayHit.HitData.T)
-                    {
-                        rayHit.HitData = tempHit;
-                        rayHit.HitObject = candidate;
-                    }
-                }
-                Resources.GiveBack(hitElements);
-                return rayHit.HitData.T != float.MaxValue;
-            }
-            Resources.GiveBack(hitElements);
-            return false;
+            RayHit hitData;
+            CompoundChild hitChild;
+            bool hit = RayCast(ray, maximumLength, out hitData, out hitChild);
+            rayHit = new RayCastResult { HitData = hitData, HitObject = hitChild.CollisionInformation };
+            return hit;
         }
 
         /// <summary>
@@ -368,6 +302,111 @@ namespace BEPUphysics.BroadPhaseEntries.MobileCollidables
             return false;
         }
 
+        /// <summary>
+        /// Tests a ray against the collidable.
+        /// </summary>
+        /// <param name="ray">Ray to test.</param>
+        /// <param name="maximumLength">Maximum length, in units of the ray's direction's length, to test.</param>
+        /// <param name="filter">Test to apply to the entry. If it returns true, the entry is processed, otherwise the entry is ignored. If a collidable hierarchy is present
+        /// in the entry, this filter will be passed into inner ray casts.</param>
+        /// <param name="rayHit">Hit location of the ray on the collidable, if any.</param>
+        /// <returns>Whether or not the ray hit the collidable.</returns>
+        public override bool RayCast(Ray ray, float maximumLength, Func<BroadPhaseEntry, bool> filter, out RayHit rayHit)
+        {
+            CompoundChild hitChild;
+            bool hit = RayCast(ray, maximumLength, filter, out rayHit, out hitChild);
+            return hit;
+        }
+
+        /// <summary>
+        /// Tests a ray against the compound.
+        /// </summary>
+        /// <param name="ray">Ray to test.</param>
+        /// <param name="maximumLength">Maximum length, in units of the ray's direction's length, to test.</param>
+        /// <param name="rayHit">Hit data and the hit child collidable, if any.</param>
+        /// <param name="filter">Test to apply to the entry. If it returns true, the entry is processed, otherwise the entry is ignored. If a collidable hierarchy is present
+        /// in the entry, this filter will be passed into inner ray casts.</param>
+        /// <returns>Whether or not the ray hit the entry.</returns>
+        public bool RayCast(Ray ray, float maximumLength, Func<BroadPhaseEntry, bool> filter, out RayCastResult rayHit)
+        {
+            RayHit hitData;
+            CompoundChild hitChild;
+            bool hit = RayCast(ray, maximumLength, filter, out hitData, out hitChild);
+            rayHit = new RayCastResult { HitData = hitData, HitObject = hitChild.CollisionInformation };
+            return hit;
+        }
+
+        /// <summary>
+        /// Tests a ray against the collidable.
+        /// </summary>
+        /// <param name="ray">Ray to test.</param>
+        /// <param name="maximumLength">Maximum length, in units of the ray's direction's length, to test.</param>
+        /// <param name="filter">Test to apply to the entry. If it returns true, the entry is processed, otherwise the entry is ignored. If a collidable hierarchy is present
+        /// in the entry, this filter will be passed into inner ray casts.</param>
+        /// <param name="rayHit">Hit location of the ray on the collidable, if any.</param>
+        /// <param name="hitChild">Child hit by the ray.</param>
+        /// <returns>Whether or not the ray hit the collidable.</returns>
+        public bool RayCast(Ray ray, float maximumLength, Func<BroadPhaseEntry, bool> filter, out RayHit rayHit, out CompoundChild hitChild)
+        {
+            rayHit = new RayHit();
+            hitChild = null;
+            if (filter(this))
+            {
+                var hitElements = Resources.GetCompoundChildList();
+                if (hierarchy.Tree.GetOverlaps(ray, maximumLength, hitElements))
+                {
+                    rayHit.T = float.MaxValue;
+                    for (int i = 0; i < hitElements.count; i++)
+                    {
+                        RayHit tempHit;
+                        if (hitElements.Elements[i].CollisionInformation.RayCast(ray, maximumLength, filter, out tempHit) && tempHit.T < rayHit.T)
+                        {
+                            rayHit = tempHit;
+                            hitChild = hitElements.Elements[i];
+                        }
+                    }
+                    Resources.GiveBack(hitElements);
+                    return rayHit.T != float.MaxValue;
+                }
+                Resources.GiveBack(hitElements);
+            }
+            return false;
+        }
+
+
+        /// <summary>
+        /// Casts a convex shape against the collidable.
+        /// </summary>
+        /// <param name="castShape">Shape to cast.</param>
+        /// <param name="startingTransform">Initial transform of the shape.</param>
+        /// <param name="sweep">Sweep to apply to the shape.</param>
+        /// <param name="rayHit">Hit data, if any.</param>
+        /// <returns>Whether or not the cast hit anything.</returns>
+        public override bool ConvexCast(CollisionShapes.ConvexShapes.ConvexShape castShape, ref RigidTransform startingTransform, ref Vector3 sweep, out RayHit rayHit)
+        {
+            CompoundChild hitChild;
+            bool hit = ConvexCast(castShape, ref startingTransform, ref sweep, out rayHit, out hitChild);
+            return hit;
+        }
+
+
+        /// <summary>
+        /// Casts a convex shape against the collidable.
+        /// </summary>
+        /// <param name="castShape">Shape to cast.</param>
+        /// <param name="startingTransform">Initial transform of the shape.</param>
+        /// <param name="sweep">Sweep to apply to the shape.</param>
+        /// <param name="result">Data and hit object from the first impact, if any.</param>
+        /// <returns>Whether or not the cast hit anything.</returns>
+        public bool ConvexCast(CollisionShapes.ConvexShapes.ConvexShape castShape, ref RigidTransform startingTransform, ref Vector3 sweep, out RayCastResult result)
+        {
+            CompoundChild hitChild;
+            RayHit rayHit;
+            bool hit = ConvexCast(castShape, ref startingTransform, ref sweep, out rayHit, out hitChild);
+            result = new RayCastResult { HitData = rayHit, HitObject = hitChild.CollisionInformation };
+            return hit;
+        }
+
 
         /// <summary>
         /// Casts a convex shape against the collidable.
@@ -376,10 +415,12 @@ namespace BEPUphysics.BroadPhaseEntries.MobileCollidables
         /// <param name="startingTransform">Initial transform of the shape.</param>
         /// <param name="sweep">Sweep to apply to the shape.</param>
         /// <param name="hit">Hit data, if any.</param>
+        /// <param name="hitChild">Child hit by the cast.</param>
         /// <returns>Whether or not the cast hit anything.</returns>
-        public override bool ConvexCast(CollisionShapes.ConvexShapes.ConvexShape castShape, ref RigidTransform startingTransform, ref Vector3 sweep, out RayHit hit)
+        public bool ConvexCast(CollisionShapes.ConvexShapes.ConvexShape castShape, ref RigidTransform startingTransform, ref Vector3 sweep, out RayHit hit, out CompoundChild hitChild)
         {
             hit = new RayHit();
+            hitChild = null;
             BoundingBox boundingBox;
             Toolbox.GetExpandedBoundingBox(ref castShape, ref startingTransform, ref sweep, out boundingBox);
             var hitElements = Resources.GetCompoundChildList();
@@ -393,6 +434,82 @@ namespace BEPUphysics.BroadPhaseEntries.MobileCollidables
                     if (candidate.ConvexCast(castShape, ref startingTransform, ref sweep, out tempHit) && tempHit.T < hit.T)
                     {
                         hit = tempHit;
+                        hitChild = hitElements.Elements[i];
+                    }
+                }
+                Resources.GiveBack(hitElements);
+                return hit.T != float.MaxValue;
+            }
+            Resources.GiveBack(hitElements);
+            return false;
+        }
+
+        /// <summary>
+        /// Casts a convex shape against the collidable.
+        /// </summary>
+        /// <param name="castShape">Shape to cast.</param>
+        /// <param name="startingTransform">Initial transform of the shape.</param>
+        /// <param name="sweep">Sweep to apply to the shape.</param>
+        /// <param name="filter">Test to apply to the entry. If it returns true, the entry is processed, otherwise the entry is ignored. If a collidable hierarchy is present
+        /// in the entry, this filter will be passed into inner ray casts.</param>
+        /// <param name="rayHit">Hit data, if any.</param>
+        /// <returns>Whether or not the cast hit anything.</returns>
+        public override bool ConvexCast(CollisionShapes.ConvexShapes.ConvexShape castShape, ref RigidTransform startingTransform, ref Vector3 sweep, Func<BroadPhaseEntry, bool> filter, out RayHit rayHit)
+        {
+            CompoundChild hitChild;
+            bool hit = ConvexCast(castShape, ref startingTransform, ref sweep, filter, out rayHit, out hitChild);
+            return hit;
+        }
+
+
+        /// <summary>
+        /// Casts a convex shape against the collidable.
+        /// </summary>
+        /// <param name="castShape">Shape to cast.</param>
+        /// <param name="startingTransform">Initial transform of the shape.</param>
+        /// <param name="sweep">Sweep to apply to the shape.</param>
+        /// <param name="filter">Test to apply to the entry. If it returns true, the entry is processed, otherwise the entry is ignored. If a collidable hierarchy is present
+        /// in the entry, this filter will be passed into inner ray casts.</param>
+        /// <param name="result">Data and hit object from the first impact, if any.</param>
+        /// <returns>Whether or not the cast hit anything.</returns>
+        public bool ConvexCast(CollisionShapes.ConvexShapes.ConvexShape castShape, ref RigidTransform startingTransform, ref Vector3 sweep, Func<BroadPhaseEntry, bool> filter, out RayCastResult result)
+        {
+            CompoundChild hitChild;
+            RayHit rayHit;
+            bool hit = ConvexCast(castShape, ref startingTransform, ref sweep, filter, out rayHit, out hitChild);
+            result = new RayCastResult { HitData = rayHit, HitObject = hitChild.CollisionInformation };
+            return hit;
+        }
+
+        /// <summary>
+        /// Casts a convex shape against the collidable.
+        /// </summary>
+        /// <param name="castShape">Shape to cast.</param>
+        /// <param name="startingTransform">Initial transform of the shape.</param>
+        /// <param name="sweep">Sweep to apply to the shape.</param>
+        /// <param name="filter">Test to apply to the entry. If it returns true, the entry is processed, otherwise the entry is ignored. If a collidable hierarchy is present
+        /// in the entry, this filter will be passed into inner ray casts.</param>
+        /// <param name="hit">Hit data, if any.</param>
+        /// <param name="hitChild">Child hit by the cast.</param>
+        /// <returns>Whether or not the cast hit anything.</returns>
+        public bool ConvexCast(CollisionShapes.ConvexShapes.ConvexShape castShape, ref RigidTransform startingTransform, ref Vector3 sweep, Func<BroadPhaseEntry, bool> filter, out RayHit hit, out CompoundChild hitChild)
+        {
+            hit = new RayHit();
+            hitChild = null;
+            BoundingBox boundingBox;
+            Toolbox.GetExpandedBoundingBox(ref castShape, ref startingTransform, ref sweep, out boundingBox);
+            var hitElements = Resources.GetCompoundChildList();
+            if (hierarchy.Tree.GetOverlaps(boundingBox, hitElements))
+            {
+                hit.T = float.MaxValue;
+                for (int i = 0; i < hitElements.count; i++)
+                {
+                    var candidate = hitElements.Elements[i].CollisionInformation;
+                    RayHit tempHit;
+                    if (candidate.ConvexCast(castShape, ref startingTransform, ref sweep, filter, out tempHit) && tempHit.T < hit.T)
+                    {
+                        hit = tempHit;
+                        hitChild = hitElements.Elements[i];
                     }
                 }
                 Resources.GiveBack(hitElements);

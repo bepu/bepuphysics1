@@ -59,6 +59,9 @@ namespace BEPUphysicsDrawer.Models
         }
 
 
+        public Vector3 Color { get; set; }
+
+
         /// <summary>
         /// Gets or sets the world transformation applied to the model.
         /// </summary>
@@ -91,6 +94,7 @@ namespace BEPUphysicsDrawer.Models
                         effect.World = transforms[Model.Meshes[i].ParentBone.Index] * WorldTransform;
                         effect.View = viewMatrix;
                         effect.Projection = projectionMatrix;
+                        effect.AmbientLightColor = Color;
 
                         if (Texture != null)
                         {
@@ -104,5 +108,6 @@ namespace BEPUphysicsDrawer.Models
                 Model.Meshes[i].Draw();
             }
         }
+
     }
 }

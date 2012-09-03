@@ -9,46 +9,38 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
 {
     /// <summary>
     /// Constrains an individual bone in an attempt to reach some goal.
+    /// Controls act as groups of single bone constraints. They are used
+    /// by the solver to determine the active set of body constraints.
     /// </summary>
-    public class Control
+    public abstract class Control
     {
         /// <summary>
         /// Gets or sets the controlled bone.
         /// </summary>
-        public Bone TargetBone
-        {
-            get { return LinearMotor.TargetBone; }
-            set
-            {
-                LinearMotor.TargetBone = value;
-                AngularMotor.TargetBone = value;
-            }
-        }
+        public abstract Bone TargetBone { get; set; }
 
+        /// <summary>
+        /// Gets whether or not the control is used by an IK solver.
+        /// </summary>
+        public bool IsActive
+        {
+            get { return solverIndex >= 0; }
+        }
 
         /// <summary>
         /// Stores where the control is in the solver listing for quick adds and removes.
         /// </summary>
-        internal int solverIndex;
+        internal int solverIndex = -1;
 
-        /// <summary>
-        /// Gets or sets the linear motor used by the control.
-        /// </summary>
-        public SingleBoneLinearMotor LinearMotor
-        {
-            get;
-            private set;
 
-        }
+        protected internal abstract void UpdateJacobiansAndVelocityBias();
 
-        /// <summary>
-        /// Gets or sets the angular motor used by the control.
-        /// </summary>
-        public SingleBoneAngularMotor AngularMotor
-        {
-            get;
-            private set;
+        protected internal abstract void ComputeEffectiveMass();
 
-        }
+        protected internal abstract void WarmStart();
+
+        protected internal abstract void SolveVelocityIteration();
+
+        protected internal abstract void ClearAccumulatedImpulses();
     }
 }

@@ -22,17 +22,17 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
 
         internal Vector3 accumulatedImpulse;
 
-        float softness;
+        float softness = 0;
         /// <summary>
         /// Gets or sets the softness of the constraint. The higher the softness is, the more the constraint can be violated. Must be nonnegative; 0 corresponds to complete rigidity.
         /// </summary>
         public float Softness
         {
             get { return softness; }
-            set { softness = Math.Max(value, 0); }
+            set { softness = MathHelper.Max(value, 0); }
         }
 
-        float errorCorrectionFactor;
+        float errorCorrectionFactor = 1;
         /// <summary>
         /// Gets or sets the error correction factor of the constraint. Values range from 0 to 1. 0 means the constraint will not attempt to correct any error.
         /// 1 means the constraint will attempt to correct all error in a single iteration. This factor, combined with Softness, define the springlike behavior of a constraint.
@@ -43,8 +43,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             set { errorCorrectionFactor = MathHelper.Clamp(value, 0, 1); }
         }
 
-        private float maximumImpulse;
-        private float maximumImpulseSquared;
+        private float maximumImpulse = float.MaxValue;
+        private float maximumImpulseSquared = float.MaxValue;
         /// <summary>
         /// Gets or sets the maximum impulse that the constraint can apply.
         /// Velocity error requiring a greater impulse will result in the impulse being clamped to the maximum impulse.
@@ -55,7 +55,10 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             set
             {
                 maximumImpulse = Math.Max(value, 0);
-                maximumImpulseSquared = maximumImpulse * maximumImpulse;
+                if (maximumImpulse >= float.MaxValue)
+                    maximumImpulseSquared = float.MaxValue;
+                else
+                    maximumImpulseSquared = maximumImpulse * maximumImpulse;
             }
         }
 
@@ -133,7 +136,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             Vector3 linearContribution;
             Matrix3X3.Transform(ref TargetBone.linearVelocity, ref linearJacobian, out linearContribution);
             Vector3 angularContribution;
-            Matrix3X3.Transform(ref TargetBone.linearVelocity, ref linearJacobian, out angularContribution);
+            Matrix3X3.Transform(ref TargetBone.angularVelocity, ref angularJacobian, out angularContribution);
 
             //The constraint velocity error will be the velocity we try to remove.
             Vector3 constraintVelocityError;
@@ -143,13 +146,15 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             Vector3.Subtract(ref constraintVelocityError, ref velocityBias, out constraintVelocityError);
             //And second, the bias from softness:
             Vector3 softnessBias;
-            Vector3.Multiply(ref accumulatedImpulse, softness, out softnessBias);
+            Vector3.Multiply(ref accumulatedImpulse, -softness, out softnessBias);
             Vector3.Subtract(ref constraintVelocityError, ref softnessBias, out constraintVelocityError);
 
             //By now, the constraint velocity error contains all the velocity we want to get rid of.
             //Convert it into an impulse using the effective mass matrix.
             Vector3 constraintSpaceImpulse;
             Matrix3X3.Transform(ref constraintVelocityError, ref effectiveMass, out constraintSpaceImpulse);
+
+            Vector3.Negate(ref constraintSpaceImpulse, out constraintSpaceImpulse);
 
             //Add the constraint space impulse to the accumulated impulse so that warm starting and softness work properly.
             Vector3 preadd = accumulatedImpulse;
@@ -184,6 +189,6 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         {
             accumulatedImpulse = new Vector3();
         }
-        
+
     }
 }

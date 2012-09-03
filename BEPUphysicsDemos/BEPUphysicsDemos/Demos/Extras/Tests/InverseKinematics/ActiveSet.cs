@@ -67,6 +67,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
                 //Note that a bone is added to the visited bone set before it is actually processed.
                 //This prevents a bone from being put in the queue redundantly.
                 control.TargetBone.IsActive = true;
+                bones.Add(control.TargetBone);
             }
 
             //Note that it's technically possible for multiple controls to affect the same bone.
@@ -91,6 +92,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
                         //Note that a bone is added to the visited bone set before it is actually processed.
                         //This prevents a bone from being put in the queue redundantly.
                         bonesToVisit.Enqueue(boneToAdd);
+                        bones.Add(boneToAdd);
                     }
                 }
             }

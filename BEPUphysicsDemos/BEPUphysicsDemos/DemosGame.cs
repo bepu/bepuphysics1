@@ -65,6 +65,7 @@ namespace BEPUphysicsDemos
         public GamePadState PreviousGamePadInput;
 #if WINDOWS
         public MouseState MouseInput;
+        public MouseState PreviousMouseInput;
 #endif
 
         //Display Booleans        
@@ -259,6 +260,7 @@ namespace BEPUphysicsDemos
             KeyboardInput = Keyboard.GetState();
             var dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
 #if WINDOWS
+            PreviousMouseInput = MouseInput;
             MouseInput = Mouse.GetState();
 
             //Keep the mouse within the screen

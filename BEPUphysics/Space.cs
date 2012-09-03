@@ -5,6 +5,7 @@ using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.BroadPhaseSystems.Hierarchies;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
+using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.DeactivationManagement;
 using BEPUphysics.Entities;
 using BEPUphysics.EntityStateManagement;
@@ -574,7 +575,7 @@ namespace BEPUphysics
         /// Tests a ray against the space.
         /// </summary>
         /// <param name="ray">Ray to test.</param>
-        /// <param name="filter">Delegate to prune out hit candidates before performing a ray cast against them.</param>
+        /// <param name="filter">Delegate to prune out hit candidates before performing a ray cast against them. Return true from the filter to process an entry or false to ignore the entry.</param>
         /// <param name="result">Hit data of the ray, if any.</param>
         /// <returns>Whether or not the ray hit anything.</returns>
         public bool RayCast(Ray ray, Func<BroadPhaseEntry, bool> filter, out RayCastResult result)
@@ -610,7 +611,7 @@ namespace BEPUphysics
         /// </summary>
         /// <param name="ray">Ray to test.</param>
         /// <param name="maximumLength">Maximum length of the ray in units of the ray direction's length.</param>
-        /// <param name="filter">Delegate to prune out hit candidates before performing a ray cast against them.</param>
+        /// <param name="filter">Delegate to prune out hit candidates before performing a ray cast against them. Return true from the filter to process an entry or false to ignore the entry.</param>
         /// <param name="result">Hit data of the ray, if any.</param>
         /// <returns>Whether or not the ray hit anything.</returns>
         public bool RayCast(Ray ray, float maximumLength, Func<BroadPhaseEntry, bool> filter, out RayCastResult result)
@@ -661,7 +662,7 @@ namespace BEPUphysics
         /// </summary>
         /// <param name="ray">Ray to test.</param>
         /// <param name="maximumLength">Maximum length of the ray in units of the ray direction's length.</param>
-        /// <param name="filter">Delegate to prune out hit candidates before performing a ray cast against them.</param>
+        /// <param name="filter">Delegate to prune out hit candidates before performing a cast against them. Return true from the filter to process an entry or false to ignore the entry.</param>
         /// <param name="outputRayCastResults">Hit data of the ray, if any.</param>
         /// <returns>Whether or not the ray hit anything.</returns>
         public bool RayCast(Ray ray, float maximumLength, Func<BroadPhaseEntry, bool> filter, IList<RayCastResult> outputRayCastResults)
@@ -682,6 +683,112 @@ namespace BEPUphysics
             }
             Resources.GiveBack(outputIntersections);
             return outputRayCastResults.Count > 0;
+        }
+
+        /// <summary>
+        /// <para>Casts a convex shape against the space.</para>
+        /// <para>Convex casts are sensitive to length; avoid extremely long convex casts for better stability and performance.</para>
+        /// </summary>
+        /// <param name="castShape">Shape to cast.</param>
+        /// <param name="startingTransform">Initial transform of the shape.</param>
+        /// <param name="sweep">Sweep to apply to the shape. Avoid extremely long convex casts for better stability and performance.</param>
+        /// <param name="castResult">Hit data, if any.</param>
+        /// <returns>Whether or not the cast hit anything.</returns>
+        public bool ConvexCast(ConvexShape castShape, ref RigidTransform startingTransform, ref Vector3 sweep, out RayCastResult castResult)
+        {
+            var castResults = Resources.GetRayCastResultList();
+            bool didHit = ConvexCast(castShape, ref startingTransform, ref sweep, castResults);
+            castResult = castResults.Elements[0];
+            for (int i = 1; i < castResults.count; i++)
+            {
+                RayCastResult candidate = castResults.Elements[i];
+                if (candidate.HitData.T < castResult.HitData.T)
+                    castResult = candidate;
+            }
+            Resources.GiveBack(castResults);
+            return didHit;
+        }
+
+        /// <summary>
+        /// <para>Casts a convex shape against the space.</para>
+        /// <para>Convex casts are sensitive to length; avoid extremely long convex casts for better stability and performance.</para>
+        /// </summary>
+        /// <param name="castShape">Shape to cast.</param>
+        /// <param name="startingTransform">Initial transform of the shape.</param>
+        /// <param name="sweep">Sweep to apply to the shape. Avoid extremely long convex casts for better stability and performance.</param>
+        /// <param name="filter">Delegate to prune out hit candidates before performing a cast against them. Return true from the filter to process an entry or false to ignore the entry.</param>
+        /// <param name="castResult">Hit data, if any.</param>
+        /// <returns>Whether or not the cast hit anything.</returns>
+        public bool ConvexCast(ConvexShape castShape, ref RigidTransform startingTransform, ref Vector3 sweep, Func<BroadPhaseEntry, bool> filter, out RayCastResult castResult)
+        {
+            var castResults = Resources.GetRayCastResultList();
+            bool didHit = ConvexCast(castShape, ref startingTransform, ref sweep, filter, castResults);
+            castResult = castResults.Elements[0];
+            for (int i = 1; i < castResults.count; i++)
+            {
+                RayCastResult candidate = castResults.Elements[i];
+                if (candidate.HitData.T < castResult.HitData.T)
+                    castResult = candidate;
+            }
+            Resources.GiveBack(castResults);
+            return didHit;
+        }
+
+        /// <summary>
+        /// <para>Casts a convex shape against the space.</para>
+        /// <para>Convex casts are sensitive to length; avoid extremely long convex casts for better stability and performance.</para>
+        /// </summary>
+        /// <param name="castShape">Shape to cast.</param>
+        /// <param name="startingTransform">Initial transform of the shape.</param>
+        /// <param name="sweep">Sweep to apply to the shape. Avoid extremely long convex casts for better stability and performance.</param>
+        /// <param name="outputCastResults">Hit data, if any.</param>
+        /// <returns>Whether or not the cast hit anything.</returns>
+        public bool ConvexCast(ConvexShape castShape, ref RigidTransform startingTransform, ref Vector3 sweep, IList<RayCastResult> outputCastResults)
+        {
+            var overlappedElements = Resources.GetBroadPhaseEntryList();
+            BoundingBox boundingBox;
+            Toolbox.GetExpandedBoundingBox(ref castShape, ref startingTransform, ref sweep, out boundingBox);
+
+            BroadPhase.QueryAccelerator.GetEntries(boundingBox, overlappedElements);
+            for (int i = 0; i < overlappedElements.count; ++i)
+            {
+                RayHit hit;
+                if (overlappedElements.Elements[i].ConvexCast(castShape, ref startingTransform, ref sweep, out hit))
+                {
+                    outputCastResults.Add(new RayCastResult { HitData = hit, HitObject = overlappedElements.Elements[i] });
+                }
+            }
+            Resources.GiveBack(overlappedElements);
+            return outputCastResults.Count > 0;
+        }
+
+        /// <summary>
+        /// <para>Casts a convex shape against the space.</para>
+        /// <para>Convex casts are sensitive to length; avoid extremely long convex casts for better stability and performance.</para>
+        /// </summary>
+        /// <param name="castShape">Shape to cast.</param>
+        /// <param name="startingTransform">Initial transform of the shape.</param>
+        /// <param name="sweep">Sweep to apply to the shape. Avoid extremely long convex casts for better stability and performance.</param>
+        /// <param name="filter">Delegate to prune out hit candidates before performing a cast against them. Return true from the filter to process an entry or false to ignore the entry.</param>
+        /// <param name="outputCastResults">Hit data, if any.</param>
+        /// <returns>Whether or not the cast hit anything.</returns>
+        public bool ConvexCast(ConvexShape castShape, ref RigidTransform startingTransform, ref Vector3 sweep, Func<BroadPhaseEntry, bool> filter, IList<RayCastResult> outputCastResults)
+        {
+            var overlappedElements = Resources.GetBroadPhaseEntryList();
+            BoundingBox boundingBox;
+            Toolbox.GetExpandedBoundingBox(ref castShape, ref startingTransform, ref sweep, out boundingBox);
+
+            BroadPhase.QueryAccelerator.GetEntries(boundingBox, overlappedElements);
+            for (int i = 0; i < overlappedElements.count; ++i)
+            {
+                RayHit hit;
+                if (overlappedElements.Elements[i].ConvexCast(castShape, ref startingTransform, ref sweep, filter, out hit))
+                {
+                    outputCastResults.Add(new RayCastResult { HitData = hit, HitObject = overlappedElements.Elements[i] });
+                }
+            }
+            Resources.GiveBack(overlappedElements);
+            return outputCastResults.Count > 0;
         }
 
 
