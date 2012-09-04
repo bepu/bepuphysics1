@@ -47,6 +47,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         {
             LinearMotor = new SingleBoneLinearMotor();
             AngularMotor = new SingleBoneAngularMotor();
+            LinearMotor.Softness = .2f;
+            AngularMotor.Softness = .2f;
         }
 
         protected internal override void UpdateJacobiansAndVelocityBias()

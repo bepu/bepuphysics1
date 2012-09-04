@@ -28,7 +28,9 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             Vector3 angularError;
             Toolbox.GetAxisAngleFromQuaternion(ref errorQuaternion, out angularError, out angle);
             Vector3.Multiply(ref angularError, angle, out angularError);
-            ComputeVelocityBias(ref Toolbox.ZeroVector, ref angularError);
+
+            //This is equivalent to projecting the error onto the angular jacobian. The angular jacobian just happens to be the identity matrix!
+            Vector3.Multiply(ref angularError, errorCorrectionFactor, out velocityBias);
         }
 
 

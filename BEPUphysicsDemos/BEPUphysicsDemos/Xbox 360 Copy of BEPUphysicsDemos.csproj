@@ -121,6 +121,7 @@
     <Compile Include="Demos\Extras\Tests\InverseKinematics\Bone.cs" />
     <Compile Include="Demos\Extras\Tests\InverseKinematics\Control.cs" />
     <Compile Include="Demos\Extras\Tests\InverseKinematics\DragControl.cs" />
+    <Compile Include="Demos\Extras\Tests\InverseKinematics\IKBallSocketJoint.cs" />
     <Compile Include="Demos\Extras\Tests\InverseKinematics\IKConstraint.cs" />
     <Compile Include="Demos\Extras\Tests\InverseKinematics\IKJoint.cs" />
     <Compile Include="Demos\Extras\Tests\InverseKinematics\IKSolver.cs" />

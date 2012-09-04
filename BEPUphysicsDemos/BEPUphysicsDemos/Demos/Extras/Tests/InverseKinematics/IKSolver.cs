@@ -56,9 +56,9 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         public IKSolver()
         {
             ActiveSet = new ActiveSet();
-            ControlIterationCount = 1;
-            FixerIterationCount = 0;
-            VelocitySubiterationCount = 5;
+            ControlIterationCount = 100;
+            FixerIterationCount = 150;
+            VelocitySubiterationCount = 2;
         }
 
         /// <summary>
@@ -104,7 +104,6 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
                     //so solving far constraints last means those constraints connected to pin endpoints will always succeed in keeping a bone nearby.
                     foreach (Control control in controls)
                     {
-                        control.SolveVelocityIteration();
                         control.SolveVelocityIteration();
                     }
                     foreach (IKJoint joint in ActiveSet.joints)

@@ -1,0 +1,73 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using BEPUphysics.MathExtensions;
+using Microsoft.Xna.Framework;
+
+namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
+{
+    public class IKBallSocketJoint : IKJoint
+    {
+        /// <summary>
+        /// Gets or sets the offset in connection A's local space from the center of mass to the anchor point.
+        /// </summary>
+        public Vector3 LocalOffsetA;
+        /// <summary>
+        /// Gets or sets the offset in connection B's local space from the center of mass to the anchor point.
+        /// </summary>
+        public Vector3 LocalOffsetB;
+
+        /// <summary>
+        /// Gets or sets the offset in world space from the center of mass of connection A to the anchor point.
+        /// </summary>
+        public Vector3 OffsetA
+        {
+            get { return Vector3.Transform(LocalOffsetA, ConnectionA.Orientation); }
+            set { LocalOffsetA = Vector3.Transform(value, Quaternion.Conjugate(ConnectionA.Orientation)); }
+        }
+
+        /// <summary>
+        /// Gets or sets the offset in world space from the center of mass of connection A to the anchor point.
+        /// </summary>
+        public Vector3 OffsetB
+        {
+            get { return Vector3.Transform(LocalOffsetB, ConnectionB.Orientation); }
+            set { LocalOffsetB = Vector3.Transform(value, Quaternion.Conjugate(ConnectionB.Orientation)); }
+        }
+
+        public IKBallSocketJoint(Bone connectionA, Bone connectionB, Vector3 anchor)
+            : base(connectionA, connectionB)
+        {
+            OffsetA = anchor - ConnectionA.Position;
+            OffsetB = anchor - ConnectionB.Position;
+        }
+
+        protected internal override void UpdateJacobiansAndVelocityBias()
+        {
+            linearJacobianA = Matrix3X3.Identity;
+            //The jacobian entries are is [ La, Aa, -Lb, -Ab ] because the relative velocity is computed using A-B. So, negate B's jacobians!
+            linearJacobianB = new Matrix3X3 { M11 = -1, M22 = -1, M33 = -1 };
+            Vector3 rA;
+            Vector3.Transform(ref LocalOffsetA, ref ConnectionA.Orientation, out rA);
+            Matrix3X3.CreateCrossProduct(ref rA, out angularJacobianA);
+
+            Vector3 worldPositionA;
+            Vector3.Add(ref ConnectionA.Position, ref rA, out worldPositionA);
+
+            Vector3 rB;
+            Vector3.Transform(ref LocalOffsetB, ref ConnectionB.Orientation, out rB);
+            Matrix3X3.CreateCrossProduct(ref rB, out angularJacobianB);
+            //Transposing a skew-symmetric matrix is equivalent to negating it.
+            Matrix3X3.Transpose(ref angularJacobianB, out angularJacobianB);
+
+            Vector3 worldPositionB;
+            Vector3.Add(ref ConnectionB.Position, ref rB, out worldPositionB);
+
+            Vector3 linearError;
+            Vector3.Subtract(ref worldPositionB, ref worldPositionA, out linearError);
+            Vector3.Multiply(ref linearError, errorCorrectionFactor, out velocityBias);
+
+        }
+    }
+}
