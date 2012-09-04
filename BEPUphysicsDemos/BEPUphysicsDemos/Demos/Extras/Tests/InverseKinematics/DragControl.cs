@@ -36,6 +36,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         public DragControl()
         {
             LinearMotor = new SingleBoneLinearMotor();
+            LinearMotor.Softness = .2f;
         }
 
         protected internal override void UpdateJacobiansAndVelocityBias()

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using BEPUphysics;
+using BEPUphysics.CollisionRuleManagement;
+using BEPUphysics.Constraints.TwoEntity.Joints;
 using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.MathExtensions;
@@ -24,8 +26,9 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
 
         private StateControl stateControl = new StateControl();
         private DragControl dragControl = new DragControl();
+        private Control currentControl;
         private float distanceToGrabbedBone;
-        private Vector3 grabOffset;
+        private Vector3 grabOffset; //Used by the stateControl.
 
 
 
@@ -55,14 +58,37 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             game.Camera.Position = new Vector3(0, 3, 5);
             Box ground = new Box(new Vector3(0, 0, 0), 30, 1, 30);
             Space.Add(ground);
+            Space.ForceUpdater.Gravity = new Vector3(0, -9.81f, 0);
 
             drawer = new InstancedModelDrawer(game);
 
-            //Set up some bones to play with.
-            Cylinder boneEntity = new Cylinder(new Vector3(0, 2, 0), 1, .2f, 1);
-            Bone bone = new Bone(boneEntity.Position, boneEntity.Orientation, boneEntity.Radius, boneEntity.Height, boneEntity.Mass);
-            bones.Add(new BoneRelationship { Bone = bone, Entity = boneEntity });
-            Space.Add(boneEntity);
+            #region Chain
+            //Set up a bone chain.
+            int linkCount = 100;
+            var previousBoneEntity = new Cylinder(new Vector3(0, 2, 0), 1, .2f, 10);
+            var previousBone = new Bone(previousBoneEntity.Position, previousBoneEntity.Orientation, previousBoneEntity.Radius, previousBoneEntity.Height, previousBoneEntity.Mass);
+            bones.Add(new BoneRelationship { Bone = previousBone, Entity = previousBoneEntity });
+            Space.Add(previousBoneEntity);
+
+            for (int i = 1; i < linkCount; i++)
+            {
+                var boneEntity = new Cylinder(new Vector3(0, previousBoneEntity.Position.Y + 1, 0), 1, .2f, 10);
+                var bone = new Bone(boneEntity.Position, boneEntity.Orientation, boneEntity.Radius, boneEntity.Height, boneEntity.Mass);
+                bones.Add(new BoneRelationship { Bone = bone, Entity = boneEntity });
+                Space.Add(boneEntity);
+
+                //Make a relationship between the two bones and entities.
+                CollisionRules.AddRule(previousBoneEntity, boneEntity, CollisionRule.NoBroadPhase);
+                Vector3 anchor = (previousBoneEntity.Position + boneEntity.Position) / 2;
+                var dynamicsBallSocketJoint = new BallSocketJoint(previousBoneEntity, boneEntity, anchor);
+                Space.Add(dynamicsBallSocketJoint);
+                var ikBallSocketJoint = new IKBallSocketJoint(previousBone, bone, anchor); //(the joint is auto-added to the bones; not solver-add is needed)
+
+                previousBone = bone;
+                previousBoneEntity = boneEntity;
+            }
+            #endregion
+
 
 
             //Create the display objects.
@@ -95,6 +121,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                     {
                         bone.Entity.Position = bone.Bone.Position;
                         bone.Entity.Orientation = bone.Bone.Orientation;
+                        bone.Entity.AngularVelocity = new Vector3();
+                        bone.Entity.LinearVelocity = new Vector3();
                     }
                 }
             }
@@ -106,23 +134,44 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                 {
                     BoneRelationship hitBone;
                     Vector3 hitPosition;
-                    if (!dragControl.IsActive && //Don't bother raycasting if we are holding a bone.
+                    if ((currentControl == null || !currentControl.IsActive) && //Don't bother raycasting if we are holding a bone.
                         RayCastBones(new Ray(Game.Camera.Position, Game.Camera.WorldMatrix.Forward), out hitBone, out hitPosition) &&
                         !hitBone.Bone.Pinned) //Can't control pinned bones.
                     {
                         //We grabbed a bone!
-                        dragControl.TargetBone = hitBone.Bone;
-                        solver.Add(dragControl);
-                        var grabOffset = hitPosition - hitBone.Bone.Position;
-                        dragControl.LinearMotor.Offset = grabOffset;
+                        if (Game.KeyboardInput.IsKeyDown(Keys.LeftShift))
+                        {
+                            //Use a full linear+angular state controller.
+                            stateControl.TargetBone = hitBone.Bone;
+                            solver.Add(stateControl);
+                            grabOffset = hitPosition - hitBone.Bone.Position;
+                            stateControl.AngularMotor.TargetOrientation = hitBone.Bone.Orientation;
+                            currentControl = stateControl;
+
+                            stateControl.LinearMotor.MaximumImpulse = hitBone.Bone.Mass * 5f / (solver.FixerIterationCount + solver.ControlIterationCount);
+                            stateControl.AngularMotor.MaximumImpulse = hitBone.Bone.Mass * 5f / (solver.FixerIterationCount + solver.ControlIterationCount);
+                        }
+                        else
+                        {
+                            //Use a point-grab-puller-controller thing.
+                            dragControl.TargetBone = hitBone.Bone;
+                            solver.Add(dragControl);
+                            dragControl.LinearMotor.Offset = hitPosition - hitBone.Bone.Position;
+                            currentControl = dragControl;
+
+                            dragControl.LinearMotor.MaximumImpulse = hitBone.Bone.Mass * 5f / (solver.FixerIterationCount + solver.ControlIterationCount);
+                        }
+                        
                         distanceToGrabbedBone = Vector3.Dot(Game.Camera.WorldMatrix.Forward, hitPosition - Game.Camera.Position);
                     }
 
-                    if (dragControl.IsActive)
+                    if (currentControl != null && currentControl.IsActive)
                     {
                         //If the mouse control is active, then update the mouse control's goal location.
-                        dragControl.LinearMotor.TargetPosition = Game.Camera.Position + Game.Camera.WorldMatrix.Forward * distanceToGrabbedBone + grabOffset;
-                        //TODO: Modify the control to support different grabbing styles, like grabbing a point and pulling without care for angular control.
+                        if (currentControl == dragControl)
+                            dragControl.LinearMotor.TargetPosition = Game.Camera.Position + Game.Camera.WorldMatrix.Forward * distanceToGrabbedBone;
+                        else
+                            stateControl.LinearMotor.TargetPosition = Game.Camera.Position + Game.Camera.WorldMatrix.Forward * distanceToGrabbedBone - grabOffset;
 
 
                         //Solve for the new bone positions and orientations.
@@ -131,23 +180,14 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                         long end = Stopwatch.GetTimestamp();
                         elapsedTime = (end - start) / (double)Stopwatch.Frequency;
 
-                        //Update the positions of the bone graphics.
-                        for (int i = 0; i < bones.Count; i++)
-                        {
-                            Matrix localTransform;
-                            Matrix.CreateScale(bones[i].Bone.Radius, bones[i].Bone.Height, bones[i].Bone.Radius, out localTransform);
-                            Matrix transform;
-                            Matrix.CreateFromQuaternion(ref bones[i].Bone.Orientation, out transform);
-                            Matrix.Multiply(ref localTransform, ref transform, out transform);
-                            transform.Translation = bones[i].Bone.Position;
-                            bones[i].DisplayBone.WorldTransform = transform;
-                        }
+
                     }
                 }
                 else
                 {
                     elapsedTime = 0;
-                    solver.Remove(dragControl); //Disable the control if it's active.
+                    if (currentControl != null)
+                        solver.Remove(currentControl); //Disable the control if it's active.
 
                     if (Game.MouseInput.LeftButton == ButtonState.Pressed && Game.PreviousMouseInput.LeftButton == ButtonState.Released)
                     {
@@ -165,6 +205,17 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                         }
                     }
                 }
+                //Update the positions of the bone graphics.
+                for (int i = 0; i < bones.Count; i++)
+                {
+                    Matrix localTransform;
+                    Matrix.CreateScale(bones[i].Bone.Radius, bones[i].Bone.Height, bones[i].Bone.Radius, out localTransform);
+                    Matrix transform;
+                    Matrix.CreateFromQuaternion(ref bones[i].Bone.Orientation, out transform);
+                    Matrix.Multiply(ref localTransform, ref transform, out transform);
+                    transform.Translation = bones[i].Bone.Position;
+                    bones[i].DisplayBone.WorldTransform = transform;
+                }
 
 
             }
@@ -177,19 +228,20 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
 
         public override void DrawUI()
         {
-            Game.DataTextDrawer.Draw("IK Controls:", new Vector2(1000, 20));
-            Game.TinyTextDrawer.Draw(" T: Toggle Dynamics/IK", new Vector2(1000, 43));
-            Game.TinyTextDrawer.Draw(" Right click: Grab and pull", new Vector2(1000, 57));
-            Game.TinyTextDrawer.Draw(" Left click: Pin/unpin bone", new Vector2(1000, 71));
+            Game.DataTextDrawer.Draw("IK Controls:", new Vector2(970, 20));
+            Game.TinyTextDrawer.Draw(" T: Toggle Dynamics/IK", new Vector2(970, 43));
+            Game.TinyTextDrawer.Draw(" Right click: Drag", new Vector2(970, 57));
+            Game.TinyTextDrawer.Draw(" Right click + Left shift: Move", new Vector2(970, 71));
+            Game.TinyTextDrawer.Draw(" Left click: Pin/unpin bone", new Vector2(970, 85));
 
-            Game.DataTextDrawer.Draw("Current mode: ", new Vector2(1000, 99));
+            Game.DataTextDrawer.Draw("Current mode: ", new Vector2(970, 113));
             if (usingIK)
-                Game.DataTextDrawer.Draw("IK", new Vector2(1140, 99));
+                Game.DataTextDrawer.Draw("IK", new Vector2(1110, 113));
             else
-                Game.DataTextDrawer.Draw("Dynamics", new Vector2(1140, 99));
+                Game.DataTextDrawer.Draw("Dynamics", new Vector2(1110, 113));
 
             if (usingIK)
-                Game.TinyTextDrawer.Draw("Solving time (ms): ", elapsedTime * 1000, 2, new Vector2(1000, 127));
+                Game.TinyTextDrawer.Draw(" Solving time (ms): ", elapsedTime * 1000, 2, new Vector2(970, 141));
             Game.UIDrawer.Draw(whitePixel, new Rectangle(Game.Graphics.PreferredBackBufferWidth / 2, Game.Graphics.PreferredBackBufferHeight / 2, 3, 3), Color.LightBlue);
 
         }

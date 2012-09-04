@@ -24,7 +24,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         /// <summary>
         /// Gets or sets the orientation of the bone.
         /// </summary>
-        public Quaternion Orientation;
+        public Quaternion Orientation = Quaternion.Identity;
 
         /// <summary>
         /// The mid-iteration angular velocity associated with the bone.
@@ -161,9 +161,11 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         internal void UpdateInertiaTensor()
         {
             //This is separate from the position update because the orientation can change outside of our iteration loop, so this has to run first.
+            //Iworld^-1 = RT * Ilocal^1 * R
             Matrix3X3 orientationMatrix;
             Matrix3X3.CreateFromQuaternion(ref Orientation, out orientationMatrix);
             Matrix3X3.MultiplyTransposed(ref orientationMatrix, ref localInertiaTensorInverse, out inertiaTensorInverse);
+            Matrix3X3.Multiply(ref inertiaTensorInverse, ref orientationMatrix, out inertiaTensorInverse);
         }
 
         /// <summary>
@@ -187,6 +189,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             //(Well, that and the whole lack of collision detection...)
             linearVelocity = new Vector3();
             angularVelocity = new Vector3();
+            //linearVelocity *= .95f;
         }
 
         internal void ApplyLinearImpulse(ref Vector3 impulse)

@@ -36,11 +36,11 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             Vector3 worldPosition;
             Vector3.Add(ref TargetBone.Position, ref r, out worldPosition);
 
-            //Error is in world space. It gets projected onto the jacobians later.
+            //Error is in world space.
             Vector3 linearError;
             Vector3.Subtract(ref TargetPosition, ref worldPosition, out linearError);
-            Vector3 angularError = Vector3.Zero;
-            ComputeVelocityBias(ref linearError, ref angularError);
+            //This is equivalent to projecting the error onto the linear jacobian. The linear jacobian just happens to be the identity matrix!
+            Vector3.Multiply(ref linearError, errorCorrectionFactor, out velocityBias);
         }
 
 
