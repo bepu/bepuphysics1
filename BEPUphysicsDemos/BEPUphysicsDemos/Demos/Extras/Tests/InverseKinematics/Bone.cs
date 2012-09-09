@@ -63,6 +63,11 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         internal Matrix3X3 localInertiaTensorInverse;
 
         /// <summary>
+        /// An arbitrary scaling factor is applied to the inertia tensor. This tends to improve stability.
+        /// </summary>
+        public static float InertiaTensorScaling = 2.5f;
+
+        /// <summary>
         /// Gets the list of joints affecting this bone.
         /// </summary>
         public ReadOnlyList<IKJoint> Joints
@@ -136,10 +141,23 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         /// <param name="height">Height of the bone.</param>
         /// <param name="mass">Mass of the bone.</param>
         public Bone(Vector3 position, Quaternion orientation, float radius, float height, float mass)
+            :this(position, orientation, radius, height)
         {
+            Mass = mass;
+        }
+
+        /// <summary>
+        /// Constructs a new bone. Assumes the mass will be set later.
+        /// </summary>
+        /// <param name="position">Initial position of the bone.</param>
+        /// <param name="orientation">Initial orientation of the bone.</param>
+        /// <param name="radius">Radius of the bone.</param>
+        /// <param name="height">Height of the bone.</param>
+        public Bone(Vector3 position, Quaternion orientation, float radius, float height)
+        {
+            inverseMass = 1;
             Position = position;
             Orientation = orientation;
-            Mass = mass;
             Radius = radius;
             Height = height;
         }
@@ -148,9 +166,10 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         void ComputeLocalInertiaTensor()
         {
             var localInertiaTensor = new Matrix3X3();
-            float diagValue = (.0833333333f * Height * Height + .25f * Radius * Radius) * Mass;
+            var multiplier = Mass * InertiaTensorScaling;
+            float diagValue = (.0833333333f * Height * Height + .25f * Radius * Radius) * multiplier;
             localInertiaTensor.M11 = diagValue;
-            localInertiaTensor.M22 = .5f * Radius * Radius * Mass;
+            localInertiaTensor.M22 = .5f * Radius * Radius * multiplier;
             localInertiaTensor.M33 = diagValue;
             Matrix3X3.Invert(ref localInertiaTensor, out localInertiaTensorInverse);
         }
@@ -189,7 +208,6 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             //(Well, that and the whole lack of collision detection...)
             linearVelocity = new Vector3();
             angularVelocity = new Vector3();
-            //linearVelocity *= .95f;
         }
 
         internal void ApplyLinearImpulse(ref Vector3 impulse)
@@ -206,5 +224,27 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             Vector3.Add(ref velocityChange, ref angularVelocity, out angularVelocity);
         }
 
+        /// <summary>
+        /// Used by the per-control traversals to find stressed paths.
+        /// It has to be separate from the IsActive flag because the IsActive flag is used in the same traversal
+        /// to denote all visited bones (including unstressed ones).
+        /// Also used in the unstressed traversals; FindCycles uses the IsActive flag and the following DistributeMass phase uses the traversed flag.
+        /// </summary>
+        internal bool traversed;
+
+        /// <summary>
+        /// The number of stressed paths which use this bone. A stressed path is a possible path between a pin and a control.
+        /// </summary>
+        internal int stressCount;
+
+        /// <summary>
+        /// Parent of the bone in the unstressed dependency analysis. Allows analysis of the tree after the traversal and backwards traversal without exiting recursion.
+        /// </summary>
+        internal Bone parent;
+
+        /// <summary>
+        /// True of the bone is a member of a cycle in an unstressed part of the graph. False if the bone is either stressed or in an acyclic unstressed part of the graph.
+        /// </summary>
+        internal bool unstressedCycle;
     }
 }

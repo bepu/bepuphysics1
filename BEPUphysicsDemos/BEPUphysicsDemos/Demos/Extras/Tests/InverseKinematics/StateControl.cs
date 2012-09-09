@@ -80,5 +80,15 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             LinearMotor.ClearAccumulatedImpulses();
             AngularMotor.ClearAccumulatedImpulses();
         }
+
+        protected internal override float MaximumImpulse
+        {
+            get { return LinearMotor.MaximumImpulse; }
+            set
+            {
+                LinearMotor.MaximumImpulse = value;
+                AngularMotor.MaximumImpulse = value;
+            }
+        }
     }
 }

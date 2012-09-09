@@ -42,5 +42,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         protected internal abstract void SolveVelocityIteration();
 
         protected internal abstract void ClearAccumulatedImpulses();
+
+        protected internal abstract float MaximumImpulse { get; set; }
     }
 }
