@@ -51,6 +51,16 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         public int VelocitySubiterationCount { get; set; }
 
         /// <summary>
+        /// Gets or sets whether or not to scale control impulses such that they fit well with the mass of objects and the number of iterations.
+        /// </summary>
+        public bool AutoscaleControlImpulses { get; set; }
+
+        /// <summary>
+        /// Gets or sets the maximum impulse the controls will try to push bones with when AutoscaleControlImpulses is enabled.
+        /// </summary>
+        public float AutoscaleControlMaximumForce { get; set; }
+
+        /// <summary>
         /// Constructs a new IKSolver.
         /// </summary>
         public IKSolver()
@@ -68,6 +78,15 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         {
             //Update the list of active joints.
             ActiveSet.UpdateActiveSet(controls);
+
+            if (AutoscaleControlImpulses)
+            {
+                //Update the control strengths to match the mass of the target bones and the desired maximum force.
+                foreach (var control in controls)
+                {
+                    control.MaximumImpulse = control.TargetBone.Mass * AutoscaleControlMaximumForce / ControlIterationCount;
+                }
+            }
 
 
             //Go through the set of controls and active joints, updating the state of bones.
