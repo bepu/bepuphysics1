@@ -238,12 +238,13 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         internal int stressCount;
 
         /// <summary>
-        /// Parent of the bone in the unstressed dependency analysis. Allows analysis of the tree after the traversal and backwards traversal without exiting recursion.
+        /// The set of parents of a given bone in a traversal. This is like a list of parents; there can be multiple incoming paths and they all need to be kept handy in order to perform some traversal details.
         /// </summary>
-        internal Bone parent;
+        internal List<Bone> predecessors = new List<Bone>();
 
         /// <summary>
-        /// True of the bone is a member of a cycle in an unstressed part of the graph. False if the bone is either stressed or in an acyclic unstressed part of the graph.
+        /// True of the bone is a member of a cycle in an unstressed part of the graph or an unstressed predecessor of an unstressed cycle.
+        /// Marking all the predecessors is conceptually simpler than attempting to mark the cycles in isolation.
         /// </summary>
         internal bool unstressedCycle;
     }
