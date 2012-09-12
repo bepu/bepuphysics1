@@ -80,15 +80,13 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
                 //that happens after a pin or stressed path is found.
                 FindStressedPaths(control.TargetBone);
 
-                //The stressed traversal state needs to be reset for each control; it will be reused by the next control.
-                //(cannot reuse the old stressed states without clearing them; each control 'layer' is added to the last
-                //to figure out the points with the greatest degree of dependency (StressCount).)
+                //We've analyzed the whole graph for this control. Clean up the bits we used.
                 foreach (var bone in bones)
                 {
                     bone.traversed = false;
                     bone.IsActive = false;
+                    bone.predecessors.Clear();
                 }
-                //Don't forget to clear out the accumulated bones list!
                 bones.Clear();
             }
 
@@ -96,6 +94,22 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
 
         }
 
+        void NotifyPredecessorsOfStress(Bone bone)
+        {
+            //We don't need to tell already-stressed bones about the fact that they are stressed.
+            //Their predecessors are already stressed either by previous notifications like this or
+            //through the predecessors being added on after the fact and seeing that the path was stressed.
+            if (!bone.traversed)
+            {
+                bone.traversed = true;
+                bone.stressCount++;
+                foreach (var predecessor in bone.predecessors)
+                {
+
+                    NotifyPredecessorsOfStress(predecessor);
+                }
+            }
+        }
         void FindStressedPaths(Bone bone)
         {
             bone.IsActive = true; //We must keep track of which bones have been visited
@@ -103,37 +117,50 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             foreach (var joint in bone.joints)
             {
                 Bone boneToAnalyze = joint.ConnectionA == bone ? joint.ConnectionB : joint.ConnectionA;
-                if (boneToAnalyze.IsActive)
-                {
-                    //The bone has already been visited. We should not proceed.
+                if (bone.predecessors.Contains(boneToAnalyze)) //boneToAnalyze is a parent of bone. Don't revisit them, that's where we came from!
                     continue;
-                }
+                //The boneToAnalyze is reached by following a path from bone. We record this regardless of whether or not we traverse further.
+                boneToAnalyze.predecessors.Add(bone);
+
                 if (boneToAnalyze.Pinned || boneToAnalyze.traversed)
                 {
                     //This bone is connected to a pinned bone (or a bone which is directly or indirectly connected to a pinned bone)!
-                    //This bone and all of its parents returning to the root are a part of a 'stressed path.'
+                    //This bone and all of its predecessors are a part of a 'stressed path.'
                     //This backwards notification is necessary because this depth first search could attempt a deep branch which winds 
                     //its way back up to a part of the graph which SHOULD be marked as stressed, but is not yet marked because this path
                     //has not popped its way all the way up the stack yet! Left untreated, this would lead to missed stressed paths.
-                    Bone traversalBone = bone;
-                    while (true)
-                    {
-                        traversalBone.stressCount++;
-                        traversalBone.traversed = true;
-                        if (traversalBone.parent == null ||
-                            traversalBone.parent.traversed)//If the parent is already stressed, it got the message from another path. We don't need to/shouldn't proceed.
-                            break;
-                        traversalBone = traversalBone.parent;
-                    }
+                    NotifyPredecessorsOfStress(bone);
+                    continue;
+                }
+                if (boneToAnalyze.IsActive)
+                {
+                    //The bone has already been visited. We should not proceed.
+                    //Any bone which is visited but not stressed is either A: not fully explored yet or B: fully explored.
+                    //Given that we followed an unexplored path to the bone, it must be not fully explored.
+                    //However, we do not attempt to perform exploration on the bone: any not-yet-fully-explored bones
+                    //must belong to one of our parents in the DFS! They will take care of it.
                     continue;
                 }
 
                 //The search hasn't yet found a stressed path or pinned bone yet.
                 //Keep on movin' on!
-                //Keep the parent pointer handy so that we can work our way back up when we find a pin or stressed path.
-                boneToAnalyze.parent = bone;
                 FindStressedPaths(boneToAnalyze);
                 //If a child finds a pin, we will be notified of that fact by the above while loop which traverses the parent pointers.
+            }
+
+
+        }
+
+        void NotifyPredecessorsOfCycle(Bone bone)
+        {
+            //Rather than attempting to only mark cycles, this will simply mark all of the cycle elements and any cycle predecessors up to the unstressed root.
+            if (!bone.unstressedCycle && bone.stressCount == 0)
+            {
+                bone.unstressedCycle = true;
+                foreach (var predecessor in bone.predecessors)
+                {
+                    NotifyPredecessorsOfCycle(predecessor);
+                }
             }
         }
 
@@ -143,33 +170,23 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             foreach (var joint in bone.joints)
             {
                 Bone boneToAnalyze = joint.ConnectionA == bone ? joint.ConnectionB : joint.ConnectionA;
-                if (boneToAnalyze == bone.parent)
-                    continue; //Don't consider the parent. We can't only test for activity to avoid it; that is how we find cycles.
+
+                if (bone.predecessors.Contains(boneToAnalyze))//Do not attempt to traverse a path which leads to this bone.
+                    continue;
+                //We found this bone. Regardless of what happens after, make sure that the bone knows about this path.
+                boneToAnalyze.predecessors.Add(bone);
+
                 if (boneToAnalyze.IsActive)
                 {
                     //This bone is butting up against a node which was previously visited.
                     //Based on the previous stress path computation, there is only one entry point into an unstressed part of the graph.
                     //by the previous condition, we know it's not our immediate parent. We hit an unstressed part of the graph.
-                    //The unstressed part of the graph is explored by this DFS, taking the deepest branches first.
-                    //If we've ran into an already-visited bone which isn't our *direct* parent,
-                    //it must in the chain of our parents up to the root of the unstressed part of the graph or
-                    //it would have already been explored by the DFS.
 
                     //In other words, this is an unstressed cycle.
 
-                    //Because we know the hit node is one of our (potentially distant great-*) grandparents,
-                    //the parent path can be traversed until the bone is found. All bones along the path are
-                    //marked as cyclic.
-                    Bone traversalBone = bone;
-                    while (true)
-                    {
-                        traversalBone.unstressedCycle = true;
-                        if (traversalBone == boneToAnalyze)
-                            break;
-                        //Note: It is not possible for the parent to be null before boneToAnalyze is found; there is no need to test for it.
-                        traversalBone = traversalBone.parent;
-                    }
-                    //Note: We do not stop the DFS here or anything like that. It just continues regularly, looking for more paths.
+                    //Rather than attempting to only mark cycles, this will simply mark all of the cycle elements and any cycle predecessors up to the unstressed root.
+                    NotifyPredecessorsOfCycle(bone);
+                    continue;
                 }
                 //Note that no testing for pinned bones is necessary; based on the previous stressed path searches,
                 //any unstressed bone is known to not be a path to any pinned bones.
@@ -179,7 +196,6 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
                 boneToAnalyze.IsActive = true;
                 bones.Add(boneToAnalyze);
                 FindCycles(boneToAnalyze);
-                //Don't have to assign parent pointers; the stress path calculation already did that for us.
             }
         }
 
@@ -191,49 +207,51 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             {
                 Bone boneToAnalyze = joint.ConnectionA == bone ? joint.ConnectionB : joint.ConnectionA;
 
-                if (boneToAnalyze.traversed)
+                if (boneToAnalyze.traversed || boneToAnalyze.unstressedCycle) // bone.predecessors.Contains(boneToAnalyze))
                 {
                     //The bone was already visited or was a member of the stressed path we branched from. Do not proceed.
                     continue;
                 }
                 numberOfChildren++;
             }
-            if (numberOfChildren > 0)
+            //We distribute a portion of the current bone's total mass to the child bones.
+            //By applying a multiplier automassUnstressedFalloff, we guarantee that a chain has a certain maximum weight (excluding cycles).
+            //This is thanks to the convergent geometric series sum(automassUnstressedFalloff^n, 1, infinity).
+            float massPerChild = numberOfChildren > 0 ? automassUnstressedFalloff * bone.Mass / numberOfChildren : 0;
+
+            //(If the number of children is 0, then the only bones which can exist are either bones which were already traversed and will be skipped
+            //or bones which are members of unstressed cycles and will inherit the full parent weight. Don't have to worry about the 0 mass.)
+
+            //The current bone is known to not be stressed.
+            foreach (var joint in bone.joints)
             {
-                //We distribute a portion of the current bone's total mass to the child bones.
-                //By applying a multiplier automassUnstressedFalloff, we guarantee that a chain has a certain maximum weight (excluding cycles).
-                //This is thanks to the convergent geometric series sum(automassUnstressedFalloff^n, 1, infinity).
-                float massPerChild = automassUnstressedFalloff * bone.Mass / numberOfChildren;
-                //The current bone is known to not be stressed.
-                foreach (var joint in bone.joints)
+                Bone boneToAnalyze = joint.ConnectionA == bone ? joint.ConnectionB : joint.ConnectionA;
+                //Note that no testing for pinned bones is necessary; based on the previous stressed path searches,
+                //any unstressed bone is known to not be a path to any pinned bones.
+                if (boneToAnalyze.traversed)// || bone.unstressedCycle)//bone.predecessors.Contains(boneToAnalyze))
                 {
-                    Bone boneToAnalyze = joint.ConnectionA == bone ? joint.ConnectionB : joint.ConnectionA;
-                    //Note that no testing for pinned bones is necessary; based on the previous stressed path searches,
-                    //any unstressed bone is known to not be a path to any pinned bones.
-                    if (boneToAnalyze.traversed)
-                    {
-                        //The bone was already visited or was a member of the stressed path we branched from. Do not proceed.
-                        continue;
-                    }
-
-                    if (boneToAnalyze.unstressedCycle)
-                    {
-                        //This bone is part of a cycle! We cannot give it less mass; that would add in a potential instability.
-                        //Just give it the current node's full mass.
-                        boneToAnalyze.Mass = bone.Mass;
-                    }
-                    else
-                    {
-                        //This bone is not a part of a cycle; give it the allotted mass.
-                        boneToAnalyze.Mass = massPerChild;
-                    }
-                    //The root bone is already added to the traversal set; add the children.
-                    boneToAnalyze.traversed = true;
-                    //Note that we do not need to add anything to the bones list here; the previous FindCycles DFS on this unstressed part of the graph did it for us.
-                    DistributeMass(boneToAnalyze);
-
+                    //The bone was already visited or was a member of the stressed path we branched from. Do not proceed.
+                    continue;
                 }
+
+                if (boneToAnalyze.unstressedCycle)
+                {
+                    //This bone is part of a cycle! We cannot give it less mass; that would add in a potential instability.
+                    //Just give it the current node's full mass.
+                    boneToAnalyze.Mass = bone.Mass;
+                }
+                else
+                {
+                    //This bone is not a part of a cycle; give it the allotted mass.
+                    boneToAnalyze.Mass = massPerChild;
+                }
+                //The root bone is already added to the traversal set; add the children.
+                boneToAnalyze.traversed = true;
+                //Note that we do not need to add anything to the bones list here; the previous FindCycles DFS on this unstressed part of the graph did it for us.
+                DistributeMass(boneToAnalyze);
+
             }
+
         }
 
         void DistributeMass(List<Control> controls)
@@ -302,6 +320,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
                         boneToAdd.IsActive = true;
                         //A second traversal flag is required for the mass distribution phase on each unstressed part to work efficiently.
                         boneToAdd.traversed = true;
+                        boneToAdd.predecessors.Add(bone);
                         //The bone was not already present in the active set. We should visit it!
                         //Note that a bone is added to the visited bone set before it is actually processed.
                         //This prevents a bone from being put in the queue redundantly.
@@ -314,16 +333,23 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             //Clean the bones up!
             for (int i = 0; i < bones.Count; i++)
             {
+                //Use this to visualize the flags for debugging purposes.
+                //if (bones[i].stressCount > 0)
+                //    bones[i].Mass = 2;
+                //else if (bones[i].unstressedCycle)
+                //    bones[i].Mass = .5f;
+                //else
+                //    bones[i].Mass = 0.01f;
                 bones[i].IsActive = false;
                 bones[i].traversed = false;
                 bones[i].stressCount = 0;
-                bones[i].parent = null;
+                bones[i].unstressedCycle = false;
             }
             bones.Clear();
         }
 
 
-
+        
 
         /// <summary>
         /// Updates the ordered set of active joints.
@@ -342,8 +368,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             {
                 bones[i].IsActive = false;
                 bones[i].stressCount = 0;
-                bones[i].parent = null;
-                bones[i].Mass = 1;
+                bones[i].predecessors.Clear();
+                bones[i].Mass = .01f;
             }
             for (int i = 0; i < joints.Count; i++)
             {
@@ -359,22 +385,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
 
                 //Compute the dependency graph for all the unstressed bones and assign masses.
                 DistributeMass(controls);
-
-                ////All the stress counts and dependency counts are now available on each bone.
-
-                //foreach (var bone in bones)
-                //{
-                //    bone.IsActive = false;
-                //    if (bone.stressCount > 0)
-                //        bone.Mass = bone.stressCount;
-                //    else
-                //        bone.Mass = .5f; //For now, just arbitrarily choose a low mass for all unstressed paths (a fraction of the weight of a one-path stressed bone).
-                //    //Keep in mind here that the parents are still not null for unstressed things!
-                //}
-
-                ////Clear out all the touched bones in preparation for the upcoming traversal.
-                //bones.Clear();
-            }
+           }
 
             //While we have traversed the whole active set in the previous stressed/unstressed searches, we do not yet have a proper breadth-first constraint ordering available.
 

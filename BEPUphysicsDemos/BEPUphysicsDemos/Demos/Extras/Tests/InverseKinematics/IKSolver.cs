@@ -66,8 +66,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         public IKSolver()
         {
             ActiveSet = new ActiveSet();
-            ControlIterationCount = 100;
-            FixerIterationCount = 150;
+            ControlIterationCount = 50;
+            FixerIterationCount = 70;
             VelocitySubiterationCount = 2;
         }
 

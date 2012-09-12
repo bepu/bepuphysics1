@@ -227,6 +227,137 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
 
         }
 
+        void BuildCyclicMesh(Vector3 position)
+        {
+            int widthCount = 5;
+            int heightCount = 5;
+            var boneMesh = new BoneRelationship[widthCount, heightCount];
+            for (int i = 0; i < widthCount; i++)
+            {
+                for (int j = 0; j < heightCount; j++)
+                {
+                    var bonePosition = position + new Vector3(i, j, 0);
+                    boneMesh[i, j] = new BoneRelationship(
+                        new Bone(bonePosition, Quaternion.Identity, .4f, .8f),
+                        new Box(bonePosition, .8f, .8f, .8f, 10));
+                    Space.Add(boneMesh[i, j].Entity);
+                    bones.Add(boneMesh[i, j]);
+                }
+            }
+
+            for (int i = 0; i < widthCount; i++)
+            {
+                for (int j = 0; j < heightCount; j++)
+                {
+                    if (i > 0)
+                    {
+                        var boneA = boneMesh[i, j];
+                        var boneB = boneMesh[i - 1, j];
+                        var anchor = (boneA.Entity.Position + boneB.Entity.Position) / 2;
+                        var dynamicsJoint = new BallSocketJoint(boneA.Entity, boneB.Entity, anchor);
+                        CollisionRules.AddRule(boneA.Entity, boneB.Entity, CollisionRule.NoBroadPhase);
+                        Space.Add(dynamicsJoint);
+                        var ikJoint = new IKBallSocketJoint(boneA.Bone, boneB.Bone, anchor);
+                    }
+                    if (j > 0)
+                    {
+                        var boneA = boneMesh[i, j];
+                        var boneB = boneMesh[i, j - 1];
+                        var anchor = (boneA.Entity.Position + boneB.Entity.Position) / 2;
+                        var dynamicsJoint = new BallSocketJoint(boneA.Entity, boneB.Entity, anchor);
+                        CollisionRules.AddRule(boneA.Entity, boneB.Entity, CollisionRule.NoBroadPhase);
+                        Space.Add(dynamicsJoint);
+                        var ikJoint = new IKBallSocketJoint(boneA.Bone, boneB.Bone, anchor);
+                    }
+                    if (i > 0 && j > 0)
+                    {
+                        var boneA = boneMesh[i, j];
+                        var boneB = boneMesh[i - 1, j - 1];
+                        var anchor = (boneA.Entity.Position + boneB.Entity.Position) / 2;
+                        var dynamicsJoint = new BallSocketJoint(boneA.Entity, boneB.Entity, anchor);
+                        CollisionRules.AddRule(boneA.Entity, boneB.Entity, CollisionRule.NoBroadPhase);
+                        Space.Add(dynamicsJoint);
+                        var ikJoint = new IKBallSocketJoint(boneA.Bone, boneB.Bone, anchor);
+                    }
+
+                    if (i < widthCount - 1 && j > 0)
+                    {
+                        var boneA = boneMesh[i, j];
+                        var boneB = boneMesh[i + 1, j - 1];
+                        var anchor = (boneA.Entity.Position + boneB.Entity.Position) / 2;
+                        var dynamicsJoint = new BallSocketJoint(boneA.Entity, boneB.Entity, anchor);
+                        CollisionRules.AddRule(boneA.Entity, boneB.Entity, CollisionRule.NoBroadPhase);
+                        Space.Add(dynamicsJoint);
+                        var ikJoint = new IKBallSocketJoint(boneA.Bone, boneB.Bone, anchor);
+                    }
+                }
+            }
+
+            int limbCount = 4;
+
+            var previous = boneMesh[boneMesh.GetLength(0) / 2, 0];
+
+            for (int i = 0; i < limbCount; i++)
+            {
+                Bone bone = new Bone(previous.Bone.Position + new Vector3(0, -0.8f, 0), Quaternion.Identity, .2f, .4f);
+                Entity entity = new Box(bone.Position, .4f, .4f, .4f, 10);
+                Space.Add(entity);
+                var anchor = (entity.Position + previous.Entity.Position) / 2;
+                Space.Add(new BallSocketJoint(entity, previous.Entity, anchor));
+                var ikJoint = new IKBallSocketJoint(bone, previous.Bone, anchor);
+                CollisionRules.AddRule(entity, previous.Entity, CollisionRule.NoBroadPhase);
+                previous = new BoneRelationship(bone, entity);
+                bones.Add(previous);
+            }
+
+            previous = boneMesh[boneMesh.GetLength(0) / 2, boneMesh.GetLength(1) - 1];
+
+            for (int i = 0; i < limbCount; i++)
+            {
+                Bone bone = new Bone(previous.Bone.Position + new Vector3(0, 0.8f, 0), Quaternion.Identity, .2f, .4f);
+                Entity entity = new Box(bone.Position, .4f, .4f, .4f, 10);
+                Space.Add(entity);
+                var anchor = (entity.Position + previous.Entity.Position) / 2;
+                Space.Add(new BallSocketJoint(entity, previous.Entity, anchor));
+                CollisionRules.AddRule(entity, previous.Entity, CollisionRule.NoBroadPhase);
+                var ikJoint = new IKBallSocketJoint(bone, previous.Bone, anchor);
+                previous = new BoneRelationship(bone, entity);
+                bones.Add(previous);
+            }
+
+            previous = boneMesh[0, boneMesh.GetLength(1) / 2];
+
+            for (int i = 0; i < limbCount; i++)
+            {
+                Bone bone = new Bone(previous.Bone.Position + new Vector3(-.8f, 0, 0), Quaternion.Identity, .2f, .4f);
+                Entity entity = new Box(bone.Position, .4f, .4f, .4f, 10);
+                Space.Add(entity);
+                var anchor = (entity.Position + previous.Entity.Position) / 2;
+                Space.Add(new BallSocketJoint(entity, previous.Entity, anchor));
+                CollisionRules.AddRule(entity, previous.Entity, CollisionRule.NoBroadPhase);
+                var ikJoint = new IKBallSocketJoint(bone, previous.Bone, anchor);
+                previous = new BoneRelationship(bone, entity);
+                bones.Add(previous);
+            }
+
+
+            previous = boneMesh[boneMesh.GetLength(0) - 1, boneMesh.GetLength(1) / 2];
+
+            for (int i = 0; i < limbCount; i++)
+            {
+                Bone bone = new Bone(previous.Bone.Position + new Vector3(0.8f, 0, 0), Quaternion.Identity, .2f, .4f);
+                Entity entity = new Box(bone.Position, .4f, .4f, .4f, 10);
+                Space.Add(entity);
+                var anchor = (entity.Position + previous.Entity.Position) / 2;
+                Space.Add(new BallSocketJoint(entity, previous.Entity, anchor));
+                CollisionRules.AddRule(entity, previous.Entity, CollisionRule.NoBroadPhase);
+                var ikJoint = new IKBallSocketJoint(bone, previous.Bone, anchor);
+                previous = new BoneRelationship(bone, entity);
+                bones.Add(previous);
+            }
+
+        }
+
         /// <summary>
         /// Constructs a new demo.
         /// </summary>
@@ -253,7 +384,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             BuildActionFigure(new Vector3(5, 5, 3));
             BuildActionFigure(new Vector3(5, 5, 8));
 
-
+            BuildCyclicMesh(new Vector3(-5, 5, -5));
 
 
             //Create the display objects.
