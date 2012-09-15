@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using BEPUphysics;
 using BEPUphysics.CollisionRuleManagement;
+using BEPUphysics.Constraints.TwoEntity.JointLimits;
 using BEPUphysics.Constraints.TwoEntity.Joints;
 using BEPUphysics.Constraints.TwoEntity.Motors;
 using BEPUphysics.Entities;
@@ -360,6 +361,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
 
         void BuildJointTest(Vector3 position)
         {
+            ////DISTANCE JOINT
+
             //Bone a, b;
             //a = new Bone(new Vector3(0, 5, 0), Quaternion.Identity, .5f, 1);
             //b = new Bone(new Vector3(0, 7, 0), Quaternion.Identity, .5f, 1);
@@ -373,6 +376,27 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             //Space.Add(distanceJoint);
             //bones.Add(new BoneRelationship(a, entityA));
             //bones.Add(new BoneRelationship(b, entityB));
+
+            //SWING LIMIT
+            //solver.FixerIterationCount = 0;
+            //solver.ControlIterationCount = 1;
+
+            Bone a, b;
+            a = new Bone(new Vector3(0, 5, 0), Quaternion.Identity, .5f, 1);
+            b = new Bone(new Vector3(0, 7, 0), Quaternion.Identity, .5f, 1);
+            var ikJoint = new IKBallSocketJoint(a, b, (a.Position + b.Position) * 0.5f);
+            var ikLimit = new IKSwingLimit(a, b, Vector3.Up, Vector3.Up, MathHelper.PiOver2);
+
+            var entityA = new Cylinder(a.Position, 1, 0.5f, 10);
+            var entityB = new Cylinder(b.Position, 1, 0.5f, 10);
+            var joint = new BallSocketJoint(entityA, entityB, (a.Position + b.Position) * 0.5f);
+            var limit = new SwingLimit(entityA, entityB, Vector3.Up, Vector3.Up, MathHelper.PiOver2);
+            Space.Add(entityA);
+            Space.Add(entityB);
+            Space.Add(joint);
+            Space.Add(limit);
+            bones.Add(new BoneRelationship(a, entityA));
+            bones.Add(new BoneRelationship(b, entityB));
         }
 
         /// <summary>

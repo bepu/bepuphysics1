@@ -125,7 +125,9 @@
     <Compile Include="Demos\Extras\Tests\InverseKinematics\IKConstraint.cs" />
     <Compile Include="Demos\Extras\Tests\InverseKinematics\IKDistanceJoint.cs" />
     <Compile Include="Demos\Extras\Tests\InverseKinematics\IKJoint.cs" />
+    <Compile Include="Demos\Extras\Tests\InverseKinematics\IKLimit.cs" />
     <Compile Include="Demos\Extras\Tests\InverseKinematics\IKSolver.cs" />
+    <Compile Include="Demos\Extras\Tests\InverseKinematics\IKSwingLimit.cs" />
     <Compile Include="Demos\Extras\Tests\InverseKinematics\SingleBoneAngularMotor.cs" />
     <Compile Include="Demos\Extras\Tests\InverseKinematics\SingleBoneConstraint.cs" />
     <Compile Include="Demos\Extras\Tests\InverseKinematics\SingleBoneLinearMotor.cs" />
