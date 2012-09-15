@@ -137,6 +137,7 @@
     <Compile Include="Demos\Extras\Tests\InverseKinematics\ActiveSet.cs" />
     <Compile Include="Demos\Extras\Tests\InverseKinematics\Bone.cs" />
     <Compile Include="Demos\Extras\Tests\InverseKinematics\Control.cs" />
+    <Compile Include="Demos\Extras\Tests\InverseKinematics\IKRevoluteJoint.cs" />
     <Compile Include="Demos\Extras\Tests\InverseKinematics\IKLimit.cs" />
     <Compile Include="Demos\Extras\Tests\InverseKinematics\IKSwingLimit.cs" />
     <Compile Include="Demos\Extras\Tests\InverseKinematics\IKDistanceJoint.cs" />
