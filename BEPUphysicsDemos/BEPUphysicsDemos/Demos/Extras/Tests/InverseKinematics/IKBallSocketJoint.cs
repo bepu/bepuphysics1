@@ -51,6 +51,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             Vector3 rA;
             Vector3.Transform(ref LocalOffsetA, ref ConnectionA.Orientation, out rA);
             Matrix3X3.CreateCrossProduct(ref rA, out angularJacobianA);
+            //Transposing a skew-symmetric matrix is equivalent to negating it.
+            Matrix3X3.Transpose(ref angularJacobianA, out angularJacobianA);
 
             Vector3 worldPositionA;
             Vector3.Add(ref ConnectionA.Position, ref rA, out worldPositionA);
@@ -58,8 +60,6 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             Vector3 rB;
             Vector3.Transform(ref LocalOffsetB, ref ConnectionB.Orientation, out rB);
             Matrix3X3.CreateCrossProduct(ref rB, out angularJacobianB);
-            //Transposing a skew-symmetric matrix is equivalent to negating it.
-            Matrix3X3.Transpose(ref angularJacobianB, out angularJacobianB);
 
             Vector3 worldPositionB;
             Vector3.Add(ref ConnectionB.Position, ref rB, out worldPositionB);

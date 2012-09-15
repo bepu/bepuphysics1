@@ -358,6 +358,23 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
 
         }
 
+        void BuildJointTest(Vector3 position)
+        {
+            //Bone a, b;
+            //a = new Bone(new Vector3(0, 5, 0), Quaternion.Identity, .5f, 1);
+            //b = new Bone(new Vector3(0, 7, 0), Quaternion.Identity, .5f, 1);
+            //var ikDistanceJoint = new IKDistanceJoint(a, b, a.Position + new Vector3(0, .5f, 0), b.Position - new Vector3(0, .5f, 0));
+
+            //var entityA = new Cylinder(a.Position, 1, 0.5f, 10);
+            //var entityB = new Cylinder(b.Position, 1, 0.5f, 10);
+            //var distanceJoint = new DistanceJoint(entityA, entityB, ikDistanceJoint.AnchorA, ikDistanceJoint.AnchorB);
+            //Space.Add(entityA);
+            //Space.Add(entityB);
+            //Space.Add(distanceJoint);
+            //bones.Add(new BoneRelationship(a, entityA));
+            //bones.Add(new BoneRelationship(b, entityB));
+        }
+
         /// <summary>
         /// Constructs a new demo.
         /// </summary>
@@ -385,6 +402,11 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             BuildActionFigure(new Vector3(5, 5, 8));
 
             BuildCyclicMesh(new Vector3(-5, 5, -5));
+
+
+            BuildJointTest(new Vector3(0, 5, 0));
+
+
 
 
             //Create the display objects.

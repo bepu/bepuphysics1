@@ -25,7 +25,7 @@ using BEPUphysics.Constraints.TwoEntity.Motors;
 namespace BEPUphysicsDemos.Demos
 {
     /// <summary>
-    /// Demo showing a wall of blocks stacked up.
+    /// Demo showing a set of entity meshes capable of dynamic movement.
     /// </summary>
     public class MobileMeshDemo : StandardDemo
     {

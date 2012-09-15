@@ -32,6 +32,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             Vector3 r;
             Vector3.Transform(ref LocalOffset, ref TargetBone.Orientation, out r);
             Matrix3X3.CreateCrossProduct(ref r, out angularJacobian);
+            //Transposing a skew symmetric matrix is equivalent to negating it.
+            Matrix3X3.Transpose(ref angularJacobian, out angularJacobian);
 
             Vector3 worldPosition;
             Vector3.Add(ref TargetBone.Position, ref r, out worldPosition);
