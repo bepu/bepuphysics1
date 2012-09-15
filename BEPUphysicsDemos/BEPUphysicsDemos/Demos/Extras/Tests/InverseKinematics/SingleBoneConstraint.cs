@@ -61,11 +61,11 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             //Recall the jacobian takes impulses from world space into constraint space, and transpose takes them from constraint space into world space.
             //Compute and apply linear impulse.
             Vector3 impulse;
-            Matrix3X3.TransformTranspose(ref accumulatedImpulse, ref linearJacobian, out impulse);
+            Matrix3X3.Transform(ref accumulatedImpulse, ref linearJacobian, out impulse);
             TargetBone.ApplyLinearImpulse(ref impulse);
 
             //Compute and apply angular impulse.
-            Matrix3X3.TransformTranspose(ref accumulatedImpulse, ref angularJacobian, out impulse);
+            Matrix3X3.Transform(ref accumulatedImpulse, ref angularJacobian, out impulse);
             TargetBone.ApplyAngularImpulse(ref impulse);
         }
 
@@ -74,9 +74,9 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             //Compute the 'relative' linear and angular velocities. For single bone constraints, it's based entirely on the one bone's velocities!
             //They have to be pulled into constraint space first to compute the necessary impulse, though.
             Vector3 linearContribution;
-            Matrix3X3.Transform(ref TargetBone.linearVelocity, ref linearJacobian, out linearContribution);
+            Matrix3X3.TransformTranspose(ref TargetBone.linearVelocity, ref linearJacobian, out linearContribution);
             Vector3 angularContribution;
-            Matrix3X3.Transform(ref TargetBone.angularVelocity, ref angularJacobian, out angularContribution);
+            Matrix3X3.TransformTranspose(ref TargetBone.angularVelocity, ref angularJacobian, out angularContribution);
 
             //The constraint velocity error will be the velocity we try to remove.
             Vector3 constraintVelocityError;
@@ -112,9 +112,9 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             //The constraint space impulse now represents the impulse we want to apply to the bone... but in constraint space.
             //Bring it out to world space using the transposed jacobian.
             Vector3 linearImpulse;
-            Matrix3X3.TransformTranspose(ref constraintSpaceImpulse, ref linearJacobian, out linearImpulse);
+            Matrix3X3.Transform(ref constraintSpaceImpulse, ref linearJacobian, out linearImpulse);
             Vector3 angularImpulse;
-            Matrix3X3.TransformTranspose(ref constraintSpaceImpulse, ref angularJacobian, out angularImpulse);
+            Matrix3X3.Transform(ref constraintSpaceImpulse, ref angularJacobian, out angularImpulse);
 
             //Apply them!
             TargetBone.ApplyLinearImpulse(ref linearImpulse);

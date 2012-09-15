@@ -534,7 +534,7 @@ namespace BEPUphysics.MathExtensions
         /// </summary>
         /// <param name="matrix">Matrix to be inverted.</param>
         /// <param name="result">Inverted matrix.</param>
-        internal static void AdaptiveInvert(ref Matrix3X3 matrix, out Matrix3X3 result)
+        public static void AdaptiveInvert(ref Matrix3X3 matrix, out Matrix3X3 result)
         {
             int submatrix;
             float determinantInverse = 1 / matrix.AdaptiveDeterminant(out submatrix);
