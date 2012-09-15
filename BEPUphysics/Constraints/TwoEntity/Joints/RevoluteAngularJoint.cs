@@ -86,7 +86,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Joints
         /// </summary>
         public Vector3 WorldFreeAxisA
         {
-            get { return localAxisA; }
+            get { return worldAxisA; }
             set
             {
                 worldAxisA = Vector3.Normalize(value);
@@ -101,7 +101,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Joints
         /// </summary>
         public Vector3 WorldFreeAxisB
         {
-            get { return localAxisB; }
+            get { return worldAxisB; }
             set
             {
                 worldAxisB = Vector3.Normalize(value);

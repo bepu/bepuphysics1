@@ -386,15 +386,18 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             b = new Bone(new Vector3(0, 7, 0), Quaternion.Identity, .5f, 1);
             var ikJoint = new IKBallSocketJoint(a, b, (a.Position + b.Position) * 0.5f);
             var ikLimit = new IKSwingLimit(a, b, Vector3.Up, Vector3.Up, MathHelper.PiOver2);
+            var ikRevolute = new IKRevoluteJoint(a, b, Vector3.Right);
 
             var entityA = new Cylinder(a.Position, 1, 0.5f, 10);
             var entityB = new Cylinder(b.Position, 1, 0.5f, 10);
             var joint = new BallSocketJoint(entityA, entityB, (a.Position + b.Position) * 0.5f);
             var limit = new SwingLimit(entityA, entityB, Vector3.Up, Vector3.Up, MathHelper.PiOver2);
+            var revolute = new RevoluteAngularJoint(entityA, entityB, Vector3.Right);
             Space.Add(entityA);
             Space.Add(entityB);
             Space.Add(joint);
             Space.Add(limit);
+            Space.Add(revolute);
             bones.Add(new BoneRelationship(a, entityA));
             bones.Add(new BoneRelationship(b, entityB));
         }
