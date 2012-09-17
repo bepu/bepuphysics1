@@ -137,6 +137,14 @@
     <Compile Include="Demos\Extras\Tests\InverseKinematics\ActiveSet.cs" />
     <Compile Include="Demos\Extras\Tests\InverseKinematics\Bone.cs" />
     <Compile Include="Demos\Extras\Tests\InverseKinematics\Control.cs" />
+    <Compile Include="Demos\Extras\Tests\InverseKinematics\IKPointOnPlaneJoint.cs" />
+    <Compile Include="Demos\Extras\Tests\InverseKinematics\IKPointOnLineJoint.cs" />
+    <Compile Include="Demos\Extras\Tests\InverseKinematics\IKTwistJoint.cs" />
+    <Compile Include="Demos\Extras\Tests\InverseKinematics\IKLinearAxisLimit.cs" />
+    <Compile Include="Demos\Extras\Tests\InverseKinematics\IKDistanceLimit.cs" />
+    <Compile Include="Demos\Extras\Tests\InverseKinematics\IKTwistLimit.cs" />
+    <Compile Include="Demos\Extras\Tests\InverseKinematics\IKAngularJoint.cs" />
+    <Compile Include="Demos\Extras\Tests\InverseKinematics\IKSwivelHingeJoint.cs" />
     <Compile Include="Demos\Extras\Tests\InverseKinematics\IKRevoluteJoint.cs" />
     <Compile Include="Demos\Extras\Tests\InverseKinematics\IKLimit.cs" />
     <Compile Include="Demos\Extras\Tests\InverseKinematics\IKSwingLimit.cs" />

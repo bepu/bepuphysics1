@@ -405,13 +405,12 @@ namespace BEPUphysics.Constraints.TwoEntity.Joints
             Matrix3X3.Transform(ref localPoint, ref connectionB.orientationMatrix, out rB);
             Vector3.Add(ref rB, ref connectionB.position, out worldPoint);
 
-            //Find the closest point worldAxis line to worldPoint on the line.
+            //Find the point on the line closest to the world point.
             Vector3 offset;
             Vector3.Subtract(ref worldPoint, ref worldLineAnchor, out offset);
             float distanceAlongAxis;
             Vector3.Dot(ref offset, ref worldLineDirection, out distanceAlongAxis);
 
-            //Find the point on the line closest to the world point.
             Vector3 worldNearPoint;
             Vector3.Multiply(ref worldLineDirection, distanceAlongAxis, out offset);
             Vector3.Add(ref worldLineAnchor, ref offset, out worldNearPoint);
