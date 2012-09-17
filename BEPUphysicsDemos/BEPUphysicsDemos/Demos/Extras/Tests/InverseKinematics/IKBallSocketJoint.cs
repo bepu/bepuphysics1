@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework;
 
 namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
 {
+    //Keeps the anchors from two connections near each other.
     public class IKBallSocketJoint : IKJoint
     {
         /// <summary>
@@ -28,7 +29,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         }
 
         /// <summary>
-        /// Gets or sets the offset in world space from the center of mass of connection A to the anchor point.
+        /// Gets or sets the offset in world space from the center of mass of connection B to the anchor point.
         /// </summary>
         public Vector3 OffsetB
         {
@@ -36,6 +37,12 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             set { LocalOffsetB = Vector3.Transform(value, Quaternion.Conjugate(ConnectionB.Orientation)); }
         }
 
+        /// <summary>
+        /// Builds a ball socket joint.
+        /// </summary>
+        /// <param name="connectionA">First connection in the pair.</param>
+        /// <param name="connectionB">Second connection in the pair.</param>
+        /// <param name="anchor">World space anchor location used to initialize the local anchors.</param>
         public IKBallSocketJoint(Bone connectionA, Bone connectionB, Vector3 anchor)
             : base(connectionA, connectionB)
         {

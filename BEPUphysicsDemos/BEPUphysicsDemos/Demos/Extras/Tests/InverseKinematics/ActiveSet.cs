@@ -171,7 +171,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             {
                 Bone boneToAnalyze = joint.ConnectionA == bone ? joint.ConnectionB : joint.ConnectionA;
 
-                if (bone.predecessors.Contains(boneToAnalyze))//Do not attempt to traverse a path which leads to this bone.
+                if (bone.predecessors.Contains(boneToAnalyze) || //Do not attempt to traverse a path which leads to this bone.
+                    boneToAnalyze.predecessors.Contains(bone)) //Do not attempt to traverse a path which was already traversed *from this bone.*
                     continue;
                 //We found this bone. Regardless of what happens after, make sure that the bone knows about this path.
                 boneToAnalyze.predecessors.Add(bone);
@@ -199,26 +200,28 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             }
         }
 
+        private List<Bone> uniqueChildren = new List<Bone>();
         void DistributeMass(Bone bone)
         {
             //Accumulate the number of child joints which we are going to distribute mass to.
-            int numberOfChildren = 0;
             foreach (var joint in bone.joints)
             {
                 Bone boneToAnalyze = joint.ConnectionA == bone ? joint.ConnectionB : joint.ConnectionA;
 
-                if (boneToAnalyze.traversed || boneToAnalyze.unstressedCycle) // bone.predecessors.Contains(boneToAnalyze))
+                if (boneToAnalyze.traversed || boneToAnalyze.unstressedCycle ||
+                    uniqueChildren.Contains(boneToAnalyze)) //There could exist multiple joints involved with the same pair of bones; don't continually double count.
                 {
                     //The bone was already visited or was a member of the stressed path we branched from. Do not proceed.
                     continue;
                 }
-                numberOfChildren++;
+                uniqueChildren.Add(boneToAnalyze);
             }
             //We distribute a portion of the current bone's total mass to the child bones.
             //By applying a multiplier automassUnstressedFalloff, we guarantee that a chain has a certain maximum weight (excluding cycles).
             //This is thanks to the convergent geometric series sum(automassUnstressedFalloff^n, 1, infinity).
-            float massPerChild = numberOfChildren > 0 ? automassUnstressedFalloff * bone.Mass / numberOfChildren : 0;
+            float massPerChild = uniqueChildren.Count > 0 ? automassUnstressedFalloff * bone.Mass / uniqueChildren.Count : 0;
 
+            uniqueChildren.Clear();
             //(If the number of children is 0, then the only bones which can exist are either bones which were already traversed and will be skipped
             //or bones which are members of unstressed cycles and will inherit the full parent weight. Don't have to worry about the 0 mass.)
 
@@ -349,7 +352,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         }
 
 
-        
+
 
         /// <summary>
         /// Updates the ordered set of active joints.
@@ -385,7 +388,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
 
                 //Compute the dependency graph for all the unstressed bones and assign masses.
                 DistributeMass(controls);
-           }
+            }
 
             //While we have traversed the whole active set in the previous stressed/unstressed searches, we do not yet have a proper breadth-first constraint ordering available.
 

@@ -92,7 +92,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
 
             //Note how we've computed the jacobians despite the limit being potentially inactive.
             //This is to enable 'speculative' limits.
-            if (angle > maximumAngle)
+            if (angle >= maximumAngle)
             {
                 velocityBias = new Vector3(errorCorrectionFactor * (angle - maximumAngle), 0, 0);
             }

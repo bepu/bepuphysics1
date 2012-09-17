@@ -10,26 +10,45 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
 {
     public class IKRevoluteJoint : IKJoint
     {
+        private Vector3 localFreeAxisA;
         /// <summary>
         /// Gets or sets the free axis in connection A's local space.
-        /// Updates the internal restricted axes.
+        /// Must be unit length.
         /// </summary>
-        public Vector3 LocalFreeAxisA;
+        public Vector3 LocalFreeAxisA
+        {
+            get { return localFreeAxisA; }
+            set
+            {
+                localFreeAxisA = value;
+                ComputedConstrainedAxes();
+            }
+        }
+
+        private Vector3 localFreeAxisB;
         /// <summary>
         /// Gets or sets the free axis in connection B's local space.
-        /// Updates the internal restricted axes.
+        /// Must be unit length.
         /// </summary>
-        public Vector3 LocalFreeAxisB;
+        public Vector3 LocalFreeAxisB
+        {
+            get { return localFreeAxisB; }
+            set
+            {
+                localFreeAxisB = value;
+                ComputedConstrainedAxes();
+            }
+        }
+
 
 
         /// <summary>
         /// Gets or sets the free axis attached to connection A in world space.
         /// This does not change the other connection's free axis.
-        /// Updates the internal restricted axes.
         /// </summary>
         public Vector3 WorldFreeAxisA
         {
-            get { return LocalFreeAxisA; }
+            get { return Vector3.Transform(localFreeAxisA, ConnectionA.Orientation); }
             set
             {
                 LocalFreeAxisA = Vector3.Transform(value, Quaternion.Conjugate(ConnectionA.Orientation));
@@ -42,48 +61,20 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         /// </summary>
         public Vector3 WorldFreeAxisB
         {
-            get { return LocalFreeAxisB; }
+            get { return Vector3.Transform(localFreeAxisB, ConnectionB.Orientation); }
             set
             {
                 LocalFreeAxisB = Vector3.Transform(value, Quaternion.Conjugate(ConnectionB.Orientation));
             }
         }
 
-        /// <summary>
-        /// Constructs a new orientation joint.
-        /// Orientation joints can be used to simulate the angular portion of a hinge.
-        /// Orientation joints allow rotation around only a single axis.
-        /// </summary>
-        /// <param name="connectionA">First entity connected in the orientation joint.</param>
-        /// <param name="connectionB">Second entity connected in the orientation joint.</param>
-        /// <param name="freeAxis">Axis allowed to rotate freely in world space.</param>
-        public IKRevoluteJoint(Bone connectionA, Bone connectionB, Vector3 freeAxis)
-            : base(connectionA, connectionB)
+        private Vector3 localConstrainedAxis1, localConstrainedAxis2;
+        void ComputedConstrainedAxes()
         {
-            WorldFreeAxisA = freeAxis;
-            WorldFreeAxisB = freeAxis;
-        }
-
-        protected internal override void UpdateJacobiansAndVelocityBias()
-        {
-            linearJacobianA = linearJacobianB = new Matrix3X3();
-
-            //While we could technically treat this as a 1DOF 'hinge' like the swing limit,
-            //better robustness is achieved by using a 2DOF restriction.
-
-            //We know the one free axis. We need the two restricted axes. This amounts to completing the orthonormal basis.
-            //We can grab one of the restricted axes using a cross product of the two world axes. This is not guaranteed
-            //to be nonzero, so the normalization requires protection.
-
-            Vector3 worldAxisA, worldAxisB;
-            Vector3.Transform(ref LocalFreeAxisA, ref ConnectionA.Orientation, out worldAxisA);
-            Vector3.Transform(ref LocalFreeAxisB, ref ConnectionB.Orientation, out worldAxisB);
-
-            Vector3 error;
-            Vector3.Cross(ref worldAxisA, ref worldAxisB, out error);
-
-            Vector3 worldConstrainedAxis1, worldConstrainedAxis2;
+            Vector3 worldAxisA = WorldFreeAxisA;
+            Vector3 error = Vector3.Cross(worldAxisA, WorldFreeAxisB);
             float lengthSquared = error.LengthSquared();
+            Vector3 worldConstrainedAxis1, worldConstrainedAxis2;
             //Find the first constrained axis.
             if (lengthSquared > Toolbox.Epsilon)
             {
@@ -110,6 +101,45 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             }
             //Don't have to normalize the second constraint axis; it's the cross product of two perpendicular normalized vectors.
             Vector3.Cross(ref worldAxisA, ref worldConstrainedAxis1, out worldConstrainedAxis2);
+
+            localConstrainedAxis1 = Vector3.Transform(worldConstrainedAxis1, Quaternion.Conjugate(ConnectionA.Orientation));
+            localConstrainedAxis2 = Vector3.Transform(worldConstrainedAxis2, Quaternion.Conjugate(ConnectionA.Orientation));
+        }
+
+        /// <summary>
+        /// Constructs a new orientation joint.
+        /// Orientation joints can be used to simulate the angular portion of a hinge.
+        /// Orientation joints allow rotation around only a single axis.
+        /// </summary>
+        /// <param name="connectionA">First entity connected in the orientation joint.</param>
+        /// <param name="connectionB">Second entity connected in the orientation joint.</param>
+        /// <param name="freeAxis">Axis allowed to rotate freely in world space.</param>
+        public IKRevoluteJoint(Bone connectionA, Bone connectionB, Vector3 freeAxis)
+            : base(connectionA, connectionB)
+        {
+            WorldFreeAxisA = freeAxis;
+            WorldFreeAxisB = freeAxis;
+        }
+
+        protected internal override void UpdateJacobiansAndVelocityBias()
+        {
+            linearJacobianA = linearJacobianB = new Matrix3X3();
+
+            //We know the one free axis. We need the two restricted axes. This amounts to completing the orthonormal basis.
+            //We can grab one of the restricted axes using a cross product of the two world axes. This is not guaranteed
+            //to be nonzero, so the normalization requires protection.
+
+            Vector3 worldAxisA, worldAxisB;
+            Vector3.Transform(ref localFreeAxisA, ref ConnectionA.Orientation, out worldAxisA);
+            Vector3.Transform(ref localFreeAxisB, ref ConnectionB.Orientation, out worldAxisB);
+
+            Vector3 error;
+            Vector3.Cross(ref worldAxisA, ref worldAxisB, out error);
+
+            Vector3 worldConstrainedAxis1, worldConstrainedAxis2;
+            Vector3.Transform(ref localConstrainedAxis1, ref ConnectionA.Orientation, out worldConstrainedAxis1);
+            Vector3.Transform(ref localConstrainedAxis2, ref ConnectionA.Orientation, out worldConstrainedAxis2);
+
 
             angularJacobianA = new Matrix3X3
             {
