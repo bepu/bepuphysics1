@@ -71,11 +71,21 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
 
         void FindStressedPaths(List<Control> controls)
         {
+
+
             //Start a depth first search from each controlled bone to find any pinned bones.
             //All paths from the controlled bone to the pinned bones are 'stressed.'
             //Stressed bones are given greater mass later on.
             foreach (var control in controls)
             {
+                //Paths connecting controls should be considered stressed just in case someone tries to pull things apart.
+                //Mark bones affected by controls so we can find them in the traversal.
+                foreach (var otherControl in controls)
+                {
+                    if (otherControl != control) //Don't include the current control; that could cause false positives for stress cycles.
+                        otherControl.TargetBone.targetedByOtherControl = true;
+                }
+
                 //The control.TargetBone.Parent is null; that's one of the terminating condition for the 'upwards' post-traversal
                 //that happens after a pin or stressed path is found.
                 FindStressedPaths(control.TargetBone);
@@ -88,9 +98,17 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
                     bone.predecessors.Clear();
                 }
                 bones.Clear();
+
+                //Get rid of the targetedByOtherControl markings.
+                foreach (var otherControl in controls)
+                {
+                    otherControl.TargetBone.targetedByOtherControl = false;
+                }
             }
 
             //All bones in the active set now have their appropriate StressCount values.
+
+
 
         }
 
@@ -117,10 +135,16 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             foreach (var joint in bone.joints)
             {
                 Bone boneToAnalyze = joint.ConnectionA == bone ? joint.ConnectionB : joint.ConnectionA;
-                if (bone.predecessors.Contains(boneToAnalyze)) //boneToAnalyze is a parent of bone. Don't revisit them, that's where we came from!
+                if (bone.predecessors.Contains(boneToAnalyze) ||  //boneToAnalyze is a parent of bone. Don't revisit them, that's where we came from!
+                    boneToAnalyze.predecessors.Contains(bone)) //This bone already explored the next bone; don't do it again.
                     continue;
-                //The boneToAnalyze is reached by following a path from bone. We record this regardless of whether or not we traverse further.
-                boneToAnalyze.predecessors.Add(bone);
+
+                if (!boneToAnalyze.Pinned)
+                {
+                    //The boneToAnalyze is reached by following a path from bone. We record this regardless of whether or not we traverse further.
+                    //There is one exception: DO NOT create paths to pinned bones!
+                    boneToAnalyze.predecessors.Add(bone);
+                }
 
                 if (boneToAnalyze.Pinned || boneToAnalyze.traversed)
                 {
@@ -131,6 +155,13 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
                     //has not popped its way all the way up the stack yet! Left untreated, this would lead to missed stressed paths.
                     NotifyPredecessorsOfStress(bone);
                     continue;
+                }
+
+                if (boneToAnalyze.targetedByOtherControl)
+                {
+                    //We will consider other controls to be sources of stress. This prevents mass ratio issues from allowing multiple controls to tear a structure apart.
+                    //We do not, however, stop the traversal here. Allow it to continue.         
+                    NotifyPredecessorsOfStress(bone);
                 }
                 if (boneToAnalyze.IsActive)
                 {
@@ -347,6 +378,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
                 bones[i].traversed = false;
                 bones[i].stressCount = 0;
                 bones[i].unstressedCycle = false;
+                bones[i].predecessors.Clear();
             }
             bones.Clear();
         }
