@@ -247,5 +247,10 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         /// Marking all the predecessors is conceptually simpler than attempting to mark the cycles in isolation.
         /// </summary>
         internal bool unstressedCycle;
+        
+        /// <summary>
+        /// True if the bone is targeted by a control in the current stress cycle traversal that isn't the current source control.
+        /// </summary>
+        internal  bool targetedByOtherControl;
     }
 }
