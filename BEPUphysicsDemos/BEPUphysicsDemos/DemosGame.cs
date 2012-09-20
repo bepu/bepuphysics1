@@ -430,6 +430,12 @@ namespace BEPUphysicsDemos
                 SimulationIslandDrawer.Draw(LineDrawer, currentSimulation.Space);
 
 
+            //This doesn't actually draw the elements in the demo (that's the modeldrawer's job),
+            //but some demos can specify their own extra stuff to draw.
+            currentSimulation.Draw();
+
+            base.Draw(gameTime);
+
             #region UI Drawing
 
             UIDrawer.Begin();
@@ -480,12 +486,6 @@ namespace BEPUphysicsDemos
             UIDrawer.End();
 
             #endregion
-
-            //This doesn't actually draw the elements in the demo (that's the modeldrawer's job),
-            //but some demos can specify their own extra stuff to draw.
-            currentSimulation.Draw();
-
-            base.Draw(gameTime);
         }
     }
 }
