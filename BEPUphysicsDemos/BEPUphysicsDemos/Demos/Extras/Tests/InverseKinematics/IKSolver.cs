@@ -214,10 +214,12 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             if (control.solverIndex < 0 || control.solverIndex >= controls.Count || controls[control.solverIndex] != control)
                 return false;
 
-            var lastControl = controls[controls.Count - 1];
-            controls.RemoveAt(controls.Count - 1);
-            if (controls.Count > 0)
+            if (control.solverIndex == controls.Count - 1)
+                controls.RemoveAt(controls.Count - 1);
+            else
             {
+                var lastControl = controls[controls.Count - 1];
+                controls.RemoveAt(controls.Count - 1);
                 controls[control.solverIndex] = lastControl;
                 lastControl.solverIndex = control.solverIndex;
             }

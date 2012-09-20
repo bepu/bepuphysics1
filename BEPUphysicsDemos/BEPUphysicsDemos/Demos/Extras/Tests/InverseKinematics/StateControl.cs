@@ -22,6 +22,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             {
                 LinearMotor.TargetBone = value;
                 AngularMotor.TargetBone = value;
+                if (value != null)
+                    AngularMotor.TargetOrientation = value.Orientation;
             }
         }
 
