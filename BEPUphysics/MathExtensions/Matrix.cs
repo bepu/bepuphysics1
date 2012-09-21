@@ -105,10 +105,10 @@ namespace BEPUphysics.MathExtensions
         /// <param name="m32">Value at row 3, column 2 of the matrix.</param>
         /// <param name="m33">Value at row 3, column 3 of the matrix.</param>
         /// <param name="m34">Value at row 3, column 4 of the matrix.</param>
-        /// <param name="m31">Value at row 4, column 1 of the matrix.</param>
-        /// <param name="m32">Value at row 4, column 2 of the matrix.</param>
-        /// <param name="m33">Value at row 4, column 3 of the matrix.</param>
-        /// <param name="m34">Value at row 4, column 4 of the matrix.</param>
+        /// <param name="m41">Value at row 4, column 1 of the matrix.</param>
+        /// <param name="m42">Value at row 4, column 2 of the matrix.</param>
+        /// <param name="m43">Value at row 4, column 3 of the matrix.</param>
+        /// <param name="m44">Value at row 4, column 4 of the matrix.</param>
         public Matrix(float m11, float m12, float m13, float m14,
                       float m21, float m22, float m23, float m24,
                       float m31, float m32, float m33, float m34,
