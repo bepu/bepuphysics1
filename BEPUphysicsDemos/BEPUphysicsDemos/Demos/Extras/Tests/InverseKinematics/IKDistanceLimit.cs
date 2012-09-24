@@ -95,6 +95,9 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
 
             //Compute jacobians
             Vector3 linearA;
+#if !WINDOWS
+            linearA = new Vector3();
+#endif
             if (currentDistance > Toolbox.Epsilon)
             {
                 linearA.X = separation.X / currentDistance;

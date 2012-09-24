@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if WINDOWS
+using System;
 using System.Collections.Generic;
 using BEPUphysics;
 using BEPUphysics.CollisionRuleManagement;
@@ -7,6 +8,7 @@ using BEPUphysics.Constraints.TwoEntity.Joints;
 using BEPUphysics.Constraints.TwoEntity.Motors;
 using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
+using BEPUphysics.EntityStateManagement;
 using BEPUphysics.MathExtensions;
 using BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics;
 using BEPUphysicsDrawer.Models;
@@ -659,6 +661,60 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
 
         }
 
+        void BuildRing(Vector3 position)
+        {
+            int incrementCount = 20;
+            float radius = 5;
+            float anglePerIncrement = MathHelper.TwoPi / incrementCount;
+            Bone[] bonesList = new Bone[incrementCount];
+            for (int i = 0; i < incrementCount; i++)
+            {
+                Vector3 bonePosition;
+#if !WINDOWS
+            bonePosition = new Vector3();
+#endif
+                bonePosition.X = (float)Math.Cos(anglePerIncrement * i);
+                bonePosition.Y = 0;
+                bonePosition.Z = (float)Math.Sin(anglePerIncrement * i);
+                bonePosition = bonePosition * radius + position;
+                bonesList[i] = new Bone(bonePosition,
+                                     Quaternion.Concatenate(Quaternion.CreateFromAxisAngle(Vector3.Right, MathHelper.PiOver2), Quaternion.CreateFromAxisAngle(Vector3.Up, -anglePerIncrement * i)),
+                                     0.5f,
+                                     MathHelper.Pi * radius * 2 / incrementCount);
+            }
+
+            for (int i = 0; i < bonesList.Length; i++)
+            {
+                var boneA = bonesList[i];
+                var boneB = bonesList[(i + 1) % incrementCount];
+                var upA = Vector3.Transform(Vector3.Up, boneA.Orientation);
+                var upB = Vector3.Transform(Vector3.Up, boneB.Orientation);
+                var ikJoint = new IKBallSocketJoint(boneA, boneB, (boneA.Position + upA * boneB.HalfHeight + boneB.Position - upB * boneB.HalfHeight) * .5f);
+                var swingLimit = new IKSwingLimit(boneA, boneB, upA, upB, MathHelper.Pi * .5f);
+            }
+            Cylinder[] boneEntitiesList = new Cylinder[incrementCount];
+            for (int i = 0; i < incrementCount; i++)
+            {
+                var boneEntity = new Cylinder(new MotionState { Position = bonesList[i].Position, Orientation = bonesList[i].Orientation }, bonesList[i].Height, bonesList[i].Radius, 10);
+                bones.Add(new BoneRelationship(bonesList[i], boneEntity));
+                boneEntitiesList[i] = boneEntity;
+                Space.Add(boneEntity);
+            }
+
+            for (int i = 0; i < incrementCount; i++)
+            {
+                var boneA = boneEntitiesList[i];
+                var boneB = boneEntitiesList[(i + 1) % incrementCount];
+                var upA = Vector3.Transform(Vector3.Up, boneA.Orientation);
+                var upB = Vector3.Transform(Vector3.Up, boneB.Orientation);
+                var joint = new BallSocketJoint(boneA, boneB, (boneA.Position + upA * boneB.Height * 0.5f + boneB.Position - upB * boneB.Height * 0.5f) * .5f);
+                var swingLimit = new SwingLimit(boneA, boneB, upA, upB, MathHelper.Pi * .5f);
+                Space.Add(swingLimit);
+                Space.Add(joint);
+                CollisionRules.AddRule(boneA, boneB, CollisionRule.NoBroadPhase);
+            }
+        }
+
         /// <summary>
         /// Constructs a new demo.
         /// </summary>
@@ -678,7 +734,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
 
             solver.ActiveSet.UseAutomass = true;
             solver.AutoscaleControlImpulses = true;
-            solver.AutoscaleControlMaximumForce = 2;
+            solver.AutoscaleControlMaximumForce = 10;
             solver.FixerIterationCount = 10;
             //solver.VelocitySubiterationCount = 4;
 
@@ -696,6 +752,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             //BuildJointTest(new Vector3(0, 5, 0));
 
             BuildRoboArmThing(new Vector3(0, 5, 0));
+
+            BuildRing(new Vector3(0, 10, 8));
 
 
             //Create the display objects.
@@ -1043,3 +1101,4 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
         }
     }
 }
+#endif

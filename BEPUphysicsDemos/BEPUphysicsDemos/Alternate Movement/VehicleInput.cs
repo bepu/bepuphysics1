@@ -176,7 +176,7 @@ namespace BEPUphysicsDemos.AlternateMovement
                 Vehicle.Body.LinearVelocity = Vector3.Zero;
                 Vehicle.Body.AngularVelocity = Vector3.Zero;
                 Vehicle.Body.Orientation = Quaternion.Identity;
-                Camera.ActivateChaseCameraMode(Vehicle.Body, new Vector3(0, .6f, 0), true, 10);
+                Camera.ActivateChaseCameraMode(Vehicle.Body, new Vector3(0, .6f, 0), true, 11);
             }
         }
 

@@ -28,7 +28,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         }
 
         /// <summary>
-        /// Gets or sets the linear motor used by the control.
+        /// Gets the linear motor used by the control.
         /// </summary>
         public SingleBoneLinearMotor LinearMotor
         {
@@ -37,7 +37,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         }
 
         /// <summary>
-        /// Gets or sets the angular motor used by the control.
+        /// Gets the angular motor used by the control.
         /// </summary>
         public SingleBoneAngularMotor AngularMotor
         {
