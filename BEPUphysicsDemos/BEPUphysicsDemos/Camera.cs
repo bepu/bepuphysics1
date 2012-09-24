@@ -106,6 +106,8 @@ namespace BEPUphysicsDemos
         /// </summary>
         private float distanceToTarget;
 
+        private const float chaseCameraMargin = 1f;
+
         /// <summary>
         /// Whether or not the camera is currently in chase camera mode.
         /// </summary>
@@ -231,10 +233,10 @@ namespace BEPUphysicsDemos
                 RayCastResult result;
                 if (entityToChase.Space.RayCast(new Ray(lookAt, backwards), distanceToTarget, rayCastFilter, out result))
                 {
-                    Position = lookAt + (result.HitData.T) * backwards; //Put the camera just before any hit spot.
+                    Position = lookAt + (Math.Max(result.HitData.T - chaseCameraMargin, 0)) * backwards; //Put the camera just before any hit spot.
                 }
                 else
-                    Position = lookAt + (distanceToTarget) * backwards;
+                    Position = lookAt + (Math.Max(distanceToTarget - chaseCameraMargin, 0)) * backwards;
             }
             else if (UseMovementControls)
             {
