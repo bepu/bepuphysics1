@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework;
 namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
 {
     /// <summary>
-    /// Constrains an individual bone in an attempt to reach some position and orientatoin goal.
+    /// Constrains an individual bone in an attempt to reach some position and orientation goal.
     /// </summary>
     public class StateControl : Control
     {

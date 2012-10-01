@@ -34,15 +34,6 @@ namespace BEPUphysics.Entities
             Initialize(collisionInformation);
         }
 
-        ///<summary>
-        /// Constructs a kinematic Entity.
-        ///</summary>
-        ///<param name="collisionInformation">Collidable for the entity.</param>
-        public Entity(T collisionInformation, bool computeVolume)
-        {
-            Initialize(collisionInformation);
-        }
-
 
         ///<summary>
         /// Constructs a dynamic Entity.

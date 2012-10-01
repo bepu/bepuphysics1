@@ -168,7 +168,7 @@ namespace BEPUphysicsDemos.Demos
             //************************
             //Compound bodies are unique in that they allow you to specify groups of shapes to create a concave shape.
             //Here's the common simple approach to making a compound body, using a prefab type for now.
-            CompoundBody body = new CompoundBody(new List<CompoundShapeEntry>()
+            CompoundBody body = new CompoundBody(new List<CompoundShapeEntry>
             {
                 new CompoundShapeEntry(new BoxShape(1, 1, 1), new Vector3(-7, 3, 8), 1),
                 new CompoundShapeEntry(new BoxShape(1, 3, 1), new Vector3(-8, 2, 8), 5),
@@ -183,7 +183,7 @@ namespace BEPUphysicsDemos.Demos
 
             //************************
             //Just like shapes can be shared between entities, you can re-use a shape for multiple entries within a compound body.
-            var compoundShape = new CompoundShape(new List<CompoundShapeEntry>()
+            var compoundShape = new CompoundShape(new List<CompoundShapeEntry>
             {
                 new CompoundShapeEntry(convexHullShape, new Vector3(7, 3, 8), 1),
                 new CompoundShapeEntry(convexHullShape, new RigidTransform(new Vector3(8, 2, 8), Quaternion.CreateFromAxisAngle(Vector3.Forward, MathHelper.PiOver2)), 5),
@@ -196,7 +196,7 @@ namespace BEPUphysicsDemos.Demos
 
             //************************
             //You can also use compound shapes as subshapes, creating nested compounds.
-            Space.Add(new Entity(new CompoundShape(new List<CompoundShapeEntry>()
+            Space.Add(new Entity(new CompoundShape(new List<CompoundShapeEntry>
             {
                 new CompoundShapeEntry(compoundShape, new Vector3(7, 5, 8), 1),
                 new CompoundShapeEntry(compoundShape, new Vector3(9, 1, 8), 1)
@@ -210,9 +210,9 @@ namespace BEPUphysicsDemos.Demos
             //CompoundChildData objects contain CompoundShapeEntry objects as well as other data to be used by a Collidable instance.
             //That extra data includes material, events, and collision rules.
 
-            var compoundBody = new CompoundBody(new List<CompoundChildData>()
+            var compoundBody = new CompoundBody(new List<CompoundChildData>
             {
-                new CompoundChildData() { Entry = new CompoundShapeEntry(new CylinderShape(1, 1), new Vector3(0, 2, 8)), CollisionRules = new CollisionRules() { Personal = CollisionRule.NoBroadPhase } },
+                new CompoundChildData() { Entry = new CompoundShapeEntry(new CylinderShape(1, 1), new Vector3(0, 2, 8)), CollisionRules = new CollisionRules { Personal = CollisionRule.NoBroadPhase } },
                 new CompoundChildData() { Entry = new CompoundShapeEntry(new BoxShape(3, 1, 3), new Vector3(0, 1, 8)), Material = new Material(3, 3, 0) }
             }, 10);
             Space.Add(compoundBody);
