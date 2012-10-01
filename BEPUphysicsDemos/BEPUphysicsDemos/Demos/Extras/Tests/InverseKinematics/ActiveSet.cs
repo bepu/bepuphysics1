@@ -306,10 +306,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             //Care must be taken in determining the masses, though; if the root is light and its children, while individually lighter, are cumulatively much heavier,
             //there could be mass-ratio related instability.
 
-            //To address this, a search through this isolated limb's graph is performed and the number of bones dependent on each bone is computed.
-            //(This will use the convention that a leaf node has one dependency- itself- so a tree of height one with 3 nodes will have two leaves of dependency count 1 and a root of dependency count 3.)
-
-            //Those dependency counts are used to assign stable masses to the unstressed portions of the graph. A bone with more dependents is heavier, but still less than or equal to a stressed bone.
+            //To address this, cycles are found and given equal mass and each noncycle branch splits the current object's mass between all noncycle children.
 
 
             //Perform a breadth-first search through the graph starting at the bones targeted by each control.

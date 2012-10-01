@@ -21,7 +21,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             set
             {
                 localFreeAxisA = value;
-                ComputedConstrainedAxes();
+                ComputeConstrainedAxes();
             }
         }
 
@@ -36,7 +36,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             set
             {
                 localFreeAxisB = value;
-                ComputedConstrainedAxes();
+                ComputeConstrainedAxes();
             }
         }
 
@@ -69,7 +69,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         }
 
         private Vector3 localConstrainedAxis1, localConstrainedAxis2;
-        void ComputedConstrainedAxes()
+        void ComputeConstrainedAxes()
         {
             Vector3 worldAxisA = WorldFreeAxisA;
             Vector3 error = Vector3.Cross(worldAxisA, WorldFreeAxisB);
