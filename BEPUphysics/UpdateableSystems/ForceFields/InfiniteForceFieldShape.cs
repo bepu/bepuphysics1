@@ -9,13 +9,14 @@ namespace BEPUphysics.UpdateableSystems.ForceFields
     /// </summary>
     public class InfiniteForceFieldShape : ForceFieldShape
     {
+        private IList<Entity> boxedList;
         /// <summary>
         /// Determines the possibly involved entities.
         /// </summary>
         /// <returns>Possibly involved entities.</returns>
         public override IList<Entity> GetPossiblyAffectedEntities()
         {
-            return (ForceField as ISpaceObject).Space.Entities;
+            return boxedList ?? (boxedList = (ForceField as ISpaceObject).Space.Entities);
         }
 
         /// <summary>
