@@ -133,9 +133,11 @@ namespace BEPUphysicsDemos
         /// a different scale interpretation.  For example, if you want to increase your gravity to -100 from -10 and consider a 5 unit wide box to be tiny,
         /// apply a scale of 10 to get the collision response and detection systems to match expectations.
         /// </summary>
+        /// <param name="space">Space to configure.</param>
         /// <param name="scale">Scale to apply to relevant configuration settings.</param>
-        public static void ApplyScale(float scale)
-        { 
+        public static void ApplyScale(Space space, float scale)
+        {
+            space.DeactivationManager.VelocityLowerLimit *= scale;
             CollisionResponseSettings.MaximumPenetrationCorrectionSpeed *= scale;
             CollisionResponseSettings.BouncinessVelocityThreshold *= scale;
             CollisionResponseSettings.StaticFrictionVelocityThreshold *= scale;
