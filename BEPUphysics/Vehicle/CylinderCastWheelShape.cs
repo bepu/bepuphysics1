@@ -30,13 +30,16 @@ namespace BEPUphysics.Vehicle
         /// <param name="localWheelOrientation">Unsteered orientation of the wheel in the vehicle's local space.</param>
         /// <param name="localGraphicTransform">Local graphic transform of the wheel shape.
         /// This transform is applied first when creating the shape's worldTransform.</param>
-        public CylinderCastWheelShape(float radius, float width, Quaternion localWheelOrientation, Matrix localGraphicTransform)
+        /// <param name="includeSteeringTransformInCast">Whether or not to include the steering transform in the wheel shape cast. If false, the casted wheel shape will always point straight forward.
+        /// If true, it will rotate with steering. Sometimes, setting this to false is helpful when the cast shape would otherwise become exposed when steering.</param>
+        public CylinderCastWheelShape(float radius, float width, Quaternion localWheelOrientation, Matrix localGraphicTransform, bool includeSteeringTransformInCast)
         {
             shape = new CylinderShape(width, radius);
             this.LocalWheelOrientation = localWheelOrientation;
             LocalGraphicTransform = localGraphicTransform;
+            this.IncludeSteeringTransformInCast = includeSteeringTransformInCast;
         }
-        
+
         /// <summary>
         /// Gets or sets the radius of the wheel.
         /// </summary>
@@ -54,6 +57,12 @@ namespace BEPUphysics.Vehicle
             get { return shape.Height; }
             set { shape.Height = MathHelper.Max(value, 0); }
         }
+
+        /// <summary>
+        /// Gets or sets whether or not to include the rotation from steering in the cast. If false, the casted wheel shape will always point straight forward.
+        /// If true, it will rotate with steering. Sometimes, setting this to false is helpful when the cast shape would otherwise become exposed when steering.
+        /// </summary>
+        public bool IncludeSteeringTransformInCast { get; set; }
 
         /// <summary>
         /// Updates the wheel's world transform for graphics.
@@ -123,7 +132,13 @@ namespace BEPUphysics.Vehicle
 
             bool hit = false;
 
-            var startingTransform = new RigidTransform { Position = wheel.suspension.worldAttachmentPoint, Orientation = Quaternion.Concatenate(LocalWheelOrientation, wheel.vehicle.Body.orientation) };
+            Quaternion localSteeringTransform;
+            Quaternion.CreateFromAxisAngle(ref wheel.suspension.localDirection, steeringAngle, out localSteeringTransform);
+            var startingTransform = new RigidTransform
+            {
+                Position = wheel.suspension.worldAttachmentPoint,
+                Orientation = Quaternion.Concatenate(Quaternion.Concatenate(LocalWheelOrientation, IncludeSteeringTransformInCast ? localSteeringTransform : Quaternion.Identity), wheel.vehicle.Body.orientation)
+            };
             Vector3 sweep;
             Vector3.Multiply(ref wheel.suspension.worldDirection, wheel.suspension.restLength, out sweep);
 
@@ -185,7 +200,7 @@ namespace BEPUphysics.Vehicle
         protected internal override void Initialize()
         {
             //Setup the dimensions of the detector.
-            var initialTransform = new RigidTransform {Orientation = LocalWheelOrientation};
+            var initialTransform = new RigidTransform { Orientation = LocalWheelOrientation };
             BoundingBox boundingBox;
             shape.GetBoundingBox(ref initialTransform, out boundingBox);
             var expansion = wheel.suspension.localDirection * wheel.suspension.restLength;
@@ -226,7 +241,17 @@ namespace BEPUphysics.Vehicle
             newPosition.Z = wheel.suspension.worldAttachmentPoint.Z + wheel.suspension.worldDirection.Z * wheel.suspension.restLength * .5f;
 
             detector.Position = newPosition;
-            detector.Orientation = wheel.Vehicle.Body.orientation;
+            if (IncludeSteeringTransformInCast)
+            {
+                Quaternion localSteeringTransform;
+                Quaternion.CreateFromAxisAngle(ref wheel.suspension.localDirection, steeringAngle, out localSteeringTransform);
+
+                detector.Orientation = Quaternion.Concatenate(localSteeringTransform, wheel.Vehicle.Body.orientation);
+            }
+            else
+            {
+                detector.Orientation = wheel.Vehicle.Body.orientation;
+            }
             Vector3 linearVelocity;
             Vector3.Subtract(ref newPosition, ref wheel.vehicle.Body.position, out linearVelocity);
             Vector3.Cross(ref linearVelocity, ref wheel.vehicle.Body.angularVelocity, out linearVelocity);
