@@ -57,7 +57,7 @@ namespace BEPUphysicsDemos.Demos.Extras
             Space.ForceUpdater.Gravity *= scale;
 
             //Change the various engine tuning factors so that collision detection and collision response handle the changed scale better.
-            ConfigurationHelper.ApplyScale(scale);
+            ConfigurationHelper.ApplyScale(Space, scale);
 
             //When dealing with objects that generally have high velocities and accelerations relative to their size, having a shorter time step duration can boost quality
             //a whole lot.  Once the configuration is set properly, most of any remaining 'unsmoothness' in the simulation is due to a lack of temporal resolution; 

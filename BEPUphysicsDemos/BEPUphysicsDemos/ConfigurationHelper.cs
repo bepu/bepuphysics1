@@ -1,3 +1,4 @@
+using System;
 using BEPUphysics;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
 using BEPUphysics.CollisionTests.CollisionAlgorithms.GJK;
@@ -45,6 +46,7 @@ namespace BEPUphysicsDemos
             MotionSettings.UseExtraExpansionForContinuousBoundingBoxes = false;
 
             //Set all the scaling settings back to their defaults.
+            space.DeactivationManager.VelocityLowerLimit = (float)Math.Sqrt(.07);
             CollisionResponseSettings.MaximumPenetrationCorrectionSpeed = 2;
             CollisionResponseSettings.BouncinessVelocityThreshold = 1;
             CollisionResponseSettings.StaticFrictionVelocityThreshold = .2f;

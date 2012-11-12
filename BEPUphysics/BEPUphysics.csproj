@@ -386,6 +386,7 @@
     <Compile Include="BroadPhaseEntries\Events\CollisionEventTypes.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\CollidablePairHandler.cs" />
     <Compile Include="BroadPhaseEntries\DetectorVolume.cs" />
+    <Compile Include="Vehicle\CylinderCastWheelShape.cs" />
     <Compile Include="Vehicle\WheelFrictionBlender.cs" />
     <Compile Include="Settings\CollisionDetectionSettings.cs" />
     <Compile Include="SolverSystems\SolverUpdateable.cs" />

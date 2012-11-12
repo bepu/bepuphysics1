@@ -450,6 +450,7 @@
     <Compile Include="TimeStepSettings.cs" />
     <Compile Include="Toolbox.cs" />
     <Compile Include="Materials\IMaterialOwner.cs" />
+    <Compile Include="Vehicle\CylinderCastWheelShape.cs" />
     <Compile Include="Vehicle\RaycastWheelShape.cs" />
     <Compile Include="Vehicle\Vehicle.cs" />
     <Compile Include="Vehicle\Wheel.cs" />

@@ -96,36 +96,35 @@ namespace BEPUphysicsDemos.AlternateMovement
             body.Position = position; //At first, just keep it out of the way.
             Vehicle = new Vehicle(body);
 
-            #region RaycastWheelShapes
+            var localWheelRotation = Quaternion.CreateFromAxisAngle(new Vector3(0, 0, 1), MathHelper.PiOver2);
 
             //The wheel model used is not aligned initially with how a wheel would normally look, so rotate them.
             Matrix wheelGraphicRotation = Matrix.CreateFromAxisAngle(Vector3.Forward, MathHelper.PiOver2);
             Vehicle.AddWheel(new Wheel(
-                                 new RaycastWheelShape(.375f, wheelGraphicRotation),
-                                 new WheelSuspension(2000, 100f, Vector3.Down, .8f, new Vector3(-1.1f, 0, 1.8f)),
+                                 new CylinderCastWheelShape(.375f, 0.2f, localWheelRotation, wheelGraphicRotation),
+                                 new WheelSuspension(2000, 100f, Vector3.Down, .8f - .375f, new Vector3(-1.1f, 0, 1.8f)),
                                  new WheelDrivingMotor(2.5f, 30000, 10000),
                                  new WheelBrake(1.5f, 2, .02f),
                                  new WheelSlidingFriction(4, 5)));
             Vehicle.AddWheel(new Wheel(
-                                 new RaycastWheelShape(.375f, wheelGraphicRotation),
-                                 new WheelSuspension(2000, 100f, Vector3.Down, .8f, new Vector3(-1.1f, 0, -1.8f)),
+                                 new CylinderCastWheelShape(.375f, 0.2f, localWheelRotation, wheelGraphicRotation),
+                                 new WheelSuspension(2000, 100f, Vector3.Down, .8f - .375f, new Vector3(-1.1f, 0, -1.8f)),
                                  new WheelDrivingMotor(2.5f, 30000, 10000),
                                  new WheelBrake(1.5f, 2, .02f),
                                  new WheelSlidingFriction(4, 5)));
             Vehicle.AddWheel(new Wheel(
-                                 new RaycastWheelShape(.375f, wheelGraphicRotation),
-                                 new WheelSuspension(2000, 100f, Vector3.Down, .8f, new Vector3(1.1f, 0, 1.8f)),
+                                 new CylinderCastWheelShape(.375f, 0.2f, localWheelRotation, wheelGraphicRotation),
+                                 new WheelSuspension(2000, 100f, Vector3.Down, .8f - .375f, new Vector3(1.1f, 0, 1.8f)),
                                  new WheelDrivingMotor(2.5f, 30000, 10000),
                                  new WheelBrake(1.5f, 2, .02f),
                                  new WheelSlidingFriction(4, 5)));
             Vehicle.AddWheel(new Wheel(
-                                 new RaycastWheelShape(.375f, wheelGraphicRotation),
-                                 new WheelSuspension(2000, 100f, Vector3.Down, .8f, new Vector3(1.1f, 0, -1.8f)),
+                                 new CylinderCastWheelShape(.375f, 0.2f, localWheelRotation, wheelGraphicRotation),
+                                 new WheelSuspension(2000, 100f, Vector3.Down, .8f - .375f, new Vector3(1.1f, 0, -1.8f)),
                                  new WheelDrivingMotor(2.5f, 30000, 10000),
                                  new WheelBrake(1.5f, 2, .02f),
                                  new WheelSlidingFriction(4, 5)));
 
-            #endregion
 
 
             foreach (Wheel wheel in Vehicle.Wheels)

@@ -449,6 +449,7 @@
     <Compile Include="UpdateableSystems\UpdateableManagers.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Vehicle\CylinderCastWheelShape.cs" />
     <Compile Include="Vehicle\RaycastWheelShape.cs" />
     <Compile Include="Vehicle\Vehicle.cs" />
     <Compile Include="Vehicle\Wheel.cs" />
