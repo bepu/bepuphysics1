@@ -425,6 +425,8 @@ namespace BEPUphysics.NarrowPhaseSystems
         public static bool Intersecting(ref CollidablePair pair)
         {
             var pairHandler = GetPairHandler(ref pair);
+            if (pairHandler == null)
+                return false;
             pairHandler.SuppressEvents = true;
             pairHandler.UpdateCollision(0);
             //Technically, contacts with negative depth do not count.
