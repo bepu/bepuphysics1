@@ -91,7 +91,7 @@ namespace BEPUphysics.Entities.Prefabs
         {
             get
             {
-                return Matrix3X3.Transform(CollisionInformation.Shape.VertexB, orientationMatrix) + position;
+                return Matrix3X3.Transform(CollisionInformation.Shape.VertexC, orientationMatrix) + position;
             }
             set
             {
