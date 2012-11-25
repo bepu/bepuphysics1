@@ -54,7 +54,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
 
         /// <summary>
         /// Gets the basis attached to entity A.
-        /// The primary axis represents the limited axis of rotation.  The 'measurement plane' which the test axis is tested against is based on this primary axis.
+        /// The primary axis represents the motorized axis of rotation.  The 'measurement plane' which the test axis is tested against is based on this primary axis.
         /// The x axis defines the 'base' direction on the measurement plane corresponding to 0 degrees of relative rotation.
         /// </summary>
         public JointBasis2D Basis
