@@ -47,9 +47,7 @@ namespace BEPUphysicsDemos.Demos.Extras
             var body = new Box(new Vector3(0, 0, 0), 2, .5f, 3, 20);
             body.CollisionInformation.LocalPosition = new Vector3(0, 1f, 0);
             Space.Add(body);
-
-            body.ActivityInformation.AllowStabilization = false;
-
+            
             AddBackWheel(new Vector3(-1f, .55f, 1.3f), body, true);
             AddBackWheel(new Vector3(1f, .55f, 1.3f), body, false);
             Box suspensionLeg1, suspensionLeg2;
