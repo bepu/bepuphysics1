@@ -107,6 +107,7 @@
     <Compile Include="Demos\Extras\SelfCollidingClothDemo.cs" />
     <Compile Include="Demos\Extras\SpiderDemo.cs" />
     <Compile Include="Demos\Extras\SuspensionCarDemo.cs" />
+    <Compile Include="Demos\Extras\SuspensionCarDemo2.cs" />
     <Compile Include="Demos\Extras\Tests\AccumulationTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\AddRemoveStressDemo.cs" />
     <Compile Include="Demos\Extras\Tests\BooleanConvexTestDemo.cs" />
