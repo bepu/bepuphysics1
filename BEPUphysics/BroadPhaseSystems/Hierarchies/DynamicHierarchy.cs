@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using BEPUphysics.BroadPhaseEntries;
-using BEPUphysics.DataStructures;
+using BEPUutilities.DataStructures;
+using BEPUutilities.ResourceManagement;
 using Microsoft.Xna.Framework;
-using System.Runtime.InteropServices;
-using BEPUphysics.Threading;
-using BEPUphysics.ResourceManagement;
+using BEPUutilities;
 
 namespace BEPUphysics.BroadPhaseSystems.Hierarchies
 {
@@ -91,7 +87,7 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
             {
                 root.CollectMultithreadingNodes(splitDepth, 1, multithreadingSourceNodes);
                 //Go through every node and refit it.
-                ThreadManager.ForLoop(0, multithreadingSourceNodes.count, multithreadedRefit);
+                ThreadManager.ForLoop(0, multithreadingSourceNodes.Count, multithreadedRefit);
                 multithreadingSourceNodes.Clear();
                 //Now that the subtrees belonging to the source nodes are refit, refit the top nodes.
                 //Sometimes, this will go deeper than necessary because the refit process may require an extremely high level (nonmultithreaded) revalidation.
@@ -113,7 +109,7 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
                 if (!root.IsLeaf) //If the root is a leaf, it's alone- nothing to collide against! This test is required by the assumptions of the leaf-leaf test.
                 {
                     root.GetMultithreadedOverlaps(root, splitDepth, 1, this, multithreadingSourceOverlaps);
-                    ThreadManager.ForLoop(0, multithreadingSourceOverlaps.count, multithreadedOverlap);
+                    ThreadManager.ForLoop(0, multithreadingSourceOverlaps.Count, multithreadedOverlap);
                     multithreadingSourceOverlaps.Clear();
                 }
             }

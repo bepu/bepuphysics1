@@ -1,14 +1,14 @@
 ﻿using System;
 using BEPUphysics.BroadPhaseEntries.Events;
 using BEPUphysics.CollisionShapes;
+using BEPUutilities;
+using BEPUutilities.ResourceManagement;
 using Microsoft.Xna.Framework;
-using BEPUphysics.Materials;
-using BEPUphysics.CollisionRuleManagement;
-using BEPUphysics.CollisionShapes.ConvexShapes;
-using BEPUphysics.MathExtensions;
-using BEPUphysics.ResourceManagement;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
 using BEPUphysics.OtherSpaceStages;
+using AffineTransform = BEPUutilities.AffineTransform;
+using Matrix3X3 = BEPUutilities.Matrix3X3;
+using RigidTransform = BEPUutilities.RigidTransform;
 
 namespace BEPUphysics.BroadPhaseEntries
 {
@@ -206,8 +206,8 @@ namespace BEPUphysics.BroadPhaseEntries
             hit = new RayHit();
             BoundingBox boundingBox;
             castShape.GetSweptLocalBoundingBox(ref startingTransform, ref worldTransform, ref sweep, out boundingBox);
-            var tri = Resources.GetTriangle();
-            var hitElements = Resources.GetIntList();
+            var tri = PhysicsResources.GetTriangle();
+            var hitElements = CommonResources.GetIntList();
             if (this.Shape.TriangleMesh.Tree.GetOverlaps(boundingBox, hitElements))
             {
                 hit.T = float.MaxValue;
@@ -241,12 +241,12 @@ namespace BEPUphysics.BroadPhaseEntries
                     }
                 }
                 tri.maximumRadius = 0;
-                Resources.GiveBack(tri);
-                Resources.GiveBack(hitElements);
+                PhysicsResources.GiveBack(tri);
+                CommonResources.GiveBack(hitElements);
                 return hit.T != float.MaxValue;
             }
-            Resources.GiveBack(tri);
-            Resources.GiveBack(hitElements);
+            PhysicsResources.GiveBack(tri);
+            CommonResources.GiveBack(hitElements);
             return false;
         }
 

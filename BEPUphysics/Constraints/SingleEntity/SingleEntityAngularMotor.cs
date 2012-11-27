@@ -1,7 +1,7 @@
 ﻿using System;
 using BEPUphysics.Constraints.TwoEntity.Motors;
 using BEPUphysics.Entities;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 using Microsoft.Xna.Framework;
 
 namespace BEPUphysics.Constraints.SingleEntity

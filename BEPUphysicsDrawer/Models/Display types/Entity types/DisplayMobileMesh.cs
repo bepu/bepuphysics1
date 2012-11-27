@@ -1,6 +1,4 @@
 using System.Collections.Generic;
-using BEPUphysics.BroadPhaseEntries;
-using BEPUphysics.MathExtensions;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using BEPUphysics.CollisionShapes;

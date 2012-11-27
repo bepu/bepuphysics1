@@ -2,9 +2,7 @@
 using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
-using Microsoft.Xna.Framework;
-using BEPUphysics.DataStructures;
-using BEPUphysics.ResourceManagement;
+using BEPUutilities.DataStructures;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 
 namespace BEPUphysics.CollisionTests.Manifolds

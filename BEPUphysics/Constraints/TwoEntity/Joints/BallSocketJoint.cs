@@ -1,6 +1,6 @@
 using System;
 using BEPUphysics.Entities;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 using Microsoft.Xna.Framework;
 using System.Diagnostics;
 

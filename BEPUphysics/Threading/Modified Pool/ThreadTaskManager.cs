@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using BEPUutilities.DataStructures;
 
-namespace BEPUphysics.Threading
+namespace BEPUutilities
 {
     /// <summary>
     /// Keeps track of the threads currently available to the physics engine.

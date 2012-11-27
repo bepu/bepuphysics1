@@ -1,17 +1,8 @@
-﻿using System;
-using BEPUphysics.BroadPhaseEntries;
-using BEPUphysics.Entities.Prefabs;
-using BEPUphysics.MathExtensions;
+﻿using BEPUphysics.Entities.Prefabs;
+using BEPUutilities;
 using Microsoft.Xna.Framework;
-using BEPUphysics.Settings;
-using BEPUphysics.CollisionTests.CollisionAlgorithms;
 using BEPUphysics.CollisionRuleManagement;
-using BEPUphysics.NarrowPhaseSystems.Pairs;
-using BEPUphysics.CollisionTests.Manifolds;
-using System.Diagnostics;
-using BEPUphysics.BroadPhaseSystems.SortAndSweep;
 using BEPUphysics.CollisionShapes;
-using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.DataStructures;
 using Microsoft.Xna.Framework.Graphics;
 

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 using Microsoft.Xna.Framework;
-using BEPUphysics.DataStructures;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.CollisionShapes.ConvexShapes
 {
@@ -90,7 +90,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             center = ComputeCenter();
             for (int i = 0; i < shapes.Count; i++)
             {
-                shapes.list.Elements[i].Transform.Position -= center;
+                shapes.WrappedList.Elements[i].Transform.Position -= center;
             }
         }
 
@@ -189,13 +189,13 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         public override void GetBoundingBox(ref RigidTransform shapeTransform, out BoundingBox boundingBox)
         {
             RigidTransform subTransform;
-            RigidTransform.Transform(ref shapes.list.Elements[0].Transform, ref shapeTransform, out subTransform);
-            shapes.list.Elements[0].CollisionShape.GetBoundingBox(ref subTransform, out boundingBox);
-            for (int i = 1; i < shapes.list.count; i++)
+            RigidTransform.Transform(ref shapes.WrappedList.Elements[0].Transform, ref shapeTransform, out subTransform);
+            shapes.WrappedList.Elements[0].CollisionShape.GetBoundingBox(ref subTransform, out boundingBox);
+            for (int i = 1; i < shapes.WrappedList.Count; i++)
             {
-                RigidTransform.Transform(ref shapes.list.Elements[i].Transform, ref shapeTransform, out subTransform);
+                RigidTransform.Transform(ref shapes.WrappedList.Elements[i].Transform, ref shapeTransform, out subTransform);
                 BoundingBox toMerge;
-                shapes.list.Elements[i].CollisionShape.GetBoundingBox(ref subTransform, out toMerge);
+                shapes.WrappedList.Elements[i].CollisionShape.GetBoundingBox(ref subTransform, out toMerge);
                 BoundingBox.CreateMerged(ref boundingBox, ref toMerge, out boundingBox);
             }
 
@@ -216,15 +216,15 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         ///<param name="extremePoint">Extreme point on the shape.</param>
         public override void GetLocalExtremePointWithoutMargin(ref Vector3 direction, out Vector3 extremePoint)
         {
-            shapes.list.Elements[0].CollisionShape.GetExtremePoint(direction, ref shapes.list.Elements[0].Transform, out extremePoint);
+            shapes.WrappedList.Elements[0].CollisionShape.GetExtremePoint(direction, ref shapes.WrappedList.Elements[0].Transform, out extremePoint);
             float maxDot;
             Vector3.Dot(ref extremePoint, ref direction, out maxDot);
-            for (int i = 1; i < shapes.list.count; i++)
+            for (int i = 1; i < shapes.WrappedList.Count; i++)
             {
                 float dot;
                 Vector3 temp;
 
-                shapes.list.Elements[i].CollisionShape.GetExtremePoint(direction, ref shapes.list.Elements[i].Transform, out temp);
+                shapes.WrappedList.Elements[i].CollisionShape.GetExtremePoint(direction, ref shapes.WrappedList.Elements[i].Transform, out temp);
                 Vector3.Dot(ref direction, ref temp, out dot);
                 if (dot > maxDot)
                 {
@@ -247,8 +247,8 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             float maxRadius = 0;
             for (int i = 0; i < shapes.Count; i++)
             {
-                float radius = shapes.list.Elements[i].CollisionShape.ComputeMaximumRadius() +
-                               shapes.list.Elements[i].Transform.Position.Length();
+                float radius = shapes.WrappedList.Elements[i].CollisionShape.ComputeMaximumRadius() +
+                               shapes.WrappedList.Elements[i].Transform.Position.Length();
                 if (radius > maxRadius)
                     maxRadius = radius;
             }
@@ -260,7 +260,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             float minRadius = 0;
             for (int i = 0; i < shapes.Count; i++)
             {
-                float radius = shapes.list.Elements[i].CollisionShape.ComputeMinimumRadius();
+                float radius = shapes.WrappedList.Elements[i].CollisionShape.ComputeMinimumRadius();
                 if (radius < minRadius)
                     minRadius = radius;
             }

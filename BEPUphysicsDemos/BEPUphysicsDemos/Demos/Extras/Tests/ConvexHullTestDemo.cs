@@ -1,4 +1,6 @@
 ﻿using BEPUphysics.Entities.Prefabs;
+using BEPUutilities;
+using BEPUutilities.DataStructures;
 using Microsoft.Xna.Framework;
 using BEPUphysics;
 using BEPUphysics.DataStructures;

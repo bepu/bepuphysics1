@@ -5,10 +5,9 @@ using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.Entities;
-using BEPUphysics.MathExtensions;
-using BEPUphysics.ResourceManagement;
+using BEPUutilities;
+using BEPUutilities.ResourceManagement;
 using Microsoft.Xna.Framework;
-using BEPUphysics.Threading;
 
 namespace BEPUphysics.UpdateableSystems
 {
@@ -249,7 +248,7 @@ namespace BEPUphysics.UpdateableSystems
         /// </summary>
         public void RecalculateBoundingBox()
         {
-            var points = Resources.GetVectorList();
+            var points = CommonResources.GetVectorList();
             foreach (var tri in SurfaceTriangles)
             {
                 points.Add(tri[0]);
@@ -260,7 +259,7 @@ namespace BEPUphysics.UpdateableSystems
                 points.Add(tri[2] - upVector * MaxDepth);
             }
             boundingBox = BoundingBox.CreateFromPoints(points);
-            Resources.GiveBack(points);
+            CommonResources.GiveBack(points);
 
             //Compute the transforms used to pull objects into fluid local space.
             Toolbox.GetQuaternionBetweenNormalizedVectors(ref Toolbox.UpVector, ref upVector, out surfaceTransform.Orientation);

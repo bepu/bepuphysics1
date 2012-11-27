@@ -1,8 +1,9 @@
 ﻿using BEPUphysics.Entities;
+using BEPUutilities.DataStructures;
 using Microsoft.Xna.Framework;
 using BEPUphysics.CollisionTests;
 using BEPUphysics.Settings;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 using System;
 
 namespace BEPUphysics.Constraints.Collision
@@ -303,7 +304,7 @@ namespace BEPUphysics.Constraints.Collision
             return Math.Abs(lambda);
         }
 
-        protected internal override void CollectInvolvedEntities(DataStructures.RawList<Entity> outputInvolvedEntities)
+        protected internal override void CollectInvolvedEntities(RawList<Entity> outputInvolvedEntities)
         {
             //This should never really have to be called.
             if (entityA != null)

@@ -1,7 +1,7 @@
 ﻿using System;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using Microsoft.Xna.Framework;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 
 namespace BEPUphysics.CollisionShapes.ConvexShapes
 {

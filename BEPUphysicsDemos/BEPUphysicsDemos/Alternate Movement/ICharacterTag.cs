@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using BEPUphysics.Entities;
+using BEPUutilities;
 
 namespace BEPUphysicsDemos.AlternateMovement
 {
@@ -27,7 +28,7 @@ namespace BEPUphysicsDemos.AlternateMovement
         /// This object is locked by the characters when performing any constraint changes.  There's no strong conceptual reason for this locker
         /// to be within the ICharacterTag implementation; it's just a convenient shared location for both the SphereCharacterController and CharacterController.
         /// </summary>
-        public static BEPUphysics.Threading.SpinLock ConstraintAccessLocker = new BEPUphysics.Threading.SpinLock();
+        public static SpinLock ConstraintAccessLocker = new SpinLock();
 
         Entity body;
 

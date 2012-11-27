@@ -2,9 +2,9 @@
 using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using Microsoft.Xna.Framework;
-using BEPUphysics.DataStructures;
+using BEPUutilities.DataStructures;
 using BEPUphysics.CollisionShapes.ConvexShapes;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 using BEPUphysics.Settings;
 
 namespace BEPUphysics.CollisionTests.Manifolds
@@ -62,7 +62,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
 
 
             terrain.Shape.GetOverlaps(boundingBox, overlappedTriangles);
-            return overlappedTriangles.count;
+            return overlappedTriangles.Count;
         }
 
         protected override bool ConfigureTriangle(int i, out TriangleIndices indices)
@@ -104,7 +104,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
         protected override void ProcessCandidates(RawValueList<ContactData> candidates)
         {
             //If the candidates list is empty, then let's see if the convex is in the 'thickness' of the terrain.
-            if (candidates.count == 0 & terrain.thickness > 0)
+            if (candidates.Count == 0 & terrain.thickness > 0)
             {
                 RayHit rayHit;
                 Ray ray = new Ray() { Position = convex.worldTransform.Position, Direction = terrain.worldTransform.LinearTransform.Up };
@@ -125,7 +125,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                         PenetrationDepth = -rayHit.T * dot + convex.Shape.minimumRadius
                     };
                     bool found = false;
-                    for (int i = 0; i < contacts.count; i++)
+                    for (int i = 0; i < contacts.Count; i++)
                     {
                         if (contacts.Elements[i].Id == 2)
                         {

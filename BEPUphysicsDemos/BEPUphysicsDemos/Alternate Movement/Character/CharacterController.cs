@@ -1,25 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using BEPUphysics.BroadPhaseEntries;
-using BEPUphysics.CollisionShapes;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.UpdateableSystems;
 using BEPUphysics;
+using BEPUutilities;
 using Microsoft.Xna.Framework;
-using BEPUphysics.MathExtensions;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
-using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
 using BEPUphysics.Materials;
 using BEPUphysics.PositionUpdating;
-using BEPUphysics.DataStructures;
 using System.Diagnostics;
-using BEPUphysics.CollisionShapes.ConvexShapes;
-using Microsoft.Xna.Framework.Input;
-using BEPUphysics.Entities;
-using BEPUphysics.Threading;
 using System.Threading;
 
 namespace BEPUphysicsDemos.AlternateMovement.Character
@@ -578,7 +569,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                         entityCollidable.Entity.Locker.Enter();
                     try
                     {
-                        entityVelocity = Toolbox.GetVelocityOfPoint(supportData.Position, entityCollidable.Entity);
+                        entityVelocity = Toolbox.GetVelocityOfPoint(supportData.Position, entityCollidable.Entity.Position, entityCollidable.Entity.LinearVelocity, entityCollidable.Entity.AngularVelocity);
                     }
                     finally
                     {

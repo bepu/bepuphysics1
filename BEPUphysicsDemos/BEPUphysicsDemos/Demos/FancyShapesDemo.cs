@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using BEPUphysics.Entities.Prefabs;
+using BEPUutilities;
 using Microsoft.Xna.Framework;
 using BEPUphysics.CollisionShapes.ConvexShapes;
-using BEPUphysics.MathExtensions;
-using BEPUphysics;
-using System.Diagnostics;
-using BEPUphysicsDrawer.Models;
-using BEPUphysics.DataStructures;
 
 namespace BEPUphysicsDemos.Demos
 {

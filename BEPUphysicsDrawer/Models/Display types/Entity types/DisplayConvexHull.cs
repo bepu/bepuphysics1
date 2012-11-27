@@ -2,6 +2,7 @@
 
 using System.Collections.Generic;
 using BEPUphysics;
+using BEPUutilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using BEPUphysics.CollisionShapes;

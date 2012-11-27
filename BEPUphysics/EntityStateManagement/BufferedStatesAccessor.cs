@@ -1,5 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 
 namespace BEPUphysics.EntityStateManagement
 {

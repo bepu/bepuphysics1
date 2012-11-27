@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using BEPUphysics.Threading;
+using BEPUutilities;
 using BEPUphysics.Entities;
-using BEPUphysics.DataStructures;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.EntityStateManagement
 {

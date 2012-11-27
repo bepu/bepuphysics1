@@ -1,13 +1,11 @@
 ﻿using BEPUphysics.Entities.Prefabs;
+using BEPUutilities;
 using Microsoft.Xna.Framework;
 using BEPUphysics.CollisionShapes;
 using System.Collections.Generic;
 using BEPUphysics.CollisionShapes.ConvexShapes;
-using BEPUphysics.MathExtensions;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.Entities;
-using System;
-using System.Diagnostics;
 
 namespace BEPUphysicsDemos.Demos.Extras.Tests
 {

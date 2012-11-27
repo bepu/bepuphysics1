@@ -1,7 +1,7 @@
 ﻿using System;
 using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.Entities.Prefabs;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 using Microsoft.Xna.Framework;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.BroadPhaseEntries.Events;

@@ -1,8 +1,8 @@
 ﻿using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
-using BEPUphysics.ResourceManagement;
+using BEPUutilities.ResourceManagement;
 using Microsoft.Xna.Framework;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 
 namespace BEPUphysics.NarrowPhaseSystems.Pairs
 {
@@ -31,7 +31,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         protected override TriangleCollidable GetOpposingCollidable(int index)
         {
             //Construct a TriangleCollidable from the static mesh.
-            var toReturn = Resources.GetTriangleCollidable();
+            var toReturn = PhysicsResources.GetTriangleCollidable();
             toReturn.Shape.sidedness = mesh.Shape.Sidedness;
             toReturn.Shape.collisionMargin = mobileMesh.Shape.MeshCollisionMargin;
             toReturn.Entity = mesh.entity;
@@ -102,7 +102,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
 
         protected override void UpdateContainedPairs(float dt)
         {
-            var overlappedElements = Resources.GetIntList();
+            var overlappedElements = CommonResources.GetIntList();
             BoundingBox localBoundingBox;
             AffineTransform meshTransform;
             AffineTransform.CreateFromRigidTransform(ref mesh.worldTransform, out meshTransform);
@@ -112,12 +112,12 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             Vector3.Multiply(ref sweep, dt, out sweep);
             mobileMesh.Shape.GetSweptLocalBoundingBox(ref mobileMesh.worldTransform, ref meshTransform, ref sweep, out localBoundingBox);
             mesh.Shape.TriangleMesh.Tree.GetOverlaps(localBoundingBox, overlappedElements);
-            for (int i = 0; i < overlappedElements.count; i++)
+            for (int i = 0; i < overlappedElements.Count; i++)
             {
                 TryToAdd(overlappedElements.Elements[i]);
             }
 
-            Resources.GiveBack(overlappedElements);
+            CommonResources.GiveBack(overlappedElements);
 
         }
 

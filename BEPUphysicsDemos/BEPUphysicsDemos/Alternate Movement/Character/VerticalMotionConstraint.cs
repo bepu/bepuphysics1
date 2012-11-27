@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using BEPUphysics.Constraints;
-using BEPUphysics.DataStructures;
 using BEPUphysics.Entities;
+using BEPUutilities;
+using BEPUutilities.DataStructures;
 using Microsoft.Xna.Framework;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
-using BEPUphysics.MathExtensions;
-using BEPUphysics;
-using System.Diagnostics;
 using BEPUphysics.Settings;
 
 namespace BEPUphysicsDemos.AlternateMovement.Character

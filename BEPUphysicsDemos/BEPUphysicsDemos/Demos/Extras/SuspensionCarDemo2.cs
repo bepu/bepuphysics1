@@ -1,7 +1,7 @@
-﻿using BEPUphysics.Constraints;
-using BEPUphysics.Constraints.SolverGroups;
+﻿using BEPUphysics.Constraints.SolverGroups;
 using BEPUphysics.Constraints.TwoEntity.Motors;
 using BEPUphysics.Entities.Prefabs;
+using BEPUutilities;
 using Microsoft.Xna.Framework;
 using BEPUphysics.Entities;
 using BEPUphysics.CollisionRuleManagement;
@@ -9,7 +9,6 @@ using BEPUphysics.Constraints.TwoEntity.Joints;
 using BEPUphysics.Constraints.TwoEntity.JointLimits;
 using Microsoft.Xna.Framework.Input;
 using System;
-using BEPUphysics.MathExtensions;
 using BEPUphysics.BroadPhaseEntries;
 namespace BEPUphysicsDemos.Demos.Extras
 {

@@ -4,7 +4,7 @@ using BEPUphysics.EntityStateManagement;
 using Microsoft.Xna.Framework;
 using System.Collections.ObjectModel;
 using BEPUphysics.CollisionShapes.ConvexShapes;
-using BEPUphysics.DataStructures;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.Entities.Prefabs
 {

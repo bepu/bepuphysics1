@@ -2,8 +2,8 @@
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using System;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
-using BEPUphysics.DataStructures;
-using BEPUphysics.MathExtensions;
+using BEPUutilities.DataStructures;
+using BEPUutilities;
 using Microsoft.Xna.Framework;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 
@@ -64,7 +64,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
 
             var transform = new RigidTransform { Orientation = Quaternion.Identity };
             DetectorVolume.TriangleMesh.Tree.GetOverlaps(convex.boundingBox, overlaps);
-            for (int i = 0; i < overlaps.count; i++)
+            for (int i = 0; i < overlaps.Count; i++)
             {
                 DetectorVolume.TriangleMesh.Data.GetTriangle(overlaps.Elements[i], out triangle.vA, out triangle.vB, out triangle.vC);
                 Vector3.Add(ref triangle.vA, ref triangle.vB, out transform.Position);

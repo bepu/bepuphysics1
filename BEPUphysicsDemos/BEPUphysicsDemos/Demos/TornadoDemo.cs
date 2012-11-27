@@ -2,9 +2,9 @@
 using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
-using BEPUphysics.MathExtensions;
 using BEPUphysics.UpdateableSystems.ForceFields;
 using BEPUphysicsDemos.SampleCode;
+using BEPUutilities;
 using Microsoft.Xna.Framework;
 
 namespace BEPUphysicsDemos.Demos

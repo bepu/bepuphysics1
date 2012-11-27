@@ -1,8 +1,8 @@
 ﻿using System;
 using BEPUphysics.CollisionTests.Manifolds;
 using Microsoft.Xna.Framework;
-using BEPUphysics.MathExtensions;
-using BEPUphysics.DataStructures;
+using BEPUutilities;
+using BEPUutilities.DataStructures;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 
 namespace BEPUphysics.CollisionShapes
@@ -567,7 +567,7 @@ namespace BEPUphysics.CollisionShapes
 
                 }
             }
-            return overlappedTriangles.count > 0;
+            return overlappedTriangles.Count > 0;
         }
 
         ///<summary>
@@ -622,7 +622,7 @@ namespace BEPUphysics.CollisionShapes
 
                 }
             }
-            return overlappedElements.count > 0;
+            return overlappedElements.Count > 0;
         }
 
         ///<summary>

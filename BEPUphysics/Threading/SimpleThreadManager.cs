@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 
-namespace BEPUphysics.Threading
+namespace BEPUutilities
 {
     /// <summary>
     /// Manages the engine's threads.

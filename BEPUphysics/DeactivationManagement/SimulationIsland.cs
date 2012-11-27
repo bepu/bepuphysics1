@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading;
-using BEPUphysics.DataStructures;
+using BEPUutilities.DataStructures;
 using System.Collections.ObjectModel;
 
 namespace BEPUphysics.DeactivationManagement

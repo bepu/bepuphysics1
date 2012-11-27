@@ -1,5 +1,5 @@
-﻿using BEPUphysics.ResourceManagement;
-using BEPUphysics.CollisionTests.CollisionAlgorithms;
+﻿using BEPUphysics.CollisionTests.CollisionAlgorithms;
+using BEPUutilities.ResourceManagement;
 
 namespace BEPUphysics.CollisionTests.Manifolds
 {

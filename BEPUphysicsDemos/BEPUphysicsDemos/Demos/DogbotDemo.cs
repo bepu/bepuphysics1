@@ -3,8 +3,8 @@ using BEPUphysics.Constraints.TwoEntity.JointLimits;
 using BEPUphysics.Constraints.TwoEntity.Joints;
 using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
+using BEPUutilities;
 using Microsoft.Xna.Framework;
-using BEPUphysics.MathExtensions;
 
 namespace BEPUphysicsDemos.Demos
 {

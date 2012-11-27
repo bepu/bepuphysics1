@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using BEPUphysics.Settings;
-using BEPUphysics.Threading;
-using BEPUphysics.DataStructures;
+using BEPUutilities;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.PositionUpdating
 {
@@ -50,12 +50,12 @@ namespace BEPUphysics.PositionUpdating
         Action<int> preUpdate;
         void PreUpdate(int i)
         {
-            if (i >= discreteUpdateables.count)
+            if (i >= discreteUpdateables.Count)
             {
-                i -= discreteUpdateables.count;
-                if (i >= passiveUpdateables.count)
+                i -= discreteUpdateables.Count;
+                if (i >= passiveUpdateables.Count)
                 {
-                    i -= passiveUpdateables.count;
+                    i -= passiveUpdateables.Count;
                     //It's a continuous updateable.
                     if (continuousUpdateables.Elements[i].IsActive)
                         continuousUpdateables.Elements[i].PreUpdatePosition(timeStepSettings.TimeStepDuration);
@@ -87,15 +87,15 @@ namespace BEPUphysics.PositionUpdating
         Action<int> updateContinuous;
         void UpdateContinuousItem(int i)
         {
-            if (i < passiveUpdateables.count)
+            if (i < passiveUpdateables.Count)
             {
                 if (passiveUpdateables.Elements[i].IsActive)
                     passiveUpdateables.Elements[i].UpdatePositionContinuously(timeStepSettings.TimeStepDuration);
             }
             else
             {
-                if (continuousUpdateables.Elements[i - passiveUpdateables.count].IsActive)
-                    continuousUpdateables.Elements[i - passiveUpdateables.count].UpdatePositionContinuously(timeStepSettings.TimeStepDuration);
+                if (continuousUpdateables.Elements[i - passiveUpdateables.Count].IsActive)
+                    continuousUpdateables.Elements[i - passiveUpdateables.Count].UpdatePositionContinuously(timeStepSettings.TimeStepDuration);
             }
         }
 
@@ -106,20 +106,20 @@ namespace BEPUphysics.PositionUpdating
             //Since these do not care about CCD, just update them as if they were discrete.
             //In addition, go through the remaining non-discrete objects and perform their prestep.
             //This usually involves updating their angular motion, but not their linear motion.
-            int count = discreteUpdateables.count + passiveUpdateables.count + continuousUpdateables.count;
+            int count = discreteUpdateables.Count + passiveUpdateables.Count + continuousUpdateables.Count;
             ThreadManager.ForLoop(0, count, preUpdate);
 
             //Now go through the list of all full CCD objects.  These are responsible
             //for determining the TOI of collision pairs, if existent.
-            if (continuousUpdateables.count > MultithreadingThreshold)
-                ThreadManager.ForLoop(0, continuousUpdateables.count, updateTimeOfImpact);
+            if (continuousUpdateables.Count > MultithreadingThreshold)
+                ThreadManager.ForLoop(0, continuousUpdateables.Count, updateTimeOfImpact);
             else
-                for (int i = 0; i < continuousUpdateables.count; i++)
+                for (int i = 0; i < continuousUpdateables.Count; i++)
                     UpdateTimeOfImpact(i);
 
             //The TOI's are now computed, so we can integrate all of the CCD or allow-motionclampers 
             //to their new positions.
-            count = passiveUpdateables.count + continuousUpdateables.count;
+            count = passiveUpdateables.Count + continuousUpdateables.Count;
             if (count > MultithreadingThreshold)
                 ThreadManager.ForLoop(0, count, updateContinuous);
             else
@@ -139,18 +139,18 @@ namespace BEPUphysics.PositionUpdating
             //Since these do not care about CCD, just update them as if they were discrete.
             //In addition, go through the remaining non-discrete objects and perform their prestep.
             //This usually involves updating their angular motion, but not their linear motion.
-            int count = discreteUpdateables.count + passiveUpdateables.count + continuousUpdateables.count;
+            int count = discreteUpdateables.Count + passiveUpdateables.Count + continuousUpdateables.Count;
             for (int i = 0; i < count; i++)
                 PreUpdate(i);
 
             //Now go through the list of all full CCD objects.  These are responsible
             //for determining the TOI of collision pairs, if existent.
-            for (int i = 0; i < continuousUpdateables.count; i++)
+            for (int i = 0; i < continuousUpdateables.Count; i++)
                 UpdateTimeOfImpact(i);
 
             //The TOI's are now computed, so we can integrate all of the CCD or allow-motionclampers 
             //to their new positions.
-            count = passiveUpdateables.count + continuousUpdateables.count;
+            count = passiveUpdateables.Count + continuousUpdateables.Count;
             for (int i = 0; i < count; i++)
                 UpdateContinuousItem(i);
         }

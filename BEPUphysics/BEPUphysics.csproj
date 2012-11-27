@@ -144,13 +144,9 @@
     <Compile Include="CollisionTests\Manifolds\MobileMeshConvexContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\TerrainSphereContactManifold.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\TriangleTrianglePairTester.cs" />
-    <Compile Include="CollisionTests\VoronoiRegion.cs" />
-    <Compile Include="ConvexHullHelper.cs" />
-    <Compile Include="ConvexHullHelper.Pruning.cs" />
     <Compile Include="DataStructures\BoundingBoxTree.cs" />
     <Compile Include="DataStructures\MeshBoundingBoxTree.cs" />
     <Compile Include="DataStructures\MeshBoundingBoxTreeData.cs" />
-    <Compile Include="DataStructures\ReadOnlyList.cs" />
     <Compile Include="DataStructures\StaticMeshData.cs" />
     <Compile Include="DataStructures\TransformableMeshData.cs" />
     <Compile Include="DataStructures\TreeOverlapPair.cs" />
@@ -266,7 +262,6 @@
     <Compile Include="Entities\Prefabs\TransformableEntity.cs" />
     <Compile Include="Entities\Prefabs\Triangle.cs" />
     <Compile Include="Entities\Prefabs\WrappedBody.cs" />
-    <Compile Include="MathExtensions\MathChecker.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\CompoundMobileMeshPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\ContactCollection.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\ContactInformation.cs" />
@@ -301,8 +296,8 @@
     <Compile Include="NarrowPhaseSystems\Pairs\GroupPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\StandardPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\MobileMeshConvexPairHandler.cs" />
+    <Compile Include="PhysicsResources.cs" />
     <Compile Include="PositionUpdating\ContinuousPositionUpdater.cs" />
-    <Compile Include="MathExtensions\AffineTransform.cs" />
     <Compile Include="BroadPhaseEntries\Events\ContactEventManager.cs" />
     <Compile Include="BroadPhaseEntries\Events\EntryEventManager.cs" />
     <Compile Include="BroadPhaseEntries\Terrain.cs" />
@@ -323,7 +318,6 @@
     <Compile Include="NarrowPhaseSystems\Pairs\SpherePairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\GeneralConvexPairHandler.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\IPairHandlerParent.cs" />
-    <Compile Include="DataStructures\ObservableList.cs" />
     <Compile Include="DataStructures\TriangleMesh.cs" />
     <Compile Include="EntityStateManagement\MotionState.cs" />
     <Compile Include="RayCastResult.cs" />
@@ -341,7 +335,6 @@
     <Compile Include="CollisionShapes\ConvexShapes\SphereShape.cs" />
     <Compile Include="CollisionShapes\StaticMeshShape.cs" />
     <Compile Include="CollisionShapes\TerrainShape.cs" />
-    <Compile Include="RayHit.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\GJK\SimpleSimplex.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\GJK\GJKToolbox.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\GJK\PairSimplex.cs" />
@@ -354,14 +347,6 @@
     <Compile Include="CollisionTests\Manifolds\GeneralConvexContactManifold.cs" />
     <Compile Include="CollisionTests\ContactRefresher.cs" />
     <Compile Include="CollisionTests\CollisionAlgorithms\GeneralConvexPairTester.cs" />
-    <Compile Include="DataStructures\RawValueList.cs" />
-    <Compile Include="DataStructures\RawList.cs" />
-    <Compile Include="DataStructures\ObservableDictionary.cs" />
-    <Compile Include="DataStructures\HashSet.cs" />
-    <Compile Include="DataStructures\ReadOnlyDictionary.cs" />
-    <Compile Include="DataStructures\ReadOnlyEnumerable.cs" />
-    <Compile Include="DataStructures\TinyList.cs" />
-    <Compile Include="DataStructures\TinyStructList.cs" />
     <Compile Include="Entities\Entity.cs" />
     <Compile Include="Entities\EntityBase.cs" />
     <Compile Include="Entities\MorphableEntity.cs" />
@@ -378,7 +363,6 @@
     <Compile Include="PositionUpdating\PositionUpdater.cs" />
     <Compile Include="EntityStateManagement\InterpolatedStatesManager.cs" />
     <Compile Include="MultithreadedProcessingStage.cs" />
-    <Compile Include="MathExtensions\RigidTransform.cs" />
     <Compile Include="Materials\Material.cs" />
     <Compile Include="Materials\MaterialManager.cs" />
     <Compile Include="Materials\MaterialPair.cs" />
@@ -393,10 +377,6 @@
     <Compile Include="ISpace.cs" />
     <Compile Include="ISpaceObject.cs" />
     <Compile Include="OtherSpaceStages\IForceUpdateable.cs" />
-    <Compile Include="MathExtensions\Matrix2x2.cs" />
-    <Compile Include="MathExtensions\Matrix2x3.cs" />
-    <Compile Include="MathExtensions\Matrix3x2.cs" />
-    <Compile Include="MathExtensions\Matrix3x3.cs" />
     <Compile Include="BroadPhaseEntries\Collidable.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\NarrowPhasePair.cs" />
     <Compile Include="NarrowPhaseSystems\NarrowPhase.cs" />
@@ -422,26 +402,19 @@
     <Compile Include="Paths\VariableLinearSpeedCurve.cs" />
     <Compile Include="Paths\VariableSpeedCurve.cs" />
     <Compile Include="ProcessingStage.cs" />
-    <Compile Include="ResourceManagement\LockingResourcePool.cs" />
-    <Compile Include="ResourceManagement\ResourcePool.cs" />
-    <Compile Include="ResourceManagement\Resources.cs" />
-    <Compile Include="ResourceManagement\UnsafeResourcePool.cs" />
     <Compile Include="SolverSystems\Solver.cs" />
     <Compile Include="SolverSystems\SolverUpdateableChange.cs" />
     <Compile Include="Space.cs" />
     <Compile Include="OtherSpaceStages\SpaceObjectBuffer.cs" />
     <Compile Include="BroadPhaseEntries\StaticMesh.cs" />
-    <Compile Include="Threading\ConcurrentDeque.cs" />
     <Compile Include="Threading\IThreadManager.cs" />
     <Compile Include="Threading\Modified Pool\ParallelLoopManager.cs" />
     <Compile Include="Threading\Modified Pool\ParallelLoopWorker.cs" />
     <Compile Include="Threading\Modified Pool\SpecializedThreadManager.cs" />
     <Compile Include="Threading\Modified Pool\ThreadTaskManager.cs" />
     <Compile Include="Threading\SimpleThreadManager.cs" />
-    <Compile Include="Threading\SpinLock.cs" />
     <Compile Include="Threading\ThreadManagerTPL.cs" />
     <Compile Include="TimeStepSettings.cs" />
-    <Compile Include="Toolbox.cs" />
     <Compile Include="Materials\IMaterialOwner.cs" />
     <Compile Include="UpdateableSystems\CombinedUpdateable.cs" />
     <Compile Include="UpdateableSystems\FluidVolume.cs" />
@@ -471,7 +444,12 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <None Include="strongNameKey.snk" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\BEPUutilities\BEPUutilities.csproj">
+      <Project>{E3AAEB61-D7DF-4E7E-A75B-B5282D2FF3F5}</Project>
+      <Name>BEPUutilities</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\Microsoft.Xna.GameStudio.targets" />
   <!--

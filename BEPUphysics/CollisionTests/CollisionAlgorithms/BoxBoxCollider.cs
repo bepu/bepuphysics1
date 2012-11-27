@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using BEPUphysics.DataStructures;
-using BEPUphysics.MathExtensions;
+using BEPUutilities.DataStructures;
+using BEPUutilities;
 using Microsoft.Xna.Framework;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using System.Diagnostics;

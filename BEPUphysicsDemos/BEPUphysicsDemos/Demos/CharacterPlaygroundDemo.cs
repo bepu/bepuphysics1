@@ -1,17 +1,15 @@
 ﻿using BEPUphysics.Entities.Prefabs;
+using BEPUutilities;
 using Microsoft.Xna.Framework;
 using BEPUphysics.DataStructures;
-using BEPUphysics.MathExtensions;
 using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.Entities;
 using Microsoft.Xna.Framework.Graphics;
-using BEPUphysics.Constraints.TwoEntity.Joints;
 using BEPUphysics.Constraints.SolverGroups;
 using BEPUphysics.Paths;
 using BEPUphysics.Paths.PathFollowing;
 using BEPUphysics.Constraints.TwoEntity.Motors;
-using BEPUphysics.Constraints;
 using BEPUphysics.CollisionShapes;
 using System.Collections.Generic;
 
