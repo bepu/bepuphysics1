@@ -4,6 +4,7 @@ using BEPUphysics.NarrowPhaseSystems.Pairs;
 using BEPUphysics.OtherSpaceStages;
 using BEPUphysics.Threading;
 using System;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.Collidables.Events
 {

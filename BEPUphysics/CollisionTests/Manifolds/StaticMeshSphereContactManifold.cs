@@ -1,9 +1,5 @@
-﻿using System;
-using BEPUphysics.Collidables;
-using BEPUphysics.Collidables.MobileCollidables;
-using BEPUphysics.DataStructures;
-using BEPUphysics.CollisionTests.CollisionAlgorithms;
-using BEPUphysics.ResourceManagement;
+﻿using BEPUphysics.CollisionTests.CollisionAlgorithms;
+using BEPUutilities.ResourceManagement;
 
 namespace BEPUphysics.CollisionTests.Manifolds
 {
@@ -15,12 +11,12 @@ namespace BEPUphysics.CollisionTests.Manifolds
 
 
         UnsafeResourcePool<TriangleSpherePairTester> testerPool = new UnsafeResourcePool<TriangleSpherePairTester>();
-        protected override void GiveBackTester(CollisionAlgorithms.TrianglePairTester tester)
+        protected override void GiveBackTester(TrianglePairTester tester)
         {
             testerPool.GiveBack((TriangleSpherePairTester)tester);
         }
 
-        protected override CollisionAlgorithms.TrianglePairTester GetTester()
+        protected override TrianglePairTester GetTester()
         {
             return testerPool.Take();
         }

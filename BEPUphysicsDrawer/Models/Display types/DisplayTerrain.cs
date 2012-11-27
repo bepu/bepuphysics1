@@ -39,11 +39,11 @@ namespace BEPUphysicsDrawer.Models
             //up vector points in the same direction as the collidable surfaces.
             //To make sure the graphics match the terrain collision, see if a triangle normal faces in the same direction as the local up vector.
             //If not, construct the graphics with reversed winding.
-            BEPUphysics.MathExtensions.Vector3 a, b, c;
+            BEPUutilities.Vector3 a, b, c;
             DisplayedObject.GetPosition(0, 0, out a);
             DisplayedObject.GetPosition(1, 0, out b);
             DisplayedObject.GetPosition(0, 1, out c);
-            Vector3 normal = MathConverter.Convert(BEPUphysics.MathExtensions.Vector3.Cross(c - a, b - a));
+            Vector3 normal = MathConverter.Convert(BEPUutilities.Vector3.Cross(c - a, b - a));
             Vector3 terrainUp = new Vector3(DisplayedObject.WorldTransform.LinearTransform.M21, DisplayedObject.WorldTransform.LinearTransform.M22, DisplayedObject.WorldTransform.LinearTransform.M23);
             float dot;
             Vector3.Dot(ref normal, ref terrainUp, out dot);
@@ -56,7 +56,7 @@ namespace BEPUphysicsDrawer.Models
                 for (int i = 0; i < numColumns; i++)
                 {
                     VertexPositionNormalTexture v;
-                    BEPUphysics.MathExtensions.Vector3 position, n;
+                    BEPUutilities.Vector3 position, n;
                     DisplayedObject.GetPosition(i, j, out position);
                     DisplayedObject.GetNormal(i, j, out n);
                     MathConverter.Convert(ref position, out v.Position);

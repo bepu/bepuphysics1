@@ -4,7 +4,7 @@ using BEPUphysics;
 using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.Collidables.MobileCollidables;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 
 namespace BEPUphysicsDemos.SampleCode
 {

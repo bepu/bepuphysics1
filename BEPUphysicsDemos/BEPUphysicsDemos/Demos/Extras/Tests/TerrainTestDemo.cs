@@ -1,7 +1,7 @@
 ﻿using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.CollisionShapes;
 using BEPUphysics.CollisionShapes.ConvexShapes;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 
 namespace BEPUphysicsDemos.Demos.Extras.Tests
 {

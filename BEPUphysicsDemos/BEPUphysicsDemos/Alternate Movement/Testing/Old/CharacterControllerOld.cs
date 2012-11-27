@@ -2,7 +2,7 @@
 using BEPUphysics;
 using BEPUphysics.Entities;
 using BEPUphysics.CollisionRuleManagement;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.UpdateableSystems;

@@ -10,7 +10,7 @@ using BEPUphysics.Materials;
 using BEPUphysics.CollisionShapes;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using System.Collections.Generic;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 
 namespace BEPUphysicsDemos.Demos
 {

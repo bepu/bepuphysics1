@@ -2,7 +2,7 @@
 using BEPUphysics.CollisionShapes.ConvexShapes;
  
 using BEPUphysics.Settings;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 
 namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 {

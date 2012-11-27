@@ -2,7 +2,7 @@
 using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.CollisionShapes.ConvexShapes;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 
 namespace BEPUphysics.BroadPhaseEntries
 {

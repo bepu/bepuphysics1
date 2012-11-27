@@ -2,7 +2,7 @@
 using BEPUphysics.Entities;
 using BEPUphysics.UpdateableSystems;
  
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 using BEPUphysics.Materials;
 using BEPUphysics.Collidables;
 

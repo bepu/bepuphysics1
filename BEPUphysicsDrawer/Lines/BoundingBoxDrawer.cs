@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using BEPUutilities.DataStructures;
 using Microsoft.Xna.Framework.Graphics;
 using BEPUphysics.DataStructures;
 using BEPUphysics;

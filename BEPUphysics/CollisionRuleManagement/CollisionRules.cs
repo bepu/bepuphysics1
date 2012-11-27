@@ -1,6 +1,7 @@
 ﻿﻿using System;
 using System.Collections.Generic;
 using BEPUphysics.DataStructures;
+﻿using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.CollisionRuleManagement
 {
@@ -265,9 +266,9 @@ namespace BEPUphysics.CollisionRuleManagement
         public static CollisionRule GetSpecificCollisionRuleDefault(CollisionRules a, CollisionRules b)
         {
             CollisionRule aToB;
-            a.specific.wrappedDictionary.TryGetValue(b, out aToB);
+            a.specific.WrappedDictionary.TryGetValue(b, out aToB);
             CollisionRule bToA;
-            b.specific.wrappedDictionary.TryGetValue(a, out bToA);
+            b.specific.WrappedDictionary.TryGetValue(a, out bToA);
             return aToB > bToA ? aToB : bToA;
 
         }

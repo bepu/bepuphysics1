@@ -9,6 +9,7 @@ using BEPUphysics.Constraints.Collision;
 using BEPUphysics.DataStructures;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.CollisionTests;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.NarrowPhaseSystems.Pairs
 {
@@ -66,7 +67,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         protected override void UpdateContainedPairs()
         {
             compoundInfo.hierarchy.Tree.GetOverlaps(compoundInfoB.hierarchy.Tree, overlappedElements);
-            for (int i = 0; i < overlappedElements.count; i++)
+            for (int i = 0; i < overlappedElements.Count; i++)
             {
                 var element = overlappedElements.Elements[i];
                 TryToAdd(element.OverlapA.CollisionInformation, element.OverlapB.CollisionInformation,

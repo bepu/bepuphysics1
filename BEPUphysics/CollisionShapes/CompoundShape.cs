@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using BEPUphysics.Collidables.MobileCollidables;
- 
-using BEPUphysics.DataStructures;
-using BEPUphysics.MathExtensions;
-using BEPUphysics.ResourceManagement;
-using System.Collections.ObjectModel;
+using BEPUutilities;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.CollisionShapes
 {
@@ -163,7 +160,7 @@ namespace BEPUphysics.CollisionShapes
             {
                 center = ComputeCenter(shapes);
                 this.shapes = new RawList<CompoundShapeEntry>(shapes);
-                for (int i = 0; i < this.shapes.count; i++)
+                for (int i = 0; i < this.shapes.Count; i++)
                 {
                     this.shapes.Elements[i].LocalTransform.Position -= center;
                 }
@@ -184,7 +181,7 @@ namespace BEPUphysics.CollisionShapes
             {
                 Vector3 center = ComputeCenter(shapes);
                 this.shapes = new RawList<CompoundShapeEntry>(shapes);
-                for (int i = 0; i < this.shapes.count; i++)
+                for (int i = 0; i < this.shapes.Count; i++)
                 {
                     this.shapes.Elements[i].LocalTransform.Position -= center;
                 }
@@ -208,7 +205,7 @@ namespace BEPUphysics.CollisionShapes
         {
             float totalWeight = 0;
             var center = new Vector3();
-            for (int i = 0; i < shapes.count; i++)
+            for (int i = 0; i < shapes.Count; i++)
             {
                 totalWeight += shapes.Elements[i].Weight;
                 Vector3 centerContribution;
@@ -270,7 +267,7 @@ namespace BEPUphysics.CollisionShapes
         public override float ComputeVolume()
         {
             float volume = 0;
-            for (int i = 0; i < shapes.count; i++)
+            for (int i = 0; i < shapes.Count; i++)
             {
                 volume += shapes.Elements[i].Shape.ComputeVolume();
             }
@@ -298,7 +295,7 @@ namespace BEPUphysics.CollisionShapes
         {
             var volumeDistribution = new Matrix3X3();
             float totalWeight = 0;
-            for (int i = 0; i < shapes.count; i++)
+            for (int i = 0; i < shapes.Count; i++)
             {
                 totalWeight += shapes.Elements[i].Weight;
                 Matrix3X3 contribution;
@@ -431,8 +428,8 @@ namespace BEPUphysics.CollisionShapes
         /// <returns>Volume, volume distribution, and center contributions from each child shape in the compound shape.</returns>
         public ShapeDistributionInformation[] ComputeChildContributions()
         {
-            var toReturn = new ShapeDistributionInformation[shapes.count];
-            for (int i = 0; i < shapes.count; i++)
+            var toReturn = new ShapeDistributionInformation[shapes.Count];
+            for (int i = 0; i < shapes.Count; i++)
             {
                 shapes.Elements[i].Shape.ComputeDistributionInformation(out toReturn[i]);
             }

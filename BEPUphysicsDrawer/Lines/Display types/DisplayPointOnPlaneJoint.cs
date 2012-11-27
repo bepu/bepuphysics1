@@ -54,10 +54,10 @@ namespace BEPUphysicsDrawer.Lines
             //Move lines around
             PointOnPlaneJoint constraint = LineObject;
             Vector3 planeAnchor = MathConverter.Convert(constraint.PlaneAnchor);
-            Vector3 y = MathConverter.Convert(BEPUphysics.MathExtensions.Vector3.Cross(constraint.ConnectionA.OrientationMatrix.Up, constraint.PlaneNormal));
+            Vector3 y = MathConverter.Convert(BEPUutilities.Vector3.Cross(constraint.ConnectionA.OrientationMatrix.Up, constraint.PlaneNormal));
             if (y.LengthSquared() < .001f)
             {
-                y = MathConverter.Convert(BEPUphysics.MathExtensions.Vector3.Cross(constraint.ConnectionA.OrientationMatrix.Right, constraint.PlaneNormal));
+                y = MathConverter.Convert(BEPUutilities.Vector3.Cross(constraint.ConnectionA.OrientationMatrix.Right, constraint.PlaneNormal));
             }
             Vector3 x = Vector3.Cross(MathConverter.Convert(constraint.PlaneNormal), y);
 

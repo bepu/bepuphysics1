@@ -1,8 +1,9 @@
 ﻿using System;
 using BEPUphysics.Entities;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
  
 using BEPUphysics.Settings;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.Constraints.Collision
 {
@@ -244,7 +245,7 @@ namespace BEPUphysics.Constraints.Collision
             entityADynamic = entityA != null && entityA.isDynamic;
             entityBDynamic = entityB != null && entityB.isDynamic;
 
-            contactCount = contactManifoldConstraint.penetrationConstraints.count;
+            contactCount = contactManifoldConstraint.penetrationConstraints.Count;
             switch (contactCount)
             {
                 case 1:
@@ -500,7 +501,7 @@ namespace BEPUphysics.Constraints.Collision
             isActive = false;
         }
 
-        protected internal override void CollectInvolvedEntities(DataStructures.RawList<Entity> outputInvolvedEntities)
+        protected internal override void CollectInvolvedEntities(RawList<Entity> outputInvolvedEntities)
         {
             //This should never really have to be called.
             if (entityA != null)

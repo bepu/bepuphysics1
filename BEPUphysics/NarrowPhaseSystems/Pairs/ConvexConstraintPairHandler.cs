@@ -10,7 +10,7 @@ using BEPUphysics.PositionUpdating;
 using BEPUphysics.Settings;
  
 using BEPUphysics.CollisionShapes.ConvexShapes;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 
 namespace BEPUphysics.NarrowPhaseSystems.Pairs
 {
@@ -44,7 +44,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             //Find the contact's normal force.
             float totalNormalImpulse = 0;
             info.NormalImpulse = 0;
-            for (int i = 0; i < contactConstraint.penetrationConstraints.count; i++)
+            for (int i = 0; i < contactConstraint.penetrationConstraints.Count; i++)
             {
                 totalNormalImpulse += contactConstraint.penetrationConstraints.Elements[i].accumulatedImpulse;
                 if (contactConstraint.penetrationConstraints.Elements[i].contact == info.Contact)

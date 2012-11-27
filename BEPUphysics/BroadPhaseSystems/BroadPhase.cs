@@ -3,6 +3,8 @@ using BEPUphysics.Threading;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.DataStructures;
 using System;
+using BEPUutilities;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.BroadPhaseSystems
 {

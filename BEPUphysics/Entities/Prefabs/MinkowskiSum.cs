@@ -3,7 +3,7 @@ using BEPUphysics.Collidables.MobileCollidables;
 using BEPUphysics.EntityStateManagement;
  
 using BEPUphysics.CollisionShapes.ConvexShapes;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 
 namespace BEPUphysics.Entities.Prefabs
 {

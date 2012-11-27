@@ -1,14 +1,10 @@
 ﻿using System;
 using BEPUphysics.Collidables.Events;
 using BEPUphysics.CollisionShapes;
- 
-using BEPUphysics.Materials;
-using BEPUphysics.CollisionRuleManagement;
-using BEPUphysics.CollisionShapes.ConvexShapes;
-using BEPUphysics.MathExtensions;
-using BEPUphysics.ResourceManagement;
+using BEPUutilities;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
 using BEPUphysics.OtherSpaceStages;
+using BEPUutilities.ResourceManagement;
 
 namespace BEPUphysics.Collidables
 {
@@ -206,8 +202,8 @@ namespace BEPUphysics.Collidables
             hit = new RayHit();
             BoundingBox boundingBox;
             castShape.GetSweptLocalBoundingBox(ref startingTransform, ref worldTransform, ref sweep, out boundingBox);
-            var tri = Resources.GetTriangle();
-            var hitElements = Resources.GetIntList();
+            var tri = PhysicsResources.GetTriangle();
+            var hitElements = CommonResources.GetIntList();
             if (this.Shape.TriangleMesh.Tree.GetOverlaps(boundingBox, hitElements))
             {
                 hit.T = float.MaxValue;
@@ -241,12 +237,12 @@ namespace BEPUphysics.Collidables
                     }
                 }
                 tri.maximumRadius = 0;
-                Resources.GiveBack(tri);
-                Resources.GiveBack(hitElements);
+                PhysicsResources.GiveBack(tri);
+                CommonResources.GiveBack(hitElements);
                 return hit.T != float.MaxValue;
             }
-            Resources.GiveBack(tri);
-            Resources.GiveBack(hitElements);
+            PhysicsResources.GiveBack(tri);
+            CommonResources.GiveBack(hitElements);
             return false;
         }
 

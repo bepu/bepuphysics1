@@ -6,7 +6,7 @@ using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.Collidables.MobileCollidables;
 using BEPUphysics.DataStructures;
 using BEPUphysics.CollisionTests;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 using BEPUphysics.Collidables;
 using BEPUphysics.NarrowPhaseSystems;
 using BEPUphysics.CollisionRuleManagement;
@@ -15,6 +15,7 @@ using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.Settings;
 using BEPUphysics;
 using BEPUphysics.BroadPhaseSystems;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysicsDemos.AlternateMovement.Character
 {

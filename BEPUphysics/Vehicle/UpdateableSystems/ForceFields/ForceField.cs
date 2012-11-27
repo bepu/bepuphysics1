@@ -5,7 +5,7 @@ using BEPUphysics.Entities;
  
 using BEPUphysics.Threading;
 using BEPUphysics.DataStructures;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 
 namespace BEPUphysics.UpdateableSystems.ForceFields
 {

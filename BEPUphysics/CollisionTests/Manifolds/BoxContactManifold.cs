@@ -2,12 +2,10 @@
 using BEPUphysics.Collidables;
 using BEPUphysics.Collidables.MobileCollidables;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
- 
-using BEPUphysics.DataStructures;
-using BEPUphysics.ResourceManagement;
 using BEPUphysics.CollisionShapes.ConvexShapes;
-using System.Diagnostics;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
+using BEPUutilities.DataStructures;
+using BEPUutilities.ResourceManagement;
 
 namespace BEPUphysics.CollisionTests.Manifolds
 {
@@ -69,7 +67,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     BoxContactData* manifoldPointer = &manifold.D1;
                     Vector3.Negate(ref axis, out axis);
                     var toRemove = new TinyList<int>();
-                    for (int i = 0; i < contacts.count; i++)
+                    for (int i = 0; i < contacts.Count; i++)
                     {
                         bool found = false;
                         for (int j = manifold.Count - 1; j >= 0; j--)
@@ -115,7 +113,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
             else
             {
                 //Not colliding, so get rid of it.
-                for (int i = contacts.count - 1; i >= 0; i--)
+                for (int i = contacts.Count - 1; i >= 0; i--)
                 {
                     Remove(i);
                 }

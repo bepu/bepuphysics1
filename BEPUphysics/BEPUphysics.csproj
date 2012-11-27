@@ -79,11 +79,35 @@
     <OutputPath>bin\x64\Release\</OutputPath>
     <DefineConstants>WINDOWS;ALLOWUNSAFE</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DocumentationFile>bin\Release\BEPUphysics.XML</DocumentationFile>
+    <DocumentationFile>bin\x64\Release\BEPUphysics.XML</DocumentationFile>
     <Optimize>true</Optimize>
     <NoStdLib>true</NoStdLib>
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;WINDOWS;ALLOWUNSAFE;CHECKMATH</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DocumentationFile>bin\Debug\BEPUphysics.XML</DocumentationFile>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>WINDOWS;ALLOWUNSAFE</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DocumentationFile>bin\Release\BEPUphysics.XML</DocumentationFile>
+    <Optimize>true</Optimize>
+    <NoStdLib>true</NoStdLib>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="BroadPhaseSystems\BroadPhase.cs" />
@@ -111,8 +135,6 @@
     <Compile Include="BroadPhaseEntries\MobileCollidables\MobileMeshCollidable.cs" />
     <Compile Include="CollisionRuleManagement\ICollisionRulesOwner.cs" />
     <Compile Include="CollisionShapes\StaticGroupShape.cs" />
-    <Compile Include="ConvexHullHelper.cs" />
-    <Compile Include="ConvexHullHelper.Pruning.cs" />
     <Compile Include="BroadPhaseEntries\CollidableCollection.cs" />
     <Compile Include="BroadPhaseEntries\CollidablePair.cs" />
     <Compile Include="BroadPhaseEntries\EntityCollidableCollection.cs" />
@@ -185,7 +207,6 @@
     <Compile Include="CollisionTests\Manifolds\TerrainSphereContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\TriangleConvexContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\TriangleMeshConvexContactManifold.cs" />
-    <Compile Include="CollisionTests\VoronoiRegion.cs" />
     <Compile Include="Constraints\Collision\ContactFrictionConstraint.cs" />
     <Compile Include="Constraints\Collision\ContactManifoldConstraint.cs" />
     <Compile Include="Constraints\Collision\ContactManifoldConstraintGroup.cs" />
@@ -242,16 +263,7 @@
     <Compile Include="DataStructures\BoundingBoxTree.cs" />
     <Compile Include="DataStructures\MeshBoundingBoxTree.cs" />
     <Compile Include="DataStructures\MeshBoundingBoxTreeData.cs" />
-    <Compile Include="DataStructures\ObservableDictionary.cs" />
-    <Compile Include="DataStructures\ObservableList.cs" />
-    <Compile Include="DataStructures\RawList.cs" />
-    <Compile Include="DataStructures\RawValueList.cs" />
-    <Compile Include="DataStructures\ReadOnlyDictionary.cs" />
-    <Compile Include="DataStructures\ReadOnlyEnumerable.cs" />
-    <Compile Include="DataStructures\ReadOnlyList.cs" />
     <Compile Include="DataStructures\StaticMeshData.cs" />
-    <Compile Include="DataStructures\TinyList.cs" />
-    <Compile Include="DataStructures\TinyStructList.cs" />
     <Compile Include="DataStructures\TransformableMeshData.cs" />
     <Compile Include="DataStructures\TreeOverlapPair.cs" />
     <Compile Include="DataStructures\TriangleMesh.cs" />
@@ -280,7 +292,6 @@
     <Compile Include="Entities\Prefabs\TransformableEntity.cs" />
     <Compile Include="Entities\Prefabs\Triangle.cs" />
     <Compile Include="Entities\Prefabs\WrappedBody.cs" />
-    <Compile Include="MathExtensions\MathChecker.cs" />
     <Compile Include="EntityStateManagement\BufferedStatesAccessor.cs" />
     <Compile Include="EntityStateManagement\BufferedStatesManager.cs" />
     <Compile Include="EntityStateManagement\EntityBufferedStates.cs" />
@@ -296,21 +307,6 @@
     <Compile Include="Materials\Material.cs" />
     <Compile Include="Materials\MaterialManager.cs" />
     <Compile Include="Materials\MaterialPair.cs" />
-    <Compile Include="MathExtensions\AffineTransform.cs" />
-    <Compile Include="MathExtensions\BoundingBox.cs" />
-    <Compile Include="MathExtensions\BoundingSphere.cs" />
-    <Compile Include="MathExtensions\MathHelper.cs" />
-    <Compile Include="MathExtensions\Matrix.cs" />
-    <Compile Include="MathExtensions\Matrix2x2.cs" />
-    <Compile Include="MathExtensions\Matrix2x3.cs" />
-    <Compile Include="MathExtensions\Matrix3x2.cs" />
-    <Compile Include="MathExtensions\Matrix3x3.cs" />
-    <Compile Include="MathExtensions\Plane.cs" />
-    <Compile Include="MathExtensions\Quaternion.cs" />
-    <Compile Include="MathExtensions\Ray.cs" />
-    <Compile Include="MathExtensions\RigidTransform.cs" />
-    <Compile Include="MathExtensions\Vector2.cs" />
-    <Compile Include="MathExtensions\Vector3.cs" />
     <Compile Include="MultithreadedProcessingStage.cs" />
     <Compile Include="NarrowPhaseSystems\NarrowPhase.cs" />
     <Compile Include="NarrowPhaseSystems\NarrowPhaseHelper.cs" />
@@ -410,11 +406,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="RayCastResult.cs" />
-    <Compile Include="RayHit.cs" />
-    <Compile Include="ResourceManagement\LockingResourcePool.cs" />
-    <Compile Include="ResourceManagement\ResourcePool.cs" />
-    <Compile Include="ResourceManagement\Resources.cs" />
-    <Compile Include="ResourceManagement\UnsafeResourcePool.cs" />
+    <Compile Include="PhysicsResources.cs" />
     <Compile Include="Settings\CollisionDetectionSettings.cs" />
     <Compile Include="Settings\CollisionResponseSettings.cs" />
     <Compile Include="Settings\MotionSettings.cs" />
@@ -423,17 +415,14 @@
     <Compile Include="SolverSystems\SolverUpdateableChange.cs" />
     <Compile Include="Space.cs" />
     <Compile Include="BroadPhaseEntries\StaticMesh.cs" />
-    <Compile Include="Threading\ConcurrentDeque.cs" />
     <Compile Include="Threading\IThreadManager.cs" />
     <Compile Include="Threading\Modified Pool\ParallelLoopManager.cs" />
     <Compile Include="Threading\Modified Pool\ParallelLoopWorker.cs" />
     <Compile Include="Threading\Modified Pool\SpecializedThreadManager.cs" />
     <Compile Include="Threading\Modified Pool\ThreadTaskManager.cs" />
     <Compile Include="Threading\SimpleThreadManager.cs" />
-    <Compile Include="Threading\SpinLock.cs" />
     <Compile Include="Threading\ThreadManagerTPL.cs" />
     <Compile Include="TimeStepSettings.cs" />
-    <Compile Include="Toolbox.cs" />
     <Compile Include="Vehicle\UpdateableSystems\CombinedUpdateable.cs" />
     <Compile Include="Vehicle\UpdateableSystems\FluidVolume.cs" />
     <Compile Include="Vehicle\UpdateableSystems\ForceFields\BoundingBoxForceFieldShape.cs" />
@@ -488,6 +477,12 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BEPUutilities\BEPUutilities.csproj">
+      <Project>{34853DEA-43A6-4F2F-A379-D1EE04D256D2}</Project>
+      <Name>BEPUutilities</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

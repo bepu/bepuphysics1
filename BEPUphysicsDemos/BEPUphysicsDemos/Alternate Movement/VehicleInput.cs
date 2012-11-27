@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.CollisionShapes;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 using ConversionHelper;
 using System.Diagnostics;
 

@@ -1,6 +1,6 @@
 using BEPUphysics.Entities;
 using BEPUphysics.UpdateableSystems;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 
 namespace BEPUphysicsDemos.SampleCode
 {

@@ -2,7 +2,7 @@
 using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.Constraints.SolverGroups;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 using ConversionHelper;
 
 namespace BEPUphysicsDemos.Demos

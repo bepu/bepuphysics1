@@ -4,7 +4,7 @@ using BEPUphysics.Collidables.MobileCollidables;
  
 using BEPUphysics.DataStructures;
 using BEPUphysics.CollisionShapes;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 using System.Collections.ObjectModel;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 

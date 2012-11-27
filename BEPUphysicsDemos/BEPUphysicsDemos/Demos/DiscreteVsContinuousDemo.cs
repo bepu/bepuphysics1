@@ -1,6 +1,6 @@
 ﻿using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.PositionUpdating;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 
 namespace BEPUphysicsDemos.Demos
 {

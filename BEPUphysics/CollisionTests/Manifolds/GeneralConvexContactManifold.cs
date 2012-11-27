@@ -2,12 +2,10 @@
 using BEPUphysics.Collidables;
 using BEPUphysics.Collidables.MobileCollidables;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
-using BEPUphysics.MathExtensions;
- 
-using BEPUphysics.DataStructures;
+using BEPUutilities;
 using BEPUphysics.Settings;
-using BEPUphysics.ResourceManagement;
-using System.Diagnostics;
+using BEPUutilities.DataStructures;
+using BEPUutilities.ResourceManagement;
 
 namespace BEPUphysics.CollisionTests.Manifolds
 {
@@ -85,7 +83,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                 if (IsContactUnique(ref contact))
                 {
                     //Check if adding the new contact would overflow the manifold.
-                    if (contacts.count == 4)
+                    if (contacts.Count == 4)
                     {
                         //Adding that contact would overflow the manifold.  Reduce to the best subset.
                         bool addCandidate;
@@ -104,7 +102,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
             else
             {
                 //No collision, clean out the manifold.
-                for (int i = contacts.count - 1; i >= 0; i--)
+                for (int i = contacts.Count - 1; i >= 0; i--)
                 {
                     Remove(i);
                 }
@@ -132,7 +130,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
 
         private bool IsContactUnique(ref ContactData contactCandidate)
         {
-            for (int i = 0; i < contacts.count; i++)
+            for (int i = 0; i < contacts.Count; i++)
             {
                 float distanceSquared;
                 Vector3.DistanceSquared(ref contacts.Elements[i].Position, ref contactCandidate.Position, out distanceSquared);

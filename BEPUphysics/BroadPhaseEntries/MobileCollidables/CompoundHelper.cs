@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using BEPUphysics.CollisionShapes;
  
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 using BEPUphysics.Entities;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 
@@ -72,13 +72,13 @@ namespace BEPUphysics.Collidables.MobileCollidables
             {
                 //Reconfigure the entities using the data computed in the split.
                 float originalMass = a.mass;
-                if (a.CollisionInformation.children.count > 0)
+                if (a.CollisionInformation.children.Count > 0)
                 {
                     float newMassA = (weightA / (weightA + weightB)) * originalMass;
                     Matrix3X3.Multiply(ref distributionInfoA.VolumeDistribution, newMassA * InertiaHelper.InertiaTensorScale, out distributionInfoA.VolumeDistribution);
                     a.Initialize(a.CollisionInformation, newMassA, distributionInfoA.VolumeDistribution, distributionInfoA.Volume);
                 }
-                if (bCollidable.children.count > 0)
+                if (bCollidable.children.Count > 0)
                 {
                     float newMassB = (weightB / (weightA + weightB)) * originalMass;
                     Matrix3X3.Multiply(ref distributionInfoB.VolumeDistribution, newMassB * InertiaHelper.InertiaTensorScale, out distributionInfoB.VolumeDistribution);
@@ -187,14 +187,14 @@ namespace BEPUphysics.Collidables.MobileCollidables
             {
                 //Reconfigure the entities using the data computed in the split.
                 float originalMass = a.mass;
-                if (a.CollisionInformation.children.count > 0)
+                if (a.CollisionInformation.children.Count > 0)
                 {
                     float newMassA = (weightA / (weightA + weightB)) * originalMass;
                     Matrix3X3.Multiply(ref distributionInfoA.VolumeDistribution, newMassA * InertiaHelper.InertiaTensorScale, out distributionInfoA.VolumeDistribution);
                     a.Initialize(a.CollisionInformation, newMassA, distributionInfoA.VolumeDistribution, distributionInfoA.Volume);
                 }
 
-                if (b.CollisionInformation.children.count > 0)
+                if (b.CollisionInformation.children.Count > 0)
                 {
                     float newMassB = (weightB / (weightA + weightB)) * originalMass;
                     Matrix3X3.Multiply(ref distributionInfoB.VolumeDistribution, newMassB * InertiaHelper.InertiaTensorScale, out distributionInfoB.VolumeDistribution);
@@ -227,7 +227,7 @@ namespace BEPUphysics.Collidables.MobileCollidables
             out float weightA, out float weightB)
         {
             bool splitOccurred = false;
-            for (int i = a.children.count - 1; i >= 0; i--)
+            for (int i = a.children.Count - 1; i >= 0; i--)
             {
                 //The shape doesn't change during this process.  The entity could, though.
                 //All of the other collidable information, like the Tag, CollisionRules, Events, etc. all stay the same.
@@ -258,7 +258,7 @@ namespace BEPUphysics.Collidables.MobileCollidables
             weightA = 0;
             distributionInfoB = new ShapeDistributionInformation();
             weightB = 0;
-            for (int i = a.children.count - 1; i >= 0; i--)
+            for (int i = a.children.Count - 1; i >= 0; i--)
             {
                 var child = a.children.Elements[i];
                 var entry = child.Entry;
@@ -269,7 +269,7 @@ namespace BEPUphysics.Collidables.MobileCollidables
                 distributionInfoA.Volume += contribution.Volume;
                 weightA += entry.Weight;
             }
-            for (int i = b.children.count - 1; i >= 0; i--)
+            for (int i = b.children.Count - 1; i >= 0; i--)
             {
                 var child = b.children.Elements[i];
                 var entry = child.Entry;
@@ -297,7 +297,7 @@ namespace BEPUphysics.Collidables.MobileCollidables
             Vector3.Negate(ref distributionInfoB.Center, out offsetB);
 
             //Compute the unscaled inertia tensor.
-            for (int i = a.children.count - 1; i >= 0; i--)
+            for (int i = a.children.Count - 1; i >= 0; i--)
             {
                 var child = a.children.Elements[i];
                 var entry = child.Entry;
@@ -311,7 +311,7 @@ namespace BEPUphysics.Collidables.MobileCollidables
                 //Vector3.Add(ref entry.LocalTransform.Position, ref offsetA, out entry.LocalTransform.Position);
                 Matrix3X3.Add(ref contribution.VolumeDistribution, ref distributionInfoA.VolumeDistribution, out distributionInfoA.VolumeDistribution);
             }
-            for (int i = b.children.count - 1; i >= 0; i--)
+            for (int i = b.children.Count - 1; i >= 0; i--)
             {
                 var child = b.children.Elements[i];
                 var entry = child.Entry;
@@ -435,7 +435,7 @@ namespace BEPUphysics.Collidables.MobileCollidables
             bool removalOccurred = false;
             removedWeight = 0;
             removedCenter = new Vector3();
-            for (int i = compound.children.count - 1; i >= 0; i--)
+            for (int i = compound.children.Count - 1; i >= 0; i--)
             {
                 //The shape doesn't change during this process.  The entity could, though.
                 //All of the other collidable information, like the Tag, CollisionRules, Events, etc. all stay the same.
@@ -469,7 +469,7 @@ namespace BEPUphysics.Collidables.MobileCollidables
             //Compute the contributions from the original shape to the new form of the original collidable.
             distributionInfo = new ShapeDistributionInformation();
             weight = 0;
-            for (int i = compound.children.count - 1; i >= 0; i--)
+            for (int i = compound.children.Count - 1; i >= 0; i--)
             {
                 var child = compound.children.Elements[i];
                 var entry = child.Entry;
@@ -490,7 +490,7 @@ namespace BEPUphysics.Collidables.MobileCollidables
             Vector3.Negate(ref distributionInfo.Center, out offset);
 
             //Compute the unscaled inertia tensor.
-            for (int i = compound.children.count - 1; i >= 0; i--)
+            for (int i = compound.children.Count - 1; i >= 0; i--)
             {
                 var child = compound.children.Elements[i];
                 var entry = child.Entry;

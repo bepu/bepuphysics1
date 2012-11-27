@@ -6,7 +6,7 @@ using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.UpdateableSystems;
 using BEPUphysics;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 using BEPUphysics.Collidables.MobileCollidables;
 using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
@@ -206,7 +206,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.ConvexCast
                 var entityCollidable = support as EntityCollidable;
                 if (entityCollidable != null)
                 {
-                    Vector3 entityVelocity = Toolbox.GetVelocityOfPoint(supportData.Location, entityCollidable.Entity);
+                    Vector3 entityVelocity = Toolbox.GetVelocityOfPoint(supportData.Location, entityCollidable.Entity.Position, entityCollidable.Entity.LinearVelocity, entityCollidable.Entity.AngularVelocity);
                     Vector3.Subtract(ref relativeVelocity, ref entityVelocity, out relativeVelocity);
                     //TODO: Multithreaded safety.  If characters are running in parallel, ensure that this operation will not corrupt anything.
                     if (entityCollidable.Entity.IsDynamic)

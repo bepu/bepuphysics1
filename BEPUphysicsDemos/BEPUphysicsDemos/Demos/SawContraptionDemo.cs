@@ -3,7 +3,7 @@ using System;
 using BEPUphysics.Constraints.SolverGroups;
 using BEPUphysics.Constraints.TwoEntity.Motors;
 using BEPUphysics.Entities.Prefabs;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 namespace BEPUphysicsDemos.Demos
 {
     /// <summary>

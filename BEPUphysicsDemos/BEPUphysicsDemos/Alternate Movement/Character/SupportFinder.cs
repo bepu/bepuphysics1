@@ -9,7 +9,8 @@ using BEPUphysics.Collidables;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.BroadPhaseSystems;
 using System.Diagnostics;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysicsDemos.AlternateMovement.Character
 {

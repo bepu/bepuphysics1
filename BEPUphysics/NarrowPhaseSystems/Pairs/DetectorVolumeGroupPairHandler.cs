@@ -2,6 +2,7 @@
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.DataStructures;
 using BEPUphysics.Collidables.MobileCollidables;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.NarrowPhaseSystems.Pairs
 {
@@ -84,7 +85,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                 if (!containedPairs.Contains(other))
                     pairsToRemove.Add(other);
             }
-            for (int i = 0; i < pairsToRemove.count; i++)
+            for (int i = 0; i < pairsToRemove.Count; i++)
             {
                 var toReturn = subPairs[pairsToRemove.Elements[i]];
                 subPairs.Remove(pairsToRemove.Elements[i]);

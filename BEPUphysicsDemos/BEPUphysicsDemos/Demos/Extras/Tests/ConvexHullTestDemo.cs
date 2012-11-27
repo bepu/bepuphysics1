@@ -1,8 +1,7 @@
 ﻿using BEPUphysics.Entities.Prefabs;
-using BEPUphysics.MathExtensions;
-using BEPUphysics;
-using BEPUphysics.DataStructures;
+using BEPUutilities;
 using BEPUphysics.CollisionShapes;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysicsDemos.Demos.Tests
 {
@@ -26,7 +25,7 @@ namespace BEPUphysicsDemos.Demos.Tests
                 new Vector3(-1, 1, 0.5f), 
                 new Vector3(-1, -1, 0.5f), 
             };
-            RawList<Vector3> hullVertices = new RawList<Vector3>();
+            var hullVertices = new RawList<Vector3>();
             ConvexHullHelper.GetConvexHull(vertices, hullVertices);
 
             ConvexHull hull = new ConvexHull(vertices, 5);

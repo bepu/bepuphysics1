@@ -1,6 +1,6 @@
 ﻿
 
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 namespace BEPUphysics.CollisionTests.CollisionAlgorithms.GJK
 {
 

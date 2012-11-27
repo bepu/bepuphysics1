@@ -3,9 +3,8 @@ using BEPUphysics.Collidables;
 using BEPUphysics.Collidables.MobileCollidables;
  
 using BEPUphysics.DataStructures;
-using BEPUphysics.MathExtensions;
-using BEPUphysics.ResourceManagement;
-using BEPUphysics.CollisionTests.CollisionAlgorithms;
+using BEPUutilities;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.CollisionTests.Manifolds
 {
@@ -58,7 +57,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
             }
 
             mesh.Shape.TriangleMesh.Tree.GetOverlaps(boundingBox, overlappedTriangles);
-            return overlappedTriangles.count;
+            return overlappedTriangles.Count;
         }
 
         protected override bool ConfigureTriangle(int i, out TriangleIndices indices)

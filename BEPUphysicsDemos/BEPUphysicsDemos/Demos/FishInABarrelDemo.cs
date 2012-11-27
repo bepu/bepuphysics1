@@ -7,7 +7,7 @@ using BEPUphysicsDrawer.Models;
 using Microsoft.Xna.Framework.Graphics;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 
 namespace BEPUphysicsDemos.Demos
 {

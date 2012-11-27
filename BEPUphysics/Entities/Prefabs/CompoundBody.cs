@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
 using BEPUphysics.Collidables.MobileCollidables;
- 
-using BEPUphysics.DataStructures;
 using BEPUphysics.CollisionShapes;
-using BEPUphysics.MathExtensions;
-using System.Collections.ObjectModel;
+using BEPUutilities;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.Entities.Prefabs
 {

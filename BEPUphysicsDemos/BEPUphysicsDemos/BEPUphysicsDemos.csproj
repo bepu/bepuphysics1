@@ -51,7 +51,7 @@
     <DebugType>full</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\x86\Release</OutputPath>
-    <DefineConstants>WINDOWS</DefineConstants>
+    <DefineConstants>WINDOWS;CHECKMATH</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoStdLib>true</NoStdLib>
@@ -62,8 +62,12 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="BEPUphysics">
+    <Reference Include="BEPUphysics, Version=1.2.0.0, Culture=neutral, PublicKeyToken=31f6a8732a21de19, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\BEPUphysics\bin\Release\BEPUphysics.dll</HintPath>
+    </Reference>
+    <Reference Include="BEPUutilities">
+      <HintPath>..\..\BEPUphysics\bin\Release\BEPUutilities.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Xna.Framework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
     <Reference Include="Microsoft.Xna.Framework.Game, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />

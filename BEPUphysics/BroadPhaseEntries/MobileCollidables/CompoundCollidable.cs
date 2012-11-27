@@ -3,14 +3,11 @@ using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.Collidables.Events;
 using BEPUphysics.CollisionShapes;
-using BEPUphysics.MathExtensions;
- 
-using BEPUphysics.ResourceManagement;
-using BEPUphysics.DataStructures;
+using BEPUutilities;
 using BEPUphysics.Materials;
-using System.Collections.ObjectModel;
 using BEPUphysics.CollisionRuleManagement;
 using System;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.Collidables.MobileCollidables
 {
@@ -75,7 +72,7 @@ namespace BEPUphysics.Collidables.MobileCollidables
 
         protected override void OnEntityChanged()
         {
-            for (int i = 0; i < children.count; i++)
+            for (int i = 0; i < children.Count; i++)
             {
                 children.Elements[i].CollisionInformation.Entity = entity;
                 if (children.Elements[i].Material == null)
@@ -183,7 +180,7 @@ namespace BEPUphysics.Collidables.MobileCollidables
         {
             Events = new CompoundEventManager();
 
-            for (int i = 0; i < compoundShape.shapes.count; i++)
+            for (int i = 0; i < compoundShape.shapes.Count; i++)
             {
                 CompoundChild child = GetChild(compoundShape.shapes.Elements[i], i);
                 this.children.Add(child);
@@ -220,7 +217,7 @@ namespace BEPUphysics.Collidables.MobileCollidables
         {
             base.UpdateWorldTransform(ref position, ref orientation);
             var shapeList = Shape.shapes;
-            for (int i = 0; i < children.count; i++)
+            for (int i = 0; i < children.Count; i++)
             {
                 RigidTransform transform;
                 RigidTransform.Transform(ref shapeList.Elements[children.Elements[i].shapeIndex].LocalTransform, ref worldTransform, out transform);
@@ -230,7 +227,7 @@ namespace BEPUphysics.Collidables.MobileCollidables
 
         protected internal override void UpdateBoundingBoxInternal(float dt)
         {
-            for (int i = 0; i < children.count; i++)
+            for (int i = 0; i < children.Count; i++)
             {
                 children.Elements[i].CollisionInformation.UpdateBoundingBoxInternal(dt);
             }
@@ -250,11 +247,11 @@ namespace BEPUphysics.Collidables.MobileCollidables
         public override bool RayCast(Ray ray, float maximumLength, out RayHit rayHit)
         {
             rayHit = new RayHit();
-            var hitElements = Resources.GetCompoundChildList();
+            var hitElements = PhysicsResources.GetCompoundChildList();
             if (hierarchy.Tree.GetOverlaps(ray, maximumLength, hitElements))
             {
                 rayHit.T = float.MaxValue;
-                for (int i = 0; i < hitElements.count; i++)
+                for (int i = 0; i < hitElements.Count; i++)
                 {
                     RayHit tempHit;
                     if (hitElements.Elements[i].CollisionInformation.RayCast(ray, maximumLength, out tempHit) && tempHit.T < rayHit.T)
@@ -262,10 +259,10 @@ namespace BEPUphysics.Collidables.MobileCollidables
                         rayHit = tempHit;
                     }
                 }
-                Resources.GiveBack(hitElements);
+                PhysicsResources.GiveBack(hitElements);
                 return rayHit.T != float.MaxValue;
             }
-            Resources.GiveBack(hitElements);
+            PhysicsResources.GiveBack(hitElements);
             return false;
         }
 
@@ -284,11 +281,11 @@ namespace BEPUphysics.Collidables.MobileCollidables
             rayHit = new RayHit();
             if (filter(this))
             {
-                var hitElements = Resources.GetCompoundChildList();
+                var hitElements = PhysicsResources.GetCompoundChildList();
                 if (hierarchy.Tree.GetOverlaps(ray, maximumLength, hitElements))
                 {
                     rayHit.T = float.MaxValue;
-                    for (int i = 0; i < hitElements.count; i++)
+                    for (int i = 0; i < hitElements.Count; i++)
                     {
                         RayHit tempHit;
                         if (hitElements.Elements[i].CollisionInformation.RayCast(ray, maximumLength, filter, out tempHit) && tempHit.T < rayHit.T)
@@ -296,10 +293,10 @@ namespace BEPUphysics.Collidables.MobileCollidables
                             rayHit = tempHit;
                         }
                     }
-                    Resources.GiveBack(hitElements);
+                    PhysicsResources.GiveBack(hitElements);
                     return rayHit.T != float.MaxValue;
                 }
-                Resources.GiveBack(hitElements);
+                PhysicsResources.GiveBack(hitElements);
             }
             return false;
         }
@@ -315,11 +312,11 @@ namespace BEPUphysics.Collidables.MobileCollidables
         public bool RayCast(Ray ray, float maximumLength, out RayCastResult rayHit)
         {
             rayHit = new RayCastResult();
-            var hitElements = Resources.GetCompoundChildList();
+            var hitElements = PhysicsResources.GetCompoundChildList();
             if (hierarchy.Tree.GetOverlaps(ray, maximumLength, hitElements))
             {
                 rayHit.HitData.T = float.MaxValue;
-                for (int i = 0; i < hitElements.count; i++)
+                for (int i = 0; i < hitElements.Count; i++)
                 {
                     EntityCollidable candidate = hitElements.Elements[i].CollisionInformation;
                     RayHit tempHit;
@@ -329,10 +326,10 @@ namespace BEPUphysics.Collidables.MobileCollidables
                         rayHit.HitObject = candidate;
                     }
                 }
-                Resources.GiveBack(hitElements);
+                PhysicsResources.GiveBack(hitElements);
                 return rayHit.HitData.T != float.MaxValue;
             }
-            Resources.GiveBack(hitElements);
+            PhysicsResources.GiveBack(hitElements);
             return false;
         }
 
@@ -348,11 +345,11 @@ namespace BEPUphysics.Collidables.MobileCollidables
         {
             rayHit = new RayHit();
             hitChild = null;
-            var hitElements = Resources.GetCompoundChildList();
+            var hitElements = PhysicsResources.GetCompoundChildList();
             if (hierarchy.Tree.GetOverlaps(ray, maximumLength, hitElements))
             {
                 rayHit.T = float.MaxValue;
-                for (int i = 0; i < hitElements.count; i++)
+                for (int i = 0; i < hitElements.Count; i++)
                 {
                     EntityCollidable candidate = hitElements.Elements[i].CollisionInformation;
                     RayHit tempHit;
@@ -362,10 +359,10 @@ namespace BEPUphysics.Collidables.MobileCollidables
                         hitChild = hitElements.Elements[i];
                     }
                 }
-                Resources.GiveBack(hitElements);
+                PhysicsResources.GiveBack(hitElements);
                 return rayHit.T != float.MaxValue;
             }
-            Resources.GiveBack(hitElements);
+            PhysicsResources.GiveBack(hitElements);
             return false;
         }
 
@@ -382,12 +379,12 @@ namespace BEPUphysics.Collidables.MobileCollidables
         {
             hit = new RayHit();
             BoundingBox boundingBox;
-            Toolbox.GetExpandedBoundingBox(ref castShape, ref startingTransform, ref sweep, out boundingBox);
-            var hitElements = Resources.GetCompoundChildList();
+            castShape.GetSweptBoundingBox(ref startingTransform, ref sweep, out boundingBox);
+            var hitElements = PhysicsResources.GetCompoundChildList();
             if (hierarchy.Tree.GetOverlaps(boundingBox, hitElements))
             {
                 hit.T = float.MaxValue;
-                for (int i = 0; i < hitElements.count; i++)
+                for (int i = 0; i < hitElements.Count; i++)
                 {
                     var candidate = hitElements.Elements[i].CollisionInformation;
                     RayHit tempHit;
@@ -396,10 +393,10 @@ namespace BEPUphysics.Collidables.MobileCollidables
                         hit = tempHit;
                     }
                 }
-                Resources.GiveBack(hitElements);
+                PhysicsResources.GiveBack(hitElements);
                 return hit.T != float.MaxValue;
             }
-            Resources.GiveBack(hitElements);
+            PhysicsResources.GiveBack(hitElements);
             return false;
         }
 

@@ -4,7 +4,8 @@ using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
 using BEPUphysics.DataStructures;
 using BEPUphysics.Collidables.MobileCollidables;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.NarrowPhaseSystems.Pairs
 {
@@ -101,7 +102,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                 BoundingBox mobileBoundingBox;
                 mobileTriangle.GetBoundingBox(ref mobileTriangleTransform, out mobileBoundingBox);
                 DetectorVolume.TriangleMesh.Tree.GetOverlaps(mobileBoundingBox, overlaps);
-                for (int j = 0; j < overlaps.count; j++)
+                for (int j = 0; j < overlaps.Count; j++)
                 {
                     DetectorVolume.TriangleMesh.Data.GetTriangle(overlaps.Elements[j], out detectorTriangle.vA, out detectorTriangle.vB, out detectorTriangle.vC);
                     Vector3.Add(ref detectorTriangle.vA, ref detectorTriangle.vB, out detectorTriangleTransform.Position);

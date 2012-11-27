@@ -3,7 +3,7 @@ using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.Paths;
 using BEPUphysics.Paths.PathFollowing;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 
 namespace BEPUphysicsDemos.Demos
 {

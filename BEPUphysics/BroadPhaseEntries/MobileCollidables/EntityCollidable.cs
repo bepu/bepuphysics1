@@ -1,7 +1,7 @@
 ﻿using BEPUphysics.Collidables.Events;
 using BEPUphysics.CollisionShapes;
 using BEPUphysics.Entities;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
  
 using BEPUphysics.Settings;
 using System;

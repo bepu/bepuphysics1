@@ -4,7 +4,7 @@ using BEPUphysics.Collidables;
 using BEPUphysics.Constraints.TwoEntity.Joints;
 using BEPUphysics.Constraints.TwoEntity.Motors;
 using BEPUphysics.Entities.Prefabs;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 using Microsoft.Xna.Framework.Input;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.Materials;

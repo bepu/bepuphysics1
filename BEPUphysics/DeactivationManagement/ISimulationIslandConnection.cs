@@ -1,5 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using BEPUphysics.DataStructures;
+﻿using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.DeactivationManagement
 {

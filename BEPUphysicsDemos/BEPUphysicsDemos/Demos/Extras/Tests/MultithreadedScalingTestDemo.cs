@@ -2,7 +2,7 @@
 using BEPUphysics;
 using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 using BEPUphysics.NarrowPhaseSystems;
 using BEPUphysics.UpdateableSystems.ForceFields;
 using BEPUphysicsDemos.SampleCode;

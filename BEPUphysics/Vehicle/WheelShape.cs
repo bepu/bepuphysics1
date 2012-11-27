@@ -5,7 +5,7 @@ using BEPUphysics.Entities.Prefabs;
  
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.Materials;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 
 namespace BEPUphysics.Vehicle
 {

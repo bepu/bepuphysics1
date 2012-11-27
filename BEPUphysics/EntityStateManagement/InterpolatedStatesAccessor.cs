@@ -1,5 +1,5 @@
 ﻿ 
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 
 namespace BEPUphysics.EntityStateManagement
 {

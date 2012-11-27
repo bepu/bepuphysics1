@@ -1,7 +1,7 @@
 
 using BEPUphysics;
 using Microsoft.Xna.Framework.Input;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 using ConversionHelper;
 
 namespace BEPUphysicsDemos.AlternateMovement.SimpleCharacter

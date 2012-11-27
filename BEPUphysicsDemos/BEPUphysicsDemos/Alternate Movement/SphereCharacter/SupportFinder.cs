@@ -8,7 +8,8 @@ using BEPUphysics;
 using BEPUphysics.Collidables;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.BroadPhaseSystems;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
 {

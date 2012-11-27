@@ -6,9 +6,10 @@ using BEPUphysics.Constraints;
 using BEPUphysics.DataStructures;
 using BEPUphysics.Entities;
 using BEPUphysics.Collidables.MobileCollidables;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 using BEPUphysics;
 using System.Diagnostics;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysicsDemos.AlternateMovement.Character
 {
@@ -699,7 +700,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             {
                 Vector3 bodyVelocity = character.Body.LinearVelocity;
                 if (supportEntity != null)
-                    return bodyVelocity - Toolbox.GetVelocityOfPoint(supportData.Position, supportEntity);
+                    return bodyVelocity - Toolbox.GetVelocityOfPoint(supportData.Position, supportEntity.Position, supportEntity.LinearVelocity, supportEntity.AngularVelocity);
                 else
                     return bodyVelocity;
             }

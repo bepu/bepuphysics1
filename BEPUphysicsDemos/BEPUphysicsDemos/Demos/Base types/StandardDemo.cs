@@ -14,7 +14,7 @@ using System.Diagnostics;
 using BEPUphysics.Settings;
 using BEPUphysicsDemos.AlternateMovement.Character;
 using BEPUphysicsDemos.AlternateMovement;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 using ConversionHelper;
 
 namespace BEPUphysicsDemos.Demos

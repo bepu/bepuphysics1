@@ -11,7 +11,7 @@ using BEPUphysics.PositionUpdating;
 using BEPUphysics.Settings;
  
 using BEPUphysics.CollisionShapes.ConvexShapes;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 
 namespace BEPUphysics.NarrowPhaseSystems.Pairs
 {

@@ -8,7 +8,7 @@ using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
 using BEPUphysicsDrawer.Models;
 using Microsoft.Xna.Framework.Graphics;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 
 namespace BEPUphysicsDemos.Demos
 {

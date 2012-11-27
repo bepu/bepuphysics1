@@ -7,7 +7,8 @@ using BEPUphysics.CollisionTests;
 using BEPUphysics.DataStructures;
 using BEPUphysics.Settings;
 using BEPUphysics;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysicsDemos.AlternateMovement.Character
 {

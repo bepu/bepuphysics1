@@ -31,7 +31,7 @@ namespace BEPUphysicsDrawer.Models
             var tempVertices = new VertexPositionNormalTexture[mesh.Data.Vertices.Length];
             for (int i = 0; i < mesh.Data.Vertices.Length; i++)
             {
-                BEPUphysics.MathExtensions.Vector3 v;
+                BEPUutilities.Vector3 v;
                 mesh.Data.GetVertexPosition(i, out v);
                 tempVertices[i] = new VertexPositionNormalTexture(MathConverter.Convert(v), Vector3.Zero, Vector2.Zero);
             }
