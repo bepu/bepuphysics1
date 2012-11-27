@@ -8,7 +8,7 @@
     <ProjectGuid>{34853DEA-43A6-4F2F-A379-D1EE04D256D2}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>BEPUmath</RootNamespace>
+    <RootNamespace>BEPUutilities</RootNamespace>
     <AssemblyName>BEPUutilities</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -22,6 +22,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DocumentationFile>bin\Debug\BEPUutilities.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -51,6 +52,7 @@
   <ItemGroup>
     <Compile Include="ConvexHullHelper.cs" />
     <Compile Include="ConvexHullHelper.Pruning.cs" />
+    <Compile Include="Vector4.cs" />
     <Compile Include="DataStructures\ConcurrentDeque.cs" />
     <Compile Include="AffineTransform.cs" />
     <Compile Include="BoundingBox.cs" />
