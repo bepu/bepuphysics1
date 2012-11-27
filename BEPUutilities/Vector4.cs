@@ -1,9 +1,11 @@
-﻿namespace BEPUutilities
+﻿using System;
+
+namespace BEPUutilities
 {
     /// <summary>
     /// Provides XNA-like 4-component vector math.
     /// </summary>
-    public struct Vector4
+    public struct Vector4 : IEquatable<Vector4>
     {
         /// <summary>
         /// X component of the vector.
@@ -261,6 +263,46 @@
         public static bool operator !=(Vector4 a, Vector4 b)
         {
             return a.X != b.X || a.Y != b.Y || a.Z != b.Z || a.W != b.W;
+        }
+
+        /// <summary>
+        /// Indicates whether the current object is equal to another object of the same type.
+        /// </summary>
+        /// <returns>
+        /// true if the current object is equal to the <paramref name="other"/> parameter; otherwise, false.
+        /// </returns>
+        /// <param name="other">An object to compare with this object.</param>
+        public bool Equals(Vector4 other)
+        {
+            return X == other.X && Y == other.Y && Z == other.Z && W == other.W;
+        }
+
+        /// <summary>
+        /// Indicates whether this instance and a specified object are equal.
+        /// </summary>
+        /// <returns>
+        /// true if <paramref name="obj"/> and this instance are the same type and represent the same value; otherwise, false.
+        /// </returns>
+        /// <param name="obj">Another object to compare to. </param><filterpriority>2</filterpriority>
+        public override bool Equals(object obj)
+        {
+            if (obj is Vector4)
+            {
+                return Equals((Vector4)obj);
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Returns the hash code for this instance.
+        /// </summary>
+        /// <returns>
+        /// A 32-bit signed integer that is the hash code for this instance.
+        /// </returns>
+        /// <filterpriority>2</filterpriority>
+        public override int GetHashCode()
+        {
+            return X.GetHashCode() + Y.GetHashCode() + Z.GetHashCode() + W.GetHashCode();
         }
 
         /// <summary>

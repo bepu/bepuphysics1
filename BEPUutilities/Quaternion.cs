@@ -339,7 +339,6 @@ namespace BEPUutilities
             return a.X != b.X || a.Y != b.Y || a.Z != b.Z || a.W != b.W;
         }
 
-
         /// <summary>
         /// Indicates whether the current object is equal to another object of the same type.
         /// </summary>
@@ -351,6 +350,36 @@ namespace BEPUutilities
         {
             return X == other.X && Y == other.Y && Z == other.Z && W == other.W;
         }
+
+        /// <summary>
+        /// Indicates whether this instance and a specified object are equal.
+        /// </summary>
+        /// <returns>
+        /// true if <paramref name="obj"/> and this instance are the same type and represent the same value; otherwise, false.
+        /// </returns>
+        /// <param name="obj">Another object to compare to. </param><filterpriority>2</filterpriority>
+        public override bool Equals(object obj)
+        {
+            if (obj is Quaternion)
+            {
+                return Equals((Quaternion)obj);
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Returns the hash code for this instance.
+        /// </summary>
+        /// <returns>
+        /// A 32-bit signed integer that is the hash code for this instance.
+        /// </returns>
+        /// <filterpriority>2</filterpriority>
+        public override int GetHashCode()
+        {
+            return X.GetHashCode() + Y.GetHashCode() + Z.GetHashCode() + W.GetHashCode();
+        }
+
+
 
         /// <summary>
         /// Multiplies two quaternions.

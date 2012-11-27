@@ -5,16 +5,16 @@ namespace BEPUutilities
     /// <summary>
     /// Provides XNA-like 3D vector math.
     /// </summary>
-    public struct Vector3
-    {      
+    public struct Vector3 : IEquatable<Vector3>
+    {
         /// <summary>
         /// X component of the vector.
         /// </summary>
-        public float X;       
+        public float X;
         /// <summary>
         /// Y component of the vector.
         /// </summary>
-        public float Y;      
+        public float Y;
         /// <summary>
         /// Z component of the vector.
         /// </summary>
@@ -246,6 +246,46 @@ namespace BEPUutilities
         public static bool operator !=(Vector3 a, Vector3 b)
         {
             return a.X != b.X || a.Y != b.Y || a.Z != b.Z;
+        }
+
+        /// <summary>
+        /// Indicates whether the current object is equal to another object of the same type.
+        /// </summary>
+        /// <returns>
+        /// true if the current object is equal to the <paramref name="other"/> parameter; otherwise, false.
+        /// </returns>
+        /// <param name="other">An object to compare with this object.</param>
+        public bool Equals(Vector3 other)
+        {
+            return X == other.X && Y == other.Y && Z == other.Z;
+        }
+
+        /// <summary>
+        /// Indicates whether this instance and a specified object are equal.
+        /// </summary>
+        /// <returns>
+        /// true if <paramref name="obj"/> and this instance are the same type and represent the same value; otherwise, false.
+        /// </returns>
+        /// <param name="obj">Another object to compare to. </param><filterpriority>2</filterpriority>
+        public override bool Equals(object obj)
+        {
+            if (obj is Vector3)
+            {
+                return Equals((Vector3)obj);
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Returns the hash code for this instance.
+        /// </summary>
+        /// <returns>
+        /// A 32-bit signed integer that is the hash code for this instance.
+        /// </returns>
+        /// <filterpriority>2</filterpriority>
+        public override int GetHashCode()
+        {
+            return X.GetHashCode() + Y.GetHashCode() + Z.GetHashCode();
         }
 
         /// <summary>
