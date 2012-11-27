@@ -1,19 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using BEPUphysics.BroadPhaseEntries;
-using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
 using BEPUphysics.DataStructures;
 using BEPUphysics.Entities;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 using BEPUphysics.OtherSpaceStages;
-using BEPUphysics.ResourceManagement;
- 
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
-using BEPUphysics.MathExtensions;
-using BEPUphysics.Threading;
+using BEPUutilities.DataStructures;
+using BEPUutilities.ResourceManagement;
 
 namespace BEPUphysics.Collidables
 {
@@ -174,9 +171,9 @@ namespace BEPUphysics.Collidables
         /// <returns>Whether or not the point is contained by the detector volume.</returns>
         public bool IsPointContained(Vector3 point)
         {
-            var triangles = Resources.GetIntList();
+            var triangles = CommonResources.GetIntList();
             bool contained = IsPointContained(ref point, triangles);
-            Resources.GiveBack(triangles);
+            CommonResources.GiveBack(triangles);
             return contained;
         }
 
@@ -198,7 +195,7 @@ namespace BEPUphysics.Collidables
             float minimumT = float.MaxValue;
             bool minimumIsClockwise = false;
 
-            for (int i = 0; i < triangles.count; i++)
+            for (int i = 0; i < triangles.Count; i++)
             {
                 Vector3 a, b, c;
                 triangleMesh.Data.GetTriangle(triangles.Elements[i], out a, out b, out c);
@@ -238,13 +235,13 @@ namespace BEPUphysics.Collidables
             return triangleMesh.RayCast(ray, maximumLength, TriangleSidedness.DoubleSided, out rayHit);
         }
 
-        public override bool ConvexCast(ConvexShape castShape, ref MathExtensions.RigidTransform startingTransform, ref Vector3 sweep, out RayHit hit)
+        public override bool ConvexCast(ConvexShape castShape, ref RigidTransform startingTransform, ref Vector3 sweep, out RayHit hit)
         {
             hit = new RayHit();
             BoundingBox boundingBox;
-            Toolbox.GetExpandedBoundingBox(ref castShape, ref startingTransform, ref sweep, out boundingBox);
-            var tri = Resources.GetTriangle();
-            var hitElements = Resources.GetIntList();
+            castShape.GetSweptBoundingBox(ref startingTransform, ref sweep, out boundingBox);
+            var tri = PhysicsResources.GetTriangle();
+            var hitElements = CommonResources.GetIntList();
             if (triangleMesh.Tree.GetOverlaps(boundingBox, hitElements))
             {
                 hit.T = float.MaxValue;
@@ -275,12 +272,12 @@ namespace BEPUphysics.Collidables
                     }
                 }
                 tri.maximumRadius = 0;
-                Resources.GiveBack(tri);
-                Resources.GiveBack(hitElements);
+                PhysicsResources.GiveBack(tri);
+                CommonResources.GiveBack(hitElements);
                 return hit.T != float.MaxValue;
             }
-            Resources.GiveBack(tri);
-            Resources.GiveBack(hitElements);
+            PhysicsResources.GiveBack(tri);
+            CommonResources.GiveBack(hitElements);
             return false;
         }
 
@@ -306,12 +303,12 @@ namespace BEPUphysics.Collidables
             var direction = (a + b + c) / 3 - origin;
 
             var ray = new Ray(origin, direction);
-            var triangles = Resources.GetIntList();
+            var triangles = CommonResources.GetIntList();
             triangleMesh.Tree.GetOverlaps(ray, triangles);
 
             float minimumT = float.MaxValue;
 
-            for (int i = 0; i < triangles.count; i++)
+            for (int i = 0; i < triangles.Count; i++)
             {
                 triangleMesh.Data.GetTriangle(triangles.Elements[i], out a, out b, out c);
 
@@ -326,7 +323,7 @@ namespace BEPUphysics.Collidables
                     }
                 }
             }
-            Resources.GiveBack(triangles);
+            CommonResources.GiveBack(triangles);
         }
 
 

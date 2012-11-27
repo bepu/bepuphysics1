@@ -19,7 +19,7 @@ namespace BEPUphysicsDrawer.Models
             var tempVertices = new VertexPositionNormalTexture[shape.TriangleMesh.Data.Vertices.Length];
             for (int i = 0; i < shape.TriangleMesh.Data.Vertices.Length; i++)
             {
-                BEPUphysics.MathExtensions.Vector3 position;
+                BEPUutilities.Vector3 position;
                 shape.TriangleMesh.Data.GetVertexPosition(i, out position);
                 tempVertices[i] = new VertexPositionNormalTexture(
                     MathConverter.Convert(position),

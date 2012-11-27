@@ -4,10 +4,9 @@ using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.Collidables;
 using BEPUphysics.Collidables.MobileCollidables;
-using BEPUphysics.ResourceManagement;
- 
 using BEPUphysics.Threading;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
+using BEPUutilities.ResourceManagement;
 
 namespace BEPUphysics.UpdateableSystems
 {
@@ -241,7 +240,7 @@ namespace BEPUphysics.UpdateableSystems
         /// </summary>
         public void RecalculateBoundingBox()
         {
-            var points = Resources.GetVectorList();
+            var points = CommonResources.GetVectorList();
             foreach (var tri in SurfaceTriangles)
             {
                 points.Add(tri[0]);
@@ -253,7 +252,7 @@ namespace BEPUphysics.UpdateableSystems
             }
             boundingBox = BoundingBox.CreateFromPoints(points);
             surfacePlaneHeight = Vector3.Dot(points[0], upVector);
-            Resources.GiveBack(points);
+            CommonResources.GiveBack(points);
         }
 
         List<BroadPhaseEntry> collisionEntries = new List<BroadPhaseEntry>();

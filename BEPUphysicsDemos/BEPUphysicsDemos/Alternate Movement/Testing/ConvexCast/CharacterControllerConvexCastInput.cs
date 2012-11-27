@@ -1,7 +1,7 @@
 using BEPUphysics;
 using Microsoft.Xna.Framework.Input;
 using ConversionHelper;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 
 namespace BEPUphysicsDemos.AlternateMovement.Testing.ConvexCast
 {

@@ -2,7 +2,8 @@
 using BEPUphysics.Entities;
  
 using BEPUphysics.Settings;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.Constraints.Collision
 {
@@ -323,7 +324,7 @@ namespace BEPUphysics.Constraints.Collision
             }
         }
 
-        protected internal override void CollectInvolvedEntities(DataStructures.RawList<Entity> outputInvolvedEntities)
+        protected internal override void CollectInvolvedEntities(RawList<Entity> outputInvolvedEntities)
         {
             //This should never really have to be called.
             if (entityA != null)

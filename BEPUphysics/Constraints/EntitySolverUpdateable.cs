@@ -1,12 +1,8 @@
 using System.Collections.Generic;
-using System.Threading;
 using BEPUphysics.Constraints.SolverGroups;
-using BEPUphysics.DeactivationManagement;
 using BEPUphysics.Entities;
-using BEPUphysics.ResourceManagement;
-using System.Collections.ObjectModel;
-using BEPUphysics.DataStructures;
 using BEPUphysics.SolverSystems;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.Constraints
 {
@@ -133,9 +129,9 @@ namespace BEPUphysics.Constraints
         {
             //First verify that something really changed.
             bool entitiesChanged = false;
-            RawList<Entity> newInvolvedEntities = Resources.GetEntityRawList();
+            RawList<Entity> newInvolvedEntities = PhysicsResources.GetEntityRawList();
             CollectInvolvedEntities(newInvolvedEntities);
-            if (newInvolvedEntities.count == involvedEntities.count)
+            if (newInvolvedEntities.Count == involvedEntities.Count)
             {
                 for (int i = 0; i < newInvolvedEntities.Count; i++)
                 {
@@ -155,7 +151,7 @@ namespace BEPUphysics.Constraints
             {
                 //Probably need to wake things up given that such a significant change was made.
 
-                for (int i = 0; i < involvedEntities.count; i++)
+                for (int i = 0; i < involvedEntities.Count; i++)
                 {
                     Entity e = involvedEntities.Elements[i];
                     if (e.isDynamic)
@@ -174,7 +170,7 @@ namespace BEPUphysics.Constraints
                     SolverGroup.OnInvolvedEntitiesChanged();
 
                 //We woke up the FORMER involved entities, now wake up the current involved entities.
-                for (int i = 0; i < involvedEntities.count; i++)
+                for (int i = 0; i < involvedEntities.Count; i++)
                 {
                     Entity e = involvedEntities.Elements[i];
                     if (e.isDynamic)
@@ -184,7 +180,7 @@ namespace BEPUphysics.Constraints
                     }
                 }
             }
-            Resources.GiveBack(newInvolvedEntities);
+            PhysicsResources.GiveBack(newInvolvedEntities);
         }
 
         /// <summary>
@@ -230,14 +226,14 @@ namespace BEPUphysics.Constraints
                 deactivationManager.Remove(simulationIslandConnection);
             }
             else if (!simulationIslandConnection.SlatedForRemoval) //If it's not already going to be cleaned up, then we need to do it here.
-                Resources.GiveBack(simulationIslandConnection); //Well, since we're going to orphan the connection, we'll need to take care of its trash.
+                PhysicsResources.GiveBack(simulationIslandConnection); //Well, since we're going to orphan the connection, we'll need to take care of its trash.
 
 
             //The SimulationIslandConnection is immutable.
             //So create a new one!
             //Assume we've already dealt with the old connection.
-            simulationIslandConnection = Resources.GetSimulationIslandConnection();
-            for (int i = 0; i < involvedEntities.count; i++)
+            simulationIslandConnection = PhysicsResources.GetSimulationIslandConnection();
+            for (int i = 0; i < involvedEntities.Count; i++)
             {
                 simulationIslandConnection.Add(involvedEntities.Elements[i].activityInformation);
             }

@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using BEPUphysics.Collidables.MobileCollidables;
-using BEPUphysics.DataStructures;
 using BEPUphysics.EntityStateManagement;
  
 using BEPUphysics.CollisionShapes.ConvexShapes;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.Entities.Prefabs
 {

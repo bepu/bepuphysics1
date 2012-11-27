@@ -1,7 +1,7 @@
 ﻿using BEPUphysics.Constraints;
 using BEPUphysics.Entities;
  
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 
 namespace BEPUphysics.Vehicle
 {

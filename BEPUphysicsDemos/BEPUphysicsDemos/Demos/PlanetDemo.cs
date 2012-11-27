@@ -4,7 +4,7 @@ using BEPUphysics.UpdateableSystems.ForceFields;
 using BEPUphysicsDemos.SampleCode;
 using System.Collections.Generic;
 using BEPUphysics.NarrowPhaseSystems;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 
 namespace BEPUphysicsDemos.Demos
 {

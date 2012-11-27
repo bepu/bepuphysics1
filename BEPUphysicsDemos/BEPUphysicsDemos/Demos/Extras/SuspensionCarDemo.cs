@@ -6,7 +6,7 @@ using BEPUphysics.Constraints.TwoEntity.Joints;
 using BEPUphysics.Constraints.TwoEntity.JointLimits;
 using Microsoft.Xna.Framework.Input;
 using System;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 using BEPUphysics.Collidables;
 using ConversionHelper;
 namespace BEPUphysicsDemos.Demos.Extras

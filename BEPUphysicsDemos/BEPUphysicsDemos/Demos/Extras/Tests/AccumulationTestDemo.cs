@@ -1,7 +1,7 @@
 ﻿using System;
 using BEPUphysics.Collidables;
 using BEPUphysics.Entities.Prefabs;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.Collidables.Events;
 using BEPUphysics.Collidables.MobileCollidables;

@@ -1,9 +1,10 @@
-﻿using BEPUphysics.MathExtensions;
+﻿using BEPUutilities;
 using BEPUphysics.Settings;
  
 using BEPUphysics.DataStructures;
 using System.Diagnostics;
 using System;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.CollisionTests
 {
@@ -22,7 +23,7 @@ namespace BEPUphysics.CollisionTests
             //TODO: Could also refresh normals with some trickery.
             //Would also need to refresh depth using new normals, and would require some extra information.
 
-            for (int k = 0; k < contacts.count; k++)
+            for (int k = 0; k < contacts.Count; k++)
             {
                 ContactSupplementData data = supplementData.Elements[k];
                 Vector3 newPosA, newPosB;

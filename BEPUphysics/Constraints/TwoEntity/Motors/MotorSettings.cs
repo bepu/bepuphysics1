@@ -1,5 +1,5 @@
 ﻿using System;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
  
 
 namespace BEPUphysics.Constraints.TwoEntity.Motors
@@ -85,7 +85,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
 
         internal void WakeUpEntities()
         {
-            for (int i = 0; i < motor.involvedEntities.count; i++)
+            for (int i = 0; i < motor.involvedEntities.Count; i++)
             {
                 if (motor.involvedEntities[i].isDynamic)
                 {

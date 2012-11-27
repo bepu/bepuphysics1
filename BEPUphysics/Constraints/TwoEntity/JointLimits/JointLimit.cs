@@ -1,6 +1,6 @@
 ﻿using System;
 using BEPUphysics.Constraints.TwoEntity.Joints;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
  
 
 namespace BEPUphysics.Constraints.TwoEntity.JointLimits

@@ -4,7 +4,7 @@ using BEPUphysics.Entities;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
  
 using BEPUphysics.CollisionRuleManagement;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 using BEPUphysics.Materials;
 using System;
 

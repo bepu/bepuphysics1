@@ -6,9 +6,10 @@ using BEPUphysics.Constraints;
 using BEPUphysics.DataStructures;
 using BEPUphysics.Entities;
 using BEPUphysics.Collidables.MobileCollidables;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 using BEPUphysics;
 using BEPUphysics.Settings;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
 {

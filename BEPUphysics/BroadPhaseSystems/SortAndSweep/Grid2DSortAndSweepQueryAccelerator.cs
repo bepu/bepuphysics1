@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 using BEPUphysics.BroadPhaseEntries;
  
 
@@ -84,7 +84,7 @@ namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
                     //To fully accelerate this, the entries list would need to contain both min and max interval markers.
                     //Since it only contains the sorted min intervals, we can't just start at a point in the middle of the list.
                     //Consider some giant bounding box that spans the entire list. 
-                    for (int i = 0; i < cell.entries.count 
+                    for (int i = 0; i < cell.entries.Count 
                         && cell.entries.Elements[i].item.boundingBox.Min.X <= endingX; i++) //TODO: Try additional x axis pruning?
                     {
                         float? intersects;
@@ -143,7 +143,7 @@ namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
                         //To fully accelerate this, the entries list would need to contain both min and max interval markers.
                         //Since it only contains the sorted min intervals, we can't just start at a point in the middle of the list.
                         //Consider some giant bounding box that spans the entire list. 
-                        for (int k = 0; k < cell.entries.count
+                        for (int k = 0; k < cell.entries.Count
                             && cell.entries.Elements[k].item.boundingBox.Min.X <= boundingShape.Max.X; k++) //TODO: Try additional x axis pruning? A bit of optimization potential due to overlap with AABB test.
                         {
                             bool intersects;
@@ -194,7 +194,7 @@ namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
                         //To fully accelerate this, the entries list would need to contain both min and max interval markers.
                         //Since it only contains the sorted min intervals, we can't just start at a point in the middle of the list.
                         //Consider some giant bounding box that spans the entire list. 
-                        for (int k = 0; k < cell.entries.count
+                        for (int k = 0; k < cell.entries.Count
                             && cell.entries.Elements[k].item.boundingBox.Min.X <= box.Max.X; k++) //TODO: Try additional x axis pruning? A bit of optimization potential due to overlap with AABB test.
                         {
                             bool intersects;

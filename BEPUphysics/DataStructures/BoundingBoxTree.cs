@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using BEPUphysics.ResourceManagement;
+﻿using System.Collections.Generic;
 using BEPUphysics.BroadPhaseSystems;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 
 namespace BEPUphysics.DataStructures
 {

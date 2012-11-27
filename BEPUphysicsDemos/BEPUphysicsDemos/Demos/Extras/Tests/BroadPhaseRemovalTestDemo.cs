@@ -2,6 +2,7 @@
 using BEPUphysics.DataStructures;
 using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
+using BEPUutilities.DataStructures;
 using ConversionHelper;
 using Microsoft.Xna.Framework;
 using System.Diagnostics;

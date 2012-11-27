@@ -2,7 +2,7 @@
 using BEPUphysics.DataStructures;
 using BEPUphysics.Entities.Prefabs;
 using Microsoft.Xna.Framework.Graphics;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysicsDemos.AlternateMovement.SphereCharacter;
 using System.Collections.Generic;

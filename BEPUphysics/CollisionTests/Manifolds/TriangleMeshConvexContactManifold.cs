@@ -2,13 +2,11 @@
 using System.Collections.Generic;
 using BEPUphysics.Collidables.MobileCollidables;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
- 
-using BEPUphysics.DataStructures;
 using BEPUphysics.Settings;
-using BEPUphysics.ResourceManagement;
 using BEPUphysics.CollisionShapes.ConvexShapes;
-using BEPUphysics.MathExtensions;
-using System.Diagnostics;
+using BEPUutilities;
+using BEPUutilities.DataStructures;
+using BEPUutilities.ResourceManagement;
 
 namespace BEPUphysics.CollisionTests.Manifolds
 {
@@ -121,7 +119,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     TinyStructList<ContactData> contactList;
                     if (pairTester.GenerateContactCandidate(out contactList))
                     {
-                        for (int j = 0; j < contactList.count; j++)
+                        for (int j = 0; j < contactList.Count; j++)
                         {
                             contactList.Get(j, out contact);
 
@@ -165,7 +163,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                 //Sure, it might not be necessary under normal circumstances, but it's a better option than having no contacts.
                 //TODO: There is another option: Changing restricted regions so that a vertex only restricts the other two vertices and the far edge,
                 //and an edge only restricts the far vertex and other two edges.  This introduces an occasional bump though...
-                int guaranteedContacts = candidatesToAdd.count;
+                int guaranteedContacts = candidatesToAdd.Count;
 
                 //It's possible, in very specific instances, for an object to wedge itself between two adjacent triangles.
                 //For this state to continue beyond a brief instant generally requires the object be orientation locked and slender.
@@ -180,7 +178,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                 //This isn't a completely free operation, but it's guarded behind pretty rare conditions.
                 //Essentially, we will check to see if there's just edge contacts fighting against each other.
                 //If they are, then we will correct any stuck-contributing normals to the triangle normal.
-                if (vertexContacts.count == 0 && guaranteedContacts == 0 && edgeContacts.count > 1)
+                if (vertexContacts.Count == 0 && guaranteedContacts == 0 && edgeContacts.Count > 1)
                 {
                     //There are only edge contacts, check to see if:
                     //all normals are coplanar, and
@@ -203,7 +201,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                         //TODO: Note that we're only checking the new edge contacts, not the existing contacts.
                         //It's possible that some existing contacts could interfere and cause issues, but for the sake of simplicity and due to rarity
                         //we'll ignore that possibility for now.
-                        for (int i = 1; i < edgeContacts.count; i++)
+                        for (int i = 1; i < edgeContacts.Count; i++)
                         {
                             Vector3.Dot(ref edgeContacts.Elements[i].ContactData.Normal, ref firstNormal, out dot);
                             if (dot < 0)
@@ -233,7 +231,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                         edgeContacts.Elements[0].ContactData.Normal = edgeContacts.Elements[0].CorrectedNormal;
                         edgeContacts.Elements[0].ShouldCorrect = true;
 
-                        for (int i = 1; i < edgeContacts.count; i++)
+                        for (int i = 1; i < edgeContacts.Count; i++)
                         {
                             //Must normalize the corrected normal before using it.
                             edgeContacts.Elements[i].CorrectedNormal.Normalize();
@@ -259,7 +257,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
 
 
 
-                for (int i = 0; i < edgeContacts.count; i++)
+                for (int i = 0; i < edgeContacts.Count; i++)
                 {
                     //Only correct if it's allowed AND it's blocked.
                     //If it's not blocked, the contact being created is necessary!
@@ -287,7 +285,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
 
 
                 }
-                for (int i = 0; i < vertexContacts.count; i++)
+                for (int i = 0; i < vertexContacts.Count; i++)
                 {
                     if (!blockedVertexRegions.Contains(vertexContacts.Elements[i].Vertex))
                     {
@@ -336,7 +334,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
 
 
 
-            for (int i = toRemove.count - 1; i >= 0; i--)
+            for (int i = toRemove.Count - 1; i >= 0; i--)
             {
                 var pairTester = activePairTesters[toRemove[i]];
                 pairTester.CleanUp();
@@ -350,21 +348,21 @@ namespace BEPUphysics.CollisionTests.Manifolds
 
 
             //Check if adding the new contacts would overflow the manifold.
-            if (contacts.count + candidatesToAdd.count > 4)
+            if (contacts.Count + candidatesToAdd.Count > 4)
             {
                 //Adding all the contacts would overflow the manifold.  Reduce to the best subset.
                 ContactReducer.ReduceContacts(contacts, candidatesToAdd, contactIndicesToRemove, reducedCandidates);
                 RemoveQueuedContacts();
-                for (int i = reducedCandidates.count - 1; i >= 0; i--)
+                for (int i = reducedCandidates.Count - 1; i >= 0; i--)
                 {
                     Add(ref reducedCandidates.Elements[i]);
                     reducedCandidates.RemoveAt(i);
                 }
             }
-            else if (candidatesToAdd.count > 0)
+            else if (candidatesToAdd.Count > 0)
             {
                 //Won't overflow the manifold, so just toss it in PROVIDED that it isn't too close to something else.
-                for (int i = 0; i < candidatesToAdd.count; i++)
+                for (int i = 0; i < candidatesToAdd.Count; i++)
                 {
                     Add(ref candidatesToAdd.Elements[i]);
                 }
@@ -576,7 +574,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
 
             float distanceSquared;
             RigidTransform meshTransform = MeshTransform;
-            for (int i = 0; i < contacts.count; i++)
+            for (int i = 0; i < contacts.Count; i++)
             {
                 Vector3.DistanceSquared(ref contacts.Elements[i].Position, ref contactCandidate.Position, out distanceSquared);
                 if (distanceSquared < CollisionDetectionSettings.ContactMinimumSeparationDistanceSquared)
@@ -598,7 +596,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     }
                 }
             }
-            for (int i = 0; i < candidatesToAdd.count; i++)
+            for (int i = 0; i < candidatesToAdd.Count; i++)
             {
                 Vector3.DistanceSquared(ref candidatesToAdd.Elements[i].Position, ref contactCandidate.Position, out distanceSquared);
                 if (distanceSquared < CollisionDetectionSettings.ContactMinimumSeparationDistanceSquared)

@@ -1,17 +1,10 @@
-﻿using System.Collections.Generic;
-using BEPUphysics.BroadPhaseSystems;
-using BEPUphysics.Collidables.Events;
+﻿using BEPUphysics.Collidables.Events;
 using BEPUphysics.CollisionShapes;
-using BEPUphysics.MathExtensions;
- 
-using BEPUphysics.ResourceManagement;
-using BEPUphysics.DataStructures;
-using BEPUphysics.Materials;
-using System.Collections.ObjectModel;
-using BEPUphysics.CollisionRuleManagement;
+using BEPUutilities;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
 using System;
+using BEPUutilities.ResourceManagement;
 
 namespace BEPUphysics.Collidables.MobileCollidables
 {
@@ -207,8 +200,8 @@ namespace BEPUphysics.Collidables.MobileCollidables
             var transform = new AffineTransform {Translation = worldTransform.Position};
             Matrix3X3.CreateFromQuaternion(ref worldTransform.Orientation, out transform.LinearTransform);
             castShape.GetSweptLocalBoundingBox(ref startingTransform, ref transform, ref sweep, out boundingBox);
-            var tri = Resources.GetTriangle();
-            var hitElements = Resources.GetIntList();
+            var tri = PhysicsResources.GetTriangle();
+            var hitElements = CommonResources.GetIntList();
             if (this.Shape.TriangleMesh.Tree.GetOverlaps(boundingBox, hitElements))
             {
                 hit.T = float.MaxValue;
@@ -242,12 +235,12 @@ namespace BEPUphysics.Collidables.MobileCollidables
                     }
                 }
                 tri.maximumRadius = 0;
-                Resources.GiveBack(tri);
-                Resources.GiveBack(hitElements);
+                PhysicsResources.GiveBack(tri);
+                CommonResources.GiveBack(hitElements);
                 return hit.T != float.MaxValue;
             }
-            Resources.GiveBack(tri);
-            Resources.GiveBack(hitElements);
+            PhysicsResources.GiveBack(tri);
+            CommonResources.GiveBack(hitElements);
             return false;
         }
     }

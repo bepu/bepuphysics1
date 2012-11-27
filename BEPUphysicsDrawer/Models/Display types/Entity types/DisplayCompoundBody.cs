@@ -1,8 +1,5 @@
 using System.Collections.Generic;
-using BEPUphysics.MathExtensions;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using BEPUphysics.CollisionShapes;
 using System;
 using BEPUphysics.Collidables.MobileCollidables;
 using ConversionHelper;

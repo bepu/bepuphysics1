@@ -1,6 +1,6 @@
 ﻿using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.DataStructures;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 using BEPUphysics.Collidables;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.Entities;

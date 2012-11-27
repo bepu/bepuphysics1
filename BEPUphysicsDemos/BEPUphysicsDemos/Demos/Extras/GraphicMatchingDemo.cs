@@ -26,7 +26,7 @@ namespace BEPUphysicsDemos.Demos.Extras
             //http://bepuphysics.codeplex.com/wikipage?title=Shape%20Recentering
 
             var model = game.Content.Load<Model>("guy");
-            BEPUphysics.MathExtensions.Vector3[] vertices;
+            BEPUutilities.Vector3[] vertices;
             int[] indices;
             ModelDataExtractor.GetVerticesAndIndicesFromModel(model, out vertices, out indices);
 
@@ -65,7 +65,7 @@ namespace BEPUphysicsDemos.Demos.Extras
             //This graphic is perfectly aligned with the collision shape!  Hooray!
 
 
-            Box ground = new Box(new BEPUphysics.MathExtensions.Vector3(0, -1.5f, 0), 50, 1, 50);
+            Box ground = new Box(new BEPUutilities.Vector3(0, -1.5f, 0), 50, 1, 50);
             Space.Add(ground);
             game.Camera.Position = new Vector3(0, 6, 15);
         }

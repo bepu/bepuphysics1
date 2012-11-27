@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
-using BEPUphysics.MathExtensions;
- 
-using BEPUphysics.ResourceManagement;
-using BEPUphysics.DataStructures;
+﻿using BEPUutilities;
+using BEPUutilities.DataStructures;
+using BEPUutilities.ResourceManagement;
 
 namespace BEPUphysics.CollisionShapes.ConvexShapes
 {
@@ -42,10 +40,10 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         ///<returns>Center of the shape.</returns>
         public static Vector3 ComputeCenter(ConvexShape shape, out float volume)
         {
-            var pointContributions = Resources.GetVectorList();
+            var pointContributions = CommonResources.GetVectorList();
             GetPoints(shape, out volume, pointContributions);
             Vector3 center = AveragePoints(pointContributions);
-            Resources.GiveBack(pointContributions);
+            CommonResources.GiveBack(pointContributions);
             return center;
         }
 
@@ -72,11 +70,11 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         ///<returns>Volume distribution of the shape.</returns>
         public static Matrix3X3 ComputeVolumeDistribution(ConvexShape shape, out float volume)
         {
-            var pointContributions = Resources.GetVectorList();
+            var pointContributions = CommonResources.GetVectorList();
             GetPoints(shape, out volume, pointContributions);
             Vector3 center = AveragePoints(pointContributions);
             Matrix3X3 volumeDistribution = ComputeVolumeDistribution(pointContributions, ref center);
-            Resources.GiveBack(pointContributions);
+            CommonResources.GiveBack(pointContributions);
             return volumeDistribution;
         }
 
@@ -90,10 +88,10 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         ///<returns>Volume distribution of the shape.</returns>
         public static Matrix3X3 ComputeVolumeDistribution(ConvexShape shape, ref Vector3 center, out float volume)
         {
-            var pointContributions = Resources.GetVectorList();
+            var pointContributions = CommonResources.GetVectorList();
             GetPoints(shape, out volume, pointContributions);
             Matrix3X3 volumeDistribution = ComputeVolumeDistribution(pointContributions, ref center);
-            Resources.GiveBack(pointContributions);
+            CommonResources.GiveBack(pointContributions);
             return volumeDistribution;
         }
 

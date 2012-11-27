@@ -11,7 +11,7 @@ using BEPUphysics.OtherSpaceStages;
 using BEPUphysics.PositionUpdating;
 using BEPUphysics.Settings;
  
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 using BEPUphysics.Materials;
 using BEPUphysics.Constraints;
 using System.Collections.ObjectModel;
@@ -1088,7 +1088,7 @@ namespace BEPUphysics.Entities
             //I must order the pairs to compute a time of impact.
 
             //The pair method works in such a way that, when this method is run asynchronously, there will be no race conditions.
-            for (int i = 0; i < collisionInformation.pairs.count; i++)
+            for (int i = 0; i < collisionInformation.pairs.Count; i++)
             {
                 //Only perform CCD if we're either supposed to test against no solver pairs or if this isn't a no solver pair.
                 if (MotionSettings.PairAllowsCCD(this, collisionInformation.pairs.Elements[i]))

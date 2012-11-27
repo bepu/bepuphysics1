@@ -2,7 +2,7 @@
 using BEPUphysics.CollisionShapes;
 using System.Collections.Generic;
 using BEPUphysics.CollisionShapes.ConvexShapes;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 using BEPUphysics.Collidables.MobileCollidables;
 using BEPUphysics.Entities;
 using System;

@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using BEPUphysics.Threading;
 using BEPUphysics.Entities;
 using BEPUphysics.DataStructures;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.EntityStateManagement
 {

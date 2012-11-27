@@ -1,11 +1,9 @@
 using System.Collections.Generic;
 using BEPUphysics.BroadPhaseEntries;
-using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.Collidables.MobileCollidables;
 using BEPUphysics.Entities;
- 
-using BEPUphysics.DataStructures;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.UpdateableSystems.ForceFields
 {
@@ -39,7 +37,7 @@ namespace BEPUphysics.UpdateableSystems.ForceFields
         {
             affectedEntities.Clear();
             ForceField.QueryAccelerator.GetEntries(BoundingBox, affectedEntries);
-            for (int i = 0; i < affectedEntries.count; i++)
+            for (int i = 0; i < affectedEntries.Count; i++)
             {
                 var EntityCollidable = affectedEntries[i] as EntityCollidable;
                 if (EntityCollidable != null)

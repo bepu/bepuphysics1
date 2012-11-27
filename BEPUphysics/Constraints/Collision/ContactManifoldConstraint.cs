@@ -6,6 +6,7 @@ using BEPUphysics.NarrowPhaseSystems.Pairs;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.Materials;
 using BEPUphysics.SolverSystems;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.Constraints.Collision
 {
@@ -139,11 +140,10 @@ namespace BEPUphysics.Constraints.Collision
 
             if (isActive)
             {
-                var aValid = entityA != null && entityA.isDynamic;
                 isActiveInSolver = pair.BroadPhaseOverlap.collisionRule < CollisionRule.NoSolver &&
                                    ((entityA != null && entityA.isDynamic && entityA.activityInformation.IsActive) || //At least one of the objects must be an active dynamic entity.
                                    (entityB != null && entityB.isDynamic && entityB.activityInformation.IsActive));
-                for (int i = 0; i < solverUpdateables.count; i++)
+                for (int i = 0; i < solverUpdateables.Count; i++)
                 {
                     solverUpdateables.Elements[i].isActiveInSolver = solverUpdateables.Elements[i].isActive && isActiveInSolver;
                 }

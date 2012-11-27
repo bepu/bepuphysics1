@@ -3,11 +3,11 @@ using BEPUphysics.Collidables;
 using BEPUphysics.Collidables.MobileCollidables;
  
 using BEPUphysics.DataStructures;
-using BEPUphysics.MathExtensions;
-using BEPUphysics.CollisionShapes.ConvexShapes;
+using BEPUutilities;
 using BEPUphysics.CollisionShapes;
-using BEPUphysics.ResourceManagement;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
+using BEPUutilities.DataStructures;
+using BEPUutilities.ResourceManagement;
 
 namespace BEPUphysics.CollisionTests.Manifolds
 {
@@ -75,7 +75,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                 boundingBox.Min.Z += transformedVelocity.Z;
 
             mesh.Shape.TriangleMesh.Tree.GetOverlaps(boundingBox, overlappedTriangles);
-            return overlappedTriangles.count;
+            return overlappedTriangles.Count;
         }
 
         protected override bool ConfigureTriangle(int i, out TriangleIndices indices)
@@ -142,7 +142,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
         Vector3 lastValidConvexPosition;
         protected override void ProcessCandidates(RawValueList<ContactData> candidates)
         {
-            if (candidates.count == 0 && parentContactCount == 0 && Mesh.Shape.solidity == MobileMeshSolidity.Solid)
+            if (candidates.Count == 0 && parentContactCount == 0 && Mesh.Shape.solidity == MobileMeshSolidity.Solid)
             {
 
                 //If there's no new contacts on the mesh and it's supposed to be a solid,
@@ -198,7 +198,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
 
                     //Do not yet create a new contact.  Check to see if an 'inner contact' with id == 2 already exists.
                     bool addContact = true;
-                    for (int i = 0; i < contacts.count; i++)
+                    for (int i = 0; i < contacts.Count; i++)
                     {
                         if (contacts.Elements[i].Id == 2)
                         {
@@ -212,7 +212,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                             break;
                         }
                     }
-                    if (addContact && contacts.count == 0)
+                    if (addContact && contacts.Count == 0)
                         Add(ref newContact);
                     previousDepth = newContact.PenetrationDepth;
                 }

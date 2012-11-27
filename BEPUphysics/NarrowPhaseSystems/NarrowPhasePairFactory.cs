@@ -1,7 +1,6 @@
-﻿using BEPUphysics.BroadPhaseSystems;
-using BEPUphysics.NarrowPhaseSystems.Pairs;
-using BEPUphysics.ResourceManagement;
+﻿using BEPUphysics.NarrowPhaseSystems.Pairs;
 using System;
+using BEPUutilities.ResourceManagement;
 
 namespace BEPUphysics.NarrowPhaseSystems
 {

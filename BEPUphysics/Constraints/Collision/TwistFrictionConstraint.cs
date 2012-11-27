@@ -2,7 +2,8 @@
 using BEPUphysics.Entities;
  
 using BEPUphysics.Settings;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.Constraints.Collision
 {
@@ -160,7 +161,7 @@ namespace BEPUphysics.Constraints.Collision
                            : contactManifoldConstraint.materialInteraction.StaticFriction;
             friction *= CollisionResponseSettings.TwistFrictionFactor;
 
-            contactCount = contactManifoldConstraint.penetrationConstraints.count;
+            contactCount = contactManifoldConstraint.penetrationConstraints.Count;
 
             Vector3 contactOffset;
             for (int i = 0; i < contactCount; i++)
@@ -220,7 +221,7 @@ namespace BEPUphysics.Constraints.Collision
             isActive = false;
         }
 
-        protected internal override void CollectInvolvedEntities(DataStructures.RawList<Entity> outputInvolvedEntities)
+        protected internal override void CollectInvolvedEntities(RawList<Entity> outputInvolvedEntities)
         {
             //This should never really have to be called.
             if (entityA != null)

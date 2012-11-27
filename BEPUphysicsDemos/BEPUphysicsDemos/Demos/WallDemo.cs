@@ -1,5 +1,5 @@
 ﻿using BEPUphysics.Entities.Prefabs;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 
 namespace BEPUphysicsDemos.Demos
 {
@@ -40,7 +40,7 @@ namespace BEPUphysicsDemos.Demos
             Space.Add(ground);
             game.Camera.Position = new Microsoft.Xna.Framework.Vector3(0, 6, 15);
            
-
+            
         }
 
         /// <summary>

@@ -1,11 +1,5 @@
-﻿using System;
-using BEPUphysics.CollisionTests.CollisionAlgorithms.GJK;
- 
-using BEPUphysics.CollisionShapes.ConvexShapes;
-using BEPUphysics.MathExtensions;
-using BEPUphysics.Settings;
-using BEPUphysics.DataStructures;
-using System.Diagnostics;
+﻿using BEPUphysics.CollisionShapes.ConvexShapes;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 {

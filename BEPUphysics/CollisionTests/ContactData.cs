@@ -1,6 +1,6 @@
 ﻿ 
 using System;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 
 namespace BEPUphysics.CollisionTests
 {

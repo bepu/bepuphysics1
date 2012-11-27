@@ -7,8 +7,9 @@ using BEPUphysics.DataStructures;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.BroadPhaseSystems.Hierarchies;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 using BEPUphysics.Threading;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysicsDemos.Demos.Extras.Tests
 {

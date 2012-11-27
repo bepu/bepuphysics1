@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.CollisionShapes.ConvexShapes;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 using BEPUphysics;
 using System.Diagnostics;
 using BEPUphysicsDrawer.Models;

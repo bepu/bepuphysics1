@@ -2,12 +2,11 @@
 using BEPUphysics.Collidables;
 using BEPUphysics.Collidables.MobileCollidables;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
- 
-using BEPUphysics.DataStructures;
 using BEPUphysics.Settings;
-using BEPUphysics.ResourceManagement;
 using BEPUphysics.CollisionShapes.ConvexShapes;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
+using BEPUutilities.DataStructures;
+using BEPUutilities.ResourceManagement;
 
 namespace BEPUphysics.CollisionTests.Manifolds
 {
@@ -101,7 +100,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
             TinyStructList<ContactData> contactList;
             if (pairTester.GenerateContactCandidate(out contactList))
             {
-                for (int i = 0; i < contactList.count; i++)
+                for (int i = 0; i < contactList.Count; i++)
                 {
                     contactList.Get(i, out contact);
                     //Put the contact into world space.
@@ -112,7 +111,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     if (IsContactUnique(ref contact))
                     {
                         //Check if adding the new contact would overflow the manifold.
-                        if (contacts.count == 4)
+                        if (contacts.Count == 4)
                         {
                             //Adding that contact would overflow the manifold.  Reduce to the best subset.
                             bool addCandidate;
@@ -132,7 +131,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
             else
             {
                 //Clear out the contacts, it's separated.
-                for (int i = contacts.count - 1; i >= 0; i--)
+                for (int i = contacts.Count - 1; i >= 0; i--)
                     Remove(i);
             }
 
@@ -160,7 +159,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
         {
 
             float distanceSquared;
-            for (int i = 0; i < contacts.count; i++)
+            for (int i = 0; i < contacts.Count; i++)
             {
                 Vector3.DistanceSquared(ref contacts.Elements[i].Position, ref contactCandidate.Position, out distanceSquared);
                 if (distanceSquared < CollisionDetectionSettings.ContactMinimumSeparationDistanceSquared)

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using BEPUphysics.Collidables.MobileCollidables;
 using BEPUphysics.CollisionShapes.ConvexShapes;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 using BEPUphysics.NarrowPhaseSystems;
 using BEPUphysics.Collidables;
 using BEPUphysics.CollisionTests;
@@ -14,6 +14,7 @@ using BEPUphysics.Settings;
 using BEPUphysics;
 using System.Diagnostics;
 using BEPUphysics.CollisionRuleManagement;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysicsDemos.AlternateMovement.Character
 {

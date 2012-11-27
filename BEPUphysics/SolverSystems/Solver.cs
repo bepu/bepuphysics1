@@ -7,6 +7,7 @@ using BEPUphysics.Constraints;
 using BEPUphysics.DataStructures;
 using System.Diagnostics;
 using BEPUphysics.NarrowPhaseSystems;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.SolverSystems
 {
@@ -91,7 +92,7 @@ namespace BEPUphysics.SolverSystems
             if (item.Solver == null)
             {
                 item.Solver = this;
-                item.solverIndex = solverUpdateables.count;
+                item.solverIndex = solverUpdateables.Count;
                 solverUpdateables.Add(item);
                 DeactivationManager.Add(item.simulationIslandConnection);
                 item.OnAdditionToSolver(this);
@@ -111,15 +112,15 @@ namespace BEPUphysics.SolverSystems
             {
 
                 item.Solver = null;
-                solverUpdateables.count--;
-                if (item.solverIndex < solverUpdateables.count)
+                solverUpdateables.Count--;
+                if (item.solverIndex < solverUpdateables.Count)
                 {
                     //The solver updateable isn't the last element, so put the last element in its place.
-                    solverUpdateables.Elements[item.solverIndex] = solverUpdateables.Elements[solverUpdateables.count];
+                    solverUpdateables.Elements[item.solverIndex] = solverUpdateables.Elements[solverUpdateables.Count];
                     //Update the replacement's solver index to its new location.
                     solverUpdateables.Elements[item.solverIndex].solverIndex = item.solverIndex;
                 }
-                solverUpdateables.Elements[solverUpdateables.count] = null;
+                solverUpdateables.Elements[solverUpdateables.Count] = null;
 
 
                 DeactivationManager.Remove(item.simulationIslandConnection);
@@ -213,7 +214,7 @@ namespace BEPUphysics.SolverSystems
             //'i' is currently an index into an implicit array of solver updateables that goes from 0 to solverUpdateables.count * iterationLimit.
             //It includes iterationLimit copies of each updateable.
             //Permute the entire set with duplicates.
-            var updateable = solverUpdateables.Elements[(i * prime) % solverUpdateables.count];
+            var updateable = solverUpdateables.Elements[(i * prime) % solverUpdateables.Count];
 
 
             SolverSettings solverSettings = updateable.solverSettings;
@@ -257,15 +258,15 @@ namespace BEPUphysics.SolverSystems
 
         protected override void UpdateMultithreaded()
         {
-            ThreadManager.ForLoop(0, solverUpdateables.count, multithreadedPrestepDelegate);
+            ThreadManager.ForLoop(0, solverUpdateables.Count, multithreadedPrestepDelegate);
             ComputeIterationCoefficient();
-            ThreadManager.ForLoop(0, iterationLimit * solverUpdateables.count, multithreadedIterationDelegate);
+            ThreadManager.ForLoop(0, iterationLimit * solverUpdateables.Count, multithreadedIterationDelegate);
         }
 
         protected override void UpdateSingleThreaded()
         {
 
-            int totalUpdateableCount = solverUpdateables.count;
+            int totalUpdateableCount = solverUpdateables.Count;
             for (int i = 0; i < totalUpdateableCount; i++)
             {
                 UnsafePrestep(solverUpdateables.Elements[i]);

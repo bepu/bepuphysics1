@@ -1,6 +1,7 @@
 ﻿using System;
-using BEPUphysics.DataStructures;
 using BEPUphysics.Entities;
+using BEPUutilities;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.DeactivationManagement
 {
@@ -126,10 +127,10 @@ namespace BEPUphysics.DeactivationManagement
                         //To solve this, when we encounter active kinematic objects,
                         //tell simulation islands associated with connected objects that they aren't allowed to deactivate.
 
-                        for (int i = 0; i < connections.count; i++)
+                        for (int i = 0; i < connections.Count; i++)
                         {
                             var connectedMembers = connections.Elements[i].entries;
-                            for (int j = connectedMembers.count - 1; j >= 0; j--)
+                            for (int j = connectedMembers.Count - 1; j >= 0; j--)
                             {
                                 //The change locker must be obtained before attempting to access the SimulationIsland.
                                 //Path compression can force the simulation island to evaluate to null briefly.
@@ -189,7 +190,7 @@ namespace BEPUphysics.DeactivationManagement
             }
         }
 
-        internal BEPUphysics.Threading.SpinLock simulationIslandChangeLocker = new BEPUphysics.Threading.SpinLock();
+        internal SpinLock simulationIslandChangeLocker = new SpinLock();
         void TryToCompressIslandHierarchy()
         {
 
@@ -406,10 +407,10 @@ namespace BEPUphysics.DeactivationManagement
         ///<param name="index">Index of the connection in this member's list</param>
         internal void RemoveConnectionReference(SimulationIslandConnection connection, int index)
         {
-            if (connections.count > index)
+            if (connections.Count > index)
             {
                 connections.FastRemoveAt(index);
-                if (connections.count > index)
+                if (connections.Count > index)
                     connections.Elements[index].SetListIndex(this, index);
             }
         }
@@ -422,7 +423,7 @@ namespace BEPUphysics.DeactivationManagement
         internal int AddConnectionReference(SimulationIslandConnection connection)
         {
             connections.Add(connection);
-            return connections.count - 1;
+            return connections.Count - 1;
         }
 
 

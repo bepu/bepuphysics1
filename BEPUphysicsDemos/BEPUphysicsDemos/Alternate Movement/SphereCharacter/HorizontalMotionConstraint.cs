@@ -6,8 +6,9 @@ using BEPUphysics.Constraints;
 using BEPUphysics.DataStructures;
 using BEPUphysics.Entities;
 using BEPUphysics.Collidables.MobileCollidables;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 using BEPUphysics;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
 {
@@ -679,7 +680,7 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
             {
                 Vector3 bodyVelocity = character.Body.LinearVelocity;
                 if (supportEntity != null)
-                    return bodyVelocity - Toolbox.GetVelocityOfPoint(supportData.Position, supportEntity);
+                    return bodyVelocity - Toolbox.GetVelocityOfPoint(supportData.Position, supportEntity.Position, supportEntity.LinearVelocity, supportEntity.AngularVelocity);
                 else
                     return bodyVelocity;
             }

@@ -1,5 +1,5 @@
 ﻿using BEPUphysics.Entities.Prefabs;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.CollisionShapes;
 using Microsoft.Xna.Framework.Graphics;

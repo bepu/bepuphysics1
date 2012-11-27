@@ -1,7 +1,7 @@
 using BEPUphysics;
 using System;
 using BEPUphysics.Collidables.MobileCollidables;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 using ConversionHelper;
 using Microsoft.Xna.Framework.Input;
 

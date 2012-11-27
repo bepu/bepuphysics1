@@ -4,7 +4,7 @@ using System;
 using System.Diagnostics;
 using BEPUphysics.Collidables.MobileCollidables;
 using ConversionHelper;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 
 namespace BEPUphysicsDemos.AlternateMovement.Character
 {

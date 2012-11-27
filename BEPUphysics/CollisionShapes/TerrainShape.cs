@@ -1,9 +1,8 @@
 ﻿using System;
 using BEPUphysics.CollisionTests.Manifolds;
  
-using BEPUphysics.MathExtensions;
-using BEPUphysics.DataStructures;
-using BEPUphysics.CollisionShapes.ConvexShapes;
+using BEPUutilities;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.CollisionShapes
 {
@@ -567,7 +566,7 @@ namespace BEPUphysics.CollisionShapes
 
                 }
             }
-            return overlappedTriangles.count > 0;
+            return overlappedTriangles.Count > 0;
         }
 
         ///<summary>
@@ -622,7 +621,7 @@ namespace BEPUphysics.CollisionShapes
 
                 }
             }
-            return overlappedElements.count > 0;
+            return overlappedElements.Count > 0;
         }
 
         ///<summary>

@@ -1,6 +1,6 @@
 ﻿using BEPUphysics.Collidables.MobileCollidables;
  
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 
 namespace BEPUphysics.CollisionShapes
 {
