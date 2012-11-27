@@ -1,17 +1,10 @@
-﻿using System.Threading;
-using BEPUphysics;
-using BEPUphysics.BroadPhaseSystems.Hierarchies;
-using BEPUphysics.CollisionRuleManagement;
-using BEPUphysics.DataStructures;
+﻿using BEPUphysics.BroadPhaseSystems.Hierarchies;
 using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
-using BEPUphysics.NarrowPhaseSystems;
-using BEPUphysics.UpdateableSystems.ForceFields;
-using BEPUphysicsDemos.SampleCode;
+using BEPUutilities.DataStructures;
 using Microsoft.Xna.Framework;
 using System.Diagnostics;
 using System;
-using BEPUphysics.Threading;
 
 namespace BEPUphysicsDemos.Demos.Extras.Tests
 {

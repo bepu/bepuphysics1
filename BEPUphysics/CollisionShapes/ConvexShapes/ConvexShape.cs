@@ -3,7 +3,7 @@ using System.Diagnostics;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
 using BEPUphysics.CollisionTests.CollisionAlgorithms.GJK;
 using Microsoft.Xna.Framework;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 using BEPUphysics.Settings;
 
 namespace BEPUphysics.CollisionShapes.ConvexShapes
@@ -274,6 +274,19 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         {
             shapeInfo.VolumeDistribution = ComputeVolumeDistribution(out shapeInfo.Volume);
             shapeInfo.Center = ComputeCenter();
+        }
+
+        /// <summary>
+        /// Computes a bounding box for the shape and expands it.
+        /// </summary>
+        /// <param name="transform">Transform to use to position the shape.</param>
+        /// <param name="sweep">Extra to add to the bounding box.</param>
+        /// <param name="boundingBox">Expanded bounding box.</param>
+        public void GetSweptBoundingBox(ref RigidTransform transform, ref Vector3 sweep, out BoundingBox boundingBox)
+        {
+            GetBoundingBox(ref transform, out boundingBox);
+            Toolbox.ExpandBoundingBox(ref boundingBox, ref sweep);
+
         }
 
         /// <summary>

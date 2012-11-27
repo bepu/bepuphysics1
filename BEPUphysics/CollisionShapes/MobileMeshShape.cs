@@ -1,10 +1,9 @@
-﻿using Microsoft.Xna.Framework;
-using BEPUphysics.DataStructures;
-using BEPUphysics.MathExtensions;
+﻿using BEPUphysics.DataStructures;
+using BEPUutilities.ResourceManagement;
+using Microsoft.Xna.Framework;
+using BEPUutilities.DataStructures;
+using BEPUutilities;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
-using BEPUphysics.CollisionShapes.ConvexShapes;
-using BEPUphysics.ResourceManagement;
-using System.Collections.Generic;
 using System;
 using BEPUphysics.Settings;
 
@@ -132,7 +131,7 @@ namespace BEPUphysics.CollisionShapes
             ShapeDistributionInformation distributionInfo;
             ComputeShapeInformation(data, out distributionInfo);
 
-            for (int i = 0; i < surfaceVertices.count; i++)
+            for (int i = 0; i < surfaceVertices.Count; i++)
             {
                 Vector3.Subtract(ref surfaceVertices.Elements[i], ref distributionInfo.Center, out surfaceVertices.Elements[i]);
             }
@@ -155,7 +154,7 @@ namespace BEPUphysics.CollisionShapes
             var data = new TransformableMeshData(vertices, indices, localTransform);
             ComputeShapeInformation(data, out distributionInfo);
 
-            for (int i = 0; i < surfaceVertices.count; i++)
+            for (int i = 0; i < surfaceVertices.Count; i++)
             {
                 Vector3.Subtract(ref surfaceVertices.Elements[i], ref distributionInfo.Center, out surfaceVertices.Elements[i]);
             }
@@ -185,7 +184,7 @@ namespace BEPUphysics.CollisionShapes
         /// <returns>Whether or not the ray origin was in the mesh.</returns>
         public bool IsLocalRayOriginInMesh(ref Ray ray, out RayHit hit)
         {
-            var overlapList = Resources.GetIntList();
+            var overlapList = CommonResources.GetIntList();
             hit = new RayHit();
             hit.T = float.MaxValue;
             if (triangleMesh.Tree.GetOverlaps(ray, overlapList))
@@ -204,12 +203,12 @@ namespace BEPUphysics.CollisionShapes
                         minimumClockwise = hitClockwise;
                     }
                 }
-                Resources.GiveBack(overlapList);
+                CommonResources.GiveBack(overlapList);
 
                 //If the mesh is hit from behind by the ray on the first hit, then the ray is inside.
                 return hit.T < float.MaxValue && ((solidSidedness == TriangleSidedness.Clockwise && !minimumClockwise) || (solidSidedness == TriangleSidedness.Counterclockwise && minimumClockwise));
             }
-            Resources.GiveBack(overlapList);
+            CommonResources.GiveBack(overlapList);
             return false;
 
         }
@@ -221,7 +220,7 @@ namespace BEPUphysics.CollisionShapes
 
         internal bool IsHitUnique(RawList<RayHit> hits, ref RayHit hit)
         {
-            for (int i = 0; i < hits.count; i++)
+            for (int i = 0; i < hits.Count; i++)
             {
                 if (Math.Abs(hits.Elements[i].T - hit.T) < MeshHitUniquenessThreshold)
                     return false;
@@ -281,11 +280,11 @@ namespace BEPUphysics.CollisionShapes
         TriangleSidedness ComputeSolidSidednessHelper(Ray ray)
         {
             TriangleSidedness toReturn;
-            var hitList = Resources.GetIntList();
+            var hitList = CommonResources.GetIntList();
             if (triangleMesh.Tree.GetOverlaps(ray, hitList))
             {
                 Vector3 vA, vB, vC;
-                var hits = Resources.GetRayHitList();
+                var hits = CommonResources.GetRayHitList();
                 //Identify the first and last hits.
                 int minimum = 0;
                 int maximum = 0;
@@ -311,7 +310,7 @@ namespace BEPUphysics.CollisionShapes
                     }
                 }
 
-                if (hits.count % 2 == 0)
+                if (hits.Count % 2 == 0)
                 {
                     //Since we were outside, the first hit triangle should be calibrated
                     //such that it faces towards us.
@@ -336,12 +335,12 @@ namespace BEPUphysics.CollisionShapes
                         toReturn = TriangleSidedness.Clockwise;
                 }
 
-                Resources.GiveBack(hits);
+                CommonResources.GiveBack(hits);
 
             }
             else
                 toReturn = TriangleSidedness.DoubleSided; //This is a problem...
-            Resources.GiveBack(hitList);
+            CommonResources.GiveBack(hitList);
             return toReturn;
         }
 
@@ -352,7 +351,7 @@ namespace BEPUphysics.CollisionShapes
             try
             {
                 ConvexHullHelper.GetConvexHull(data.vertices, surfaceVertices);
-                for (int i = 0; i < surfaceVertices.count; i++)
+                for (int i = 0; i < surfaceVertices.Count; i++)
                 {
                     AffineTransform.Transform(ref surfaceVertices.Elements[i], ref data.worldTransform, out surfaceVertices.Elements[i]);
                 }
@@ -629,7 +628,7 @@ namespace BEPUphysics.CollisionShapes
             int right = 0, left = 0, up = 0, down = 0, backward = 0, forward = 0;
             float minX = float.MaxValue, maxX = -float.MaxValue, minY = float.MaxValue, maxY = -float.MaxValue, minZ = float.MaxValue, maxZ = -float.MaxValue;
 
-            for (int i = 0; i < surfaceVertices.count; i++)
+            for (int i = 0; i < surfaceVertices.Count; i++)
             {
                 float dotX, dotY, dotZ;
                 Vector3.Dot(ref rightDirection, ref surfaceVertices.Elements[i], out dotX);

@@ -5,12 +5,12 @@ using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.Constraints;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
 using BEPUphysics.SolverSystems;
-using BEPUphysics.Threading;
+using BEPUutilities;
 using BEPUphysics.CollisionRuleManagement;
 using System.Collections.ObjectModel;
-using BEPUphysics.DataStructures;
 using System.Diagnostics;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.NarrowPhaseSystems
 {
@@ -315,7 +315,7 @@ namespace BEPUphysics.NarrowPhaseSystems
             ApplySolverUpdateableChangesDirectly = true;
 
             //Remove stale objects.
-            for (int i = narrowPhasePairs.count - 1; i >= 0; i--)
+            for (int i = narrowPhasePairs.Count - 1; i >= 0; i--)
             {
                 var pair = narrowPhasePairs.Elements[i];
 

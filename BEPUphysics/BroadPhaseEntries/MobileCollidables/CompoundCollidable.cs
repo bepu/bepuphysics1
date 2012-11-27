@@ -1,14 +1,12 @@
 ﻿using System.Collections.Generic;
-using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseEntries.Events;
 using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.CollisionShapes;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
+using BEPUutilities.ResourceManagement;
 using Microsoft.Xna.Framework;
-using BEPUphysics.ResourceManagement;
-using BEPUphysics.DataStructures;
+using BEPUutilities.DataStructures;
 using BEPUphysics.Materials;
-using System.Collections.ObjectModel;
 using BEPUphysics.CollisionRuleManagement;
 using System;
 
@@ -74,7 +72,7 @@ namespace BEPUphysics.BroadPhaseEntries.MobileCollidables
 
         protected override void OnEntityChanged()
         {
-            for (int i = 0; i < children.count; i++)
+            for (int i = 0; i < children.Count; i++)
             {
                 children.Elements[i].CollisionInformation.Entity = entity;
                 if (children.Elements[i].Material == null)
@@ -182,7 +180,7 @@ namespace BEPUphysics.BroadPhaseEntries.MobileCollidables
         {
             Events = new CompoundEventManager();
 
-            for (int i = 0; i < compoundShape.shapes.count; i++)
+            for (int i = 0; i < compoundShape.shapes.Count; i++)
             {
                 CompoundChild child = GetChild(compoundShape.shapes.Elements[i], i);
                 this.children.Add(child);
@@ -219,7 +217,7 @@ namespace BEPUphysics.BroadPhaseEntries.MobileCollidables
         {
             base.UpdateWorldTransform(ref position, ref orientation);
             var shapeList = Shape.shapes;
-            for (int i = 0; i < children.count; i++)
+            for (int i = 0; i < children.Count; i++)
             {
                 RigidTransform transform;
                 RigidTransform.Transform(ref shapeList.Elements[children.Elements[i].shapeIndex].LocalTransform, ref worldTransform, out transform);
@@ -229,7 +227,7 @@ namespace BEPUphysics.BroadPhaseEntries.MobileCollidables
 
         protected internal override void UpdateBoundingBoxInternal(float dt)
         {
-            for (int i = 0; i < children.count; i++)
+            for (int i = 0; i < children.Count; i++)
             {
                 children.Elements[i].CollisionInformation.UpdateBoundingBoxInternal(dt);
             }
@@ -281,11 +279,11 @@ namespace BEPUphysics.BroadPhaseEntries.MobileCollidables
         {
             rayHit = new RayHit();
             hitChild = null;
-            var hitElements = Resources.GetCompoundChildList();
+            var hitElements = PhysicsResources.GetCompoundChildList();
             if (hierarchy.Tree.GetOverlaps(ray, maximumLength, hitElements))
             {
                 rayHit.T = float.MaxValue;
-                for (int i = 0; i < hitElements.count; i++)
+                for (int i = 0; i < hitElements.Count; i++)
                 {
                     EntityCollidable candidate = hitElements.Elements[i].CollisionInformation;
                     RayHit tempHit;
@@ -295,10 +293,10 @@ namespace BEPUphysics.BroadPhaseEntries.MobileCollidables
                         hitChild = hitElements.Elements[i];
                     }
                 }
-                Resources.GiveBack(hitElements);
+                PhysicsResources.GiveBack(hitElements);
                 return rayHit.T != float.MaxValue;
             }
-            Resources.GiveBack(hitElements);
+            PhysicsResources.GiveBack(hitElements);
             return false;
         }
 
@@ -352,11 +350,11 @@ namespace BEPUphysics.BroadPhaseEntries.MobileCollidables
             hitChild = null;
             if (filter(this))
             {
-                var hitElements = Resources.GetCompoundChildList();
+                var hitElements = PhysicsResources.GetCompoundChildList();
                 if (hierarchy.Tree.GetOverlaps(ray, maximumLength, hitElements))
                 {
                     rayHit.T = float.MaxValue;
-                    for (int i = 0; i < hitElements.count; i++)
+                    for (int i = 0; i < hitElements.Count; i++)
                     {
                         RayHit tempHit;
                         if (hitElements.Elements[i].CollisionInformation.RayCast(ray, maximumLength, filter, out tempHit) && tempHit.T < rayHit.T)
@@ -365,10 +363,10 @@ namespace BEPUphysics.BroadPhaseEntries.MobileCollidables
                             hitChild = hitElements.Elements[i];
                         }
                     }
-                    Resources.GiveBack(hitElements);
+                    PhysicsResources.GiveBack(hitElements);
                     return rayHit.T != float.MaxValue;
                 }
-                Resources.GiveBack(hitElements);
+                PhysicsResources.GiveBack(hitElements);
             }
             return false;
         }
@@ -422,12 +420,12 @@ namespace BEPUphysics.BroadPhaseEntries.MobileCollidables
             hit = new RayHit();
             hitChild = null;
             BoundingBox boundingBox;
-            Toolbox.GetExpandedBoundingBox(ref castShape, ref startingTransform, ref sweep, out boundingBox);
-            var hitElements = Resources.GetCompoundChildList();
+            castShape.GetSweptBoundingBox(ref startingTransform, ref sweep, out boundingBox);
+            var hitElements = PhysicsResources.GetCompoundChildList();
             if (hierarchy.Tree.GetOverlaps(boundingBox, hitElements))
             {
                 hit.T = float.MaxValue;
-                for (int i = 0; i < hitElements.count; i++)
+                for (int i = 0; i < hitElements.Count; i++)
                 {
                     var candidate = hitElements.Elements[i].CollisionInformation;
                     RayHit tempHit;
@@ -437,10 +435,10 @@ namespace BEPUphysics.BroadPhaseEntries.MobileCollidables
                         hitChild = hitElements.Elements[i];
                     }
                 }
-                Resources.GiveBack(hitElements);
+                PhysicsResources.GiveBack(hitElements);
                 return hit.T != float.MaxValue;
             }
-            Resources.GiveBack(hitElements);
+            PhysicsResources.GiveBack(hitElements);
             return false;
         }
 
@@ -497,12 +495,12 @@ namespace BEPUphysics.BroadPhaseEntries.MobileCollidables
             hit = new RayHit();
             hitChild = null;
             BoundingBox boundingBox;
-            Toolbox.GetExpandedBoundingBox(ref castShape, ref startingTransform, ref sweep, out boundingBox);
-            var hitElements = Resources.GetCompoundChildList();
+            castShape.GetSweptBoundingBox(ref startingTransform, ref sweep, out boundingBox);
+            var hitElements = PhysicsResources.GetCompoundChildList();
             if (hierarchy.Tree.GetOverlaps(boundingBox, hitElements))
             {
                 hit.T = float.MaxValue;
-                for (int i = 0; i < hitElements.count; i++)
+                for (int i = 0; i < hitElements.Count; i++)
                 {
                     var candidate = hitElements.Elements[i].CollisionInformation;
                     RayHit tempHit;
@@ -512,10 +510,10 @@ namespace BEPUphysics.BroadPhaseEntries.MobileCollidables
                         hitChild = hitElements.Elements[i];
                     }
                 }
-                Resources.GiveBack(hitElements);
+                PhysicsResources.GiveBack(hitElements);
                 return hit.T != float.MaxValue;
             }
-            Resources.GiveBack(hitElements);
+            PhysicsResources.GiveBack(hitElements);
             return false;
         }
 

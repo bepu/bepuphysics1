@@ -1,20 +1,11 @@
 ﻿using BEPUphysics.CollisionTests.CollisionAlgorithms.GJK;
-using BEPUphysics.DataStructures;
-using BEPUphysics.Entities;
-using BEPUphysics.Entities.Prefabs;
+using BEPUutilities;
+using BEPUutilities.DataStructures;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 using System.Diagnostics;
-using System.Collections.Generic;
 using System;
-using BEPUphysics.MathExtensions;
 using BEPUphysics.CollisionShapes.ConvexShapes;
-using Microsoft.Xna.Framework.Graphics;
-using BEPUphysics.Settings;
-using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
-using BEPUphysics.CollisionTests;
-using BEPUphysics;
 
 namespace BEPUphysicsDemos.Demos.Extras.Tests
 {

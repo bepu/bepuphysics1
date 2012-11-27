@@ -1,5 +1,5 @@
 ﻿using System.Threading;
-using BEPUphysics.DataStructures;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.DeactivationManagement
 {
@@ -56,7 +56,7 @@ namespace BEPUphysics.DeactivationManagement
         public void AddReferencesToConnectedMembers()
         {
             //Add back the references to this to entities
-            for (int i = 0; i < entries.count; i++)
+            for (int i = 0; i < entries.Count; i++)
             {
                 entries.Elements[i].Index = entries.Elements[i].Member.AddConnectionReference(this);
             }
@@ -68,7 +68,7 @@ namespace BEPUphysics.DeactivationManagement
         public void RemoveReferencesFromConnectedMembers()
         {
             //Clean out the references entities may have had to this solver updateable.
-            for (int i = 0; i < entries.count; i++)
+            for (int i = 0; i < entries.Count; i++)
             {
                 entries.Elements[i].Member.RemoveConnectionReference(this, entries.Elements[i].Index);
             }
@@ -81,7 +81,7 @@ namespace BEPUphysics.DeactivationManagement
         /// <param name="index">New index of this connection in the member's connections list.</param>
         internal void SetListIndex(SimulationIslandMember member, int index)
         {
-            for (int i = 0; i < entries.count; i++)
+            for (int i = 0; i < entries.Count; i++)
             {
                 if (member == entries.Elements[i].Member)
                 {

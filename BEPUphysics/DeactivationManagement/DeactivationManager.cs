@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using BEPUphysics.Threading;
-using BEPUphysics.DataStructures;
-using BEPUphysics.ResourceManagement;
-using System.Collections.ObjectModel;
+using BEPUutilities;
+using BEPUutilities.DataStructures;
+using BEPUutilities.ResourceManagement;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
-using System.Diagnostics;
 
 namespace BEPUphysics.DeactivationManagement
 {
@@ -224,7 +221,7 @@ namespace BEPUphysics.DeactivationManagement
         {
             FlushSplits();
 
-            ThreadManager.ForLoop(0, simulationIslandMembers.count, multithreadedCandidacyLoopDelegate);
+            ThreadManager.ForLoop(0, simulationIslandMembers.Count, multithreadedCandidacyLoopDelegate);
 
             DeactivateObjects();
         }
@@ -234,7 +231,7 @@ namespace BEPUphysics.DeactivationManagement
         {
             FlushSplits();
 
-            for (int i = 0; i < simulationIslandMembers.count; i++)
+            for (int i = 0; i < simulationIslandMembers.Count; i++)
                 simulationIslandMembers.Elements[i].UpdateDeactivationCandidacy(timeStepSettings.TimeStepDuration);
 
             DeactivateObjects();
@@ -294,9 +291,9 @@ namespace BEPUphysics.DeactivationManagement
                     attempt.SlatedForRemoval = false; //Reset the removal state so that future adds will add back references, since we're about to remove them.
                     attempt.RemoveReferencesFromConnectedMembers();
                     bool triedToSplit = false;
-                    for (int i = 0; i < attempt.entries.count; i++)
+                    for (int i = 0; i < attempt.entries.Count; i++)
                     {
-                        for (int j = i + 1; j < attempt.entries.count; j++)
+                        for (int j = i + 1; j < attempt.entries.Count; j++)
                         {
                             triedToSplit |= TryToSplit(attempt.entries.Elements[i].Member, attempt.entries.Elements[j].Member);
                         }
@@ -309,7 +306,7 @@ namespace BEPUphysics.DeactivationManagement
                         //It's an orphan connection.  No one owns it, and now that it's been dequeued from the deactivation manager,
                         //it has no home at all.
                         //Don't let it rot- return it to the pool!
-                        Resources.GiveBack(attempt);
+                        PhysicsResources.GiveBack(attempt);
                         //This occurs when a constraint changes members.
                         //Because connections need to be immutable for this scheme to work,
                         //the old connection is orphaned and put into the deactivation manager's removal queue
@@ -327,10 +324,10 @@ namespace BEPUphysics.DeactivationManagement
             //Deactivate only some objects each frame.
             int numberOfEntitiesDeactivated = 0;
             int numberOfIslandsChecked = 0;
-            int originalIslandCount = simulationIslands.count;
-            while (numberOfEntitiesDeactivated < maximumDeactivationAttemptsPerFrame && simulationIslands.count > 0 && numberOfIslandsChecked < originalIslandCount)
+            int originalIslandCount = simulationIslands.Count;
+            while (numberOfEntitiesDeactivated < maximumDeactivationAttemptsPerFrame && simulationIslands.Count > 0 && numberOfIslandsChecked < originalIslandCount)
             {
-                deactivationIslandIndex = (deactivationIslandIndex + 1) % simulationIslands.count;
+                deactivationIslandIndex = (deactivationIslandIndex + 1) % simulationIslands.Count;
                 var island = simulationIslands.Elements[deactivationIslandIndex];
                 if (island.memberCount == 0)
                 {
@@ -359,10 +356,10 @@ namespace BEPUphysics.DeactivationManagement
             if (connection.DeactivationManager == null)
             {
                 connection.DeactivationManager = this;
-                if (connection.entries.count > 0)
+                if (connection.entries.Count > 0)
                 {
                     var island = connection.entries.Elements[0].Member.SimulationIsland;
-                    for (int i = 1; i < connection.entries.count; i++)
+                    for (int i = 1; i < connection.entries.Count; i++)
                     {
                         SimulationIsland opposingIsland;
                         if (island != (opposingIsland = connection.entries.Elements[i].Member.SimulationIsland))
@@ -510,9 +507,9 @@ namespace BEPUphysics.DeactivationManagement
 
 
                 SimulationIslandMember currentNode = member1Friends.Dequeue();
-                for (int i = 0; i < currentNode.connections.count; i++)
+                for (int i = 0; i < currentNode.connections.Count; i++)
                 {
-                    for (int j = 0; j < currentNode.connections.Elements[i].entries.count; j++)
+                    for (int j = 0; j < currentNode.connections.Elements[i].entries.Count; j++)
                     {
                         SimulationIslandMember connectedNode;
                         if ((connectedNode = currentNode.connections.Elements[i].entries.Elements[j].Member) != currentNode &&
@@ -538,9 +535,9 @@ namespace BEPUphysics.DeactivationManagement
                 }
 
                 currentNode = member2Friends.Dequeue();
-                for (int i = 0; i < currentNode.connections.count; i++)
+                for (int i = 0; i < currentNode.connections.Count; i++)
                 {
-                    for (int j = 0; j < currentNode.connections.Elements[i].entries.count; j++)
+                    for (int j = 0; j < currentNode.connections.Elements[i].entries.Count; j++)
                     {
                         SimulationIslandMember connectedNode;
                         if ((connectedNode = currentNode.connections.Elements[i].entries.Elements[j].Member) != currentNode &&
@@ -650,13 +647,13 @@ namespace BEPUphysics.DeactivationManagement
                     return;
                 }
             }
-            if (member.connections.count > 0)
+            if (member.connections.Count > 0)
             {
-                for (int i = 0; i < member.connections.count; i++)
+                for (int i = 0; i < member.connections.Count; i++)
                 {
                     //Find a member with a non-null island to represent connection i.
                     SimulationIslandMember representativeA = null;
-                    for (int j = 0; j < member.connections.Elements[i].entries.count; j++)
+                    for (int j = 0; j < member.connections.Elements[i].entries.Count; j++)
                     {
                         if (member.connections.Elements[i].entries.Elements[j].Member.SimulationIsland != null)
                         {
@@ -674,11 +671,11 @@ namespace BEPUphysics.DeactivationManagement
                         continue;
                     }
                     //Split the representative against representatives from other connections.
-                    for (int j = i + 1; j < member.connections.count; j++)
+                    for (int j = i + 1; j < member.connections.Count; j++)
                     {
                         //Find a representative for another connection.
                         SimulationIslandMember representativeB = null;
-                        for (int k = 0; k < member.connections.Elements[j].entries.count; k++)
+                        for (int k = 0; k < member.connections.Elements[j].entries.Count; k++)
                         {
                             if (member.connections.Elements[j].entries.Elements[k].Member.SimulationIsland != null)
                             {
@@ -718,13 +715,13 @@ namespace BEPUphysics.DeactivationManagement
             {
                 throw new Exception("Cannot initialize member's simulation island; it already has one.");
             }
-            if (member.connections.count > 0)
+            if (member.connections.Count > 0)
             {
                 SimulationIsland island = null;
                 //Find a simulation starting island to live in.
-                for (int i = 0; i < member.connections.count; i++)
+                for (int i = 0; i < member.connections.Count; i++)
                 {
-                    for (int j = 0; j < member.connections.Elements[i].entries.count; j++)
+                    for (int j = 0; j < member.connections.Elements[i].entries.Count; j++)
                     {
                         island = member.connections.Elements[i].entries.Elements[j].Member.SimulationIsland;
                         if (island != null)
@@ -752,9 +749,9 @@ namespace BEPUphysics.DeactivationManagement
 
                 //Becoming dynamic adds a new path.
                 //Merges must be attempted between its connected members.
-                for (int i = 0; i < member.connections.count; i++)
+                for (int i = 0; i < member.connections.Count; i++)
                 {
-                    for (int j = 0; j < member.connections.Elements[i].entries.count; j++)
+                    for (int j = 0; j < member.connections.Elements[i].entries.Count; j++)
                     {
                         if (member.connections.Elements[i].entries.Elements[j].Member == member)
                             continue; //Don't bother trying to compare against ourselves.  That would cause an erroneous early-out sometimes.

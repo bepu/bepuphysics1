@@ -1,0 +1,112 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{4D5235A2-55CD-49AF-8695-7BDE944B8487}</ProjectGuid>
+    <ProjectTypeGuids>{6D335F3A-9D43-41b4-9D22-F6F17C4BE596};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">Xbox 360</Platform>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>BEPUutilities</RootNamespace>
+    <AssemblyName>BEPUutilities</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <XnaFrameworkVersion>v4.0</XnaFrameworkVersion>
+    <XnaPlatform>Xbox 360</XnaPlatform>
+    <XnaProfile>HiDef</XnaProfile>
+    <XnaCrossPlatformGroupID>0aedf39e-8385-4a55-9db6-916f6d31ad51</XnaCrossPlatformGroupID>
+    <XnaOutputType>Library</XnaOutputType>
+    <Thumbnail Condition="$(XnaOutputType)=='Game'">GameThumbnail.png</Thumbnail>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|Xbox 360' ">
+    <OutputPath>bin\Xbox 360\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <NoStdLib>true</NoStdLib>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineConstants>XBOX;XBOX360;ALLOWUNSAFE</DefineConstants>
+    <XnaCompressContent>true</XnaCompressContent>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DocumentationFile>bin\Xbox 360\Release\BEPUutilities.XML</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|Xbox 360' ">
+    <OutputPath>bin\Xbox 360\Debug</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <NoStdLib>true</NoStdLib>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineConstants>TRACE;DEBUG;XBOX;XBOX360;ALLOWUNSAFE</DefineConstants>
+    <XnaCompressContent>true</XnaCompressContent>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DocumentationFile>bin\Xbox 360\Debug\BEPUutilities.XML</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>strongNameKey.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Compile Include="AffineTransform.cs" />
+    <Compile Include="ConvexHullHelper.cs" />
+    <Compile Include="ConvexHullHelper.Pruning.cs" />
+    <Compile Include="DataStructures\ConcurrentDeque.cs" />
+    <Compile Include="DataStructures\HashSet.cs" />
+    <Compile Include="DataStructures\ObservableDictionary.cs" />
+    <Compile Include="DataStructures\ObservableList.cs" />
+    <Compile Include="DataStructures\RawList.cs" />
+    <Compile Include="DataStructures\RawValueList.cs" />
+    <Compile Include="DataStructures\ReadOnlyDictionary.cs" />
+    <Compile Include="DataStructures\ReadOnlyEnumerable.cs" />
+    <Compile Include="DataStructures\ReadOnlyList.cs" />
+    <Compile Include="DataStructures\TinyList.cs" />
+    <Compile Include="DataStructures\TinyStructList.cs" />
+    <Compile Include="MathChecker.cs" />
+    <Compile Include="Matrix2x2.cs" />
+    <Compile Include="Matrix2x3.cs" />
+    <Compile Include="Matrix3x2.cs" />
+    <Compile Include="Matrix3x3.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RayHit.cs" />
+    <Compile Include="ResourceManagement\CommonResources.cs" />
+    <Compile Include="ResourceManagement\LockingResourcePool.cs" />
+    <Compile Include="ResourceManagement\ResourcePool.cs" />
+    <Compile Include="ResourceManagement\UnsafeResourcePool.cs" />
+    <Compile Include="RigidTransform.cs" />
+    <Compile Include="SpinLock.cs" />
+    <Compile Include="Toolbox.cs" />
+    <Compile Include="TriangleSidedness.cs" />
+    <Compile Include="VoronoiRegion.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="strongNameKey.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Xna.Framework" />
+    <Reference Include="Microsoft.Xna.Framework.Game" />
+    <Reference Include="Microsoft.Xna.Framework.GamerServices" />
+    <Reference Include="Microsoft.Xna.Framework.Graphics" />
+    <Reference Include="mscorlib" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\Microsoft.Xna.GameStudio.targets" />
+  <!--
+      To modify your build process, add your task inside one of the targets below and uncomment it. 
+      Other similar extension points exist, see Microsoft.Common.targets.
+      <Target Name="BeforeBuild">
+      </Target>
+      <Target Name="AfterBuild">
+      </Target>
+    -->
+</Project>

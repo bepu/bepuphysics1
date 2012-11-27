@@ -1,5 +1,5 @@
 ﻿using BEPUphysics.BroadPhaseEntries.MobileCollidables;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 using BEPUphysics.CollisionShapes;
 
 namespace BEPUphysics.Entities

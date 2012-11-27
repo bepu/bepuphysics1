@@ -1,24 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
 using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.CollisionShapes.ConvexShapes;
-using BEPUphysics.Constraints.TwoEntity;
 using BEPUphysics.DeactivationManagement;
 using BEPUphysics.EntityStateManagement;
 using BEPUphysics.OtherSpaceStages;
 using BEPUphysics.PositionUpdating;
 using BEPUphysics.Settings;
+using BEPUutilities;
 using Microsoft.Xna.Framework;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 using BEPUphysics.Materials;
-using BEPUphysics.Constraints;
-using System.Collections.ObjectModel;
 using BEPUphysics.CollisionShapes;
 using BEPUphysics.CollisionRuleManagement;
-using BEPUphysics.DataStructures;
-using BEPUphysics.Threading;
+using MathChecker = BEPUutilities.MathChecker;
+using Matrix3X3 = BEPUutilities.Matrix3X3;
 
 namespace BEPUphysics.Entities
 {
@@ -62,7 +59,7 @@ namespace BEPUphysics.Entities
                 position = value;
                 activityInformation.Activate();
 
-                position.Validate();
+                MathChecker.Validate(position);
             }
         }
         ///<summary>
@@ -86,7 +83,7 @@ namespace BEPUphysics.Entities
                 Matrix3X3.Multiply(ref multiplied, ref orientationMatrix, out inertiaTensor);
                 activityInformation.Activate();
 
-                orientation.Validate();
+                MathChecker.Validate(orientation);
             }
         }
         /// <summary>
@@ -126,7 +123,7 @@ namespace BEPUphysics.Entities
                 position = value.Translation;
                 activityInformation.Activate();
 
-                position.Validate();
+                MathChecker.Validate(position);
             }
 
         }
@@ -145,8 +142,8 @@ namespace BEPUphysics.Entities
                 Matrix3X3.Transform(ref value, ref inertiaTensor, out angularMomentum);
                 activityInformation.Activate();
 
-                angularVelocity.Validate();
-                angularMomentum.Validate();
+                MathChecker.Validate(angularVelocity);
+                MathChecker.Validate(angularMomentum);
             }
         }
         /// <summary>
@@ -171,8 +168,8 @@ namespace BEPUphysics.Entities
                 Matrix3X3.Transform(ref value, ref inertiaTensorInverse, out angularVelocity);
                 activityInformation.Activate();
 
-                angularVelocity.Validate();
-                angularMomentum.Validate();
+                MathChecker.Validate(angularVelocity);
+                MathChecker.Validate(angularMomentum);
             }
         }
         /// <summary>
@@ -190,8 +187,8 @@ namespace BEPUphysics.Entities
                 Vector3.Multiply(ref linearVelocity, mass, out linearMomentum);
                 activityInformation.Activate();
 
-                linearVelocity.Validate();
-                linearMomentum.Validate();
+                MathChecker.Validate(linearVelocity);
+                MathChecker.Validate(linearMomentum);
             }
         }
         /// <summary>
@@ -209,8 +206,8 @@ namespace BEPUphysics.Entities
                 Vector3.Multiply(ref linearMomentum, inverseMass, out linearVelocity);
                 activityInformation.Activate();
 
-                linearVelocity.Validate();
-                linearMomentum.Validate();
+                MathChecker.Validate(linearVelocity);
+                MathChecker.Validate(linearMomentum);
             }
         }
         /// <summary>
@@ -773,8 +770,8 @@ namespace BEPUphysics.Entities
             linearVelocity.Y = linearMomentum.Y * inverseMass;
             linearVelocity.Z = linearMomentum.Z * inverseMass;
 #endif
-            linearVelocity.Validate();
-            linearMomentum.Validate();
+            MathChecker.Validate(linearVelocity);
+            MathChecker.Validate(linearMomentum);
 
         }
         /// <summary>
@@ -803,8 +800,8 @@ namespace BEPUphysics.Entities
                 angularVelocity.Z += impulse.X * inertiaTensorInverse.M13 + impulse.Y * inertiaTensorInverse.M23 + impulse.Z * inertiaTensorInverse.M33;
             }
 
-            angularVelocity.Validate();
-            angularMomentum.Validate();
+            MathChecker.Validate(angularVelocity);
+            MathChecker.Validate(angularMomentum);
         }
 
         /// <summary>
@@ -983,10 +980,10 @@ namespace BEPUphysics.Entities
                 Matrix3X3.Transform(ref angularVelocity, ref inertiaTensor, out angularMomentum);
             }
 
-            linearVelocity.Validate();
-            linearMomentum.Validate();
-            angularVelocity.Validate();
-            angularMomentum.Validate();
+            MathChecker.Validate(linearVelocity);
+            MathChecker.Validate(linearMomentum);
+            MathChecker.Validate(angularVelocity);
+            MathChecker.Validate(angularMomentum);
 
 
         }
@@ -1089,7 +1086,7 @@ namespace BEPUphysics.Entities
             //I must order the pairs to compute a time of impact.
 
             //The pair method works in such a way that, when this method is run asynchronously, there will be no race conditions.
-            for (int i = 0; i < collisionInformation.pairs.count; i++)
+            for (int i = 0; i < collisionInformation.pairs.Count; i++)
             {
                 //Only perform CCD if we're either supposed to test against no solver pairs or if this isn't a no solver pair.
                 if (MotionSettings.PairAllowsCCD(this, collisionInformation.pairs.Elements[i]))
@@ -1099,7 +1096,7 @@ namespace BEPUphysics.Entities
         void ICCDPositionUpdateable.ResetTimesOfImpact()
         {
             //Reset all of the times of impact to 1, allowing the entity to move all the way through its velocity-defined motion.
-            for (int i = 0; i < collisionInformation.pairs.count; i++)
+            for (int i = 0; i < collisionInformation.pairs.Count; i++)
             {
                 collisionInformation.pairs.Elements[i].timeOfImpact = 1;
             }
@@ -1127,12 +1124,12 @@ namespace BEPUphysics.Entities
             if (PositionUpdated != null)
                 PositionUpdated(this);
 
-            linearMomentum.Validate();
-            linearVelocity.Validate();
-            angularMomentum.Validate();
-            angularVelocity.Validate();
-            position.Validate();
-            orientation.Validate();
+            MathChecker.Validate(linearMomentum);
+            MathChecker.Validate(linearVelocity);
+            MathChecker.Validate(angularMomentum);
+            MathChecker.Validate(angularVelocity);
+            MathChecker.Validate(position);
+            MathChecker.Validate(orientation);
         }
 
         void IPositionUpdateable.PreUpdatePosition(float dt)
@@ -1165,12 +1162,12 @@ namespace BEPUphysics.Entities
             }
             collisionInformation.UpdateWorldTransform(ref position, ref orientation);
 
-            linearMomentum.Validate();
-            linearVelocity.Validate();
-            angularMomentum.Validate();
-            angularVelocity.Validate();
-            position.Validate();
-            orientation.Validate();
+            MathChecker.Validate(linearMomentum);
+            MathChecker.Validate(linearVelocity);
+            MathChecker.Validate(angularMomentum);
+            MathChecker.Validate(angularVelocity);
+            MathChecker.Validate(position);
+            MathChecker.Validate(orientation);
 
         }
 

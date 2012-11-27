@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using BEPUphysics.CollisionTests;
-using BEPUphysics.DataStructures;
+using BEPUutilities;
+using BEPUutilities.DataStructures;
 using Microsoft.Xna.Framework;
-using BEPUphysics;
 using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.CollisionRuleManagement;
-using BEPUphysics.BroadPhaseSystems;
-using System.Diagnostics;
 
 namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
 {

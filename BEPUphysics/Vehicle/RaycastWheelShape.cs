@@ -4,7 +4,7 @@ using BEPUphysics.Entities;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
 using Microsoft.Xna.Framework;
 using BEPUphysics.CollisionRuleManagement;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 using BEPUphysics.Materials;
 
 namespace BEPUphysics.Vehicle

@@ -1,22 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.UpdateableSystems;
 using BEPUphysics;
+using BEPUutilities;
 using Microsoft.Xna.Framework;
-using BEPUphysics.MathExtensions;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
-using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
 using BEPUphysics.Materials;
 using BEPUphysics.PositionUpdating;
-using BEPUphysics.DataStructures;
-using System.Diagnostics;
 using BEPUphysics.CollisionShapes.ConvexShapes;
-using Microsoft.Xna.Framework.Input;
 
 namespace BEPUphysicsDemos.AlternateMovement.Testing.ConvexCast
 {
@@ -207,7 +200,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.ConvexCast
                 var entityCollidable = support as EntityCollidable;
                 if (entityCollidable != null)
                 {
-                    Vector3 entityVelocity = Toolbox.GetVelocityOfPoint(supportData.Location, entityCollidable.Entity);
+                    Vector3 entityVelocity = Toolbox.GetVelocityOfPoint(supportData.Location, entityCollidable.Entity.Position, entityCollidable.Entity.LinearVelocity, entityCollidable.Entity.AngularVelocity);
                     Vector3.Subtract(ref relativeVelocity, ref entityVelocity, out relativeVelocity);
                     //TODO: Multithreaded safety.  If characters are running in parallel, ensure that this operation will not corrupt anything.
                     if (entityCollidable.Entity.IsDynamic)

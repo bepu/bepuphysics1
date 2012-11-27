@@ -2,11 +2,10 @@
 using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
+using BEPUutilities.ResourceManagement;
 using Microsoft.Xna.Framework;
-using BEPUphysics.DataStructures;
-using BEPUphysics.ResourceManagement;
+using BEPUutilities.DataStructures;
 using BEPUphysics.CollisionShapes.ConvexShapes;
-using System.Diagnostics;
 
 namespace BEPUphysics.CollisionTests.Manifolds
 {
@@ -68,7 +67,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     BoxContactData* manifoldPointer = &manifold.D1;
                     Vector3.Negate(ref axis, out axis);
                     var toRemove = new TinyList<int>();
-                    for (int i = 0; i < contacts.count; i++)
+                    for (int i = 0; i < contacts.Count; i++)
                     {
                         bool found = false;
                         for (int j = manifold.Count - 1; j >= 0; j--)
@@ -114,7 +113,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
             else
             {
                 //Not colliding, so get rid of it.
-                for (int i = contacts.count - 1; i >= 0; i--)
+                for (int i = contacts.Count - 1; i >= 0; i--)
                 {
                     Remove(i);
                 }
@@ -133,7 +132,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                 Vector3.Negate(ref axis, out axis);
                 TinyList<int> toRemove = new TinyList<int>();
                 BoxContactData data;
-                for (int i = 0; i < contacts.count; i++)
+                for (int i = 0; i < contacts.Count; i++)
                 {
                     bool found = false;
                     for (int j = manifold.Count - 1; j >= 0; j--)
@@ -196,7 +195,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
             else
             {
                 //Not colliding, so get rid of it.
-                for (int i = contacts.count - 1; i >= 0; i--)
+                for (int i = contacts.Count - 1; i >= 0; i--)
                 {
                     Remove(i);
                 }

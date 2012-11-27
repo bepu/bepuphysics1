@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
-using BEPUphysics.Threading;
-using BEPUphysics.MathExtensions;
-using BEPUphysics.DataStructures;
+using BEPUutilities;
+using BEPUutilities;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.OtherSpaceStages
 {
@@ -78,7 +78,7 @@ namespace BEPUphysics.OtherSpaceStages
 
         protected override void UpdateSingleThreaded()
         {
-            for (int i = 0; i < entries.count; ++i)
+            for (int i = 0; i < entries.Count; ++i)
             {
                 LoopBody(i);
             }

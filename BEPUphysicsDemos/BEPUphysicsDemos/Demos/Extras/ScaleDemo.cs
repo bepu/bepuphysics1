@@ -1,15 +1,8 @@
 ﻿using BEPUphysics.BroadPhaseEntries;
-using BEPUphysics.DataStructures;
 using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
+using BEPUutilities;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using BEPUphysics.MathExtensions;
-using BEPUphysics.CollisionShapes.ConvexShapes;
-using System.Diagnostics;
-using BEPUphysics.Settings;
-using BEPUphysics.Materials;
-using BEPUphysics.Constraints.SingleEntity;
 
 namespace BEPUphysicsDemos.Demos.Extras
 {

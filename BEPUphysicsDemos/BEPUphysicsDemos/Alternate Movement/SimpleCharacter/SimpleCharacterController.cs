@@ -5,9 +5,9 @@ using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.UpdateableSystems;
+using BEPUutilities;
 using Microsoft.Xna.Framework;
 using BEPUphysics.CollisionRuleManagement;
-using BEPUphysics.MathExtensions;
 
 namespace BEPUphysicsDemos.AlternateMovement.SimpleCharacter
 {

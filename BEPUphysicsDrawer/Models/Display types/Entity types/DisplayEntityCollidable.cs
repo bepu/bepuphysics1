@@ -1,6 +1,5 @@
-﻿using BEPUphysics.Entities;
+﻿using BEPUutilities;
 using Microsoft.Xna.Framework;
-using BEPUphysics.MathExtensions;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;

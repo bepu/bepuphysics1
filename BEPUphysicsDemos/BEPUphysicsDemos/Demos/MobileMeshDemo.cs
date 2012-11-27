@@ -1,26 +1,9 @@
-﻿using BEPUphysics.BroadPhaseEntries;
-using BEPUphysics.Entities;
-using BEPUphysics.Entities.Prefabs;
-using BEPUphysics.PositionUpdating;
+﻿using BEPUphysics.Entities.Prefabs;
+using BEPUutilities;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
-using System.Diagnostics;
-using System.Collections.Generic;
-using System;
-using BEPUphysics.MathExtensions;
-using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.DataStructures;
 using Microsoft.Xna.Framework.Graphics;
-using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.CollisionShapes;
-using BEPUphysics.Settings;
-using BEPUphysics.NarrowPhaseSystems.Pairs;
-using BEPUphysics.CollisionRuleManagement;
-using BEPUphysics.BroadPhaseSystems;
-using BEPUphysics.Constraints;
-using BEPUphysics.CollisionTests.CollisionAlgorithms.GJK;
-using BEPUphysics.Constraints.SolverGroups;
-using BEPUphysics.Constraints.TwoEntity.Motors;
 
 namespace BEPUphysicsDemos.Demos
 {

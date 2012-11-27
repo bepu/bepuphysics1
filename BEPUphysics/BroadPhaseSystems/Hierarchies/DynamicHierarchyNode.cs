@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using BEPUphysics.BroadPhaseEntries;
+using BEPUutilities.ResourceManagement;
 using Microsoft.Xna.Framework;
-using BEPUphysics.DataStructures;
-using BEPUphysics.ResourceManagement;
-using System.Diagnostics;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.BroadPhaseSystems.Hierarchies
 {
@@ -317,9 +314,9 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
             var leafNodes = nodeListPool.Take();
             oldChildA.RetrieveNodes(leafNodes);
             oldChildB.RetrieveNodes(leafNodes);
-            for (int i = 0; i < leafNodes.count; i++)
+            for (int i = 0; i < leafNodes.Count; i++)
                 leafNodes.Elements[i].Refit();
-            Reconstruct(leafNodes, 0, leafNodes.count);
+            Reconstruct(leafNodes, 0, leafNodes.Count);
             leafNodes.Clear();
             nodeListPool.GiveBack(leafNodes);
 

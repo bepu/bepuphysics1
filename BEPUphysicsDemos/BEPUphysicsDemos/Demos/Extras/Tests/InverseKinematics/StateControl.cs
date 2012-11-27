@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using BEPUphysics.MathExtensions;
-using Microsoft.Xna.Framework;
-
-namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
+﻿namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
 {
     /// <summary>
     /// Constrains an individual bone in an attempt to reach some position and orientation goal.

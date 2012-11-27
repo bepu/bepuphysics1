@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 
-namespace BEPUphysics.Threading
+namespace BEPUutilities
 {
     internal class ParallelLoopWorker : IDisposable
     {

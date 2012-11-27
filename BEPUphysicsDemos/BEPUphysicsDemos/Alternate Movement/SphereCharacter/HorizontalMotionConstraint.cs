@@ -1,16 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using BEPUphysics.Constraints;
-using BEPUphysics.DataStructures;
 using BEPUphysics.Entities;
+using BEPUutilities;
+using BEPUutilities.DataStructures;
 using Microsoft.Xna.Framework;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
-using BEPUphysics.MathExtensions;
-using BEPUphysics;
-using System.Diagnostics;
-using Microsoft.Xna.Framework.Input;
 
 namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
 {
@@ -677,7 +671,7 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
             {
                 Vector3 bodyVelocity = character.Body.LinearVelocity;
                 if (supportEntity != null)
-                    return bodyVelocity - Toolbox.GetVelocityOfPoint(supportData.Position, supportEntity);
+                    return bodyVelocity - Toolbox.GetVelocityOfPoint(supportData.Position, supportEntity.Position, supportEntity.LinearVelocity, supportEntity.AngularVelocity);
                 return bodyVelocity;
             }
         }

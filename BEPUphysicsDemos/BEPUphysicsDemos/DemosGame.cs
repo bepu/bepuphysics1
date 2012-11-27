@@ -1,10 +1,7 @@
 #region Using Statements
 
 using System;
-using System.Collections.Generic;
-using BEPUphysics.DeactivationManagement;
 using BEPUphysics.Entities;
-using BEPUphysics.Entities.Prefabs;
 using BEPUphysicsDemos.Demos;
 using BEPUphysicsDemos.SampleCode;
 using BEPUphysicsDrawer.Font;
@@ -13,11 +10,6 @@ using BEPUphysicsDrawer.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using BEPUphysics.NarrowPhaseSystems.Pairs;
-using BEPUphysics.Settings;
-using BEPUphysics.DataStructures;
-using BEPUphysicsDemos.Demos.Extras;
-using BEPUphysicsDemos.Demos.Extras.Tests;
 
 #endregion
 

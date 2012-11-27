@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using BEPUphysics.BroadPhaseEntries;
-using BEPUphysics.CollisionShapes;
-using BEPUphysics.CollisionShapes.ConvexShapes;
+﻿using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.DataStructures;
 using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;

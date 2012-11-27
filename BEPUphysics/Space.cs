@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.BroadPhaseSystems.Hierarchies;
@@ -12,15 +11,11 @@ using BEPUphysics.EntityStateManagement;
 using BEPUphysics.OtherSpaceStages;
 using BEPUphysics.PositionUpdating;
 using BEPUphysics.SolverSystems;
-using BEPUphysics.Threading;
+using BEPUutilities;
 using BEPUphysics.NarrowPhaseSystems;
 using BEPUphysics.UpdateableSystems;
 using Microsoft.Xna.Framework;
-using BEPUphysics.ResourceManagement;
-using System.Collections.ObjectModel;
-using BEPUphysics.BroadPhaseSystems.SortAndSweep;
-using BEPUphysics.DataStructures;
-using BEPUphysics.MathExtensions;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysics
 {
@@ -592,16 +587,16 @@ namespace BEPUphysics
         /// <returns>Whether or not the ray hit anything.</returns>
         public bool RayCast(Ray ray, float maximumLength, out RayCastResult result)
         {
-            var resultsList = Resources.GetRayCastResultList();
+            var resultsList = PhysicsResources.GetRayCastResultList();
             bool didHit = RayCast(ray, maximumLength, resultsList);
             result = resultsList.Elements[0];
-            for (int i = 1; i < resultsList.count; i++)
+            for (int i = 1; i < resultsList.Count; i++)
             {
                 RayCastResult candidate = resultsList.Elements[i];
                 if (candidate.HitData.T < result.HitData.T)
                     result = candidate;
             }
-            Resources.GiveBack(resultsList);
+            PhysicsResources.GiveBack(resultsList);
 
             return didHit;
         }
@@ -616,16 +611,16 @@ namespace BEPUphysics
         /// <returns>Whether or not the ray hit anything.</returns>
         public bool RayCast(Ray ray, float maximumLength, Func<BroadPhaseEntry, bool> filter, out RayCastResult result)
         {
-            var resultsList = Resources.GetRayCastResultList();
+            var resultsList = PhysicsResources.GetRayCastResultList();
             bool didHit = RayCast(ray, maximumLength, filter, resultsList);
             result = resultsList.Elements[0];
-            for (int i = 1; i < resultsList.count; i++)
+            for (int i = 1; i < resultsList.Count; i++)
             {
                 RayCastResult candidate = resultsList.Elements[i];
                 if (candidate.HitData.T < result.HitData.T)
                     result = candidate;
             }
-            Resources.GiveBack(resultsList);
+            PhysicsResources.GiveBack(resultsList);
 
             return didHit;
         }
@@ -639,11 +634,11 @@ namespace BEPUphysics
         /// <returns>Whether or not the ray hit anything.</returns>
         public bool RayCast(Ray ray, float maximumLength, IList<RayCastResult> outputRayCastResults)
         {
-            var outputIntersections = Resources.GetBroadPhaseEntryList();
+            var outputIntersections = PhysicsResources.GetBroadPhaseEntryList();
             if (BroadPhase.QueryAccelerator.RayCast(ray, maximumLength, outputIntersections))
             {
 
-                for (int i = 0; i < outputIntersections.count; i++)
+                for (int i = 0; i < outputIntersections.Count; i++)
                 {
                     RayHit rayHit;
                     BroadPhaseEntry candidate = outputIntersections.Elements[i];
@@ -653,7 +648,7 @@ namespace BEPUphysics
                     }
                 }
             }
-            Resources.GiveBack(outputIntersections);
+            PhysicsResources.GiveBack(outputIntersections);
             return outputRayCastResults.Count > 0;
         }
 
@@ -667,11 +662,11 @@ namespace BEPUphysics
         /// <returns>Whether or not the ray hit anything.</returns>
         public bool RayCast(Ray ray, float maximumLength, Func<BroadPhaseEntry, bool> filter, IList<RayCastResult> outputRayCastResults)
         {
-            var outputIntersections = Resources.GetBroadPhaseEntryList();
+            var outputIntersections = PhysicsResources.GetBroadPhaseEntryList();
             if (BroadPhase.QueryAccelerator.RayCast(ray, maximumLength, outputIntersections))
             {
 
-                for (int i = 0; i < outputIntersections.count; i++)
+                for (int i = 0; i < outputIntersections.Count; i++)
                 {
                     RayHit rayHit;
                     BroadPhaseEntry candidate = outputIntersections.Elements[i];
@@ -681,7 +676,7 @@ namespace BEPUphysics
                     }
                 }
             }
-            Resources.GiveBack(outputIntersections);
+            PhysicsResources.GiveBack(outputIntersections);
             return outputRayCastResults.Count > 0;
         }
 
@@ -696,16 +691,16 @@ namespace BEPUphysics
         /// <returns>Whether or not the cast hit anything.</returns>
         public bool ConvexCast(ConvexShape castShape, ref RigidTransform startingTransform, ref Vector3 sweep, out RayCastResult castResult)
         {
-            var castResults = Resources.GetRayCastResultList();
+            var castResults = PhysicsResources.GetRayCastResultList();
             bool didHit = ConvexCast(castShape, ref startingTransform, ref sweep, castResults);
             castResult = castResults.Elements[0];
-            for (int i = 1; i < castResults.count; i++)
+            for (int i = 1; i < castResults.Count; i++)
             {
                 RayCastResult candidate = castResults.Elements[i];
                 if (candidate.HitData.T < castResult.HitData.T)
                     castResult = candidate;
             }
-            Resources.GiveBack(castResults);
+            PhysicsResources.GiveBack(castResults);
             return didHit;
         }
 
@@ -721,16 +716,16 @@ namespace BEPUphysics
         /// <returns>Whether or not the cast hit anything.</returns>
         public bool ConvexCast(ConvexShape castShape, ref RigidTransform startingTransform, ref Vector3 sweep, Func<BroadPhaseEntry, bool> filter, out RayCastResult castResult)
         {
-            var castResults = Resources.GetRayCastResultList();
+            var castResults = PhysicsResources.GetRayCastResultList();
             bool didHit = ConvexCast(castShape, ref startingTransform, ref sweep, filter, castResults);
             castResult = castResults.Elements[0];
-            for (int i = 1; i < castResults.count; i++)
+            for (int i = 1; i < castResults.Count; i++)
             {
                 RayCastResult candidate = castResults.Elements[i];
                 if (candidate.HitData.T < castResult.HitData.T)
                     castResult = candidate;
             }
-            Resources.GiveBack(castResults);
+            PhysicsResources.GiveBack(castResults);
             return didHit;
         }
 
@@ -745,12 +740,12 @@ namespace BEPUphysics
         /// <returns>Whether or not the cast hit anything.</returns>
         public bool ConvexCast(ConvexShape castShape, ref RigidTransform startingTransform, ref Vector3 sweep, IList<RayCastResult> outputCastResults)
         {
-            var overlappedElements = Resources.GetBroadPhaseEntryList();
+            var overlappedElements = PhysicsResources.GetBroadPhaseEntryList();
             BoundingBox boundingBox;
-            Toolbox.GetExpandedBoundingBox(ref castShape, ref startingTransform, ref sweep, out boundingBox);
+            castShape.GetSweptBoundingBox(ref startingTransform, ref sweep, out boundingBox);
 
             BroadPhase.QueryAccelerator.GetEntries(boundingBox, overlappedElements);
-            for (int i = 0; i < overlappedElements.count; ++i)
+            for (int i = 0; i < overlappedElements.Count; ++i)
             {
                 RayHit hit;
                 if (overlappedElements.Elements[i].ConvexCast(castShape, ref startingTransform, ref sweep, out hit))
@@ -758,7 +753,7 @@ namespace BEPUphysics
                     outputCastResults.Add(new RayCastResult { HitData = hit, HitObject = overlappedElements.Elements[i] });
                 }
             }
-            Resources.GiveBack(overlappedElements);
+            PhysicsResources.GiveBack(overlappedElements);
             return outputCastResults.Count > 0;
         }
 
@@ -774,12 +769,12 @@ namespace BEPUphysics
         /// <returns>Whether or not the cast hit anything.</returns>
         public bool ConvexCast(ConvexShape castShape, ref RigidTransform startingTransform, ref Vector3 sweep, Func<BroadPhaseEntry, bool> filter, IList<RayCastResult> outputCastResults)
         {
-            var overlappedElements = Resources.GetBroadPhaseEntryList();
+            var overlappedElements = PhysicsResources.GetBroadPhaseEntryList();
             BoundingBox boundingBox;
-            Toolbox.GetExpandedBoundingBox(ref castShape, ref startingTransform, ref sweep, out boundingBox);
+            castShape.GetSweptBoundingBox(ref startingTransform, ref sweep, out boundingBox);
 
             BroadPhase.QueryAccelerator.GetEntries(boundingBox, overlappedElements);
-            for (int i = 0; i < overlappedElements.count; ++i)
+            for (int i = 0; i < overlappedElements.Count; ++i)
             {
                 RayHit hit;
                 if (overlappedElements.Elements[i].ConvexCast(castShape, ref startingTransform, ref sweep, filter, out hit))
@@ -787,7 +782,7 @@ namespace BEPUphysics
                     outputCastResults.Add(new RayCastResult { HitData = hit, HitObject = overlappedElements.Elements[i] });
                 }
             }
-            Resources.GiveBack(overlappedElements);
+            PhysicsResources.GiveBack(overlappedElements);
             return outputCastResults.Count > 0;
         }
 

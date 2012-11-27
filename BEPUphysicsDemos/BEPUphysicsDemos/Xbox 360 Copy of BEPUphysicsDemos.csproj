@@ -205,6 +205,10 @@
       <Project>{B71CDDD4-5A86-4C46-9403-E58157736D13}</Project>
       <Name>Xbox 360 Copy of BEPUphysics</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\BEPUutilities\Xbox 360 Copy of BEPUutilities.csproj">
+      <Project>{4D5235A2-55CD-49AF-8695-7BDE944B8487}</Project>
+      <Name>Xbox 360 Copy of BEPUutilities</Name>
+    </ProjectReference>
     <ProjectReference Include="..\BEPUphysicsDemosContent\BEPUphysicsDemosContent.contentproj">
       <Name>BEPUphysicsDemosContent %28Content%29</Name>
       <XnaReferenceType>Content</XnaReferenceType>

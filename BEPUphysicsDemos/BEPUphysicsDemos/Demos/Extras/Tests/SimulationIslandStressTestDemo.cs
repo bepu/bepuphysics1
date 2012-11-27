@@ -1,15 +1,7 @@
 ﻿using System;
-using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.Entities.Prefabs;
-using BEPUphysics.MathExtensions;
 using Microsoft.Xna.Framework;
-using BEPUphysics.Settings;
-using BEPUphysics.CollisionTests.CollisionAlgorithms;
-using BEPUphysics.CollisionRuleManagement;
-using BEPUphysics.NarrowPhaseSystems.Pairs;
-using BEPUphysics.CollisionTests.Manifolds;
 using System.Diagnostics;
-using BEPUphysics.BroadPhaseSystems.SortAndSweep;
 using BEPUphysics.NarrowPhaseSystems;
 
 namespace BEPUphysicsDemos.Demos.Extras.Tests

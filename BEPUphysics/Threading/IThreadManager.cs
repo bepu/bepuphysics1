@@ -1,6 +1,6 @@
 using System;
 
-namespace BEPUphysics.Threading
+namespace BEPUutilities
 {
 
     /// <summary>

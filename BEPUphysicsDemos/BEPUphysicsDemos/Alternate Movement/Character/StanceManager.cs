@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using BEPUphysics.CollisionShapes.ConvexShapes;
+using BEPUutilities;
+using BEPUutilities.DataStructures;
 using Microsoft.Xna.Framework;
 using BEPUphysics.CollisionTests;
-using BEPUphysics.DataStructures;
 using BEPUphysics.Settings;
-using BEPUphysics;
 
 namespace BEPUphysicsDemos.AlternateMovement.Character
 {

@@ -2,7 +2,7 @@
 using BEPUphysics.Entities;
 using BEPUphysics.UpdateableSystems;
 using Microsoft.Xna.Framework;
-using BEPUphysics.MathExtensions;
+using BEPUutilities;
 using BEPUphysics.Materials;
 using BEPUphysics.BroadPhaseEntries;
 

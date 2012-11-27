@@ -2,7 +2,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace BEPUphysics.Threading
+namespace BEPUutilities
 {
     /// <summary>
     /// Uses the .NET Task Parallel library to manage the engine's threads.
