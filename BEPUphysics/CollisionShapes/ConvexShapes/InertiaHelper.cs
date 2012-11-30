@@ -68,12 +68,12 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         ///<param name="shape">Shape to compute the volume information of.</param>
         ///<param name="volume">Volume of the shape.</param>
         ///<returns>Volume distribution of the shape.</returns>
-        public static Matrix3X3 ComputeVolumeDistribution(ConvexShape shape, out float volume)
+        public static Matrix3x3 ComputeVolumeDistribution(ConvexShape shape, out float volume)
         {
             var pointContributions = CommonResources.GetVectorList();
             GetPoints(shape, out volume, pointContributions);
             Vector3 center = AveragePoints(pointContributions);
-            Matrix3X3 volumeDistribution = ComputeVolumeDistribution(pointContributions, ref center);
+            Matrix3x3 volumeDistribution = ComputeVolumeDistribution(pointContributions, ref center);
             CommonResources.GiveBack(pointContributions);
             return volumeDistribution;
         }
@@ -86,11 +86,11 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         ///<param name="center">Location to use as the center of the shape when computing the volume distribution.</param>
         ///<param name="volume">Volume of the shape.</param>
         ///<returns>Volume distribution of the shape.</returns>
-        public static Matrix3X3 ComputeVolumeDistribution(ConvexShape shape, ref Vector3 center, out float volume)
+        public static Matrix3x3 ComputeVolumeDistribution(ConvexShape shape, ref Vector3 center, out float volume)
         {
             var pointContributions = CommonResources.GetVectorList();
             GetPoints(shape, out volume, pointContributions);
-            Matrix3X3 volumeDistribution = ComputeVolumeDistribution(pointContributions, ref center);
+            Matrix3x3 volumeDistribution = ComputeVolumeDistribution(pointContributions, ref center);
             CommonResources.GiveBack(pointContributions);
             return volumeDistribution;
         }
@@ -101,15 +101,15 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         ///<param name="pointContributions">Point contributions to the volume distribution.</param>
         ///<param name="center">Location to use as the center for purposes of computing point contributions.</param>
         ///<returns>Volume distribution of the point contributions.</returns>
-        public static Matrix3X3 ComputeVolumeDistribution(RawList<Vector3> pointContributions, ref Vector3 center)
+        public static Matrix3x3 ComputeVolumeDistribution(RawList<Vector3> pointContributions, ref Vector3 center)
         {
-            var volumeDistribution = new Matrix3X3();
+            var volumeDistribution = new Matrix3x3();
             float pointWeight = 1f / pointContributions.Count;
             for (int i = 0; i < pointContributions.Count; i++)
             {
-                Matrix3X3 contribution;
+                Matrix3x3 contribution;
                 GetPointContribution(pointWeight, ref center, pointContributions[i], out contribution);
-                Matrix3X3.Add(ref volumeDistribution, ref contribution, out volumeDistribution);
+                Matrix3x3.Add(ref volumeDistribution, ref contribution, out volumeDistribution);
             }
             return volumeDistribution;
         }
@@ -241,7 +241,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         ///<param name="center">Location to use as the center for the purposes of computing the contribution.</param>
         ///<param name="p">Point to compute the contribution of.</param>
         ///<param name="contribution">Contribution of the point.</param>
-        public static void GetPointContribution(float pointWeight, ref Vector3 center, Vector3 p, out Matrix3X3 contribution)
+        public static void GetPointContribution(float pointWeight, ref Vector3 center, Vector3 p, out Matrix3x3 contribution)
         {
             Vector3.Subtract(ref p, ref center, out p);
             float xx = pointWeight * p.X * p.X;

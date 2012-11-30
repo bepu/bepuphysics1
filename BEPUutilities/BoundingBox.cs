@@ -127,6 +127,22 @@ namespace BEPUutilities
         //    return intersects;
         //}
 
+        public ContainmentType Contains(ref BoundingBox boundingBox)
+        {
+            if (Max.X < boundingBox.Min.X || Min.X > boundingBox.Max.X ||
+                Max.Y < boundingBox.Min.Y || Min.Y > boundingBox.Max.Y ||
+                Max.Z < boundingBox.Min.Z || Min.Z > boundingBox.Max.Z)
+                return ContainmentType.Disjoint;
+            //It is known to be at least intersecting. Is it contained?
+            if (Min.X <= boundingBox.Min.X && Max.X >= boundingBox.Max.X &&
+                Min.Y <= boundingBox.Min.Y && Max.Y >= boundingBox.Max.Y &&
+                Min.Z <= boundingBox.Min.Z && Max.Z >= boundingBox.Max.Z)
+                return ContainmentType.Contains;
+            return ContainmentType.Intersects;
+        }
+
+
+
         /// <summary>
         /// Creates the smallest possible bounding box that contains a list of points.
         /// </summary>
@@ -195,6 +211,23 @@ namespace BEPUutilities
                 merged.Max.Z = a.Max.Z;
             else
                 merged.Max.Z = b.Max.Z;
+        }
+
+
+        /// <summary>
+        /// Creates a bounding box from a bounding sphere.
+        /// </summary>
+        /// <param name="boundingSphere">Bounding sphere to be used to create the bounding box.</param>
+        /// <param name="boundingBox">Bounding box created from the bounding sphere.</param>
+        public static void CreateFromSphere(ref BoundingSphere boundingSphere, out BoundingBox boundingBox)
+        {
+            boundingBox.Min.X = boundingSphere.Center.X - boundingSphere.Radius;
+            boundingBox.Min.Y = boundingSphere.Center.Y - boundingSphere.Radius;
+            boundingBox.Min.Z = boundingSphere.Center.Z - boundingSphere.Radius;
+
+            boundingBox.Max.X = boundingSphere.Center.X + boundingSphere.Radius;
+            boundingBox.Max.Y = boundingSphere.Center.Y + boundingSphere.Radius;
+            boundingBox.Max.Z = boundingSphere.Center.Z + boundingSphere.Radius;
         }
 
     }

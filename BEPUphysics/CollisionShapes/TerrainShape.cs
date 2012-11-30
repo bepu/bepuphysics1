@@ -103,7 +103,7 @@ namespace BEPUphysics.CollisionShapes
                 for (int j = 0; j < heights.GetLength(1); j++)
                 {
                     var vertex = new Vector3(i, heights[i, j], j);
-                    Matrix3X3.Transform(ref vertex, ref transform.LinearTransform, out vertex);
+                    Matrix3x3.Transform(ref vertex, ref transform.LinearTransform, out vertex);
                     if (vertex.X < minX)
                     {
                         minX = vertex.X;
@@ -175,7 +175,7 @@ namespace BEPUphysics.CollisionShapes
             Ray localRay;
             AffineTransform inverse;
             AffineTransform.Invert(ref transform, out inverse);
-            Matrix3X3.Transform(ref ray.Direction, ref inverse.LinearTransform, out localRay.Direction);
+            Matrix3x3.Transform(ref ray.Direction, ref inverse.LinearTransform, out localRay.Direction);
             AffineTransform.Transform(ref ray.Position, ref inverse, out localRay.Position);
 
             //Use rasterizey traversal.
@@ -321,13 +321,13 @@ namespace BEPUphysics.CollisionShapes
                         {
                             Vector3.Multiply(ref ray.Direction, hit1.T, out hit.Location);
                             Vector3.Add(ref hit.Location, ref ray.Position, out hit.Location);
-                            Matrix3X3.TransformTranspose(ref hit1.Normal, ref inverse.LinearTransform, out hit.Normal);
+                            Matrix3x3.TransformTranspose(ref hit1.Normal, ref inverse.LinearTransform, out hit.Normal);
                             hit.T = hit1.T;
                             return true;
                         }
                         Vector3.Multiply(ref ray.Direction, hit2.T, out hit.Location);
                         Vector3.Add(ref hit.Location, ref ray.Position, out hit.Location);
-                        Matrix3X3.TransformTranspose(ref hit2.Normal, ref inverse.LinearTransform, out hit.Normal);
+                        Matrix3x3.TransformTranspose(ref hit2.Normal, ref inverse.LinearTransform, out hit.Normal);
                         hit.T = hit2.T;
                         return true;
                     }
@@ -335,7 +335,7 @@ namespace BEPUphysics.CollisionShapes
                     {
                         Vector3.Multiply(ref ray.Direction, hit1.T, out hit.Location);
                         Vector3.Add(ref hit.Location, ref ray.Position, out hit.Location);
-                        Matrix3X3.TransformTranspose(ref hit1.Normal, ref inverse.LinearTransform, out hit.Normal);
+                        Matrix3x3.TransformTranspose(ref hit1.Normal, ref inverse.LinearTransform, out hit.Normal);
                         hit.T = hit1.T;
                         return true;
                     }
@@ -343,7 +343,7 @@ namespace BEPUphysics.CollisionShapes
                     {
                         Vector3.Multiply(ref ray.Direction, hit2.T, out hit.Location);
                         Vector3.Add(ref hit.Location, ref ray.Position, out hit.Location);
-                        Matrix3X3.TransformTranspose(ref hit2.Normal, ref inverse.LinearTransform, out hit.Normal);
+                        Matrix3x3.TransformTranspose(ref hit2.Normal, ref inverse.LinearTransform, out hit.Normal);
                         hit.T = hit2.T;
                         return true;
                     }

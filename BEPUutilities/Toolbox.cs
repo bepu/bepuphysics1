@@ -1661,7 +1661,7 @@ namespace BEPUutilities
         /// <param name="angularMomentum">Angular momentum of the object.</param>
         /// <param name="dt">Time since last frame, in seconds.</param>
         /// <param name="newOrientation">New orientation quaternion.</param>
-        public static void UpdateOrientationRK4(ref Quaternion q, ref Matrix3X3 localInertiaTensorInverse, ref Vector3 angularMomentum, float dt, out Quaternion newOrientation)
+        public static void UpdateOrientationRK4(ref Quaternion q, ref Matrix3x3 localInertiaTensorInverse, ref Vector3 angularMomentum, float dt, out Quaternion newOrientation)
         {
             //TODO: This is a little goofy
             //Quaternion diff = differentiateQuaternion(ref q, ref localInertiaTensorInverse, ref angularMomentum);
@@ -1706,17 +1706,17 @@ namespace BEPUutilities
         /// <param name="localInertiaTensorInverse">Local-space inertia tensor of the object being updated.</param>
         /// <param name="angularMomentum">Angular momentum of the object.</param>
         ///  <param name="orientationChange">Change in quaternion.</param>
-        public static void DifferentiateQuaternion(ref Quaternion orientation, ref Matrix3X3 localInertiaTensorInverse, ref Vector3 angularMomentum, out Quaternion orientationChange)
+        public static void DifferentiateQuaternion(ref Quaternion orientation, ref Matrix3x3 localInertiaTensorInverse, ref Vector3 angularMomentum, out Quaternion orientationChange)
         {
             Quaternion normalizedOrientation;
             Quaternion.Normalize(ref orientation, out normalizedOrientation);
-            Matrix3X3 tempRotMat;
-            Matrix3X3.CreateFromQuaternion(ref normalizedOrientation, out tempRotMat);
-            Matrix3X3 tempInertiaTensorInverse;
-            Matrix3X3.MultiplyTransposed(ref tempRotMat, ref localInertiaTensorInverse, out tempInertiaTensorInverse);
-            Matrix3X3.Multiply(ref tempInertiaTensorInverse, ref tempRotMat, out tempInertiaTensorInverse);
+            Matrix3x3 tempRotMat;
+            Matrix3x3.CreateFromQuaternion(ref normalizedOrientation, out tempRotMat);
+            Matrix3x3 tempInertiaTensorInverse;
+            Matrix3x3.MultiplyTransposed(ref tempRotMat, ref localInertiaTensorInverse, out tempInertiaTensorInverse);
+            Matrix3x3.Multiply(ref tempInertiaTensorInverse, ref tempRotMat, out tempInertiaTensorInverse);
             Vector3 halfspin;
-            Matrix3X3.Transform(ref angularMomentum, ref tempInertiaTensorInverse, out halfspin);
+            Matrix3x3.Transform(ref angularMomentum, ref tempInertiaTensorInverse, out halfspin);
             Vector3.Multiply(ref halfspin, .5f, out halfspin);
             var halfspinQuaternion = new Quaternion(halfspin.X, halfspin.Y, halfspin.Z, 0);
             Quaternion.Multiply(ref halfspinQuaternion, ref normalizedOrientation, out orientationChange);

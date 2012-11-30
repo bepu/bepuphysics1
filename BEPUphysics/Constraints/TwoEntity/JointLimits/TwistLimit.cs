@@ -376,7 +376,7 @@ namespace BEPUphysics.Constraints.TwoEntity.JointLimits
             Vector3 transformedAxis;
             if (connectionA.isDynamic)
             {
-                Matrix3X3.Transform(ref jacobianA, ref connectionA.inertiaTensorInverse, out transformedAxis);
+                Matrix3x3.Transform(ref jacobianA, ref connectionA.inertiaTensorInverse, out transformedAxis);
                 Vector3.Dot(ref transformedAxis, ref jacobianA, out entryA);
             }
             else
@@ -386,7 +386,7 @@ namespace BEPUphysics.Constraints.TwoEntity.JointLimits
             float entryB;
             if (connectionB.isDynamic)
             {
-                Matrix3X3.Transform(ref jacobianB, ref connectionB.inertiaTensorInverse, out transformedAxis);
+                Matrix3x3.Transform(ref jacobianB, ref connectionB.inertiaTensorInverse, out transformedAxis);
                 Vector3.Dot(ref transformedAxis, ref jacobianB, out entryB);
             }
             else
