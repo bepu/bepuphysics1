@@ -151,7 +151,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             Vector3.Cross(ref worldRestrictedAxis2, ref rB, out angularB2);
 
             //Put all the 1x3 jacobians into a 3x3 matrix representation.
-            linearJacobianA = new Matrix3X3
+            linearJacobianA = new Matrix3x3
             {
                 M11 = worldRestrictedAxis1.X,
                 M12 = worldRestrictedAxis1.Y,
@@ -160,9 +160,9 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
                 M22 = worldRestrictedAxis2.Y,
                 M23 = worldRestrictedAxis2.Z
             };
-            Matrix3X3.Negate(ref linearJacobianA, out linearJacobianB);
+            Matrix3x3.Negate(ref linearJacobianA, out linearJacobianB);
 
-            angularJacobianA = new Matrix3X3
+            angularJacobianA = new Matrix3x3
             {
                 M11 = angularA1.X,
                 M12 = angularA1.Y,
@@ -171,7 +171,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
                 M22 = angularA2.Y,
                 M23 = angularA2.Z
             };
-            angularJacobianB = new Matrix3X3
+            angularJacobianB = new Matrix3x3
             {
                 M11 = angularB1.X,
                 M12 = angularB1.Y,

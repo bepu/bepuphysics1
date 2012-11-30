@@ -67,7 +67,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         {
 
             //This constraint doesn't consider linear motion.
-            linearJacobianA = linearJacobianB = new Matrix3X3();
+            linearJacobianA = linearJacobianB = new Matrix3x3();
 
             //Compute the world axes.
             Vector3 axisA, axisB;
@@ -84,8 +84,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             Vector3 hingeAxis;
             Vector3.Cross(ref axisA, ref axisB, out hingeAxis);
 
-            angularJacobianA = new Matrix3X3 { M11 = hingeAxis.X, M12 = hingeAxis.Y, M13 = hingeAxis.Z };
-            angularJacobianB = new Matrix3X3 { M11 = -hingeAxis.X, M12 = -hingeAxis.Y, M13 = -hingeAxis.Z };
+            angularJacobianA = new Matrix3x3 { M11 = hingeAxis.X, M12 = hingeAxis.Y, M13 = hingeAxis.Z };
+            angularJacobianB = new Matrix3x3 { M11 = -hingeAxis.X, M12 = -hingeAxis.Y, M13 = -hingeAxis.Z };
 
             //Note how we've computed the jacobians despite the limit being potentially inactive.
             //This is to enable 'speculative' limits.

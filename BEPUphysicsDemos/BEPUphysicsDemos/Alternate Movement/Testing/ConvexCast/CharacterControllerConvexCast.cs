@@ -91,7 +91,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.ConvexCast
             Body = new Capsule(Vector3.Zero, 1.7f, .3f, 10);
             //Making the character a continuous object prevents it from flying through walls which would be pretty jarring from a player's perspective.
             Body.PositionUpdateMode = PositionUpdateMode.Continuous;
-            Body.LocalInertiaTensorInverse = new Matrix3X3();
+            Body.LocalInertiaTensorInverse = new Matrix3x3();
             Body.CollisionInformation.Events.CreatingPair += RemoveFriction;
             GlueSpeed = 20;
             StepHeight = 1;

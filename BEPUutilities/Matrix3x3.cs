@@ -7,7 +7,7 @@ namespace BEPUutilities
     /// <summary>
     /// 3 row, 3 column matrix.
     /// </summary>
-    public struct Matrix3X3
+    public struct Matrix3x3
     {
         /// <summary>
         /// Value at row 1, column 1 of the matrix.
@@ -66,7 +66,7 @@ namespace BEPUutilities
         /// <param name="m31">Value at row 3, column 1 of the matrix.</param>
         /// <param name="m32">Value at row 3, column 2 of the matrix.</param>
         /// <param name="m33">Value at row 3, column 3 of the matrix.</param>
-        public Matrix3X3(float m11, float m12, float m13, float m21, float m22, float m23, float m31, float m32, float m33)
+        public Matrix3x3(float m11, float m12, float m13, float m21, float m22, float m23, float m31, float m32, float m33)
         {
             M11 = m11;
             M12 = m12;
@@ -82,9 +82,9 @@ namespace BEPUutilities
         /// <summary>
         /// Gets the 3x3 identity matrix.
         /// </summary>
-        public static Matrix3X3 Identity
+        public static Matrix3x3 Identity
         {
-            get { return new Matrix3X3(1, 0, 0, 0, 1, 0, 0, 0, 1); }
+            get { return new Matrix3x3(1, 0, 0, 0, 1, 0, 0, 0, 1); }
         }
 
 
@@ -244,7 +244,7 @@ namespace BEPUutilities
         /// <param name="a">First matrix to add.</param>
         /// <param name="b">Second matrix to add.</param>
         /// <param name="result">Sum of the two matrices.</param>
-        public static void Add(ref Matrix3X3 a, ref Matrix3X3 b, out Matrix3X3 result)
+        public static void Add(ref Matrix3x3 a, ref Matrix3x3 b, out Matrix3x3 result)
         {
             float m11 = a.M11 + b.M11;
             float m12 = a.M12 + b.M12;
@@ -277,7 +277,7 @@ namespace BEPUutilities
         /// <param name="a">First matrix to add.</param>
         /// <param name="b">Second matrix to add.</param>
         /// <param name="result">Sum of the two matrices.</param>
-        public static void Add(ref Matrix a, ref Matrix3X3 b, out Matrix3X3 result)
+        public static void Add(ref Matrix a, ref Matrix3x3 b, out Matrix3x3 result)
         {
             float m11 = a.M11 + b.M11;
             float m12 = a.M12 + b.M12;
@@ -310,7 +310,7 @@ namespace BEPUutilities
         /// <param name="a">First matrix to add.</param>
         /// <param name="b">Second matrix to add.</param>
         /// <param name="result">Sum of the two matrices.</param>
-        public static void Add(ref Matrix3X3 a, ref Matrix b, out Matrix3X3 result)
+        public static void Add(ref Matrix3x3 a, ref Matrix b, out Matrix3x3 result)
         {
             float m11 = a.M11 + b.M11;
             float m12 = a.M12 + b.M12;
@@ -343,7 +343,7 @@ namespace BEPUutilities
         /// <param name="a">First matrix to add.</param>
         /// <param name="b">Second matrix to add.</param>
         /// <param name="result">Sum of the two matrices.</param>
-        public static void Add(ref Matrix a, ref Matrix b, out Matrix3X3 result)
+        public static void Add(ref Matrix a, ref Matrix b, out Matrix3x3 result)
         {
             float m11 = a.M11 + b.M11;
             float m12 = a.M12 + b.M12;
@@ -375,7 +375,7 @@ namespace BEPUutilities
         /// </summary>
         /// <param name="v">Vector to base the matrix on.</param>
         /// <param name="result">Skew-symmetric matrix result.</param>
-        public static void CreateCrossProduct(ref Vector3 v, out Matrix3X3 result)
+        public static void CreateCrossProduct(ref Vector3 v, out Matrix3x3 result)
         {
             result.M11 = 0;
             result.M12 = -v.Z;
@@ -393,7 +393,7 @@ namespace BEPUutilities
         /// </summary>
         /// <param name="matrix4X4">Matrix to extract a 3x3 matrix from.</param>
         /// <param name="matrix3X3">Upper 3x3 matrix extracted from the XNA matrix.</param>
-        public static void CreateFromMatrix(ref Matrix matrix4X4, out Matrix3X3 matrix3X3)
+        public static void CreateFromMatrix(ref Matrix matrix4X4, out Matrix3x3 matrix3X3)
         {
             matrix3X3.M11 = matrix4X4.M11;
             matrix3X3.M12 = matrix4X4.M12;
@@ -412,9 +412,9 @@ namespace BEPUutilities
         /// </summary>
         /// <param name="matrix4X4">Matrix to extract a 3x3 matrix from.</param>
         /// <returns>Upper 3x3 matrix extracted from the XNA matrix.</returns>
-        public static Matrix3X3 CreateFromMatrix(Matrix matrix4X4)
+        public static Matrix3x3 CreateFromMatrix(Matrix matrix4X4)
         {
-            Matrix3X3 matrix3X3;
+            Matrix3x3 matrix3X3;
             matrix3X3.M11 = matrix4X4.M11;
             matrix3X3.M12 = matrix4X4.M12;
             matrix3X3.M13 = matrix4X4.M13;
@@ -434,9 +434,9 @@ namespace BEPUutilities
         /// </summary>
         /// <param name="scale">Value to use in the diagonal.</param>
         /// <param name="matrix">Scaling matrix.</param>
-        public static void CreateScale(float scale, out Matrix3X3 matrix)
+        public static void CreateScale(float scale, out Matrix3x3 matrix)
         {
-            matrix = new Matrix3X3 {M11 = scale, M22 = scale, M33 = scale};
+            matrix = new Matrix3x3 {M11 = scale, M22 = scale, M33 = scale};
         }
 
         /// <summary>
@@ -444,9 +444,9 @@ namespace BEPUutilities
         /// </summary>
         /// <param name="scale">Value to use in the diagonal.</param>
         /// <returns>Scaling matrix.</returns>
-        public static Matrix3X3 CreateScale(float scale)
+        public static Matrix3x3 CreateScale(float scale)
         {
-            var matrix = new Matrix3X3 {M11 = scale, M22 = scale, M33 = scale};
+            var matrix = new Matrix3x3 {M11 = scale, M22 = scale, M33 = scale};
             return matrix;
         }
 
@@ -455,9 +455,9 @@ namespace BEPUutilities
         /// </summary>
         /// <param name="scale">Values defining the axis scales.</param>
         /// <param name="matrix">Scaling matrix.</param>
-        public static void CreateScale(ref Vector3 scale, out Matrix3X3 matrix)
+        public static void CreateScale(ref Vector3 scale, out Matrix3x3 matrix)
         {
-            matrix = new Matrix3X3 {M11 = scale.X, M22 = scale.Y, M33 = scale.Z};
+            matrix = new Matrix3x3 {M11 = scale.X, M22 = scale.Y, M33 = scale.Z};
         }
 
         /// <summary>
@@ -465,9 +465,9 @@ namespace BEPUutilities
         /// </summary>
         /// <param name="scale">Values defining the axis scales.</param>
         /// <returns>Scaling matrix.</returns>
-        public static Matrix3X3 CreateScale(ref Vector3 scale)
+        public static Matrix3x3 CreateScale(ref Vector3 scale)
         {
-            var matrix = new Matrix3X3 {M11 = scale.X, M22 = scale.Y, M33 = scale.Z};
+            var matrix = new Matrix3x3 {M11 = scale.X, M22 = scale.Y, M33 = scale.Z};
             return matrix;
         }
 
@@ -479,9 +479,9 @@ namespace BEPUutilities
         /// <param name="y">Scaling along the y axis.</param>
         /// <param name="z">Scaling along the z axis.</param>
         /// <param name="matrix">Scaling matrix.</param>
-        public static void CreateScale(float x, float y, float z, out Matrix3X3 matrix)
+        public static void CreateScale(float x, float y, float z, out Matrix3x3 matrix)
         {
-            matrix = new Matrix3X3 {M11 = x, M22 = y, M33 = z};
+            matrix = new Matrix3x3 {M11 = x, M22 = y, M33 = z};
         }
 
         /// <summary>
@@ -491,9 +491,9 @@ namespace BEPUutilities
         /// <param name="y">Scaling along the y axis.</param>
         /// <param name="z">Scaling along the z axis.</param>
         /// <returns>Scaling matrix.</returns>
-        public static Matrix3X3 CreateScale(float x, float y, float z)
+        public static Matrix3x3 CreateScale(float x, float y, float z)
         {
-            var matrix = new Matrix3X3 {M11 = x, M22 = y, M33 = z};
+            var matrix = new Matrix3x3 {M11 = x, M22 = y, M33 = z};
             return matrix;
         }
 
@@ -502,7 +502,7 @@ namespace BEPUutilities
         /// </summary>
         /// <param name="matrix">Matrix to be inverted.</param>
         /// <param name="result">Inverted matrix.</param>
-        public static void Invert(ref Matrix3X3 matrix, out Matrix3X3 result)
+        public static void Invert(ref Matrix3x3 matrix, out Matrix3x3 result)
         {
             float determinantInverse = 1 / matrix.Determinant();
             float m11 = (matrix.M22 * matrix.M33 - matrix.M23 * matrix.M32) * determinantInverse;
@@ -535,7 +535,7 @@ namespace BEPUutilities
         /// </summary>
         /// <param name="matrix">Matrix to be inverted.</param>
         /// <param name="result">Inverted matrix.</param>
-        public static void AdaptiveInvert(ref Matrix3X3 matrix, out Matrix3X3 result)
+        public static void AdaptiveInvert(ref Matrix3x3 matrix, out Matrix3x3 result)
         {
             int submatrix;
             float determinantInverse = 1 / matrix.AdaptiveDeterminant(out submatrix);
@@ -657,9 +657,9 @@ namespace BEPUutilities
         /// <param name="a">First matrix to multiply.</param>
         /// <param name="b">Second matrix to multiply.</param>
         /// <returns>Product of the multiplication.</returns>
-        public static Matrix3X3 operator *(Matrix3X3 a, Matrix3X3 b)
+        public static Matrix3x3 operator *(Matrix3x3 a, Matrix3x3 b)
         {
-            Matrix3X3 result;
+            Matrix3x3 result;
             float resultM11 = a.M11 * b.M11 + a.M12 * b.M21 + a.M13 * b.M31;
             float resultM12 = a.M11 * b.M12 + a.M12 * b.M22 + a.M13 * b.M32;
             float resultM13 = a.M11 * b.M13 + a.M12 * b.M23 + a.M13 * b.M33;
@@ -692,7 +692,7 @@ namespace BEPUutilities
         /// <param name="a">First matrix to multiply.</param>
         /// <param name="b">Second matrix to multiply.</param>
         /// <param name="result">Product of the multiplication.</param>
-        public static void Multiply(ref Matrix3X3 a, ref Matrix3X3 b, out Matrix3X3 result)
+        public static void Multiply(ref Matrix3x3 a, ref Matrix3x3 b, out Matrix3x3 result)
         {
             float resultM11 = a.M11 * b.M11 + a.M12 * b.M21 + a.M13 * b.M31;
             float resultM12 = a.M11 * b.M12 + a.M12 * b.M22 + a.M13 * b.M32;
@@ -725,7 +725,7 @@ namespace BEPUutilities
         /// <param name="a">First matrix to multiply.</param>
         /// <param name="b">Second matrix to multiply.</param>
         /// <param name="result">Product of the multiplication.</param>
-        public static void Multiply(ref Matrix3X3 a, ref Matrix b, out Matrix3X3 result)
+        public static void Multiply(ref Matrix3x3 a, ref Matrix b, out Matrix3x3 result)
         {
             float resultM11 = a.M11 * b.M11 + a.M12 * b.M21 + a.M13 * b.M31;
             float resultM12 = a.M11 * b.M12 + a.M12 * b.M22 + a.M13 * b.M32;
@@ -758,7 +758,7 @@ namespace BEPUutilities
         /// <param name="a">First matrix to multiply.</param>
         /// <param name="b">Second matrix to multiply.</param>
         /// <param name="result">Product of the multiplication.</param>
-        public static void Multiply(ref Matrix a, ref Matrix3X3 b, out Matrix3X3 result)
+        public static void Multiply(ref Matrix a, ref Matrix3x3 b, out Matrix3x3 result)
         {
             float resultM11 = a.M11 * b.M11 + a.M12 * b.M21 + a.M13 * b.M31;
             float resultM12 = a.M11 * b.M12 + a.M12 * b.M22 + a.M13 * b.M32;
@@ -792,7 +792,7 @@ namespace BEPUutilities
         /// <param name="matrix">Matrix to be multiplied.</param>
         /// <param name="transpose">Matrix to be transposed and multiplied.</param>
         /// <param name="result">Product of the multiplication.</param>
-        public static void MultiplyTransposed(ref Matrix3X3 transpose, ref Matrix3X3 matrix, out Matrix3X3 result)
+        public static void MultiplyTransposed(ref Matrix3x3 transpose, ref Matrix3x3 matrix, out Matrix3x3 result)
         {
             float resultM11 = transpose.M11 * matrix.M11 + transpose.M21 * matrix.M21 + transpose.M31 * matrix.M31;
             float resultM12 = transpose.M11 * matrix.M12 + transpose.M21 * matrix.M22 + transpose.M31 * matrix.M32;
@@ -825,7 +825,7 @@ namespace BEPUutilities
         /// <param name="matrix">Matrix to be multiplied.</param>
         /// <param name="transpose">Matrix to be transposed and multiplied.</param>
         /// <param name="result">Product of the multiplication.</param>
-        public static void MultiplyByTransposed(ref Matrix3X3 matrix, ref Matrix3X3 transpose, out Matrix3X3 result)
+        public static void MultiplyByTransposed(ref Matrix3x3 matrix, ref Matrix3x3 transpose, out Matrix3x3 result)
         {
             float resultM11 = matrix.M11 * transpose.M11 + matrix.M12 * transpose.M12 + matrix.M13 * transpose.M13;
             float resultM12 = matrix.M11 * transpose.M21 + matrix.M12 * transpose.M22 + matrix.M13 * transpose.M23;
@@ -858,7 +858,7 @@ namespace BEPUutilities
         /// <param name="matrix">Matrix to scale.</param>
         /// <param name="scale">Amount to scale.</param>
         /// <param name="result">Scaled matrix.</param>
-        public static void Multiply(ref Matrix3X3 matrix, float scale, out Matrix3X3 result)
+        public static void Multiply(ref Matrix3x3 matrix, float scale, out Matrix3x3 result)
         {
             result.M11 = matrix.M11 * scale;
             result.M12 = matrix.M12 * scale;
@@ -878,7 +878,7 @@ namespace BEPUutilities
         /// </summary>
         /// <param name="matrix">Matrix to negate.</param>
         /// <param name="result">Negated matrix.</param>
-        public static void Negate(ref Matrix3X3 matrix, out Matrix3X3 result)
+        public static void Negate(ref Matrix3x3 matrix, out Matrix3x3 result)
         {
             result.M11 = -matrix.M11;
             result.M12 = -matrix.M12;
@@ -899,7 +899,7 @@ namespace BEPUutilities
         /// <param name="a">First matrix to subtract.</param>
         /// <param name="b">Second matrix to subtract.</param>
         /// <param name="result">Difference of the two matrices.</param>
-        public static void Subtract(ref Matrix3X3 a, ref Matrix3X3 b, out Matrix3X3 result)
+        public static void Subtract(ref Matrix3x3 a, ref Matrix3x3 b, out Matrix3x3 result)
         {
             float m11 = a.M11 - b.M11;
             float m12 = a.M12 - b.M12;
@@ -931,7 +931,7 @@ namespace BEPUutilities
         /// </summary>
         /// <param name="a">3x3 matrix.</param>
         /// <param name="b">Created 4x4 matrix.</param>
-        public static void ToMatrix4X4(ref Matrix3X3 a, out Matrix b)
+        public static void ToMatrix4X4(ref Matrix3x3 a, out Matrix b)
         {
 #if !WINDOWS
             b = new Matrix();
@@ -962,7 +962,7 @@ namespace BEPUutilities
         /// </summary>
         /// <param name="a">3x3 matrix.</param>
         /// <returns>Created 4x4 matrix.</returns>
-        public static Matrix ToMatrix4X4(Matrix3X3 a)
+        public static Matrix ToMatrix4X4(Matrix3x3 a)
         {
 #if !WINDOWS
             Matrix b = new Matrix();
@@ -997,7 +997,7 @@ namespace BEPUutilities
         /// <param name="v">Vector3 to transform.</param>
         /// <param name="matrix">Matrix to use as the transformation.</param>
         /// <returns>Product of the transformation.</returns>
-        public static Vector3 Transform(Vector3 v, Matrix3X3 matrix)
+        public static Vector3 Transform(Vector3 v, Matrix3x3 matrix)
         {
             Vector3 result;
 #if !WINDOWS
@@ -1019,7 +1019,7 @@ namespace BEPUutilities
         /// <param name="v">Vector3 to transform.</param>
         /// <param name="matrix">Matrix to use as the transformation.</param>
         /// <param name="result">Product of the transformation.</param>
-        public static void Transform(ref Vector3 v, ref Matrix3X3 matrix, out Vector3 result)
+        public static void Transform(ref Vector3 v, ref Matrix3x3 matrix, out Vector3 result)
         {
             float vX = v.X;
             float vY = v.Y;
@@ -1057,7 +1057,7 @@ namespace BEPUutilities
         /// <param name="v">Vector3 to transform.</param>
         /// <param name="matrix">Matrix to use as the transformation transpose.</param>
         /// <returns>Product of the transformation.</returns>
-        public static Vector3 TransformTranspose(Vector3 v, Matrix3X3 matrix)
+        public static Vector3 TransformTranspose(Vector3 v, Matrix3x3 matrix)
         {
             float vX = v.X;
             float vY = v.Y;
@@ -1078,7 +1078,7 @@ namespace BEPUutilities
         /// <param name="v">Vector3 to transform.</param>
         /// <param name="matrix">Matrix to use as the transformation transpose.</param>
         /// <param name="result">Product of the transformation.</param>
-        public static void TransformTranspose(ref Vector3 v, ref Matrix3X3 matrix, out Vector3 result)
+        public static void TransformTranspose(ref Vector3 v, ref Matrix3x3 matrix, out Vector3 result)
         {
             float vX = v.X;
             float vY = v.Y;
@@ -1115,7 +1115,7 @@ namespace BEPUutilities
         /// </summary>
         /// <param name="matrix">Matrix to transpose.</param>
         /// <param name="result">Transposed matrix.</param>
-        public static void Transpose(ref Matrix3X3 matrix, out Matrix3X3 result)
+        public static void Transpose(ref Matrix3x3 matrix, out Matrix3x3 result)
         {
             float m21 = matrix.M12;
             float m31 = matrix.M13;
@@ -1140,7 +1140,7 @@ namespace BEPUutilities
         /// </summary>
         /// <param name="matrix">Matrix to transpose.</param>
         /// <param name="result">Transposed matrix.</param>
-        public static void Transpose(ref Matrix matrix, out Matrix3X3 result)
+        public static void Transpose(ref Matrix matrix, out Matrix3x3 result)
         {
             float m21 = matrix.M12;
             float m31 = matrix.M13;
@@ -1247,7 +1247,7 @@ namespace BEPUutilities
         /// </summary>
         /// <param name="r">Rotation matrix to create the quaternion from.</param>
         /// <param name="q">Quaternion based on the rotation matrix.</param>
-        public static void CreateQuaternion(ref Matrix3X3 r, out Quaternion q)
+        public static void CreateQuaternion(ref Matrix3x3 r, out Quaternion q)
         {
             float trace = r.M11 + r.M22 + r.M33;
 #if !WINDOWS
@@ -1296,7 +1296,7 @@ namespace BEPUutilities
         /// </summary>
         /// <param name="quaternion">Quaternion to use to create a matrix.</param>
         /// <param name="result">Matrix representing the quaternion's orientation.</param>
-        public static void CreateFromQuaternion(ref Quaternion quaternion, out Matrix3X3 result)
+        public static void CreateFromQuaternion(ref Quaternion quaternion, out Matrix3x3 result)
         {
 
             float XX = 2 * quaternion.X * quaternion.X;
@@ -1328,7 +1328,7 @@ namespace BEPUutilities
         /// <param name="a">First vector.</param>
         /// <param name="b">Second vector.</param>
         /// <param name="result">Outer product result.</param>
-        public static void CreateOuterProduct(ref Vector3 a, ref Vector3 b, out Matrix3X3 result)
+        public static void CreateOuterProduct(ref Vector3 a, ref Vector3 b, out Matrix3x3 result)
         {
             result.M11 = a.X * b.X;
             result.M12 = a.X * b.Y;
@@ -1349,9 +1349,9 @@ namespace BEPUutilities
         /// <param name="axis">Axis around which to rotate.</param>
         /// <param name="angle">Amount to rotate.</param>
         /// <returns>Matrix representing the rotation.</returns>
-        public static Matrix3X3 CreateFromAxisAngle(Vector3 axis, float angle)
+        public static Matrix3x3 CreateFromAxisAngle(Vector3 axis, float angle)
         {
-            Matrix3X3 toReturn;
+            Matrix3x3 toReturn;
             CreateFromAxisAngle(ref axis, angle, out toReturn);
             return toReturn;
         }
@@ -1362,7 +1362,7 @@ namespace BEPUutilities
         /// <param name="axis">Axis around which to rotate.</param>
         /// <param name="angle">Amount to rotate.</param>
         /// <param name="result">Matrix representing the rotation.</param>
-        public static void CreateFromAxisAngle(ref Vector3 axis, float angle, out Matrix3X3 result)
+        public static void CreateFromAxisAngle(ref Vector3 axis, float angle, out Matrix3x3 result)
         {
             float xx = axis.X * axis.X;
             float yy = axis.Y * axis.Y;

@@ -38,9 +38,9 @@ namespace BEPUphysics.CollisionTests.Manifolds
             if (convex.entity != null)
             {
                 Vector3 transformedVelocity;
-                Matrix3X3 inverse;
-                Matrix3X3.Invert(ref terrain.worldTransform.LinearTransform, out inverse);
-                Matrix3X3.Transform(ref convex.entity.linearVelocity, ref inverse, out transformedVelocity);
+                Matrix3x3 inverse;
+                Matrix3x3.Invert(ref terrain.worldTransform.LinearTransform, out inverse);
+                Matrix3x3.Transform(ref convex.entity.linearVelocity, ref inverse, out transformedVelocity);
                 Vector3.Multiply(ref transformedVelocity, dt, out transformedVelocity);
 
 

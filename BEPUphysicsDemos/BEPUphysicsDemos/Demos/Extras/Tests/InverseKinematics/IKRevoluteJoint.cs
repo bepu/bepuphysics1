@@ -119,7 +119,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
 
         protected internal override void UpdateJacobiansAndVelocityBias()
         {
-            linearJacobianA = linearJacobianB = new Matrix3X3();
+            linearJacobianA = linearJacobianB = new Matrix3x3();
 
             //We know the one free axis. We need the two restricted axes. This amounts to completing the orthonormal basis.
             //We can grab one of the restricted axes using a cross product of the two world axes. This is not guaranteed
@@ -137,7 +137,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             Vector3.Transform(ref localConstrainedAxis2, ref ConnectionA.Orientation, out worldConstrainedAxis2);
 
 
-            angularJacobianA = new Matrix3X3
+            angularJacobianA = new Matrix3x3
             {
                 M11 = worldConstrainedAxis1.X,
                 M12 = worldConstrainedAxis1.Y,
@@ -146,7 +146,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
                 M22 = worldConstrainedAxis2.Y,
                 M23 = worldConstrainedAxis2.Z
             };
-            Matrix3X3.Negate(ref angularJacobianA, out angularJacobianB);
+            Matrix3x3.Negate(ref angularJacobianA, out angularJacobianB);
 
 
             Vector2 constraintSpaceError;

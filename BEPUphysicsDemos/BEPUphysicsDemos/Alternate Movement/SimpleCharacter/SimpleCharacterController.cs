@@ -108,8 +108,8 @@ namespace BEPUphysicsDemos.AlternateMovement.SimpleCharacter
             rayOriginOffset = new Vector3(0, -characterHeight / 2, 0);
             this.supportHeight = supportHeight;
 
-            Body.LocalInertiaTensorInverse = new Matrix3X3();
-            collisionPairCollector.LocalInertiaTensorInverse = new Matrix3X3();
+            Body.LocalInertiaTensorInverse = new Matrix3x3();
+            collisionPairCollector.LocalInertiaTensorInverse = new Matrix3x3();
             //Make the body slippery.
             //Note that this will not make all collisions have zero friction;
             //the friction coefficient between a pair of objects is based

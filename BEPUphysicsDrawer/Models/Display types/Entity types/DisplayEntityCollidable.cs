@@ -41,9 +41,9 @@ namespace BEPUphysicsDrawer.Models
                 //That means we can't rely solely on the collidable's world transform or the entity's world transform alone;
                 //we must rebuild it from the entity's world transform and the collidable's local position.
                 //TODO: This is awfully annoying.  Could use some built-in convenience methods to ease the usage.
-                Vector3 translation = Matrix3X3.Transform(DisplayedObject.LocalPosition, DisplayedObject.Entity.BufferedStates.InterpolatedStates.OrientationMatrix);
+                Vector3 translation = Matrix3x3.Transform(DisplayedObject.LocalPosition, DisplayedObject.Entity.BufferedStates.InterpolatedStates.OrientationMatrix);
                 translation += DisplayedObject.Entity.BufferedStates.InterpolatedStates.Position;
-                Matrix worldTransform = Matrix3X3.ToMatrix4X4(DisplayedObject.Entity.BufferedStates.InterpolatedStates.OrientationMatrix);
+                Matrix worldTransform = Matrix3x3.ToMatrix4X4(DisplayedObject.Entity.BufferedStates.InterpolatedStates.OrientationMatrix);
                 worldTransform.Translation = translation;
                 WorldTransform = worldTransform;
             }

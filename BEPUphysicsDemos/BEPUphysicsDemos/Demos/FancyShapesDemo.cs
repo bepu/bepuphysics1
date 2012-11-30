@@ -100,8 +100,8 @@ namespace BEPUphysicsDemos.Demos
             Space.Add(new WrappedBody(new Vector3(-3, 4, 0), oddShape, 10));
 
             //Transformable shapes can be any other kind of convex primitive transformed by any affine transformation.
-            Matrix3X3 transform;
-            transform = Matrix3X3.Identity;
+            Matrix3x3 transform;
+            transform = Matrix3x3.Identity;
             transform.M23 = .5f;
             transform.M13 = .5f;
             var transformable = new TransformableEntity(new Vector3(0, 0, 4), new BoxShape(1, 1, 1), transform, 10);

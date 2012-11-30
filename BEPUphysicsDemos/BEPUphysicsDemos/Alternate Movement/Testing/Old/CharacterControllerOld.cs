@@ -176,9 +176,9 @@ namespace BEPUphysicsDemos.AlternateMovement.Testing.Old
             this.maximumStepHeight = maximumStepHeight;
             this.supportMargin = .01f;
 
-            Body.LocalInertiaTensorInverse = new Matrix3X3();
-            feetCollisionPairCollector.LocalInertiaTensorInverse = new Matrix3X3();
-            headCollisionPairCollector.LocalInertiaTensorInverse = new Matrix3X3();
+            Body.LocalInertiaTensorInverse = new Matrix3x3();
+            feetCollisionPairCollector.LocalInertiaTensorInverse = new Matrix3x3();
+            headCollisionPairCollector.LocalInertiaTensorInverse = new Matrix3x3();
         }
 
         /// <summary>

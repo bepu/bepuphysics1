@@ -144,13 +144,13 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         /// </summary>
         /// <param name="volume">Volume of the shape.</param>
         /// <returns>Volume distribution of the shape.</returns>
-        public override Matrix3X3 ComputeVolumeDistribution(out float volume)
+        public override Matrix3x3 ComputeVolumeDistribution(out float volume)
         {
             volume = ComputeVolume();
 
 
             //Calculate inertia tensor.
-            var volumeDistribution = new Matrix3X3();
+            var volumeDistribution = new Matrix3x3();
             float effectiveLength = Length + Radius / 2;
             float diagValue = (.0833333333f * effectiveLength * effectiveLength + .25f * Radius * Radius);
             volumeDistribution.M11 = diagValue;

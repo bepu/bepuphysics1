@@ -35,9 +35,9 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             var toReturn = PhysicsResources.GetTriangleCollidable();
             var shape = toReturn.Shape;
             mesh.Shape.TriangleMesh.Data.GetTriangle(index, out shape.vA, out shape.vB, out shape.vC);
-            Matrix3X3.Transform(ref shape.vA, ref mesh.worldTransform.LinearTransform, out shape.vA);
-            Matrix3X3.Transform(ref shape.vB, ref mesh.worldTransform.LinearTransform, out shape.vB);
-            Matrix3X3.Transform(ref shape.vC, ref mesh.worldTransform.LinearTransform, out shape.vC);
+            Matrix3x3.Transform(ref shape.vA, ref mesh.worldTransform.LinearTransform, out shape.vA);
+            Matrix3x3.Transform(ref shape.vB, ref mesh.worldTransform.LinearTransform, out shape.vB);
+            Matrix3x3.Transform(ref shape.vC, ref mesh.worldTransform.LinearTransform, out shape.vC);
             Vector3 center;
             Vector3.Add(ref shape.vA, ref shape.vB, out center);
             Vector3.Add(ref center, ref shape.vC, out center);

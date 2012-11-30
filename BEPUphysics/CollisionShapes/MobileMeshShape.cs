@@ -457,7 +457,7 @@ namespace BEPUphysics.CollisionShapes
                 ao *= offFactor;
                 bo *= offFactor;
                 co *= offFactor;
-                shapeInformation.VolumeDistribution = new Matrix3X3(a, bo, co,
+                shapeInformation.VolumeDistribution = new Matrix3x3(a, bo, co,
                                                                     bo, b, ao,
                                                                     co, ao, c);
 
@@ -490,7 +490,7 @@ namespace BEPUphysics.CollisionShapes
 
                 data.worldTransform.Translation -= shapeInformation.Center;
 
-                shapeInformation.VolumeDistribution = new Matrix3X3();
+                shapeInformation.VolumeDistribution = new Matrix3x3();
                 for (int i = 0; i < data.indices.Length; i += 3)
                 { //Configure the inertia tensor to be local.
                     Vector3 vA, vB, vC;
@@ -504,29 +504,29 @@ namespace BEPUphysics.CollisionShapes
                     float weight = cross.Length();
                     totalWeight += weight;
 
-                    Matrix3X3 innerProduct;
-                    Matrix3X3.CreateScale(vA.LengthSquared(), out innerProduct);
-                    Matrix3X3 outerProduct;
-                    Matrix3X3.CreateOuterProduct(ref vA, ref vA, out outerProduct);
-                    Matrix3X3 contribution;
-                    Matrix3X3.Subtract(ref innerProduct, ref outerProduct, out contribution);
-                    Matrix3X3.Multiply(ref contribution, weight, out contribution);
-                    Matrix3X3.Add(ref shapeInformation.VolumeDistribution, ref contribution, out shapeInformation.VolumeDistribution);
+                    Matrix3x3 innerProduct;
+                    Matrix3x3.CreateScale(vA.LengthSquared(), out innerProduct);
+                    Matrix3x3 outerProduct;
+                    Matrix3x3.CreateOuterProduct(ref vA, ref vA, out outerProduct);
+                    Matrix3x3 contribution;
+                    Matrix3x3.Subtract(ref innerProduct, ref outerProduct, out contribution);
+                    Matrix3x3.Multiply(ref contribution, weight, out contribution);
+                    Matrix3x3.Add(ref shapeInformation.VolumeDistribution, ref contribution, out shapeInformation.VolumeDistribution);
 
-                    Matrix3X3.CreateScale(vB.LengthSquared(), out innerProduct);
-                    Matrix3X3.CreateOuterProduct(ref vB, ref vB, out outerProduct);
-                    Matrix3X3.Subtract(ref innerProduct, ref outerProduct, out outerProduct);
-                    Matrix3X3.Multiply(ref contribution, weight, out contribution);
-                    Matrix3X3.Add(ref shapeInformation.VolumeDistribution, ref contribution, out shapeInformation.VolumeDistribution);
+                    Matrix3x3.CreateScale(vB.LengthSquared(), out innerProduct);
+                    Matrix3x3.CreateOuterProduct(ref vB, ref vB, out outerProduct);
+                    Matrix3x3.Subtract(ref innerProduct, ref outerProduct, out outerProduct);
+                    Matrix3x3.Multiply(ref contribution, weight, out contribution);
+                    Matrix3x3.Add(ref shapeInformation.VolumeDistribution, ref contribution, out shapeInformation.VolumeDistribution);
 
-                    Matrix3X3.CreateScale(vC.LengthSquared(), out innerProduct);
-                    Matrix3X3.CreateOuterProduct(ref vC, ref vC, out outerProduct);
-                    Matrix3X3.Subtract(ref innerProduct, ref outerProduct, out contribution);
-                    Matrix3X3.Multiply(ref contribution, weight, out contribution);
-                    Matrix3X3.Add(ref shapeInformation.VolumeDistribution, ref contribution, out shapeInformation.VolumeDistribution);
+                    Matrix3x3.CreateScale(vC.LengthSquared(), out innerProduct);
+                    Matrix3x3.CreateOuterProduct(ref vC, ref vC, out outerProduct);
+                    Matrix3x3.Subtract(ref innerProduct, ref outerProduct, out contribution);
+                    Matrix3x3.Multiply(ref contribution, weight, out contribution);
+                    Matrix3x3.Add(ref shapeInformation.VolumeDistribution, ref contribution, out shapeInformation.VolumeDistribution);
 
                 }
-                Matrix3X3.Multiply(ref shapeInformation.VolumeDistribution, 1 / (6 * totalWeight), out shapeInformation.VolumeDistribution);
+                Matrix3x3.Multiply(ref shapeInformation.VolumeDistribution, 1 / (6 * totalWeight), out shapeInformation.VolumeDistribution);
             }
 
             ////Configure the inertia tensor to be local.
@@ -615,7 +615,7 @@ namespace BEPUphysics.CollisionShapes
         //    }
         //}
 
-        private void GetBoundingBox(ref Matrix3X3 o, out BoundingBox boundingBox)
+        private void GetBoundingBox(ref Matrix3x3 o, out BoundingBox boundingBox)
         {
 #if !WINDOWS
             boundingBox = new BoundingBox();
@@ -689,12 +689,12 @@ namespace BEPUphysics.CollisionShapes
 
             //TODO: This could be optimized.  Unnecessary transformation information gets computed.
             Vector3 vMinX, vMaxX, vMinY, vMaxY, vMinZ, vMaxZ;
-            Matrix3X3.Transform(ref rightElement, ref o, out vMaxX);
-            Matrix3X3.Transform(ref leftElement, ref o, out vMinX);
-            Matrix3X3.Transform(ref upElement, ref o, out vMaxY);
-            Matrix3X3.Transform(ref downElement, ref o, out vMinY);
-            Matrix3X3.Transform(ref backwardElement, ref o, out vMaxZ);
-            Matrix3X3.Transform(ref forwardElement, ref o, out vMinZ);
+            Matrix3x3.Transform(ref rightElement, ref o, out vMaxX);
+            Matrix3x3.Transform(ref leftElement, ref o, out vMinX);
+            Matrix3x3.Transform(ref upElement, ref o, out vMaxY);
+            Matrix3x3.Transform(ref downElement, ref o, out vMinY);
+            Matrix3x3.Transform(ref backwardElement, ref o, out vMaxZ);
+            Matrix3x3.Transform(ref forwardElement, ref o, out vMinZ);
 
 
             boundingBox.Max.X = vMaxX.X;
@@ -751,8 +751,8 @@ namespace BEPUphysics.CollisionShapes
             //boundingBox.Min.Z = shapeTransform.Position.Z + forward.Z;
 
 
-            Matrix3X3 o;
-            Matrix3X3.CreateFromQuaternion(ref shapeTransform.Orientation, out o);
+            Matrix3x3 o;
+            Matrix3x3.CreateFromQuaternion(ref shapeTransform.Orientation, out o);
             GetBoundingBox(ref o, out boundingBox);
 
 
@@ -812,7 +812,7 @@ namespace BEPUphysics.CollisionShapes
         {
             GetLocalBoundingBox(ref shapeTransform, ref spaceTransform, out boundingBox);
             Vector3 expansion;
-            Matrix3X3.TransformTranspose(ref sweep, ref spaceTransform.LinearTransform, out expansion);
+            Matrix3x3.TransformTranspose(ref sweep, ref spaceTransform.LinearTransform, out expansion);
             Toolbox.ExpandBoundingBox(ref boundingBox, ref expansion);
         }
 

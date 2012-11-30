@@ -79,11 +79,11 @@ namespace BEPUphysics.BroadPhaseEntries.MobileCollidables
         {
             //Put the ray into local space.
             Ray localRay;
-            Matrix3X3 orientation;
-            Matrix3X3.CreateFromQuaternion(ref worldTransform.Orientation, out orientation);
-            Matrix3X3.TransformTranspose(ref ray.Direction, ref orientation, out localRay.Direction);
+            Matrix3x3 orientation;
+            Matrix3x3.CreateFromQuaternion(ref worldTransform.Orientation, out orientation);
+            Matrix3x3.TransformTranspose(ref ray.Direction, ref orientation, out localRay.Direction);
             Vector3.Subtract(ref ray.Position, ref worldTransform.Position, out localRay.Position);
-            Matrix3X3.TransformTranspose(ref localRay.Position, ref orientation, out localRay.Position);
+            Matrix3x3.TransformTranspose(ref localRay.Position, ref orientation, out localRay.Position);
 
 
             if (Shape.solidity == MobileMeshSolidity.Solid)
@@ -106,7 +106,7 @@ namespace BEPUphysics.BroadPhaseEntries.MobileCollidables
                         //Transform the hit into world space.
                         Vector3.Multiply(ref ray.Direction, rayHit.T, out rayHit.Location);
                         Vector3.Add(ref rayHit.Location, ref ray.Position, out rayHit.Location);
-                        Matrix3X3.Transform(ref rayHit.Normal, ref orientation, out rayHit.Normal);
+                        Matrix3x3.Transform(ref rayHit.Normal, ref orientation, out rayHit.Normal);
                     }
                     else
                     {
@@ -137,7 +137,7 @@ namespace BEPUphysics.BroadPhaseEntries.MobileCollidables
                     //Transform the hit into world space.
                     Vector3.Multiply(ref ray.Direction, rayHit.T, out rayHit.Location);
                     Vector3.Add(ref rayHit.Location, ref ray.Position, out rayHit.Location);
-                    Matrix3X3.Transform(ref rayHit.Normal, ref orientation, out rayHit.Normal);
+                    Matrix3x3.Transform(ref rayHit.Normal, ref orientation, out rayHit.Normal);
                     return true;
                 }
             }
@@ -157,18 +157,18 @@ namespace BEPUphysics.BroadPhaseEntries.MobileCollidables
         {
             //Put the ray into local space.
             Ray localRay;
-            Matrix3X3 orientation;
-            Matrix3X3.CreateFromQuaternion(ref worldTransform.Orientation, out orientation);
-            Matrix3X3.TransformTranspose(ref ray.Direction, ref orientation, out localRay.Direction);
+            Matrix3x3 orientation;
+            Matrix3x3.CreateFromQuaternion(ref worldTransform.Orientation, out orientation);
+            Matrix3x3.TransformTranspose(ref ray.Direction, ref orientation, out localRay.Direction);
             Vector3.Subtract(ref ray.Position, ref worldTransform.Position, out localRay.Position);
-            Matrix3X3.TransformTranspose(ref localRay.Position, ref orientation, out localRay.Position);
+            Matrix3x3.TransformTranspose(ref localRay.Position, ref orientation, out localRay.Position);
 
             if (Shape.TriangleMesh.RayCast(localRay, maximumLength, sidedness, out rayHit))
             {
                 //Transform the hit into world space.
                 Vector3.Multiply(ref ray.Direction, rayHit.T, out rayHit.Location);
                 Vector3.Add(ref rayHit.Location, ref ray.Position, out rayHit.Location);
-                Matrix3X3.Transform(ref rayHit.Normal, ref orientation, out rayHit.Normal);
+                Matrix3x3.Transform(ref rayHit.Normal, ref orientation, out rayHit.Normal);
                 return true;
             }
             rayHit = new RayHit();
@@ -199,7 +199,7 @@ namespace BEPUphysics.BroadPhaseEntries.MobileCollidables
             hit = new RayHit();
             BoundingBox boundingBox;
             var transform = new AffineTransform {Translation = worldTransform.Position};
-            Matrix3X3.CreateFromQuaternion(ref worldTransform.Orientation, out transform.LinearTransform);
+            Matrix3x3.CreateFromQuaternion(ref worldTransform.Orientation, out transform.LinearTransform);
             castShape.GetSweptLocalBoundingBox(ref startingTransform, ref transform, ref sweep, out boundingBox);
             var tri = PhysicsResources.GetTriangle();
             var hitElements = CommonResources.GetIntList();

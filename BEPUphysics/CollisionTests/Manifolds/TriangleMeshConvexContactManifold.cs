@@ -86,8 +86,8 @@ namespace BEPUphysics.CollisionTests.Manifolds
             //Get all the overlapped triangle indices.
             int triangleCount = FindOverlappingTriangles(dt);
 
-            Matrix3X3 orientation;
-            Matrix3X3.CreateFromQuaternion(ref convex.worldTransform.Orientation, out orientation);
+            Matrix3x3 orientation;
+            Matrix3x3.CreateFromQuaternion(ref convex.worldTransform.Orientation, out orientation);
             var guaranteedContacts = 0;
             for (int i = 0; i < triangleCount; i++)
             {
@@ -111,9 +111,9 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     Vector3.Subtract(ref localTriangleShape.vA, ref convex.worldTransform.Position, out localTriangleShape.vA);
                     Vector3.Subtract(ref localTriangleShape.vB, ref convex.worldTransform.Position, out localTriangleShape.vB);
                     Vector3.Subtract(ref localTriangleShape.vC, ref convex.worldTransform.Position, out localTriangleShape.vC);
-                    Matrix3X3.TransformTranspose(ref localTriangleShape.vA, ref orientation, out localTriangleShape.vA);
-                    Matrix3X3.TransformTranspose(ref localTriangleShape.vB, ref orientation, out localTriangleShape.vB);
-                    Matrix3X3.TransformTranspose(ref localTriangleShape.vC, ref orientation, out localTriangleShape.vC);
+                    Matrix3x3.TransformTranspose(ref localTriangleShape.vA, ref orientation, out localTriangleShape.vA);
+                    Matrix3x3.TransformTranspose(ref localTriangleShape.vB, ref orientation, out localTriangleShape.vB);
+                    Matrix3x3.TransformTranspose(ref localTriangleShape.vC, ref orientation, out localTriangleShape.vC);
 
                     //Now, generate a contact between the two shapes.
                     ContactData contact;
@@ -376,12 +376,12 @@ namespace BEPUphysics.CollisionTests.Manifolds
 
         }
 
-        void AddLocalContact(ref ContactData contact, ref Matrix3X3 orientation)
+        void AddLocalContact(ref ContactData contact, ref Matrix3x3 orientation)
         {
             //Put the contact into world space.
-            Matrix3X3.Transform(ref contact.Position, ref orientation, out contact.Position);
+            Matrix3x3.Transform(ref contact.Position, ref orientation, out contact.Position);
             Vector3.Add(ref contact.Position, ref convex.worldTransform.Position, out contact.Position);
-            Matrix3X3.Transform(ref contact.Normal, ref orientation, out contact.Normal);
+            Matrix3x3.Transform(ref contact.Normal, ref orientation, out contact.Normal);
             //Check to see if the contact is unique before proceeding.
             if (IsContactUnique(ref contact))
             {

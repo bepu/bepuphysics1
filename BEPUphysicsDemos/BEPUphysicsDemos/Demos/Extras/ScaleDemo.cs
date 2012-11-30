@@ -40,7 +40,7 @@ namespace BEPUphysicsDemos.Demos.Extras
             int[] indices;
             vertices = new Vector3[] { new Vector3(-10000, 0, -10000), new Vector3(-10000, 0, 20000), new Vector3(20000, 0, -10000) };
             indices = new int[] { 2, 1, 0 };
-            var staticMesh = new StaticMesh(vertices, indices, new AffineTransform(Matrix3X3.CreateFromAxisAngle(Vector3.Up, MathHelper.Pi), new Vector3(0, 0, 0)));
+            var staticMesh = new StaticMesh(vertices, indices, new AffineTransform(Matrix3x3.CreateFromAxisAngle(Vector3.Up, MathHelper.Pi), new Vector3(0, 0, 0)));
             staticMesh.Sidedness = TriangleSidedness.Counterclockwise;
 
             Space.Add(staticMesh);

@@ -101,10 +101,10 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             Vector3.Cross(ref linearA, ref offsetB, out angularB);
 
             //Put all the 1x3 jacobians into a 3x3 matrix representation.
-            linearJacobianA = new Matrix3X3 { M11 = linearA.X, M12 = linearA.Y, M13 = linearA.Z };
-            linearJacobianB = new Matrix3X3 { M11 = -linearA.X, M12 = -linearA.Y, M13 = -linearA.Z };
-            angularJacobianA = new Matrix3X3 { M11 = angularA.X, M12 = angularA.Y, M13 = angularA.Z };
-            angularJacobianB = new Matrix3X3 { M11 = angularB.X, M12 = angularB.Y, M13 = angularB.Z };
+            linearJacobianA = new Matrix3x3 { M11 = linearA.X, M12 = linearA.Y, M13 = linearA.Z };
+            linearJacobianB = new Matrix3x3 { M11 = -linearA.X, M12 = -linearA.Y, M13 = -linearA.Z };
+            angularJacobianA = new Matrix3x3 { M11 = angularA.X, M12 = angularA.Y, M13 = angularA.Z };
+            angularJacobianB = new Matrix3x3 { M11 = angularB.X, M12 = angularB.Y, M13 = angularB.Z };
 
         }
     }

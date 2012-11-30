@@ -121,8 +121,8 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
 #if !WINDOWS
             boundingBox = new BoundingBox();
 #endif
-            Matrix3X3 o;
-            Matrix3X3.CreateFromQuaternion(ref shapeTransform.Orientation, out o);
+            Matrix3x3 o;
+            Matrix3x3.CreateFromQuaternion(ref shapeTransform.Orientation, out o);
             //Sample the local directions from the orientation matrix, implicitly transposed.
 
             Vector3 right;
@@ -150,12 +150,12 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             GetLocalExtremePointWithoutMargin(ref direction, out forward);
 
 
-            Matrix3X3.Transform(ref right, ref o, out right);
-            Matrix3X3.Transform(ref left, ref o, out left);
-            Matrix3X3.Transform(ref up, ref o, out up);
-            Matrix3X3.Transform(ref down, ref o, out down);
-            Matrix3X3.Transform(ref backward, ref o, out backward);
-            Matrix3X3.Transform(ref forward, ref o, out forward);
+            Matrix3x3.Transform(ref right, ref o, out right);
+            Matrix3x3.Transform(ref left, ref o, out left);
+            Matrix3x3.Transform(ref up, ref o, out up);
+            Matrix3x3.Transform(ref down, ref o, out down);
+            Matrix3x3.Transform(ref backward, ref o, out backward);
+            Matrix3x3.Transform(ref forward, ref o, out forward);
 
             //These right/up/backward represent the extreme points in world space along the world space axes.
 
@@ -246,7 +246,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         /// </summary>
         /// <param name="volume">Volume of the shape.</param>
         /// <returns>Volume distribution of the shape.</returns>
-        public override Matrix3X3 ComputeVolumeDistribution(out float volume)
+        public override Matrix3x3 ComputeVolumeDistribution(out float volume)
         {
             return InertiaHelper.ComputeVolumeDistribution(this, out volume);
         }
@@ -264,7 +264,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         /// paired with mass and other tuning factors.
         /// </summary>
         /// <returns>Volume distribution of the shape.</returns>
-        public override Matrix3X3 ComputeVolumeDistribution()
+        public override Matrix3x3 ComputeVolumeDistribution()
         {
             float volume;
             return ComputeVolumeDistribution(out volume);
@@ -301,7 +301,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         {
             GetLocalBoundingBox(ref shapeTransform, ref spaceTransform, out boundingBox);
             Vector3 expansion;
-            Matrix3X3.TransformTranspose(ref sweep, ref spaceTransform.LinearTransform, out expansion);
+            Matrix3x3.TransformTranspose(ref sweep, ref spaceTransform.LinearTransform, out expansion);
             Toolbox.ExpandBoundingBox(ref boundingBox, ref expansion);
         }
 
@@ -356,12 +356,12 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
 
 
             //This could be optimized.  Unnecessary transformation information gets computed.
-            Matrix3X3.Transform(ref right, ref transform.LinearTransform, out right);
-            Matrix3X3.Transform(ref left, ref transform.LinearTransform, out left);
-            Matrix3X3.Transform(ref up, ref transform.LinearTransform, out up);
-            Matrix3X3.Transform(ref down, ref transform.LinearTransform, out down);
-            Matrix3X3.Transform(ref backward, ref transform.LinearTransform, out backward);
-            Matrix3X3.Transform(ref forward, ref transform.LinearTransform, out forward);
+            Matrix3x3.Transform(ref right, ref transform.LinearTransform, out right);
+            Matrix3x3.Transform(ref left, ref transform.LinearTransform, out left);
+            Matrix3x3.Transform(ref up, ref transform.LinearTransform, out up);
+            Matrix3x3.Transform(ref down, ref transform.LinearTransform, out down);
+            Matrix3x3.Transform(ref backward, ref transform.LinearTransform, out backward);
+            Matrix3x3.Transform(ref forward, ref transform.LinearTransform, out forward);
 
             //These right/up/backward represent the extreme points in world space along the world space axes.
             boundingBox.Max.X = transform.Translation.X + right.X;
