@@ -39,7 +39,7 @@ namespace BEPUphysicsDemos.Demos
                             2 + zSpacing * j - (numColumns - 1) * zSpacing / 2f),
                         .3f, 10);
 
-                    latticePiece.LocalInertiaTensorInverse = new Matrix3X3();
+                    latticePiece.LocalInertiaTensorInverse = new Matrix3x3();
                     latticePiece.Tag = "noDisplayObject"; //The joint lines are visible enough; don't add a sphere model for this sphere.
                     lattice[i, j] = latticePiece;
 

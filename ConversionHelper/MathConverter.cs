@@ -159,14 +159,14 @@ namespace ConversionHelper
 
         }
 
-        public static Matrix Convert(BEPUutilities.Matrix3X3 matrix)
+        public static Matrix Convert(BEPUutilities.Matrix3x3 matrix)
         {
             Matrix toReturn;
             Convert(ref matrix, out toReturn);
             return toReturn;
         }
 
-        public static void Convert(ref BEPUutilities.Matrix3X3 matrix, out Matrix xnaMatrix)
+        public static void Convert(ref BEPUutilities.Matrix3x3 matrix, out Matrix xnaMatrix)
         {
             xnaMatrix.M11 = matrix.M11;
             xnaMatrix.M12 = matrix.M12;
@@ -189,7 +189,7 @@ namespace ConversionHelper
             xnaMatrix.M44 = 1;
         }
 
-        public static void Convert(ref Matrix matrix, out BEPUutilities.Matrix3X3 bepuMatrix)
+        public static void Convert(ref Matrix matrix, out BEPUutilities.Matrix3x3 bepuMatrix)
         {
             bepuMatrix.M11 = matrix.M11;
             bepuMatrix.M12 = matrix.M12;

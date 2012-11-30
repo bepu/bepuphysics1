@@ -222,7 +222,7 @@ namespace BEPUphysicsDemos
             {
                 Vector3 offset;
                 if (transformOffset)
-                    offset = MathConverter.Convert(BEPUutilities.Matrix3X3.Transform(MathConverter.Convert(offsetFromChaseTarget), entityToChase.BufferedStates.InterpolatedStates.OrientationMatrix));
+                    offset = MathConverter.Convert(BEPUutilities.Matrix3x3.Transform(MathConverter.Convert(offsetFromChaseTarget), entityToChase.BufferedStates.InterpolatedStates.OrientationMatrix));
                 else
                     offset = offsetFromChaseTarget;
                 Vector3 lookAt = MathConverter.Convert(entityToChase.BufferedStates.InterpolatedStates.Position) + offset;
