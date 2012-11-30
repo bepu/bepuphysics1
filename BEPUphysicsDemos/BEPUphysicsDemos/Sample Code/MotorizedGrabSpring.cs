@@ -158,7 +158,7 @@ namespace BEPUphysicsDemos.SampleCode
             //Since the grabbed position is usually examined graphically, 
             //it's good to use the interpolated positions in case the 
             //engine is using internal time stepping and interpolation.
-            GrabbedPosition = Matrix3X3.Transform(LocalOffset, Entity.BufferedStates.InterpolatedStates.OrientationMatrix) + Entity.BufferedStates.InterpolatedStates.Position;
+            GrabbedPosition = Matrix3x3.Transform(LocalOffset, Entity.BufferedStates.InterpolatedStates.OrientationMatrix) + Entity.BufferedStates.InterpolatedStates.Position;
         }
 
         public override void OnAdditionToSpace(ISpace newSpace)

@@ -232,7 +232,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         float maxForce;
 
 
-        Matrix2X2 massMatrix;
+        Matrix2x2 massMatrix;
         Entity supportEntity;
         Vector3 linearJacobianA1;
         Vector3 linearJacobianA2;
@@ -437,16 +437,16 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
 
                 //Scale the inertia and mass of the support.  This will make the solver view the object as 'heavier' with respect to horizontal motion.
-                Matrix3X3 inertiaInverse = supportEntity.InertiaTensorInverse;
-                Matrix3X3.Multiply(ref inertiaInverse, supportForceFactor, out inertiaInverse);
+                Matrix3x3 inertiaInverse = supportEntity.InertiaTensorInverse;
+                Matrix3x3.Multiply(ref inertiaInverse, supportForceFactor, out inertiaInverse);
                 float extra;
                 inverseMass = supportForceFactor * supportEntity.InverseMass;
-                Matrix3X3.Transform(ref angularJacobianB1, ref inertiaInverse, out intermediate);
+                Matrix3x3.Transform(ref angularJacobianB1, ref inertiaInverse, out intermediate);
                 Vector3.Dot(ref intermediate, ref angularJacobianB1, out extra);
                 m11 += inverseMass + extra;
                 Vector3.Dot(ref intermediate, ref angularJacobianB2, out extra);
                 m1221 += extra;
-                Matrix3X3.Transform(ref angularJacobianB2, ref inertiaInverse, out intermediate);
+                Matrix3x3.Transform(ref angularJacobianB2, ref inertiaInverse, out intermediate);
                 Vector3.Dot(ref intermediate, ref angularJacobianB2, out extra);
                 m22 += inverseMass + extra;
 
@@ -455,14 +455,14 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 massMatrix.M12 = m1221;
                 massMatrix.M21 = m1221;
                 massMatrix.M22 = m22;
-                Matrix2X2.Invert(ref massMatrix, out massMatrix);
+                Matrix2x2.Invert(ref massMatrix, out massMatrix);
 
 
             }
             else
             {
                 //If we're not standing on a dynamic entity, then the mass matrix is defined entirely by the character.
-                Matrix2X2.CreateScale(character.Body.Mass, out massMatrix);
+                Matrix2x2.CreateScale(character.Body.Mass, out massMatrix);
             }
 
             //If we're trying to stand still on an object that's moving, use a position correction term to keep the character
@@ -489,7 +489,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 {
                     Vector3.Multiply(ref downDirection, character.Body.Height * .5f, out positionLocalOffset);
                     positionLocalOffset = (positionLocalOffset + character.Body.Position) - supportEntity.Position;
-                    positionLocalOffset = Matrix3X3.TransformTranspose(positionLocalOffset, supportEntity.OrientationMatrix);
+                    positionLocalOffset = Matrix3x3.TransformTranspose(positionLocalOffset, supportEntity.OrientationMatrix);
                     timeSinceTransition = -1; //Negative 1 means that the offset has been computed.
                 }
                 if (timeSinceTransition < 0)
@@ -497,7 +497,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     Vector3 targetPosition;
                     Vector3.Multiply(ref downDirection, character.Body.Height * .5f, out targetPosition);
                     targetPosition += character.Body.Position;
-                    Vector3 worldSupportLocation = Matrix3X3.Transform(positionLocalOffset, supportEntity.OrientationMatrix) + supportEntity.Position;
+                    Vector3 worldSupportLocation = Matrix3x3.Transform(positionLocalOffset, supportEntity.OrientationMatrix) + supportEntity.Position;
                     Vector3 error;
                     Vector3.Subtract(ref targetPosition, ref worldSupportLocation, out error);
                     //If the error is too large, then recompute the offset.  We don't want the character rubber banding around.
@@ -505,7 +505,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     {
                         Vector3.Multiply(ref downDirection, character.Body.Height * .5f, out positionLocalOffset);
                         positionLocalOffset = (positionLocalOffset + character.Body.Position) - supportEntity.Position;
-                        positionLocalOffset = Matrix3X3.TransformTranspose(positionLocalOffset, supportEntity.OrientationMatrix);
+                        positionLocalOffset = Matrix3x3.TransformTranspose(positionLocalOffset, supportEntity.OrientationMatrix);
                         positionCorrectionBias = new Vector2();
                     }
                     else
@@ -586,7 +586,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             //Create the full velocity change, and convert it to an impulse in constraint space.
             Vector2 lambda;
             Vector2.Subtract(ref targetVelocity, ref relativeVelocity, out lambda);
-            Matrix2X2.Transform(ref lambda, ref massMatrix, out lambda);
+            Matrix2x2.Transform(ref lambda, ref massMatrix, out lambda);
 
             //Add and clamp the impulse.
 

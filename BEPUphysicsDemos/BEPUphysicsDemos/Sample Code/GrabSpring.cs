@@ -86,7 +86,7 @@ namespace BEPUphysicsDemos.SampleCode
         {
             if (Entity.IsDynamic)
             {
-                Vector3 grabbedLocation = Matrix3X3.Transform(localOffset, Entity.OrientationMatrix) + Entity.Position;
+                Vector3 grabbedLocation = Matrix3x3.Transform(localOffset, Entity.OrientationMatrix) + Entity.Position;
                 Vector3 positionError = GoalPosition - grabbedLocation;
 
                 //Apply the force.
@@ -110,7 +110,7 @@ namespace BEPUphysicsDemos.SampleCode
             //Since the grabbed position is usually examined graphically, 
             //it's good to use the interpolated positions in case the 
             //engine is using internal time stepping and interpolation.
-            GrabbedPosition = Matrix3X3.Transform(localOffset, Entity.BufferedStates.InterpolatedStates.OrientationMatrix) + Entity.BufferedStates.InterpolatedStates.Position;
+            GrabbedPosition = Matrix3x3.Transform(localOffset, Entity.BufferedStates.InterpolatedStates.OrientationMatrix) + Entity.BufferedStates.InterpolatedStates.Position;
         }
     }
 }

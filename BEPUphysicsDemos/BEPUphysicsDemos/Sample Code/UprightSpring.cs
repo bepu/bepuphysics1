@@ -59,7 +59,7 @@ namespace BEPUphysicsDemos.SampleCode
             set
             {
                 myLocalUpVector = Vector3.Normalize(value);
-                myWorldUpVector = Matrix3X3.Transform(myLocalUpVector, Entity.OrientationMatrix);
+                myWorldUpVector = Matrix3x3.Transform(myLocalUpVector, Entity.OrientationMatrix);
             }
         }
 
@@ -72,7 +72,7 @@ namespace BEPUphysicsDemos.SampleCode
             set
             {
                 myWorldUpVector = Vector3.Normalize(value);
-                myLocalUpVector = Matrix3X3.TransformTranspose(myWorldUpVector, Entity.OrientationMatrix);
+                myLocalUpVector = Matrix3x3.TransformTranspose(myWorldUpVector, Entity.OrientationMatrix);
             }
         }
 
@@ -119,7 +119,7 @@ namespace BEPUphysicsDemos.SampleCode
         /// <param name="dt">Time since last frame in simulation seconds.</param>
         void IDuringForcesUpdateable.Update(float dt)
         {
-            myWorldUpVector = Matrix3X3.Transform(myLocalUpVector, Entity.OrientationMatrix);
+            myWorldUpVector = Matrix3x3.Transform(myLocalUpVector, Entity.OrientationMatrix);
 
             //Compute the axis and angle 
             Vector3 axis = Vector3.Cross(myWorldUpVector, Vector3.Up);
