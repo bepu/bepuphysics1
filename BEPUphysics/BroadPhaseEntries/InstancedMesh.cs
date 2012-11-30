@@ -174,7 +174,7 @@ namespace BEPUphysics.Collidables
             Ray localRay;
             AffineTransform inverse;
             AffineTransform.Invert(ref worldTransform, out inverse);
-            Matrix3X3.Transform(ref ray.Direction, ref inverse.LinearTransform, out localRay.Direction);
+            Matrix3x3.Transform(ref ray.Direction, ref inverse.LinearTransform, out localRay.Direction);
             AffineTransform.Transform(ref ray.Position, ref inverse, out localRay.Position);
 
             if (Shape.TriangleMesh.RayCast(localRay, maximumLength, sidedness, out rayHit))
@@ -182,7 +182,7 @@ namespace BEPUphysics.Collidables
                 //Transform the hit into world space.
                 Vector3.Multiply(ref ray.Direction, rayHit.T, out rayHit.Location);
                 Vector3.Add(ref rayHit.Location, ref ray.Position, out rayHit.Location);
-                Matrix3X3.TransformTranspose(ref rayHit.Normal, ref inverse.LinearTransform, out rayHit.Normal);
+                Matrix3x3.TransformTranspose(ref rayHit.Normal, ref inverse.LinearTransform, out rayHit.Normal);
                 return true;
             }
             rayHit = new RayHit();

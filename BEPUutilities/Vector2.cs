@@ -114,6 +114,22 @@ namespace BEPUutilities
             }
         }
 
+        /// <summary>
+        /// Gets a vector pointing along the X axis.
+        /// </summary>
+        public static Vector2 UnitX
+        {
+            get { return new Vector2 { X = 1 }; }
+        }
+
+        /// <summary>
+        /// Gets a vector pointing along the Y axis.
+        /// </summary>
+        public static Vector2 UnitY
+        {
+            get { return new Vector2 { Y = 1 }; }
+        }
+
 
         /// <summary>
         /// Normalizes the vector.

@@ -1255,11 +1255,11 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
                 contact.Id = -1;
                 //we're still in local space! transform it all back.
-                Matrix3X3 orientation;
-                Matrix3X3.CreateFromQuaternion(ref transformA.Orientation, out orientation);
-                Matrix3X3.Transform(ref contact.Normal, ref orientation, out contact.Normal);
+                Matrix3x3 orientation;
+                Matrix3x3.CreateFromQuaternion(ref transformA.Orientation, out orientation);
+                Matrix3x3.Transform(ref contact.Normal, ref orientation, out contact.Normal);
                 //Vector3.Negate(ref contact.Normal, out contact.Normal);
-                Matrix3X3.Transform(ref contact.Position, ref orientation, out contact.Position);
+                Matrix3x3.Transform(ref contact.Position, ref orientation, out contact.Position);
                 Vector3.Add(ref contact.Position, ref transformA.Position, out contact.Position);
                 return true;
             }

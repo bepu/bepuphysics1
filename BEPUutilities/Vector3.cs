@@ -34,6 +34,30 @@ namespace BEPUutilities
         }
 
         /// <summary>
+        /// Constructs a new 3d vector.
+        /// </summary>
+        /// <param name="xy">X and Y components of the vector.</param>
+        /// <param name="z">Z component of the vector.</param>
+        public Vector3(Vector2 xy, float z)
+        {
+            this.X = xy.X;
+            this.Y = xy.Y;
+            this.Z = z;
+        }
+
+        /// <summary>
+        /// Constructs a new 3d vector.
+        /// </summary>
+        /// <param name="x">X component of the vector.</param>
+        /// <param name="yz">Y and Z components of the vector.</param>
+        public Vector3(float x, Vector2 yz)
+        {
+            this.X = x;
+            this.Y = yz.X;
+            this.Z = yz.Y;
+        }
+
+        /// <summary>
         /// Computes the squared length of the vector.
         /// </summary>
         /// <returns>Squared length of the vector.</returns>
@@ -433,6 +457,30 @@ namespace BEPUutilities
                     Z = 1
                 };
             }
+        }
+
+        /// <summary>
+        /// Gets a vector pointing along the X axis.
+        /// </summary>
+        public static Vector3 UnitX
+        {
+            get { return new Vector3 { X = 1 }; }
+        }
+
+        /// <summary>
+        /// Gets a vector pointing along the Y axis.
+        /// </summary>
+        public static Vector3 UnitY
+        {
+            get { return new Vector3 { Y = 1 }; }
+        }
+
+        /// <summary>
+        /// Gets a vector pointing along the Z axis.
+        /// </summary>
+        public static Vector3 UnitZ
+        {
+            get { return new Vector3 { Z = 1 }; }
         }
 
         /// <summary>

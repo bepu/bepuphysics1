@@ -40,6 +40,89 @@ namespace BEPUutilities
         }
 
         /// <summary>
+        /// Constructs a new 3d vector.
+        /// </summary>
+        /// <param name="xyz">X, Y, and Z components of the vector.</param>
+        /// <param name="w">W component of the vector.</param>
+        public Vector4(Vector3 xyz, float w)
+        {
+            this.X = xyz.X;
+            this.Y = xyz.Y;
+            this.Z = xyz.Z;
+            this.W = w;
+        }
+
+
+        /// <summary>
+        /// Constructs a new 3d vector.
+        /// </summary>
+        /// <param name="x">X component of the vector.</param>
+        /// <param name="yzw">Y, Z, and W components of the vector.</param>
+        public Vector4(float x, Vector3 yzw)
+        {
+            this.X = x;
+            this.Y = yzw.X;
+            this.Z = yzw.Y;
+            this.W = yzw.Z;
+        }
+
+        /// <summary>
+        /// Constructs a new 3d vector.
+        /// </summary>
+        /// <param name="xy">X and Y components of the vector.</param>
+        /// <param name="z">Z component of the vector.</param>
+        /// <param name="w">W component of the vector.</param>
+        public Vector4(Vector2 xy, float z, float w)
+        {
+            this.X = xy.X;
+            this.Y = xy.Y;
+            this.Z = z;
+            this.W = w;
+        }
+
+        /// <summary>
+        /// Constructs a new 3d vector.
+        /// </summary>
+        /// <param name="x">X component of the vector.</param>
+        /// <param name="yz">Y and Z components of the vector.</param>
+        /// <param name="w">W component of the vector.</param>
+        public Vector4(float x, Vector2 yz, float w)
+        {
+            this.X = x;
+            this.Y = yz.X;
+            this.Z = yz.Y;
+            this.W = w;
+        }
+
+        /// <summary>
+        /// Constructs a new 3d vector.
+        /// </summary>
+        /// <param name="x">X component of the vector.</param>
+        /// <param name="y">Y and Z components of the vector.</param>
+        /// <param name="zw">W component of the vector.</param>
+        public Vector4(float x, float y, Vector2 zw)
+        {
+            this.X = x;
+            this.Y = y;
+            this.Z = zw.X;
+            this.W = zw.Y;
+        }
+
+        /// <summary>
+        /// Constructs a new 3d vector.
+        /// </summary>
+        /// <param name="xy">X and Y components of the vector.</param>
+        /// <param name="zw">Z and W components of the vector.</param>
+        public Vector4(Vector2 xy, Vector2 zw)
+        {
+            this.X = xy.X;
+            this.Y = xy.Y;
+            this.Z = zw.X;
+            this.W = zw.Y;
+        }
+
+
+        /// <summary>
         /// Computes the squared length of the vector.
         /// </summary>
         /// <returns>Squared length of the vector.</returns>

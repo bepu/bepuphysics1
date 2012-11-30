@@ -45,8 +45,8 @@ namespace BEPUphysics.Entities.Prefabs
         {
             ShapeDistributionInformation info;
             var shape = new MobileMeshShape(vertices, indices, localTransform, solidity, out info);
-            Matrix3X3 inertia;
-            Matrix3X3.Multiply(ref info.VolumeDistribution, mass * InertiaHelper.InertiaTensorScale, out inertia);
+            Matrix3x3 inertia;
+            Matrix3x3.Multiply(ref info.VolumeDistribution, mass * InertiaHelper.InertiaTensorScale, out inertia);
             Initialize(new MobileMeshCollidable(shape), mass, inertia, info.Volume);
             Position = info.Center;
         }

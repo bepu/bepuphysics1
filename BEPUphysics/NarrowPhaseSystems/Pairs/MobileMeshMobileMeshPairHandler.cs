@@ -48,11 +48,11 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         {
             var shape = entry.Collidable.Shape;
             mesh.Shape.TriangleMesh.Data.GetTriangle(entry.Index, out shape.vA, out shape.vB, out shape.vC);
-            Matrix3X3 o;
-            Matrix3X3.CreateFromQuaternion(ref mesh.worldTransform.Orientation, out o);
-            Matrix3X3.Transform(ref shape.vA, ref o, out shape.vA);
-            Matrix3X3.Transform(ref shape.vB, ref o, out shape.vB);
-            Matrix3X3.Transform(ref shape.vC, ref o, out shape.vC);
+            Matrix3x3 o;
+            Matrix3x3.CreateFromQuaternion(ref mesh.worldTransform.Orientation, out o);
+            Matrix3x3.Transform(ref shape.vA, ref o, out shape.vA);
+            Matrix3x3.Transform(ref shape.vB, ref o, out shape.vB);
+            Matrix3x3.Transform(ref shape.vC, ref o, out shape.vC);
             Vector3 center;
             Vector3.Add(ref shape.vA, ref shape.vB, out center);
             Vector3.Add(ref center, ref shape.vC, out center);
