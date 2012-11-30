@@ -282,7 +282,7 @@ namespace BEPUphysics.CollisionShapes
         /// </summary>
         /// <param name="volume">Volume of the shape.</param>
         /// <returns>Volume distribution of the shape.</returns>
-        public override Matrix3X3 ComputeVolumeDistribution(out float volume)
+        public override Matrix3x3 ComputeVolumeDistribution(out float volume)
         {
             volume = ComputeVolume();
             return ComputeVolumeDistribution();
@@ -292,19 +292,19 @@ namespace BEPUphysics.CollisionShapes
         /// Computes the volume distribution of the shape.
         /// </summary>
         /// <returns>Volume distribution of the shape.</returns>
-        public override Matrix3X3 ComputeVolumeDistribution()
+        public override Matrix3x3 ComputeVolumeDistribution()
         {
-            var volumeDistribution = new Matrix3X3();
+            var volumeDistribution = new Matrix3x3();
             float totalWeight = 0;
             for (int i = 0; i < shapes.Count; i++)
             {
                 totalWeight += shapes.Elements[i].Weight;
-                Matrix3X3 contribution;
+                Matrix3x3 contribution;
                 GetContribution(shapes.Elements[i].Shape, ref shapes.Elements[i].LocalTransform, ref Toolbox.ZeroVector, shapes.Elements[i].Weight, out contribution);
-                Matrix3X3.Add(ref contribution, ref volumeDistribution, out volumeDistribution);
+                Matrix3x3.Add(ref contribution, ref volumeDistribution, out volumeDistribution);
 
             }
-            Matrix3X3.Multiply(ref volumeDistribution, 1 / totalWeight, out volumeDistribution);
+            Matrix3x3.Multiply(ref volumeDistribution, 1 / totalWeight, out volumeDistribution);
             return volumeDistribution;
         }
 
@@ -314,7 +314,7 @@ namespace BEPUphysics.CollisionShapes
         /// <param name="entries">Mass-weighted entries of the compound.</param>
         /// <param name="center">Center of the compound.</param>
         /// <returns>Volume distribution of the shape.</returns>
-        public static Matrix3X3 ComputeVolumeDistribution(IList<CompoundShapeEntry> entries, out Vector3 center)
+        public static Matrix3x3 ComputeVolumeDistribution(IList<CompoundShapeEntry> entries, out Vector3 center)
         {
             center = new Vector3();
             float totalWeight = 0;
@@ -324,13 +324,13 @@ namespace BEPUphysics.CollisionShapes
                 totalWeight += entries[i].Weight;
             }
             center /= totalWeight;
-            var volumeDistribution = new Matrix3X3();
+            var volumeDistribution = new Matrix3x3();
             for (int i = 0; i < entries.Count; i++)
             {
                 RigidTransform transform = entries[i].LocalTransform;
-                Matrix3X3 contribution;
+                Matrix3x3 contribution;
                 GetContribution(entries[i].Shape, ref transform, ref center, entries[i].Weight, out contribution);
-                Matrix3X3.Add(ref volumeDistribution, ref contribution, out volumeDistribution);
+                Matrix3x3.Add(ref volumeDistribution, ref contribution, out volumeDistribution);
             }
             return volumeDistribution;
         }
@@ -343,7 +343,7 @@ namespace BEPUphysics.CollisionShapes
         ///<param name="center">Center to use when computing the distribution.</param>
         ///<param name="weight">Weighting to apply to the contribution.</param>
         ///<param name="contribution">Volume distribution of the contribution.</param>
-        public static void GetContribution(EntityShape shape, ref RigidTransform transform, ref Vector3 center, float weight, out Matrix3X3 contribution)
+        public static void GetContribution(EntityShape shape, ref RigidTransform transform, ref Vector3 center, float weight, out Matrix3x3 contribution)
         {
             contribution = shape.ComputeVolumeDistribution();
             TransformContribution(ref transform, ref center, ref contribution, weight, out contribution);
@@ -360,32 +360,32 @@ namespace BEPUphysics.CollisionShapes
         /// <param name="baseContribution">Original unmodified contribution.</param>
         /// <param name="weight">Weight of the contribution.</param>
         /// <param name="contribution">Transformed contribution.</param>
-        public static void TransformContribution(ref RigidTransform transform, ref Vector3 center, ref Matrix3X3 baseContribution, float weight, out Matrix3X3 contribution)
+        public static void TransformContribution(ref RigidTransform transform, ref Vector3 center, ref Matrix3x3 baseContribution, float weight, out Matrix3x3 contribution)
         {
-            Matrix3X3 rotation;
-            Matrix3X3.CreateFromQuaternion(ref transform.Orientation, out rotation);
-            Matrix3X3 temp;
+            Matrix3x3 rotation;
+            Matrix3x3.CreateFromQuaternion(ref transform.Orientation, out rotation);
+            Matrix3x3 temp;
 
             //TODO: Verify contribution
 
             //Do angular transformed contribution first...
-            Matrix3X3.MultiplyTransposed(ref rotation, ref baseContribution, out temp);
-            Matrix3X3.Multiply(ref temp, ref rotation, out temp);
+            Matrix3x3.MultiplyTransposed(ref rotation, ref baseContribution, out temp);
+            Matrix3x3.Multiply(ref temp, ref rotation, out temp);
 
             contribution = temp;
 
             //Now add in the offset from the origin.
             Vector3 offset;
             Vector3.Subtract(ref transform.Position, ref center, out offset);
-            Matrix3X3 innerProduct;
-            Matrix3X3.CreateScale(offset.LengthSquared(), out innerProduct);
-            Matrix3X3 outerProduct;
-            Matrix3X3.CreateOuterProduct(ref offset, ref offset, out outerProduct);
+            Matrix3x3 innerProduct;
+            Matrix3x3.CreateScale(offset.LengthSquared(), out innerProduct);
+            Matrix3x3 outerProduct;
+            Matrix3x3.CreateOuterProduct(ref offset, ref offset, out outerProduct);
 
-            Matrix3X3.Subtract(ref innerProduct, ref outerProduct, out temp);
+            Matrix3x3.Subtract(ref innerProduct, ref outerProduct, out temp);
 
-            Matrix3X3.Add(ref contribution, ref temp, out contribution);
-            Matrix3X3.Multiply(ref contribution, weight, out contribution);
+            Matrix3x3.Add(ref contribution, ref temp, out contribution);
+            Matrix3x3.Multiply(ref contribution, weight, out contribution);
 
         }
 

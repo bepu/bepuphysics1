@@ -16,7 +16,7 @@ namespace BEPUutilities
         /// <summary>
         /// Linear transform in the affine transform.
         /// </summary>
-        public Matrix3X3 LinearTransform;
+        public Matrix3x3 LinearTransform;
 
         ///<summary>
         /// Constructs a new affine transform.
@@ -24,7 +24,7 @@ namespace BEPUutilities
         ///<param name="translation">Translation to use in the transform.</param>
         public AffineTransform(Vector3 translation)
         {
-            LinearTransform = Matrix3X3.Identity;
+            LinearTransform = Matrix3x3.Identity;
             Translation = translation;
         }
 
@@ -35,7 +35,7 @@ namespace BEPUutilities
         ///<param name="translation">Translation to use in the transform.</param>
         public AffineTransform(Quaternion orientation, Vector3 translation)
         {
-            Matrix3X3.CreateFromQuaternion(ref orientation, out LinearTransform);
+            Matrix3x3.CreateFromQuaternion(ref orientation, out LinearTransform);
             Translation = translation;
         }
 
@@ -48,10 +48,10 @@ namespace BEPUutilities
         public AffineTransform(Vector3 scaling, Quaternion orientation, Vector3 translation)
         {
             //Create an SRT transform.
-            Matrix3X3.CreateScale(ref scaling, out LinearTransform);
-            Matrix3X3 rotation;
-            Matrix3X3.CreateFromQuaternion(ref orientation, out rotation);
-            Matrix3X3.Multiply(ref LinearTransform, ref rotation, out LinearTransform);
+            Matrix3x3.CreateScale(ref scaling, out LinearTransform);
+            Matrix3x3 rotation;
+            Matrix3x3.CreateFromQuaternion(ref orientation, out rotation);
+            Matrix3x3.Multiply(ref LinearTransform, ref rotation, out LinearTransform);
             Translation = translation;
         }
 
@@ -60,7 +60,7 @@ namespace BEPUutilities
         ///</summary>
         ///<param name="linearTransform">The linear transform component.</param>
         ///<param name="translation">Translation component of the transform.</param>
-        public AffineTransform(Matrix3X3 linearTransform, Vector3 translation)
+        public AffineTransform(Matrix3x3 linearTransform, Vector3 translation)
         {
             LinearTransform = linearTransform;
             Translation = translation;
@@ -77,13 +77,13 @@ namespace BEPUutilities
             get
             {
                 Matrix toReturn;
-                Matrix3X3.ToMatrix4X4(ref LinearTransform, out toReturn);
+                Matrix3x3.ToMatrix4X4(ref LinearTransform, out toReturn);
                 toReturn.Translation = Translation;
                 return toReturn;
             }
             set
             {
-                Matrix3X3.CreateFromMatrix(ref value, out LinearTransform);
+                Matrix3x3.CreateFromMatrix(ref value, out LinearTransform);
                 Translation = value.Translation;
             }
         }
@@ -96,7 +96,7 @@ namespace BEPUutilities
         {
             get
             {
-                var t = new AffineTransform { LinearTransform = Matrix3X3.Identity, Translation = new Vector3() };
+                var t = new AffineTransform { LinearTransform = Matrix3x3.Identity, Translation = new Vector3() };
                 return t;
             }
         }
@@ -109,7 +109,7 @@ namespace BEPUutilities
         ///<param name="transformed">Transformed position.</param>
         public static void Transform(ref Vector3 position, ref AffineTransform transform, out Vector3 transformed)
         {
-            Matrix3X3.Transform(ref position, ref transform.LinearTransform, out transformed);
+            Matrix3x3.Transform(ref position, ref transform.LinearTransform, out transformed);
             Vector3.Add(ref transformed, ref transform.Translation, out transformed);
         }
 
@@ -122,9 +122,9 @@ namespace BEPUutilities
         public static void TransformInverse(ref Vector3 position, ref AffineTransform transform, out Vector3 transformed)
         {
             Vector3.Subtract(ref position, ref transform.Translation, out transformed);
-            Matrix3X3 inverse;
-            Matrix3X3.Invert(ref transform.LinearTransform, out inverse);
-            Matrix3X3.TransformTranspose(ref transformed, ref inverse, out transformed);
+            Matrix3x3 inverse;
+            Matrix3x3.Invert(ref transform.LinearTransform, out inverse);
+            Matrix3x3.TransformTranspose(ref transformed, ref inverse, out transformed);
         }
 
         ///<summary>
@@ -134,8 +134,8 @@ namespace BEPUutilities
         /// <param name="inverse">Inverse of the transform.</param>
         public static void Invert(ref AffineTransform transform, out AffineTransform inverse)
         {
-            Matrix3X3.Invert(ref transform.LinearTransform, out inverse.LinearTransform);
-            Matrix3X3.Transform(ref transform.Translation, ref inverse.LinearTransform, out inverse.Translation);
+            Matrix3x3.Invert(ref transform.LinearTransform, out inverse.LinearTransform);
+            Matrix3x3.Transform(ref transform.Translation, ref inverse.LinearTransform, out inverse.Translation);
             Vector3.Negate(ref inverse.Translation, out inverse.Translation);
         }
 
@@ -147,10 +147,10 @@ namespace BEPUutilities
         /// <param name="transform">Combined transform.</param>
         public static void Multiply(ref AffineTransform a, ref AffineTransform b, out AffineTransform transform)
         {
-            Matrix3X3 linearTransform;//Have to use temporary variable just in case a or b reference is transform.
-            Matrix3X3.Multiply(ref a.LinearTransform, ref b.LinearTransform, out linearTransform);
+            Matrix3x3 linearTransform;//Have to use temporary variable just in case a or b reference is transform.
+            Matrix3x3.Multiply(ref a.LinearTransform, ref b.LinearTransform, out linearTransform);
             Vector3 translation;
-            Matrix3X3.Transform(ref a.Translation, ref b.LinearTransform, out translation);
+            Matrix3x3.Transform(ref a.Translation, ref b.LinearTransform, out translation);
             Vector3.Add(ref translation, ref b.Translation, out transform.Translation);
             transform.LinearTransform = linearTransform;
         }
@@ -163,11 +163,11 @@ namespace BEPUutilities
         ///<param name="transform">Combined transform.</param>
         public static void Multiply(ref RigidTransform a, ref AffineTransform b, out AffineTransform transform)
         {
-            Matrix3X3 linearTransform;//Have to use temporary variable just in case b reference is transform.
-            Matrix3X3.CreateFromQuaternion(ref a.Orientation, out linearTransform);
-            Matrix3X3.Multiply(ref linearTransform, ref b.LinearTransform, out linearTransform);
+            Matrix3x3 linearTransform;//Have to use temporary variable just in case b reference is transform.
+            Matrix3x3.CreateFromQuaternion(ref a.Orientation, out linearTransform);
+            Matrix3x3.Multiply(ref linearTransform, ref b.LinearTransform, out linearTransform);
             Vector3 translation;
-            Matrix3X3.Transform(ref a.Position, ref b.LinearTransform, out translation);
+            Matrix3x3.Transform(ref a.Position, ref b.LinearTransform, out translation);
             Vector3.Add(ref translation, ref b.Translation, out transform.Translation);
             transform.LinearTransform = linearTransform;
         }
@@ -194,7 +194,7 @@ namespace BEPUutilities
         public static void CreateFromRigidTransform(ref RigidTransform rigid, out AffineTransform affine)
         {
             affine.Translation = rigid.Position;
-            Matrix3X3.CreateFromQuaternion(ref rigid.Orientation, out affine.LinearTransform);
+            Matrix3x3.CreateFromQuaternion(ref rigid.Orientation, out affine.LinearTransform);
         }
 
         /// <summary>
@@ -206,7 +206,7 @@ namespace BEPUutilities
         {
             AffineTransform toReturn;
             toReturn.Translation = rigid.Position;
-            Matrix3X3.CreateFromQuaternion(ref rigid.Orientation, out toReturn.LinearTransform);
+            Matrix3x3.CreateFromQuaternion(ref rigid.Orientation, out toReturn.LinearTransform);
             return toReturn;
         }
     }

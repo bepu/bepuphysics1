@@ -82,8 +82,8 @@ namespace BEPUphysicsDemos.SampleCode
         void IDuringForcesUpdateable.Update(float dt)
         {
             //Transform the local position and direction into world space.
-            Vector3 worldPosition = Target.Position + Matrix3X3.Transform(Position, Target.OrientationMatrix);
-            Vector3 worldDirection = Matrix3X3.Transform(Direction, Target.OrientationMatrix);
+            Vector3 worldPosition = Target.Position + Matrix3x3.Transform(Position, Target.OrientationMatrix);
+            Vector3 worldDirection = Matrix3x3.Transform(Direction, Target.OrientationMatrix);
             //Apply the force.
             Target.ApplyImpulse(worldPosition, worldDirection * dt);
 

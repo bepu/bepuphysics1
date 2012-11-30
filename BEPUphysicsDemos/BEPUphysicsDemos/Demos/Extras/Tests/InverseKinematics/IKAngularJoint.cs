@@ -29,9 +29,9 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
 
         protected internal override void UpdateJacobiansAndVelocityBias()
         {
-            linearJacobianA = linearJacobianB = new Matrix3X3();
-            angularJacobianA = new Matrix3X3 { M11 = 1, M22 = 1, M33 = 1 };
-            angularJacobianB = new Matrix3X3 { M11 = -1, M22 = -1, M33 = -1 };
+            linearJacobianA = linearJacobianB = new Matrix3x3();
+            angularJacobianA = new Matrix3x3 { M11 = 1, M22 = 1, M33 = 1 };
+            angularJacobianB = new Matrix3x3 { M11 = -1, M22 = -1, M33 = -1 };
 
             //Compute the error between A and B's orientations.
             Quaternion conjugateB;

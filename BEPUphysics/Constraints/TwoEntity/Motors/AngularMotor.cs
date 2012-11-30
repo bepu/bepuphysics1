@@ -20,7 +20,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
         private float angle;
         private Vector3 axis;
         private Vector3 biasVelocity;
-        private Matrix3X3 effectiveMassMatrix;
+        private Matrix3x3 effectiveMassMatrix;
 
         /// <summary>
         /// Constructs a new constraint which attempts to restrict the relative angular motion of two entities.
@@ -155,7 +155,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
         /// Gets the mass matrix of the constraint.
         /// </summary>
         /// <param name="outputMassMatrix">Constraint's mass matrix.</param>
-        public void GetMassMatrix(out Matrix3X3 outputMassMatrix)
+        public void GetMassMatrix(out Matrix3x3 outputMassMatrix)
         {
             outputMassMatrix = effectiveMassMatrix;
         }
@@ -178,7 +178,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
             lambda.Y = bVel.Y - aVel.Y - biasVelocity.Y - usedSoftness * accumulatedImpulse.Y;
             lambda.Z = bVel.Z - aVel.Z - biasVelocity.Z - usedSoftness * accumulatedImpulse.Z;
 
-            Matrix3X3.Transform(ref lambda, ref effectiveMassMatrix, out lambda);
+            Matrix3x3.Transform(ref lambda, ref effectiveMassMatrix, out lambda);
 
             Vector3 previousAccumulatedImpulse = accumulatedImpulse;
             accumulatedImpulse.X += lambda.X;
@@ -251,7 +251,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
                 //Quaternion.Multiply(ref currentRelativeOrientation, ref goal, out errorOrientation);
 
 
-                Matrix worldTransform = Matrix3X3.ToMatrix4X4(basis.WorldTransform);
+                Matrix worldTransform = Matrix3x3.ToMatrix4X4(basis.WorldTransform);
                 Quaternion basisOrientation;
                 Quaternion.CreateFromRotationMatrix(ref worldTransform, out basisOrientation);
 
@@ -306,16 +306,16 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
             {
                 usedSoftness = settings.velocityMotor.softness / dt;
                 angle = 0; //Zero out the error;
-                Matrix3X3 transform = basis.WorldTransform;
-                Matrix3X3.Transform(ref settings.velocityMotor.goalVelocity, ref transform, out biasVelocity);
+                Matrix3x3 transform = basis.WorldTransform;
+                Matrix3x3.Transform(ref settings.velocityMotor.goalVelocity, ref transform, out biasVelocity);
             }
 
             //Compute effective mass
-            Matrix3X3.Add(ref connectionA.inertiaTensorInverse, ref connectionB.inertiaTensorInverse, out effectiveMassMatrix);
+            Matrix3x3.Add(ref connectionA.inertiaTensorInverse, ref connectionB.inertiaTensorInverse, out effectiveMassMatrix);
             effectiveMassMatrix.M11 += usedSoftness;
             effectiveMassMatrix.M22 += usedSoftness;
             effectiveMassMatrix.M33 += usedSoftness;
-            Matrix3X3.Invert(ref effectiveMassMatrix, out effectiveMassMatrix);
+            Matrix3x3.Invert(ref effectiveMassMatrix, out effectiveMassMatrix);
 
             //Update the maximum force
             ComputeMaxForces(settings.maximumForce, dt);

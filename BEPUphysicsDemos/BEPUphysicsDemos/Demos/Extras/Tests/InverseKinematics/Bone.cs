@@ -56,8 +56,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             }
         }
 
-        internal Matrix3X3 inertiaTensorInverse;
-        internal Matrix3X3 localInertiaTensorInverse;
+        internal Matrix3x3 inertiaTensorInverse;
+        internal Matrix3x3 localInertiaTensorInverse;
 
         /// <summary>
         /// An arbitrary scaling factor is applied to the inertia tensor. This tends to improve stability.
@@ -162,13 +162,13 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
 
         void ComputeLocalInertiaTensor()
         {
-            var localInertiaTensor = new Matrix3X3();
+            var localInertiaTensor = new Matrix3x3();
             var multiplier = Mass * InertiaTensorScaling;
             float diagValue = (.0833333333f * Height * Height + .25f * Radius * Radius) * multiplier;
             localInertiaTensor.M11 = diagValue;
             localInertiaTensor.M22 = .5f * Radius * Radius * multiplier;
             localInertiaTensor.M33 = diagValue;
-            Matrix3X3.Invert(ref localInertiaTensor, out localInertiaTensorInverse);
+            Matrix3x3.Invert(ref localInertiaTensor, out localInertiaTensorInverse);
         }
 
         /// <summary>
@@ -178,10 +178,10 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         {
             //This is separate from the position update because the orientation can change outside of our iteration loop, so this has to run first.
             //Iworld^-1 = RT * Ilocal^1 * R
-            Matrix3X3 orientationMatrix;
-            Matrix3X3.CreateFromQuaternion(ref Orientation, out orientationMatrix);
-            Matrix3X3.MultiplyTransposed(ref orientationMatrix, ref localInertiaTensorInverse, out inertiaTensorInverse);
-            Matrix3X3.Multiply(ref inertiaTensorInverse, ref orientationMatrix, out inertiaTensorInverse);
+            Matrix3x3 orientationMatrix;
+            Matrix3x3.CreateFromQuaternion(ref Orientation, out orientationMatrix);
+            Matrix3x3.MultiplyTransposed(ref orientationMatrix, ref localInertiaTensorInverse, out inertiaTensorInverse);
+            Matrix3x3.Multiply(ref inertiaTensorInverse, ref orientationMatrix, out inertiaTensorInverse);
         }
 
         /// <summary>
@@ -217,7 +217,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         internal void ApplyAngularImpulse(ref Vector3 impulse)
         {
             Vector3 velocityChange;
-            Matrix3X3.Transform(ref impulse, ref inertiaTensorInverse, out velocityChange);
+            Matrix3x3.Transform(ref impulse, ref inertiaTensorInverse, out velocityChange);
             Vector3.Add(ref velocityChange, ref angularVelocity, out angularVelocity);
         }
 

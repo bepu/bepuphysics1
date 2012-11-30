@@ -44,8 +44,8 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
 #endif
 
 
-            Matrix3X3 o;
-            Matrix3X3.CreateFromQuaternion(ref shapeTransform.Orientation, out o);
+            Matrix3x3 o;
+            Matrix3x3.CreateFromQuaternion(ref shapeTransform.Orientation, out o);
             //Sample the local directions from the orientation matrix, implicitly transposed.
             //Notice only three directions are used.  Due to box symmetry, 'left' is just -right.
             var direction = new Vector3(o.M11, o.M21, o.M31);
@@ -60,9 +60,9 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             Vector3 backward;
             GetLocalExtremePointWithoutMargin(ref direction, out backward);
 
-            Matrix3X3.Transform(ref right, ref o, out right);
-            Matrix3X3.Transform(ref up, ref o, out up);
-            Matrix3X3.Transform(ref backward, ref o, out backward);
+            Matrix3x3.Transform(ref right, ref o, out right);
+            Matrix3x3.Transform(ref up, ref o, out up);
+            Matrix3x3.Transform(ref backward, ref o, out backward);
             //These right/up/backward represent the extreme points in world space along the world space axes.
 
             boundingBox.Max.X = shapeTransform.Position.X + collisionMargin + right.X;
@@ -124,11 +124,11 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         /// </summary>
         /// <param name="volume">Volume of the shape.</param>
         /// <returns>Volume distribution of the shape.</returns>
-        public override Matrix3X3 ComputeVolumeDistribution(out float volume)
+        public override Matrix3x3 ComputeVolumeDistribution(out float volume)
         {
             volume = ComputeVolume();
 
-            var volumeDistribution = new Matrix3X3();
+            var volumeDistribution = new Matrix3x3();
 
             float diagValue = (.0833333333f * Height * Height + .25f * Radius * Radius);
             volumeDistribution.M11 = diagValue;

@@ -43,7 +43,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             {
                 for (int j = 0; j < yCount; j++)
                 {
-                    var staticMesh = new InstancedMesh(meshShape, new AffineTransform(Matrix3X3.Identity, new Vector3(-xSpacing * (xCount - 1) / 2 + i * xSpacing, 0, -ySpacing * (yCount - 1) / 2 + j * ySpacing)));
+                    var staticMesh = new InstancedMesh(meshShape, new AffineTransform(Matrix3x3.Identity, new Vector3(-xSpacing * (xCount - 1) / 2 + i * xSpacing, 0, -ySpacing * (yCount - 1) / 2 + j * ySpacing)));
                     staticMesh.Sidedness = TriangleSidedness.Counterclockwise;
                     meshes.Add(staticMesh);
                     game.ModelDrawer.Add(staticMesh);

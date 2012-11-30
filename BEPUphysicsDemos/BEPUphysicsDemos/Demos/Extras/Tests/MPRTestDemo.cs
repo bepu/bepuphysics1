@@ -90,11 +90,11 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             boxWidth = .25f;
             boxHeight = .05f;
             boxLength = 1f;
-            b = new TransformableEntity(new Vector3(0, 2, 0), new BoxShape(boxWidth, boxHeight, boxLength), Matrix3X3.Identity, 1);
+            b = new TransformableEntity(new Vector3(0, 2, 0), new BoxShape(boxWidth, boxHeight, boxLength), Matrix3x3.Identity, 1);
             //b = new Cone(new Vector3(0, 2, 0), .2f, .1f, 1);
             //b = new Capsule(new Vector3(0, 2, 0), 1, .5f, 1);
             //b = new Capsule(new Vector3(0, 2, 0), 1, .5f, 1);
-            b.LocalInertiaTensorInverse = new Matrix3X3();
+            b.LocalInertiaTensorInverse = new Matrix3x3();
             CollisionRules.AddRule(b, a, CollisionRule.NoSolver);
             b.ActivityInformation.IsAlwaysActive = true;
             Space.Add(b);

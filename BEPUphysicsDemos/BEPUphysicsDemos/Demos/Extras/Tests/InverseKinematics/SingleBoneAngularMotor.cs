@@ -12,8 +12,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
 
         protected internal override void UpdateJacobiansAndVelocityBias()
         {
-            linearJacobian = new Matrix3X3();
-            angularJacobian = Matrix3X3.Identity;
+            linearJacobian = new Matrix3x3();
+            angularJacobian = Matrix3x3.Identity;
 
             //Error is in world space. It gets projected onto the jacobians later.
             Quaternion errorQuaternion;

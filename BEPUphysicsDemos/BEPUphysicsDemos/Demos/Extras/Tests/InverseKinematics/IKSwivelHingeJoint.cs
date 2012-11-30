@@ -58,7 +58,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
 
         protected internal override void UpdateJacobiansAndVelocityBias()
         {
-            linearJacobianA = linearJacobianB = new Matrix3X3();
+            linearJacobianA = linearJacobianB = new Matrix3x3();
 
 
             //There are two free axes and one restricted axis.
@@ -83,13 +83,13 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             }
 
 
-            angularJacobianA = new Matrix3X3
+            angularJacobianA = new Matrix3x3
               {
                   M11 = restrictedAxis.X,
                   M12 = restrictedAxis.Y,
                   M13 = restrictedAxis.Z,
               };
-            Matrix3X3.Negate(ref angularJacobianA, out angularJacobianB);
+            Matrix3x3.Negate(ref angularJacobianA, out angularJacobianB);
 
             float error;
             Vector3.Dot(ref worldHingeAxis, ref worldTwistAxis, out error);

@@ -22,7 +22,7 @@ namespace BEPUphysics.UpdateableSystems
         //(A mesh volume, maybe?)
 
         private RigidTransform surfaceTransform;
-        private Matrix3X3 toSurfaceRotationMatrix;
+        private Matrix3x3 toSurfaceRotationMatrix;
         Vector3 upVector;
         ///<summary>
         /// Gets or sets the up vector of the fluid volume.
@@ -263,7 +263,7 @@ namespace BEPUphysics.UpdateableSystems
 
             //Compute the transforms used to pull objects into fluid local space.
             Toolbox.GetQuaternionBetweenNormalizedVectors(ref Toolbox.UpVector, ref upVector, out surfaceTransform.Orientation);
-            Matrix3X3.CreateFromQuaternion(ref surfaceTransform.Orientation, out toSurfaceRotationMatrix);
+            Matrix3x3.CreateFromQuaternion(ref surfaceTransform.Orientation, out toSurfaceRotationMatrix);
             surfaceTransform.Position = surfaceTriangles[0][0];
         }
 

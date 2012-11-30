@@ -180,9 +180,9 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
                 {
                     //Only dynamic entities can actually contribute anything to the effective mass.
                     //Kinematic entities have infinite mass and inertia, so this would all zero out.
-                    Matrix3X3 inertiaInverse = supportEntity.InertiaTensorInverse;
+                    Matrix3x3 inertiaInverse = supportEntity.InertiaTensorInverse;
                     Vector3 angularComponentB;
-                    Matrix3X3.Transform(ref angularJacobianB, ref inertiaInverse, out angularComponentB);
+                    Matrix3x3.Transform(ref angularJacobianB, ref inertiaInverse, out angularComponentB);
                     float effectiveMassContribution;
                     Vector3.Dot(ref angularComponentB, ref angularJacobianB, out effectiveMassContribution);
 

@@ -56,7 +56,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                 Vector3.Subtract(ref transformedVelocity, ref mesh.entity.linearVelocity, out transformedVelocity);
 
             //The linear transform is known to be orientation only, so using the transpose is allowed.
-            Matrix3X3.TransformTranspose(ref transformedVelocity, ref transform.LinearTransform, out transformedVelocity);
+            Matrix3x3.TransformTranspose(ref transformedVelocity, ref transform.LinearTransform, out transformedVelocity);
             Vector3.Multiply(ref transformedVelocity, dt, out transformedVelocity);
 
             if (transformedVelocity.X > 0)
@@ -153,12 +153,12 @@ namespace BEPUphysics.CollisionTests.Manifolds
 
                 //To find out which it is, raycast against the shell.
 
-                Matrix3X3 orientation;
-                Matrix3X3.CreateFromQuaternion(ref mesh.worldTransform.Orientation, out orientation);
+                Matrix3x3 orientation;
+                Matrix3x3.CreateFromQuaternion(ref mesh.worldTransform.Orientation, out orientation);
 
                 Ray ray;
                 Vector3.Subtract(ref convex.worldTransform.Position, ref mesh.worldTransform.Position, out ray.Position);
-                Matrix3X3.TransformTranspose(ref ray.Position, ref orientation, out ray.Position);
+                Matrix3x3.TransformTranspose(ref ray.Position, ref orientation, out ray.Position);
 
                 //Cast from the current position back to the previous position.
                 Vector3.Subtract(ref lastValidConvexPosition, ref ray.Position, out ray.Direction);
@@ -184,7 +184,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                 {
                     ContactData newContact = new ContactData {Id = 2};
                     //Give it a special id so that we know that it came from the inside.
-                    Matrix3X3.Transform(ref ray.Position, ref orientation, out newContact.Position);
+                    Matrix3x3.Transform(ref ray.Position, ref orientation, out newContact.Position);
                     Vector3.Add(ref newContact.Position, ref mesh.worldTransform.Position, out newContact.Position);
 
                     newContact.Normal = hit.Normal;
@@ -194,7 +194,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     Vector3.Dot(ref ray.Direction, ref newContact.Normal, out factor);
                     newContact.PenetrationDepth = -factor * hit.T + convex.Shape.minimumRadius;
 
-                    Matrix3X3.Transform(ref newContact.Normal, ref orientation, out newContact.Normal);
+                    Matrix3x3.Transform(ref newContact.Normal, ref orientation, out newContact.Normal);
 
                     //Do not yet create a new contact.  Check to see if an 'inner contact' with id == 2 already exists.
                     bool addContact = true;

@@ -129,7 +129,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         {
 
             //This constraint doesn't consider linear motion.
-            linearJacobianA = linearJacobianB = new Matrix3X3();
+            linearJacobianA = linearJacobianB = new Matrix3x3();
 
             //Compute the world axes.
             Vector3 axisA, axisB;
@@ -175,8 +175,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
                 jacobian = new Vector3();
             }
 
-            angularJacobianA = new Matrix3X3 { M11 = jacobian.X, M12 = jacobian.Y, M13 = jacobian.Z };
-            angularJacobianB = new Matrix3X3 { M11 = -jacobian.X, M12 = -jacobian.Y, M13 = -jacobian.Z };
+            angularJacobianA = new Matrix3x3 { M11 = jacobian.X, M12 = jacobian.Y, M13 = jacobian.Z };
+            angularJacobianB = new Matrix3x3 { M11 = -jacobian.X, M12 = -jacobian.Y, M13 = -jacobian.Z };
 
 
 

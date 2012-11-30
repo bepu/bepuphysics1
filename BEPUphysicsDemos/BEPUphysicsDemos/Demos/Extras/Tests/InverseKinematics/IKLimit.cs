@@ -19,13 +19,13 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             //Compute the 'relative' linear and angular velocities. For single bone constraints, it's based entirely on the one bone's velocities!
             //They have to be pulled into constraint space first to compute the necessary impulse, though.
             Vector3 linearContributionA;
-            Matrix3X3.TransformTranspose(ref ConnectionA.linearVelocity, ref linearJacobianA, out linearContributionA);
+            Matrix3x3.TransformTranspose(ref ConnectionA.linearVelocity, ref linearJacobianA, out linearContributionA);
             Vector3 angularContributionA;
-            Matrix3X3.TransformTranspose(ref ConnectionA.angularVelocity, ref angularJacobianA, out angularContributionA);
+            Matrix3x3.TransformTranspose(ref ConnectionA.angularVelocity, ref angularJacobianA, out angularContributionA);
             Vector3 linearContributionB;
-            Matrix3X3.TransformTranspose(ref ConnectionB.linearVelocity, ref linearJacobianB, out linearContributionB);
+            Matrix3x3.TransformTranspose(ref ConnectionB.linearVelocity, ref linearJacobianB, out linearContributionB);
             Vector3 angularContributionB;
-            Matrix3X3.TransformTranspose(ref ConnectionB.angularVelocity, ref angularJacobianB, out angularContributionB);
+            Matrix3x3.TransformTranspose(ref ConnectionB.angularVelocity, ref angularJacobianB, out angularContributionB);
 
             //The constraint velocity error will be the velocity we try to remove.
             Vector3 constraintVelocityError;
@@ -43,7 +43,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             //By now, the constraint velocity error contains all the velocity we want to get rid of.
             //Convert it into an impulse using the effective mass matrix.
             Vector3 constraintSpaceImpulse;
-            Matrix3X3.Transform(ref constraintVelocityError, ref effectiveMass, out constraintSpaceImpulse);
+            Matrix3x3.Transform(ref constraintVelocityError, ref effectiveMass, out constraintSpaceImpulse);
 
             Vector3.Negate(ref constraintSpaceImpulse, out constraintSpaceImpulse);
 
@@ -67,9 +67,9 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             if (!ConnectionA.Pinned)//Treat pinned elements as if they have infinite inertia.
             {
                 Vector3 linearImpulseA;
-                Matrix3X3.Transform(ref constraintSpaceImpulse, ref linearJacobianA, out linearImpulseA);
+                Matrix3x3.Transform(ref constraintSpaceImpulse, ref linearJacobianA, out linearImpulseA);
                 Vector3 angularImpulseA;
-                Matrix3X3.Transform(ref constraintSpaceImpulse, ref angularJacobianA, out angularImpulseA);
+                Matrix3x3.Transform(ref constraintSpaceImpulse, ref angularJacobianA, out angularImpulseA);
 
                 //Apply them!
                 ConnectionA.ApplyLinearImpulse(ref linearImpulseA);
@@ -78,9 +78,9 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             if (!ConnectionB.Pinned)//Treat pinned elements as if they have infinite inertia.
             {
                 Vector3 linearImpulseB;
-                Matrix3X3.Transform(ref constraintSpaceImpulse, ref linearJacobianB, out linearImpulseB);
+                Matrix3x3.Transform(ref constraintSpaceImpulse, ref linearJacobianB, out linearImpulseB);
                 Vector3 angularImpulseB;
-                Matrix3X3.Transform(ref constraintSpaceImpulse, ref angularJacobianB, out angularImpulseB);
+                Matrix3x3.Transform(ref constraintSpaceImpulse, ref angularJacobianB, out angularImpulseB);
 
                 //Apply them!
                 ConnectionB.ApplyLinearImpulse(ref linearImpulseB);

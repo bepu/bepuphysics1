@@ -139,7 +139,7 @@ namespace BEPUphysics.Vehicle
             {
                 localForwardDirection = Vector3.Normalize(value);
                 if (vehicle != null)
-                    Matrix3X3.Transform(ref localForwardDirection, ref Vehicle.Body.orientationMatrix, out worldForwardDirection);
+                    Matrix3x3.Transform(ref localForwardDirection, ref Vehicle.Body.orientationMatrix, out worldForwardDirection);
                 else
                     worldForwardDirection = localForwardDirection;
             }
@@ -294,7 +294,7 @@ namespace BEPUphysics.Vehicle
         {
             Matrix.CreateFromAxisAngle(ref suspension.localDirection, shape.steeringAngle, out shape.steeringTransform);
             Vector3.TransformNormal(ref localForwardDirection, ref shape.steeringTransform, out worldForwardDirection);
-            Matrix3X3.Transform(ref worldForwardDirection, ref Vehicle.Body.orientationMatrix, out worldForwardDirection);
+            Matrix3x3.Transform(ref worldForwardDirection, ref Vehicle.Body.orientationMatrix, out worldForwardDirection);
             if (HasSupport)
             {
                 Vector3.Subtract(ref supportLocation, ref Vehicle.Body.position, out ra);

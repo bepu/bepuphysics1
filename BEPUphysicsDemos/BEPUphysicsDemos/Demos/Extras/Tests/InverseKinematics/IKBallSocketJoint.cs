@@ -48,21 +48,21 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
 
         protected internal override void UpdateJacobiansAndVelocityBias()
         {
-            linearJacobianA = Matrix3X3.Identity;
+            linearJacobianA = Matrix3x3.Identity;
             //The jacobian entries are is [ La, Aa, -Lb, -Ab ] because the relative velocity is computed using A-B. So, negate B's jacobians!
-            linearJacobianB = new Matrix3X3 { M11 = -1, M22 = -1, M33 = -1 };
+            linearJacobianB = new Matrix3x3 { M11 = -1, M22 = -1, M33 = -1 };
             Vector3 rA;
             Vector3.Transform(ref LocalOffsetA, ref ConnectionA.Orientation, out rA);
-            Matrix3X3.CreateCrossProduct(ref rA, out angularJacobianA);
+            Matrix3x3.CreateCrossProduct(ref rA, out angularJacobianA);
             //Transposing a skew-symmetric matrix is equivalent to negating it.
-            Matrix3X3.Transpose(ref angularJacobianA, out angularJacobianA);
+            Matrix3x3.Transpose(ref angularJacobianA, out angularJacobianA);
 
             Vector3 worldPositionA;
             Vector3.Add(ref ConnectionA.Position, ref rA, out worldPositionA);
 
             Vector3 rB;
             Vector3.Transform(ref LocalOffsetB, ref ConnectionB.Orientation, out rB);
-            Matrix3X3.CreateCrossProduct(ref rB, out angularJacobianB);
+            Matrix3x3.CreateCrossProduct(ref rB, out angularJacobianB);
 
             Vector3 worldPositionB;
             Vector3.Add(ref ConnectionB.Position, ref rB, out worldPositionB);

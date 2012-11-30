@@ -50,7 +50,7 @@ namespace BEPUutilities
         /// This is only run when the CHECKMATH symbol is defined.
         /// </summary>
         [Conditional("CHECKMATH")]
-        public static void Validate(this Matrix2X2 m)
+        public static void Validate(this Matrix2x2 m)
         {
             if (IsInvalid(m.M11) || IsInvalid(m.M12) ||
                 IsInvalid(m.M21) || IsInvalid(m.M22))
@@ -64,7 +64,7 @@ namespace BEPUutilities
         /// This is only run when the CHECKMATH symbol is defined.
         /// </summary>
         [Conditional("CHECKMATH")]
-        public static void Validate(this Matrix3X2 m)
+        public static void Validate(this Matrix3x2 m)
         {
             if (IsInvalid(m.M11) || IsInvalid(m.M12) ||
                 IsInvalid(m.M21) || IsInvalid(m.M22) ||
@@ -79,7 +79,7 @@ namespace BEPUutilities
         /// This is only run when the CHECKMATH symbol is defined.
         /// </summary>
         [Conditional("CHECKMATH")]
-        public static void Validate(this Matrix2X3 m)
+        public static void Validate(this Matrix2x3 m)
         {
             if (IsInvalid(m.M11) || IsInvalid(m.M12) || IsInvalid(m.M13) ||
                 IsInvalid(m.M21) || IsInvalid(m.M22) || IsInvalid(m.M23))
@@ -93,7 +93,7 @@ namespace BEPUutilities
         /// This is only run when the CHECKMATH symbol is defined.
         /// </summary>
         [Conditional("CHECKMATH")]
-        public static void Validate(this Matrix3X3 m)
+        public static void Validate(this Matrix3x3 m)
         {
             if (IsInvalid(m.M11) || IsInvalid(m.M12) || IsInvalid(m.M13) ||
                 IsInvalid(m.M21) || IsInvalid(m.M22) || IsInvalid(m.M23) ||

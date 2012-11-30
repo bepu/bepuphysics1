@@ -163,8 +163,8 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                 if (minimumRadius * minimumRadius < velocitySquared)
                 {
                     TriangleSidedness sidedness = mobileMesh.Shape.Sidedness;
-                    Matrix3X3 orientation;
-                    Matrix3X3.CreateFromQuaternion(ref mobileMesh.worldTransform.Orientation, out orientation);
+                    Matrix3x3 orientation;
+                    Matrix3x3.CreateFromQuaternion(ref mobileMesh.worldTransform.Orientation, out orientation);
                     var triangle = PhysicsResources.GetTriangle();
                     triangle.collisionMargin = 0;
                     //Spherecast against all triangles to find the earliest time.
@@ -173,9 +173,9 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                         MeshBoundingBoxTreeData data = mobileMesh.Shape.TriangleMesh.Data;
                         int triangleIndex = MeshManifold.overlappedTriangles.Elements[i];
                         data.GetTriangle(triangleIndex, out triangle.vA, out triangle.vB, out triangle.vC);
-                        Matrix3X3.Transform(ref triangle.vA, ref orientation, out triangle.vA);
-                        Matrix3X3.Transform(ref triangle.vB, ref orientation, out triangle.vB);
-                        Matrix3X3.Transform(ref triangle.vC, ref orientation, out triangle.vC);
+                        Matrix3x3.Transform(ref triangle.vA, ref orientation, out triangle.vA);
+                        Matrix3x3.Transform(ref triangle.vB, ref orientation, out triangle.vB);
+                        Matrix3x3.Transform(ref triangle.vC, ref orientation, out triangle.vC);
                         Vector3.Add(ref triangle.vA, ref mobileMesh.worldTransform.Position, out triangle.vA);
                         Vector3.Add(ref triangle.vB, ref mobileMesh.worldTransform.Position, out triangle.vB);
                         Vector3.Add(ref triangle.vC, ref mobileMesh.worldTransform.Position, out triangle.vC);

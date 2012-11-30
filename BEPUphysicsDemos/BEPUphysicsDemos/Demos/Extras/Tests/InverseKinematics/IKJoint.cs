@@ -58,11 +58,11 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
 
 
         internal Vector3 velocityBias;
-        internal Matrix3X3 linearJacobianA;
-        internal Matrix3X3 angularJacobianA;
-        internal Matrix3X3 linearJacobianB;
-        internal Matrix3X3 angularJacobianB;
-        internal Matrix3X3 effectiveMass;
+        internal Matrix3x3 linearJacobianA;
+        internal Matrix3x3 angularJacobianA;
+        internal Matrix3x3 linearJacobianB;
+        internal Matrix3x3 angularJacobianB;
+        internal Matrix3x3 effectiveMass;
 
         internal Vector3 accumulatedImpulse;
 
@@ -75,45 +75,45 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             //For all constraints, the effective mass matrix is 1 / (J * M^-1 * JT).
             //For two bone constraints, J has 4 3x3 matrices. M^-1 (W below) is a 12x12 matrix with 4 3x3 block diagonal matrices.
             //To compute the whole denominator,
-            Matrix3X3 linearW;
-            Matrix3X3 linearA, angularA, linearB, angularB;
+            Matrix3x3 linearW;
+            Matrix3x3 linearA, angularA, linearB, angularB;
 
             if (!ConnectionA.Pinned)
             {
-                Matrix3X3.CreateScale(ConnectionA.inverseMass, out linearW);
-                Matrix3X3.Multiply(ref linearJacobianA, ref linearW, out linearA); //Compute J * M^-1 for linear component
-                Matrix3X3.MultiplyByTransposed(ref linearA, ref linearJacobianA, out linearA); //Compute (J * M^-1) * JT for linear component
+                Matrix3x3.CreateScale(ConnectionA.inverseMass, out linearW);
+                Matrix3x3.Multiply(ref linearJacobianA, ref linearW, out linearA); //Compute J * M^-1 for linear component
+                Matrix3x3.MultiplyByTransposed(ref linearA, ref linearJacobianA, out linearA); //Compute (J * M^-1) * JT for linear component
 
-                Matrix3X3.Multiply(ref angularJacobianA, ref ConnectionA.inertiaTensorInverse, out angularA); //Compute J * M^-1 for angular component
-                Matrix3X3.MultiplyByTransposed(ref angularA, ref angularJacobianA, out angularA); //Compute (J * M^-1) * JT for angular component
+                Matrix3x3.Multiply(ref angularJacobianA, ref ConnectionA.inertiaTensorInverse, out angularA); //Compute J * M^-1 for angular component
+                Matrix3x3.MultiplyByTransposed(ref angularA, ref angularJacobianA, out angularA); //Compute (J * M^-1) * JT for angular component
             }
             else
             {
                 //Treat pinned bones as if they have infinite inertia.
-                linearA = new Matrix3X3();
-                angularA = new Matrix3X3();
+                linearA = new Matrix3x3();
+                angularA = new Matrix3x3();
             }
 
             if (!ConnectionB.Pinned)
             {
-                Matrix3X3.CreateScale(ConnectionB.inverseMass, out linearW);
-                Matrix3X3.Multiply(ref linearJacobianB, ref linearW, out linearB); //Compute J * M^-1 for linear component
-                Matrix3X3.MultiplyByTransposed(ref linearB, ref linearJacobianB, out linearB); //Compute (J * M^-1) * JT for linear component
+                Matrix3x3.CreateScale(ConnectionB.inverseMass, out linearW);
+                Matrix3x3.Multiply(ref linearJacobianB, ref linearW, out linearB); //Compute J * M^-1 for linear component
+                Matrix3x3.MultiplyByTransposed(ref linearB, ref linearJacobianB, out linearB); //Compute (J * M^-1) * JT for linear component
 
-                Matrix3X3.Multiply(ref angularJacobianB, ref ConnectionB.inertiaTensorInverse, out angularB); //Compute J * M^-1 for angular component
-                Matrix3X3.MultiplyByTransposed(ref angularB, ref angularJacobianB, out angularB); //Compute (J * M^-1) * JT for angular component
+                Matrix3x3.Multiply(ref angularJacobianB, ref ConnectionB.inertiaTensorInverse, out angularB); //Compute J * M^-1 for angular component
+                Matrix3x3.MultiplyByTransposed(ref angularB, ref angularJacobianB, out angularB); //Compute (J * M^-1) * JT for angular component
             }
             else
             {
                 //Treat pinned bones as if they have infinite inertia.
-                linearB = new Matrix3X3();
-                angularB = new Matrix3X3();
+                linearB = new Matrix3x3();
+                angularB = new Matrix3x3();
             }
 
             //A nice side effect of the block diagonal nature of M^-1 is that the above separated components are now combined into the complete denominator matrix by addition!
-            Matrix3X3.Add(ref linearA, ref angularA, out effectiveMass);
-            Matrix3X3.Add(ref effectiveMass, ref linearB, out effectiveMass);
-            Matrix3X3.Add(ref effectiveMass, ref angularB, out effectiveMass);
+            Matrix3x3.Add(ref linearA, ref angularA, out effectiveMass);
+            Matrix3x3.Add(ref effectiveMass, ref linearB, out effectiveMass);
+            Matrix3x3.Add(ref effectiveMass, ref angularB, out effectiveMass);
 
             //Incorporate the constraint softness into the effective mass denominator. This pushes the matrix away from singularity.
             //Softness will also be incorporated into the velocity solve iterations to complete the implementation.
@@ -125,7 +125,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
                 effectiveMass.M33 += Softness;
 
             //Invert! Takes us from J * M^-1 * JT to 1 / (J * M^-1 * JT).
-            Matrix3X3.AdaptiveInvert(ref effectiveMass, out effectiveMass);
+            Matrix3x3.AdaptiveInvert(ref effectiveMass, out effectiveMass);
 
         }
 
@@ -139,22 +139,22 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             if (!ConnectionA.Pinned) //Treat pinned elements as if they have infinite inertia.
             {
                 //Compute and apply linear impulse for A.
-                Matrix3X3.Transform(ref accumulatedImpulse, ref linearJacobianA, out impulse);
+                Matrix3x3.Transform(ref accumulatedImpulse, ref linearJacobianA, out impulse);
                 ConnectionA.ApplyLinearImpulse(ref impulse);
 
                 //Compute and apply angular impulse for A.
-                Matrix3X3.Transform(ref accumulatedImpulse, ref angularJacobianA, out impulse);
+                Matrix3x3.Transform(ref accumulatedImpulse, ref angularJacobianA, out impulse);
                 ConnectionA.ApplyAngularImpulse(ref impulse);
             }
 
             if (!ConnectionB.Pinned) //Treat pinned elements as if they have infinite inertia.
             {
                 //Compute and apply linear impulse for B.
-                Matrix3X3.Transform(ref accumulatedImpulse, ref linearJacobianB, out impulse);
+                Matrix3x3.Transform(ref accumulatedImpulse, ref linearJacobianB, out impulse);
                 ConnectionB.ApplyLinearImpulse(ref impulse);
 
                 //Compute and apply angular impulse for B.
-                Matrix3X3.Transform(ref accumulatedImpulse, ref angularJacobianB, out impulse);
+                Matrix3x3.Transform(ref accumulatedImpulse, ref angularJacobianB, out impulse);
                 ConnectionB.ApplyAngularImpulse(ref impulse);
             }
         }
@@ -164,13 +164,13 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             //Compute the 'relative' linear and angular velocities. For single bone constraints, it's based entirely on the one bone's velocities!
             //They have to be pulled into constraint space first to compute the necessary impulse, though.
             Vector3 linearContributionA;
-            Matrix3X3.TransformTranspose(ref ConnectionA.linearVelocity, ref linearJacobianA, out linearContributionA);
+            Matrix3x3.TransformTranspose(ref ConnectionA.linearVelocity, ref linearJacobianA, out linearContributionA);
             Vector3 angularContributionA;
-            Matrix3X3.TransformTranspose(ref ConnectionA.angularVelocity, ref angularJacobianA, out angularContributionA);
+            Matrix3x3.TransformTranspose(ref ConnectionA.angularVelocity, ref angularJacobianA, out angularContributionA);
             Vector3 linearContributionB;
-            Matrix3X3.TransformTranspose(ref ConnectionB.linearVelocity, ref linearJacobianB, out linearContributionB);
+            Matrix3x3.TransformTranspose(ref ConnectionB.linearVelocity, ref linearJacobianB, out linearContributionB);
             Vector3 angularContributionB;
-            Matrix3X3.TransformTranspose(ref ConnectionB.angularVelocity, ref angularJacobianB, out angularContributionB);
+            Matrix3x3.TransformTranspose(ref ConnectionB.angularVelocity, ref angularJacobianB, out angularContributionB);
 
             //The constraint velocity error will be the velocity we try to remove.
             Vector3 constraintVelocityError;
@@ -188,7 +188,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             //By now, the constraint velocity error contains all the velocity we want to get rid of.
             //Convert it into an impulse using the effective mass matrix.
             Vector3 constraintSpaceImpulse;
-            Matrix3X3.Transform(ref constraintVelocityError, ref effectiveMass, out constraintSpaceImpulse);
+            Matrix3x3.Transform(ref constraintVelocityError, ref effectiveMass, out constraintSpaceImpulse);
 
             Vector3.Negate(ref constraintSpaceImpulse, out constraintSpaceImpulse);
 
@@ -210,9 +210,9 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             if (!ConnectionA.Pinned)//Treat pinned elements as if they have infinite inertia.
             {
                 Vector3 linearImpulseA;
-                Matrix3X3.Transform(ref constraintSpaceImpulse, ref linearJacobianA, out linearImpulseA);
+                Matrix3x3.Transform(ref constraintSpaceImpulse, ref linearJacobianA, out linearImpulseA);
                 Vector3 angularImpulseA;
-                Matrix3X3.Transform(ref constraintSpaceImpulse, ref angularJacobianA, out angularImpulseA);
+                Matrix3x3.Transform(ref constraintSpaceImpulse, ref angularJacobianA, out angularImpulseA);
 
                 //Apply them!
                 ConnectionA.ApplyLinearImpulse(ref linearImpulseA);
@@ -221,9 +221,9 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             if (!ConnectionB.Pinned)//Treat pinned elements as if they have infinite inertia.
             {
                 Vector3 linearImpulseB;
-                Matrix3X3.Transform(ref constraintSpaceImpulse, ref linearJacobianB, out linearImpulseB);
+                Matrix3x3.Transform(ref constraintSpaceImpulse, ref linearJacobianB, out linearImpulseB);
                 Vector3 angularImpulseB;
-                Matrix3X3.Transform(ref constraintSpaceImpulse, ref angularJacobianB, out angularImpulseB);
+                Matrix3x3.Transform(ref constraintSpaceImpulse, ref angularJacobianB, out angularImpulseB);
 
                 //Apply them!
                 ConnectionB.ApplyLinearImpulse(ref linearImpulseB);

@@ -24,7 +24,7 @@ namespace BEPUphysicsDemos.Demos
             Space.Add(body);
 
             Entity head = new Cone(body.Position + new Vector3(3.2f, .3f, 0), 1.5f, .7f, 4);
-            head.OrientationMatrix = Matrix3X3.CreateFromAxisAngle(Vector3.Forward, MathHelper.PiOver2);
+            head.OrientationMatrix = Matrix3x3.CreateFromAxisAngle(Vector3.Forward, MathHelper.PiOver2);
             Space.Add(head);
 
             //Attach the head to the body
@@ -63,7 +63,7 @@ namespace BEPUphysicsDemos.Demos
             Space.Add(arm);
 
             shoulder = new Cylinder(body.Position + new Vector3(-1.8f, .3f, 1.25f), .1f, .7f, 10);
-            shoulder.OrientationMatrix = Matrix3X3.CreateFromAxisAngle(Vector3.Right, MathHelper.PiOver2);
+            shoulder.OrientationMatrix = Matrix3x3.CreateFromAxisAngle(Vector3.Right, MathHelper.PiOver2);
             Space.Add(shoulder);
 
             //Connect the shoulder to the body.
@@ -84,14 +84,14 @@ namespace BEPUphysicsDemos.Demos
             Space.Add(pointOnLineJoint);
 
 
-            shoulder.OrientationMatrix *= Matrix3X3.CreateFromAxisAngle(Vector3.Forward, MathHelper.Pi); //Force the walker's legs out of phase.
+            shoulder.OrientationMatrix *= Matrix3x3.CreateFromAxisAngle(Vector3.Forward, MathHelper.Pi); //Force the walker's legs out of phase.
 
             //*************  Second Arm   *************//
             arm = new Box(body.Position + new Vector3(1.8f, -.5f, 1.5f), .5f, 3, .2f, 20);
             Space.Add(arm);
 
             shoulder = new Cylinder(body.Position + new Vector3(1.8f, .3f, 1.25f), .1f, .7f, 10);
-            shoulder.OrientationMatrix = Matrix3X3.CreateFromAxisAngle(Vector3.Right, MathHelper.PiOver2);
+            shoulder.OrientationMatrix = Matrix3x3.CreateFromAxisAngle(Vector3.Right, MathHelper.PiOver2);
             Space.Add(shoulder);
 
             //Connect the shoulder to the body.
@@ -117,7 +117,7 @@ namespace BEPUphysicsDemos.Demos
             Space.Add(arm);
 
             shoulder = new Cylinder(body.Position + new Vector3(-1.8f, .3f, -1.25f), .1f, .7f, 10);
-            shoulder.OrientationMatrix = Matrix3X3.CreateFromAxisAngle(Vector3.Right, MathHelper.PiOver2);
+            shoulder.OrientationMatrix = Matrix3x3.CreateFromAxisAngle(Vector3.Right, MathHelper.PiOver2);
             Space.Add(shoulder);
 
             //Connect the shoulder to the body.
@@ -138,14 +138,14 @@ namespace BEPUphysicsDemos.Demos
             Space.Add(pointOnLineJoint);
 
 
-            shoulder.OrientationMatrix *= Matrix3X3.CreateFromAxisAngle(Vector3.Forward, MathHelper.Pi); //Force the walker's legs out of phase.
+            shoulder.OrientationMatrix *= Matrix3x3.CreateFromAxisAngle(Vector3.Forward, MathHelper.Pi); //Force the walker's legs out of phase.
 
             //*************  Fourth Arm   *************//
             arm = new Box(body.Position + new Vector3(1.8f, -.5f, -1.5f), .5f, 3, .2f, 20);
             Space.Add(arm);
 
             shoulder = new Cylinder(body.Position + new Vector3(1.8f, .3f, -1.25f), .1f, .7f, 10);
-            shoulder.OrientationMatrix = Matrix3X3.CreateFromAxisAngle(Vector3.Right, MathHelper.PiOver2);
+            shoulder.OrientationMatrix = Matrix3x3.CreateFromAxisAngle(Vector3.Right, MathHelper.PiOver2);
             Space.Add(shoulder);
 
             //Connect the shoulder to the body.
