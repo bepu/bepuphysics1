@@ -155,6 +155,157 @@ namespace BEPUutilities
         }
 
         /// <summary>
+        /// Gets or sets the backward vector of the matrix.
+        /// </summary>
+        public Vector3 Backward
+        {
+            get
+            {
+#if !WINDOWS
+                Vector3 vector = new Vector3();
+#else
+                Vector3 vector;
+#endif
+                vector.X = M31;
+                vector.Y = M32;
+                vector.Z = M33;
+                return vector;
+            }
+            set
+            {
+                M31 = value.X;
+                M32 = value.Y;
+                M33 = value.Z;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the down vector of the matrix.
+        /// </summary>
+        public Vector3 Down
+        {
+            get
+            {
+#if !WINDOWS
+                Vector3 vector = new Vector3();
+#else
+                Vector3 vector;
+#endif
+                vector.X = -M21;
+                vector.Y = -M22;
+                vector.Z = -M23;
+                return vector;
+            }
+            set
+            {
+                M21 = -value.X;
+                M22 = -value.Y;
+                M23 = -value.Z;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the forward vector of the matrix.
+        /// </summary>
+        public Vector3 Forward
+        {
+            get
+            {
+#if !WINDOWS
+                Vector3 vector = new Vector3();
+#else
+                Vector3 vector;
+#endif
+                vector.X = -M31;
+                vector.Y = -M32;
+                vector.Z = -M33;
+                return vector;
+            }
+            set
+            {
+                M31 = -value.X;
+                M32 = -value.Y;
+                M33 = -value.Z;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the left vector of the matrix.
+        /// </summary>
+        public Vector3 Left
+        {
+            get
+            {
+#if !WINDOWS
+                Vector3 vector = new Vector3();
+#else
+                Vector3 vector;
+#endif
+                vector.X = -M11;
+                vector.Y = -M12;
+                vector.Z = -M13;
+                return vector;
+            }
+            set
+            {
+                M11 = -value.X;
+                M12 = -value.Y;
+                M13 = -value.Z;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the right vector of the matrix.
+        /// </summary>
+        public Vector3 Right
+        {
+            get
+            {
+#if !WINDOWS
+                Vector3 vector = new Vector3();
+#else
+                Vector3 vector;
+#endif
+                vector.X = M11;
+                vector.Y = M12;
+                vector.Z = M13;
+                return vector;
+            }
+            set
+            {
+                M11 = value.X;
+                M12 = value.Y;
+                M13 = value.Z;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the up vector of the matrix.
+        /// </summary>
+        public Vector3 Up
+        {
+            get
+            {
+#if !WINDOWS
+                Vector3 vector = new Vector3();
+#else
+                Vector3 vector;
+#endif
+                vector.X = M21;
+                vector.Y = M22;
+                vector.Z = M23;
+                return vector;
+            }
+            set
+            {
+                M21 = value.X;
+                M22 = value.Y;
+                M23 = value.Z;
+            }
+        }
+
+
+        /// <summary>
         /// Computes the determinant of the matrix.
         /// </summary>
         /// <returns></returns>
@@ -369,11 +520,73 @@ namespace BEPUutilities
             return result;
         }
 
+
+        /// <summary>
+        /// Scales all components of the matrix.
+        /// </summary>
+        /// <param name="matrix">Matrix to scale.</param>
+        /// <param name="scale">Amount to scale.</param>
+        /// <param name="result">Scaled matrix.</param>
+        public static void Multiply(ref Matrix matrix, float scale, out Matrix result)
+        {
+            result.M11 = matrix.M11 * scale;
+            result.M12 = matrix.M12 * scale;
+            result.M13 = matrix.M13 * scale;
+            result.M14 = matrix.M14 * scale;
+
+            result.M21 = matrix.M21 * scale;
+            result.M22 = matrix.M22 * scale;
+            result.M23 = matrix.M23 * scale;
+            result.M24 = matrix.M24 * scale;
+
+            result.M31 = matrix.M31 * scale;
+            result.M32 = matrix.M32 * scale;
+            result.M33 = matrix.M33 * scale;
+            result.M34 = matrix.M34 * scale;
+
+            result.M41 = matrix.M41 * scale;
+            result.M42 = matrix.M42 * scale;
+            result.M43 = matrix.M43 * scale;
+            result.M44 = matrix.M44 * scale;
+        }
+
+        /// <summary>
+        /// Multiplies two matrices together.
+        /// </summary>
+        /// <param name="a">First matrix to multiply.</param>
+        /// <param name="b">Second matrix to multiply.</param>
+        /// <returns>Combined transformation.</returns>
         public static Matrix operator *(Matrix a, Matrix b)
         {
             Matrix toReturn;
             Multiply(ref a, ref b, out toReturn);
             return toReturn;
+        }
+
+        /// <summary>
+        /// Scales all components of the matrix by the given value.
+        /// </summary>
+        /// <param name="m">First matrix to multiply.</param>
+        /// <param name="f">Scaling value to apply to all components of the matrix.</param>
+        /// <returns>Product of the multiplication.</returns>
+        public static Matrix operator *(Matrix m, float f)
+        {
+            Matrix result;
+            Multiply(ref m, f, out result);
+            return result;
+        }
+
+        /// <summary>
+        /// Scales all components of the matrix by the given value.
+        /// </summary>
+        /// <param name="m">First matrix to multiply.</param>
+        /// <param name="f">Scaling value to apply to all components of the matrix.</param>
+        /// <returns>Product of the multiplication.</returns>
+        public static Matrix operator *(float f, Matrix m)
+        {
+            Matrix result;
+            Multiply(ref m, f, out result);
+            return result;
         }
 
         /// <summary>

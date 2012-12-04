@@ -685,6 +685,33 @@ namespace BEPUutilities
             return result;
         }
 
+
+        /// <summary>
+        /// Scales all components of the matrix by the given value.
+        /// </summary>
+        /// <param name="m">First matrix to multiply.</param>
+        /// <param name="f">Scaling value to apply to all components of the matrix.</param>
+        /// <returns>Product of the multiplication.</returns>
+        public static Matrix3x3 operator *(Matrix3x3 m, float f)
+        {
+            Matrix3x3 result;
+            Multiply(ref m, f, out result);
+            return result;
+        }
+
+        /// <summary>
+        /// Scales all components of the matrix by the given value.
+        /// </summary>
+        /// <param name="m">First matrix to multiply.</param>
+        /// <param name="f">Scaling value to apply to all components of the matrix.</param>
+        /// <returns>Product of the multiplication.</returns>
+        public static Matrix3x3 operator *(float f, Matrix3x3 m)
+        {
+            Matrix3x3 result;
+            Multiply(ref m, f, out result);
+            return result;
+        }
+
         /// <summary>
         /// Multiplies the two matrices.
         /// </summary>
@@ -852,7 +879,7 @@ namespace BEPUutilities
         }
 
         /// <summary>
-        /// Scales the matrix.
+        /// Scales all components of the matrix.
         /// </summary>
         /// <param name="matrix">Matrix to scale.</param>
         /// <param name="scale">Amount to scale.</param>
