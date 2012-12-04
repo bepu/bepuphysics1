@@ -332,6 +332,7 @@ namespace BEPUphysics.CollisionShapes
                 GetContribution(entries[i].Shape, ref transform, ref center, entries[i].Weight, out contribution);
                 Matrix3x3.Add(ref volumeDistribution, ref contribution, out volumeDistribution);
             }
+            Matrix3x3.Multiply(ref volumeDistribution, 1 / totalWeight, out volumeDistribution);
             return volumeDistribution;
         }
 
