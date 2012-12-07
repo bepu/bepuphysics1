@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using BEPUutilities.DataStructures;
 
-namespace BEPUutilities
+namespace BEPUphysics.Threading
 {
     /// <summary>
     /// Keeps track of the threads currently available to the physics engine.

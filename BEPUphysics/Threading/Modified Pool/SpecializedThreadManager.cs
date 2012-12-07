@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BEPUutilities
+namespace BEPUphysics.Threading
 {
     /// <summary>
     /// Manages the engine's threads.
