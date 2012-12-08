@@ -5,6 +5,7 @@ using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.Constraints;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
 using BEPUphysics.SolverSystems;
+using BEPUphysics.Threading;
 using BEPUutilities;
 using BEPUphysics.CollisionRuleManagement;
 using System.Collections.ObjectModel;

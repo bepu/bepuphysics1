@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Diagnostics;
-using BEPUutilities;
+using BEPUphysics.Threading;
 
 namespace BEPUphysics
 {

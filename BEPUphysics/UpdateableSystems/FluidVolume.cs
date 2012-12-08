@@ -5,6 +5,7 @@ using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.Entities;
+using BEPUphysics.Threading;
 using BEPUutilities;
 using BEPUutilities.ResourceManagement;
 using Microsoft.Xna.Framework;

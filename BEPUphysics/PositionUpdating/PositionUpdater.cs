@@ -1,5 +1,5 @@
 ﻿using System;
-using BEPUutilities;
+using BEPUphysics.Threading;
 
 namespace BEPUphysics.PositionUpdating
 {

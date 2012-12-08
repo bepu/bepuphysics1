@@ -436,7 +436,7 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
             {
 
                 //TODO: could also require that the character has a nonzero movement direction in order to use a ray cast.  Questionable- would complicate the behavior on edges.
-                float length = hadTraction ? bottomHeight + maximumAssistedDownStepHeight : bottomHeight;
+                float length = bottomHeight + maximumAssistedDownStepHeight;
                 Ray ray = new Ray(body.Position, downDirection);
 
                 bool hasTraction;
@@ -464,7 +464,7 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
                 if (!character.QueryManager.RayCastHitAnything(obstructionRay, 1))
                 {
                     //The origin isn't obstructed, so now ray cast down.
-                    float length = hadTraction ? bottomHeight + maximumAssistedDownStepHeight : bottomHeight;
+                    float length = bottomHeight + maximumAssistedDownStepHeight;
                     bool hasTraction;
                     SupportRayData data;
                     if (TryDownCast(ref ray, length, out hasTraction, out data))
@@ -502,7 +502,7 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
                 if (!character.QueryManager.RayCastHitAnything(obstructionRay, 1))
                 {
                     //The origin isn't obstructed, so now ray cast down.
-                    float length = hadTraction ? bottomHeight + maximumAssistedDownStepHeight : bottomHeight;
+                    float length = bottomHeight + maximumAssistedDownStepHeight;
                     bool hasTraction;
                     SupportRayData data;
                     if (TryDownCast(ref ray, length, out hasTraction, out data))
@@ -540,7 +540,7 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
                 if (!character.QueryManager.RayCastHitAnything(obstructionRay, 1))
                 {
                     //The origin isn't obstructed, so now ray cast down.
-                    float length = hadTraction ? bottomHeight + maximumAssistedDownStepHeight : bottomHeight;
+                    float length = bottomHeight + maximumAssistedDownStepHeight;
                     bool hasTraction;
                     SupportRayData data;
                     if (TryDownCast(ref ray, length, out hasTraction, out data))

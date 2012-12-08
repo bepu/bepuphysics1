@@ -1,5 +1,6 @@
 ﻿using System;
 using BEPUphysics.Entities;
+using BEPUphysics.Threading;
 using BEPUutilities;
 
 namespace BEPUphysics.EntityStateManagement

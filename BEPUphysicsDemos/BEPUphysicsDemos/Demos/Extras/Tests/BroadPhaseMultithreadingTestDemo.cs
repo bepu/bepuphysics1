@@ -2,6 +2,7 @@
 using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
+using BEPUphysics.Threading;
 using BEPUutilities;
 using BEPUutilities.DataStructures;
 using Microsoft.Xna.Framework;

@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Threading;
-using System.Collections.ObjectModel;
 using BEPUphysics.DeactivationManagement;
-using BEPUutilities;
+using BEPUphysics.Threading;
 using BEPUphysics.Constraints;
 using BEPUutilities.DataStructures;
-using System.Diagnostics;
-using BEPUphysics.NarrowPhaseSystems;
 
 namespace BEPUphysics.SolverSystems
 {
