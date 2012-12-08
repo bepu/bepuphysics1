@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using BEPUphysics.BroadPhaseEntries;
+using BEPUphysics.Threading;
 using BEPUutilities.DataStructures;
 using Microsoft.Xna.Framework;
-using BEPUutilities;
 
 namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
 {

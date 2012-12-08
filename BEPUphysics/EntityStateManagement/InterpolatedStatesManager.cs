@@ -1,5 +1,6 @@
 ﻿using System;
 using BEPUphysics.Entities;
+using BEPUphysics.Threading;
 using BEPUutilities;
 using Microsoft.Xna.Framework;
 using BEPUutilities;

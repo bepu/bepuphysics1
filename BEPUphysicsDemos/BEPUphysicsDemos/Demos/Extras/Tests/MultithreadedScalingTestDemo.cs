@@ -3,6 +3,7 @@ using BEPUphysics;
 using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.NarrowPhaseSystems;
+using BEPUphysics.Threading;
 using BEPUphysics.UpdateableSystems.ForceFields;
 using BEPUphysicsDemos.SampleCode;
 using BEPUutilities;

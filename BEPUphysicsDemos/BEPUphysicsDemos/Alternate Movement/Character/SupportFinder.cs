@@ -465,7 +465,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             {
 
                 //TODO: could also require that the character has a nonzero movement direction in order to use a ray cast.  Questionable- would complicate the behavior on edges.
-                float length = hadTraction ? bottomHeight + character.StepManager.MaximumStepHeight : bottomHeight;
+                float length = bottomHeight + character.StepManager.MaximumStepHeight;
                 Ray ray = new Ray(body.Position + downDirection * body.Height * .25f, downDirection);
 
                 bool hasTraction;
@@ -494,7 +494,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 if (!character.QueryManager.RayCastHitAnything(obstructionRay, 1))
                 {
                     //The origin isn't obstructed, so now ray cast down.
-                    float length = hadTraction ? bottomHeight + character.StepManager.MaximumStepHeight : bottomHeight;
+                    float length = bottomHeight + character.StepManager.MaximumStepHeight;
                     bool hasTraction;
                     SupportRayData data;
                     if (TryDownCast(ref ray, length, out hasTraction, out data))
@@ -532,7 +532,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 if (!character.QueryManager.RayCastHitAnything(obstructionRay, 1))
                 {
                     //The origin isn't obstructed, so now ray cast down.
-                    float length = hadTraction ? bottomHeight + character.StepManager.MaximumStepHeight : bottomHeight;
+                    float length = bottomHeight + character.StepManager.MaximumStepHeight;
                     bool hasTraction;
                     SupportRayData data;
                     if (TryDownCast(ref ray, length, out hasTraction, out data))
@@ -570,7 +570,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 if (!character.QueryManager.RayCastHitAnything(obstructionRay, 1))
                 {
                     //The origin isn't obstructed, so now ray cast down.
-                    float length = hadTraction ? bottomHeight + character.StepManager.MaximumStepHeight : bottomHeight;
+                    float length = bottomHeight + character.StepManager.MaximumStepHeight;
                     bool hasTraction;
                     SupportRayData data;
                     if (TryDownCast(ref ray, length, out hasTraction, out data))

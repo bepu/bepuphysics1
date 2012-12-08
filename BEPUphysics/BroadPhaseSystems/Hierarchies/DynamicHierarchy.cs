@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using BEPUphysics.BroadPhaseEntries;
+using BEPUphysics.Threading;
 using BEPUutilities.DataStructures;
 using BEPUutilities.ResourceManagement;
 using Microsoft.Xna.Framework;

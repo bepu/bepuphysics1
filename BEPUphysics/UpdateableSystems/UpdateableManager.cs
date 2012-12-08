@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using BEPUutilities;
+using BEPUphysics.Threading;
 
 namespace BEPUphysics.UpdateableSystems
 {
