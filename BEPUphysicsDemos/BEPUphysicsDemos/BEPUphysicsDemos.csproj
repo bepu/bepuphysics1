@@ -172,6 +172,7 @@
     <Compile Include="Demos\Extras\Tests\ThreadManagerTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\DeterminismTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\ConvexHullTestDemo.cs" />
+    <Compile Include="Demos\Extras\Tests\MoreConstraintsTestDemo.cs" />
     <Compile Include="Demos\StaticGroupDemo.cs" />
     <Compile Include="Demos\MobileMeshDemo.cs" />
     <Compile Include="Demos\DetectorVolumeDemo.cs" />

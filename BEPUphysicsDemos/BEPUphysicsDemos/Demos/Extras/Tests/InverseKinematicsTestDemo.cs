@@ -630,6 +630,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             Entity upperArmEntity = new Cylinder(upperArm.Position, upperArm.Height, upperArm.Radius, 7);
             Entity lowerArmEntity = new Cylinder(lowerArm.Position, lowerArm.Height, lowerArm.Radius, 5);
             Entity bonkDeviceEntity = new Cylinder(bonkDevice.Position, bonkDevice.Height, bonkDevice.Radius, 3);
+            bonkDeviceEntity.Orientation = bonkDevice.Orientation;
 
             Space.Add(baseEntity);
             Space.Add(upperArmEntity);
@@ -796,7 +797,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             if (usingIK)
             {
                 //Check for pinning!
-                if (Game.MouseInput.LeftButton == ButtonState.Pressed && Game.PreviousMouseInput.LeftButton == ButtonState.Released)
+                if (Game.MouseInput.LeftButton == ButtonState.Pressed && Game.PreviousMouseInput.LeftButton == ButtonState.Released && Game.MouseInput.RightButton == ButtonState.Released)
                 {
                     //Try to pin a bone.
                     BoneRelationship hitBone;

@@ -9,7 +9,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
     public class IKAngularJoint : IKJoint
     {
         /// <summary>
-        /// Gets or sets the relative orientation between the connections to maintain.
+        /// Gets or sets the rotation from connection A's orientation to connection B's orientation in A's local space.
         /// </summary>
         public Quaternion GoalRelativeOrientation;
 
@@ -24,7 +24,9 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         {  
             Quaternion orientationAConjugate;
             Quaternion.Conjugate(ref ConnectionA.Orientation, out orientationAConjugate);
-            Quaternion.Multiply(ref ConnectionB.Orientation, ref orientationAConjugate, out GoalRelativeOrientation);
+            //Store the orientation from A to B in A's local space in the GoalRelativeOrientation.
+            Quaternion.Concatenate(ref ConnectionB.Orientation, ref orientationAConjugate, out GoalRelativeOrientation);
+
         }
 
         protected internal override void UpdateJacobiansAndVelocityBias()
@@ -33,29 +35,29 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             angularJacobianA = new Matrix3x3 { M11 = 1, M22 = 1, M33 = 1 };
             angularJacobianB = new Matrix3x3 { M11 = -1, M22 = -1, M33 = -1 };
 
-            //Compute the error between A and B's orientations.
-            Quaternion conjugateB;
-            Quaternion.Conjugate(ref ConnectionB.Orientation, out conjugateB);
-            Quaternion errorOrientation;
-            Quaternion.Multiply(ref ConnectionA.Orientation, ref conjugateB, out errorOrientation);
+            //The error is computed using this equation:
+            //GoalRelativeOrientation * ConnectionA.Orientation * Error = ConnectionB.Orientation
+            //GoalRelativeOrientation is the original rotation from A to B in A's local space.
+            //Multiplying by A's orientation gives us where B *should* be.
+            //Of course, B won't be exactly where it should be after initialization.
+            //The Error component holds the difference between what is and what should be.
+            //Error = (GoalRelativeOrientation * ConnectionA.Orientation)^-1 * ConnectionB.Orientation
+            Quaternion bTarget;
+            Quaternion.Concatenate(ref GoalRelativeOrientation, ref ConnectionA.Orientation, out bTarget);
+            Quaternion bTargetConjugate;
+            Quaternion.Conjugate(ref bTarget, out bTargetConjugate);
 
-            //Construct the goal in world space using the basis.
-            Quaternion goal;
-            Quaternion conjugateA;
-            Quaternion.Conjugate(ref ConnectionA.Orientation, out conjugateA);
-            Quaternion.Multiply(ref GoalRelativeOrientation, ref conjugateA, out goal);
-            Quaternion.Multiply(ref ConnectionA.Orientation, ref goal, out goal);
-            Quaternion.Multiply(ref goal, ref errorOrientation, out errorOrientation);      
-            //TODO: The above could really use some clearing up. Bad names, indirect computations...
+            Quaternion error;
+            Quaternion.Concatenate(ref bTargetConjugate, ref ConnectionB.Orientation, out error);
 
             //Convert the error into an axis-angle vector usable for bias velocity.
             float angle;
             Vector3 axis;
-            Toolbox.GetAxisAngleFromQuaternion(ref errorOrientation, out axis, out angle);
+            Toolbox.GetAxisAngleFromQuaternion(ref error, out axis, out angle);
 
-            velocityBias.X = -errorCorrectionFactor * axis.X * angle;
-            velocityBias.Y = -errorCorrectionFactor * axis.Y * angle;
-            velocityBias.Z = -errorCorrectionFactor * axis.Z * angle;
+            velocityBias.X = errorCorrectionFactor * axis.X * angle;
+            velocityBias.Y = errorCorrectionFactor * axis.Y * angle;
+            velocityBias.Z = errorCorrectionFactor * axis.Z * angle;
 
 
         }
