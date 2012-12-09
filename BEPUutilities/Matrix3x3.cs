@@ -1324,13 +1324,25 @@ namespace BEPUutilities
             }
             else
             {
-                var S = (float)System.Math.Sqrt(1.0 + r.M33 - r.M11 - r.M22) * 2; // S=4*qz
+                var S = (float)Math.Sqrt(1.0 + r.M33 - r.M11 - r.M22) * 2; // S=4*qz
                 var inverseS = 1 / S;
                 q.W = (r.M12 - r.M21) * inverseS;
                 q.X = (r.M31 + r.M13) * inverseS;
                 q.Y = (r.M32 + r.M23) * inverseS;
                 q.Z = 0.25f * S;
             }
+        }
+
+        /// <summary>
+        /// Constructs a quaternion from a 3x3 rotation matrix.
+        /// </summary>
+        /// <param name="r">Rotation matrix to create the quaternion from.</param>
+        /// <returns>Quaternion based on the rotation matrix.</returns>
+        public static Quaternion CreateQuaternion(Matrix3x3 r)
+        {
+            Quaternion result;
+            CreateQuaternion(ref r, out result);
+            return result;
         }
 
         /// <summary>
@@ -1362,6 +1374,18 @@ namespace BEPUutilities
             result.M13 = XZ - YW;
             result.M23 = YZ + XW;
             result.M33 = 1 - XX - YY;
+        }
+
+        /// <summary>
+        /// Creates a 3x3 matrix representing the orientation stored in the quaternion.
+        /// </summary>
+        /// <param name="quaternion">Quaternion to use to create a matrix.</param>
+        /// <returns>Matrix representing the quaternion's orientation.</returns>
+        public static Matrix3x3 CreateFromQuaternion(Quaternion quaternion)
+        {
+            Matrix3x3 result;
+            CreateFromQuaternion(ref quaternion, out result);
+            return result;
         }
 
         /// <summary>
