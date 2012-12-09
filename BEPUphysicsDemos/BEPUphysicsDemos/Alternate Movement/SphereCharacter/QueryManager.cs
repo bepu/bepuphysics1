@@ -182,7 +182,10 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
                     var pairHandler = NarrowPhaseHelper.GetPairHandler(ref pair);
                     if (pairHandler.CollisionRule == CollisionRule.Normal)
                     {
+                        pairHandler.SuppressEvents = true;
                         pairHandler.UpdateCollision(0);
+                        pairHandler.SuppressEvents = false;
+                        
                         foreach (var contact in pairHandler.Contacts)
                         {
                             //Must check per-contact collision rules, just in case

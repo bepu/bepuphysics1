@@ -45,10 +45,11 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
 
             settings = new MotorSettingsOrientation(this);
 
-            //Since no target relative orientation was specified, just use the current relative orientation.  Prevents any nasty start-of-sim 'snapping.'
-            Quaternion orientationBConjugate;
-            Quaternion.Conjugate(ref this.connectionB.orientation, out orientationBConjugate);
-            Quaternion.Multiply(ref this.connectionA.orientation, ref orientationBConjugate, out settings.servo.goal);
+            //Compute the rotation from A to B in A's local space.
+            Quaternion orientationAConjugate;
+            Quaternion.Conjugate(ref connectionA.orientation, out orientationAConjugate);
+            Quaternion.Concatenate(ref connectionB.orientation, ref orientationAConjugate, out settings.servo.goal);
+
         }
 
         /// <summary>
@@ -226,59 +227,37 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
 
             if (settings.mode == MotorMode.Servomechanism) //Only need to do the bulk of this work if it's a servo.
             {
-                ////Compute the relative orientation R between a and b
-                //Quaternion conjugateQuaternionB;
-                //Quaternion.Conjugate(ref myConnectionB.myInternalOrientationQuaternion, out conjugateQuaternionB);
 
-                //Matrix worldTransform = Matrix3x3.ToMatrix4x4(myBasis.worldTransform);
-                //Quaternion basis;
-                //Quaternion.CreateFromRotationMatrix(ref worldTransform, out basis);
+                //The error is computed using this equation:
+                //GoalRelativeOrientation * ConnectionA.Orientation * Error = ConnectionB.Orientation
+                //GoalRelativeOrientation is the original rotation from A to B in A's local space.
+                //Multiplying by A's orientation gives us where B *should* be.
+                //Of course, B won't be exactly where it should be after initialization.
+                //The Error component holds the difference between what is and what should be.
+                //Error = (GoalRelativeOrientation * ConnectionA.Orientation)^-1 * ConnectionB.Orientation
 
-                //Quaternion currentRelativeOrientation;
-                //Quaternion.Multiply(ref basis, ref conjugateQuaternionB, out currentRelativeOrientation);
+                //ConnectionA.Orientation is replaced in the above by the world space basis orientation.
+                Quaternion worldBasis = Matrix3x3.CreateQuaternion(basis.WorldTransform);
 
-                ////Construct the goal in world space using the basis.
-                //Quaternion goal;
-                //Quaternion basisConjugate;
-                //Quaternion.Conjugate(ref basis, out basisConjugate);
-                //Quaternion.Multiply(ref mySettings.myServo.myGoal, ref basisConjugate, out goal);
-                //Quaternion.Multiply(ref basis, ref goal, out goal);
+                Quaternion bTarget;
+                Quaternion.Concatenate(ref settings.servo.goal, ref worldBasis, out bTarget);
+                Quaternion bTargetConjugate;
+                Quaternion.Conjugate(ref bTarget, out bTargetConjugate);
 
-
-                ////Compute the relative orientation R' between R and the target relative orientation.
-                //Quaternion errorOrientation;
-                //Quaternion.Conjugate(ref currentRelativeOrientation, out currentRelativeOrientation);
-                //Quaternion.Multiply(ref currentRelativeOrientation, ref goal, out errorOrientation);
-
-
-                Matrix worldTransform = Matrix3x3.ToMatrix4X4(basis.WorldTransform);
-                Quaternion basisOrientation;
-                Quaternion.CreateFromRotationMatrix(ref worldTransform, out basisOrientation);
-
-                Quaternion quaternionB;
-                Quaternion.Conjugate(ref connectionB.orientation, out quaternionB);
-                Quaternion errorOrientation;
-                Quaternion.Multiply(ref basisOrientation, ref quaternionB, out errorOrientation);
-
-                //Construct the goal in world space using the basis.
-                Quaternion goal;
-                Quaternion basisConjugate;
-                Quaternion.Conjugate(ref basisOrientation, out basisConjugate);
-                Quaternion.Multiply(ref settings.servo.goal, ref basisConjugate, out goal);
-                Quaternion.Multiply(ref basisOrientation, ref goal, out goal);
-
-                Quaternion.Multiply(ref goal, ref errorOrientation, out errorOrientation);
+                Quaternion error;
+                Quaternion.Concatenate(ref bTargetConjugate, ref connectionB.orientation, out error);
+                
 
                 float errorReduction;
                 settings.servo.springSettings.ComputeErrorReductionAndSoftness(dt, out errorReduction, out usedSoftness);
 
                 //Turn this into an axis-angle representation.
-                Toolbox.GetAxisAngleFromQuaternion(ref errorOrientation, out axis, out angle);
+                Toolbox.GetAxisAngleFromQuaternion(ref error, out axis, out angle);
 
                 //Scale the axis by the desired velocity if the angle is sufficiently large (epsilon).
                 if (angle > Toolbox.BigEpsilon)
                 {
-                    float velocity = MathHelper.Min(settings.servo.baseCorrectiveSpeed, angle / dt) + angle * errorReduction;
+                    float velocity = -(MathHelper.Min(settings.servo.baseCorrectiveSpeed, angle / dt) + angle * errorReduction);
 
                     biasVelocity.X = axis.X * velocity;
                     biasVelocity.Y = axis.Y * velocity;
