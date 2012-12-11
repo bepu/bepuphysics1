@@ -12,20 +12,6 @@
         /// </summary>
         public abstract Bone TargetBone { get; set; }
 
-        /// <summary>
-        /// Gets whether or not the control is used by an IK solver.
-        /// </summary>
-        public bool IsActive
-        {
-            get { return solverIndex >= 0; }
-        }
-
-        /// <summary>
-        /// Stores where the control is in the solver listing for quick adds and removes.
-        /// </summary>
-        internal int solverIndex = -1;
-
-
         protected internal abstract void UpdateJacobiansAndVelocityBias();
 
         protected internal abstract void ComputeEffectiveMass();
