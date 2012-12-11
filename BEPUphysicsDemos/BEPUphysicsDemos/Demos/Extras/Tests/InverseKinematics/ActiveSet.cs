@@ -404,19 +404,22 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
 
             for (int i = 0; i < joints.Count; ++i)
             {
-                if (!joints[i].ConnectionA.IsActive)
+                if (joints[i].Enabled)
                 {
-                    joints[i].ConnectionA.IsActive = true;
-                    bones.Add(joints[i].ConnectionA);
-                }
+                    if (!joints[i].ConnectionA.IsActive)
+                    {
+                        joints[i].ConnectionA.IsActive = true;
+                        bones.Add(joints[i].ConnectionA);
+                    }
 
-                if (!joints[i].ConnectionB.IsActive)
-                {
-                    joints[i].ConnectionB.IsActive = true;
-                    bones.Add(joints[i].ConnectionB);
-                }
+                    if (!joints[i].ConnectionB.IsActive)
+                    {
+                        joints[i].ConnectionB.IsActive = true;
+                        bones.Add(joints[i].ConnectionB);
+                    }
 
-                this.joints.Add(joints[i]);
+                    this.joints.Add(joints[i]);
+                }
             }
 
             //Use an arbitrary mass for the bones.
