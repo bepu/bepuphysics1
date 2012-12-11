@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using BEPUutilities.DataStructures;
 
@@ -17,14 +18,6 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
     /// </summary>
     public class IKSolver
     {
-        List<Control> controls = new List<Control>();
-        /// <summary>
-        /// Gets the list of controls used by the solver.
-        /// </summary>
-        public ReadOnlyList<Control> Controls
-        {
-            get { return new ReadOnlyList<Control>(controls); }
-        }
 
         /// <summary>
         /// Gets the active joint set associated with the solver.
@@ -69,9 +62,60 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         }
 
         /// <summary>
+        /// Updates the positions of bones acted upon by the joints given to this solver.
+        /// This variant of the solver can be used when there are no goal-driven controls in the simulation.
+        /// This amounts to running just the 'fixer iterations' of a normal control-driven solve.
+        /// </summary>
+        public void Solve(List<IKJoint> joints)
+        {
+            ActiveSet.UpdateActiveSet(joints);
+
+            for (int i = 0; i < FixerIterationCount; i++)
+            {
+                //Update the world inertia tensors of objects for the latest position.
+                foreach (Bone bone in ActiveSet.bones)
+                {
+                    bone.UpdateInertiaTensor();
+                }
+
+                //Update the per-constraint jacobians and effective mass for the current bone orientations and positions.
+                foreach (IKJoint joint in ActiveSet.joints)
+                {
+                    joint.UpdateJacobiansAndVelocityBias();
+                    joint.ComputeEffectiveMass();
+                    joint.WarmStart();
+                }
+
+                for (int j = 0; j < VelocitySubiterationCount; j++)
+                {
+                    //Controls are updated first, and the active joint set is sorted from closest-to-control constraints to furthest-from-control constraints.
+                    //In addition, the last constraints which update get the last word in the state of bones for a given iteration,
+                    //so solving far constraints last means those constraints connected to pin endpoints will always succeed in keeping a bone nearby.
+                    foreach (IKJoint joint in ActiveSet.joints)
+                    {
+                        joint.SolveVelocityIteration();
+                    }
+                }
+
+                //Integrate the positions of the bones forward.
+                foreach (Bone bone in ActiveSet.bones)
+                {
+                    bone.UpdatePosition();
+                }
+            }
+
+            //Clear out accumulated impulses; they should not persist through to another solving round because the state could be arbitrarily different.
+            for (int j = 0; j < ActiveSet.joints.Count; j++)
+            {
+                ActiveSet.joints[j].ClearAccumulatedImpulses();
+            }
+        }
+
+        /// <summary>
         /// Updates the positions of bones acted upon by the controls given to this solver.
         /// </summary>
-        public void Solve()
+        /// <param name="controls">List of currently active controls.</param>
+        public void Solve(List<Control> controls)
         {
             //Update the list of active joints.
             ActiveSet.UpdateActiveSet(controls);
@@ -187,41 +231,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         }
 
 
-        /// <summary>
-        /// Adds a control constraint to the solver.
-        /// </summary>
-        /// <param name="control">Control to add.</param>
-        /// <returns>True if the control was added, or false otherwise.</returns>
-        public bool Add(Control control)
-        {
-            if (control.solverIndex != -1)
-                return false;
-            control.solverIndex = controls.Count;
-            controls.Add(control);
-            return true;
-        }
 
-        /// <summary>
-        /// Removes a control from the solver.
-        /// </summary>
-        /// <param name="control">Control to remove.</param>
-        /// <returns>True if the control was present, or false otherwise.</returns>
-        public bool Remove(Control control)
-        {
-            if (control.solverIndex < 0 || control.solverIndex >= controls.Count || controls[control.solverIndex] != control)
-                return false;
-
-            if (control.solverIndex == controls.Count - 1)
-                controls.RemoveAt(controls.Count - 1);
-            else
-            {
-                var lastControl = controls[controls.Count - 1];
-                controls.RemoveAt(controls.Count - 1);
-                controls[control.solverIndex] = lastControl;
-                lastControl.solverIndex = control.solverIndex;
-            }
-            control.solverIndex = -1;
-            return true;
-        }
+        
     }
 }

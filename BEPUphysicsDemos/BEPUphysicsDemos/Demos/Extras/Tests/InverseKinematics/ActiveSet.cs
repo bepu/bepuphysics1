@@ -378,8 +378,61 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             bones.Clear();
         }
 
+        private void Clear()
+        {
+            for (int i = 0; i < bones.Count; i++)
+            {
+                bones[i].IsActive = false;
+                bones[i].stressCount = 0;
+                bones[i].predecessors.Clear();
+                bones[i].Mass = .01f;
+            }
+            for (int i = 0; i < joints.Count; i++)
+            {
+                joints[i].IsActive = false;
+            }
+            bones.Clear();
+            joints.Clear();
+        }
+
+        internal void UpdateActiveSet(List<IKJoint> joints)
+        {
+            //Clear out the previous active set to make way for the new active set.   
+            //Note that the below flag clearing and usage creates a requirement.
+            //Two IKSolvers cannot operate on the same graph; the active set flags could be corrupted.
+            Clear();
+
+            for (int i = 0; i < joints.Count; ++i)
+            {
+                if (!joints[i].ConnectionA.IsActive)
+                {
+                    joints[i].ConnectionA.IsActive = true;
+                    bones.Add(joints[i].ConnectionA);
+                }
+
+                if (!joints[i].ConnectionB.IsActive)
+                {
+                    joints[i].ConnectionB.IsActive = true;
+                    bones.Add(joints[i].ConnectionB);
+                }
+
+                this.joints.Add(joints[i]);
+            }
+
+            //Use an arbitrary mass for the bones.
+            //This could conceivably encounter issues with pathological cases, but we don't have controls to easily guide a better choice.
+            if (UseAutomass)
+            {
+                for (int i = 0; i < bones.Count; ++i)
+                {
+                    bones[i].Mass = massPerStressPath;
+                }
+            }
 
 
+
+
+        }
 
         /// <summary>
         /// Updates the ordered set of active joints.
@@ -394,19 +447,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             //Clear out the previous active set to make way for the new active set.
             //Note that the below flag clearing and usage creates a requirement.
             //Two IKSolvers cannot operate on the same graph; the active set flags could be corrupted.
-            for (int i = 0; i < bones.Count; i++)
-            {
-                bones[i].IsActive = false;
-                bones[i].stressCount = 0;
-                bones[i].predecessors.Clear();
-                bones[i].Mass = .01f;
-            }
-            for (int i = 0; i < joints.Count; i++)
-            {
-                joints[i].IsActive = false;
-            }
-            bones.Clear();
-            joints.Clear();
+            Clear();
 
             if (UseAutomass)
             {

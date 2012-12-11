@@ -29,16 +29,18 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
         private float distanceToTarget;
         private IKSolver solver;
         private Camera camera;
+        public List<Control> Controls { get; set; }
 
         public bool IsActive
         {
             get { return stateControls.Count > 0; }
         }
 
-        public StateControlGroup(Camera camera, IKSolver solver)
+        public StateControlGroup(Camera camera, List<Control> controls, IKSolver solver)
         {
             this.camera = camera;
             this.solver = solver;
+            this.Controls = controls;
         }
 
         private List<ControlEntry> stateControls = new List<ControlEntry>();
@@ -56,12 +58,12 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
         {
             var control = stateControlsPool.Count > 0 ? stateControlsPool.Pop() : new StateControl();
             control.TargetBone = bone;
-            solver.Add(control);
+            Controls.Add(control);
             return control;
         }
         void GiveBack(StateControl control)
         {
-            solver.Remove(control);
+            Controls.Remove(control);
             control.TargetBone = null;
             stateControlsPool.Push(control);
         }
@@ -137,6 +139,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
         private Texture2D whitePixel;
 
         private List<BoneRelationship> bones = new List<BoneRelationship>();
+        private List<Control> controls = new List<Control>();
+        private List<IKJoint> joints = new List<IKJoint>();
 
         void BuildChain(Vector3 position)
         {
@@ -165,6 +169,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                 Space.Add(dynamicsAngularFriction);
                 var ikBallSocketJoint = new IKBallSocketJoint(previousBone, bone, anchor); //(the joint is auto-added to the bones; not solver-add is needed)
                 var ikAngularFriction = new IKAngularJoint(previousBone, bone) { ErrorCorrectionFactor = 0, MaximumImpulse = 10 };
+                joints.Add(ikBallSocketJoint);
+                joints.Add(ikAngularFriction);
 
                 previousBone = bone;
                 previousBoneEntity = boneEntity;
@@ -364,57 +370,57 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             bones.Add(new BoneRelationship(rightFootBone, rightFoot));
 
             //[We don't care about the return values here. A bit weird, but the constructor puts the reference where it needs to go.]
-            new IKBallSocketJoint(bodyBone, headBone, headBodyBallSocketAnchor);
-            new IKSwingLimit(bodyBone, headBone, Vector3.Up, Vector3.Up, MathHelper.PiOver2);
-            new IKTwistLimit(bodyBone, headBone, Vector3.Up, Vector3.Up, MathHelper.PiOver2);
+            joints.Add(new IKBallSocketJoint(bodyBone, headBone, headBodyBallSocketAnchor));
+            joints.Add(new IKSwingLimit(bodyBone, headBone, Vector3.Up, Vector3.Up, MathHelper.PiOver2));
+            joints.Add(new IKTwistLimit(bodyBone, headBone, Vector3.Up, Vector3.Up, MathHelper.PiOver2));
 
             //Left arm
-            new IKBallSocketJoint(bodyBone, upperLeftArmBone, bodyUpperLeftArmBallSocketAnchor);
-            new IKSwingLimit(bodyBone, upperLeftArmBone, Vector3.Normalize(new Vector3(-1, 0, .3f)), Vector3.Left, MathHelper.Pi * .65f);
-            new IKTwistLimit(bodyBone, upperLeftArmBone, Vector3.Left, Vector3.Left, MathHelper.PiOver2) { Softness = 10 };
-            new IKBallSocketJoint(upperLeftArmBone, lowerLeftArmBone, upperLeftArmLowerLeftArmBallSocketAnchor);
-            new IKSwivelHingeJoint(upperLeftArmBone, lowerLeftArmBone, Vector3.Up, Vector3.Left);
-            new IKSwingLimit(upperLeftArmBone, lowerLeftArmBone, Vector3.Normalize(new Vector3(-0.23f, 0, .97f)), Vector3.Left, MathHelper.Pi * 0.435f);
-            new IKTwistLimit(upperLeftArmBone, lowerLeftArmBone, Vector3.Left, Vector3.Left, MathHelper.PiOver4) { Softness = 10 };
-            new IKBallSocketJoint(lowerLeftArmBone, leftHandBone, lowerLeftArmLeftHandBallSocketAnchor);
-            new IKSwingLimit(lowerLeftArmBone, leftHandBone, Vector3.Left, Vector3.Left, MathHelper.PiOver2);
-            new IKTwistLimit(lowerLeftArmBone, leftHandBone, Vector3.Left, Vector3.Left, MathHelper.PiOver4) { Softness = 10 };
+            joints.Add(new IKBallSocketJoint(bodyBone, upperLeftArmBone, bodyUpperLeftArmBallSocketAnchor));
+            joints.Add(new IKSwingLimit(bodyBone, upperLeftArmBone, Vector3.Normalize(new Vector3(-1, 0, .3f)), Vector3.Left, MathHelper.Pi * .65f));
+            joints.Add(new IKTwistLimit(bodyBone, upperLeftArmBone, Vector3.Left, Vector3.Left, MathHelper.PiOver2) { Softness = 10 });
+            joints.Add(new IKBallSocketJoint(upperLeftArmBone, lowerLeftArmBone, upperLeftArmLowerLeftArmBallSocketAnchor));
+            joints.Add(new IKSwivelHingeJoint(upperLeftArmBone, lowerLeftArmBone, Vector3.Up, Vector3.Left));
+            joints.Add(new IKSwingLimit(upperLeftArmBone, lowerLeftArmBone, Vector3.Normalize(new Vector3(-0.23f, 0, .97f)), Vector3.Left, MathHelper.Pi * 0.435f));
+            joints.Add(new IKTwistLimit(upperLeftArmBone, lowerLeftArmBone, Vector3.Left, Vector3.Left, MathHelper.PiOver4) { Softness = 10 });
+            joints.Add(new IKBallSocketJoint(lowerLeftArmBone, leftHandBone, lowerLeftArmLeftHandBallSocketAnchor));
+            joints.Add(new IKSwingLimit(lowerLeftArmBone, leftHandBone, Vector3.Left, Vector3.Left, MathHelper.PiOver2));
+            joints.Add(new IKTwistLimit(lowerLeftArmBone, leftHandBone, Vector3.Left, Vector3.Left, MathHelper.PiOver4) { Softness = 10 });
 
             //Right arm
-            new IKBallSocketJoint(bodyBone, upperRightArmBone, bodyUpperRightArmBallSocketAnchor);
-            new IKSwingLimit(bodyBone, upperRightArmBone, Vector3.Normalize(new Vector3(1, 0, .3f)), Vector3.Right, MathHelper.Pi * .65f);
-            new IKTwistLimit(bodyBone, upperRightArmBone, Vector3.Right, Vector3.Right, MathHelper.PiOver2) { Softness = 10 };
-            new IKBallSocketJoint(upperRightArmBone, lowerRightArmBone, upperRightArmLowerRightArmBallSocketAnchor);
-            new IKSwivelHingeJoint(upperRightArmBone, lowerRightArmBone, Vector3.Up, Vector3.Right);
-            new IKSwingLimit(upperRightArmBone, lowerRightArmBone, Vector3.Normalize(new Vector3(0.23f, 0, .97f)), Vector3.Right, MathHelper.Pi * 0.435f);
-            new IKTwistLimit(upperRightArmBone, lowerRightArmBone, Vector3.Right, Vector3.Right, MathHelper.PiOver4) { Softness = 10 };
-            new IKBallSocketJoint(lowerRightArmBone, rightHandBone, lowerRightArmRightHandBallSocketAnchor);
-            new IKSwingLimit(lowerRightArmBone, rightHandBone, Vector3.Right, Vector3.Right, MathHelper.PiOver2);
-            new IKTwistLimit(lowerRightArmBone, rightHandBone, Vector3.Right, Vector3.Right, MathHelper.PiOver4) { Softness = 10 };
+            joints.Add(new IKBallSocketJoint(bodyBone, upperRightArmBone, bodyUpperRightArmBallSocketAnchor));
+            joints.Add(new IKSwingLimit(bodyBone, upperRightArmBone, Vector3.Normalize(new Vector3(1, 0, .3f)), Vector3.Right, MathHelper.Pi * .65f));
+            joints.Add(new IKTwistLimit(bodyBone, upperRightArmBone, Vector3.Right, Vector3.Right, MathHelper.PiOver2) { Softness = 10 });
+            joints.Add(new IKBallSocketJoint(upperRightArmBone, lowerRightArmBone, upperRightArmLowerRightArmBallSocketAnchor));
+            joints.Add(new IKSwivelHingeJoint(upperRightArmBone, lowerRightArmBone, Vector3.Up, Vector3.Right));
+            joints.Add(new IKSwingLimit(upperRightArmBone, lowerRightArmBone, Vector3.Normalize(new Vector3(0.23f, 0, .97f)), Vector3.Right, MathHelper.Pi * 0.435f));
+            joints.Add(new IKTwistLimit(upperRightArmBone, lowerRightArmBone, Vector3.Right, Vector3.Right, MathHelper.PiOver4) { Softness = 10 });
+            joints.Add(new IKBallSocketJoint(lowerRightArmBone, rightHandBone, lowerRightArmRightHandBallSocketAnchor));
+            joints.Add(new IKSwingLimit(lowerRightArmBone, rightHandBone, Vector3.Right, Vector3.Right, MathHelper.PiOver2));
+            joints.Add(new IKTwistLimit(lowerRightArmBone, rightHandBone, Vector3.Right, Vector3.Right, MathHelper.PiOver4) { Softness = 10 });
 
             //Left Leg
-            new IKBallSocketJoint(bodyBone, upperLeftLegBone, bodyUpperLeftLegBallSocketAnchor);
-            new IKSwingLimit(bodyBone, upperLeftLegBone, Vector3.Normalize(new Vector3(-.3f, -1, .6f)), Vector3.Down, MathHelper.Pi * 0.6f);
-            new IKTwistLimit(bodyBone, upperLeftLegBone, Vector3.Up, Vector3.Up, MathHelper.PiOver4) { MeasurementAxisA = Vector3.Normalize(new Vector3(-1, 0, 1)), Softness = 10 };
-            new IKBallSocketJoint(upperLeftLegBone, lowerLeftLegBone, upperLeftLegLowerLeftLegBallSocketAnchor);
-            new IKSwivelHingeJoint(upperLeftLegBone, lowerLeftLegBone, Vector3.Left, Vector3.Down);
-            new IKTwistLimit(upperLeftLegBone, lowerLeftLegBone, Vector3.Up, Vector3.Up, MathHelper.Pi * .1f) { Softness = 10 };
-            new IKSwingLimit(upperLeftLegBone, lowerLeftLegBone, Vector3.Normalize(new Vector3(0, -.23f, -.97f)), Vector3.Down, MathHelper.Pi * 0.435f);
-            new IKBallSocketJoint(lowerLeftLegBone, leftFootBone, lowerLeftLegLeftFootBallSocketAnchor);
-            new IKTwistJoint(lowerLeftLegBone, leftFootBone, Vector3.Down, Vector3.Down) { Softness = 10 };
-            new IKSwingLimit(lowerLeftLegBone, leftFootBone, Vector3.Normalize(new Vector3(0, -1, -.3f)), Vector3.Down, MathHelper.Pi * 0.22f);
+            joints.Add(new IKBallSocketJoint(bodyBone, upperLeftLegBone, bodyUpperLeftLegBallSocketAnchor));
+            joints.Add(new IKSwingLimit(bodyBone, upperLeftLegBone, Vector3.Normalize(new Vector3(-.3f, -1, .6f)), Vector3.Down, MathHelper.Pi * 0.6f));
+            joints.Add(new IKTwistLimit(bodyBone, upperLeftLegBone, Vector3.Up, Vector3.Up, MathHelper.PiOver4) { MeasurementAxisA = Vector3.Normalize(new Vector3(-1, 0, 1)), Softness = 10 });
+            joints.Add(new IKBallSocketJoint(upperLeftLegBone, lowerLeftLegBone, upperLeftLegLowerLeftLegBallSocketAnchor));
+            joints.Add(new IKSwivelHingeJoint(upperLeftLegBone, lowerLeftLegBone, Vector3.Left, Vector3.Down));
+            joints.Add(new IKTwistLimit(upperLeftLegBone, lowerLeftLegBone, Vector3.Up, Vector3.Up, MathHelper.Pi * .1f) { Softness = 10 });
+            joints.Add(new IKSwingLimit(upperLeftLegBone, lowerLeftLegBone, Vector3.Normalize(new Vector3(0, -.23f, -.97f)), Vector3.Down, MathHelper.Pi * 0.435f));
+            joints.Add(new IKBallSocketJoint(lowerLeftLegBone, leftFootBone, lowerLeftLegLeftFootBallSocketAnchor));
+            joints.Add(new IKTwistJoint(lowerLeftLegBone, leftFootBone, Vector3.Down, Vector3.Down) { Softness = 10 });
+            joints.Add(new IKSwingLimit(lowerLeftLegBone, leftFootBone, Vector3.Normalize(new Vector3(0, -1, -.3f)), Vector3.Down, MathHelper.Pi * 0.22f));
 
             //Right leg
-            new IKBallSocketJoint(bodyBone, upperRightLegBone, bodyUpperRightLegBallSocketAnchor);
-            new IKSwingLimit(bodyBone, upperRightLegBone, Vector3.Normalize(new Vector3(.3f, -1, .6f)), Vector3.Down, MathHelper.Pi * 0.6f);
-            new IKTwistLimit(bodyBone, upperRightLegBone, Vector3.Up, Vector3.Up, MathHelper.PiOver4) { MeasurementAxisA = Vector3.Normalize(new Vector3(1, 0, 1)), Softness = 10 };
-            new IKBallSocketJoint(upperRightLegBone, lowerRightLegBone, upperRightLegLowerRightLegBallSocketAnchor);
-            new IKSwivelHingeJoint(upperRightLegBone, lowerRightLegBone, Vector3.Right, Vector3.Down);
-            new IKTwistLimit(upperRightLegBone, lowerRightLegBone, Vector3.Up, Vector3.Up, MathHelper.Pi * .1f) { Softness = 10 };
-            new IKSwingLimit(upperRightLegBone, lowerRightLegBone, Vector3.Normalize(new Vector3(0, -.23f, -.97f)), Vector3.Down, MathHelper.Pi * 0.435f);
-            new IKBallSocketJoint(lowerRightLegBone, rightFootBone, lowerRightLegRightFootBallSocketAnchor);
-            new IKTwistJoint(lowerRightLegBone, rightFootBone, Vector3.Down, Vector3.Down) { Softness = 10 };
-            new IKSwingLimit(lowerRightLegBone, rightFootBone, Vector3.Normalize(new Vector3(0, -1, -.3f)), Vector3.Down, MathHelper.Pi * 0.22f);
+            joints.Add(new IKBallSocketJoint(bodyBone, upperRightLegBone, bodyUpperRightLegBallSocketAnchor));
+            joints.Add(new IKSwingLimit(bodyBone, upperRightLegBone, Vector3.Normalize(new Vector3(.3f, -1, .6f)), Vector3.Down, MathHelper.Pi * 0.6f));
+            joints.Add(new IKTwistLimit(bodyBone, upperRightLegBone, Vector3.Up, Vector3.Up, MathHelper.PiOver4) { MeasurementAxisA = Vector3.Normalize(new Vector3(1, 0, 1)), Softness = 10 });
+            joints.Add(new IKBallSocketJoint(upperRightLegBone, lowerRightLegBone, upperRightLegLowerRightLegBallSocketAnchor));
+            joints.Add(new IKSwivelHingeJoint(upperRightLegBone, lowerRightLegBone, Vector3.Right, Vector3.Down));
+            joints.Add(new IKTwistLimit(upperRightLegBone, lowerRightLegBone, Vector3.Up, Vector3.Up, MathHelper.Pi * .1f) { Softness = 10 });
+            joints.Add(new IKSwingLimit(upperRightLegBone, lowerRightLegBone, Vector3.Normalize(new Vector3(0, -.23f, -.97f)), Vector3.Down, MathHelper.Pi * 0.435f));
+            joints.Add(new IKBallSocketJoint(lowerRightLegBone, rightFootBone, lowerRightLegRightFootBallSocketAnchor));
+            joints.Add(new IKTwistJoint(lowerRightLegBone, rightFootBone, Vector3.Down, Vector3.Down) { Softness = 10 });
+            joints.Add(new IKSwingLimit(lowerRightLegBone, rightFootBone, Vector3.Normalize(new Vector3(0, -1, -.3f)), Vector3.Down, MathHelper.Pi * 0.22f));
 
 
 
@@ -453,7 +459,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                         var dynamicsJoint = new BallSocketJoint(boneA.Entity, boneB.Entity, anchor);
                         CollisionRules.AddRule(boneA.Entity, boneB.Entity, CollisionRule.NoBroadPhase);
                         Space.Add(dynamicsJoint);
-                        var ikJoint = new IKBallSocketJoint(boneA.Bone, boneB.Bone, anchor);
+                        joints.Add(new IKBallSocketJoint(boneA.Bone, boneB.Bone, anchor));
                     }
                     if (j > 0)
                     {
@@ -463,7 +469,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                         var dynamicsJoint = new BallSocketJoint(boneA.Entity, boneB.Entity, anchor);
                         CollisionRules.AddRule(boneA.Entity, boneB.Entity, CollisionRule.NoBroadPhase);
                         Space.Add(dynamicsJoint);
-                        var ikJoint = new IKBallSocketJoint(boneA.Bone, boneB.Bone, anchor);
+                        joints.Add(new IKBallSocketJoint(boneA.Bone, boneB.Bone, anchor));
                     }
                     if (i > 0 && j > 0)
                     {
@@ -473,7 +479,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                         var dynamicsJoint = new BallSocketJoint(boneA.Entity, boneB.Entity, anchor);
                         CollisionRules.AddRule(boneA.Entity, boneB.Entity, CollisionRule.NoBroadPhase);
                         Space.Add(dynamicsJoint);
-                        var ikJoint = new IKBallSocketJoint(boneA.Bone, boneB.Bone, anchor);
+                        joints.Add(new IKBallSocketJoint(boneA.Bone, boneB.Bone, anchor));
                     }
 
                     if (i < widthCount - 1 && j > 0)
@@ -484,7 +490,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                         var dynamicsJoint = new BallSocketJoint(boneA.Entity, boneB.Entity, anchor);
                         CollisionRules.AddRule(boneA.Entity, boneB.Entity, CollisionRule.NoBroadPhase);
                         Space.Add(dynamicsJoint);
-                        var ikJoint = new IKBallSocketJoint(boneA.Bone, boneB.Bone, anchor);
+                        joints.Add(new IKBallSocketJoint(boneA.Bone, boneB.Bone, anchor));
                     }
                 }
             }
@@ -500,7 +506,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                 Space.Add(entity);
                 var anchor = (entity.Position + previous.Entity.Position) / 2;
                 Space.Add(new BallSocketJoint(entity, previous.Entity, anchor));
-                var ikJoint = new IKBallSocketJoint(bone, previous.Bone, anchor);
+                joints.Add(new IKBallSocketJoint(bone, previous.Bone, anchor));
                 CollisionRules.AddRule(entity, previous.Entity, CollisionRule.NoBroadPhase);
                 previous = new BoneRelationship(bone, entity);
                 bones.Add(previous);
@@ -516,7 +522,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                 var anchor = (entity.Position + previous.Entity.Position) / 2;
                 Space.Add(new BallSocketJoint(entity, previous.Entity, anchor));
                 CollisionRules.AddRule(entity, previous.Entity, CollisionRule.NoBroadPhase);
-                var ikJoint = new IKBallSocketJoint(bone, previous.Bone, anchor);
+                joints.Add(new IKBallSocketJoint(bone, previous.Bone, anchor));
                 previous = new BoneRelationship(bone, entity);
                 bones.Add(previous);
             }
@@ -531,7 +537,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                 var anchor = (entity.Position + previous.Entity.Position) / 2;
                 Space.Add(new BallSocketJoint(entity, previous.Entity, anchor));
                 CollisionRules.AddRule(entity, previous.Entity, CollisionRule.NoBroadPhase);
-                var ikJoint = new IKBallSocketJoint(bone, previous.Bone, anchor);
+                joints.Add(new IKBallSocketJoint(bone, previous.Bone, anchor));
                 previous = new BoneRelationship(bone, entity);
                 bones.Add(previous);
             }
@@ -547,7 +553,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                 var anchor = (entity.Position + previous.Entity.Position) / 2;
                 Space.Add(new BallSocketJoint(entity, previous.Entity, anchor));
                 CollisionRules.AddRule(entity, previous.Entity, CollisionRule.NoBroadPhase);
-                var ikJoint = new IKBallSocketJoint(bone, previous.Bone, anchor);
+                joints.Add(new IKBallSocketJoint(bone, previous.Bone, anchor));
                 previous = new BoneRelationship(bone, entity);
                 bones.Add(previous);
             }
@@ -616,14 +622,14 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             Bone lowerArm = new Bone(upperArm.Position + new Vector3(0, 2 + 1, 0), Quaternion.Identity, .7f, 2);
             Bone bonkDevice = new Bone(lowerArm.Position + new Vector3(0, 5, 0), Quaternion.Identity, .6f, 1.2f);
 
-            new IKBallSocketJoint(baseBone, upperArm, baseBone.Position + new Vector3(0, 1.5f, 0));
-            new IKSwingLimit(baseBone, upperArm, Vector3.Up, Vector3.Up, MathHelper.PiOver4);
-            new IKBallSocketJoint(upperArm, lowerArm, upperArm.Position + new Vector3(0, 2f, 0));
-            new IKRevoluteJoint(upperArm, lowerArm, Vector3.Forward);
-            new IKSwingLimit(upperArm, lowerArm, Vector3.Up, Vector3.Up, MathHelper.PiOver4);
-            new IKPointOnLineJoint(lowerArm, bonkDevice, lowerArm.Position, Vector3.Up, bonkDevice.Position);
-            new IKAngularJoint(lowerArm, bonkDevice);
-            new IKLinearAxisLimit(lowerArm, bonkDevice, lowerArm.Position, Vector3.Up, bonkDevice.Position, 1.6f, 5);
+            joints.Add(new IKBallSocketJoint(baseBone, upperArm, baseBone.Position + new Vector3(0, 1.5f, 0)));
+            joints.Add(new IKSwingLimit(baseBone, upperArm, Vector3.Up, Vector3.Up, MathHelper.PiOver4));
+            joints.Add(new IKBallSocketJoint(upperArm, lowerArm, upperArm.Position + new Vector3(0, 2f, 0)));
+            joints.Add(new IKRevoluteJoint(upperArm, lowerArm, Vector3.Forward));
+            joints.Add(new IKSwingLimit(upperArm, lowerArm, Vector3.Up, Vector3.Up, MathHelper.PiOver4));
+            joints.Add(new IKPointOnLineJoint(lowerArm, bonkDevice, lowerArm.Position, Vector3.Up, bonkDevice.Position));
+            joints.Add(new IKAngularJoint(lowerArm, bonkDevice));
+            joints.Add(new IKLinearAxisLimit(lowerArm, bonkDevice, lowerArm.Position, Vector3.Up, bonkDevice.Position, 1.6f, 5));
 
             //Make the dynamics representation
             Entity baseEntity = new Cylinder(baseBone.Position, baseBone.Height, baseBone.Radius, 10);
@@ -689,8 +695,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                 var boneB = bonesList[(i + 1) % incrementCount];
                 var upA = Vector3.Transform(Vector3.Up, boneA.Orientation);
                 var upB = Vector3.Transform(Vector3.Up, boneB.Orientation);
-                var ikJoint = new IKBallSocketJoint(boneA, boneB, (boneA.Position + upA * boneB.HalfHeight + boneB.Position - upB * boneB.HalfHeight) * .5f);
-                var swingLimit = new IKSwingLimit(boneA, boneB, upA, upB, MathHelper.Pi * .5f);
+                joints.Add(new IKBallSocketJoint(boneA, boneB, (boneA.Position + upA * boneB.HalfHeight + boneB.Position - upB * boneB.HalfHeight) * .5f));
+                joints.Add(new IKSwingLimit(boneA, boneB, upA, upB, MathHelper.Pi * .5f));
             }
             Cylinder[] boneEntitiesList = new Cylinder[incrementCount];
             for (int i = 0; i < incrementCount; i++)
@@ -728,7 +734,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             Space.Add(ground);
             Space.ForceUpdater.Gravity = new Vector3(0, -9.81f, 0);
 
-            stateControlGroup = new StateControlGroup(game.Camera, solver);
+            stateControlGroup = new StateControlGroup(game.Camera, controls, solver);
+
 
             drawer = new InstancedModelDrawer(game);
 
@@ -811,7 +818,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
 
                 //Manage bone grabbery.
                 if ((Game.MouseInput.RightButton == ButtonState.Pressed && Game.PreviousMouseInput.RightButton == ButtonState.Released) || //Either a new click, or
-                    (Game.MouseInput.RightButton == ButtonState.Pressed && !dragControl.IsActive && !stateControlGroup.IsActive)) //we do not yet have a grab, but we want one.
+                    (Game.MouseInput.RightButton == ButtonState.Pressed && dragControl.TargetBone == null && !stateControlGroup.IsActive)) //we do not yet have a grab, but we want one.
                 {
                     //This is a new click. Try to grab.
                     BoneRelationship hitBone;
@@ -821,7 +828,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                         if (Game.KeyboardInput.IsKeyDown(Keys.LeftShift))
                         {
                             //Disable the drag control.
-                            solver.Remove(dragControl);
+                            controls.Remove(dragControl);
+                            dragControl.TargetBone = null;
                             //Grab with a state control.
                             stateControlGroup.TryToAddBone(hitBone.Bone, hitPosition);
                         }
@@ -831,7 +839,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                             stateControlGroup.ClearStateControls();
                             //Grab a bone with the drag control.
                             dragControl.TargetBone = hitBone.Bone;
-                            solver.Add(dragControl);
+                            controls.Add(dragControl);
                             dragControl.LinearMotor.Offset = hitPosition - hitBone.Bone.Position;
                             distanceToGrabbedBone = Vector3.Dot(Game.Camera.WorldMatrix.Forward, hitPosition - Game.Camera.Position);
                         }
@@ -840,22 +848,23 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                     {
                         //We missed! Clear controls.
                         stateControlGroup.ClearStateControls();
-                        solver.Remove(dragControl);
+                        controls.Remove(dragControl);
+                        dragControl.TargetBone = null;
                     }
 
                 }
                 if (Game.MouseInput.RightButton == ButtonState.Pressed)
                 {
                     //We may be dragging something. If we are, update it.
-                    if (dragControl.IsActive)
+                    if (dragControl.TargetBone != null)
                         dragControl.LinearMotor.TargetPosition = Game.Camera.Position + Game.Camera.WorldMatrix.Forward * distanceToGrabbedBone;
                     else if (stateControlGroup.IsActive)
                         stateControlGroup.UpdateGoals();
 
-                    if (dragControl.IsActive || stateControlGroup.IsActive)
+                    if (dragControl.TargetBone != null || stateControlGroup.IsActive)
                     {
                         long start = Stopwatch.GetTimestamp();
-                        solver.Solve();
+                        solver.Solve(controls);
                         long end = Stopwatch.GetTimestamp();
                         elapsedTime = (end - start) / (double)Stopwatch.Frequency;
                     }
@@ -864,9 +873,16 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                 else
                 {
                     elapsedTime = 0;
+                    dragControl.TargetBone = null;
+                    controls.Remove(dragControl);
+
                 }
 
 
+                if (Game.MouseInput.XButton1 == ButtonState.Pressed)
+                {
+                    solver.Solve(joints);
+                }
 
                 //Update the positions of the bone graphics.
                 for (int i = 0; i < bones.Count; i++)
