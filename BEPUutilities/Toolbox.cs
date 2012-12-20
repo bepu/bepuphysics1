@@ -16,14 +16,14 @@ namespace BEPUutilities
     public static class Toolbox
     {
         /// <summary>
-        /// Large tolerance value.
+        /// Large tolerance value. Defaults to 1e-5f.
         /// </summary>
-        public const float BigEpsilon = 1E-5f;
+        public static float BigEpsilon = 1E-5f;
 
         /// <summary>
-        /// Tolerance value.
+        /// Tolerance value. Defaults to 1e-7f.
         /// </summary>
-        public const float Epsilon = 1E-7f;
+        public static float Epsilon = 1E-7f;
 
         /// <summary>
         /// Represents an invalid Vector3.

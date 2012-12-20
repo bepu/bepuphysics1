@@ -19,17 +19,8 @@ namespace BEPUphysicsDemos.Demos.Extras
             : base(game)
         {
             //Pick a scale!
-            //Beware: If you go too far (say, 0.01 or 100), numerical issues will start to crop up.
-            //There are two reasons: 
-            //1) Limited numerical precision in 32 bit floats. There are far fewer discrete values between 100,000 and 100,001 than there are between 10 and 11.
-            //This manifests most noticeably in general case collision detection.
-            //2) Numerical tolerances that are not adjusted by the ConfigurationHelper.ApplyScale method below.
-            //These other tolerances are defined as constants in the engine as they aren't usually the limiting factor, but you can still
-            //go into the source code and change them if you want.  The most used ones are the Epsilon and BigEpsilon in the Toolbox class.
-            //Some other systems have custom epsilons as well, though they are typically far smaller.
-            //Note that extremely large scales can force various epsilon-reliant systems to do more work than necessary, resulting in slightly lower performance.
-            //On the flip side, extremely small scales may cause exits too quickly, resulting in odd behavior.
-            float scale = 1f;
+            //Beware: If you go too far (particularly 0.01 and lower) issues could start to crop up.
+            float scale = 1;
 
             //Load in mesh data and create the collision mesh.
             //The 'mesh' will be a supergiant triangle.
@@ -112,6 +103,8 @@ namespace BEPUphysicsDemos.Demos.Extras
 
 
             game.Camera.Position = scale * new Vector3(0, 4, 10);
+            originalCameraSpeed = game.Camera.Speed;
+            game.Camera.Speed *= scale;
 
 
         }
@@ -125,7 +118,12 @@ namespace BEPUphysicsDemos.Demos.Extras
             get { return "Scale Demo"; }
         }
 
-
+        private float originalCameraSpeed;
+        public override void CleanUp()
+        {
+            Game.Camera.Speed = originalCameraSpeed;
+            base.CleanUp();
+        }
 
     }
 }

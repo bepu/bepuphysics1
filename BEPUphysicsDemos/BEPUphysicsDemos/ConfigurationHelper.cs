@@ -6,6 +6,7 @@ using BEPUphysics.Constraints;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
 using BEPUphysics.PositionUpdating;
 using BEPUphysics.Settings;
+using BEPUutilities;
 
 namespace BEPUphysicsDemos
 {
@@ -46,15 +47,26 @@ namespace BEPUphysicsDemos
             MotionSettings.UseExtraExpansionForContinuousBoundingBoxes = false;
 
             //Set all the scaling settings back to their defaults.
-            space.DeactivationManager.VelocityLowerLimit = (float)Math.Sqrt(.07);
+            space.DeactivationManager.VelocityLowerLimit = 0.26f;
             CollisionResponseSettings.MaximumPenetrationCorrectionSpeed = 2;
             CollisionResponseSettings.BouncinessVelocityThreshold = 1;
             CollisionResponseSettings.StaticFrictionVelocityThreshold = .2f;
             CollisionDetectionSettings.ContactInvalidationLength = .1f;
-            CollisionDetectionSettings.ContactMinimumSeparationDistance = .1f;
+            CollisionDetectionSettings.ContactMinimumSeparationDistance = .03f;
             CollisionDetectionSettings.MaximumContactDistance = .1f;
             CollisionDetectionSettings.DefaultMargin = .04f;
             CollisionDetectionSettings.AllowedPenetration = .01f;
+            SolverSettings.DefaultMinimumImpulse = 0.001f;
+
+            //Adjust epsilons back to defaults.
+            Toolbox.Epsilon = 1e-7f;
+            Toolbox.BigEpsilon = 1e-5f;
+            MPRToolbox.DepthRefinementEpsilon = 1e-4f;
+            MPRToolbox.RayCastSurfaceEpsilon = 1e-9f;
+            MPRToolbox.SurfaceEpsilon = 1e-7f;
+            PairSimplex.DistanceConvergenceEpsilon = 1e-7f;
+            PairSimplex.ProgressionEpsilon = 1e-8f;
+
         }
 
         /// <summary>
@@ -139,15 +151,30 @@ namespace BEPUphysicsDemos
         /// <param name="scale">Scale to apply to relevant configuration settings.</param>
         public static void ApplyScale(Space space, float scale)
         {
-            space.DeactivationManager.VelocityLowerLimit *= scale;
-            CollisionResponseSettings.MaximumPenetrationCorrectionSpeed *= scale;
-            CollisionResponseSettings.BouncinessVelocityThreshold *= scale;
-            CollisionResponseSettings.StaticFrictionVelocityThreshold *= scale;
-            CollisionDetectionSettings.ContactInvalidationLength *= scale;
-            CollisionDetectionSettings.ContactMinimumSeparationDistance *= scale;
-            CollisionDetectionSettings.MaximumContactDistance *= scale;
-            CollisionDetectionSettings.DefaultMargin *= scale;
-            CollisionDetectionSettings.AllowedPenetration *= scale;
+            //Set all values to default values * scale.
+            space.DeactivationManager.VelocityLowerLimit = 0.26f * scale;
+            CollisionResponseSettings.MaximumPenetrationCorrectionSpeed = 2 * scale;
+            CollisionResponseSettings.BouncinessVelocityThreshold = 1 * scale;
+            CollisionResponseSettings.StaticFrictionVelocityThreshold = .2f * scale;
+            CollisionDetectionSettings.ContactInvalidationLength = .1f * scale;
+            CollisionDetectionSettings.ContactMinimumSeparationDistance = .03f * scale;
+            CollisionDetectionSettings.MaximumContactDistance = .1f * scale;
+            CollisionDetectionSettings.DefaultMargin = .04f * scale;
+            CollisionDetectionSettings.AllowedPenetration = .01f * scale;
+
+            //Adjust epsilons, too.
+            Toolbox.Epsilon = 1e-7f * scale;
+            Toolbox.BigEpsilon = 1e-5f * scale;
+            MPRToolbox.DepthRefinementEpsilon = 1e-4f * scale;
+            MPRToolbox.RayCastSurfaceEpsilon = 1e-9f * scale;
+            MPRToolbox.SurfaceEpsilon = 1e-7f * scale;
+            PairSimplex.DistanceConvergenceEpsilon = 1e-7f * scale;
+            PairSimplex.ProgressionEpsilon = 1e-8f * scale;
+
+            //While not fully a size-related parameter, you may find that adjusting the SolverSettings.DefaultMinimumImpulse can help the simulation quality.
+            //It is related to 'mass scale' instead of 'size scale.'
+            //Heavy or effectively heavy objects will produce higher impulses and early out slower, taking more time than needed.
+            //Light or effectively light objects will produce smaller impulses and early out faster, producing a lower quality result.
         }
     }
 }

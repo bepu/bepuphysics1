@@ -932,7 +932,7 @@ namespace BEPUphysics.Entities
                 float energy = linearVelocity.LengthSquared() + angularVelocity.LengthSquared();
                 if (energy < activityInformation.DeactivationManager.velocityLowerLimitSquared)
                 {
-                    float boost = 1 - energy / (2f * activityInformation.DeactivationManager.velocityLowerLimitSquared);
+                    float boost = 1 - (float)(Math.Sqrt(energy) / (2f * activityInformation.DeactivationManager.velocityLowerLimit));
                     ModifyAngularDamping(boost);
                     ModifyLinearDamping(boost);
                 }

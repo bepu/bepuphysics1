@@ -16,7 +16,8 @@ namespace BEPUphysics.DeactivationManagement
         private int maximumDeactivationAttemptsPerFrame = 100;
         private int deactivationIslandIndex;
 
-        internal float velocityLowerLimitSquared = .07f;
+        internal float velocityLowerLimit = .26f;
+        internal float velocityLowerLimitSquared = .26f * .26f;
         internal float lowVelocityTimeMinimum = 1f;
 
         ///<summary>
@@ -29,11 +30,12 @@ namespace BEPUphysics.DeactivationManagement
         {
             get
             {
-                return (float)Math.Sqrt(velocityLowerLimitSquared);
+                return velocityLowerLimit;
             }
             set
             {
-                velocityLowerLimitSquared = value * value;
+                velocityLowerLimit = Math.Max(0, value);
+                velocityLowerLimitSquared = velocityLowerLimit * velocityLowerLimit;;
             }
         }
 
