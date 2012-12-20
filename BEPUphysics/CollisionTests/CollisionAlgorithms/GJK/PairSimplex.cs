@@ -92,12 +92,14 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms.GJK
     {
         ///<summary>
         /// The baseline amount that a GJK iteration must progress through to avoid exiting.
+        /// Defaults to 1e-8f.
         ///</summary>
-        public static float ProgressionEpsilon = Toolbox.Epsilon * .1f;
+        public static float ProgressionEpsilon = 1e-8f;
         /// <summary>
         /// The baseline amount that an iteration must converge with its distance to avoid exiting.
+        /// Defaults to 1e-7f.
         /// </summary>
-        public static float DistanceConvergenceEpsilon = Toolbox.Epsilon;
+        public static float DistanceConvergenceEpsilon = 1e-7f;
 
         ///<summary>
         /// Simplex as viewed from the local space of A.
