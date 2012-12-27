@@ -1408,7 +1408,7 @@ namespace BEPUutilities
 
 
 
-        
+
 
         #region Miscellaneous
 
@@ -1640,14 +1640,24 @@ namespace BEPUutilities
         {
             float dot;
             Vector3.Dot(ref v1, ref v2, out dot);
-            Vector3 axis;
-            Vector3.Cross(ref v1, ref v2, out axis);
             //For non-normal vectors, the multiplying the axes length squared would be necessary:
             //float w = dot + (float)Math.Sqrt(v1.LengthSquared() * v2.LengthSquared());
             if (dot < -0.9999f) //parallel, opposing direction
-                q = new Quaternion(-v1.Z, v1.Y, v1.X, 0);
+            {
+                //Project onto the plane which has the lowest component magnitude.
+                if (v1.X < v1.Y && v1.X < v1.Z)
+                    q = new Quaternion(0, -v1.Z, v1.Y, 0);
+                else if (v1.Y < v1.Z)
+                    q = new Quaternion(-v1.Z, 0, v1.X, 0);
+                else
+                    q = new Quaternion(-v1.Y, -v1.X, 0, 0);
+            }
             else
+            {
+                Vector3 axis;
+                Vector3.Cross(ref v1, ref v2, out axis);
                 q = new Quaternion(axis.X, axis.Y, axis.Z, dot + 1);
+            }
             q.Normalize();
         }
 
