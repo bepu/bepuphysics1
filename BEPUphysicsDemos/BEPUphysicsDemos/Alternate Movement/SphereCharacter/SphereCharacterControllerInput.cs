@@ -130,7 +130,9 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
                 Vector3 right = Camera.WorldMatrix.Right;
                 totalMovement += gamePadInput.ThumbSticks.Left.Y * new Vector2(forward.X, forward.Z);
                 totalMovement += gamePadInput.ThumbSticks.Left.X * new Vector2(right.X, right.Z);
-                CharacterController.HorizontalMotionConstraint.MovementDirection = Vector2.Normalize(totalMovement);
+
+                CharacterController.HorizontalMotionConstraint.SpeedScale = Math.Min(totalMovement.Length(), 1); //Don't trust the game pad to output perfectly normalized values.
+                CharacterController.HorizontalMotionConstraint.MovementDirection = totalMovement;
 
                 //Jumping
                 if (previousGamePadInput.IsButtonUp(Buttons.LeftStick) && gamePadInput.IsButtonDown(Buttons.LeftStick))
