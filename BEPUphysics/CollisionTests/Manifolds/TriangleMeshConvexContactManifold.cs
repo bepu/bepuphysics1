@@ -154,7 +154,6 @@ namespace BEPUphysics.CollisionTests.Manifolds
 
 
 
-
             if (UseImprovedBoundaryHandling)
             {
 
@@ -251,12 +250,14 @@ namespace BEPUphysics.CollisionTests.Manifolds
                                 //If the current depth was NOT less than the true depth along the corrected normal, then the collision detection system 
                                 //would have picked a different depth, as it finds a reasonable approximation of the minimum penetration!
                                 //As a consequence, this contact will not be active beyond the object's destuckification, because its contact depth will be negative (or very close to it).
-                                
+
                             }
                         }
                     }
                 }
 
+
+              
 
 
                 for (int i = 0; i < edgeContacts.Count; i++)
@@ -287,8 +288,13 @@ namespace BEPUphysics.CollisionTests.Manifolds
 
 
                 }
+
+
+
+
                 for (int i = 0; i < vertexContacts.Count; i++)
                 {
+
                     if (!blockedVertexRegions.Contains(vertexContacts.Elements[i].Vertex))
                     {
                         //If it's not blocked, use the contact as-is without correcting it.
@@ -309,6 +315,9 @@ namespace BEPUphysics.CollisionTests.Manifolds
 
 
                 }
+
+
+
                 blockedEdgeRegions.Clear();
                 blockedVertexRegions.Clear();
                 vertexContacts.Clear();
@@ -418,8 +427,9 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     Vector3.Cross(ref AB, ref AC, out normal);
                     break;
             }
-
-
+            //If the normal is degenerate, just use the uncorrected normal.
+            if (normal.LengthSquared() < Toolbox.Epsilon)
+                normal = uncorrectedNormal;
         }
 
         bool AnalyzeCandidate(ref TriangleIndices indices, TrianglePairTester pairTester, ref ContactData contact)
@@ -429,13 +439,10 @@ namespace BEPUphysics.CollisionTests.Manifolds
                 case VoronoiRegion.A:
                     //Add the contact.
                     VertexContact vertexContact;
+                    GetNormal(ref contact.Normal, out vertexContact.CorrectedNormal);
                     vertexContact.ContactData = contact;
                     vertexContact.Vertex = indices.A;
                     vertexContact.ShouldCorrect = pairTester.ShouldCorrectContactNormal;
-                    //if (vertexContact.ShouldCorrect)
-                    GetNormal(ref contact.Normal, out vertexContact.CorrectedNormal);
-                    //else
-                    //    vertexContact.CorrectedNormal = contact.Normal;
                     vertexContacts.Add(ref vertexContact);
 
                     //Block all of the other voronoi regions.
@@ -444,16 +451,14 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     blockedEdgeRegions.Add(new Edge(indices.A, indices.C));
                     blockedVertexRegions.Add(indices.B);
                     blockedVertexRegions.Add(indices.C);
+
                     break;
                 case VoronoiRegion.B:
                     //Add the contact.
+                    GetNormal(ref contact.Normal, out vertexContact.CorrectedNormal);
                     vertexContact.ContactData = contact;
                     vertexContact.Vertex = indices.B;
                     vertexContact.ShouldCorrect = pairTester.ShouldCorrectContactNormal;
-                    //if (vertexContact.ShouldCorrect)
-                    GetNormal(ref contact.Normal, out vertexContact.CorrectedNormal);
-                    //else
-                    //    vertexContact.CorrectedNormal = contact.Normal;
                     vertexContacts.Add(ref vertexContact);
 
                     //Block all of the other voronoi regions.
@@ -462,16 +467,14 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     blockedEdgeRegions.Add(new Edge(indices.A, indices.C));
                     blockedVertexRegions.Add(indices.A);
                     blockedVertexRegions.Add(indices.C);
+
                     break;
                 case VoronoiRegion.C:
                     //Add the contact.
+                    GetNormal(ref contact.Normal, out vertexContact.CorrectedNormal);
                     vertexContact.ContactData = contact;
                     vertexContact.Vertex = indices.C;
                     vertexContact.ShouldCorrect = pairTester.ShouldCorrectContactNormal;
-                    //if (vertexContact.ShouldCorrect)
-                    GetNormal(ref contact.Normal, out vertexContact.CorrectedNormal);
-                    //else
-                    //    vertexContact.CorrectedNormal = contact.Normal;
                     vertexContacts.Add(ref vertexContact);
 
                     //Block all of the other voronoi regions.
@@ -480,17 +483,15 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     blockedEdgeRegions.Add(new Edge(indices.A, indices.C));
                     blockedVertexRegions.Add(indices.A);
                     blockedVertexRegions.Add(indices.B);
+
                     break;
                 case VoronoiRegion.AB:
                     //Add the contact.
                     EdgeContact edgeContact;
+                    GetNormal(ref contact.Normal, out edgeContact.CorrectedNormal);
                     edgeContact.Edge = new Edge(indices.A, indices.B);
                     edgeContact.ContactData = contact;
                     edgeContact.ShouldCorrect = pairTester.ShouldCorrectContactNormal;
-                    //if (edgeContact.ShouldCorrect)
-                    GetNormal(ref contact.Normal, out edgeContact.CorrectedNormal);
-                    //else
-                    //    edgeContact.CorrectedNormal = contact.Normal;
                     edgeContacts.Add(ref edgeContact);
 
                     //Block all of the other voronoi regions.
@@ -502,13 +503,10 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     break;
                 case VoronoiRegion.AC:
                     //Add the contact.
+                    GetNormal(ref contact.Normal, out edgeContact.CorrectedNormal);
                     edgeContact.Edge = new Edge(indices.A, indices.C);
                     edgeContact.ContactData = contact;
                     edgeContact.ShouldCorrect = pairTester.ShouldCorrectContactNormal;
-                    //if (edgeContact.ShouldCorrect)
-                    GetNormal(ref contact.Normal, out edgeContact.CorrectedNormal);
-                    //else
-                    //    edgeContact.CorrectedNormal = contact.Normal;
                     edgeContacts.Add(ref edgeContact);
 
                     //Block all of the other voronoi regions.
@@ -520,13 +518,10 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     break;
                 case VoronoiRegion.BC:
                     //Add the contact.
+                    GetNormal(ref contact.Normal, out edgeContact.CorrectedNormal);
                     edgeContact.Edge = new Edge(indices.B, indices.C);
                     edgeContact.ContactData = contact;
                     edgeContact.ShouldCorrect = pairTester.ShouldCorrectContactNormal;
-                    //if (edgeContact.ShouldCorrect)
-                    GetNormal(ref contact.Normal, out edgeContact.CorrectedNormal);
-                    //else
-                    //    edgeContact.CorrectedNormal = contact.Normal;
                     edgeContacts.Add(ref edgeContact);
 
                     //Block all of the other voronoi regions.

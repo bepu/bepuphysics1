@@ -44,7 +44,7 @@ namespace BEPUphysicsDemos.Demos
             //This is a little convenience method used to extract vertices and indices from a model.
             //It doesn't do anything special; any approach that gets valid vertices and indices will work.
             TriangleMesh.GetVerticesAndIndicesFromModel(playgroundModel, out staticTriangleVertices, out staticTriangleIndices);
-            var staticMesh = new StaticMesh(staticTriangleVertices, staticTriangleIndices, new AffineTransform(new Vector3(.01f, .01f, .01f), Quaternion.Identity, new Vector3(0, 0, 0)));
+            var staticMesh = new StaticMesh(staticTriangleVertices, staticTriangleIndices, new AffineTransform(new Vector3(0.01f, 0.01f, 0.01f), Quaternion.Identity, new Vector3(0, 0, 0)));
             staticMesh.Sidedness = TriangleSidedness.Counterclockwise;
 
             Space.Add(staticMesh);
