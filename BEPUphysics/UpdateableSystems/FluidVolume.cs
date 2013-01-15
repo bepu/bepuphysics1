@@ -239,7 +239,7 @@ namespace BEPUphysics.UpdateableSystems
 
             UpVector = upVector;
 
-            analyzeCollisionEntryDelegate = AnalyzeCollisionEntry;
+            analyzeCollisionEntryDelegate = AnalyzeEntry;
 
             DensityMultipliers = new Dictionary<Entity, float>();
         }
@@ -268,7 +268,7 @@ namespace BEPUphysics.UpdateableSystems
             surfaceTransform.Position = surfaceTriangles[0][0];
         }
 
-        List<BroadPhaseEntry> collisionEntries = new List<BroadPhaseEntry>();
+        List<BroadPhaseEntry> broadPhaseEntries = new List<BroadPhaseEntry>();
 
         /// <summary>
         /// Applies buoyancy forces to appropriate objects.
@@ -277,7 +277,7 @@ namespace BEPUphysics.UpdateableSystems
         /// <param name="dt">Time since last frame in physical logic.</param>
         void IDuringForcesUpdateable.Update(float dt)
         {
-            QueryAccelerator.GetEntries(boundingBox, collisionEntries);
+            QueryAccelerator.GetEntries(boundingBox, broadPhaseEntries);
             //TODO: Could integrate the entire thing into the collision detection pipeline.  Applying forces
             //in the collision detection pipeline isn't allowed, so there'd still need to be an Updateable involved.
             //However, the broadphase query would be eliminated and the raycasting work would be automatically multithreaded.
@@ -286,15 +286,15 @@ namespace BEPUphysics.UpdateableSystems
 
             //Don't always multithread.  For small numbers of objects, the overhead of using multithreading isn't worth it.
             //Could tune this value depending on platform for better performance.
-            if (collisionEntries.Count > 30 && ThreadManager.ThreadCount > 1)
-                ThreadManager.ForLoop(0, collisionEntries.Count, analyzeCollisionEntryDelegate);
+            if (broadPhaseEntries.Count > 30 && ThreadManager.ThreadCount > 1)
+                ThreadManager.ForLoop(0, broadPhaseEntries.Count, analyzeCollisionEntryDelegate);
             else
-                for (int i = 0; i < collisionEntries.Count; i++)
+                for (int i = 0; i < broadPhaseEntries.Count; i++)
                 {
-                    AnalyzeCollisionEntry(i);
+                    AnalyzeEntry(i);
                 }
 
-            collisionEntries.Clear();
+            broadPhaseEntries.Clear();
 
 
 
@@ -304,9 +304,9 @@ namespace BEPUphysics.UpdateableSystems
         float dt;
         Action<int> analyzeCollisionEntryDelegate;
 
-        void AnalyzeCollisionEntry(int i)
+        void AnalyzeEntry(int i)
         {
-            var entityCollidable = collisionEntries[i] as EntityCollidable;
+            var entityCollidable = broadPhaseEntries[i] as EntityCollidable;
             if (entityCollidable != null && entityCollidable.IsActive && entityCollidable.entity.isDynamic && CollisionRules.collisionRuleCalculator(this, entityCollidable) <= CollisionRule.Normal)
             {
                 bool keepGoing = false;
