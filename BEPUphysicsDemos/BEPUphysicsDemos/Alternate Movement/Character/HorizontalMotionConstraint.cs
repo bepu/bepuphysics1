@@ -196,6 +196,13 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             }
         }
 
+        /// <summary>
+        /// Gets or sets a scaling factor to apply to the maximum speed of the character.
+        /// This is useful when a character does not have 0 or MaximumSpeed target speed, but rather
+        /// intermediate values. A common use case is analog controller sticks.
+        /// </summary>
+        public float SpeedScale { get; set; }
+
         float supportForceFactor = 1;
         /// <summary>
         /// Gets or sets the scaling factor of forces applied to the supporting object if it is a dynamic entity.
@@ -303,6 +310,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             if (!isTryingToMove)
                 maxSpeed = 0;
 
+            maxSpeed *= SpeedScale;
             maxForce *= dt;
 
 
