@@ -261,6 +261,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         public HorizontalMotionConstraint(CharacterController characterController)
         {
             this.character = characterController;
+            SpeedScale = 1;
             CollectInvolvedEntities();
         }
 
