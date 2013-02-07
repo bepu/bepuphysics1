@@ -677,7 +677,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             {
                 Vector3 bonePosition;
 #if !WINDOWS
-            bonePosition = new Vector3();
+                bonePosition = new Vector3();
 #endif
                 bonePosition.X = (float)Math.Cos(anglePerIncrement * i);
                 bonePosition.Y = 0;
@@ -721,6 +721,33 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             }
         }
 
+        void BuildTinyTest(Vector3 position)
+        {
+
+            Bone[] bonesList = new Bone[2];
+
+
+
+            bonesList[0] = new Bone(position + new Vector3(0, 10, 0),
+                     Quaternion.Identity,
+                     0.05f,
+                     0.2f);
+
+            bonesList[1] = new Bone(position + new Vector3(0, 12, 0),
+                     Quaternion.Identity,
+                     0.05f * 100,
+                     0.2f * 100);
+
+
+            Cylinder[] boneEntitiesList = new Cylinder[2];
+            boneEntitiesList[0] = new Cylinder(bonesList[0].Position, bonesList[0].Radius, bonesList[0].Height, 10);
+            boneEntitiesList[1] = new Cylinder(bonesList[1].Position, bonesList[1].Radius, bonesList[1].Height, 10);
+
+            bones.Add(new BoneRelationship(bonesList[0], boneEntitiesList[0]));
+            bones.Add(new BoneRelationship(bonesList[1], boneEntitiesList[1]));
+
+        }
+
         /// <summary>
         /// Constructs a new demo.
         /// </summary>
@@ -757,10 +784,12 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
 
 
             //BuildJointTest(new Vector3(0, 5, 0));
+            //BuildTinyTest(new Vector3(0, 15, 0));
 
             BuildRoboArmThing(new Vector3(0, 5, 0));
 
             BuildRing(new Vector3(0, 10, 8));
+
 
 
             //Create the display objects.

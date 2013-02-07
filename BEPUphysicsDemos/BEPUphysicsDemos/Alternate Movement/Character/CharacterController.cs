@@ -302,7 +302,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             {
                 CorrectContacts();
 
-                bool hadTraction = SupportFinder.HasTraction;
+                bool hadSupport = SupportFinder.HasSupport;
 
                 CollectSupportData();
 
@@ -314,7 +314,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
 
                 //Don't attempt to use an object as support if we are flying away from it (and we were never standing on it to begin with).
-                if (SupportFinder.HasTraction && !hadTraction && verticalVelocity < 0)
+                if (SupportFinder.HasSupport && !hadSupport && verticalVelocity < 0)
                 {
                     SupportFinder.ClearSupportData();
                     supportData = new SupportData();
