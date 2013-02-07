@@ -60,7 +60,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         public float MinimumDistance
         {
             get { return minimumDistance; }
-            set { minimumDistance = Math.Max(0, value); }
+            set { minimumDistance = value; }
         }
 
          private float maximumDistance;
@@ -70,7 +70,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         public float MaximumDistance
         {
             get { return maximumDistance; }
-            set { maximumDistance = Math.Max(0, value); }
+            set { maximumDistance = value; }
         }
 
         /// <summary>

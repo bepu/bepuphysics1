@@ -12,6 +12,7 @@ using BEPUphysics.Paths.PathFollowing;
 using BEPUphysics.Constraints.TwoEntity.Motors;
 using BEPUphysics.CollisionShapes;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework.Input;
 
 namespace BEPUphysicsDemos.Demos
 {
