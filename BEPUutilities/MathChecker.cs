@@ -39,7 +39,7 @@ namespace BEPUutilities
         [Conditional("CHECKMATH")]
         public static void Validate(this Vector3 v)
         {
-            if (IsInvalid(v.X) || IsInvalid(v.Y) || IsInvalid(v.Z))
+            if (IsInvalid(v.LengthSquared()))
             {
                 throw new NotFiniteNumberException("Invalid value.");
             }
@@ -126,7 +126,7 @@ namespace BEPUutilities
         [Conditional("CHECKMATH")]
         public static void Validate(this Quaternion q)
         {
-            if (IsInvalid(q.W) || IsInvalid(q.X) || IsInvalid(q.Y) || IsInvalid(q.Z))
+            if (IsInvalid(q.LengthSquared()))
             {
                 throw new NotFiniteNumberException("Invalid value.");
             }
@@ -173,7 +173,7 @@ namespace BEPUutilities
         public static void Validate(this BoundingSphere b)
         {
             b.Center.Validate();
-            if(IsInvalid(b.Radius))
+            if (IsInvalid(b.Radius))
                 throw new NotFiniteNumberException("Invalid value.");
         }
 
