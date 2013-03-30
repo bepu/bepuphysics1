@@ -83,18 +83,18 @@ namespace BEPUutilities
         /// Identifies the points on the surface of hull.
         /// </summary>
         /// <param name="points">List of points in the set.</param>
-        /// <param name="outputIndices">List of indices composing the triangulated surface of the convex hull.
+        /// <param name="outputTriangleIndices">List of indices composing the triangulated surface of the convex hull.
         /// Each group of 3 indices represents a triangle on the surface of the hull.</param>
         /// <param name="outputSurfacePoints">Unique points on the surface of the convex hull.</param>
-        public static void GetConvexHull(RawList<Vector3> points, RawList<int> outputIndices, IList<Vector3> outputSurfacePoints)
+        public static void GetConvexHull(RawList<Vector3> points, RawList<int> outputTriangleIndices, IList<Vector3> outputSurfacePoints)
         {
-            GetConvexHull(points, outputIndices);
+            GetConvexHull(points, outputTriangleIndices);
 
             var alreadyContainedIndices = CommonResources.GetIntSet();
 
-            for (int i = outputIndices.Count - 1; i >= 0; i--)
+            for (int i = outputTriangleIndices.Count - 1; i >= 0; i--)
             {
-                int index = outputIndices[i];
+                int index = outputTriangleIndices[i];
                 if (!alreadyContainedIndices.Contains(index))
                 {
                     outputSurfacePoints.Add(points[index]);
@@ -111,30 +111,28 @@ namespace BEPUutilities
         /// Identifies the indices of points in a set which are on the outer convex hull of the set.
         /// </summary>
         /// <param name="points">List of points in the set.</param>
-        /// <param name="indices">List of indices composing the triangulated surface of the convex hull.
+        /// <param name="outputTriangleIndices">List of indices composing the triangulated surface of the convex hull.
         /// Each group of 3 indices represents a triangle on the surface of the hull.</param>
-        public static void GetConvexHull(RawList<Vector3> points, RawList<int> triangleIndices)
+        public static void GetConvexHull(RawList<Vector3> points, RawList<int> outputTriangleIndices)
         {
             if (points.Count == 0)
             {
                 throw new Exception("Point set must have volume.");
             }
             RawList<int> outsidePoints = CommonResources.GetIntList();
-            if (outsidePoints.Capacity < points.Count)
-                outsidePoints.Capacity = points.Count;
-            for (int i = 0; i < points.Count; ++i)
-            {
-                outsidePoints.Add(i);
-            }
+            if (outsidePoints.Capacity < points.Count - 4)
+                outsidePoints.Capacity = points.Count - 4;
 
             //Build the initial tetrahedron.
             //It will also give us the location of a point which is guaranteed to be within the
             //final convex hull.  We can use this point to calibrate the winding of triangles.
+            //A set of outside point candidates (all points other than those composing the tetrahedron) will be returned in the outsidePoints list.
+            //That list will then be further pruned by the RemoveInsidePoints call.
             Vector3 insidePoint;
-            ComputeInitialTetrahedron(points, outsidePoints, triangleIndices, out insidePoint);
+            ComputeInitialTetrahedron(points, outsidePoints, outputTriangleIndices, out insidePoint);
 
             //Compute outside points.
-            RemoveInsidePoints(points, triangleIndices, outsidePoints);
+            RemoveInsidePoints(points, outputTriangleIndices, outsidePoints);
 
             var edges = CommonResources.GetIntList();
             var toRemove = CommonResources.GetIntList();
@@ -144,11 +142,11 @@ namespace BEPUutilities
             while (outsidePoints.Count > 0)
             {
                 //While the convex hull is incomplete...
-                for (int k = 0; k < triangleIndices.Count; k += 3)
+                for (int k = 0; k < outputTriangleIndices.Count; k += 3)
                 {
                     //Find the normal of the triangle
                     Vector3 normal;
-                    FindNormal(triangleIndices, points, k, out normal);
+                    FindNormal(outputTriangleIndices, points, k, out normal);
 
                     //Get the furthest point in the direction of the normal.
                     int maxIndexInOutsideList = GetExtremePoint(ref normal, points, outsidePoints);
@@ -157,7 +155,7 @@ namespace BEPUutilities
 
                     //If the point is beyond the current triangle, continue.
                     Vector3 offset;
-                    Vector3.Subtract(ref maximum, ref points.Elements[triangleIndices.Elements[k]], out offset);
+                    Vector3.Subtract(ref maximum, ref points.Elements[outputTriangleIndices.Elements[k]], out offset);
                     float dot;
                     Vector3.Dot(ref normal, ref offset, out dot);
                     if (dot > 0)
@@ -167,22 +165,22 @@ namespace BEPUutilities
                         //Remove any triangles that can see the point, including itself!
                         edges.Clear();
                         toRemove.Clear();
-                        for (int n = triangleIndices.Count - 3; n >= 0; n -= 3)
+                        for (int n = outputTriangleIndices.Count - 3; n >= 0; n -= 3)
                         {
                             //Go through each triangle, if it can be seen, delete it and use maintainEdge on its edges.
-                            if (IsTriangleVisibleFromPoint(triangleIndices, points, n, ref maximum))
+                            if (IsTriangleVisibleFromPoint(outputTriangleIndices, points, n, ref maximum))
                             {
                                 //This triangle can see it!
                                 //TODO: CONSIDER CONSISTENT WINDING HAPPYTIMES
-                                MaintainEdge(triangleIndices[n], triangleIndices[n + 1], edges);
-                                MaintainEdge(triangleIndices[n], triangleIndices[n + 2], edges);
-                                MaintainEdge(triangleIndices[n + 1], triangleIndices[n + 2], edges);
+                                MaintainEdge(outputTriangleIndices[n], outputTriangleIndices[n + 1], edges);
+                                MaintainEdge(outputTriangleIndices[n], outputTriangleIndices[n + 2], edges);
+                                MaintainEdge(outputTriangleIndices[n + 1], outputTriangleIndices[n + 2], edges);
                                 //Because fast removals are being used, the order is very important.
                                 //It's pulling indices in from the end of the list in order, and also ensuring
                                 //that we never issue a removal order beyond the end of the list.
-                                triangleIndices.FastRemoveAt(n + 2);
-                                triangleIndices.FastRemoveAt(n + 1);
-                                triangleIndices.FastRemoveAt(n);
+                                outputTriangleIndices.FastRemoveAt(n + 2);
+                                outputTriangleIndices.FastRemoveAt(n + 1);
+                                outputTriangleIndices.FastRemoveAt(n);
 
                             }
                         }
@@ -196,11 +194,11 @@ namespace BEPUutilities
                         }
                         //Only verify the windings of the new triangles.
                         VerifyWindings(newTriangles, points, ref insidePoint);
-                        triangleIndices.AddRange(newTriangles);
+                        outputTriangleIndices.AddRange(newTriangles);
                         newTriangles.Clear();
 
                         //Remove all points from the outsidePoints if they are inside the polyhedron
-                        RemoveInsidePoints(points, triangleIndices, outsidePoints);
+                        RemoveInsidePoints(points, outputTriangleIndices, outsidePoints);
 
                         //The list has been significantly messed with, so restart the loop.
                         break;
@@ -283,7 +281,7 @@ namespace BEPUutilities
             }
         }
 
-        private static void ComputeInitialTetrahedron(RawList<Vector3> points, RawList<int> outsidePoints, RawList<int> triangleIndices, out Vector3 centroid)
+        private static void ComputeInitialTetrahedron(RawList<Vector3> points, RawList<int> outsidePointCandidates, RawList<int> triangleIndices, out Vector3 centroid)
         {
             //Find four points on the hull.
             //We'll start with using the x axis to identify two points on the hull.
@@ -416,6 +414,29 @@ namespace BEPUutilities
                     triangleIndices.Elements[i + 1] = temp;
                 }
             }
+
+            //Points which belong to the tetrahedra are guaranteed to be 'in' the convex hull. Do not allow them to be considered.
+            var tetrahedronIndices = CommonResources.GetIntList();
+            tetrahedronIndices.Add(a);
+            tetrahedronIndices.Add(b);
+            tetrahedronIndices.Add(c);
+            tetrahedronIndices.Add(d);
+            //Sort the indices to allow a linear time loop.
+            Array.Sort(tetrahedronIndices.Elements, 0, 4);
+            int tetrahedronIndex = 0;
+            for (int i = 0; i < points.Count; ++i)
+            {
+                if (tetrahedronIndex < 4 && i == tetrahedronIndices[tetrahedronIndex])
+                {
+                    //Don't add a tetrahedron index. Now that we've found this index, though, move on to the next one.
+                    ++tetrahedronIndex;
+                }
+                else
+                {
+                    outsidePointCandidates.Add(i);
+                }
+            }
+            CommonResources.GiveBack(tetrahedronIndices);
         }
 
         private static void RemoveInsidePoints(RawList<Vector3> points, RawList<int> triangleIndices, RawList<int> outsidePoints)

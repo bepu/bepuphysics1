@@ -1,4 +1,6 @@
-﻿using BEPUphysics.Entities.Prefabs;
+﻿using System;
+using System.Collections.Generic;
+using BEPUphysics.Entities.Prefabs;
 using BEPUutilities;
 using BEPUutilities.DataStructures;
 using Microsoft.Xna.Framework;
@@ -10,7 +12,7 @@ using BEPUphysics.Materials;
 namespace BEPUphysicsDemos.Demos.Extras.Tests
 {
     /// <summary>
-    /// Demo showing a wall of blocks stacked up.
+    /// Demo testing convex hulls.
     /// </summary>
     public class ConvexHullTestDemo : StandardDemo
     {
@@ -21,6 +23,21 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
         public ConvexHullTestDemo(DemosGame game)
             : base(game)
         {
+
+            var random = new Random(0);
+
+            for (int i = 0; i < 500000; ++i)
+            {
+                List<Vector3> points = new List<Vector3>();
+                for (int k = 0; k < random.Next(8, 30); k++)
+                {
+                    points.Add(new Vector3(3 * (float)random.NextDouble(), 5 * (float)random.NextDouble(), 3 * (float)random.NextDouble()));
+                }
+                var convexHull = new ConvexHull(new Vector3(0, 7, 0), points, 10);
+                //Space.Add(convexHull);
+            }
+
+
             var vertices = new[] 
             { 
                 new Vector3(0, -1.750886E-9f, -1.5f),
@@ -29,6 +46,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                 new Vector3(-1, 1, 0.5f), 
                 new Vector3(-1, -1, 0.5f), 
             };
+
+
             RawList<Vector3> hullVertices = new RawList<Vector3>();
             ConvexHullHelper.GetConvexHull(vertices, hullVertices);
 
