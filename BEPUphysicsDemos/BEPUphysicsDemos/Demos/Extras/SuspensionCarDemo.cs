@@ -25,6 +25,7 @@ namespace BEPUphysicsDemos.Demos.Extras
         private readonly RevoluteMotor drivingMotor2;
         private readonly RevoluteMotor steeringMotor1;
         private readonly RevoluteMotor steeringMotor2;
+
         private float driveSpeed = 70;
         private float maximumTurnAngle = MathHelper.Pi * .2f;
 
@@ -182,7 +183,7 @@ namespace BEPUphysicsDemos.Demos.Extras
             //Laying a revolute limit on top of it can help mitigate the problem.
             var steeringConstraint = new RevoluteLimit(body, wheel, Vector3.Up, Vector3.Right, -maximumTurnAngle, maximumTurnAngle);
 
-
+    
             //Add the wheel and connection to the space.
             Space.Add(wheel);
             Space.Add(pointOnLineJoint);
@@ -253,7 +254,7 @@ namespace BEPUphysicsDemos.Demos.Extras
                 //Face forward
                 steeringMotor1.Settings.Servo.Goal = 0;
                 steeringMotor2.Settings.Servo.Goal = 0;
-            }
+            } 
 
             base.Update(dt);
         }
