@@ -301,6 +301,7 @@
     <Compile Include="OtherSpaceStages\IDeferredEventCreatorOwner.cs" />
     <Compile Include="OtherSpaceStages\IForceUpdateable.cs" />
     <Compile Include="OtherSpaceStages\SpaceObjectBuffer.cs" />
+    <Compile Include="PhysicsChecker.cs" />
     <Compile Include="PhysicsResources.cs" />
     <Compile Include="PositionUpdating\ContinuousPositionUpdater.cs" />
     <Compile Include="PositionUpdating\ICCDPositionUpdateable.cs" />

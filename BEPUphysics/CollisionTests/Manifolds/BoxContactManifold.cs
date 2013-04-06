@@ -75,11 +75,13 @@ namespace BEPUphysics.CollisionTests.Manifolds
                             if (contacts.Elements[i].Id == manifoldPointer[j].Id)
                             {
                                 found = true;
+                                contacts.Elements[i].Validate();
                                 //Update contact...
                                 contacts.Elements[i].Position = manifoldPointer[j].Position;
                                 contacts.Elements[i].PenetrationDepth = -manifoldPointer[j].Depth;
                                 contacts.Elements[i].Normal = axis;
                                 //Remove manifold entry
+                                contacts.Elements[i].Validate();
                                 manifold.RemoveAt(j);
                                 break;
                             }
@@ -145,6 +147,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                             contacts.Elements[i].Position = data.Position;
                             contacts.Elements[i].PenetrationDepth = -data.Depth;
                             contacts.Elements[i].Normal = axis;
+                            contacts.Elements[i].Validate();
                             //Remove manifold entry
                             manifold.RemoveAt(j);
                             break;

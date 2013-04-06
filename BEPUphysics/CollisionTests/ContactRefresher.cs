@@ -24,6 +24,7 @@ namespace BEPUphysics.CollisionTests
 
             for (int k = 0; k < contacts.Count; k++)
             {
+                contacts.Elements[k].Validate();
                 ContactSupplementData data = supplementData.Elements[k];
                 Vector3 newPosA, newPosB;
                 RigidTransform.Transform(ref data.LocalOffsetA, ref transformA, out newPosA);
@@ -63,6 +64,7 @@ namespace BEPUphysics.CollisionTests
                         //RigidTransform.TransformByInverse(ref newPos, ref transformA, out data.LocalOffsetA);
                         //RigidTransform.TransformByInverse(ref newPos, ref transformB, out data.LocalOffsetB);
                     }
+                    contacts.Elements[k].Validate();
                 }
                
             }

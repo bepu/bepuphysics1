@@ -196,6 +196,8 @@ namespace BEPUphysics.CollisionTests.Manifolds
 
                     Matrix3x3.Transform(ref newContact.Normal, ref orientation, out newContact.Normal);
 
+                    newContact.Validate();
+
                     //Do not yet create a new contact.  Check to see if an 'inner contact' with id == 2 already exists.
                     bool addContact = true;
                     for (int i = 0; i < contacts.Count; i++)

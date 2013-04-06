@@ -198,6 +198,7 @@
     <Compile Include="EntityStateManagement\MotionState.cs" />
     <Compile Include="ISpace.cs" />
     <Compile Include="ISpaceObject.cs" />
+    <Compile Include="PhysicsChecker.cs" />
     <Compile Include="MultithreadedProcessingStage.cs" />
     <Compile Include="NarrowPhaseSystems\NarrowPhasePairFactory.cs" />
     <Compile Include="NarrowPhaseSystems\Pairs\CompoundGroupPairHandler.cs" />
