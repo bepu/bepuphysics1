@@ -34,11 +34,12 @@ namespace BEPUphysics.CollisionTests
 
 
         ///<summary>
-        /// Sets upt he contact with new information.
+        /// Sets up the contact with new information.
         ///</summary>
         ///<param name="candidate">Contact data to initialize the contact with.</param>
         public void Setup(ref ContactData candidate)
         {
+            candidate.Validate();
             Position = candidate.Position;
             Normal = candidate.Normal;
             PenetrationDepth = candidate.PenetrationDepth;

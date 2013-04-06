@@ -65,6 +65,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                 }
                 else if (previouslyColliding)
                 {
+                    contactData.Validate();
                     contact.Normal = contactData.Normal;
                     contact.PenetrationDepth = contactData.PenetrationDepth;
                     contact.Position = contactData.Position;
@@ -81,6 +82,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
 
         protected override void Add(ref ContactData contactCandidate)
         {
+            contactCandidate.Validate();
             contact.Normal = contactCandidate.Normal;
             contact.PenetrationDepth = contactCandidate.PenetrationDepth;
             contact.Position = contactCandidate.Position;

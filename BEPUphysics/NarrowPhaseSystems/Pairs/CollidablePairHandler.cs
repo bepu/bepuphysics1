@@ -134,6 +134,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
 
         protected virtual void OnContactAdded(Contact contact)
         {
+            contact.Validate();
             //Children manage the addition of the contact to the constraint, if any.
             if (!suppressEvents)
             {

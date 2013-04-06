@@ -568,7 +568,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
 
         private bool IsContactUnique(ref ContactData contactCandidate)
         {
-
+            contactCandidate.Validate();
             float distanceSquared;
             RigidTransform meshTransform = MeshTransform;
             for (int i = 0; i < contacts.Count; i++)

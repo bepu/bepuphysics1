@@ -113,6 +113,7 @@ namespace BEPUphysics.Constraints.Collision
         ///<param name="contact">Contact to add.</param>
         public override void AddContact(Contact contact)
         {
+            contact.Validate();
             var penetrationConstraint = penetrationConstraintPool.Pop();
             penetrationConstraint.Setup(this, contact);
             penetrationConstraints.Add(penetrationConstraint);

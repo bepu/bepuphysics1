@@ -107,7 +107,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
             if (candidates.Count == 0 & terrain.thickness > 0)
             {
                 RayHit rayHit;
-                Ray ray = new Ray() { Position = convex.worldTransform.Position, Direction = terrain.worldTransform.LinearTransform.Up };
+                Ray ray = new Ray { Position = convex.worldTransform.Position, Direction = terrain.worldTransform.LinearTransform.Up };
                 ray.Direction.Normalize();
                 //The raycast has to use doublesidedness, since we're casting from the bottom up.
                 if (terrain.Shape.RayCast(ref ray, terrain.thickness, ref terrain.worldTransform, TriangleSidedness.DoubleSided, out rayHit))
@@ -117,13 +117,14 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     float dot;
                     Vector3.Dot(ref ray.Direction, ref rayHit.Normal, out dot);
 
-                    ContactData newContact = new ContactData()
+                    var newContact = new ContactData
                     {
                         Normal = rayHit.Normal,
                         Position = convex.worldTransform.Position,
                         Id = 2,
                         PenetrationDepth = -rayHit.T * dot + convex.Shape.minimumRadius
                     };
+                    newContact.Validate();
                     bool found = false;
                     for (int i = 0; i < contacts.Count; i++)
                     {

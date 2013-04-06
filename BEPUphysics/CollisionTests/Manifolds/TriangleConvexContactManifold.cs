@@ -158,7 +158,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
 
         private bool IsContactUnique(ref ContactData contactCandidate)
         {
-
+            contactCandidate.Validate();
             float distanceSquared;
             for (int i = 0; i < contacts.Count; i++)
             {
