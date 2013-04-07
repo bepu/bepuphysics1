@@ -33,7 +33,7 @@ namespace BEPUphysics.BroadPhaseEntries.Events
             }
             else
             {
-                throw new Exception("Cannot use a CompoundEventManager with anything but a CompoundCollidable.");
+                throw new InvalidOperationException("Cannot use a CompoundEventManager with anything but a CompoundCollidable.");
             }
             base.DispatchEvents();
         }

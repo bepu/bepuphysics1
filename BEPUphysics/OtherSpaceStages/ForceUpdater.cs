@@ -107,7 +107,7 @@ namespace BEPUphysics.OtherSpaceStages
                     dynamicObjects.Add(forceUpdateable);
             }
             else
-                throw new Exception("Cannot add updateable; it already belongs to another manager.");
+                throw new ArgumentException("Cannot add updateable; it already belongs to another manager.");
         }
         ///<summary>
         /// Removes a force updateable from the force updater.
@@ -119,11 +119,11 @@ namespace BEPUphysics.OtherSpaceStages
             if (forceUpdateable.ForceUpdater == this)
             {
                 if (forceUpdateable.IsDynamic && !dynamicObjects.Remove(forceUpdateable))
-                    throw new Exception("Dynamic object not present in dynamic objects list; ensure that the IForceUpdateable was never removed from the list improperly by using ForceUpdateableBecomingKinematic.");
+                    throw new InvalidOperationException("Dynamic object not present in dynamic objects list; ensure that the IForceUpdateable was never removed from the list improperly by using ForceUpdateableBecomingKinematic.");
                 forceUpdateable.ForceUpdater = null;
             }
             else
-                throw new Exception("Cannot remove updateable; it does not belong to this manager.");
+                throw new ArgumentException("Cannot remove updateable; it does not belong to this manager.");
         }
 
         /// <summary>
@@ -138,7 +138,7 @@ namespace BEPUphysics.OtherSpaceStages
                 dynamicObjects.Add(updateable);
             }
             else
-                throw new Exception("Updateable does not belong to this manager.");
+                throw new ArgumentException("Updateable does not belong to this manager.");
         }
         /// <summary>
         /// Notifies the system that a force updateable is becoming kinematic.
@@ -150,10 +150,10 @@ namespace BEPUphysics.OtherSpaceStages
             if (updateable.ForceUpdater == this)
             {
                 if (!dynamicObjects.Remove(updateable))
-                    throw new Exception("Dynamic object not present in dynamic objects list; ensure that the IVelocityUpdateable was never removed from the list improperly by using VelocityUpdateableBecomingKinematic.");
+                    throw new InvalidOperationException("Dynamic object not present in dynamic objects list; ensure that the IVelocityUpdateable was never removed from the list improperly by using VelocityUpdateableBecomingKinematic.");
             }
             else
-                throw new Exception("Updateable does not belong to this manager.");
+                throw new ArgumentException("Updateable does not belong to this manager.");
         }
     }
 }

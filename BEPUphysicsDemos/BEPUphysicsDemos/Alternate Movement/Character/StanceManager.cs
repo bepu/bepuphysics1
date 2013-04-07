@@ -22,7 +22,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             set
             {
                 if (value <= 0 || value < CrouchingHeight)
-                    throw new Exception("Standing height must be positive and greater than the crouching height.");
+                    throw new ArgumentException("Standing height must be positive and greater than the crouching height.");
                 standingHeight = value;
                 //Notify the query manager of the change.
                 character.QueryManager.UpdateQueryShapes();
@@ -45,7 +45,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             set
             {
                 if (value <= 0 || value > StandingHeight)
-                    throw new Exception("Crouching height must be positive and less than the standing height.");
+                    throw new ArgumentException("Crouching height must be positive and less than the standing height.");
                 crouchingHeight = value;
                 character.QueryManager.UpdateQueryShapes();
 
@@ -89,7 +89,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             if (crouchingHeight < standingHeight)
                 this.crouchingHeight = StandingHeight * .7f;
             else
-                throw new Exception("Crouching height must be less than standing height.");
+                throw new ArgumentException("Crouching height must be less than standing height.");
         }
 
         /// <summary>

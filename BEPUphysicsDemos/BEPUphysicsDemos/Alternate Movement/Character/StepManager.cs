@@ -26,7 +26,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             set
             {
                 if (maximumStepHeight < 0)
-                    throw new Exception("Value must be nonnegative.");
+                    throw new ArgumentException("Value must be nonnegative.");
                 maximumStepHeight = value;
             }
         }
@@ -45,7 +45,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             set
             {
                 if (minimumDownStepHeight < 0)
-                    throw new Exception("Value must be nonnegative.");
+                    throw new ArgumentException("Value must be nonnegative.");
                 minimumDownStepHeight = value;
             }
         }

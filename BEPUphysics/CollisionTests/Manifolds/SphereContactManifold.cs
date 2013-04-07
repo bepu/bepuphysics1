@@ -112,7 +112,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
 
             if (sphereA == null || sphereB == null)
             {
-                throw new Exception("Inappropriate types used to initialize pair.");
+                throw new ArgumentException("Inappropriate types used to initialize pair.");
             }
 
         }

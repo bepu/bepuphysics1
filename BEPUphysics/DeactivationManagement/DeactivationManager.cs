@@ -53,7 +53,7 @@ namespace BEPUphysics.DeactivationManagement
             set
             {
                 if (value <= 0)
-                    throw new Exception("Must use a positive, non-zero value for deactivation time minimum.");
+                    throw new ArgumentException("Must use a positive, non-zero value for deactivation time minimum.");
                 lowVelocityTimeMinimum = value;
             }
         }
@@ -178,7 +178,7 @@ namespace BEPUphysics.DeactivationManagement
                 }
             }
             else
-                throw new Exception("Cannot add that member to this DeactivationManager; it already belongs to a manager.");
+                throw new ArgumentException("Cannot add that member to this DeactivationManager; it already belongs to a manager.");
         }
 
         /// <summary>
@@ -211,7 +211,7 @@ namespace BEPUphysics.DeactivationManagement
 
             }
             else
-                throw new Exception("Cannot remove that member from this DeactivationManager; it belongs to a different or no manager.");
+                throw new ArgumentException("Cannot remove that member from this DeactivationManager; it belongs to a different or no manager.");
         }
 
         Action<int> multithreadedCandidacyLoopDelegate;
@@ -259,7 +259,7 @@ namespace BEPUphysics.DeactivationManagement
             set
             {
                 if (value > 1 || value < 0)
-                    throw new Exception("Value must be from zero to one.");
+                    throw new ArgumentException("Value must be from zero to one.");
                 maximumSplitAttemptsFraction = value;
             }
         }
@@ -277,7 +277,7 @@ namespace BEPUphysics.DeactivationManagement
             set
             {
                 if (value >= 0)
-                    throw new Exception("Minimum split count must be nonnegative.");
+                    throw new ArgumentException("Minimum split count must be nonnegative.");
                 minimumSplitAttempts = value;
             }
         }
@@ -716,7 +716,7 @@ namespace BEPUphysics.DeactivationManagement
         {
             if (member.SimulationIsland != null)
             {
-                throw new Exception("Cannot initialize member's simulation island; it already has one.");
+                throw new ArgumentException("Cannot initialize member's simulation island; it already has one.");
             }
             if (member.connections.Count > 0)
             {

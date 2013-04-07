@@ -35,7 +35,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                 convex = entryB as ConvexCollidable;
                 if (convex == null)
                 {
-                    throw new Exception("Incorrect types passed to pair handler.");
+                    throw new ArgumentException("Incorrect types passed to pair handler.");
                 }
             }
         }

@@ -64,7 +64,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
 
             if (boxA == null || boxB == null)
             {
-                throw new Exception("Inappropriate types used to initialize pair.");
+                throw new ArgumentException("Inappropriate types used to initialize pair.");
             }
 
             base.Initialize(entryA, entryB);

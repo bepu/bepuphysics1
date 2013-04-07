@@ -51,7 +51,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
                 if (value > 0)
                     inverseMass = 1 / value;
                 else
-                    throw new Exception("Mass must be positive.");
+                    throw new ArgumentException("Mass must be positive.");
                 ComputeLocalInertiaTensor();
             }
         }

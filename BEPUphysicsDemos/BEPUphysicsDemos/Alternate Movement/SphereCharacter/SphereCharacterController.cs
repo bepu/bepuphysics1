@@ -55,7 +55,7 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
             set
             {
                 if (value < 0)
-                    throw new Exception("Value must be nonnegative.");
+                    throw new ArgumentException("Value must be nonnegative.");
                 jumpSpeed = value;
             }
         }
@@ -72,7 +72,7 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
             set
             {
                 if (value < 0)
-                    throw new Exception("Value must be nonnegative.");
+                    throw new ArgumentException("Value must be nonnegative.");
                 slidingJumpSpeed = value;
             }
         }
@@ -89,7 +89,7 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
             set
             {
                 if (value < 0)
-                    throw new Exception("Value must be nonnegative.");
+                    throw new ArgumentException("Value must be nonnegative.");
                 jumpForceFactor = value;
             }
         }

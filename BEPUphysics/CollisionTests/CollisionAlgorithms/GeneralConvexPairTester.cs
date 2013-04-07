@@ -140,8 +140,6 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 intersecting = GJKToolbox.GetClosestPoints(collidableA.Shape, collidableB.Shape, ref collidableA.worldTransform, ref collidableB.worldTransform, ref preInitializedSimplex, out closestA, out closestB);
             }
 
-            Vector3 displacement;
-            Vector3.Subtract(ref closestB, ref closestA, out displacement);
             if (intersecting)
             //if (OldGJKVerifier.GetClosestPointsBetweenObjects(informationA.Shape, informationB.Shape, ref informationA.worldTransform, ref informationB.worldTransform, 0, 0, out closestA, out closestB))
             {
@@ -149,6 +147,8 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 return DoDeepContact(out contact);
             }
 
+            Vector3 displacement;
+            Vector3.Subtract(ref closestB, ref closestA, out displacement);
             localDirection = displacement; //Use this as the direction for future deep contacts.
             float distanceSquared = displacement.LengthSquared();
             float margin = collidableA.Shape.collisionMargin + collidableB.Shape.collisionMargin;
@@ -166,6 +166,8 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
                 Vector3.Add(ref closestA, ref contact.Position, out contact.Position); //A + t * AB.
 
+                if (distanceSquared < Toolbox.Epsilon * 1e-3f)
+                    displacement = displacement;
 
                 contact.Normal = displacement;
                 float distance = (float)Math.Sqrt(distanceSquared);

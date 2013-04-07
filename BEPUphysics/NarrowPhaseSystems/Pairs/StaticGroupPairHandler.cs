@@ -35,7 +35,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                 staticGroup = entryB as StaticGroup;
                 if (staticGroup == null)
                 {
-                    throw new Exception("Inappropriate types used to initialize pair.");
+                    throw new ArgumentException("Inappropriate types used to initialize pair.");
                 }
             }
 

@@ -44,7 +44,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             {
                 mesh = entryB as MobileMeshCollidable;
                 if (mesh == null)
-                    throw new Exception("Invalid types used to initialize pair handler.");
+                    throw new ArgumentException("Invalid types used to initialize pair handler.");
             }
 
         }

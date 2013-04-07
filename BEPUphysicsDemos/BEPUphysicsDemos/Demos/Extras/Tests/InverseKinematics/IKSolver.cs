@@ -150,7 +150,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
                 foreach (var control in controls)
                 {
                     if (control.TargetBone.Pinned)
-                        throw new Exception("Pinned objects cannot be moved by controls.");
+                        throw new InvalidOperationException("Pinned objects cannot be moved by controls.");
                     control.UpdateJacobiansAndVelocityBias();
                     control.ComputeEffectiveMass();
                     control.WarmStart();

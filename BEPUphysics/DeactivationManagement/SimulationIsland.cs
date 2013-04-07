@@ -149,7 +149,7 @@ namespace BEPUphysics.DeactivationManagement
                 }
             }
             else
-                throw new Exception("Member either is not dynamic or already has a simulation island; cannot add.");
+                throw new ArgumentException("Member either is not dynamic or already has a simulation island; cannot add.");
         }
 
         ///<summary>
@@ -180,7 +180,7 @@ namespace BEPUphysics.DeactivationManagement
                 }
             }
             else
-                throw new Exception("Member does not belong to island; cannot remove.");
+                throw new ArgumentException("Member does not belong to island; cannot remove.");
         }
 
 

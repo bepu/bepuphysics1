@@ -125,7 +125,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         public MinkowskiSumShape(IList<OrientedConvexShapeEntry> shapeEntries)
         {
             if (shapeEntries.Count == 0)
-                throw new Exception("Cannot create a wrapped shape with no contained shapes.");
+                throw new ArgumentException("Cannot create a wrapped shape with no contained shapes.");
             for (int i = 0; i < shapeEntries.Count; i++)
             {
                 shapes.Add(shapeEntries[i]);

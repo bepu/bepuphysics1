@@ -53,7 +53,7 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
             set
             {
                 if (maximumGlueForce < 0)
-                    throw new Exception("Value must be nonnegative.");
+                    throw new ArgumentException("Value must be nonnegative.");
                 maximumGlueForce = value;
             }
         }
@@ -74,7 +74,7 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
             set
             {
                 if (value < 0)
-                    throw new Exception("Value must be nonnegative.");
+                    throw new ArgumentException("Value must be nonnegative.");
                 supportForceFactor = value;
             }
         }

@@ -82,7 +82,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                 sphere = entryA as ConvexCollidable<SphereShape>;
                 if (box == null || sphere == null)
                 {
-                    throw new Exception("Inappropriate types used to initialize pair.");
+                    throw new ArgumentException("Inappropriate types used to initialize pair.");
                 }
             }
 

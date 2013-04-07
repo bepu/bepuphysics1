@@ -42,7 +42,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             {
                 if (value > 0)
                     surfaceEpsilon = value;
-                else throw new Exception("Epsilon must be positive.");
+                else throw new ArgumentException("Epsilon must be positive.");
 
             }
         }
@@ -64,7 +64,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             {
                 if (value > 0)
                     depthRefinementEpsilon = value;
-                else throw new Exception("Epsilon must be positive.");
+                else throw new ArgumentException("Epsilon must be positive.");
 
             }
         }
@@ -85,7 +85,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 if (value > 0)
                     rayCastSurfaceEpsilon = value;
                 else
-                    throw new Exception("Epsilon must be positive.");
+                    throw new ArgumentException("Epsilon must be positive.");
             }
         }
 
@@ -106,7 +106,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             {
                 if (value > 0)
                     maximumDepthRefinementIterations = value;
-                else throw new Exception("Iteration count must be positive.");
+                else throw new ArgumentException("Iteration count must be positive.");
             }
         }
 

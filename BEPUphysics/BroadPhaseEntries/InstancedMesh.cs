@@ -129,7 +129,7 @@ namespace BEPUphysics.BroadPhaseEntries
             {
                 if (value.Owner != null && //Can't use a manager which is owned by a different entity.
                     value != events) //Stay quiet if for some reason the same event manager is being set.
-                    throw new Exception("Event manager is already owned by a mesh; event managers cannot be shared.");
+                    throw new ArgumentException("Event manager is already owned by a mesh; event managers cannot be shared.");
                 if (events != null)
                     events.Owner = null;
                 events = value;

@@ -117,7 +117,7 @@ namespace BEPUutilities
         {
             if (points.Count == 0)
             {
-                throw new Exception("Point set must have volume.");
+                throw new ArgumentException("Point set must have volume.");
             }
             RawList<int> outsidePoints = CommonResources.GetIntList();
             if (outsidePoints.Capacity < points.Count - 4)
@@ -308,7 +308,7 @@ namespace BEPUutilities
             b = maximumXIndex;
             //Check for redundancies..
             if (a == b)
-                throw new Exception("Point set is degenerate; convex hulls must have volume.");
+                throw new ArgumentException("Point set is degenerate; convex hulls must have volume.");
 
             //Now, use a second axis perpendicular to the two points we found.
             Vector3 ab;
@@ -336,7 +336,7 @@ namespace BEPUutilities
 
             //Check for redundancies..
             if (a == c || b == c)
-                throw new Exception("Point set is degenerate; convex hulls must have volume.");
+                throw new ArgumentException("Point set is degenerate; convex hulls must have volume.");
 
             //Use a third axis perpendicular to the plane defined by the three unique points a, b, and c.
             Vector3 ac;
@@ -360,7 +360,7 @@ namespace BEPUutilities
 
             //Check for redundancies..
             if (a == d || b == d || c == d)
-                throw new Exception("Point set is degenerate; convex hulls must have volume.");
+                throw new ArgumentException("Point set is degenerate; convex hulls must have volume.");
 
             //Add the triangles.
             triangleIndices.Add(a);
@@ -403,7 +403,7 @@ namespace BEPUutilities
                 //This volume/cross product could also be used to check for degeneracy, but we already tested for that.
                 if (Math.Abs(volume) < Toolbox.BigEpsilon)
                 {
-                    throw new Exception("Point set is degenerate; convex hulls must have volume.");
+                    throw new ArgumentException("Point set is degenerate; convex hulls must have volume.");
                 }
                 if (volume < 0)
                 {

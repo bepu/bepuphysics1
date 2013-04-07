@@ -260,7 +260,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                 convex = newCollidableB as ConvexCollidable;
                 mesh = newCollidableA as MobileMeshCollidable;
                 if (convex == null || mesh == null)
-                    throw new Exception("Inappropriate types used to initialize contact manifold.");
+                    throw new ArgumentException("Inappropriate types used to initialize contact manifold.");
             }
 
         }
