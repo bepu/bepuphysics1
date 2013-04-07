@@ -116,7 +116,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                 sphere = newCollidableA as ConvexCollidable<SphereShape>;
                 if (box == null || sphere == null)
                 {
-                    throw new Exception("Inappropriate types used to initialize pair.");
+                    throw new ArgumentException("Inappropriate types used to initialize pair.");
                 }
             }
 

@@ -86,7 +86,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             set
             {
                 if (value < 0)
-                    throw new Exception("Value must be nonnegative.");
+                    throw new ArgumentException("Value must be nonnegative.");
                 speed = value;
             }
         }
@@ -104,7 +104,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             set
             {
                 if (value < 0)
-                    throw new Exception("Value must be nonnegative.");
+                    throw new ArgumentException("Value must be nonnegative.");
                 crouchingSpeed = value;
             }
         }
@@ -122,7 +122,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             set
             {
                 if (value < 0)
-                    throw new Exception("Value must be nonnegative.");
+                    throw new ArgumentException("Value must be nonnegative.");
                 slidingSpeed = value;
             }
         }
@@ -140,7 +140,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             set
             {
                 if (value < 0)
-                    throw new Exception("Value must be nonnegative.");
+                    throw new ArgumentException("Value must be nonnegative.");
                 airSpeed = value;
             }
         }
@@ -157,7 +157,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             set
             {
                 if (value < 0)
-                    throw new Exception("Value must be nonnegative.");
+                    throw new ArgumentException("Value must be nonnegative.");
                 maximumForce = value;
             }
         }
@@ -174,7 +174,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             set
             {
                 if (value < 0)
-                    throw new Exception("Value must be nonnegative.");
+                    throw new ArgumentException("Value must be nonnegative.");
                 maximumSlidingForce = value;
             }
         }
@@ -191,7 +191,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             set
             {
                 if (value < 0)
-                    throw new Exception("Value must be nonnegative.");
+                    throw new ArgumentException("Value must be nonnegative.");
                 maximumAirForce = value;
             }
         }
@@ -220,7 +220,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             set
             {
                 if (value < 0)
-                    throw new Exception("Value must be nonnegative.");
+                    throw new ArgumentException("Value must be nonnegative.");
                 supportForceFactor = value;
             }
         }

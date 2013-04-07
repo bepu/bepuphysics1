@@ -36,7 +36,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                 compoundInfo = entryB as CompoundCollidable;
                 if (compoundInfo == null)
                 {
-                    throw new Exception("Inappropriate types used to initialize pair.");
+                    throw new ArgumentException("Inappropriate types used to initialize pair.");
                 }
             }
 

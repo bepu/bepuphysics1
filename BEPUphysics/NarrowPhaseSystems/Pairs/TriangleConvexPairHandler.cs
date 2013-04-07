@@ -68,7 +68,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                 convex = entryA as ConvexCollidable;
 
                 if (triangle == null || convex == null)
-                    throw new Exception("Inappropriate types used to initialize pair.");
+                    throw new ArgumentException("Inappropriate types used to initialize pair.");
             }
 
             //Contact normal goes from A to B.

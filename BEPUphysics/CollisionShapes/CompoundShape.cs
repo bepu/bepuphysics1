@@ -168,7 +168,7 @@ namespace BEPUphysics.CollisionShapes
             }
             else
             {
-                throw new Exception("Compound shape must have at least 1 subshape.");
+                throw new ArgumentException("Compound shape must have at least 1 subshape.");
             }
         }
 
@@ -189,7 +189,7 @@ namespace BEPUphysics.CollisionShapes
             }
             else
             {
-                throw new Exception("Compound shape must have at least 1 subshape.");
+                throw new ArgumentException("Compound shape must have at least 1 subshape.");
             }
         }
 

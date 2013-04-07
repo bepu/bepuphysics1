@@ -34,7 +34,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                 mesh = entryB as StaticMesh;
                 if (mesh == null)
                 {
-                    throw new Exception("Inappropriate types used to initialize pair.");
+                    throw new ArgumentException("Inappropriate types used to initialize pair.");
                 }
             }
 

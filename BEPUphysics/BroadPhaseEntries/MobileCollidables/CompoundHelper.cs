@@ -524,7 +524,7 @@ namespace BEPUphysics.BroadPhaseEntries.MobileCollidables
         public static CompoundCollidable CreatePartialCompoundCollidable(CompoundShape shape, IList<int> childIndices)
         {
             if (childIndices.Count == 0)
-                throw new Exception("Cannot create a compound from zero shapes.");
+                throw new ArgumentException("Cannot create a compound from zero shapes.");
             
             CompoundCollidable compound = new CompoundCollidable();
             Vector3 center = new Vector3();
@@ -542,7 +542,7 @@ namespace BEPUphysics.BroadPhaseEntries.MobileCollidables
             }
             if (totalWeight <= 0)
             {
-                throw new Exception("Compound has zero total weight; invalid configuration.");
+                throw new ArgumentException("Compound has zero total weight; invalid configuration.");
             }
             Vector3.Divide(ref center, totalWeight, out center);
             //Our subset of the compound is not necessarily aligned with the shape's origin.

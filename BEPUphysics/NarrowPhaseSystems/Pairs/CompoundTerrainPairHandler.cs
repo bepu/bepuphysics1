@@ -34,7 +34,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                 terrain = entryB as Terrain;
                 if (terrain == null)
                 {
-                    throw new Exception("Inappropriate types used to initialize pair.");
+                    throw new ArgumentException("Inappropriate types used to initialize pair.");
                 }
             }
 

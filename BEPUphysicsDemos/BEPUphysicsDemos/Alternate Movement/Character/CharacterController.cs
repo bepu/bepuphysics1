@@ -65,7 +65,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             set
             {
                 if (value < 0)
-                    throw new Exception("Value must be nonnegative.");
+                    throw new ArgumentException("Value must be nonnegative.");
                 jumpSpeed = value;
             }
         }
@@ -82,7 +82,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             set
             {
                 if (value < 0)
-                    throw new Exception("Value must be nonnegative.");
+                    throw new ArgumentException("Value must be nonnegative.");
                 slidingJumpSpeed = value;
             }
         }
@@ -99,7 +99,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             set
             {
                 if (value < 0)
-                    throw new Exception("Value must be nonnegative.");
+                    throw new ArgumentException("Value must be nonnegative.");
                 jumpForceFactor = value;
             }
         }
@@ -113,7 +113,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             set
             {
                 if (value <= 0)
-                    throw new Exception("Radius must be positive.");
+                    throw new ArgumentException("Radius must be positive.");
                 Body.CollisionInformation.Shape.Radius = value;
                 //Tell the query manager to update its representation.
                 QueryManager.UpdateQueryShapes();

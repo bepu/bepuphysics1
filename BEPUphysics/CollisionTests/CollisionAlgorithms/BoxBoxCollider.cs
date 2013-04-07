@@ -2800,7 +2800,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                     edgeEndId = 7; //111
                     break;
                 default:
-                    throw new Exception("Invalid index or axis.");
+                    throw new ArgumentException("Invalid index or axis.");
             }
         }
 

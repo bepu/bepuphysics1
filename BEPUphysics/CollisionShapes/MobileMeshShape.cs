@@ -30,7 +30,7 @@ namespace BEPUphysics.CollisionShapes
             set
             {
                 if (value < 0)
-                    throw new Exception("Mesh margin must be nonnegative.");
+                    throw new ArgumentException("Mesh margin must be nonnegative.");
                 meshCollisionMargin = value;
                 OnShapeChanged();
             }

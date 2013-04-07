@@ -56,7 +56,7 @@ namespace BEPUphysics.BroadPhaseSystems
             if (entry.BroadPhase == null)
                 entry.BroadPhase = this;
             else
-                throw new Exception("Cannot add entry; it already belongs to a broad phase.");
+                throw new ArgumentException("Cannot add entry; it already belongs to a broad phase.");
         }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace BEPUphysics.BroadPhaseSystems
             if (entry.BroadPhase == this)
                 entry.BroadPhase = null;
             else
-                throw new Exception("Cannot remove entry; it does not belong to this broad phase.");
+                throw new ArgumentException("Cannot remove entry; it does not belong to this broad phase.");
         }
 
         protected internal void AddOverlap(BroadPhaseOverlap overlap)

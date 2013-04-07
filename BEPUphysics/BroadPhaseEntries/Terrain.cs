@@ -79,7 +79,7 @@ namespace BEPUphysics.BroadPhaseEntries
             {
                 if (value.Owner != null && //Can't use a manager which is owned by a different entity.
                     value != events) //Stay quiet if for some reason the same event manager is being set.
-                    throw new Exception("Event manager is already owned by a Terrain; event managers cannot be shared.");
+                    throw new ArgumentException("Event manager is already owned by a Terrain; event managers cannot be shared.");
                 if (events != null)
                     events.Owner = null;
                 events = value;
@@ -113,7 +113,7 @@ namespace BEPUphysics.BroadPhaseEntries
             set
             {
                 if (value < 0)
-                    throw new Exception("Cannot use a negative thickness value.");
+                    throw new ArgumentException("Cannot use a negative thickness value.");
 
                 //Modify the bounding box to include the new thickness.
                 Vector3 down = Vector3.Normalize(worldTransform.LinearTransform.Down);

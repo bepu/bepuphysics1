@@ -38,7 +38,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                 convexInfo = entryB as ConvexCollidable;
                 if (convexInfo == null)
                 {
-                    throw new Exception("Inappropriate types used to initialize pair.");
+                    throw new ArgumentException("Inappropriate types used to initialize pair.");
                 }
             }
 

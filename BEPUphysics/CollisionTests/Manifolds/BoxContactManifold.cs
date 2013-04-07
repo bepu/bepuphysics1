@@ -221,7 +221,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
 
             if (boxA == null || boxB == null)
             {
-                throw new Exception("Inappropriate types used to initialize pair tester.");
+                throw new ArgumentException("Inappropriate types used to initialize pair tester.");
             }
         }
 

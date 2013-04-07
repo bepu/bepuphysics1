@@ -141,7 +141,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         public WrappedShape(IList<ConvexShapeEntry> shapeEntries)
         {
             if (shapeEntries.Count == 0)
-                throw new Exception("Cannot create a wrapped shape with no contained shapes.");
+                throw new ArgumentException("Cannot create a wrapped shape with no contained shapes.");
             for (int i = 0; i < shapeEntries.Count; i++)
             {
                 shapes.Add(shapeEntries[i]);
@@ -163,7 +163,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         public WrappedShape(IList<ConvexShapeEntry> shapeEntries, out Vector3 center)
         {
             if (shapeEntries.Count == 0)
-                throw new Exception("Cannot create a wrapped shape with no contained shapes.");
+                throw new ArgumentException("Cannot create a wrapped shape with no contained shapes.");
             for (int i = 0; i < shapeEntries.Count; i++)
             {
                 shapes.Add(shapeEntries[i]);

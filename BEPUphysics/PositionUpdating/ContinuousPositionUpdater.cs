@@ -222,7 +222,7 @@ namespace BEPUphysics.PositionUpdating
             }
             else
             {
-                throw new Exception("Cannot add object to Integrator; it already belongs to one.");
+                throw new ArgumentException("Cannot add object to Integrator; it already belongs to one.");
             }
         }
 
@@ -257,7 +257,7 @@ namespace BEPUphysics.PositionUpdating
                     discreteUpdateables.Remove(updateable);
             }
             else
-                throw new Exception("Cannot remove object from this Integrator.  The object doesn't belong to it.");
+                throw new ArgumentException("Cannot remove object from this Integrator.  The object doesn't belong to it.");
         }
     }
 }

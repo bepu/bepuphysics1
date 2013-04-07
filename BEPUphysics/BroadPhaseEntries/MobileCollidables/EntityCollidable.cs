@@ -278,7 +278,7 @@ namespace BEPUphysics.BroadPhaseEntries.MobileCollidables
             {
                 if (value.Owner != null && //Can't use a manager which is owned by a different entity.
                     value != events) //Stay quiet if for some reason the same event manager is being set.
-                    throw new Exception("Event manager is already owned by an entity; event managers cannot be shared.");
+                    throw new ArgumentException("Event manager is already owned by an entity; event managers cannot be shared.");
                 //Must pass on the link to the parent event manager to the new event manager in case we are the child of a compound.
                 CompoundEventManager oldParent = null;
                 if (events != null)
