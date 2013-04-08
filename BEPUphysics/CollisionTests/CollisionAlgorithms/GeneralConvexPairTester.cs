@@ -129,28 +129,27 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             //Vector3.Subtract(ref closestA, ref closestB, out sub);
             //if (sub.LengthSquared() < Toolbox.Epsilon)
 
-            bool intersecting;
             if (UseSimplexCaching)
-                intersecting = GJKToolbox.GetClosestPoints(collidableA.Shape, collidableB.Shape, ref collidableA.worldTransform, ref collidableB.worldTransform, ref cachedSimplex, out closestA, out closestB);
+                GJKToolbox.GetClosestPoints(collidableA.Shape, collidableB.Shape, ref collidableA.worldTransform, ref collidableB.worldTransform, ref cachedSimplex, out closestA, out closestB);
             else
             {
                 //The initialization of the pair creates a pretty decent simplex to start from.
                 //Just don't try to update it.
                 CachedSimplex preInitializedSimplex = cachedSimplex;
-                intersecting = GJKToolbox.GetClosestPoints(collidableA.Shape, collidableB.Shape, ref collidableA.worldTransform, ref collidableB.worldTransform, ref preInitializedSimplex, out closestA, out closestB);
+                GJKToolbox.GetClosestPoints(collidableA.Shape, collidableB.Shape, ref collidableA.worldTransform, ref collidableB.worldTransform, ref preInitializedSimplex, out closestA, out closestB);
             }
+            
+            Vector3 displacement;
+            Vector3.Subtract(ref closestB, ref closestA, out displacement);
+            float distanceSquared = displacement.LengthSquared();
 
-            if (intersecting)
-            //if (OldGJKVerifier.GetClosestPointsBetweenObjects(informationA.Shape, informationB.Shape, ref informationA.worldTransform, ref informationB.worldTransform, 0, 0, out closestA, out closestB))
+            if (distanceSquared < Toolbox.Epsilon)
             {
                 state = CollisionState.DeepContact;
                 return DoDeepContact(out contact);
             }
 
-            Vector3 displacement;
-            Vector3.Subtract(ref closestB, ref closestA, out displacement);
             localDirection = displacement; //Use this as the direction for future deep contacts.
-            float distanceSquared = displacement.LengthSquared();
             float margin = collidableA.Shape.collisionMargin + collidableB.Shape.collisionMargin;
 
 
@@ -165,9 +164,6 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                     contact.Position = new Vector3();
 
                 Vector3.Add(ref closestA, ref contact.Position, out contact.Position); //A + t * AB.
-
-                if (distanceSquared < Toolbox.Epsilon * 1e-3f)
-                    displacement = displacement;
 
                 contact.Normal = displacement;
                 float distance = (float)Math.Sqrt(distanceSquared);
