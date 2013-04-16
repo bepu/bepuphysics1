@@ -42,7 +42,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             {
                 Space.Remove(Space.Entities[i]);
             }
-            SolverSettings.DefaultMinimumIterations = 100;
+            SolverSettings.DefaultMinimumIterationCount = 100;
 
             int width = 15;
             int height = 15;

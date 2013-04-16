@@ -136,10 +136,10 @@ namespace BEPUphysicsDemos.AlternateMovement
                 //performance can be improved at the cost of a little accuracy.
                 //However, because the suspension and friction are not really rigid,
                 //the lowered accuracy is not so much of a problem.
-                wheel.Suspension.SolverSettings.MaximumIterations = 1;
-                wheel.Brake.SolverSettings.MaximumIterations = 1;
-                wheel.SlidingFriction.SolverSettings.MaximumIterations = 1;
-                wheel.DrivingMotor.SolverSettings.MaximumIterations = 1;
+                wheel.Suspension.SolverSettings.MaximumIterationCount = 1;
+                wheel.Brake.SolverSettings.MaximumIterationCount = 1;
+                wheel.SlidingFriction.SolverSettings.MaximumIterationCount = 1;
+                wheel.DrivingMotor.SolverSettings.MaximumIterationCount = 1;
             }
 
             Space = owningSpace;
