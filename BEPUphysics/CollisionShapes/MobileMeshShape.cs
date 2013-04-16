@@ -826,7 +826,7 @@ namespace BEPUphysics.CollisionShapes
             ComputeShapeInformation(this.TriangleMesh.Data as TransformableMeshData, out shapeInfo);
         }
 
-        public override BroadPhaseEntries.MobileCollidables.EntityCollidable GetCollidableInstance()
+        public override EntityCollidable GetCollidableInstance()
         {
             return new MobileMeshCollidable(this);
         }

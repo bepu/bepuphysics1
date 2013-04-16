@@ -41,7 +41,7 @@ namespace BEPUphysicsDemos
             MotionSettings.ConserveAngularMomentum = false;
             MotionSettings.DefaultPositionUpdateMode = PositionUpdateMode.Discrete;
             MotionSettings.UseRk4AngularIntegration = false;
-            SolverSettings.DefaultMinimumIterations = 1;
+            SolverSettings.DefaultMinimumIterationCount = 1;
             space.Solver.IterationLimit = 10;
             GeneralConvexPairTester.UseSimplexCaching = false;
             MotionSettings.UseExtraExpansionForContinuousBoundingBoxes = false;
@@ -92,7 +92,7 @@ namespace BEPUphysicsDemos
         /// </summary>
         public static void ApplySemiSpeedySettings()
         {
-            SolverSettings.DefaultMinimumIterations = 0;
+            SolverSettings.DefaultMinimumIterationCount = 0;
         }
 
         /// <summary>
@@ -104,7 +104,7 @@ namespace BEPUphysicsDemos
         /// <param name="space">Space to configure.</param>
         public static void ApplySuperSpeedySettings(Space space)
         {
-            SolverSettings.DefaultMinimumIterations = 0;
+            SolverSettings.DefaultMinimumIterationCount = 0;
             space.Solver.IterationLimit = 5;
             GeneralConvexPairTester.UseSimplexCaching = true;
         }
@@ -119,7 +119,7 @@ namespace BEPUphysicsDemos
         public static void ApplyMediumHighStabilitySettings(Space space)
         {
             MotionSettings.DefaultPositionUpdateMode = PositionUpdateMode.Continuous;
-            SolverSettings.DefaultMinimumIterations = 2;
+            SolverSettings.DefaultMinimumIterationCount = 2;
             space.Solver.IterationLimit = 15;
 
         }
@@ -137,7 +137,7 @@ namespace BEPUphysicsDemos
         {
             MotionSettings.DefaultPositionUpdateMode = PositionUpdateMode.Continuous;
             MotionSettings.UseExtraExpansionForContinuousBoundingBoxes = true;
-            SolverSettings.DefaultMinimumIterations = 5;
+            SolverSettings.DefaultMinimumIterationCount = 5;
             space.Solver.IterationLimit = 50;
 
         }

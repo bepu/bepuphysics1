@@ -157,10 +157,10 @@ namespace BEPUphysicsDemos.AlternateMovement
 
                 //By default, wheels use as many iterations as the space.  By lowering it,
                 //performance can be improved at the cost of a little accuracy.
-                wheel.Suspension.SolverSettings.MaximumIterations = 1;
-                wheel.Brake.SolverSettings.MaximumIterations = 1;
-                wheel.SlidingFriction.SolverSettings.MaximumIterations = 1;
-                wheel.DrivingMotor.SolverSettings.MaximumIterations = 1;
+                wheel.Suspension.SolverSettings.MaximumIterationCount = 1;
+                wheel.Brake.SolverSettings.MaximumIterationCount = 1;
+                wheel.SlidingFriction.SolverSettings.MaximumIterationCount = 1;
+                wheel.DrivingMotor.SolverSettings.MaximumIterationCount = 1;
             }
 
             Space = owningSpace;

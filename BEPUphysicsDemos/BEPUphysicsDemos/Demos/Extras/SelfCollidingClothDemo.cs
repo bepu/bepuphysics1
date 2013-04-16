@@ -67,7 +67,7 @@ namespace BEPUphysicsDemos.Demos.Extras
                         //Add in column connections for left edge.
                         joint = new BallSocketJoint(lattice[0, j], lattice[0, j + 1], lattice[0, j].Position + new Vector3(-xSpacing / 2, 0, zSpacing / 2));
                         joint.SpringSettings.DampingConstant = damping; joint.SpringSettings.StiffnessConstant = stiffness;
-                        joint.SolverSettings.MaximumIterations = clothIterations;
+                        joint.SolverSettings.MaximumIterationCount = clothIterations;
                         Space.Add(joint);
                     }
                     if (i == numRows - 1 && j + 1 < numColumns)
@@ -75,7 +75,7 @@ namespace BEPUphysicsDemos.Demos.Extras
                         //Add in column connections for right edge.
                         joint = new BallSocketJoint(lattice[numRows - 1, j], lattice[numRows - 1, j + 1], lattice[numRows - 1, j].Position + new Vector3(xSpacing / 2, 0, zSpacing / 2));
                         joint.SpringSettings.DampingConstant = damping; joint.SpringSettings.StiffnessConstant = stiffness;
-                        joint.SolverSettings.MaximumIterations = clothIterations;
+                        joint.SolverSettings.MaximumIterationCount = clothIterations;
                         Space.Add(joint);
                     }
                     if (i + 1 < numRows && j == 0)
@@ -83,7 +83,7 @@ namespace BEPUphysicsDemos.Demos.Extras
                         //Add in row connections for top edge.
                         joint = new BallSocketJoint(lattice[i, 0], lattice[i + 1, 0], lattice[i, 0].Position + new Vector3(xSpacing / 2, 0, -zSpacing / 2));
                         joint.SpringSettings.DampingConstant = damping; joint.SpringSettings.StiffnessConstant = stiffness;
-                        joint.SolverSettings.MaximumIterations = clothIterations;
+                        joint.SolverSettings.MaximumIterationCount = clothIterations;
                         Space.Add(joint);
                     }
                     if (i + 1 < numRows && j == numColumns - 1)
@@ -91,7 +91,7 @@ namespace BEPUphysicsDemos.Demos.Extras
                         //Add in row connections for bottom edge.
                         joint = new BallSocketJoint(lattice[i, numColumns - 1], lattice[i + 1, numColumns - 1], lattice[i, numColumns - 1].Position + new Vector3(xSpacing / 2, 0, zSpacing / 2));
                         joint.SpringSettings.DampingConstant = damping; joint.SpringSettings.StiffnessConstant = stiffness;
-                        joint.SolverSettings.MaximumIterations = clothIterations;
+                        joint.SolverSettings.MaximumIterationCount = clothIterations;
                         Space.Add(joint);
 
                     }
@@ -102,17 +102,17 @@ namespace BEPUphysicsDemos.Demos.Extras
                         //Add in interior connections.
                         joint = new BallSocketJoint(lattice[i, j], lattice[i + 1, j], lattice[i, j].Position + new Vector3(xSpacing / 2, 0, zSpacing / 2));
                         joint.SpringSettings.DampingConstant = damping; joint.SpringSettings.StiffnessConstant = stiffness;
-                        joint.SolverSettings.MaximumIterations = clothIterations;
+                        joint.SolverSettings.MaximumIterationCount = clothIterations;
                         Space.Add(joint);
 
                         joint = new BallSocketJoint(lattice[i, j], lattice[i, j + 1], lattice[i, j].Position + new Vector3(xSpacing / 2, 0, zSpacing / 2));
                         joint.SpringSettings.DampingConstant = damping; joint.SpringSettings.StiffnessConstant = stiffness;
-                        joint.SolverSettings.MaximumIterations = clothIterations;
+                        joint.SolverSettings.MaximumIterationCount = clothIterations;
                         Space.Add(joint);
 
                         joint = new BallSocketJoint(lattice[i, j], lattice[i + 1, j + 1], lattice[i, j].Position + new Vector3(xSpacing / 2, 0, zSpacing / 2));
                         joint.SpringSettings.DampingConstant = damping; joint.SpringSettings.StiffnessConstant = stiffness;
-                        joint.SolverSettings.MaximumIterations = clothIterations;
+                        joint.SolverSettings.MaximumIterationCount = clothIterations;
                         Space.Add(joint);
                     }
 
@@ -121,17 +121,17 @@ namespace BEPUphysicsDemos.Demos.Extras
                         //Add in skipping 'starch' connections.
                         joint = new BallSocketJoint(lattice[i, j], lattice[i + 2, j], lattice[i, j].Position + new Vector3(xSpacing, 0, zSpacing));
                         joint.SpringSettings.DampingConstant = starchDamping; joint.SpringSettings.StiffnessConstant = starchStiffness;
-                        joint.SolverSettings.MaximumIterations = clothIterations;
+                        joint.SolverSettings.MaximumIterationCount = clothIterations;
                         Space.Add(joint);
 
                         joint = new BallSocketJoint(lattice[i, j], lattice[i, j + 2], lattice[i, j].Position + new Vector3(xSpacing, 0, zSpacing));
                         joint.SpringSettings.DampingConstant = starchDamping; joint.SpringSettings.StiffnessConstant = starchStiffness;
-                        joint.SolverSettings.MaximumIterations = clothIterations;
+                        joint.SolverSettings.MaximumIterationCount = clothIterations;
                         Space.Add(joint);
 
                         joint = new BallSocketJoint(lattice[i, j], lattice[i + 2, j + 2], lattice[i, j].Position + new Vector3(xSpacing, 0, zSpacing));
                         joint.SpringSettings.DampingConstant = starchDamping; joint.SpringSettings.StiffnessConstant = starchStiffness;
-                        joint.SolverSettings.MaximumIterations = clothIterations;
+                        joint.SolverSettings.MaximumIterationCount = clothIterations;
                         Space.Add(joint);
                     }
 

@@ -124,12 +124,12 @@ namespace BEPUphysics.Constraints.SolverGroups
 
                 subSolverSettings.currentIterations++;
                 if (subSolverSettings.currentIterations <= solver.iterationLimit &&
-                    subSolverSettings.currentIterations <= subSolverSettings.maximumIterations)
+                    subSolverSettings.currentIterations <= subSolverSettings.maximumIterationCount)
                 {
                     if (item.SolveIteration() < subSolverSettings.minimumImpulse)
                     {
                         subSolverSettings.iterationsAtZeroImpulse++;
-                        if (subSolverSettings.iterationsAtZeroImpulse > subSolverSettings.minimumIterations)
+                        if (subSolverSettings.iterationsAtZeroImpulse > subSolverSettings.minimumIterationCount)
                             item.isActiveInSolver = false;
                         else
                         {

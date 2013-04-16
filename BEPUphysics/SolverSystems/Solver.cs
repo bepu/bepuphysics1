@@ -225,7 +225,7 @@ namespace BEPUphysics.SolverSystems
                     if (updateable.SolveIteration() < solverSettings.minimumImpulse)
                     {
                         solverSettings.iterationsAtZeroImpulse++;
-                        if (solverSettings.iterationsAtZeroImpulse > solverSettings.minimumIterations)
+                        if (solverSettings.iterationsAtZeroImpulse > solverSettings.minimumIterationCount)
                             updateable.isActiveInSolver = false;
                     }
                     else
@@ -240,7 +240,7 @@ namespace BEPUphysics.SolverSystems
                 //Since the updateables only ever go from active to inactive, it's safe to check outside of the lock.
                 //Keeping this if statement out of the lock allows other waiters to get to work a few nanoseconds faster.
                 if (incrementedIterations > iterationLimit ||
-                    incrementedIterations > solverSettings.maximumIterations)
+                    incrementedIterations > solverSettings.maximumIterationCount)
                 {
                     updateable.isActiveInSolver = false;
                 }
@@ -299,12 +299,12 @@ namespace BEPUphysics.SolverSystems
 
                 solverSettings.currentIterations++;
                 if (solverSettings.currentIterations <= iterationLimit &&
-                    solverSettings.currentIterations <= solverSettings.maximumIterations)
+                    solverSettings.currentIterations <= solverSettings.maximumIterationCount)
                 {
                     if (updateable.SolveIteration() < solverSettings.minimumImpulse)
                     {
                         solverSettings.iterationsAtZeroImpulse++;
-                        if (solverSettings.iterationsAtZeroImpulse > solverSettings.minimumIterations)
+                        if (solverSettings.iterationsAtZeroImpulse > solverSettings.minimumIterationCount)
                             updateable.isActiveInSolver = false;
 
                     }

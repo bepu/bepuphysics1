@@ -359,11 +359,11 @@ namespace BEPUphysics.Vehicle
             int numActiveConstraints = 0;
             if (suspension.isActive)
             {
-                if (++suspension.solverSettings.currentIterations <= suspension.solverSettings.maximumIterations)
+                if (++suspension.solverSettings.currentIterations <= suspension.solverSettings.maximumIterationCount)
                     if (Math.Abs(suspension.ApplyImpulse()) < suspension.solverSettings.minimumImpulse)
                     {
                         suspension.numIterationsAtZeroImpulse++;
-                        if (suspension.numIterationsAtZeroImpulse > suspension.solverSettings.minimumIterations)
+                        if (suspension.numIterationsAtZeroImpulse > suspension.solverSettings.minimumIterationCount)
                             suspension.isActive = false;
                         else
                         {
@@ -381,11 +381,11 @@ namespace BEPUphysics.Vehicle
             }
             if (slidingFriction.isActive)
             {
-                if (++slidingFriction.solverSettings.currentIterations <= suspension.solverSettings.maximumIterations)
+                if (++slidingFriction.solverSettings.currentIterations <= suspension.solverSettings.maximumIterationCount)
                     if (Math.Abs(slidingFriction.ApplyImpulse()) < slidingFriction.solverSettings.minimumImpulse)
                     {
                         slidingFriction.numIterationsAtZeroImpulse++;
-                        if (slidingFriction.numIterationsAtZeroImpulse > slidingFriction.solverSettings.minimumIterations)
+                        if (slidingFriction.numIterationsAtZeroImpulse > slidingFriction.solverSettings.minimumIterationCount)
                             slidingFriction.isActive = false;
                         else
                         {
@@ -403,11 +403,11 @@ namespace BEPUphysics.Vehicle
             }
             if (drivingMotor.isActive)
             {
-                if (++drivingMotor.solverSettings.currentIterations <= suspension.solverSettings.maximumIterations)
+                if (++drivingMotor.solverSettings.currentIterations <= suspension.solverSettings.maximumIterationCount)
                     if (Math.Abs(drivingMotor.ApplyImpulse()) < drivingMotor.solverSettings.minimumImpulse)
                     {
                         drivingMotor.numIterationsAtZeroImpulse++;
-                        if (drivingMotor.numIterationsAtZeroImpulse > drivingMotor.solverSettings.minimumIterations)
+                        if (drivingMotor.numIterationsAtZeroImpulse > drivingMotor.solverSettings.minimumIterationCount)
                             drivingMotor.isActive = false;
                         else
                         {
@@ -425,11 +425,11 @@ namespace BEPUphysics.Vehicle
             }
             if (brake.isActive)
             {
-                if (++brake.solverSettings.currentIterations <= suspension.solverSettings.maximumIterations)
+                if (++brake.solverSettings.currentIterations <= suspension.solverSettings.maximumIterationCount)
                     if (Math.Abs(brake.ApplyImpulse()) < brake.solverSettings.minimumImpulse)
                     {
                         brake.numIterationsAtZeroImpulse++;
-                        if (brake.numIterationsAtZeroImpulse > brake.solverSettings.minimumIterations)
+                        if (brake.numIterationsAtZeroImpulse > brake.solverSettings.minimumIterationCount)
                             brake.isActive = false;
                         else
                         {

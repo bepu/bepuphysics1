@@ -173,7 +173,7 @@ namespace BEPUphysics.Constraints.Collision
             else
                 entryB = 0;
 
-            velocityToImpulse = -1 / (entryA + entryB); //Softness?
+            velocityToImpulse = -1 / (CollisionResponseSettings.Softness + entryA + entryB);
 
 
             //Bounciness and bias (penetration correction)
@@ -263,7 +263,7 @@ namespace BEPUphysics.Constraints.Collision
         {
 
             //Compute relative velocity
-            float lambda = (RelativeVelocity - bias) * velocityToImpulse; //convert to impulse
+            float lambda = (RelativeVelocity - bias + CollisionResponseSettings.Softness * accumulatedImpulse) * velocityToImpulse;
 
             //Clamp accumulated impulse
             float previousAccumulatedImpulse = accumulatedImpulse;
