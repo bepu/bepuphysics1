@@ -115,6 +115,7 @@
     <Compile Include="Demos\Extras\Tests\BroadPhaseMultithreadingTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\BroadPhaseRemovalTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\BroadPhasesTestDemo.cs" />
+    <Compile Include="Demos\Extras\Tests\CharacterStressierTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\CharacterStressTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\ConvexHullTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\GeneralConvexPairStressDemo.cs" />
