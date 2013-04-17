@@ -39,7 +39,7 @@ namespace BEPUphysicsDemos.Demos
             //This avoids the performance problem!
 
             //To demonstrate, we'll be creating a set of static objects and giving them to a group to manage.
-            List<Collidable> collidables = new List<Collidable>();
+            var collidables = new List<Collidable>();
 
             //Start with a whole bunch of boxes.  These are entity collidables, but without entities!
             float xSpacing = 6;
@@ -118,7 +118,7 @@ namespace BEPUphysicsDemos.Demos
             collidables.Add(ground);
             game.ModelDrawer.Add(ground);
 
-            StaticGroup group = new StaticGroup(collidables);
+            var group = new StaticGroup(collidables);
             Space.Add(group);
 
 

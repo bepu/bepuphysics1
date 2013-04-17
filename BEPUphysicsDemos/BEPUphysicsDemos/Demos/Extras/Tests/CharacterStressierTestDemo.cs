@@ -1,5 +1,7 @@
 ﻿using BEPUphysics.BroadPhaseEntries;
+using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.CollisionShapes;
+using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.DataStructures;
 using BEPUphysics.Entities.Prefabs;
 using BEPUutilities;
@@ -15,13 +17,13 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
     /// <summary>
     /// A nice driveble landscape.
     /// </summary>
-    public class CharacterStressTestDemo : StandardDemo
+    public class CharacterStressierTestDemo : StandardDemo
     {
         /// <summary>
         /// Constructs a new demo.
         /// </summary>
         /// <param name="game">Game owning this demo.</param>
-        public CharacterStressTestDemo(DemosGame game)
+        public CharacterStressierTestDemo(DemosGame game)
             : base(game)
         {
             //Load in mesh data and create the group.
@@ -53,13 +55,49 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             //var group = new StaticGroup(meshes);
             //Space.Add(group);
 
+            //To demonstrate, we'll be creating a set of static objects and giving them to a group to manage.
+            var collidables = new List<Collidable>();
+
+            //Start with a whole bunch of boxes.  These are entity collidables, but without entities!
+            xSpacing = 25;
+            ySpacing = 16;
+            float zSpacing = 25;
+
+            xCount = 25;
+            yCount = 7;
+            int zCount = 25;
 
 
+            var random = new Random();
+            for (int i = 0; i < xCount; i++)
+            {
+                for (int j = 0; j < yCount; j++)
+                {
+                    for (int k = 0; k < zCount; k++)
+                    {
+                        //Create a transform and the instance of the mesh.
+                        var collidable = new ConvexCollidable<BoxShape>(new BoxShape((float)random.NextDouble() * 25 + 5.5f, (float)random.NextDouble() * 25 + 5.5f, (float)random.NextDouble() * 25 + 5.5f));
+
+                        //This EntityCollidable isn't associated with an entity, so we must manually tell it where to sit by setting the WorldTransform.
+                        //This also updates its bounding box.
+                        collidable.WorldTransform = new RigidTransform(
+                            new Vector3(i * xSpacing - xCount * xSpacing * .5f, j * ySpacing + -50, k * zSpacing - zCount * zSpacing * .5f),
+                            Quaternion.CreateFromAxisAngle(Vector3.Normalize(new Vector3((float)random.NextDouble(), (float)random.NextDouble(), (float)random.NextDouble())), (float)random.NextDouble() * 100));
+
+                        collidables.Add(collidable);
+                        game.ModelDrawer.Add(collidable);
+                    }
+                }
+            }
+            var group = new StaticGroup(collidables);
+            Space.Add(group);
+
+           
             //Now drop the characters on it!
             var numColumns = 16;
             var numRows = 16;
-            var numHigh = 8;
-            float separation = 64;
+            var numHigh = 16;
+            float separation = 24;
 
             for (int i = 0; i < numRows; i++)
                 for (int j = 0; j < numColumns; j++)
@@ -69,7 +107,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                         character.Body.Position =
                             new Vector3(
                             separation * i - numRows * separation / 2,
-                            40f + k * separation,
+                            50f + k * separation,
                             separation * j - numColumns * separation / 2);
 
                         characters.Add(character);
@@ -77,35 +115,15 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                         Space.Add(character);
                     }
 
-            //Now drop the ball-characters on it!
-            numColumns = 16;
-            numRows = 16;
-            numHigh = 8;
-            separation = 64;
-            for (int i = 0; i < numRows; i++)
-                for (int j = 0; j < numColumns; j++)
-                    for (int k = 0; k < numHigh; k++)
-                    {
-                        var character = new SphereCharacterController();
-                        character.Body.Position =
-                            new Vector3(
-                            separation * i - numRows * separation / 2,
-                            48f + k * separation,
-                            separation * j - numColumns * separation / 2);
-
-                        sphereCharacters.Add(character);
-
-                        Space.Add(character);
-                    }
-
+           
 
             game.Camera.Position = new Vector3(0, 10, 40);
 
             //Dump some boxes on top of the characters for fun.
             numColumns = 16;
             numRows = 16;
-            numHigh = 4;
-            separation = 64;
+            numHigh = 8;
+            separation = 24;
             for (int i = 0; i < numRows; i++)
                 for (int j = 0; j < numColumns; j++)
                     for (int k = 0; k < numHigh; k++)
@@ -132,7 +150,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
         /// </summary>
         public override string Name
         {
-            get { return "Character Stress Test"; }
+            get { return "Character Stressier Test"; }
         }
 
         public override void Update(float dt)

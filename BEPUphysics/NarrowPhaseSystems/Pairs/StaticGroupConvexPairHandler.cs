@@ -1,7 +1,6 @@
 ﻿using System;
 using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
-using Microsoft.Xna.Framework;
 
 namespace BEPUphysics.NarrowPhaseSystems.Pairs
 {
