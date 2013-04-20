@@ -95,12 +95,9 @@ namespace BEPUutilities
         [Conditional("CHECKMATH")]
         public static void Validate(this Matrix3x3 m)
         {
-            if (IsInvalid(m.M11) || IsInvalid(m.M12) || IsInvalid(m.M13) ||
-                IsInvalid(m.M21) || IsInvalid(m.M22) || IsInvalid(m.M23) ||
-                IsInvalid(m.M31) || IsInvalid(m.M32) || IsInvalid(m.M33))
-            {
-                throw new NotFiniteNumberException("Invalid value.");
-            }
+            m.Right.Validate();
+            m.Up.Validate();
+            m.Backward.Validate();
         }
 
         /// <summary>
@@ -110,10 +107,11 @@ namespace BEPUutilities
         [Conditional("CHECKMATH")]
         public static void Validate(this Matrix m)
         {
-            if (IsInvalid(m.M11) || IsInvalid(m.M12) || IsInvalid(m.M13) || IsInvalid(m.M14) ||
-                IsInvalid(m.M21) || IsInvalid(m.M22) || IsInvalid(m.M23) || IsInvalid(m.M24) ||
-                IsInvalid(m.M31) || IsInvalid(m.M32) || IsInvalid(m.M33) || IsInvalid(m.M34) ||
-                IsInvalid(m.M41) || IsInvalid(m.M42) || IsInvalid(m.M43) || IsInvalid(m.M44))
+            m.Right.Validate();
+            m.Up.Validate();
+            m.Backward.Validate();
+            m.Translation.Validate();
+            if (IsInvalid(m.M14) || IsInvalid(m.M24) || IsInvalid(m.M34) || IsInvalid(m.M44))
             {
                 throw new NotFiniteNumberException("Invalid value.");
             }

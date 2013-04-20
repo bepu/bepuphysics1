@@ -247,7 +247,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 //This runs after the bounding box updater is run, but before the broad phase.
                 //Expanding the character's bounding box ensures that minor variations in velocity will not cause
                 //any missed information.
-                //For a character which is not bound to Vector3.Up (such as a character that needs to run around a spherical planet),
+                //For a character which is not bound to Vector3.Up (such as a character that needs to run around a spherical planet, a '6DOF' character),
                 //the bounding box expansion needs to be changed such that it includes the full motion of the character.
                 float radius = Body.CollisionInformation.Shape.CollisionMargin * 1.1f; //The character can teleport by its collision margin when stepping up.
 #if WINDOWS
