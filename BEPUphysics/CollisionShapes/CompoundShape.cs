@@ -36,6 +36,7 @@ namespace BEPUphysics.CollisionShapes
         /// for the purposes of center of rotation computation.</param>
         public CompoundShapeEntry(EntityShape shape, RigidTransform localTransform, float weight)
         {
+            localTransform.Validate();
             LocalTransform = localTransform;
             Shape = shape;
             Weight = weight;
@@ -50,6 +51,7 @@ namespace BEPUphysics.CollisionShapes
         /// for the purposes of center of mass and inertia computation.</param>
         public CompoundShapeEntry(EntityShape shape, Vector3 position, float weight)
         {
+            position.Validate();
             LocalTransform = new RigidTransform(position);
             Shape = shape;
             Weight = weight;
@@ -64,6 +66,7 @@ namespace BEPUphysics.CollisionShapes
         /// for the purposes of center of rotation computation.</param>
         public CompoundShapeEntry(EntityShape shape, Quaternion orientation, float weight)
         {
+            orientation.Validate();
             LocalTransform = new RigidTransform(orientation);
             Shape = shape;
             Weight = weight;
@@ -88,6 +91,7 @@ namespace BEPUphysics.CollisionShapes
         ///<param name="localTransform">Local transform of the shape.</param>
         public CompoundShapeEntry(EntityShape shape, RigidTransform localTransform)
         {
+            localTransform.Validate();
             LocalTransform = localTransform;
             Shape = shape;
             Weight = shape.ComputeVolume();
@@ -100,6 +104,7 @@ namespace BEPUphysics.CollisionShapes
         ///<param name="position">Local position of the shape.</param>
         public CompoundShapeEntry(EntityShape shape, Vector3 position)
         {
+            position.Validate();
             LocalTransform = new RigidTransform(position);
             Shape = shape;
             Weight = shape.ComputeVolume();
@@ -112,6 +117,7 @@ namespace BEPUphysics.CollisionShapes
         ///<param name="orientation">Local orientation of the shape.</param>
         public CompoundShapeEntry(EntityShape shape, Quaternion orientation)
         {
+            orientation.Validate();
             LocalTransform = new RigidTransform(orientation);
             Shape = shape;
             Weight = shape.ComputeVolume();
@@ -215,6 +221,7 @@ namespace BEPUphysics.CollisionShapes
 
             }
             Vector3.Multiply(ref center, 1 / totalWeight, out center);
+            center.Validate();
             return center;
         }
 
@@ -236,6 +243,7 @@ namespace BEPUphysics.CollisionShapes
                 center += childData[i].Entry.LocalTransform.Position * volumeContribution;
             }
             Vector3.Divide(ref center, volume, out center);
+            center.Validate();
             return center;
 
         }
@@ -257,6 +265,7 @@ namespace BEPUphysics.CollisionShapes
                 center += childData[i].LocalTransform.Position * weight;
             }
             Vector3.Divide(ref center, totalWeight, out center);
+            center.Validate();
             return center;
 
         }
@@ -305,6 +314,7 @@ namespace BEPUphysics.CollisionShapes
 
             }
             Matrix3x3.Multiply(ref volumeDistribution, 1 / totalWeight, out volumeDistribution);
+            volumeDistribution.Validate();
             return volumeDistribution;
         }
 
@@ -323,7 +333,10 @@ namespace BEPUphysics.CollisionShapes
                 center += entries[i].LocalTransform.Position * entries[i].Weight;
                 totalWeight += entries[i].Weight;
             }
-            center /= totalWeight;
+            float totalWeightInverse = 1 / totalWeight;
+            totalWeightInverse.Validate();
+            center *= totalWeightInverse;
+
             var volumeDistribution = new Matrix3x3();
             for (int i = 0; i < entries.Count; i++)
             {
@@ -332,7 +345,8 @@ namespace BEPUphysics.CollisionShapes
                 GetContribution(entries[i].Shape, ref transform, ref center, entries[i].Weight, out contribution);
                 Matrix3x3.Add(ref volumeDistribution, ref contribution, out volumeDistribution);
             }
-            Matrix3x3.Multiply(ref volumeDistribution, 1 / totalWeight, out volumeDistribution);
+            Matrix3x3.Multiply(ref volumeDistribution, totalWeightInverse, out volumeDistribution);
+            volumeDistribution.Validate();
             return volumeDistribution;
         }
 
