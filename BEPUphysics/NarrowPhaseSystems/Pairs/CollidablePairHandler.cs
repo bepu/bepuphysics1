@@ -237,6 +237,23 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         public ContactCollection Contacts { get; private set; }
 
         /// <summary>
+        /// Gets whether or not this pair has any contacts in it with nonnegative penetration depths.
+        /// Such a contact would imply the pair of objects is actually colliding.
+        /// </summary>
+        public bool Colliding
+        {
+            get
+            {
+                foreach (var contact in Contacts)
+                {
+                    if (contact.Contact.PenetrationDepth >= 0)
+                        return true;
+                }
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Forces the pair handler to clean out its contacts.
         /// </summary>
         public virtual void ClearContacts()
