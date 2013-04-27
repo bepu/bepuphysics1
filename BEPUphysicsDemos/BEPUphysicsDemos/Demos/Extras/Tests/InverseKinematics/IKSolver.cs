@@ -16,7 +16,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
     /// will have to go through the interfaces like everything else for now.
     /// </para>
     /// </summary>
-    public class IKSolver
+    public class IKSolver : IDisposable
     {
 
         /// <summary>
@@ -231,7 +231,14 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         }
 
 
+        ~IKSolver()
+        {
+            Dispose();
+        }
 
-        
+        public void Dispose()
+        {
+            ActiveSet.Dispose();
+        }
     }
 }
