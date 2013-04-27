@@ -9,7 +9,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
     /// The active joint set contains connected components in the joint-bone graph which interact with control constraints.
     /// These connected components can be bounded by pinned bones which do not transfer any motion.
     /// </summary>
-    public class ActiveSet
+    public class ActiveSet : IDisposable
     {
         internal List<IKJoint> joints = new List<IKJoint>();
         /// <summary>
@@ -378,7 +378,10 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             bones.Clear();
         }
 
-        private void Clear()
+        /// <summary>
+        /// Clears out the bone and joint listings and unsets all flags.
+        /// </summary>
+        public void Clear()
         {
             for (int i = 0; i < bones.Count; i++)
             {
@@ -502,6 +505,14 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
 
         }
 
+        ~ActiveSet()
+        {
+            Dispose();
+        }
 
+        public void Dispose()
+        {
+            Clear();
+        }
     }
 }
