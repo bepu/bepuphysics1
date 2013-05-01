@@ -220,7 +220,9 @@ namespace BEPUphysics.CollisionShapes
                 Vector3.Add(ref center, ref centerContribution, out center);
 
             }
-            Vector3.Multiply(ref center, 1 / totalWeight, out center);
+            if (totalWeight <= 0)
+                throw new NotFiniteNumberException("Cannot compute center; the total weight of a compound shape must be positive.");
+            Vector3.Divide(ref center, totalWeight, out center);
             center.Validate();
             return center;
         }
@@ -228,21 +230,22 @@ namespace BEPUphysics.CollisionShapes
 
         ///<summary>
         /// Computes the center of a compound using its child data.
-        /// Children are weighted using their volumes for contribution to the center of 'mass.'
         ///</summary>
         ///<param name="childData">Child data to use to compute the center.</param>
         ///<returns>Center of the children.</returns>
         public static Vector3 ComputeCenter(IList<CompoundChildData> childData)
         {
             var center = new Vector3();
-            float volume = 0;
+            float totalWeight = 0;
             for (int i = 0; i < childData.Count; i++)
             {
-                float volumeContribution = childData[i].Entry.Shape.ComputeVolume();
-                volume += volumeContribution;
-                center += childData[i].Entry.LocalTransform.Position * volumeContribution;
+                float weight = childData[i].Entry.Weight;
+                totalWeight += weight;
+                center += childData[i].Entry.LocalTransform.Position * weight;
             }
-            Vector3.Divide(ref center, volume, out center);
+            if (totalWeight <= 0)
+                throw new NotFiniteNumberException("Cannot compute center; the total weight of a compound shape must be positive.");
+            Vector3.Divide(ref center, totalWeight, out center);
             center.Validate();
             return center;
 
@@ -264,6 +267,8 @@ namespace BEPUphysics.CollisionShapes
                 totalWeight += weight;
                 center += childData[i].LocalTransform.Position * weight;
             }
+            if (totalWeight <= 0)
+                throw new NotFiniteNumberException("Cannot compute center; the total weight of a compound shape must be positive.");
             Vector3.Divide(ref center, totalWeight, out center);
             center.Validate();
             return center;
@@ -272,6 +277,7 @@ namespace BEPUphysics.CollisionShapes
 
         /// <summary>
         /// Computes the volume of the shape.
+        /// This is approximate; it will double count the intersection of multiple subshapes.
         /// </summary>
         /// <returns>Volume of the shape.</returns>
         public override float ComputeVolume()
@@ -312,7 +318,9 @@ namespace BEPUphysics.CollisionShapes
                 GetContribution(shapes.Elements[i].Shape, ref shapes.Elements[i].LocalTransform, ref Toolbox.ZeroVector, shapes.Elements[i].Weight, out contribution);
                 Matrix3x3.Add(ref contribution, ref volumeDistribution, out volumeDistribution);
 
-            }
+            } 
+            if (totalWeight <= 0)
+                throw new NotFiniteNumberException("Cannot compute distribution; the total weight of a compound shape must be positive.");
             Matrix3x3.Multiply(ref volumeDistribution, 1 / totalWeight, out volumeDistribution);
             volumeDistribution.Validate();
             return volumeDistribution;
@@ -333,6 +341,8 @@ namespace BEPUphysics.CollisionShapes
                 center += entries[i].LocalTransform.Position * entries[i].Weight;
                 totalWeight += entries[i].Weight;
             }
+            if (totalWeight <= 0)
+                throw new NotFiniteNumberException("Cannot compute distribution; the total weight of a compound shape must be positive.");
             float totalWeightInverse = 1 / totalWeight;
             totalWeightInverse.Validate();
             center *= totalWeightInverse;
