@@ -545,10 +545,10 @@ namespace BEPUphysics.Entities
         }
 
         ///<summary>
-        /// Constructs a new dynamic entity.
+        /// Constructs a new entity.
         ///</summary>
         ///<param name="collisionInformation">Collidable to use with the entity.</param>
-        ///<param name="mass">Mass of the entity.</param>
+        ///<param name="mass">Mass of the entity. If positive, the entity will be dynamic. Otherwise, it will be kinematic.</param>
         public Entity(EntityCollidable collisionInformation, float mass)
             : this()
         {
@@ -556,22 +556,22 @@ namespace BEPUphysics.Entities
         }
 
         ///<summary>
-        /// Constructs a new dynamic entity.
+        /// Constructs a new entity.
         ///</summary>
         ///<param name="collisionInformation">Collidable to use with the entity.</param>
-        ///<param name="mass">Mass of the entity.</param>
-        /// <param name="inertiaTensor">Inertia tensor of the entity.</param>
+        ///<param name="mass">Mass of the entity. If positive, the entity will be dynamic. Otherwise, it will be kinematic.</param>
+        /// <param name="inertiaTensor">Inertia tensor of the entity. Only used for a dynamic entity.</param>
         public Entity(EntityCollidable collisionInformation, float mass, Matrix3x3 inertiaTensor)
             : this()
         {
             Initialize(collisionInformation, mass, inertiaTensor);
         }
         ///<summary>
-        /// Constructs a new dynamic entity.
+        /// Constructs a new entity.
         ///</summary>
         ///<param name="collisionInformation">Collidable to use with the entity.</param>
-        ///<param name="mass">Mass of the entity.</param>
-        /// <param name="inertiaTensor">Inertia tensor of the entity.</param>
+        ///<param name="mass">Mass of the entity. If positive, the entity will be dynamic. Otherwise, it will be kinematic.</param>
+        /// <param name="inertiaTensor">Inertia tensor of the entity. Only used for a dynamic entity.</param>
         /// <param name="volume">Volume of the entity.</param>
         public Entity(EntityCollidable collisionInformation, float mass, Matrix3x3 inertiaTensor, float volume)
             : this()
@@ -590,10 +590,10 @@ namespace BEPUphysics.Entities
         }
 
         ///<summary>
-        /// Constructs a new dynamic entity.
+        /// Constructs a new entity.
         ///</summary>
         ///<param name="shape">Shape to use with the entity.</param>
-        ///<param name="mass">Mass of the entity.</param>
+        ///<param name="mass">Mass of the entity. If positive, the entity will be dynamic. Otherwise, it will be kinematic.</param>
         public Entity(EntityShape shape, float mass)
             : this()
         {
@@ -601,11 +601,11 @@ namespace BEPUphysics.Entities
         }
 
         ///<summary>
-        /// Constructs a new dynamic entity.
+        /// Constructs a new entity.
         ///</summary>
         ///<param name="shape">Shape to use with the entity.</param>
-        ///<param name="mass">Mass of the entity.</param>
-        /// <param name="inertiaTensor">Inertia tensor of the entity.</param>
+        ///<param name="mass">Mass of the entity. If positive, the entity will be dynamic. Otherwise, it will be kinematic.</param>
+        /// <param name="inertiaTensor">Inertia tensor of the entity. Only used for a dynamic entity.</param>
         public Entity(EntityShape shape, float mass, Matrix3x3 inertiaTensor)
             : this()
         {
@@ -613,11 +613,11 @@ namespace BEPUphysics.Entities
         }
 
         ///<summary>
-        /// Constructs a new dynamic entity.
+        /// Constructs a new entity.
         ///</summary>
         ///<param name="shape">Shape to use with the entity.</param>
-        ///<param name="mass">Mass of the entity.</param>
-        /// <param name="inertiaTensor">Inertia tensor of the entity.</param>
+        ///<param name="mass">Mass of the entity. If positive, the entity will be dynamic. Otherwise, it will be kinematic.</param>
+        /// <param name="inertiaTensor">Inertia tensor of the entity. Only used for a dynamic entity.</param>
         /// <param name="volume">Volume of the entity.</param>
         public Entity(EntityShape shape, float mass, Matrix3x3 inertiaTensor, float volume)
             : this()
@@ -640,13 +640,21 @@ namespace BEPUphysics.Entities
         {
             CollisionInformation = collisionInformation;
 
-            ShapeDistributionInformation shapeInfo;
-            collisionInformation.Shape.ComputeDistributionInformation(out shapeInfo);
-            Matrix3x3.Multiply(ref shapeInfo.VolumeDistribution, mass * InertiaHelper.InertiaTensorScale, out shapeInfo.VolumeDistribution);
+            if (mass > 0)
+            {
+                ShapeDistributionInformation shapeInfo;
+                collisionInformation.Shape.ComputeDistributionInformation(out shapeInfo);
+                Matrix3x3.Multiply(ref shapeInfo.VolumeDistribution, mass * InertiaHelper.InertiaTensorScale, out shapeInfo.VolumeDistribution);
 
-            volume = shapeInfo.Volume;
+                volume = shapeInfo.Volume;
 
-            BecomeDynamic(mass, shapeInfo.VolumeDistribution);
+                BecomeDynamic(mass, shapeInfo.VolumeDistribution);
+            }
+            else
+            {
+                volume = collisionInformation.Shape.ComputeVolume();
+                BecomeKinematic();
+            }
 
             collisionInformation.Entity = this;
         }
@@ -657,7 +665,10 @@ namespace BEPUphysics.Entities
 
             volume = collisionInformation.Shape.ComputeVolume();
 
-            BecomeDynamic(mass, inertiaTensor);
+            if (mass > 0)
+                BecomeDynamic(mass, inertiaTensor);
+            else
+                BecomeKinematic();
 
             collisionInformation.Entity = this;
         }
@@ -666,7 +677,10 @@ namespace BEPUphysics.Entities
         {
             CollisionInformation = collisionInformation;
             this.volume = volume;
-            BecomeDynamic(mass, inertiaTensor);
+            if (mass > 0)
+                BecomeDynamic(mass, inertiaTensor);
+            else
+                BecomeKinematic();
 
             collisionInformation.Entity = this;
         }
