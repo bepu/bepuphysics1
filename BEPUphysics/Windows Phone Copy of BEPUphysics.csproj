@@ -408,6 +408,7 @@
     <Compile Include="UpdateableSystems\CombinedUpdateable.cs" />
     <Compile Include="UpdateableSystems\FluidVolume.cs" />
     <Compile Include="UpdateableSystems\ForceFields\BoundingBoxForceFieldShape.cs" />
+    <Compile Include="UpdateableSystems\ForceFields\BoundingSphereForceFieldShape.cs" />
     <Compile Include="UpdateableSystems\ForceFields\ForceField.cs" />
     <Compile Include="UpdateableSystems\ForceFields\ForceFieldShape.cs" />
     <Compile Include="UpdateableSystems\ForceFields\InfiniteForceFieldShape.cs" />
