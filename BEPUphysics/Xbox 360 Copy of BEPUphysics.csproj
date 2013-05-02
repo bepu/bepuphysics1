@@ -381,6 +381,7 @@
     <Compile Include="UpdateableSystems\ForceFields\BoundingBoxForceFieldShape.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="UpdateableSystems\ForceFields\BoundingSphereForceFieldShape.cs" />
     <Compile Include="UpdateableSystems\ForceFields\ForceField.cs">
       <SubType>Code</SubType>
     </Compile>
