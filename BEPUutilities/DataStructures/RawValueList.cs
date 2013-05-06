@@ -7,7 +7,7 @@ namespace BEPUutilities.DataStructures
     /// No-frills list used for value types that contain no reference types.
     ///</summary>
     ///<typeparam name="T">Type of the elements in the list.</typeparam>
-    public class RawValueList<T> where T: struct
+    public class RawValueList<T> where T : struct
     {
         ///<summary>
         /// Directly accessible array of elements in the list.
@@ -15,17 +15,15 @@ namespace BEPUutilities.DataStructures
         /// if in doubt, use the regular access methods.
         ///</summary>
         public T[] Elements;
-        internal int count;
-        ///<summary>
-        /// The number of elements in the list.
-        ///</summary>
-        public int Count
-        {
-            get
-            {
-                return count;
-            }
-        }
+
+        /// <summary>
+        /// Gets the number of elements contained in the <see cref="T:System.Collections.Generic.ICollection`1"/>.
+        /// Can also be set; setting the count is a direct change to the count integer and does not change the state of the array.
+        /// </summary>
+        /// <returns>
+        /// The number of elements contained in the <see cref="T:System.Collections.Generic.ICollection`1"/>.
+        /// </returns>
+        public int Count { get; set; }
 
         ///<summary>
         /// Constructs an empty list.
@@ -54,14 +52,14 @@ namespace BEPUutilities.DataStructures
         ///<exception cref="ArgumentOutOfRangeException">Thrown when the index is not present in the list.</exception>
         public void RemoveAt(int index)
         {
-            if (index >= count)
+            if (index >= Count)
             {
                 throw new ArgumentOutOfRangeException("index");
             }
-            count--;
-            if (index < count)
+            Count--;
+            if (index < Count)
             {
-                Elements[index] = Elements[count];
+                Elements[index] = Elements[Count];
             }
 
         }
@@ -78,22 +76,22 @@ namespace BEPUutilities.DataStructures
             set
             {
                 T[] newArray = new T[value];
-                Array.Copy(Elements, newArray, count);
+                Array.Copy(Elements, newArray, Count);
                 Elements = newArray;
             }
         }
-        
+
         ///<summary>
         /// Adds an element to the list.
         ///</summary>
         ///<param name="item">Item to add.</param>
         public void Add(ref T item)
         {
-            if (count == Elements.Length)
+            if (Count == Elements.Length)
             {
                 Capacity = Elements.Length * 2;
             }
-            Elements[count++] = item;
+            Elements[Count++] = item;
 
         }
 
@@ -102,7 +100,7 @@ namespace BEPUutilities.DataStructures
         ///</summary>
         public void Clear()
         {
-            count = 0;
+            Count = 0;
         }
 
         ///<summary>
