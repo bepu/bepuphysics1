@@ -37,9 +37,10 @@
         public static float TwistFrictionFactor = 1f;
 
         /// <summary>
-        /// Softness used by collision penetration constraints. Higher softness values allow more velocity error and make things look 'squishier'. Defaults to 0.01.
+        /// <para>Softness multiplier used by collision penetration constraints. Higher softness values allow more velocity error and make things look 'squishier'. Defaults to 0.05.</para>
+        /// <para>Note that this value is not used directly by constraints; it is first scaled by the raw inverse effective mass. This allows consistent behavior across objects with different masses.</para>
         /// </summary>
-        public static float Softness = 0.01f;
+        public static float Softness = 0.05f;
 
 
     }

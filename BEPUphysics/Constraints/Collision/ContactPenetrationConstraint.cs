@@ -24,7 +24,7 @@ namespace BEPUphysics.Constraints.Collision
         internal float angularAX, angularAY, angularAZ;
         internal float angularBX, angularBY, angularBZ;
 
-
+        private float softness;
         private float bias;
         private float linearAX, linearAY, linearAZ;
         private Entity entityA, entityB;
@@ -173,7 +173,18 @@ namespace BEPUphysics.Constraints.Collision
             else
                 entryB = 0;
 
-            velocityToImpulse = -1 / (CollisionResponseSettings.Softness + entryA + entryB);
+            //If we used a single fixed softness value, then heavier objects will tend to 'squish' more than light objects.
+            //In the extreme case, very heavy objects could simply fall through the ground by force of gravity.
+            //To see why this is the case, consider that a given dt, softness, and bias factor correspond to an equivalent spring's damping and stiffness coefficients.
+            //Imagine trying to hang objects of different masses on the fixed-strength spring: obviously, heavier ones will pull it further down.
+
+            //To counteract this, scale the softness value based on the effective mass felt by the constraint.
+            //Larger effective masses should correspond to smaller softnesses so that the spring has the same positional behavior.
+            //Fortunately, we're already computing the necessary values: the raw, unsoftened effective mass inverse shall be used to compute the softness.
+    
+            float effectiveMassInverse = entryA + entryB;
+            softness = CollisionResponseSettings.Softness * effectiveMassInverse;
+            velocityToImpulse = -1 / (softness + effectiveMassInverse);
 
 
             //Bounciness and bias (penetration correction)
@@ -263,7 +274,7 @@ namespace BEPUphysics.Constraints.Collision
         {
 
             //Compute relative velocity
-            float lambda = (RelativeVelocity - bias + CollisionResponseSettings.Softness * accumulatedImpulse) * velocityToImpulse;
+            float lambda = (RelativeVelocity - bias + softness * accumulatedImpulse) * velocityToImpulse;
 
             //Clamp accumulated impulse
             float previousAccumulatedImpulse = accumulatedImpulse;
