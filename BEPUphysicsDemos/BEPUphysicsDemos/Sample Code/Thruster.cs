@@ -10,8 +10,8 @@ namespace BEPUphysicsDemos.SampleCode
     /// </summary>
     public class Thruster : Updateable, IDuringForcesUpdateable
     {
-        private float myAge;
-        private float myLifeSpan;
+        private float age;
+        private float lifeSpan;
 
         /// <summary>
         /// Constructs a thruster originating at the given position, pushing in the given direction.
@@ -49,11 +49,11 @@ namespace BEPUphysicsDemos.SampleCode
         /// </summary>
         public float Age
         {
-            get { return myAge; }
+            get { return age; }
             set
             {
-                myAge = value;
-                if (myAge < LifeSpan)
+                age = value;
+                if (age < LifeSpan)
                     IsUpdating = true; //IsUpdating is a property of the Updateable class.  The updateDuringForces method won't be called if IsUpdating is false.
             }
         }
@@ -64,11 +64,11 @@ namespace BEPUphysicsDemos.SampleCode
         /// </summary>
         public float LifeSpan
         {
-            get { return myLifeSpan; }
+            get { return lifeSpan; }
             set
             {
-                myLifeSpan = value;
-                if (myLifeSpan > Age || myLifeSpan == 0)
+                lifeSpan = value;
+                if (lifeSpan > Age || lifeSpan == 0)
                     IsUpdating = true; //Wake the thruster up if it's young again.
             }
         }
