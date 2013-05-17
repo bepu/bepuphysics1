@@ -90,9 +90,8 @@ namespace BEPUphysicsDemos.Demos
             slerpCurve.ControlPoints.Add(3, Quaternion.CreateFromAxisAngle(Vector3.Up, 3 * MathHelper.PiOver2));
             slerpCurve.ControlPoints.Add(4, Quaternion.Identity);
 
-            slerpCurve.PostLoop = CurveEndpointBehavior.Clamp;
-
-            orientationPath = new ConstantAngularSpeedCurve(1f, slerpCurve);
+            slerpCurve.PostLoop = CurveEndpointBehavior.Mirror;
+            orientationPath = slerpCurve;
 
 
             mover = new EntityMover(movingEntity);

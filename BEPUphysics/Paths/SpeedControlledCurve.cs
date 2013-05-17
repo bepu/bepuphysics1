@@ -122,6 +122,14 @@ namespace BEPUphysics.Paths
 
             int indexMin = 0;
             int indexMax = samples.Count;
+            if (indexMax == 1)
+            {
+                //1-length curve; asking the system to evaluate
+                //this will be a waste of time AND
+                //crash since +1 will be outside scope
+                return samples[0].SpeedControlled;
+            }
+
             if (indexMax == 0)
             {
                 return 0;
@@ -139,6 +147,7 @@ namespace BEPUphysics.Paths
                     indexMax = midIndex;
                 }
             }
+
 
             double curveTime = (time - samples[indexMin].Wrapped) / (samples[indexMin + 1].Wrapped - samples[indexMin].Wrapped);
             return (1 - curveTime) * samples[indexMin].SpeedControlled + (curveTime) * samples[indexMin + 1].SpeedControlled;
