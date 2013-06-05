@@ -35,7 +35,7 @@ namespace BEPUphysics.DeactivationManagement
             set
             {
                 velocityLowerLimit = Math.Max(0, value);
-                velocityLowerLimitSquared = velocityLowerLimit * velocityLowerLimit;;
+                velocityLowerLimitSquared = velocityLowerLimit * velocityLowerLimit;
             }
         }
 
@@ -189,22 +189,6 @@ namespace BEPUphysics.DeactivationManagement
         {
             if (simulationIslandMember.DeactivationManager == this)
             {
-                if (simulationIslandMember.IsDynamic)
-                    simulationIslandMember.Activate();
-                else
-                {
-                    //If the object was NOT dynamic, then simply calling activate will be insufficient
-                    //because it does not share any simulation island with connected objects.
-                    //We need to notify its connections directly.
-                    foreach (var connection in simulationIslandMember.connections)
-                    {
-                        foreach (var entry in connection.entries)
-                        {
-                            if (entry.Member != simulationIslandMember)
-                                entry.Member.Activate();
-                        }
-                    }
-                }
                 simulationIslandMember.DeactivationManager = null;
                 simulationIslandMembers.Remove(simulationIslandMember);
                 RemoveSimulationIslandFromMember(simulationIslandMember);
@@ -660,7 +644,7 @@ namespace BEPUphysics.DeactivationManagement
                     {
                         if (member.connections.Elements[i].entries.Elements[j].Member.SimulationIsland != null)
                         {
-                            representativeA = member;
+                            representativeA = member.connections.Elements[i].entries.Elements[j].Member;
                             break;
                         }
                     }
@@ -673,6 +657,9 @@ namespace BEPUphysics.DeactivationManagement
                         //In this case, simply try the next connection.
                         continue;
                     }
+                    //Activate the representative. This must be performed even if no split occurs; connected objects must be activated!
+                    representativeA.Activate();
+
                     //Split the representative against representatives from other connections.
                     for (int j = i + 1; j < member.connections.Count; j++)
                     {
@@ -682,7 +669,7 @@ namespace BEPUphysics.DeactivationManagement
                         {
                             if (member.connections.Elements[j].entries.Elements[k].Member.SimulationIsland != null)
                             {
-                                representativeB = member;
+                                representativeB = member.connections.Elements[j].entries.Elements[k].Member;
                                 break;
                             }
                         }
@@ -693,6 +680,8 @@ namespace BEPUphysics.DeactivationManagement
                             //Try the next connection.
                             continue;
                         }
+                        //Activate the representative. This must be performed even if no split occurs; connected objects must be activated!
+                        representativeB.Activate();
 
                         //Try to split the representatives.
                         //Don't bother doing any deferring; this is a rare activity
