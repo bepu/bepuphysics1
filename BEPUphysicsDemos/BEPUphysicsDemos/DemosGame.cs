@@ -10,6 +10,7 @@ using BEPUphysicsDemos.SampleCode;
 using BEPUphysicsDrawer.Font;
 using BEPUphysicsDrawer.Lines;
 using BEPUphysicsDrawer.Models;
+using BEPUutilities.DataStructures;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -222,6 +223,7 @@ namespace BEPUphysicsDemos
 #endif
 
             SwitchSimulation(1);
+
         }
 
 
