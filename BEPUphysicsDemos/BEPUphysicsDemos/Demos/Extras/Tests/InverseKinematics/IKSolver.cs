@@ -111,6 +111,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             }
         }
 
+        
         /// <summary>
         /// Updates the positions of bones acted upon by the controls given to this solver.
         /// </summary>
@@ -125,7 +126,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
                 //Update the control strengths to match the mass of the target bones and the desired maximum force.
                 foreach (var control in controls)
                 {
-                    control.MaximumImpulse = control.TargetBone.Mass * AutoscaleControlMaximumForce / ControlIterationCount;
+                    control.MaximumImpulse = control.TargetBone.Mass * (AutoscaleControlMaximumForce / ControlIterationCount);
                 }
             }
 
@@ -166,6 +167,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
                     {
                         control.SolveVelocityIteration();
                     }
+
                     foreach (IKJoint joint in ActiveSet.joints)
                     {
                         joint.SolveVelocityIteration();
@@ -202,12 +204,11 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
 
                 for (int j = 0; j < VelocitySubiterationCount; j++)
                 {
-                    //Controls are updated first, and the active joint set is sorted from closest-to-control constraints to furthest-from-control constraints.
-                    //In addition, the last constraints which update get the last word in the state of bones for a given iteration,
-                    //so solving far constraints last means those constraints connected to pin endpoints will always succeed in keeping a bone nearby.
-                    foreach (IKJoint joint in ActiveSet.joints)
+                    //Fixer iterations are run in reverse. The goal is to prevent the violation of constraints. The most likely place for such violation is 
+                    //near the pins. We want to bring the structure back to the pins, so starting the solve there will propagate the impulses effectively.
+                    for (int jointIndex = ActiveSet.joints.Count - 1; jointIndex >= 0; --jointIndex)
                     {
-                        joint.SolveVelocityIteration();
+                        ActiveSet.joints[jointIndex].SolveVelocityIteration();
                     }
                 }
 
