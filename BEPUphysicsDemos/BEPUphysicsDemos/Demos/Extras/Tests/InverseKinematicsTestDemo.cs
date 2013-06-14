@@ -167,8 +167,42 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                 dynamicsAngularFriction.Settings.MaximumForce = 200;
                 Space.Add(dynamicsBallSocketJoint);
                 Space.Add(dynamicsAngularFriction);
-                var ikBallSocketJoint = new IKBallSocketJoint(previousBone, bone, anchor); //(the joint is auto-added to the bones; not solver-add is needed)
+                var ikBallSocketJoint = new IKBallSocketJoint(previousBone, bone, anchor); //(the joint is auto-added to the bones; no solver-add is needed)
                 var ikAngularFriction = new IKAngularJoint(previousBone, bone) { ErrorCorrectionFactor = 0, MaximumImpulse = 10 };
+                joints.Add(ikBallSocketJoint);
+                joints.Add(ikAngularFriction);
+
+                previousBone = bone;
+                previousBoneEntity = boneEntity;
+            }
+        }
+
+
+        void BuildStick(Vector3 position)
+        {
+            //Set up a bone chain.
+            int linkCount = 10;
+            var previousBoneEntity = new Cylinder(position, 1, .2f, 100);
+            var previousBone = new Bone(previousBoneEntity.Position, previousBoneEntity.Orientation, previousBoneEntity.Radius, previousBoneEntity.Height);
+            bones.Add(new BoneRelationship(previousBone, previousBoneEntity));
+            Space.Add(previousBoneEntity);
+
+            for (int i = 1; i < linkCount; i++)
+            {
+                var boneEntity = new Cylinder(previousBone.Position + new Vector3(0, 1, 0), 1, .2f, 100);
+                var bone = new Bone(boneEntity.Position, boneEntity.Orientation, boneEntity.Radius, boneEntity.Height);
+                bones.Add(new BoneRelationship(bone, boneEntity));
+                Space.Add(boneEntity);
+
+                //Make a relationship between the two bones and entities.
+                CollisionRules.AddRule(previousBoneEntity, boneEntity, CollisionRule.NoBroadPhase);
+                Vector3 anchor = (previousBoneEntity.Position + boneEntity.Position) / 2;
+                var dynamicsBallSocketJoint = new BallSocketJoint(previousBoneEntity, boneEntity, anchor);
+                var dynamicsAngularFriction = new NoRotationJoint(previousBoneEntity, boneEntity);
+                Space.Add(dynamicsBallSocketJoint);
+                Space.Add(dynamicsAngularFriction);
+                var ikBallSocketJoint = new IKBallSocketJoint(previousBone, bone, anchor); //(the joint is auto-added to the bones; no solver-add is needed)
+                var ikAngularFriction = new IKAngularJoint(previousBone, bone);
                 joints.Add(ikBallSocketJoint);
                 joints.Add(ikAngularFriction);
 
@@ -768,12 +802,15 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
 
             solver.ActiveSet.UseAutomass = true;
             solver.AutoscaleControlImpulses = true;
-            solver.AutoscaleControlMaximumForce = 10;
-            solver.FixerIterationCount = 10;
-            //solver.VelocitySubiterationCount = 4;
+            solver.AutoscaleControlMaximumForce = float.MaxValue;
+            solver.ControlIterationCount = 20;
+            solver.FixerIterationCount = 0;
+            solver.VelocitySubiterationCount = 3;
 
 
             BuildChain(new Vector3(-5, 2, 0));
+
+            BuildStick(new Vector3(-10, 2, 0));
 
             BuildActionFigure(new Vector3(5, 6, -8));
             BuildActionFigure(new Vector3(5, 6, -3));

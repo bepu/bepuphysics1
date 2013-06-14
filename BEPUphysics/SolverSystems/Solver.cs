@@ -2,6 +2,7 @@
 using BEPUphysics.DeactivationManagement;
 using BEPUphysics.Threading;
 using BEPUphysics.Constraints;
+using BEPUutilities;
 using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.SolverSystems
@@ -51,6 +52,11 @@ namespace BEPUphysics.SolverSystems
         ///</summary>
         public DeactivationManager DeactivationManager { get; set; }
 
+        /// <summary>
+        /// Gets the permutation mapper used by the solver.
+        /// </summary>
+        public PermutationMapper PermutationMapper { get; private set; }
+
         ///<summary>
         /// Constructs a Solver.
         ///</summary>
@@ -63,6 +69,7 @@ namespace BEPUphysics.SolverSystems
             multithreadedPrestepDelegate = MultithreadedPrestep;
             multithreadedIterationDelegate = MultithreadedIteration;
             Enabled = true;
+            PermutationMapper = new PermutationMapper();
         }
         ///<summary>
         /// Constructs a Solver.
@@ -153,55 +160,6 @@ namespace BEPUphysics.SolverSystems
             }
         }
 
-        /// <summary>
-        /// Gets or sets the permutation index used by the solver.  If the simulation is restarting from a given frame,
-        /// setting this index to be consistent is required for deterministic results.
-        /// </summary>
-        public int PermutationIndex
-        {
-            get
-            {
-                return primeIndex;
-            }
-            set
-            {
-                primeIndex = value % primes.Length;
-            }
-        }
-
-        int primeIndex;
-        static long[] primes = {
-                                    472882049, 492876847,
-                                    492876863, 512927357,
-                                    512927377, 533000389,
-                                    533000401, 553105243,
-                                    553105253, 573259391,
-                                    573259433, 593441843,
-                                    593441861, 613651349,
-                                    613651369, 633910099,
-                                    633910111, 654188383,
-                                    654188429, 674506081,
-                                    674506111, 694847533,
-                                    694847539, 715225739,
-                                    715225741, 735632791,
-                                    735632797, 756065159,
-                                    756065179, 776531401,
-                                    776531419, 797003413,
-                                    797003437, 817504243,
-                                    817504253, 838041641,
-                                    838041647, 858599503,
-                                    858599509, 879190747,
-                                    879190841, 899809343,
-                                    899809363, 920419813,
-                                    920419823, 941083981,
-                                    941083987, 961748927,
-                                    961748941, 982451653
-                               };
-        long prime;
-        void ComputeIterationCoefficient()
-        {
-            prime = primes[primeIndex = (primeIndex + 1) % primes.Length];
-        }
 
         Action<int> multithreadedIterationDelegate;
         void MultithreadedIteration(int i)
@@ -209,7 +167,7 @@ namespace BEPUphysics.SolverSystems
             //'i' is currently an index into an implicit array of solver updateables that goes from 0 to solverUpdateables.count * iterationLimit.
             //It includes iterationLimit copies of each updateable.
             //Permute the entire set with duplicates.
-            var updateable = solverUpdateables.Elements[(i * prime) % solverUpdateables.Count];
+            var updateable = solverUpdateables.Elements[PermutationMapper.GetMappedIndex(i, solverUpdateables.Count)];
 
 
             SolverSettings solverSettings = updateable.solverSettings;
@@ -254,7 +212,7 @@ namespace BEPUphysics.SolverSystems
         protected override void UpdateMultithreaded()
         {
             ThreadManager.ForLoop(0, solverUpdateables.Count, multithreadedPrestepDelegate);
-            ComputeIterationCoefficient();
+            ++PermutationMapper.PermutationIndex;
             ThreadManager.ForLoop(0, iterationLimit * solverUpdateables.Count, multithreadedIterationDelegate);
         }
 
@@ -268,10 +226,10 @@ namespace BEPUphysics.SolverSystems
             }
 
             int totalCount = iterationLimit * totalUpdateableCount;
-            ComputeIterationCoefficient();
+            ++PermutationMapper.PermutationIndex;
             for (int i = 0; i < totalCount; i++)
             {
-                UnsafeSolveIteration(solverUpdateables.Elements[(i * prime) % totalUpdateableCount]);
+                UnsafeSolveIteration(solverUpdateables.Elements[PermutationMapper.GetMappedIndex(i, totalUpdateableCount)]);
             }
 
 
@@ -318,15 +276,6 @@ namespace BEPUphysics.SolverSystems
                     updateable.isActiveInSolver = false;
                 }
 
-                //if (++solverSettings.currentIterations > iterationLimit ||
-                //    solverSettings.currentIterations > solverSettings.maximumIterations ||
-                //    (updateable.SolveIteration() < solverSettings.minimumImpulse &&
-                //    ++solverSettings.iterationsAtZeroImpulse > solverSettings.minimumIterations))
-                //{
-                //    updateable.isActiveInSolver = false;
-                //}
-                //else //If it's greater than the minimum impulse, reset the count.
-                //    solverSettings.iterationsAtZeroImpulse = 0;
             }
         }
 

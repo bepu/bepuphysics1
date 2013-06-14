@@ -120,6 +120,7 @@
     <Compile Include="Demos\Extras\Tests\ConvexHullTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\GeneralConvexPairStressDemo.cs" />
     <Compile Include="Demos\Extras\Tests\InverseKinematicsTestDemo.cs" />
+    <Compile Include="Demos\Extras\Tests\InverseKinematicsTestDemo2.cs" />
     <Compile Include="Demos\Extras\Tests\InverseKinematics\ActiveSet.cs" />
     <Compile Include="Demos\Extras\Tests\InverseKinematics\Bone.cs" />
     <Compile Include="Demos\Extras\Tests\InverseKinematics\Control.cs" />
