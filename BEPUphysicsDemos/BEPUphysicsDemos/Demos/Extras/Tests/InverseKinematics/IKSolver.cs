@@ -172,6 +172,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
                     {
                         joint.SolveVelocityIteration();
                     }
+
+
                 }
 
                 //Integrate the positions of the bones forward.
