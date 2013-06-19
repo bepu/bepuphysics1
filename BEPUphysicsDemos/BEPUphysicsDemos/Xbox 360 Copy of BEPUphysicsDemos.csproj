@@ -154,6 +154,7 @@
     <Compile Include="Demos\Extras\Tests\MPRCastingDemo.cs" />
     <Compile Include="Demos\Extras\Tests\MPRTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\MutableCompoundDemo.cs" />
+    <Compile Include="Demos\Extras\Tests\PermutationTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\RayCastTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\SimulationIslandStressTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\StackDemo.cs" />

@@ -135,6 +135,7 @@
     <Compile Include="Demos\Extras\Tests\BooleanConvexTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\BroadPhaseRemovalTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\CharacterStressierTestDemo.cs" />
+    <Compile Include="Demos\Extras\Tests\PermutationTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\InverseKinematicsTestDemo2.cs" />
     <Compile Include="Demos\Extras\Tests\GeneralConvexPairStressDemo.cs" />
     <Compile Include="Demos\Extras\Tests\InverseKinematicsTestDemo.cs" />

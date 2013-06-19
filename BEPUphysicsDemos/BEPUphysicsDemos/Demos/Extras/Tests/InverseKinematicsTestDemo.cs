@@ -1,6 +1,7 @@
 ﻿#if WINDOWS
 using System;
 using System.Collections.Generic;
+using System.Text;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.Constraints.TwoEntity.JointLimits;
 using BEPUphysics.Constraints.TwoEntity.Joints;
@@ -823,6 +824,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
 
         }
 
+
+
         /// <summary>
         /// Constructs a new demo.
         /// </summary>
@@ -830,6 +833,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
         public InverseKinematicsTestDemo(DemosGame game)
             : base(game)
         {
+
+
             whitePixel = game.Content.Load<Texture2D>("whitePixel");
             game.Camera.Position = new Vector3(0, 3, 5);
             Box ground = new Box(new Vector3(0, 0, 0), 30, 1, 30);
