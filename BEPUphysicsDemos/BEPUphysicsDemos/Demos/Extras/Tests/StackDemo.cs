@@ -2,7 +2,7 @@
 using BEPUphysicsDemos.Demos;
 using Microsoft.Xna.Framework;
 
-namespace BEPUphysicsDemos.Extras.Tests.Demos
+namespace BEPUphysicsDemos.Demos.Extras.Tests
 {
     /// <summary>
     /// Demo showing a wall of blocks stacked up.
