@@ -95,20 +95,13 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
 
                 for (int j = 0; j < VelocitySubiterationCount; j++)
                 {
-                    ////Controls are updated first, and the active joint set is sorted from closest-to-control constraints to furthest-from-control constraints.
-                    ////In addition, the last constraints which update get the last word in the state of bones for a given iteration,
-                    ////so solving far constraints last means those constraints connected to pin endpoints will always succeed in keeping a bone nearby.
-                    //foreach (IKJoint joint in ActiveSet.joints)
-                    //{
-                    //    joint.SolveVelocityIteration();
-                    //}
-
-                    //Increment to use the next permutation.
+                    //A permuted version of the indices is used. The randomization tends to avoid issues with solving order in corner cases.
                     for (int jointIndex = 0; jointIndex < ActiveSet.joints.Count; ++jointIndex)
                     {
                         int remappedIndex = permutationMapper.GetMappedIndex(jointIndex, ActiveSet.joints.Count);
                         ActiveSet.joints[remappedIndex].SolveVelocityIteration();
                     }
+                    //Increment to use the next permutation.
                     ++permutationMapper.PermutationIndex;
                 }
 
@@ -176,34 +169,22 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
 
                 for (int j = 0; j < VelocitySubiterationCount; j++)
                 {
-                    //Controls are updated first, and the active joint set is sorted from closest-to-control constraints to furthest-from-control constraints.
-                    //This order allows the effect of controls to propagate through the graph quickly.
-                    //In addition, the last constraints which update get the last word in the state of bones for a given iteration,
-                    //so solving far constraints last means those constraints connected to pin endpoints will always succeed in keeping a bone nearby.
+                    //Controls are updated first.
                     foreach (Control control in controls)
                     {
                         control.SolveVelocityIteration();
                     }
 
-                    ////Increment to use the next permutation.
-                    //for (int jointIndex = 0; jointIndex < ActiveSet.joints.Count; ++jointIndex)
-                    //{
-                    //    int remappedIndex = permutationMapper.GetMappedIndex(jointIndex, ActiveSet.joints.Count);
-                    //    ActiveSet.joints[remappedIndex].SolveVelocityIteration();
-                    //}
-                    //++permutationMapper.PermutationIndex;
-
-                    //for (int jointIndex = ActiveSet.joints.Count - 1; jointIndex >= 0; --jointIndex)
-                    //{
-                    //    ActiveSet.joints[jointIndex].SolveVelocityIteration();
-                    //}
-
-                    foreach (IKJoint joint in ActiveSet.joints)
+                    //A permuted version of the indices is used. The randomization tends to avoid issues with solving order in corner cases.
+                    for (int jointIndex = 0; jointIndex < ActiveSet.joints.Count; ++jointIndex)
                     {
-                        joint.SolveVelocityIteration();
+                        int remappedIndex = permutationMapper.GetMappedIndex(jointIndex, ActiveSet.joints.Count);
+                        ActiveSet.joints[remappedIndex].SolveVelocityIteration();
                     }
+                    //Increment to use the next permutation.
+                    ++permutationMapper.PermutationIndex;
 
-
+                    
                 }
 
                 //Integrate the positions of the bones forward.
@@ -236,20 +217,15 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
 
                 for (int j = 0; j < VelocitySubiterationCount; j++)
                 {
-                    //Increment to use the next permutation.
+                    //A permuted version of the indices is used. The randomization tends to avoid issues with solving order in corner cases.
                     for (int jointIndex = 0; jointIndex < ActiveSet.joints.Count; ++jointIndex)
                     {
                         int remappedIndex = permutationMapper.GetMappedIndex(jointIndex, ActiveSet.joints.Count);
                         ActiveSet.joints[remappedIndex].SolveVelocityIteration();
                     }
+                    //Increment to use the next permutation.
                     ++permutationMapper.PermutationIndex;
 
-                    ////Fixer iterations are run in reverse. The goal is to prevent the violation of constraints. The most likely place for such violation is 
-                    ////near the pins. We want to bring the structure back to the pins, so starting the solve there will propagate the impulses effectively.
-                    //for (int jointIndex = ActiveSet.joints.Count - 1; jointIndex >= 0; --jointIndex)
-                    //{
-                    //    ActiveSet.joints[jointIndex].SolveVelocityIteration();
-                    //}
                 }
 
                 //Integrate the positions of the bones forward.

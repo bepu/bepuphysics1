@@ -87,8 +87,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
 
             var representedIndices = new HashSet<int>();
             mapper.PermutationIndex = 0;
-            const int setSize = 10;
-            const int iterationCount = 100000;
+            const int setSize = 250;
+            const int iterationCount = 150000;
             var conflicts = 0;
             for (int i = 0; i < iterationCount; ++i)
             {
@@ -131,7 +131,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
         /// </summary>
         public override string Name
         {
-            get { return "Stack"; }
+            get { return "Not Much"; }
         }
     }
 }
