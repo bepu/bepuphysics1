@@ -34,14 +34,8 @@ namespace BEPUutilities
             {
                 permutationIndex = value < 0 ? value + long.MaxValue + 1 : value;
                 currentPrime = primes[permutationIndex % primes.Length];
-                //currentOffset = offsetMultipliers[permutationIndex % offsetMultipliers.Length];
-                //currentOffset = currentPrime * offsetMultipliers[permutationIndex % offsetMultipliers.Length];
-                //currentOffset = currentPrime * offsetMultipliers[permutationIndex % offsetMultipliers.Length] + permutationIndex;
-                //currentOffset = currentPrime * offsetMultipliers[permutationIndex % offsetMultipliers.Length] * permutationIndex;
-                //currentOffset = currentPrime * (offsetMultipliers[permutationIndex % offsetMultipliers.Length] + permutationIndex);
+
                 currentOffset = currentPrime * permutationIndex;
-                //currentOffset = offsetMultipliers[permutationIndex % offsetMultipliers.Length] * permutationIndex;
-                //currentOffset = permutationIndex;
 
                 if (currentOffset < 0)
                     currentOffset = currentOffset + long.MaxValue + 1;
