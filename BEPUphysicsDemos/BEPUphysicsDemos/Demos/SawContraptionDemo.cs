@@ -3,8 +3,7 @@ using System;
 using BEPUphysics.Constraints.SolverGroups;
 using BEPUphysics.Constraints.TwoEntity.Motors;
 using BEPUphysics.Entities.Prefabs;
-using Microsoft.Xna.Framework;
-
+using BEPUutilities;
 namespace BEPUphysicsDemos.Demos
 {
     /// <summary>
@@ -88,7 +87,7 @@ namespace BEPUphysicsDemos.Demos
             }
 
 
-            game.Camera.Position = new Vector3(0, 2, 20);
+            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(0, 2, 20);
         }
 
         /// <summary>

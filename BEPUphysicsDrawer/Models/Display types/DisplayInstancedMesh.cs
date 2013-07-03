@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using BEPUphysics.BroadPhaseEntries;
-using BEPUutilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using ConversionHelper;
 
 namespace BEPUphysicsDrawer.Models
 {
@@ -32,7 +32,7 @@ namespace BEPUphysicsDrawer.Models
             for (int i = 0; i < DisplayedObject.Shape.TriangleMesh.Data.Vertices.Length; i++)
             {
                 tempVertices[i] = new VertexPositionNormalTexture(
-                    AffineTransform.Transform(DisplayedObject.Shape.TriangleMesh.Data.Vertices[i], DisplayedObject.WorldTransform),
+                    MathConverter.Convert(BEPUutilities.AffineTransform.Transform(DisplayedObject.Shape.TriangleMesh.Data.Vertices[i], DisplayedObject.WorldTransform)),
                     Vector3.Zero, 
                     Vector2.Zero);
             }

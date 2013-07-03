@@ -1,6 +1,6 @@
 ﻿using System;
-using BEPUphysics.Settings;
-using Microsoft.Xna.Framework;
+using BEPUutilities;
+ 
 
 namespace BEPUphysics.CollisionTests
 {

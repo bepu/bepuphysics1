@@ -1,8 +1,7 @@
 ﻿using System;
-using BEPUphysics.BroadPhaseEntries.Events;
+using BEPUphysics.Collidables.Events;
 using BEPUutilities;
 using BEPUutilities.ResourceManagement;
-using Microsoft.Xna.Framework;
 using BEPUphysics.CollisionShapes;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
 using BEPUphysics.OtherSpaceStages;

@@ -7,6 +7,7 @@ using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUutilities.DataStructures;
 using BEPUphysics.UpdateableSystems;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.NarrowPhaseSystems
 {

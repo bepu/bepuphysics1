@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using BEPUphysics.BroadPhaseEntries;
-using BEPUutilities.ResourceManagement;
-using Microsoft.Xna.Framework;
+using BEPUutilities;
 using BEPUutilities.DataStructures;
+using BEPUutilities.ResourceManagement;
 
 namespace BEPUphysics.BroadPhaseSystems.Hierarchies
 {
@@ -12,7 +12,7 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
         internal BoundingBox BoundingBox;
         internal abstract void GetOverlaps(ref BoundingBox boundingBox, IList<BroadPhaseEntry> outputOverlappedElements);
         internal abstract void GetOverlaps(ref BoundingSphere boundingSphere, IList<BroadPhaseEntry> outputOverlappedElements);
-        internal abstract void GetOverlaps(ref BoundingFrustum boundingFrustum, IList<BroadPhaseEntry> outputOverlappedElements);
+        //internal abstract void GetOverlaps(ref BoundingFrustum boundingFrustum, IList<BroadPhaseEntry> outputOverlappedElements);
         internal abstract void GetOverlaps(ref Ray ray, float maximumLength, IList<BroadPhaseEntry> outputOverlappedElements);
         internal abstract void GetOverlaps(Node node, DynamicHierarchy owner);
 
@@ -105,16 +105,16 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
                 childB.GetOverlaps(ref boundingSphere, outputOverlappedElements);
         }
 
-        internal override void GetOverlaps(ref BoundingFrustum boundingFrustum, IList<BroadPhaseEntry> outputOverlappedElements)
-        {
-            bool intersects;
-            boundingFrustum.Intersects(ref childA.BoundingBox, out intersects);
-            if (intersects)
-                childA.GetOverlaps(ref boundingFrustum, outputOverlappedElements);
-            boundingFrustum.Intersects(ref childB.BoundingBox, out intersects);
-            if (intersects)
-                childB.GetOverlaps(ref boundingFrustum, outputOverlappedElements);
-        }
+        //internal override void GetOverlaps(ref BoundingFrustum boundingFrustum, IList<BroadPhaseEntry> outputOverlappedElements)
+        //{
+        //    bool intersects;
+        //    boundingFrustum.Intersects(ref childA.BoundingBox, out intersects);
+        //    if (intersects)
+        //        childA.GetOverlaps(ref boundingFrustum, outputOverlappedElements);
+        //    boundingFrustum.Intersects(ref childB.BoundingBox, out intersects);
+        //    if (intersects)
+        //        childB.GetOverlaps(ref boundingFrustum, outputOverlappedElements);
+        //}
 
         internal override void GetOverlaps(ref Ray ray, float maximumLength, IList<BroadPhaseEntry> outputOverlappedElements)
         {
@@ -697,10 +697,10 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
             outputOverlappedElements.Add(element);
         }
 
-        internal override void GetOverlaps(ref BoundingFrustum boundingFrustum, IList<BroadPhaseEntry> outputOverlappedElements)
-        {
-            outputOverlappedElements.Add(element);
-        }
+        //internal override void GetOverlaps(ref BoundingFrustum boundingFrustum, IList<BroadPhaseEntry> outputOverlappedElements)
+        //{
+        //    outputOverlappedElements.Add(element);
+        //}
 
         internal override void GetOverlaps(ref Ray ray, float maximumLength, IList<BroadPhaseEntry> outputOverlappedElements)
         {

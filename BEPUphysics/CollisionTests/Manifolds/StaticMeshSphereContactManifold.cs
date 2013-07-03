@@ -11,12 +11,12 @@ namespace BEPUphysics.CollisionTests.Manifolds
 
 
         UnsafeResourcePool<TriangleSpherePairTester> testerPool = new UnsafeResourcePool<TriangleSpherePairTester>();
-        protected override void GiveBackTester(CollisionAlgorithms.TrianglePairTester tester)
+        protected override void GiveBackTester(TrianglePairTester tester)
         {
             testerPool.GiveBack((TriangleSpherePairTester)tester);
         }
 
-        protected override CollisionAlgorithms.TrianglePairTester GetTester()
+        protected override TrianglePairTester GetTester()
         {
             return testerPool.Take();
         }

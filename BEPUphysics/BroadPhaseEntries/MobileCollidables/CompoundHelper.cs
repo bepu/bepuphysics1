@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using BEPUphysics.CollisionShapes;
-using Microsoft.Xna.Framework;
+ 
 using BEPUutilities;
 using BEPUphysics.Entities;
 using BEPUphysics.CollisionShapes.ConvexShapes;

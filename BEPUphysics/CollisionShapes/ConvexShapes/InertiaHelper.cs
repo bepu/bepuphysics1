@@ -1,7 +1,6 @@
 ﻿using BEPUutilities;
-using BEPUutilities.ResourceManagement;
-using Microsoft.Xna.Framework;
 using BEPUutilities.DataStructures;
+using BEPUutilities.ResourceManagement;
 
 namespace BEPUphysics.CollisionShapes.ConvexShapes
 {

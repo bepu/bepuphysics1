@@ -1,10 +1,9 @@
 ﻿using BEPUphysics.Entities.Prefabs;
 using BEPUutilities;
-using Microsoft.Xna.Framework;
 using BEPUphysics.CollisionShapes;
 using System.Collections.Generic;
 using BEPUphysics.CollisionShapes.ConvexShapes;
-using BEPUphysics.BroadPhaseEntries.MobileCollidables;
+using BEPUutilities;
 using BEPUphysics.Entities;
 
 namespace BEPUphysicsDemos.Demos.Extras.Tests
@@ -120,7 +119,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
 
             Box ground = new Box(new Vector3(0, -4.5f, 0), 50, 1, 50);
             Space.Add(ground);
-            game.Camera.Position = new Vector3(0, 6, 15);
+            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(0, 6, 15);
         }
 
         /// <summary>

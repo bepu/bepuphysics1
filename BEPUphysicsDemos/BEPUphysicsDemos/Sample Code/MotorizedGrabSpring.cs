@@ -4,7 +4,6 @@ using BEPUphysics.Constraints.TwoEntity.Motors;
 using BEPUphysics.Entities;
 using BEPUphysics.UpdateableSystems;
 using BEPUutilities;
-using Microsoft.Xna.Framework;
 
 namespace BEPUphysicsDemos.SampleCode
 {

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using BEPUphysics.CollisionTests;
 using BEPUutilities.DataStructures;
 using BEPUutilities.ResourceManagement;
-using Microsoft.Xna.Framework;
 
 namespace BEPUutilities
 {

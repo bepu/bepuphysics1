@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
-using BEPUutilities.ResourceManagement;
-using Microsoft.Xna.Framework;
+ 
 using BEPUutilities;
 using BEPUutilities.DataStructures;
+using BEPUutilities.ResourceManagement;
 
 namespace BEPUphysics.CollisionShapes.ConvexShapes
 {

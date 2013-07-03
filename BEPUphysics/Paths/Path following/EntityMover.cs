@@ -3,7 +3,8 @@ using BEPUphysics.Constraints.SingleEntity;
 using BEPUphysics.Constraints.TwoEntity.Motors;
 using BEPUphysics.Entities;
 using BEPUphysics.UpdateableSystems;
-using Microsoft.Xna.Framework;
+using BEPUutilities;
+ 
 
 namespace BEPUphysics.Paths.PathFollowing
 {

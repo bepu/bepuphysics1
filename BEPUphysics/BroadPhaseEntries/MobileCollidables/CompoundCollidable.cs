@@ -4,11 +4,10 @@ using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.CollisionShapes;
 using BEPUutilities;
 using BEPUutilities.ResourceManagement;
-using Microsoft.Xna.Framework;
-using BEPUutilities.DataStructures;
 using BEPUphysics.Materials;
 using BEPUphysics.CollisionRuleManagement;
 using System;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.BroadPhaseEntries.MobileCollidables
 {
@@ -375,18 +374,30 @@ namespace BEPUphysics.BroadPhaseEntries.MobileCollidables
         /// <summary>
         /// Casts a convex shape against the collidable.
         /// </summary>
-        /// <param name="castShape">Shape to cast.</param>
-        /// <param name="startingTransform">Initial transform of the shape.</param>
-        /// <param name="sweep">Sweep to apply to the shape.</param>
-        /// <param name="rayHit">Hit data, if any.</param>
-        /// <returns>Whether or not the cast hit anything.</returns>
-        public override bool ConvexCast(CollisionShapes.ConvexShapes.ConvexShape castShape, ref RigidTransform startingTransform, ref Vector3 sweep, out RayHit rayHit)
+        /// <param name="ray">Ray to test.</param>
+        /// <param name="maximumLength">Maximum length, in units of the ray's direction's length, to test.</param>
+        /// <param name="rayHit">Hit data and the hit child collidable, if any.</param>
+        /// <returns>Whether or not the ray hit the entry.</returns>
+        public bool RayCast(Ray ray, float maximumLength, out RayCastResult rayHit)
         {
-            CompoundChild hitChild;
-            bool hit = ConvexCast(castShape, ref startingTransform, ref sweep, out rayHit, out hitChild);
-            return hit;
-        }
-
+            rayHit = new RayCastResult();
+            var hitElements = PhysicsResources.GetCompoundChildList();
+            if (hierarchy.Tree.GetOverlaps(ray, maximumLength, hitElements))
+            {
+                rayHit.HitData.T = float.MaxValue;
+                for (int i = 0; i < hitElements.Count; i++)
+                {
+                    EntityCollidable candidate = hitElements.Elements[i].CollisionInformation;
+                    RayHit tempHit;
+                    if (candidate.RayCast(ray, maximumLength, out tempHit) && tempHit.T < rayHit.HitData.T)
+                    {
+                        rayHit.HitData = tempHit;
+                        rayHit.HitObject = candidate;
+                    }
+                }
+                PhysicsResources.GiveBack(hitElements);
+                return rayHit.HitData.T != float.MaxValue;
+            }
 
         /// <summary>
         /// Casts a convex shape against the collidable.

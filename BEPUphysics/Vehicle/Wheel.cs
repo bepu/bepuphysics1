@@ -1,7 +1,7 @@
 ﻿using System;
 using BEPUphysics.Entities;
 using BEPUphysics.UpdateableSystems;
-using Microsoft.Xna.Framework;
+ 
 using BEPUutilities;
 using BEPUphysics.Materials;
 using BEPUphysics.BroadPhaseEntries;

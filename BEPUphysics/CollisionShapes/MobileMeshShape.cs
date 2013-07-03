@@ -1,11 +1,11 @@
-﻿using BEPUphysics.DataStructures;
-using BEPUutilities.ResourceManagement;
-using Microsoft.Xna.Framework;
-using BEPUutilities.DataStructures;
+﻿ 
+using BEPUphysics.DataStructures;
 using BEPUutilities;
-using BEPUphysics.BroadPhaseEntries.MobileCollidables;
+using Microsoft.Xna.Framework;
 using System;
 using BEPUphysics.Settings;
+using BEPUutilities.DataStructures;
+using BEPUutilities.ResourceManagement;
 
 namespace BEPUphysics.CollisionShapes
 {

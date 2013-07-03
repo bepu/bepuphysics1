@@ -6,8 +6,8 @@ using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.UpdateableSystems;
 using BEPUutilities;
-using Microsoft.Xna.Framework;
 using BEPUphysics.CollisionRuleManagement;
+using BEPUutilities;
 
 namespace BEPUphysicsDemos.AlternateMovement.SimpleCharacter
 {

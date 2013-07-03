@@ -1,11 +1,10 @@
-﻿using BEPUphysics.BroadPhaseEntries.Events;
-using BEPUphysics.CollisionShapes;
+﻿using BEPUphysics.CollisionShapes;
 using BEPUutilities;
 using BEPUutilities.ResourceManagement;
-using Microsoft.Xna.Framework;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
 using System;
+using BEPUutilities.ResourceManagement;
 
 namespace BEPUphysics.BroadPhaseEntries.MobileCollidables
 {

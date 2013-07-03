@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using BEPUphysics;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
 using Microsoft.Xna.Framework;
+using ConversionHelper;
 
 namespace BEPUphysicsDrawer.Lines
 {
@@ -31,11 +32,10 @@ namespace BEPUphysicsDrawer.Lines
                     foreach (ContactInformation information in pairHandler.Contacts)
                     {
                         contactCount++;
-
-                        contactLines.Add(new VertexPositionColor(information.Contact.Position, Color.White));
-                        contactLines.Add(new VertexPositionColor(information.Contact.Position + information.Contact.Normal * information.Contact.PenetrationDepth, Color.Red));
-                        contactLines.Add(new VertexPositionColor(information.Contact.Position + information.Contact.Normal * information.Contact.PenetrationDepth, Color.White));
-                        contactLines.Add(new VertexPositionColor(information.Contact.Position + information.Contact.Normal * (information.Contact.PenetrationDepth + .3f), Color.White));
+                        contactLines.Add(new VertexPositionColor(MathConverter.Convert(information.Contact.Position), Color.White));
+                        contactLines.Add(new VertexPositionColor(MathConverter.Convert(information.Contact.Position + information.Contact.Normal * information.Contact.PenetrationDepth), Color.Red));
+                        contactLines.Add(new VertexPositionColor(MathConverter.Convert(information.Contact.Position + information.Contact.Normal * information.Contact.PenetrationDepth), Color.White));
+                        contactLines.Add(new VertexPositionColor(MathConverter.Convert(information.Contact.Position + information.Contact.Normal * (information.Contact.PenetrationDepth + .3f)), Color.White));
 
 
                     }

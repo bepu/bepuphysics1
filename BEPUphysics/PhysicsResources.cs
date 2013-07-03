@@ -1,14 +1,14 @@
 ﻿using BEPUphysics.BroadPhaseEntries;
-using BEPUphysics.BroadPhaseEntries.MobileCollidables;
+using BEPUphysics.Collidables.MobileCollidables;
 using BEPUphysics.CollisionTests.Manifolds;
 using BEPUphysics.Entities;
  
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.DeactivationManagement;
-using BEPUutilities;
 using BEPUutilities.DataStructures;
+using BEPUutilities;
+using BEPUphysics.Collidables;
 using BEPUutilities.ResourceManagement;
-using Microsoft.Xna.Framework;
 
 namespace BEPUphysics
 {

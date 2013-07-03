@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using BEPUphysics.CollisionShapes;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
+using ConversionHelper;
 
 namespace BEPUphysicsDrawer.Models
 {
@@ -17,10 +18,10 @@ namespace BEPUphysicsDrawer.Models
             var tempVertices = new VertexPositionNormalTexture[shape.TriangleMesh.Data.Vertices.Length];
             for (int i = 0; i < shape.TriangleMesh.Data.Vertices.Length; i++)
             {
-                Vector3 position;
+                BEPUutilities.Vector3 position;
                 shape.TriangleMesh.Data.GetVertexPosition(i, out position);
                 tempVertices[i] = new VertexPositionNormalTexture(
-                    position,
+                    MathConverter.Convert(position),
                     Vector3.Zero, 
                     Vector2.Zero);
             }

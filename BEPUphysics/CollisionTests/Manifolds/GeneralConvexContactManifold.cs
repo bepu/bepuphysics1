@@ -4,9 +4,9 @@ using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
 using BEPUutilities;
 using BEPUutilities.ResourceManagement;
-using Microsoft.Xna.Framework;
-using BEPUutilities.DataStructures;
 using BEPUphysics.Settings;
+using BEPUutilities.DataStructures;
+using BEPUutilities.ResourceManagement;
 
 namespace BEPUphysics.CollisionTests.Manifolds
 {

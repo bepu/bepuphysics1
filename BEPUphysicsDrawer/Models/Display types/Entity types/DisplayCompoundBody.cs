@@ -1,9 +1,8 @@
 using System.Collections.Generic;
-using BEPUutilities;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
+using ConversionHelper;
 
 namespace BEPUphysicsDrawer.Models
 {
@@ -32,14 +31,17 @@ namespace BEPUphysicsDrawer.Models
                     {
                         indices.Add((ushort)(tempIndices[j] + vertices.Count));
                     }
-                    RigidTransform localTransform = child.Entry.LocalTransform;
-                    Vector3 localPosition = child.CollisionInformation.LocalPosition;
+                    var localTransform = child.Entry.LocalTransform;
+                    var localPosition = MathConverter.Convert(child.CollisionInformation.LocalPosition);
+                    var orientation = MathConverter.Convert(localTransform.Orientation);
+                    var position = MathConverter.Convert(localTransform.Position);
                     for (int j = 0; j < tempVertices.Count; j++)
                     {
                         VertexPositionNormalTexture vertex = tempVertices[j];
-                        Vector3.Add(ref vertex.Position, ref localPosition, out vertex.Position);
-                        RigidTransform.Transform(ref vertex.Position, ref localTransform, out vertex.Position);
-                        Vector3.Transform(ref vertex.Normal, ref localTransform.Orientation, out vertex.Normal);
+                        Microsoft.Xna.Framework.Vector3.Add(ref vertex.Position, ref localPosition, out vertex.Position);
+                        Microsoft.Xna.Framework.Vector3.Transform(ref vertex.Position, ref orientation, out vertex.Position);
+                        Microsoft.Xna.Framework.Vector3.Add(ref vertex.Position, ref position, out vertex.Position);
+                        Microsoft.Xna.Framework.Vector3.Transform(ref vertex.Normal, ref orientation, out vertex.Normal);
                         vertices.Add(vertex);
                     }
 

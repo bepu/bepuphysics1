@@ -4,8 +4,6 @@ using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.UpdateableSystems;
 using BEPUphysics;
 using BEPUutilities;
-using Microsoft.Xna.Framework;
-using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
 using BEPUphysics.Materials;
 using BEPUphysics.PositionUpdating;

@@ -1,7 +1,7 @@
 ﻿using System;
 using BEPUutilities;
 using BEPUutilities.DataStructures;
-using Microsoft.Xna.Framework;
+
 
 namespace BEPUphysics.CollisionTests
 {

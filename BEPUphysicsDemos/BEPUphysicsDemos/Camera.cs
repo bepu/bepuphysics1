@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using BEPUphysics.CollisionRuleManagement;
 using System;
+using ConversionHelper;
 
 namespace BEPUphysicsDemos
 {
@@ -222,15 +223,15 @@ namespace BEPUphysicsDemos
             {
                 Vector3 offset;
                 if (transformOffset)
-                    offset = Matrix3x3.Transform(offsetFromChaseTarget, entityToChase.BufferedStates.InterpolatedStates.OrientationMatrix);
+                    offset = MathConverter.Convert(BEPUutilities.Matrix3x3.Transform(MathConverter.Convert(offsetFromChaseTarget), entityToChase.BufferedStates.InterpolatedStates.OrientationMatrix));
                 else
                     offset = offsetFromChaseTarget;
-                Vector3 lookAt = entityToChase.BufferedStates.InterpolatedStates.Position + offset;
+                Vector3 lookAt = MathConverter.Convert(entityToChase.BufferedStates.InterpolatedStates.Position) + offset;
                 Vector3 backwards = WorldMatrix.Backward;
 
                 //Find the earliest ray hit that isn't the chase target to position the camera appropriately.
                 RayCastResult result;
-                if (entityToChase.Space.RayCast(new Ray(lookAt, backwards), distanceToTarget, rayCastFilter, out result))
+                if (entityToChase.Space.RayCast(MathConverter.Convert(new Ray(lookAt, backwards)), distanceToTarget, rayCastFilter, out result))
                 {
                     Position = lookAt + (Math.Max(result.HitData.T - chaseCameraMargin, 0)) * backwards; //Put the camera just before any hit spot.
                 }

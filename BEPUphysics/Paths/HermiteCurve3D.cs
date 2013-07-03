@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using Microsoft.Xna.Framework;
+using BEPUutilities;
 using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.Paths

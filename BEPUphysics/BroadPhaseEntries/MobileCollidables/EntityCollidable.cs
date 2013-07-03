@@ -2,7 +2,7 @@
 using BEPUphysics.CollisionShapes;
 using BEPUphysics.Entities;
 using BEPUutilities;
-using Microsoft.Xna.Framework;
+ 
 using BEPUphysics.Settings;
 using System;
 using BEPUphysics.PositionUpdating;

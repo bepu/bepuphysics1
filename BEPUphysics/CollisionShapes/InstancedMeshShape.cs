@@ -1,5 +1,4 @@
-﻿using BEPUphysics.DataStructures;
-using Microsoft.Xna.Framework;
+﻿
 using BEPUutilities.DataStructures;
 using BEPUutilities;
 

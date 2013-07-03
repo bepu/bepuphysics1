@@ -1,7 +1,7 @@
 ﻿using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
-using Microsoft.Xna.Framework;
 using BEPUphysics.Materials;
+using BEPUutilities;
 
 namespace BEPUphysicsDemos.Demos
 {
@@ -57,7 +57,7 @@ namespace BEPUphysicsDemos.Demos
             toAdd.Material = new Material(.5f, .5f, 0);
             toAdd.LinearVelocity = new Vector3(-5, 0, 0);
             Space.Add(toAdd);
-            game.Camera.Position = new Vector3(0, 2, 30);
+            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(0, 2, 30);
         }
 
         /// <summary>

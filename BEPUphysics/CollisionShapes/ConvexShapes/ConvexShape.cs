@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
 using BEPUphysics.CollisionTests.CollisionAlgorithms.GJK;
-using Microsoft.Xna.Framework;
 using BEPUutilities;
 using BEPUphysics.Settings;
 

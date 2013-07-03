@@ -3,11 +3,8 @@ using System.Collections.Generic;
 using BEPUphysics.Entities.Prefabs;
 using BEPUutilities;
 using BEPUutilities.DataStructures;
-using Microsoft.Xna.Framework;
-using BEPUphysics;
-using BEPUphysics.DataStructures;
 using BEPUphysics.CollisionShapes;
-using BEPUphysics.Materials;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysicsDemos.Demos.Extras.Tests
 {
@@ -47,8 +44,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                 new Vector3(-1, -1, 0.5f), 
             };
 
-
-            RawList<Vector3> hullVertices = new RawList<Vector3>();
+            var hullVertices = new RawList<Vector3>();
             ConvexHullHelper.GetConvexHull(vertices, hullVertices);
 
             ConvexHull hull = new ConvexHull(vertices, 5);
@@ -58,7 +54,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
 
             Box ground = new Box(new Vector3(0, -.5f, 0), 50, 1, 50);
             Space.Add(ground);
-            game.Camera.Position = new Vector3(0, 6, 15);
+            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(0, 6, 15);
         }
 
         /// <summary>

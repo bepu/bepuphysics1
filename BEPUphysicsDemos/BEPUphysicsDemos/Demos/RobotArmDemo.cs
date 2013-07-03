@@ -4,13 +4,13 @@ using BEPUphysics.Constraints.SolverGroups;
 using BEPUphysics.Constraints.TwoEntity.Motors;
 using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.Materials;
 using BEPUphysics.CollisionShapes;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using System.Collections.Generic;
+using BEPUutilities;
 
 namespace BEPUphysicsDemos.Demos
 {
@@ -166,7 +166,7 @@ namespace BEPUphysicsDemos.Demos
                 Space.Add(new Box(new Vector3((float)Math.Cos(k) * 5.5f, 2, (float)Math.Sin(k) * 5.5f), 1, 1, 1, 10));
             }
 
-            game.Camera.Position = new Vector3(0, 5, 13);
+            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(0, 5, 13);
         }
 
 
@@ -243,7 +243,7 @@ namespace BEPUphysicsDemos.Demos
         public override void DrawUI()
         {
             base.DrawUI();
-            Game.DataTextDrawer.Draw("Arm controls:", new Vector2(50, 20));
+            Game.DataTextDrawer.Draw("Arm controls:", new Microsoft.Xna.Framework.Vector2(50, 20));
 #if !WINDOWS
             Game.TinyTextDrawer.Draw("Spin base: Left/Right Shoulder", new Vector2(50, 38));
             Game.TinyTextDrawer.Draw("Bend shoulder: A B", new Vector2(50, 53));
@@ -251,11 +251,11 @@ namespace BEPUphysicsDemos.Demos
             Game.TinyTextDrawer.Draw("Spin forearm: Up/Down Dpad", new Vector2(50, 83));
             Game.TinyTextDrawer.Draw("Open/close claw: Left/Right Trigger", new Vector2(50, 98));
 #else
-            Game.TinyTextDrawer.Draw("Spin base: N M", new Vector2(50, 38));
-            Game.TinyTextDrawer.Draw("Bend shoulder: Q W", new Vector2(50, 53));
-            Game.TinyTextDrawer.Draw("Bend elbow: R T", new Vector2(50, 68));
-            Game.TinyTextDrawer.Draw("Spin forearm: O P", new Vector2(50, 83));
-            Game.TinyTextDrawer.Draw("Open/close claw: [ ]", new Vector2(50, 98));
+            Game.TinyTextDrawer.Draw("Spin base: N M", new Microsoft.Xna.Framework.Vector2(50, 38));
+            Game.TinyTextDrawer.Draw("Bend shoulder: Q W", new Microsoft.Xna.Framework.Vector2(50, 53));
+            Game.TinyTextDrawer.Draw("Bend elbow: R T", new Microsoft.Xna.Framework.Vector2(50, 68));
+            Game.TinyTextDrawer.Draw("Spin forearm: O P", new Microsoft.Xna.Framework.Vector2(50, 83));
+            Game.TinyTextDrawer.Draw("Open/close claw: [ ]", new Microsoft.Xna.Framework.Vector2(50, 98));
 #endif
         }
     }

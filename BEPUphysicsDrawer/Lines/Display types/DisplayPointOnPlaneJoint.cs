@@ -1,5 +1,6 @@
 ﻿using BEPUphysics.Constraints.TwoEntity.Joints;
 using Microsoft.Xna.Framework;
+using ConversionHelper;
 
 namespace BEPUphysicsDrawer.Lines
 {
@@ -52,13 +53,13 @@ namespace BEPUphysicsDrawer.Lines
         {
             //Move lines around
             PointOnPlaneJoint constraint = LineObject;
-            Vector3 planeAnchor = constraint.PlaneAnchor;
-            Vector3 y = Vector3.Cross(constraint.ConnectionA.OrientationMatrix.Up, constraint.PlaneNormal);
+            Vector3 planeAnchor = MathConverter.Convert(constraint.PlaneAnchor);
+            Vector3 y = MathConverter.Convert(BEPUutilities.Vector3.Cross(constraint.ConnectionA.OrientationMatrix.Up, constraint.PlaneNormal));
             if (y.LengthSquared() < .001f)
             {
-                y = Vector3.Cross(constraint.ConnectionA.OrientationMatrix.Right, constraint.PlaneNormal);
+                y = MathConverter.Convert(BEPUutilities.Vector3.Cross(constraint.ConnectionA.OrientationMatrix.Right, constraint.PlaneNormal));
             }
-            Vector3 x = Vector3.Cross(constraint.PlaneNormal, y);
+            Vector3 x = Vector3.Cross(MathConverter.Convert(constraint.PlaneNormal), y);
 
             //Grid
             gridRow1.PositionA = planeAnchor - 1.5f * x + y;
@@ -80,11 +81,11 @@ namespace BEPUphysicsDrawer.Lines
             gridColumn3.PositionB = planeAnchor - x + 1.5f * y;
 
             //Connection and error
-            aToConnection.PositionA = constraint.ConnectionA.Position;
-            aToConnection.PositionB = constraint.PlaneAnchor;
+            aToConnection.PositionA = MathConverter.Convert(constraint.ConnectionA.Position);
+            aToConnection.PositionB = MathConverter.Convert(constraint.PlaneAnchor);
 
-            bToConnection.PositionA = constraint.ConnectionB.Position;
-            bToConnection.PositionB = constraint.PointAnchor;
+            bToConnection.PositionA = MathConverter.Convert(constraint.ConnectionB.Position);
+            bToConnection.PositionB = MathConverter.Convert(constraint.PointAnchor);
 
             error.PositionA = aToConnection.PositionB;
             error.PositionB = bToConnection.PositionB;

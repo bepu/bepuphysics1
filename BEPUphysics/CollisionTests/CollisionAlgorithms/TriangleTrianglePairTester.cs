@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using BEPUphysics.CollisionShapes.ConvexShapes;
+﻿using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUutilities;
 using BEPUutilities.DataStructures;
-using Microsoft.Xna.Framework;
+
 
 namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 {

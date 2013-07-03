@@ -1,6 +1,6 @@
 ﻿using BEPUphysics.CollisionTests;
-using BEPUutilities.DataStructures;
 using System.Collections.Generic;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.Constraints.Collision
 {

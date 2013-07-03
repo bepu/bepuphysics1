@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Diagnostics;
 using BEPUphysics.Entities;
-using Microsoft.Xna.Framework;
+ 
 using BEPUutilities;
-using Microsoft.Xna.Framework.Input;
 
 namespace BEPUphysics.Constraints.TwoEntity.Motors
 {

@@ -1,5 +1,6 @@
 using BEPUphysics.Entities;
 using BEPUutilities.DataStructures;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.Constraints.SingleEntity
 {

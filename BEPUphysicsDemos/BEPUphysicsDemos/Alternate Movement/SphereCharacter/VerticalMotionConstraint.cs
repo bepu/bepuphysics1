@@ -3,9 +3,10 @@ using BEPUphysics.Constraints;
 using BEPUphysics.Entities;
 using BEPUutilities;
 using BEPUutilities.DataStructures;
-using Microsoft.Xna.Framework;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
+using BEPUutilities;
 using BEPUphysics.Settings;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
 {

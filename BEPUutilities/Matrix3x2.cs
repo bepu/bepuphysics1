@@ -1,6 +1,5 @@
 ﻿ 
 
-using Microsoft.Xna.Framework;
 
 namespace BEPUutilities
 {

@@ -3,6 +3,8 @@ using BEPUphysics.BroadPhaseEntries;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using BEPUphysics.CollisionShapes;
+using ConversionHelper;
+using System;
 
 namespace BEPUphysicsDrawer.Models
 {
@@ -37,11 +39,11 @@ namespace BEPUphysicsDrawer.Models
             //up vector points in the same direction as the collidable surfaces.
             //To make sure the graphics match the terrain collision, see if a triangle normal faces in the same direction as the local up vector.
             //If not, construct the graphics with reversed winding.
-            Vector3 a, b, c;
+            BEPUutilities.Vector3 a, b, c;
             DisplayedObject.GetPosition(0, 0, out a);
             DisplayedObject.GetPosition(1, 0, out b);
             DisplayedObject.GetPosition(0, 1, out c);
-            Vector3 normal = Vector3.Cross(c - a, b - a);
+            Vector3 normal = MathConverter.Convert(BEPUutilities.Vector3.Cross(c - a, b - a));
             Vector3 terrainUp = new Vector3(DisplayedObject.WorldTransform.LinearTransform.M21, DisplayedObject.WorldTransform.LinearTransform.M22, DisplayedObject.WorldTransform.LinearTransform.M23);
             float dot;
             Vector3.Dot(ref normal, ref terrainUp, out dot);
@@ -54,8 +56,13 @@ namespace BEPUphysicsDrawer.Models
                 for (int i = 0; i < numColumns; i++)
                 {
                     VertexPositionNormalTexture v;
-                    DisplayedObject.GetPosition(i, j, out v.Position);
-                    DisplayedObject.GetNormal(i, j, out v.Normal);
+                    BEPUutilities.Vector3 position, n;
+                    DisplayedObject.GetPosition(i, j, out position);
+                    DisplayedObject.GetNormal(i, j, out n);
+                    MathConverter.Convert(ref position, out v.Position);
+                    MathConverter.Convert(ref n, out v.Normal);
+
+
                     if (reverseWinding)
                         Vector3.Negate(ref v.Normal, out v.Normal);
                     v.TextureCoordinate = new Vector2(i, j);

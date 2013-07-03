@@ -1,7 +1,7 @@
 ﻿using System;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUutilities;
-using Microsoft.Xna.Framework;
+ 
 using BEPUphysics.Settings;
 
 namespace BEPUphysics.CollisionTests.CollisionAlgorithms

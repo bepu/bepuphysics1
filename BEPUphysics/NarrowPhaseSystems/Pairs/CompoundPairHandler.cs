@@ -9,6 +9,7 @@ using BEPUphysics.DataStructures;
 using BEPUutilities.DataStructures;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.CollisionTests;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.NarrowPhaseSystems.Pairs
 {

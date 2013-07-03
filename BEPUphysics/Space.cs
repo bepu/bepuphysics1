@@ -15,7 +15,7 @@ using BEPUphysics.Threading;
 using BEPUutilities;
 using BEPUphysics.NarrowPhaseSystems;
 using BEPUphysics.UpdateableSystems;
-using Microsoft.Xna.Framework;
+using BEPUutilities;
 using BEPUutilities.DataStructures;
 
 namespace BEPUphysics

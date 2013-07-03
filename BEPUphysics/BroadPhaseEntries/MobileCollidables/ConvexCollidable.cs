@@ -1,11 +1,12 @@
 ﻿using BEPUphysics.BroadPhaseEntries.Events;
 using BEPUphysics.CollisionShapes.ConvexShapes;
-using BEPUutilities;
-using Microsoft.Xna.Framework;
+ 
 using System;
 using BEPUphysics.PositionUpdating;
 using BEPUphysics.Settings;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
+using BEPUphysics.Collidables.Events;
+using BEPUutilities;
 
 namespace BEPUphysics.BroadPhaseEntries.MobileCollidables
 {

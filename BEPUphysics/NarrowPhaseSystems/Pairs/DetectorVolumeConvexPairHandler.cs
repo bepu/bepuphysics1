@@ -4,8 +4,8 @@ using System;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
 using BEPUutilities.DataStructures;
 using BEPUutilities;
-using Microsoft.Xna.Framework;
 using BEPUphysics.CollisionShapes.ConvexShapes;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.NarrowPhaseSystems.Pairs
 {

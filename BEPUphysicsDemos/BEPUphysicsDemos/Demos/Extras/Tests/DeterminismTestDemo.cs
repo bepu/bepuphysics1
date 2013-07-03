@@ -1,13 +1,11 @@
 ﻿using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
-using BEPUutilities;
-using Microsoft.Xna.Framework;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System;
+using BEPUutilities;
 using BEPUphysics.CollisionShapes.ConvexShapes;
-using BEPUphysics.DataStructures;
 using Microsoft.Xna.Framework.Graphics;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
 using BEPUphysics.BroadPhaseSystems;
@@ -64,7 +62,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
 
             Vector3[] vertices;
             int[] indices;
-            TriangleMesh.GetVerticesAndIndicesFromModel(Game.Content.Load<Model>("playground"), out vertices, out indices);
+            ModelDataExtractor.GetVerticesAndIndicesFromModel(Game.Content.Load<Model>("playground"), out vertices, out indices);
             var mesh = new StaticMesh(vertices, indices, new AffineTransform(new Vector3(50, -20, 0)));
             Space.Add(mesh);
             game.ModelDrawer.Add(mesh);

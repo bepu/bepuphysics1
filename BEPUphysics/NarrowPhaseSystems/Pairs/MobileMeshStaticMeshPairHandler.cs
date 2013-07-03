@@ -1,8 +1,9 @@
 ﻿using System;
 using BEPUphysics.BroadPhaseEntries;
-using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUutilities.ResourceManagement;
-using Microsoft.Xna.Framework;
+using BEPUutilities;
+using BEPUutilities.ResourceManagement;
+
 
 namespace BEPUphysics.NarrowPhaseSystems.Pairs
 {

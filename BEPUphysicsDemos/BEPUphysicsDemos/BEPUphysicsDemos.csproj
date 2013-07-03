@@ -51,7 +51,7 @@
     <DebugType>full</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\x86\Release</OutputPath>
-    <DefineConstants>WINDOWS</DefineConstants>
+    <DefineConstants>WINDOWS;CHECKMATH</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoStdLib>true</NoStdLib>
@@ -60,9 +60,6 @@
     <XnaCompressContent>true</XnaCompressContent>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <DebugSymbols>true</DebugSymbols>
-  </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject />
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Xna.Framework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
@@ -93,8 +90,8 @@
     <Compile Include="Alternate Movement\ICharacterTag.cs" />
     <Compile Include="Alternate Movement\SphereCharacter\HorizontalMotionConstraint.cs" />
     <Compile Include="Alternate Movement\SphereCharacter\QueryManager.cs" />
-    <Compile Include="Alternate Movement\SphereCharacter\SphereCharacterControllerInput.cs" />
     <Compile Include="Alternate Movement\SphereCharacter\SphereCharacterController.cs" />
+    <Compile Include="Alternate Movement\SphereCharacter\SphereCharacterControllerInput.cs" />
     <Compile Include="Alternate Movement\SphereCharacter\SupportFinder.cs" />
     <Compile Include="Alternate Movement\SphereCharacter\VerticalMotionConstraint.cs" />
     <Compile Include="Alternate Movement\Testing\Old\CharacterControllerOld.cs" />
@@ -211,6 +208,7 @@
     <Compile Include="Demos\WallDemo.cs" />
     <Compile Include="Extra Display Types\DisplayMotorizedGrabSpring.cs" />
     <Compile Include="Extra Display Types\DisplayGrabSpring.cs" />
+    <Compile Include="ModelDataExtractor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Sample Code\MotorizedGrabSpring.cs" />
@@ -227,13 +225,21 @@
     <Content Include="GameThumbnail.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\BEPUphysics\BEPUphysics.csproj">
-      <Project>{2A9D2227-78D7-4804-B6D1-560BB43AE911}</Project>
-      <Name>BEPUphysics</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\BEPUphysicsDrawer\BEPUphysicsDrawer.csproj">
       <Project>{A7931B1B-6BF4-43C5-B924-6AEB732243BA}</Project>
       <Name>BEPUphysicsDrawer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\BEPUphysics\BEPUphysics.csproj">
+      <Project>{C0D52C9F-14B8-4008-8DDC-109C27561A5C}</Project>
+      <Name>BEPUphysics</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\BEPUutilities\BEPUutilities.csproj">
+      <Project>{34853DEA-43A6-4F2F-A379-D1EE04D256D2}</Project>
+      <Name>BEPUutilities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ConversionHelper\ConversionHelper.csproj">
+      <Project>{BB5BF3E0-DD34-44D4-86FB-F336BB4720CA}</Project>
+      <Name>ConversionHelper</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\BEPUutilities\BEPUutilities.csproj">
       <Project>{E3AAEB61-D7DF-4E7E-A75B-B5282D2FF3F5}</Project>

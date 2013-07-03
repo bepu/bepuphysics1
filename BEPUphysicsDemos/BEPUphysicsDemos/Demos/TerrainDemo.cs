@@ -2,7 +2,6 @@
 using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.Entities.Prefabs;
 using BEPUutilities;
-using Microsoft.Xna.Framework;
 
 namespace BEPUphysicsDemos.Demos
 {
@@ -70,7 +69,7 @@ namespace BEPUphysicsDemos.Demos
 
             game.ModelDrawer.Add(terrain);
 
-            game.Camera.Position = new Vector3(0, 30, 20);
+            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(0, 30, 20);
 
         }
 

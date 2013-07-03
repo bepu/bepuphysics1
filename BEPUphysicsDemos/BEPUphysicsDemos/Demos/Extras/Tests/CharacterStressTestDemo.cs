@@ -3,8 +3,8 @@ using BEPUphysics.CollisionShapes;
 using BEPUphysics.DataStructures;
 using BEPUphysics.Entities.Prefabs;
 using BEPUutilities;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using BEPUutilities;
 using BEPUphysicsDemos.AlternateMovement.SphereCharacter;
 using System.Collections.Generic;
 using System;
@@ -31,7 +31,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             var playgroundModel = game.Content.Load<Model>("playground");
             //This is a little convenience method used to extract vertices and indices from a model.
             //It doesn't do anything special; any approach that gets valid vertices and indices will work.
-            TriangleMesh.GetVerticesAndIndicesFromModel(playgroundModel, out staticTriangleVertices, out staticTriangleIndices);
+            ModelDataExtractor.GetVerticesAndIndicesFromModel(playgroundModel, out staticTriangleVertices, out staticTriangleIndices);
             var meshShape = new InstancedMeshShape(staticTriangleVertices, staticTriangleIndices);
             var meshes = new List<Collidable>();
 
@@ -99,7 +99,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                     }
 
 
-            game.Camera.Position = new Vector3(0, 10, 40);
+            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(0, 10, 40);
 
             //Dump some boxes on top of the characters for fun.
             numColumns = 16;

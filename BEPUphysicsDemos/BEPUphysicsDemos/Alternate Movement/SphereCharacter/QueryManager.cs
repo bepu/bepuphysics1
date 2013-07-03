@@ -4,11 +4,11 @@ using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.CollisionTests;
 using BEPUutilities;
 using BEPUutilities.DataStructures;
-using Microsoft.Xna.Framework;
 using BEPUphysics.NarrowPhaseSystems;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.Settings;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
 {

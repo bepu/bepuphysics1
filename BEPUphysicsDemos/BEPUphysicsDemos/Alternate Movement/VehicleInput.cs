@@ -4,11 +4,13 @@ using BEPUphysics;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.Vehicle;
 using BEPUphysicsDrawer.Models;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.CollisionShapes;
+using BEPUutilities;
+using ConversionHelper;
+using System.Diagnostics;
 
 namespace BEPUphysicsDemos.AlternateMovement
 {
@@ -171,11 +173,11 @@ namespace BEPUphysicsDemos.AlternateMovement
                 IsActive = true;
                 Camera.UseMovementControls = false;
                 //Put the Vehicle where the camera is.
-                Vehicle.Body.Position = Camera.Position - CameraOffset;
+                Vehicle.Body.Position = MathConverter.Convert(Camera.Position) - CameraOffset;
                 Vehicle.Body.LinearVelocity = Vector3.Zero;
                 Vehicle.Body.AngularVelocity = Vector3.Zero;
                 Vehicle.Body.Orientation = Quaternion.Identity;
-                Camera.ActivateChaseCameraMode(Vehicle.Body, new Vector3(0, .6f, 0), true, 11);
+                Camera.ActivateChaseCameraMode(Vehicle.Body, new Microsoft.Xna.Framework.Vector3(0, .6f, 0), true, 10);
             }
         }
 
@@ -201,10 +203,11 @@ namespace BEPUphysicsDemos.AlternateMovement
         /// <param name="gamePadInput">Gamepad state.</param>
         public void Update(float dt, KeyboardState keyboardInput, GamePadState gamePadInput)
         {
+
             //Update the wheel's graphics.
             for (int k = 0; k < 4; k++)
             {
-                WheelModels[k].WorldTransform = Vehicle.Wheels[k].Shape.WorldTransform;
+                WheelModels[k].WorldTransform = MathConverter.Convert(Vehicle.Wheels[k].Shape.WorldTransform);
             }
 
             if (IsActive)

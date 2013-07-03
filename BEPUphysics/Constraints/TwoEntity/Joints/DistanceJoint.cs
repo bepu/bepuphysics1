@@ -1,6 +1,6 @@
 using System;
 using BEPUphysics.Entities;
-using Microsoft.Xna.Framework;
+ 
 using BEPUutilities;
 
 namespace BEPUphysics.Constraints.TwoEntity.Joints
