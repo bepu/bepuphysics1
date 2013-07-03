@@ -62,13 +62,6 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="BEPUphysics, Version=1.2.0.0, Culture=neutral, PublicKeyToken=31f6a8732a21de19, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\BEPUphysics\bin\Release\BEPUphysics.dll</HintPath>
-    </Reference>
-    <Reference Include="BEPUutilities">
-      <HintPath>..\..\BEPUphysics\bin\Release\BEPUutilities.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.Xna.Framework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
     <Reference Include="Microsoft.Xna.Framework.Game, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
     <Reference Include="Microsoft.Xna.Framework.Graphics, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
@@ -201,6 +194,14 @@
     <ProjectReference Include="..\..\BEPUphysicsDrawer\BEPUphysicsDrawer.csproj">
       <Project>{A7931B1B-6BF4-43C5-B924-6AEB732243BA}</Project>
       <Name>BEPUphysicsDrawer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\BEPUphysics\BEPUphysics.csproj">
+      <Project>{C0D52C9F-14B8-4008-8DDC-109C27561A5C}</Project>
+      <Name>BEPUphysics</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\BEPUutilities\BEPUutilities.csproj">
+      <Project>{34853DEA-43A6-4F2F-A379-D1EE04D256D2}</Project>
+      <Name>BEPUutilities</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\ConversionHelper\ConversionHelper.csproj">
       <Project>{BB5BF3E0-DD34-44D4-86FB-F336BB4720CA}</Project>
