@@ -42,7 +42,6 @@ namespace BEPUphysicsDemos.Demos
             Space.Add(ground);
 
             game.Camera.Position = new Vector3(0, 6, 15);
-
         }
 
         /// <summary>
