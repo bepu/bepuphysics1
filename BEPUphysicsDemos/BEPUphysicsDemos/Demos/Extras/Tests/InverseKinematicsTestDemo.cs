@@ -211,48 +211,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                 previousBoneEntity = boneEntity;
             }
         }
-
-        void BuildRepro(Vector3 position)
-        {
-            Bone handL = new Bone(position + new Vector3(0.7118200063705444f, 0.077179916203022f, 1.4212777614593506f), new Quaternion(0.02080017700791359f, -0.024392608553171158f, -0.7605244517326355f, 0.6485174894332886f), 0.017332351433038524f, 0.08666175716519262f);
-            Bone finger21L = new Bone(position + new Vector3(0.7098525762557983f, 0.06210964173078537f, 1.418351650238037f), new Quaternion(0.009192897006869316f, -0.01221051812171936f, -0.798805832862854f, 0.6013947129249573f), 0.017521332686342712f, 0.08760666343171357f);
-            Bone finger22L = new Bone(position + new Vector3(0.7690327763557434f, 0.047949232161045074f, 1.4190353155136108f), new Quaternion(-0.012611833401024342f, 0.014218091033399105f, -0.7479654550552368f, 0.6634655594825745f), 0.006895789397275276f, 0.03447894698637638f);
-
-            var anchor1 = position + new Vector3(0.6677764058113098f, 0.07421471178531647f, 1.4170128107070923f);
-            var ikballsocketjoint = new IKBallSocketJoint(handL, finger21L, anchor1);
-            var ikswinglimit = new IKSwingLimit(
-                handL, finger21L,
-                new Vector3(0.960570752620697f, -0.2763504683971405f, 0.030564788728952408f),
-                new Vector3(0.960570752620697f, -0.2763504683971405f, 0.030564788728952408f), .052360f);
-            //ikswinglimit.ErrorCorrectionFactor = 0.02f;
-            var ikrevolutejoint = new IKRevoluteJoint(handL, finger21L, new Vector3(-0.27647966146469116f, -0.96101975440979f, 7.450580596923828e-09f));
-            //ikrevolutejoint.ErrorCorrectionFactor = 0.02f;
-
-            var anchor2 = position + new Vector3(0.7519288063049316f, 0.050004567950963974f, 1.419690489768982f);
-            var ikballsocketjoint2 = new IKBallSocketJoint(finger21L, finger22L, anchor2);
-
-            Entity handLEntity = new Cylinder(new MotionState { Position = handL.Position, Orientation = handL.Orientation }, handL.Height, handL.Radius, 10);
-            Entity finger21LEntity = new Cylinder(new MotionState { Position = finger21L.Position, Orientation = finger21L.Orientation }, finger21L.Height, finger21L.Radius, 10);
-            Entity finger22LEntity = new Cylinder(new MotionState { Position = finger22L.Position, Orientation = finger22L.Orientation }, finger22L.Height, finger22L.Radius, 10);
-
-            CollisionRules.AddRule(handLEntity, finger21LEntity, CollisionRule.NoBroadPhase);
-            CollisionRules.AddRule(handLEntity, finger22LEntity, CollisionRule.NoBroadPhase);
-            CollisionRules.AddRule(finger21LEntity, finger22LEntity, CollisionRule.NoBroadPhase);
-
-            Space.Add(handLEntity);
-            Space.Add(finger21LEntity);
-            Space.Add(finger22LEntity);
-
-            bones.Add(new BoneRelationship(handL, handLEntity));
-            bones.Add(new BoneRelationship(finger21L, finger21LEntity));
-            bones.Add(new BoneRelationship(finger22L, finger22LEntity));
-
-            Space.Add(new BallSocketJoint(handLEntity, finger21LEntity, anchor1));
-            Space.Add(new SwingLimit(handLEntity, finger21LEntity, ikswinglimit.AxisA, ikswinglimit.AxisB, ikswinglimit.MaximumAngle));
-            Space.Add(new RevoluteAngularJoint(handLEntity, finger21LEntity, ikrevolutejoint.WorldFreeAxisA));
-            Space.Add(new BallSocketJoint(handLEntity, finger22LEntity, anchor2));
-        }
-
+        
         void BuildActionFigure(Vector3 position)
         {
             //Make a simple, poseable action figure, like the ActionFigureDemo.
@@ -853,7 +812,6 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             solver.FixerIterationCount = 0;
             solver.VelocitySubiterationCount = 3;
 
-            BuildRepro(new Vector3(0, 0, 10));
 
             BuildChain(new Vector3(-5, 2, 0));
 
