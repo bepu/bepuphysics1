@@ -1,8 +1,8 @@
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.EntityStateManagement;
-using BEPUutilities;
-using Microsoft.Xna.Framework;
+ 
 using BEPUphysics.CollisionShapes.ConvexShapes;
+using BEPUutilities;
 
 namespace BEPUphysics.Entities.Prefabs
 {

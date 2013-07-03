@@ -1,5 +1,5 @@
 ﻿using BEPUutilities;
-using Microsoft.Xna.Framework;
+using ConversionHelper;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
@@ -45,12 +45,12 @@ namespace BEPUphysicsDrawer.Models
                 translation += DisplayedObject.Entity.BufferedStates.InterpolatedStates.Position;
                 Matrix worldTransform = Matrix3x3.ToMatrix4X4(DisplayedObject.Entity.BufferedStates.InterpolatedStates.OrientationMatrix);
                 worldTransform.Translation = translation;
-                WorldTransform = worldTransform;
+                WorldTransform = MathConverter.Convert(worldTransform);
             }
             else
             {
                 //Entityless EntityCollidables just go by what their current transform is.
-                WorldTransform = DisplayedObject.WorldTransform.Matrix;
+                WorldTransform = MathConverter.Convert(DisplayedObject.WorldTransform.Matrix);
             }
         }
     }

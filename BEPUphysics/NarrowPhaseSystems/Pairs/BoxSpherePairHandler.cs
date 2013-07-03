@@ -7,10 +7,11 @@ using BEPUphysics.CollisionTests.CollisionAlgorithms.GJK;
 using BEPUphysics.Constraints.Collision;
 using BEPUphysics.PositionUpdating;
 using BEPUphysics.Settings;
-using Microsoft.Xna.Framework;
+ 
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.CollisionTests.Manifolds;
+using BEPUutilities;
 
 namespace BEPUphysics.NarrowPhaseSystems.Pairs
 {

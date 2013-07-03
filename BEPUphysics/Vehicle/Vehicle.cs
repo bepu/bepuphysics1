@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using BEPUphysics.Entities;
 using BEPUutilities.DataStructures;
 using BEPUphysics.UpdateableSystems;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.Vehicle
 {

@@ -1,6 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-
-namespace BEPUutilities
+﻿namespace BEPUutilities
 {
     ///<summary>
     /// Contains ray hit data.

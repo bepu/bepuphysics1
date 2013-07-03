@@ -1,11 +1,11 @@
 ﻿using BEPUphysics.Entities.Prefabs;
 using BEPUutilities;
-using Microsoft.Xna.Framework;
 using BEPUphysics.Entities;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using System.Collections.Generic;
 using BEPUphysics.CollisionShapes;
+using BEPUutilities;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.Materials;
 
@@ -218,7 +218,7 @@ namespace BEPUphysicsDemos.Demos
 
             //In this example, one of the two blocks doesn't collide with anything.  The other does collide, and has a very high friction material.
 
-            Game.Camera.Position = new Vector3(0, 3, 25);
+            Game.Camera.Position = new Microsoft.Xna.Framework.Vector3(0, 3, 25);
         }
 
         /// <summary>

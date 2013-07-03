@@ -1,6 +1,6 @@
 ﻿using BEPUphysics.Entities.Prefabs;
 using BEPUutilities;
-using Microsoft.Xna.Framework;
+using BEPUutilities;
 using BEPUphysics.DataStructures;
 using Microsoft.Xna.Framework.Graphics;
 using BEPUphysics.CollisionShapes;
@@ -25,7 +25,7 @@ namespace BEPUphysicsDemos.Demos
             int[] indices;
 
             //Create a big hollow sphere (squished into an ellipsoid).
-            TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("hollowsphere"), out vertices, out indices);
+            ModelDataExtractor.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("hollowsphere"), out vertices, out indices);
             var transform = new AffineTransform(new Vector3(.06f, .04f, .06f), Quaternion.Identity, new Vector3(0, 0, 0));
 
             //Note that meshes can also be made solid (MobileMeshSolidity.Solid).  This gives meshes a solid collidable volume, instead of just
@@ -37,7 +37,7 @@ namespace BEPUphysicsDemos.Demos
             Space.Add(mesh);
 
             //Add another mobile mesh inside.
-            TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("tube"), out vertices, out indices);
+            ModelDataExtractor.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("tube"), out vertices, out indices);
             transform = new AffineTransform(new Vector3(1, 1, 1), Quaternion.Identity, new Vector3(0, 0, 0));
             mesh = new MobileMesh(vertices, indices, transform, MobileMeshSolidity.Counterclockwise, 10);
             mesh.Position = new Vector3(0, 10, 0);
@@ -65,7 +65,7 @@ namespace BEPUphysicsDemos.Demos
                     }
 
             //Space.Add(new Box(new Vector3(0, -10, 0), 1, 1, 1));
-            game.Camera.Position = new Vector3(0, -10, 5);
+            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(0, -10, 5);
             game.Camera.Yaw = 0;
             game.Camera.Pitch = 0;
 

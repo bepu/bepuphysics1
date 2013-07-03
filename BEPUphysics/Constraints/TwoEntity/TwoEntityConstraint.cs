@@ -1,6 +1,8 @@
 using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
-using Microsoft.Xna.Framework;
+ 
+using BEPUutilities.DataStructures;
+using BEPUutilities;
 using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.Constraints.TwoEntity

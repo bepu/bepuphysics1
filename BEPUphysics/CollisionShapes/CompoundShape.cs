@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
-using Microsoft.Xna.Framework;
-using BEPUutilities.DataStructures;
 using BEPUutilities;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.CollisionShapes
 {

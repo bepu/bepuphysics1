@@ -1,6 +1,7 @@
 ﻿using System;
 using BEPUphysics.BroadPhaseEntries;
-using BEPUphysics.BroadPhaseEntries.MobileCollidables;
+using BEPUphysics.Collidables;
+using BEPUphysics.Collidables.MobileCollidables;
 using BEPUphysics.CollisionTests.CollisionAlgorithms.GJK;
 using BEPUphysics.CollisionTests.Manifolds;
 using BEPUphysics.Constraints.Collision;
@@ -8,7 +9,7 @@ using BEPUphysics.DataStructures;
 using BEPUutilities.DataStructures;
 using BEPUphysics.PositionUpdating;
 using BEPUphysics.Settings;
-using Microsoft.Xna.Framework;
+ 
 using BEPUutilities;
 
 namespace BEPUphysics.NarrowPhaseSystems.Pairs

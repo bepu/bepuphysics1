@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using BEPUphysics.CollisionTests;
 using BEPUutilities;
 using BEPUutilities.DataStructures;
-using Microsoft.Xna.Framework;
 using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.CollisionRuleManagement;
+using BEPUutilities;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysicsDemos.AlternateMovement.Character
 {

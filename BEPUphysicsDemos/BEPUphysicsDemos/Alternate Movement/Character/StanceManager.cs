@@ -1,9 +1,10 @@
 ﻿using System;
 using BEPUutilities;
 using BEPUutilities.DataStructures;
-using Microsoft.Xna.Framework;
 using BEPUphysics.CollisionTests;
 using BEPUphysics.Settings;
+using BEPUutilities;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysicsDemos.AlternateMovement.Character
 {

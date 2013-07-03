@@ -3,8 +3,9 @@ using BEPUphysics.Constraints;
 using BEPUphysics.Entities;
 using BEPUutilities;
 using BEPUutilities.DataStructures;
-using Microsoft.Xna.Framework;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
+using BEPUutilities;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysicsDemos.AlternateMovement.Character
 {

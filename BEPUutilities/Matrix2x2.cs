@@ -1,6 +1,6 @@
 ﻿ 
 
-using Microsoft.Xna.Framework;
+
 
 namespace BEPUutilities
 {
@@ -325,6 +325,16 @@ namespace BEPUutilities
             result.M21 = m21;
             result.M22 = matrix.M22;
         }
+        
+        /// <summary>
+        /// Transposes the matrix in-place.
+        /// </summary>
+        public void Transpose()
+        {
+            float m21 = M21;
+            M21 = M12;
+            M12 = m21;
+        }      
 
         /// <summary>
         /// Creates a string representation of the matrix.

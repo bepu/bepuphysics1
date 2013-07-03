@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using BEPUphysics.Constraints.SolverGroups;
 using BEPUphysics.Entities;
-using BEPUutilities.DataStructures;
 using BEPUphysics.SolverSystems;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.Constraints
 {

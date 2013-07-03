@@ -1,6 +1,6 @@
 ﻿using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUutilities;
-using Microsoft.Xna.Framework;
+ 
 using BEPUphysics.Settings;
 using RigidTransform = BEPUutilities.RigidTransform;
 

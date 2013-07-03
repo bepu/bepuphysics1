@@ -2,8 +2,6 @@
 using BEPUphysics.BroadPhaseEntries.Events;
 using BEPUphysics.CollisionShapes;
 using BEPUutilities;
-using Microsoft.Xna.Framework;
-using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.OtherSpaceStages;
 using System.Collections.Generic;
 using RigidTransform = BEPUutilities.RigidTransform;

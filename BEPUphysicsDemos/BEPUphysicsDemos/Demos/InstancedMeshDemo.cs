@@ -4,7 +4,6 @@ using BEPUphysics.CollisionShapes;
 using BEPUphysics.DataStructures;
 using BEPUphysics.Entities.Prefabs;
 using BEPUutilities;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace BEPUphysicsDemos.Demos
@@ -28,7 +27,7 @@ namespace BEPUphysicsDemos.Demos
 
             Vector3[] vertices;
             int[] indices;
-            TriangleMesh.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("guy"), out vertices, out indices);
+            ModelDataExtractor.GetVerticesAndIndicesFromModel(game.Content.Load<Model>("guy"), out vertices, out indices);
             var meshShape = new InstancedMeshShape(vertices, indices);
 
             var random = new Random();
@@ -62,7 +61,7 @@ namespace BEPUphysicsDemos.Demos
 
             Space.Add(new Box(new Vector3(10, 0, 10), 20, 1, 20));
 
-            game.Camera.Position = new Vector3(10, 6, 30);
+            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(10, 6, 30);
         }
 
         /// <summary>

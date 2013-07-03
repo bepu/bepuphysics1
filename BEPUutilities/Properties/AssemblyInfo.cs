@@ -6,23 +6,21 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("BEPUutilities")]
-[assembly: AssemblyProduct("BEPUutilities")]
 [assembly: AssemblyDescription("Extensions and helpers used by various bepu things.")]
+[assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Bepu Entertainment LLC.")]
+[assembly: AssemblyProduct("BEPUutilities")]
 [assembly: AssemblyCopyright("Copyright ©  2012")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
-// COM, set the ComVisible attribute to true on that type. Only Windows
-// assemblies support COM.
+// COM, set the ComVisible attribute to true on that type.
 [assembly: ComVisible(false)]
 
-// On Windows, the following GUID is for the ID of the typelib if this
-// project is exposed to COM. On other platforms, it unique identifies the
-// title storage container when deploying this assembly to the device.
-[assembly: Guid("a068ca77-0b61-484b-80dd-0dac40a2043c")]
+// The following GUID is for the ID of the typelib if this project is exposed to COM
+[assembly: Guid("c8431ed4-209d-4c02-9328-ca225b760ea6")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -31,5 +29,8 @@ using System.Runtime.InteropServices;
 //      Build Number
 //      Revision
 //
-[assembly: AssemblyVersion("1.3.0.0")]
-[assembly: AssemblyFileVersionAttribute("1.3.0.0")]
+// You can specify all the values or you can default the Build and Revision Numbers 
+// by using the '*' as shown below:
+// [assembly: AssemblyVersion("1.0.*")]
+[assembly: AssemblyVersion("1.2.0.0")]
+[assembly: AssemblyFileVersion("1.2.0.0")]

@@ -8,8 +8,7 @@ using BEPUphysics.EntityStateManagement;
 using BEPUphysics.OtherSpaceStages;
 using BEPUphysics.PositionUpdating;
 using BEPUphysics.Settings;
-using BEPUutilities;
-using Microsoft.Xna.Framework;
+ 
 using BEPUutilities;
 using BEPUphysics.Materials;
 using BEPUphysics.CollisionShapes;

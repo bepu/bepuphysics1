@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
 using BEPUphysics.OtherSpaceStages;
+using BEPUutilities.ResourceManagement;
 
 namespace BEPUphysics.BroadPhaseEntries
 {

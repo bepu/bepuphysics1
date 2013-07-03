@@ -1,9 +1,9 @@
 ﻿using System;
 using BEPUphysics.Entities.Prefabs;
-using Microsoft.Xna.Framework;
 using BEPUphysics;
 using System.Collections.Generic;
 using BEPUphysics.Entities;
+using BEPUutilities;
 
 namespace BEPUphysicsDemos.Demos.Extras.Tests
 {
@@ -40,7 +40,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                 }
                 spaces.Add(space);
             }
-            game.Camera.Position = new Vector3(20, 10, 70);
+            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(20, 10, 70);
 
         }
 

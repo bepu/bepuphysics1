@@ -1,5 +1,5 @@
 ﻿using System;
-using Microsoft.Xna.Framework;
+ 
 
 
 namespace BEPUutilities
@@ -1185,6 +1185,25 @@ namespace BEPUutilities
             result.M32 = m32;
             result.M33 = matrix.M33;
         }
+       
+        /// <summary>
+        /// Transposes the matrix in-place.
+        /// </summary>
+        public void Transpose()
+        {
+            float intermediate = M12;
+            M12 = M21;
+            M21 = intermediate;
+
+            intermediate = M13;
+            M13 = M31;
+            M31 = intermediate;
+
+            intermediate = M23;
+            M23 = M32;
+            M32 = intermediate;
+        }
+
 
         /// <summary>
         /// Creates a string representation of the matrix.

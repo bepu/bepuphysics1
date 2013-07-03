@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUutilities;
-using Microsoft.Xna.Framework;
+ 
 using System.Diagnostics;
 
 namespace BEPUphysics.CollisionTests.CollisionAlgorithms

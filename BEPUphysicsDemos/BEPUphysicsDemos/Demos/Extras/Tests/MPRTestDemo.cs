@@ -1,11 +1,10 @@
 ﻿using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
 using BEPUutilities;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System;
+using BEPUutilities;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using Microsoft.Xna.Framework.Graphics;
 using BEPUphysics.Settings;
@@ -13,7 +12,8 @@ using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
 using BEPUphysics.CollisionTests;
 
-//using BEPUphysics.CollisionTests.CollisionAlgorithms.Testing;
+using Microsoft.Xna.Framework.Input;
+using ConversionHelper;
 
 namespace BEPUphysicsDemos.Demos.Extras.Tests
 {
@@ -82,7 +82,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             groundHeight = .1f;
             groundLength = 10;
             //a = new Box(new Vector3(0, -5, 0), groundWidth, groundHeight, groundLength, 1);
-            //a = new TransformableEntity(new Vector3(0,0,0), new TriangleShape(new Vector3(-5, -5, -5), new Vector3(5, -5, -5), new Vector3(-5, -5, 5)), Matrix3X3.Identity);         
+            //a = new TransformableEntity(new Vector3(0,0,0), new TriangleShape(new Vector3(-5, -5, -5), new Vector3(5, -5, -5), new Vector3(-5, -5, 5)), Matrix3x3.Identity);         
             a = new Triangle(new Vector3(0, -5, 0), new Vector3(5, -5, 0), new Vector3(5, -5, 5), 1);
             Space.Add(a);
             
@@ -98,8 +98,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             CollisionRules.AddRule(b, a, CollisionRule.NoSolver);
             b.ActivityInformation.IsAlwaysActive = true;
             Space.Add(b);
-            //Space.Add(new TransformableEntity(new Vector3(0, 4, 0), new BoxShape(1, 1, 1), Matrix3X3.Identity, 1));
-            //Space.Add( new TransformableEntity(new Vector3(0, 6, 0), new BoxShape(1, 1, 1), Matrix3X3.Identity, 1));
+            //Space.Add(new TransformableEntity(new Vector3(0, 4, 0), new BoxShape(1, 1, 1), Matrix3x3.Identity, 1));
+            //Space.Add( new TransformableEntity(new Vector3(0, 6, 0), new BoxShape(1, 1, 1), Matrix3x3.Identity, 1));
 
             //Vector3[] vertices = new Vector3[] { new Vector3(0, -5, 0), new Vector3(5, -5, 0), new Vector3(5, -5, 5), new Vector3(0, -60, 5) };
             //int[] indices = new int[] { 0, 1, 2 , 0, 2, 3 };
@@ -289,14 +289,14 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             minkowskiLines.Clear();
             for (int i = 0; i < indices.Count; i += 3)
             {
-                minkowskiLines.Add(new VertexPositionColor(vertices[indices[i]], Color.Blue));
-                minkowskiLines.Add(new VertexPositionColor(vertices[indices[i + 1]], Color.Blue));
+                minkowskiLines.Add(new VertexPositionColor(MathConverter.Convert(vertices[indices[i]]), Microsoft.Xna.Framework.Color.Blue));
+                minkowskiLines.Add(new VertexPositionColor(MathConverter.Convert(vertices[indices[i + 1]]), Microsoft.Xna.Framework.Color.Blue));
 
-                minkowskiLines.Add(new VertexPositionColor(vertices[indices[i + 1]], Color.Blue));
-                minkowskiLines.Add(new VertexPositionColor(vertices[indices[i + 2]], Color.Blue));
+                minkowskiLines.Add(new VertexPositionColor(MathConverter.Convert(vertices[indices[i + 1]]), Microsoft.Xna.Framework.Color.Blue));
+                minkowskiLines.Add(new VertexPositionColor(MathConverter.Convert(vertices[indices[i + 2]]), Microsoft.Xna.Framework.Color.Blue));
 
-                minkowskiLines.Add(new VertexPositionColor(vertices[indices[i + 2]], Color.Blue));
-                minkowskiLines.Add(new VertexPositionColor(vertices[indices[i]], Color.Blue));
+                minkowskiLines.Add(new VertexPositionColor(MathConverter.Convert(vertices[indices[i + 2]]), Microsoft.Xna.Framework.Color.Blue));
+                minkowskiLines.Add(new VertexPositionColor(MathConverter.Convert(vertices[indices[i]]), Microsoft.Xna.Framework.Color.Blue));
             }
 
         }

@@ -1,11 +1,8 @@
 ﻿using System;
 using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
-using Microsoft.Xna.Framework;
-using BEPUutilities.DataStructures;
-using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUutilities;
-using BEPUphysics.Settings;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.CollisionTests.Manifolds
 {

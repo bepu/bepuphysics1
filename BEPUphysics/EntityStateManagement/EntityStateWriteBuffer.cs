@@ -2,7 +2,7 @@
 using BEPUphysics.Entities;
 using BEPUutilities;
 using BEPUutilities.DataStructures;
-using Microsoft.Xna.Framework;
+
 
 namespace BEPUphysics.EntityStateManagement
 {

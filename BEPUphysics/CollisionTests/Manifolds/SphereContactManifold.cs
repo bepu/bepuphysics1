@@ -2,8 +2,8 @@
 using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
-using BEPUutilities.DataStructures;
 using BEPUphysics.CollisionShapes.ConvexShapes;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.CollisionTests.Manifolds
 {

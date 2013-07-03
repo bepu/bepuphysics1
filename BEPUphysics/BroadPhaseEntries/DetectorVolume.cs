@@ -7,11 +7,10 @@ using BEPUphysics.Entities;
 using BEPUphysics.OtherSpaceStages;
 using BEPUutilities;
 using BEPUutilities.ResourceManagement;
-using Microsoft.Xna.Framework;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
-using RigidTransform = BEPUutilities.RigidTransform;
+using BEPUutilities.ResourceManagement;
 
 namespace BEPUphysics.BroadPhaseEntries
 {

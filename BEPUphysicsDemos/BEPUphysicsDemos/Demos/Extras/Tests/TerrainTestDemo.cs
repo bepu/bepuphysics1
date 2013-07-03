@@ -1,7 +1,7 @@
 ﻿using BEPUphysics.Entities.Prefabs;
-using Microsoft.Xna.Framework;
 using BEPUphysics.CollisionShapes;
 using BEPUphysics.CollisionShapes.ConvexShapes;
+using BEPUutilities;
 
 namespace BEPUphysicsDemos.Demos.Extras.Tests
 {
@@ -101,7 +101,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
 
 
 
-            game.Camera.Position = new Vector3(0, 30, 20);
+            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(0, 30, 20);
 
         }
 

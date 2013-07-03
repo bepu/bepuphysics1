@@ -1,12 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
-using BEPUphysics.BroadPhaseSystems;
-using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUutilities.DataStructures;
-using BEPUphysics.Materials;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
-using Microsoft.Xna.Framework.Input;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.NarrowPhaseSystems.Pairs
 {

@@ -1,6 +1,7 @@
 ﻿using System;
-using BEPUutilities.DataStructures;
 using BEPUphysics.Entities;
+using BEPUutilities;
+using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.DeactivationManagement
 {
@@ -312,6 +313,7 @@ namespace BEPUphysics.DeactivationManagement
                 allowStabilization = value;
             }
         }
+
 
 
         //simulationisland should hook into the activated event.  If it is fired and the simulation island is inactive, the simulation island should activate.

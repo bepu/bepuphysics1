@@ -3,10 +3,8 @@ using BEPUphysics.BroadPhaseEntries.Events;
 using BEPUphysics.CollisionShapes;
 using BEPUutilities;
 using BEPUutilities.ResourceManagement;
-using Microsoft.Xna.Framework;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
 using BEPUphysics.OtherSpaceStages;
-using AffineTransform = BEPUutilities.AffineTransform;
 using RigidTransform = BEPUutilities.RigidTransform;
 
 namespace BEPUphysics.BroadPhaseEntries

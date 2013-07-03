@@ -1,9 +1,10 @@
 ﻿using System;
 using BEPUphysics.Entities;
+ 
+using BEPUutilities.DataStructures;
+using BEPUphysics.Settings;
 using BEPUutilities;
 using BEPUutilities.DataStructures;
-using Microsoft.Xna.Framework;
-using BEPUphysics.Settings;
 
 namespace BEPUphysics.Constraints.Collision
 {
