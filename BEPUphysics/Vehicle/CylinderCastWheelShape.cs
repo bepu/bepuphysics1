@@ -2,8 +2,6 @@
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.Entities;
-using BEPUphysics.NarrowPhaseSystems.Pairs;
-using Microsoft.Xna.Framework;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUutilities;
 using BEPUphysics.Materials;

@@ -1,6 +1,7 @@
 ﻿using System;
 using BEPUphysics.BroadPhaseEntries.Events;
 using BEPUphysics.CollisionShapes;
+using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUutilities;
 using BEPUphysics.OtherSpaceStages;
 using System.Collections.Generic;

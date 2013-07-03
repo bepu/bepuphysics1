@@ -115,6 +115,19 @@ namespace BEPUutilities
         }
 
         /// <summary>
+        /// Multiplies two quaternions together in opposite order.
+        /// </summary>
+        /// <param name="a">First quaternion to multiply.</param>
+        /// <param name="b">Second quaternion to multiply.</param>
+        /// <returns>Product of the multiplication.</returns>
+        public static Quaternion Concatenate(Quaternion a, Quaternion b)
+        {
+            Quaternion result;
+            Concatenate(ref a, ref b, out result);
+            return result;
+        }
+
+        /// <summary>
         /// Quaternion representing the identity transform.
         /// </summary>
         public static Quaternion Identity
@@ -218,11 +231,29 @@ namespace BEPUutilities
         /// </summary>
         public void Normalize()
         {
-            float inverse = (float)(1 / System.Math.Sqrt(X * X + Y * Y + Z * Z + W * W));
+            float inverse = (float)(1 / Math.Sqrt(X * X + Y * Y + Z * Z + W * W));
             X *= inverse;
             Y *= inverse;
             Z *= inverse;
             W *= inverse;
+        }
+
+        /// <summary>
+        /// Computes the squared length of the quaternion.
+        /// </summary>
+        /// <returns>Squared length of the quaternion.</returns>
+        public float LengthSquared()
+        {
+            return X * X + Y * Y + Z * Z + W * W;
+        }
+
+        /// <summary>
+        /// Computes the length of the quaternion.
+        /// </summary>
+        /// <returns>Length of the quaternion.</returns>
+        public float Length()
+        {
+            return (float)Math.Sqrt(X * X + Y * Y + Z * Z + W * W);
         }
 
         /// <summary>
@@ -472,6 +503,7 @@ namespace BEPUutilities
             q.Y = (float)(cosYawSinPitch * cosRoll + sinYawCosPitch * sinRoll);
             q.Z = (float)(cosYawCosPitch * sinRoll - sinYawSinPitch * cosRoll);
         }
+
 
     }
 }

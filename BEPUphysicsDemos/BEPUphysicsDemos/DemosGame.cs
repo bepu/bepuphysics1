@@ -5,7 +5,6 @@ using BEPUphysics.Entities;
 using BEPUphysicsDemos.Demos;
 using BEPUphysicsDemos.Demos.Extras;
 using BEPUphysicsDemos.Demos.Extras.Tests;
-using BEPUphysicsDemos.Extras.Tests.Demos;
 using BEPUphysicsDemos.SampleCode;
 using BEPUphysicsDrawer.Font;
 using BEPUphysicsDrawer.Lines;
@@ -92,7 +91,7 @@ namespace BEPUphysicsDemos
                                                     typeof (MobileMeshDemo),
                                                     typeof (StaticGroupDemo),
                                                     typeof (EntityConstructionDemo),
-                                                    typeof (MultipendulumDemo),
+                                                    typeof (SpiderDemo),
                                                     typeof (ClothDemo),
                                                     typeof (EarthquakeDemo),
                                                     typeof (BridgeDemo),

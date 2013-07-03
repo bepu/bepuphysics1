@@ -1,20 +1,10 @@
 ﻿#if WINDOWS
-using System;
 using System.Collections.Generic;
 using BEPUphysics.CollisionRuleManagement;
-using BEPUphysics.Constraints.TwoEntity.JointLimits;
-using BEPUphysics.Constraints.TwoEntity.Joints;
-using BEPUphysics.Constraints.TwoEntity.Motors;
 using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
-using BEPUphysics.EntityStateManagement;
 using BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics;
-using BEPUphysicsDrawer.Models;
 using BEPUutilities;
-using Microsoft.Xna.Framework;
-using System.Diagnostics;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 
 namespace BEPUphysicsDemos.Demos.Extras.Tests
 {
@@ -73,7 +63,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
         public InverseKinematicsTestDemo2(DemosGame game)
             : base(game)
         {
-            game.Camera.Position = new Vector3(0, 3, 5);
+            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(0, 3, 5);
             Box ground = new Box(new Vector3(0, -3, 0), 30, 1, 30);
             Space.Add(ground);
             Space.ForceUpdater.Gravity = new Vector3(0, -9.81f, 0);

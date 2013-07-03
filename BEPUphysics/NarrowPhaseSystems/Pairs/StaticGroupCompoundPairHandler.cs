@@ -1,5 +1,6 @@
 ﻿using System;
 using BEPUphysics.BroadPhaseEntries;
+using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.DataStructures;
 using BEPUutilities.DataStructures;
 

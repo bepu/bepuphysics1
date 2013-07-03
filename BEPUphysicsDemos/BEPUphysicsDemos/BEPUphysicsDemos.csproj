@@ -121,7 +121,7 @@
     <Compile Include="Demos\CompoundBodiesDemo.cs" />
     <Compile Include="Demos\EntityConstructionDemo.cs" />
     <Compile Include="Demos\Extras\SuspensionCarDemo2.cs" />
-    <Compile Include="Demos\Extras\SpiderDemo.cs" />
+    <Compile Include="Demos\SpiderDemo.cs" />
     <Compile Include="Demos\Extras\Tests\BoxBoxTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\CharacterStressTestDemo.cs" />
     <Compile Include="Demos\Extras\GraphicMatchingDemo.cs" />
@@ -186,7 +186,6 @@
     <Compile Include="Demos\IncomingDemo.cs" />
     <Compile Include="Demos\JengaDemo.cs" />
     <Compile Include="Demos\LotsOSpheresDemo.cs" />
-    <Compile Include="Demos\MultipendulumDemo.cs" />
     <Compile Include="Demos\PathFollowingDemo.cs" />
     <Compile Include="Demos\StaticMeshDemo.cs" />
     <Compile Include="Demos\InstancedMeshDemo.cs" />
@@ -234,16 +233,16 @@
       <Name>BEPUphysics</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\BEPUutilities\BEPUutilities.csproj">
+      <Project>{E3AAEB61-D7DF-4E7E-A75B-B5282D2FF3F5}</Project>
+      <Name>BEPUutilities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\BEPUutilities\BEPUutilities.csproj">
       <Project>{34853DEA-43A6-4F2F-A379-D1EE04D256D2}</Project>
       <Name>BEPUutilities</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\ConversionHelper\ConversionHelper.csproj">
       <Project>{BB5BF3E0-DD34-44D4-86FB-F336BB4720CA}</Project>
       <Name>ConversionHelper</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\BEPUutilities\BEPUutilities.csproj">
-      <Project>{E3AAEB61-D7DF-4E7E-A75B-B5282D2FF3F5}</Project>
-      <Name>BEPUutilities</Name>
     </ProjectReference>
     <ProjectReference Include="..\BEPUphysicsDemosContent\BEPUphysicsDemosContent.contentproj">
       <Name>BEPUphysicsDemosContent %28Content%29</Name>

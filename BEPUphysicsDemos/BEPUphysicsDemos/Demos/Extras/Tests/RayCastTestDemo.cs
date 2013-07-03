@@ -3,9 +3,13 @@ using System;
 using System.Collections.Generic;
 using BEPUphysics;
 using BEPUphysics.Entities.Prefabs;
+using ConversionHelper;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Matrix = BEPUutilities.Matrix;
+using Ray = BEPUutilities.Ray;
+using Vector3 = BEPUutilities.Vector3;
 
 namespace BEPUphysicsDemos.Demos.Extras.Tests
 {
@@ -49,7 +53,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             Space.Add(convexHull);
 
 
-            game.Camera.Position = new Vector3(-10, 5, 10);
+            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(-10, 5, 10);
             game.Camera.Yaw = (float)Math.PI / -4f;
             game.Camera.Pitch = -(float)Math.PI / 9f;
 
@@ -76,8 +80,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
 #if WINDOWS
             if (Game.MouseInput.RightButton == ButtonState.Pressed)
             {
-                origin = Game.Camera.Position;
-                direction = Game.Camera.WorldMatrix.Forward;
+                origin = MathConverter.Convert(Game.Camera.Position);
+                direction = MathConverter.Convert(Game.Camera.WorldMatrix.Forward);
             }
 #endif
             hitAnything = Space.RayCast(new Ray(origin, direction * 3), 10000, out result);
@@ -96,7 +100,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             }
             Game.LineDrawer.LightingEnabled = false;
             Game.LineDrawer.VertexColorEnabled = true;
-            Game.LineDrawer.World = Matrix.Identity;
+            Game.LineDrawer.World = Microsoft.Xna.Framework.Matrix.Identity;
             Game.LineDrawer.View = Game.Camera.ViewMatrix;
             Game.LineDrawer.Projection = Game.Camera.ProjectionMatrix;
             Game.GraphicsDevice.BlendState = BlendState.Opaque;
@@ -108,10 +112,10 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                 Game.GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList,
                                                        new[]
                                                                {
-                                                                   new VertexPositionColor(origin, Color.Blue),
-                                                                   new VertexPositionColor(result.HitData.Location, Color.Blue),
-                                                                   new VertexPositionColor(result.HitData.Location, Color.Blue),
-                                                                   new VertexPositionColor(result.HitData.Normal + result.HitData.Location, Color.Blue)
+                                                                   new VertexPositionColor(MathConverter.Convert(origin), Color.Blue),
+                                                                   new VertexPositionColor(MathConverter.Convert(result.HitData.Location), Color.Blue),
+                                                                   new VertexPositionColor(MathConverter.Convert(result.HitData.Location), Color.Blue),
+                                                                   new VertexPositionColor(MathConverter.Convert(result.HitData.Normal + result.HitData.Location), Color.Blue)
                                                                },
                                                        0, 2);
             }

@@ -1,7 +1,6 @@
 ﻿#if WINDOWS
 using System;
 using System.Collections.Generic;
-using System.Text;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.Constraints.TwoEntity.JointLimits;
 using BEPUphysics.Constraints.TwoEntity.Joints;
@@ -12,10 +11,17 @@ using BEPUphysics.EntityStateManagement;
 using BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics;
 using BEPUphysicsDrawer.Models;
 using BEPUutilities;
-using Microsoft.Xna.Framework;
 using System.Diagnostics;
+using ConversionHelper;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MathHelper = BEPUutilities.MathHelper;
+using Matrix = BEPUutilities.Matrix;
+using Quaternion = BEPUutilities.Quaternion;
+using Ray = BEPUutilities.Ray;
+using Vector2 = BEPUutilities.Vector2;
+using Vector3 = BEPUutilities.Vector3;
 
 namespace BEPUphysicsDemos.Demos.Extras.Tests
 {
@@ -28,7 +34,6 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
         }
 
         private float distanceToTarget;
-        private IKSolver solver;
         private Camera camera;
         public List<Control> Controls { get; set; }
 
@@ -37,10 +42,9 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             get { return stateControls.Count > 0; }
         }
 
-        public StateControlGroup(Camera camera, List<Control> controls, IKSolver solver)
+        public StateControlGroup(Camera camera, List<Control> controls)
         {
             this.camera = camera;
-            this.solver = solver;
             this.Controls = controls;
         }
 
@@ -88,12 +92,12 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                 var entry = new ControlEntry { Control = GetControl(bone), GrabOffset = grabbedLocation - bone.Position };
                 stateControls.Add(entry);
             }
-            distanceToTarget = Vector3.Dot(camera.WorldMatrix.Forward, grabbedLocation - camera.Position);
+            distanceToTarget = Vector3.Dot(MathConverter.Convert(camera.WorldMatrix.Forward), grabbedLocation - MathConverter.Convert(camera.Position));
         }
 
         public void UpdateGoals()
         {
-            var newGoal = camera.WorldMatrix.Forward * distanceToTarget + camera.Position;
+            var newGoal = MathConverter.Convert(camera.WorldMatrix.Forward * distanceToTarget + camera.Position);
             foreach (var entry in stateControls)
             {
                 entry.Control.LinearMotor.TargetPosition = newGoal - entry.GrabOffset;
@@ -795,12 +799,12 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
 
 
             whitePixel = game.Content.Load<Texture2D>("whitePixel");
-            game.Camera.Position = new Vector3(0, 3, 5);
+            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(0, 3, 5);
             Box ground = new Box(new Vector3(0, 0, 0), 30, 1, 30);
             Space.Add(ground);
             Space.ForceUpdater.Gravity = new Vector3(0, -9.81f, 0);
 
-            stateControlGroup = new StateControlGroup(game.Camera, controls, solver);
+            stateControlGroup = new StateControlGroup(game.Camera, controls);
 
 
             drawer = new InstancedModelDrawer(game);
@@ -880,7 +884,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                     //Try to pin a bone.
                     BoneRelationship hitBone;
                     Vector3 hitPosition;
-                    if (RayCastBones(new Ray(Game.Camera.Position, Game.Camera.WorldMatrix.Forward), out hitBone, out hitPosition)) //Can't control pinned bones.
+                    if (RayCastBones(new Ray(MathConverter.Convert(Game.Camera.Position), MathConverter.Convert(Game.Camera.WorldMatrix.Forward)), out hitBone, out hitPosition)) //Can't control pinned bones.
                     {
                         //Found one!
                         hitBone.Bone.Pinned = !hitBone.Bone.Pinned;
@@ -894,7 +898,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                     //This is a new click. Try to grab.
                     BoneRelationship hitBone;
                     Vector3 hitPosition;
-                    if (RayCastBones(new Ray(Game.Camera.Position, Game.Camera.WorldMatrix.Forward), out hitBone, out hitPosition) && !hitBone.Bone.Pinned)
+                    if (RayCastBones(new Ray(MathConverter.Convert(Game.Camera.Position), MathConverter.Convert(Game.Camera.WorldMatrix.Forward)), out hitBone, out hitPosition) && !hitBone.Bone.Pinned)
                     {
                         if (Game.KeyboardInput.IsKeyDown(Keys.LeftShift))
                         {
@@ -912,7 +916,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                             dragControl.TargetBone = hitBone.Bone;
                             controls.Add(dragControl);
                             dragControl.LinearMotor.Offset = hitPosition - hitBone.Bone.Position;
-                            distanceToGrabbedBone = Vector3.Dot(Game.Camera.WorldMatrix.Forward, hitPosition - Game.Camera.Position);
+                            distanceToGrabbedBone = Vector3.Dot(MathConverter.Convert(Game.Camera.WorldMatrix.Forward), hitPosition - MathConverter.Convert(Game.Camera.Position));
                         }
                     }
                     else
@@ -928,7 +932,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                 {
                     //We may be dragging something. If we are, update it.
                     if (dragControl.TargetBone != null)
-                        dragControl.LinearMotor.TargetPosition = Game.Camera.Position + Game.Camera.WorldMatrix.Forward * distanceToGrabbedBone;
+                        dragControl.LinearMotor.TargetPosition = MathConverter.Convert(Game.Camera.Position + Game.Camera.WorldMatrix.Forward * distanceToGrabbedBone);
                     else if (stateControlGroup.IsActive)
                         stateControlGroup.UpdateGoals();
 
@@ -964,13 +968,13 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                     Matrix.CreateFromQuaternion(ref bones[i].Bone.Orientation, out transform);
                     Matrix.Multiply(ref localTransform, ref transform, out transform);
                     transform.Translation = bones[i].Bone.Position;
-                    bones[i].DisplayBone.WorldTransform = transform;
+                    bones[i].DisplayBone.WorldTransform = MathConverter.Convert(transform);
 
                     if (bones[i].Bone.Pinned)
-                        bones[i].DisplayBone.Color = new Vector3(0, 0, 1);
+                        bones[i].DisplayBone.Color = new Microsoft.Xna.Framework.Vector3(0, 0, 1);
                     else
                     {
-                        bones[i].DisplayBone.Color = new Vector3(bones[i].Bone.Mass / 2, 0, 0);
+                        bones[i].DisplayBone.Color = new Microsoft.Xna.Framework.Vector3(bones[i].Bone.Mass / 2, 0, 0);
                     }
                 }
 
@@ -985,20 +989,20 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
 
         public override void DrawUI()
         {
-            Game.DataTextDrawer.Draw("IK Controls:", new Vector2(970, 20));
-            Game.TinyTextDrawer.Draw(" T: Toggle Dynamics/IK", new Vector2(970, 43));
-            Game.TinyTextDrawer.Draw(" Right click: Drag", new Vector2(970, 57));
-            Game.TinyTextDrawer.Draw(" Left shift + Right click: Multiselect Move", new Vector2(970, 71));
-            Game.TinyTextDrawer.Draw(" Left click: Pin/unpin bone", new Vector2(970, 85));
+            Game.DataTextDrawer.Draw("IK Controls:", new Microsoft.Xna.Framework.Vector2(970, 20));
+            Game.TinyTextDrawer.Draw(" T: Toggle Dynamics/IK", new Microsoft.Xna.Framework.Vector2(970, 43));
+            Game.TinyTextDrawer.Draw(" Right click: Drag", new Microsoft.Xna.Framework.Vector2(970, 57));
+            Game.TinyTextDrawer.Draw(" Left shift + Right click: Multiselect Move", new Microsoft.Xna.Framework.Vector2(970, 71));
+            Game.TinyTextDrawer.Draw(" Left click: Pin/unpin bone", new Microsoft.Xna.Framework.Vector2(970, 85));
 
-            Game.DataTextDrawer.Draw("Current mode: ", new Vector2(970, 113));
+            Game.DataTextDrawer.Draw("Current mode: ", new Microsoft.Xna.Framework.Vector2(970, 113));
             if (usingIK)
-                Game.DataTextDrawer.Draw("IK", new Vector2(1110, 113));
+                Game.DataTextDrawer.Draw("IK", new Microsoft.Xna.Framework.Vector2(1110, 113));
             else
-                Game.DataTextDrawer.Draw("Dynamics", new Vector2(1110, 113));
+                Game.DataTextDrawer.Draw("Dynamics", new Microsoft.Xna.Framework.Vector2(1110, 113));
 
             if (usingIK)
-                Game.TinyTextDrawer.Draw(" Solving time (ms): ", elapsedTime * 1000, 2, new Vector2(970, 141));
+                Game.TinyTextDrawer.Draw(" Solving time (ms): ", elapsedTime * 1000, 2, new Microsoft.Xna.Framework.Vector2(970, 141));
             Game.UIDrawer.Draw(whitePixel, new Rectangle(Game.Graphics.PreferredBackBufferWidth / 2, Game.Graphics.PreferredBackBufferHeight / 2, 3, 3), Color.LightBlue);
 
         }

@@ -3,13 +3,13 @@ using BEPUphysics.Constraints.SolverGroups;
 using BEPUphysics.Constraints.TwoEntity.Motors;
 using BEPUphysics.Entities.Prefabs;
 using BEPUutilities;
-using Microsoft.Xna.Framework;
 using BEPUphysics.Entities;
 using BEPUphysics.CollisionRuleManagement;
 using Microsoft.Xna.Framework.Input;
 using System;
 using BEPUphysics.BroadPhaseEntries;
-namespace BEPUphysicsDemos.Demos.Extras
+
+namespace BEPUphysicsDemos.Demos
 {
     /// <summary>
     /// A robot with multiple individually controllable legs qwops around.
@@ -29,7 +29,7 @@ namespace BEPUphysicsDemos.Demos.Extras
         public SpiderDemo(DemosGame game)
             : base(game)
         {
-            game.Camera.Position = new Vector3(0, 2, 15);
+            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(0, 2, 15);
             game.Camera.Yaw = 0;
             game.Camera.Pitch = 0;
 
@@ -161,7 +161,7 @@ namespace BEPUphysicsDemos.Demos.Extras
         public override void DrawUI()
         {
             base.DrawUI();
-            Game.DataTextDrawer.Draw("QWRT to extend, OPKL to retract.  Good luck!", new Vector2(50, 50));
+            Game.DataTextDrawer.Draw("QWRT to extend, OPKL to retract.  Good luck!", new Microsoft.Xna.Framework.Vector2(50, 50));
         }
 
         public override void Update(float dt)
