@@ -1,4 +1,5 @@
-﻿using BEPUphysics.Entities.Prefabs;
+﻿using BEPUphysics.BroadPhaseEntries;
+using BEPUphysics.Entities.Prefabs;
 using BEPUutilities;
 using BEPUphysics.DataStructures;
 using BEPUutilities;

@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using BEPUphysics.CollisionTests;
 using BEPUutilities;
-using Microsoft.Xna.Framework;
 
 namespace BEPUphysics
 {

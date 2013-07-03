@@ -1,4 +1,5 @@
-﻿using BEPUphysics.Constraints.TwoEntity.Motors;
+﻿using BEPUphysics.BroadPhaseEntries;
+using BEPUphysics.Constraints.TwoEntity.Motors;
 using BEPUphysics.Entities.Prefabs;
 using BEPUutilities;
 using BEPUphysics.Entities;

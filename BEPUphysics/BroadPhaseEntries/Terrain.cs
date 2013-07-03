@@ -1,7 +1,6 @@
 ﻿using System;
-using BEPUphysics.Collidables.Events;
+using BEPUphysics.BroadPhaseEntries.Events;
 using BEPUutilities;
-using BEPUutilities.ResourceManagement;
 using BEPUphysics.CollisionShapes;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
 using BEPUphysics.OtherSpaceStages;

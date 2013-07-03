@@ -1,11 +1,8 @@
-﻿using BEPUutilities;
+﻿using System;
 using BEPUphysics.DataStructures;
 using BEPUutilities;
-using Microsoft.Xna.Framework;
-using BEPUutilities.DataStructures;
 using System.Collections.Generic;
 using BEPUphysics.BroadPhaseEntries;
-using BEPUutilities.ResourceManagement;
 
 namespace BEPUphysics.CollisionShapes
 {
@@ -65,7 +62,6 @@ namespace BEPUphysics.CollisionShapes
         public bool RayCast(Ray ray, float maximumLength, out RayCastResult result)
         {
             var outputOverlappedElements = PhysicsResources.GetCollidableList();
-            var rayHits = CommonResources.GetRayHitList();
             CollidableTree.GetOverlaps(ray, maximumLength, outputOverlappedElements);
             result = new RayCastResult();
             result.HitData.T = float.MaxValue;
@@ -81,8 +77,8 @@ namespace BEPUphysics.CollisionShapes
                     }
                 }
             }
-            CommonResources.GiveBack(rayHits);
             PhysicsResources.GiveBack(outputOverlappedElements);
+            return result.HitData.T < float.MaxValue;
         }
 
         /// <summary>
@@ -128,7 +124,6 @@ namespace BEPUphysics.CollisionShapes
         public bool ConvexCast(ConvexShapes.ConvexShape castShape, ref RigidTransform startingTransform, ref Vector3 sweep, out RayCastResult result)
         {
             var outputOverlappedElements = PhysicsResources.GetCollidableList();
-            var rayHits = CommonResources.GetRayHitList();
             BoundingBox boundingBox;
             castShape.GetSweptBoundingBox(ref startingTransform, ref sweep, out boundingBox);
 
@@ -147,8 +142,8 @@ namespace BEPUphysics.CollisionShapes
                     }
                 }
             }
-            CommonResources.GiveBack(rayHits);
             PhysicsResources.GiveBack(outputOverlappedElements);
+            return result.HitData.T < float.MaxValue;
         }
 
         /// <summary>

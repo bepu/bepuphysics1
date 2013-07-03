@@ -209,5 +209,3 @@ namespace BEPUutilities
         }
     }
 }
-    }
-}

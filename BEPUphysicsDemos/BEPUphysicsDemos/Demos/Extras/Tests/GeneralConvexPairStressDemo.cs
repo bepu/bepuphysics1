@@ -1,11 +1,8 @@
 ﻿using BEPUphysics.Entities;
-using BEPUphysics.Entities.Prefabs;
-using Microsoft.Xna.Framework;
 using System;
 using BEPUphysics.CollisionShapes;
 using BEPUphysics.CollisionShapes.ConvexShapes;
-using System.Collections.Generic;
-using BEPUphysics.NarrowPhaseSystems;
+using BEPUutilities;
 
 namespace BEPUphysicsDemos.Demos.Extras.Tests
 {
@@ -56,7 +53,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             }
             Space.ForceUpdater.Gravity = new Vector3();
 
-            game.Camera.Position = new Vector3(0, 6, 15);
+            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(0, 6, 15);
         }
 
         private void RandomizeEntityState(Entity entity)

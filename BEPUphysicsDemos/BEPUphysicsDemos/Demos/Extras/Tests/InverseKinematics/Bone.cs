@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using BEPUutilities;
 using BEPUutilities.DataStructures;
-using Microsoft.Xna.Framework;
 
 namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
 {

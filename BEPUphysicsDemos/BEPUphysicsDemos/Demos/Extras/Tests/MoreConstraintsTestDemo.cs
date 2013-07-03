@@ -2,10 +2,9 @@
 using BEPUphysics.Constraints.TwoEntity.Joints;
 using BEPUphysics.Constraints.TwoEntity.Motors;
 using BEPUphysics.Entities.Prefabs;
-using BEPUphysicsDemos.Demos;
-using Microsoft.Xna.Framework;
+using BEPUutilities;
 
-namespace BEPUphysicsDemos.Extras.Tests.Demos
+namespace BEPUphysicsDemos.Demos.Extras.Tests
 {
     /// <summary>
     /// Demo showing a wall of blocks stacked up.
@@ -52,7 +51,7 @@ namespace BEPUphysicsDemos.Extras.Tests.Demos
 
             Space.Add(ground);
 
-            game.Camera.Position = new Vector3(0, 6, 15);
+            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(0, 6, 15);
         }
 
         /// <summary>

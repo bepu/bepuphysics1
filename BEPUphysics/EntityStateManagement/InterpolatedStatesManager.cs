@@ -3,9 +3,6 @@ using BEPUphysics.Entities;
 using BEPUutilities;
  
 using BEPUphysics.Threading;
-using BEPUutilities;
-using Microsoft.Xna.Framework;
-using BEPUutilities;
 
 namespace BEPUphysics.EntityStateManagement
 {
