@@ -1,14 +1,7 @@
 ﻿using System;
-using BEPUphysics.Collidables;
+using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.Entities.Prefabs;
 using BEPUutilities;
-using BEPUphysics.Settings;
-using BEPUphysics.CollisionTests.CollisionAlgorithms;
-using BEPUphysics.CollisionRuleManagement;
-using BEPUphysics.NarrowPhaseSystems.Pairs;
-using BEPUphysics.CollisionTests.Manifolds;
-using System.Diagnostics;
-using BEPUphysics.BroadPhaseSystems.SortAndSweep;
 
 namespace BEPUphysicsDemos.Demos
 {
@@ -54,6 +47,7 @@ namespace BEPUphysicsDemos.Demos
 
             //terrain.Thickness = 5; //Uncomment this and shoot some things at the bottom of the terrain! They'll be sucked up through the ground.
 
+
             Space.Add(terrain);
             for (int i = 0; i < 3; i++)
             {
@@ -70,7 +64,6 @@ namespace BEPUphysicsDemos.Demos
                     }
                 }
             }
-
 
 
 

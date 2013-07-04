@@ -74,7 +74,7 @@ namespace BEPUphysicsDemos.Demos
             //Space.Add(staticSphere);
 
 
-            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(-boxCount * boxSize, 2, boxCount * boxSize);
+            game.Camera.Position = new Vector3(-boxCount * boxSize, 2, boxCount * boxSize);
             game.Camera.Yaw = (float)Math.PI / -4f;
             game.Camera.Pitch = (float)Math.PI / 9f;
         }

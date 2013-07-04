@@ -155,7 +155,7 @@ namespace BEPUphysicsDemos.Demos.Extras
             Space.Add(sphere);
             Space.Add(new Box(new Vector3(0, -20.5f, 0), 100f, 10, 100f));
 
-            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(0, 5, 25);
+            game.Camera.Position = new Vector3(0, 5, 25);
         }
 
         /// <summary>

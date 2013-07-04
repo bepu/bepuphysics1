@@ -92,12 +92,12 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                 var entry = new ControlEntry { Control = GetControl(bone), GrabOffset = grabbedLocation - bone.Position };
                 stateControls.Add(entry);
             }
-            distanceToTarget = Vector3.Dot(MathConverter.Convert(camera.WorldMatrix.Forward), grabbedLocation - MathConverter.Convert(camera.Position));
+            distanceToTarget = Vector3.Dot(camera.WorldMatrix.Forward, grabbedLocation - camera.Position);
         }
 
         public void UpdateGoals()
         {
-            var newGoal = MathConverter.Convert(camera.WorldMatrix.Forward * distanceToTarget + camera.Position);
+            var newGoal = camera.WorldMatrix.Forward * distanceToTarget + camera.Position;
             foreach (var entry in stateControls)
             {
                 entry.Control.LinearMotor.TargetPosition = newGoal - entry.GrabOffset;
@@ -799,7 +799,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
 
 
             whitePixel = game.Content.Load<Texture2D>("whitePixel");
-            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(0, 3, 5);
+            game.Camera.Position = new Vector3(0, 3, 5);
             Box ground = new Box(new Vector3(0, 0, 0), 30, 1, 30);
             Space.Add(ground);
             Space.ForceUpdater.Gravity = new Vector3(0, -9.81f, 0);
@@ -884,7 +884,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                     //Try to pin a bone.
                     BoneRelationship hitBone;
                     Vector3 hitPosition;
-                    if (RayCastBones(new Ray(MathConverter.Convert(Game.Camera.Position), MathConverter.Convert(Game.Camera.WorldMatrix.Forward)), out hitBone, out hitPosition)) //Can't control pinned bones.
+                    if (RayCastBones(new Ray(Game.Camera.Position, Game.Camera.WorldMatrix.Forward), out hitBone, out hitPosition)) //Can't control pinned bones.
                     {
                         //Found one!
                         hitBone.Bone.Pinned = !hitBone.Bone.Pinned;
@@ -898,7 +898,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                     //This is a new click. Try to grab.
                     BoneRelationship hitBone;
                     Vector3 hitPosition;
-                    if (RayCastBones(new Ray(MathConverter.Convert(Game.Camera.Position), MathConverter.Convert(Game.Camera.WorldMatrix.Forward)), out hitBone, out hitPosition) && !hitBone.Bone.Pinned)
+                    if (RayCastBones(new Ray(Game.Camera.Position, Game.Camera.WorldMatrix.Forward), out hitBone, out hitPosition) && !hitBone.Bone.Pinned)
                     {
                         if (Game.KeyboardInput.IsKeyDown(Keys.LeftShift))
                         {
@@ -916,7 +916,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                             dragControl.TargetBone = hitBone.Bone;
                             controls.Add(dragControl);
                             dragControl.LinearMotor.Offset = hitPosition - hitBone.Bone.Position;
-                            distanceToGrabbedBone = Vector3.Dot(MathConverter.Convert(Game.Camera.WorldMatrix.Forward), hitPosition - MathConverter.Convert(Game.Camera.Position));
+                            distanceToGrabbedBone = Vector3.Dot(Game.Camera.WorldMatrix.Forward, hitPosition - Game.Camera.Position);
                         }
                     }
                     else
@@ -932,7 +932,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                 {
                     //We may be dragging something. If we are, update it.
                     if (dragControl.TargetBone != null)
-                        dragControl.LinearMotor.TargetPosition = MathConverter.Convert(Game.Camera.Position + Game.Camera.WorldMatrix.Forward * distanceToGrabbedBone);
+                        dragControl.LinearMotor.TargetPosition = Game.Camera.Position + Game.Camera.WorldMatrix.Forward * distanceToGrabbedBone;
                     else if (stateControlGroup.IsActive)
                         stateControlGroup.UpdateGoals();
 
@@ -1011,7 +1011,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
         {
             if (usingIK)
             {
-                drawer.Draw(Game.Camera.ViewMatrix, Game.Camera.ProjectionMatrix);
+                drawer.Draw(MathConverter.Convert(Game.Camera.ViewMatrix), MathConverter.Convert(Game.Camera.ProjectionMatrix));
             }
             base.Draw();
         }

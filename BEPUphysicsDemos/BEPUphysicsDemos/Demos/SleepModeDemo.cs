@@ -57,7 +57,7 @@ namespace BEPUphysicsDemos.Demos
                 }
             }
 
-            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(-30, 5, 25);
+            game.Camera.Position = new Vector3(-30, 5, 25);
             game.Camera.Yaw = (float) Math.PI / -3;
             game.Camera.Pitch = -(float) Math.PI / -12;
         }
