@@ -120,7 +120,7 @@ namespace BEPUphysicsDemos.Demos
             //Add some ground.
             Space.Add(new Box(new Vector3(0, -3.5f, 0), 40f, 1, 40f));
 
-            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(0, 5, 25);
+            game.Camera.Position = new Vector3(0, 5, 25);
         }
 
         /// <summary>

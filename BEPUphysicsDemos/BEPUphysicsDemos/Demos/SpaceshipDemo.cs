@@ -59,7 +59,7 @@ namespace BEPUphysicsDemos.Demos
             Space.Add(ship);
 
 
-            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(-14, 12, 25);
+            game.Camera.Position = new Vector3(-14, 12, 25);
             game.Camera.Yaw = (float)Math.PI / -4;
         }
 

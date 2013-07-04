@@ -63,7 +63,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
         public InverseKinematicsTestDemo2(DemosGame game)
             : base(game)
         {
-            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(0, 3, 5);
+            game.Camera.Position = new Vector3(0, 3, 5);
             Box ground = new Box(new Vector3(0, -3, 0), 30, 1, 30);
             Space.Add(ground);
             Space.ForceUpdater.Gravity = new Vector3(0, -9.81f, 0);

@@ -101,7 +101,7 @@ namespace BEPUphysicsDemos.Demos.Extras
 
 
 
-            game.Camera.Position = scale * new Microsoft.Xna.Framework.Vector3(0, 4, 10);
+            game.Camera.Position = scale * new Vector3(0, 4, 10);
             originalCameraSpeed = game.Camera.Speed;
             game.Camera.Speed *= scale;
 

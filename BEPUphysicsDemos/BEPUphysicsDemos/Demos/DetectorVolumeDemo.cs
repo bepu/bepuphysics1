@@ -67,7 +67,7 @@ namespace BEPUphysicsDemos.Demos
             detectorVolume.VolumeBeganContainingEntity += BeganContaining;
             detectorVolume.VolumeStoppedContainingEntity += StoppedContaining;
 
-            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(0, 0, 22);
+            game.Camera.Position = new Vector3(0, 0, 22);
             Space.ForceUpdater.Gravity = new Vector3();
         }
 
