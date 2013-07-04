@@ -53,7 +53,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             Space.Add(convexHull);
 
 
-            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(-10, 5, 10);
+            game.Camera.Position = new Vector3(-10, 5, 10);
             game.Camera.Yaw = (float)Math.PI / -4f;
             game.Camera.Pitch = -(float)Math.PI / 9f;
 
@@ -80,8 +80,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
 #if WINDOWS
             if (Game.MouseInput.RightButton == ButtonState.Pressed)
             {
-                origin = MathConverter.Convert(Game.Camera.Position);
-                direction = MathConverter.Convert(Game.Camera.WorldMatrix.Forward);
+                origin = Game.Camera.Position;
+                direction = Game.Camera.WorldMatrix.Forward;
             }
 #endif
             hitAnything = Space.RayCast(new Ray(origin, direction * 3), 10000, out result);
@@ -101,8 +101,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             Game.LineDrawer.LightingEnabled = false;
             Game.LineDrawer.VertexColorEnabled = true;
             Game.LineDrawer.World = Microsoft.Xna.Framework.Matrix.Identity;
-            Game.LineDrawer.View = Game.Camera.ViewMatrix;
-            Game.LineDrawer.Projection = Game.Camera.ProjectionMatrix;
+            Game.LineDrawer.View = MathConverter.Convert(Game.Camera.ViewMatrix);
+            Game.LineDrawer.Projection = MathConverter.Convert(Game.Camera.ProjectionMatrix);
             Game.GraphicsDevice.BlendState = BlendState.Opaque;
             Game.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 

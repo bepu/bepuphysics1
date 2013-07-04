@@ -101,11 +101,11 @@ namespace BEPUphysicsDemos.Demos
 #endif
                 {
                     if (character.IsActive) //Keep the ball out of the character's body if its being used.
-                        kapow.Position = MathConverter.Convert(Game.Camera.Position + Game.Camera.WorldMatrix.Forward * 3);
+                        kapow.Position = Game.Camera.Position + Game.Camera.WorldMatrix.Forward * 3;
                     else
-                        kapow.Position = MathConverter.Convert(Game.Camera.Position + Game.Camera.WorldMatrix.Forward);
+                        kapow.Position = Game.Camera.Position + Game.Camera.WorldMatrix.Forward;
                     kapow.AngularVelocity = Vector3.Zero;
-                    kapow.LinearVelocity =MathConverter.Convert( Game.Camera.WorldMatrix.Forward * 30);
+                    kapow.LinearVelocity = Game.Camera.WorldMatrix.Forward * 30;
                 }
 
             #endregion
@@ -122,7 +122,7 @@ namespace BEPUphysicsDemos.Demos
             {
                 //Find the earliest ray hit
                 RayCastResult raycastResult;
-                if (Space.RayCast(new Ray(MathConverter.Convert(Game.Camera.Position), MathConverter.Convert(Game.Camera.WorldMatrix.Forward)), 1000, rayCastFilter, out raycastResult))
+                if (Space.RayCast(new Ray(Game.Camera.Position, Game.Camera.WorldMatrix.Forward), 1000, rayCastFilter, out raycastResult))
                 {
                     var entityCollision = raycastResult.HitObject as EntityCollidable;
                     //If there's a valid ray hit, then grab the connected object!
@@ -141,7 +141,7 @@ namespace BEPUphysicsDemos.Demos
             else if (Game.MouseInput.RightButton == ButtonState.Pressed && grabber.IsUpdating)
 #endif
             {
-                grabber.GoalPosition = MathConverter.Convert(Game.Camera.Position + Game.Camera.WorldMatrix.Forward * grabDistance);
+                grabber.GoalPosition = Game.Camera.Position + Game.Camera.WorldMatrix.Forward * grabDistance;
             }
 #if !WINDOWS
             if (!Game.GamePadInput.IsButtonDown(Buttons.RightShoulder) && grabber.IsUpdating)

@@ -115,7 +115,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
 
            
 
-            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(0, 10, 40);
+            game.Camera.Position = new Vector3(0, 10, 40);
 
             //Dump some boxes on top of the characters for fun.
             numColumns = 16;

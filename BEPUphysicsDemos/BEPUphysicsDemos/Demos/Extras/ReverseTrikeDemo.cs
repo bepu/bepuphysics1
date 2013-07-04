@@ -33,7 +33,7 @@ namespace BEPUphysicsDemos.Demos.Extras
         public ReverseTrikeDemo(DemosGame game)
             : base(game)
         {
-            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(0, 2, 15);
+            game.Camera.Position = new Vector3(0, 2, 15);
             game.Camera.Yaw = 0;
             game.Camera.Pitch = 0;
 

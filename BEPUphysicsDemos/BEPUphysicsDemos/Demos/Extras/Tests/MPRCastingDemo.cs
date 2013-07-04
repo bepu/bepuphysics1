@@ -40,7 +40,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             aTransform = new RigidTransform(new Vector3(-10, -10, -10), a.Orientation);
             bTransform = new RigidTransform(new Vector3(10, 10, 10), b.Orientation);
 
-            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(0, 5, 17);
+            game.Camera.Position = new Vector3(0, 5, 17);
         }
 
 

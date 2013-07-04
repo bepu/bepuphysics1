@@ -46,7 +46,7 @@ namespace BEPUphysicsDemos.Demos
             CollisionRules.AddRule(toAdd, toAdd2, CollisionRule.NoBroadPhase);
             Space.Add(toAdd);
             Space.Add(toAdd2);
-            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(0, 6, 20);
+            game.Camera.Position = new Vector3(0, 6, 20);
         }
 
         /// <summary>
