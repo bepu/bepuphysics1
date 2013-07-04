@@ -45,7 +45,7 @@ namespace BEPUphysicsDemos.Demos
             Space.Add(new RevoluteJoint(previousLink, endPlatform, position + offset * .5f, Vector3.Right));
 
 
-            game.Camera.Position = MathConverter.Convert(startPosition + new Vector3(0, 1, offset.Z * 200 + 5));
+            game.Camera.Position = startPosition + new Vector3(0, 1, offset.Z * 200 + 5);
         }
 
         /// <summary>

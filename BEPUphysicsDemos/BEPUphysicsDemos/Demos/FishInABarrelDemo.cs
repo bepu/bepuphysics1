@@ -28,7 +28,7 @@ namespace BEPUphysicsDemos.Demos
         public FishInABarrelDemo(DemosGame game)
             : base(game)
         {
-            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(0, 7, 30);
+            game.Camera.Position = new Vector3(0, 7, 30);
 
             var detector = new Box(new Vector3(0, 0, 0), 1.5f, 1.5f, 1.5f);
             detector.CollisionInformation.CollisionRules.Personal = CollisionRule.NoSolver;

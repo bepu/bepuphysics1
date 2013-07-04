@@ -81,7 +81,7 @@ namespace BEPUphysicsDemos.Demos
             //}
 
 
-            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(0, waterHeight + 5, 35);
+            game.Camera.Position = new Vector3(0, waterHeight + 5, 35);
         }
 
         /// <summary>

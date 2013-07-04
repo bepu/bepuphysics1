@@ -28,7 +28,7 @@ namespace BEPUphysicsDemos.Demos
             : base(game)
         {
 
-            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(-10, 7, 5);
+            game.Camera.Position = new Vector3(-10, 7, 5);
             game.Camera.Yaw = MathHelper.Pi;
             //Since this is the character playground, turn on the character by default.
             character.Activate();

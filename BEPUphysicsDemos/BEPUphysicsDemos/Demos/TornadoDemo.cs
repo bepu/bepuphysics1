@@ -80,7 +80,7 @@ namespace BEPUphysicsDemos.Demos
                 new Vector3(-xLength * xSpacing / 2, 0, -zLength * zSpacing / 2)));
             Space.Add(terrain);
             game.ModelDrawer.Add(terrain);
-            game.Camera.Position = new Microsoft.Xna.Framework.Vector3(0, 5, 60);
+            game.Camera.Position = new Vector3(0, 5, 60);
         }
 
         /// <summary>

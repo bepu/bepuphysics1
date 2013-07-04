@@ -193,11 +193,11 @@ namespace BEPUphysicsDemos.AlternateMovement
                 IsActive = true;
                 Camera.UseMovementControls = false;
                 //Put the vehicle where the camera is.
-                Vehicle.Body.Position = MathConverter.Convert(Camera.Position) - CameraOffset;
+                Vehicle.Body.Position = Camera.Position - CameraOffset;
                 Vehicle.Body.LinearVelocity = Vector3.Zero;
                 Vehicle.Body.AngularVelocity = Vector3.Zero;
                 Vehicle.Body.Orientation = Quaternion.Identity;
-                Camera.ActivateChaseCameraMode(Vehicle.Body, new Microsoft.Xna.Framework.Vector3(0, .6f, 0), true, 10);
+                Camera.ActivateChaseCameraMode(Vehicle.Body, new Vector3(0, .6f, 0), true, 10);
             }
         }
 
