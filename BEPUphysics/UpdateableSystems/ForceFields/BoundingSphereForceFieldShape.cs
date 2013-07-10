@@ -1,9 +1,8 @@
 using System.Collections.Generic;
 using BEPUphysics.BroadPhaseEntries;
-using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.Entities;
-using Microsoft.Xna.Framework;
+using BEPUutilities;
 using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.UpdateableSystems.ForceFields
