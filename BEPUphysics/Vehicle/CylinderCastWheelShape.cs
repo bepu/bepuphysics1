@@ -15,10 +15,15 @@ namespace BEPUphysics.Vehicle
     {
         private CylinderShape shape;
 
+        private Quaternion localWheelOrientation;
         /// <summary>
         /// Gets or sets the unsteered orientation of the wheel in the vehicle's local space.
         /// </summary>
-        public Quaternion LocalWheelOrientation { get; set; }
+        public Quaternion LocalWheelOrientation
+        {
+            get { return localWheelOrientation; }
+            set { localWheelOrientation = value; }
+        }
 
         /// <summary>
         /// Creates a new cylinder cast based wheel shape.
@@ -94,7 +99,7 @@ namespace BEPUphysics.Vehicle
             Matrix spinTransform;
 
             Vector3 localSpinAxis;
-            Vector3.Cross(ref wheel.localForwardDirection, ref wheel.suspension.localDirection, out localSpinAxis);
+            Vector3.Transform(ref Toolbox.UpVector, ref localWheelOrientation, out localSpinAxis);
             Matrix.CreateFromAxisAngle(ref localSpinAxis, spinAngle, out spinTransform);
 
 
