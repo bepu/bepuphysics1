@@ -62,8 +62,6 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         }
 
         //Stores data about an in-process BFS.
-        //HashSet<IKJoint> visitedJoints = new HashSet<IKJoint>();
-        //HashSet<IKBone> visitedBones = new HashSet<IKBone>();
         Queue<Bone> bonesToVisit = new Queue<Bone>();
 
 
