@@ -94,10 +94,9 @@ namespace BEPUutilities
             for (int i = outputTriangleIndices.Count - 1; i >= 0; i--)
             {
                 int index = outputTriangleIndices[i];
-                if (!alreadyContainedIndices.Contains(index))
+                if (alreadyContainedIndices.Add(index))
                 {
                     outputSurfacePoints.Add(points[index]);
-                    alreadyContainedIndices.Add(index);
                 }
             }
 
