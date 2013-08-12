@@ -159,8 +159,9 @@ namespace BEPUphysics.Paths
         /// <param name="endingTime">Ending time of the path.</param>
         public override void GetPathBoundsInformation(out double startingTime, out double endingTime)
         {
-            int index;
-            GetCurveBoundsInformation(out startingTime, out endingTime, out index, out index);
+            int minIndex;
+            int maxIndex;
+            GetCurveBoundsInformation(out startingTime, out endingTime, out minIndex, out maxIndex);
         }
 
         /// <summary>
