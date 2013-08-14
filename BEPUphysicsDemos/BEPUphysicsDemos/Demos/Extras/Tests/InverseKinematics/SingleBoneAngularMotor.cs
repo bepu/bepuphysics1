@@ -20,7 +20,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             Quaternion.Multiply(ref TargetOrientation, ref errorQuaternion, out errorQuaternion);
             float angle;
             Vector3 angularError;
-            Toolbox.GetAxisAngleFromQuaternion(ref errorQuaternion, out angularError, out angle);
+            Quaternion.GetAxisAngleFromQuaternion(ref errorQuaternion, out angularError, out angle);
             Vector3.Multiply(ref angularError, angle, out angularError);
 
             //This is equivalent to projecting the error onto the angular jacobian. The angular jacobian just happens to be the identity matrix!

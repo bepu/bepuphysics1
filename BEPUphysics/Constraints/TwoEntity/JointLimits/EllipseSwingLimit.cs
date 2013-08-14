@@ -305,10 +305,10 @@ namespace BEPUphysics.Constraints.TwoEntity.JointLimits
 
             //Compute the individual swing angles.
             Quaternion relativeRotation;
-            Toolbox.GetQuaternionBetweenNormalizedVectors(ref worldTwistAxisB, ref basis.primaryAxis, out relativeRotation);
+            Quaternion.GetQuaternionBetweenNormalizedVectors(ref worldTwistAxisB, ref basis.primaryAxis, out relativeRotation);
             Vector3 axis;
             float angle;
-            Toolbox.GetAxisAngleFromQuaternion(ref relativeRotation, out axis, out angle);
+            Quaternion.GetAxisAngleFromQuaternion(ref relativeRotation, out axis, out angle);
 
 #if !WINDOWS
             Vector3 axisAngle = new Vector3();

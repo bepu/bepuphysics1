@@ -98,7 +98,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             //Attach the measurement axis to entity B.
             //'Push' A's axis onto B by taking into account the swing transform.
             Quaternion alignmentRotation;
-            Toolbox.GetQuaternionBetweenNormalizedVectors(ref axisA, ref axisB, out alignmentRotation);
+            Quaternion.GetQuaternionBetweenNormalizedVectors(ref axisA, ref axisB, out alignmentRotation);
             Vector3 worldMeasurementAxisB;
             Quaternion.Transform(ref worldMeasurementAxisA, ref alignmentRotation, out worldMeasurementAxisB);
             //Plop them on!
@@ -141,7 +141,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
 
             //Compute the shortest rotation to bring axisB into alignment with axisA.
             Quaternion alignmentRotation;
-            Toolbox.GetQuaternionBetweenNormalizedVectors(ref axisB, ref axisA, out alignmentRotation);
+            Quaternion.GetQuaternionBetweenNormalizedVectors(ref axisB, ref axisA, out alignmentRotation);
 
             //Transform the measurement axis on B by the alignment quaternion.
             Quaternion.Transform(ref twistMeasureAxisB, ref alignmentRotation, out twistMeasureAxisB);

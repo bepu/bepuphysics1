@@ -68,7 +68,7 @@ namespace BEPUphysics.Entities.Prefabs
             if (length > 0)
             {
                 Vector3.Divide(ref segmentDirection, length, out segmentDirection);
-                Toolbox.GetQuaternionBetweenNormalizedVectors(ref Toolbox.UpVector, ref segmentDirection, out orientation);
+                Quaternion.GetQuaternionBetweenNormalizedVectors(ref Toolbox.UpVector, ref segmentDirection, out orientation);
             }
             else
                 orientation = Quaternion.Identity;

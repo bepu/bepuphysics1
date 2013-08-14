@@ -90,7 +90,7 @@ namespace BEPUphysics.Paths.PathFollowing
             Vector3 axis;
             float angle;
             //Turn this into an axis-angle representation.
-            Toolbox.GetAxisAngleFromQuaternion(ref errorOrientation, out axis, out angle);
+            Quaternion.GetAxisAngleFromQuaternion(ref errorOrientation, out axis, out angle);
             Vector3.Multiply(ref axis, angle / dt, out axis);
             return axis;
         }

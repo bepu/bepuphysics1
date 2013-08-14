@@ -52,7 +52,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             //Convert the error into an axis-angle vector usable for bias velocity.
             float angle;
             Vector3 axis;
-            Toolbox.GetAxisAngleFromQuaternion(ref error, out axis, out angle);
+            Quaternion.GetAxisAngleFromQuaternion(ref error, out axis, out angle);
 
             velocityBias.X = errorCorrectionFactor * axis.X * angle;
             velocityBias.Y = errorCorrectionFactor * axis.Y * angle;

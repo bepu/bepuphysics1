@@ -241,7 +241,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Joints
             Matrix3x3.Transform(ref bLocalAxisY, ref connectionB.orientationMatrix, out bAxisY);
 
             Quaternion rotation;
-            Toolbox.GetQuaternionBetweenNormalizedVectors(ref worldAxisB, ref worldAxisA, out rotation);
+            Quaternion.GetQuaternionBetweenNormalizedVectors(ref worldAxisB, ref worldAxisA, out rotation);
 
             //Transform b's 'Y' axis so that it is perpendicular with a's 'X' axis for measurement.
             Vector3 twistMeasureAxis;
@@ -352,7 +352,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Joints
 
             //Rotate the axis to B since it could be arbitrarily rotated.
             Quaternion rotation;
-            Toolbox.GetQuaternionBetweenNormalizedVectors(ref worldAxisA, ref worldAxisB, out rotation);
+            Quaternion.GetQuaternionBetweenNormalizedVectors(ref worldAxisA, ref worldAxisB, out rotation);
             Quaternion.Transform(ref yAxis, ref rotation, out yAxis);
 
             //Put it into local space.

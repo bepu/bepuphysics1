@@ -98,7 +98,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                             Position = SupportRayData.Value.HitData.Location,
                             Normal = SupportRayData.Value.HitData.Normal,
                             HasTraction = SupportRayData.Value.HasTraction,
-                            Depth = Vector3.Dot(character.Body.OrientationMatrix.Down, SupportRayData.Value.HitData.Normal) * (bottomHeight - SupportRayData.Value.HitData.T),
+                            Depth = Vector3.Dot(character.Down, SupportRayData.Value.HitData.Normal) * (bottomHeight - SupportRayData.Value.HitData.T),
                             SupportObject = SupportRayData.Value.HitObject
                         };
                     }
@@ -178,7 +178,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                         Position = SupportRayData.Value.HitData.Location,
                         Normal = SupportRayData.Value.HitData.Normal,
                         HasTraction = true,
-                        Depth = Vector3.Dot(character.Body.OrientationMatrix.Down, SupportRayData.Value.HitData.Normal) * (bottomHeight - SupportRayData.Value.HitData.T),
+                        Depth = Vector3.Dot(character.Down, SupportRayData.Value.HitData.Normal) * (bottomHeight - SupportRayData.Value.HitData.T),
                         SupportObject = SupportRayData.Value.HitObject
                     };
                 }
@@ -240,7 +240,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 {
                     supportData.Position = SupportRayData.Value.HitData.Location;
                     supportData.Normal = SupportRayData.Value.HitData.Normal;
-                    supportData.Depth = Vector3.Dot(character.Body.OrientationMatrix.Down, SupportRayData.Value.HitData.Normal) * (bottomHeight - SupportRayData.Value.HitData.T);
+                    supportData.Depth = Vector3.Dot(character.Down, SupportRayData.Value.HitData.Normal) * (bottomHeight - SupportRayData.Value.HitData.T);
                     supportData.SupportObject = SupportRayData.Value.HitObject;
                     supportData.HasTraction = true;
                     return true;
@@ -357,7 +357,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             HasSupport = false;
 
             var body = character.Body;
-            Vector3 downDirection = character.Body.OrientationMatrix.Down; //For a cylinder orientation-locked to the Up axis, this is always {0, -1, 0}.  Keeping it generic doesn't cost much.
+            Vector3 downDirection = character.Down; //For a cylinder orientation-locked to the Up axis, this is always {0, -1, 0}.  Keeping it generic doesn't cost much.
 
 
             supports.Clear();

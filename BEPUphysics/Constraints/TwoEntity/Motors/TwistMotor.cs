@@ -198,7 +198,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
 
             //Rotate the axis to B since it could be arbitrarily rotated.
             Quaternion rotation;
-            Toolbox.GetQuaternionBetweenNormalizedVectors(ref worldTwistAxisA, ref worldTwistAxisB, out rotation);
+            Quaternion.GetQuaternionBetweenNormalizedVectors(ref worldTwistAxisA, ref worldTwistAxisB, out rotation);
             Quaternion.Transform(ref worldXAxis, ref rotation, out worldXAxis);
 
             basisB.rotationMatrix = connectionB.orientationMatrix;
@@ -255,7 +255,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
             if (settings.mode == MotorMode.Servomechanism)
             {
                 Quaternion rotation;
-                Toolbox.GetQuaternionBetweenNormalizedVectors(ref basisB.primaryAxis, ref basisA.primaryAxis, out rotation);
+                Quaternion.GetQuaternionBetweenNormalizedVectors(ref basisB.primaryAxis, ref basisA.primaryAxis, out rotation);
 
                 //Transform b's 'Y' axis so that it is perpendicular with a's 'X' axis for measurement.
                 Vector3 twistMeasureAxis;

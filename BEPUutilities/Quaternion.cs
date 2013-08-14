@@ -703,5 +703,86 @@ namespace BEPUutilities
             q.Y = (float)(cosYawSinPitch * cosRoll + sinYawCosPitch * sinRoll);
             q.Z = (float)(cosYawCosPitch * sinRoll - sinYawSinPitch * cosRoll);
         }
+
+        /// <summary>
+        /// Computes the angle change represented by a normalized quaternion.
+        /// </summary>
+        /// <param name="q">Quaternion to be converted.</param>
+        /// <returns>Angle around the axis represented by the quaternion.</returns>
+        public static float GetAngleFromQuaternion(ref Quaternion q)
+        {
+            float qw = Math.Abs(q.W);
+            if (qw > 1)
+                return 0;
+            return 2 * (float)Math.Acos(qw);
+        }
+
+        /// <summary>
+        /// Computes the axis angle representation of a normalized quaternion.
+        /// </summary>
+        /// <param name="q">Quaternion to be converted.</param>
+        /// <param name="axis">Axis represented by the quaternion.</param>
+        /// <param name="angle">Angle around the axis represented by the quaternion.</param>
+        public static void GetAxisAngleFromQuaternion(ref Quaternion q, out Vector3 axis, out float angle)
+        {
+#if !WINDOWS
+            axis = new Vector3();
+#endif
+            float qx = q.X;
+            float qy = q.Y;
+            float qz = q.Z;
+            float qw = q.W;
+            if (qw < 0)
+            {
+                qx = -qx;
+                qy = -qy;
+                qz = -qz;
+                qw = -qw;
+            }
+            if (qw > 1 - 1e-12)
+            {
+                axis = Toolbox.UpVector;
+                angle = 0;
+            }
+            else
+            {
+                angle = 2 * (float)Math.Acos(qw);
+                float denominator = 1 / (float)Math.Sqrt(1 - qw * qw);
+                axis.X = qx * denominator;
+                axis.Y = qy * denominator;
+                axis.Z = qz * denominator;
+            }
+        }
+
+        /// <summary>
+        /// Computes the quaternion rotation between two normalized vectors.
+        /// </summary>
+        /// <param name="v1">First unit-length vector.</param>
+        /// <param name="v2">Second unit-length vector.</param>
+        /// <param name="q">Quaternion representing the rotation from v1 to v2.</param>
+        public static void GetQuaternionBetweenNormalizedVectors(ref Vector3 v1, ref Vector3 v2, out Quaternion q)
+        {
+            float dot;
+            Vector3.Dot(ref v1, ref v2, out dot);
+            //For non-normal vectors, the multiplying the axes length squared would be necessary:
+            //float w = dot + (float)Math.Sqrt(v1.LengthSquared() * v2.LengthSquared());
+            if (dot < -0.9999f) //parallel, opposing direction
+            {
+                //Project onto the plane which has the lowest component magnitude.
+                if (v1.X < v1.Y && v1.X < v1.Z)
+                    q = new Quaternion(0, -v1.Z, v1.Y, 0);
+                else if (v1.Y < v1.Z)
+                    q = new Quaternion(-v1.Z, 0, v1.X, 0);
+                else
+                    q = new Quaternion(-v1.Y, -v1.X, 0, 0);
+            }
+            else
+            {
+                Vector3 axis;
+                Vector3.Cross(ref v1, ref v2, out axis);
+                q = new Quaternion(axis.X, axis.Y, axis.Z, dot + 1);
+            }
+            q.Normalize();
+        }
     }
 }

@@ -262,7 +262,7 @@ namespace BEPUphysics.UpdateableSystems
             CommonResources.GiveBack(points);
 
             //Compute the transforms used to pull objects into fluid local space.
-            Toolbox.GetQuaternionBetweenNormalizedVectors(ref Toolbox.UpVector, ref upVector, out surfaceTransform.Orientation);
+            Quaternion.GetQuaternionBetweenNormalizedVectors(ref Toolbox.UpVector, ref upVector, out surfaceTransform.Orientation);
             Matrix3x3.CreateFromQuaternion(ref surfaceTransform.Orientation, out toSurfaceRotationMatrix);
             surfaceTransform.Position = surfaceTriangles[0][0];
         }
