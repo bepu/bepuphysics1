@@ -128,9 +128,11 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         {
             Vector3 a, b, c;
 
-            Vector3.Transform(ref vA, ref shapeTransform.Orientation, out a);
-            Vector3.Transform(ref vB, ref shapeTransform.Orientation, out b);
-            Vector3.Transform(ref vC, ref shapeTransform.Orientation, out c);
+            Matrix3x3 o;
+            Matrix3x3.CreateFromQuaternion(ref shapeTransform.Orientation, out o);
+            Matrix3x3.Transform(ref vA, ref o, out a);
+            Matrix3x3.Transform(ref vB, ref o, out b);
+            Matrix3x3.Transform(ref vC, ref o, out c);
 
             Vector3.Min(ref a, ref b, out boundingBox.Min);
             Vector3.Min(ref c, ref boundingBox.Min, out boundingBox.Min);

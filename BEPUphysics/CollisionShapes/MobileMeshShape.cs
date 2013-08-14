@@ -687,23 +687,9 @@ namespace BEPUphysics.CollisionShapes
             Vector3.Add(ref backwardElement, ref backDirection, out backwardElement);
             Vector3.Subtract(ref forwardElement, ref backDirection, out forwardElement);
 
-            //TODO: This could be optimized.  Unnecessary transformation information gets computed.
-            Vector3 vMinX, vMaxX, vMinY, vMaxY, vMinZ, vMaxZ;
-            Matrix3x3.Transform(ref rightElement, ref o, out vMaxX);
-            Matrix3x3.Transform(ref leftElement, ref o, out vMinX);
-            Matrix3x3.Transform(ref upElement, ref o, out vMaxY);
-            Matrix3x3.Transform(ref downElement, ref o, out vMinY);
-            Matrix3x3.Transform(ref backwardElement, ref o, out vMaxZ);
-            Matrix3x3.Transform(ref forwardElement, ref o, out vMinZ);
-
-
-            boundingBox.Max.X = vMaxX.X;
-            boundingBox.Max.Y = vMaxY.Y;
-            boundingBox.Max.Z = vMaxZ.Z;
-
-            boundingBox.Min.X = vMinX.X;
-            boundingBox.Min.Y = vMinY.Y;
-            boundingBox.Min.Z = vMinZ.Z;
+            //Rather than transforming each axis independently (and doing three times as many operations as required), just get the 6 required values directly.
+            TransformLocalExtremePoints(ref rightElement, ref upElement, ref backwardElement, ref o, out boundingBox.Max);
+            TransformLocalExtremePoints(ref leftElement, ref downElement, ref forwardElement, ref o, out boundingBox.Min);
         }
 
         ///<summary>
@@ -713,56 +699,13 @@ namespace BEPUphysics.CollisionShapes
         ///<param name="boundingBox">Bounding box containing the transformed mesh shape.</param>
         public override void GetBoundingBox(ref RigidTransform shapeTransform, out BoundingBox boundingBox)
         {
-            ////TODO: Could use an approximate bounding volume.  Would be cheaper at runtime and use less memory, though the box would be bigger.
-            //Matrix3X3 o;
-            //Matrix3X3.CreateFromQuaternion(ref shapeTransform.Orientation, out o);
-            ////Sample the local directions from the orientation matrix, implicitly transposed.
-            //Vector3 right = new Vector3(o.M11 * 100000, o.M21 * 100000, o.M31 * 100000);
-            //Vector3 up = new Vector3(o.M12 * 100000, o.M22 * 100000, o.M32 * 100000);
-            //Vector3 backward = new Vector3(o.M13 * 100000, o.M23 * 100000, o.M33 * 100000);
-            //Vector3 left, down, forward;
-            //Vector3.Negate(ref right, out left);
-            //Vector3.Negate(ref up, out down);
-            //Vector3.Negate(ref backward, out forward);
-            //for (int i = 0; i < extents.count; i++)
-            //{
-            //    extents.Elements[i].Clamp(ref right);
-            //    extents.Elements[i].Clamp(ref left);
-            //    extents.Elements[i].Clamp(ref up);
-            //    extents.Elements[i].Clamp(ref down);
-            //    extents.Elements[i].Clamp(ref backward);
-            //    extents.Elements[i].Clamp(ref forward);
-            //}
-
-            //Matrix3X3.Transform(ref right, ref o, out right);
-            //Matrix3X3.Transform(ref left, ref o, out left);
-            //Matrix3X3.Transform(ref down, ref o, out down);
-            //Matrix3X3.Transform(ref up, ref o, out up);
-            //Matrix3X3.Transform(ref forward, ref o, out forward);
-            //Matrix3X3.Transform(ref backward, ref o, out backward);
-
-
-            //boundingBox.Max.X = shapeTransform.Position.X + right.X;
-            //boundingBox.Max.Y = shapeTransform.Position.Y + up.Y;
-            //boundingBox.Max.Z = shapeTransform.Position.Z + backward.Z;
-
-            //boundingBox.Min.X = shapeTransform.Position.X + left.X;
-            //boundingBox.Min.Y = shapeTransform.Position.Y + down.Y;
-            //boundingBox.Min.Z = shapeTransform.Position.Z + forward.Z;
-
-
+            //TODO: Could use an approximate bounding volume.  Would be cheaper at runtime and use less memory, though the box would be bigger.
             Matrix3x3 o;
             Matrix3x3.CreateFromQuaternion(ref shapeTransform.Orientation, out o);
             GetBoundingBox(ref o, out boundingBox);
 
-
-            boundingBox.Max.X += shapeTransform.Position.X;
-            boundingBox.Max.Y += shapeTransform.Position.Y;
-            boundingBox.Max.Z += shapeTransform.Position.Z;
-
-            boundingBox.Min.X += shapeTransform.Position.X;
-            boundingBox.Min.Y += shapeTransform.Position.Y;
-            boundingBox.Min.Z += shapeTransform.Position.Z;
+            Vector3.Add(ref boundingBox.Max, ref shapeTransform.Position, out boundingBox.Max);
+            Vector3.Add(ref boundingBox.Min, ref shapeTransform.Position, out boundingBox.Min);
 
         }
 

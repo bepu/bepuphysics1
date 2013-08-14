@@ -159,23 +159,20 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
                     maxZIndex = i;
                 }
             }
+            
+            //Rather than transforming each axis independently (and doing three times as many operations as required), just get the 6 required values directly.
+            Vector3 positive, negative;
+            TransformLocalExtremePoints(ref vertices.Elements[maxXIndex], ref vertices.Elements[maxYIndex], ref vertices.Elements[maxZIndex], ref o, out positive);
+            TransformLocalExtremePoints(ref vertices.Elements[minXIndex], ref vertices.Elements[minYIndex], ref vertices.Elements[minZIndex], ref o, out negative);
 
-            Vector3 minXpoint, maxXpoint, minYpoint, maxYpoint, minZpoint, maxZpoint;
+            //The positive and negative vectors represent the X, Y and Z coordinates of the extreme points in world space along the world space axes.
+            boundingBox.Max.X = shapeTransform.Position.X + positive.X + collisionMargin;
+            boundingBox.Max.Y = shapeTransform.Position.Y + positive.Y + collisionMargin;
+            boundingBox.Max.Z = shapeTransform.Position.Z + positive.Z + collisionMargin;
 
-            Matrix3x3.Transform(ref vertices.Elements[minXIndex], ref o, out minXpoint);
-            Matrix3x3.Transform(ref vertices.Elements[maxXIndex], ref o, out maxXpoint);
-            Matrix3x3.Transform(ref vertices.Elements[minYIndex], ref o, out minYpoint);
-            Matrix3x3.Transform(ref vertices.Elements[maxYIndex], ref o, out maxYpoint);
-            Matrix3x3.Transform(ref vertices.Elements[minZIndex], ref o, out minZpoint);
-            Matrix3x3.Transform(ref vertices.Elements[maxZIndex], ref o, out maxZpoint);
-
-            boundingBox.Max.X = shapeTransform.Position.X + collisionMargin + maxXpoint.X;
-            boundingBox.Max.Y = shapeTransform.Position.Y + collisionMargin + maxYpoint.Y;
-            boundingBox.Max.Z = shapeTransform.Position.Z + collisionMargin + maxZpoint.Z;
-
-            boundingBox.Min.X = shapeTransform.Position.X - collisionMargin + minXpoint.X;
-            boundingBox.Min.Y = shapeTransform.Position.Y - collisionMargin + minYpoint.Y;
-            boundingBox.Min.Z = shapeTransform.Position.Z - collisionMargin + minZpoint.Z;
+            boundingBox.Min.X = shapeTransform.Position.X + negative.X - collisionMargin;
+            boundingBox.Min.Y = shapeTransform.Position.Y + negative.Y - collisionMargin;
+            boundingBox.Min.Z = shapeTransform.Position.Z + negative.Z - collisionMargin;
         }
 
 

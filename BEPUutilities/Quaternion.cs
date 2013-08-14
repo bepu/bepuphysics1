@@ -104,14 +104,17 @@ namespace BEPUutilities
             float aY = a.Y;
             float aZ = a.Z;
             float aW = a.W;
-            float x = b.X;
-            float y = b.Y;
-            float z = b.Z;
-            float w = b.W;
-            result.X = x * aW + aX * w + y * aZ - z * aY;
-            result.Y = y * aW + aY * w + z * aX - x * aZ;
-            result.Z = z * aW + aZ * w + x * aY - y * aX;
-            result.W = w * aW - x * aX - y * aY - z * aZ;
+            float bX = b.X;
+            float bY = b.Y;
+            float bZ = b.Z;
+            float bW = b.W;
+
+            result.X = aW * bX + aX * bW + aZ * bY - aY * bZ;
+            result.Y = aW * bY + aY * bW + aX * bZ - aZ * bX;
+            result.Z = aW * bZ + aZ * bW + aY * bX - aX * bY;
+            result.W = aW * bW - aX * bX - aY * bY - aZ * bZ;
+
+
         }
 
         /// <summary>
@@ -256,19 +259,7 @@ namespace BEPUutilities
             return (float)Math.Sqrt(X * X + Y * Y + Z * Z + W * W);
         }
 
-        /// <summary>
-        /// Blends two quaternions together to get an intermediate state.
-        /// </summary>
-        /// <param name="start">Starting point of the interpolation.</param>
-        /// <param name="end">Ending point of the interpolation.</param>
-        /// <param name="interpolationAmount">Amount of the end point to use.</param>
-        /// <returns>Interpolated intermediate quaternion.</returns>
-        public static Quaternion Slerp(Quaternion start, Quaternion end, float interpolationAmount)
-        {
-            Quaternion toReturn;
-            Slerp(ref start, ref end, interpolationAmount, out toReturn);
-            return toReturn;
-        }
+
         /// <summary>
         /// Blends two quaternions together to get an intermediate state.
         /// </summary>
@@ -327,16 +318,19 @@ namespace BEPUutilities
         }
 
         /// <summary>
-        /// Computes the conjugate of the quaternion.
+        /// Blends two quaternions together to get an intermediate state.
         /// </summary>
-        /// <param name="quaternion">Quaternion to conjugate.</param>
-        /// <returns>Conjugated quaternion.</returns>
-        public static Quaternion Conjugate(Quaternion quaternion)
+        /// <param name="start">Starting point of the interpolation.</param>
+        /// <param name="end">Ending point of the interpolation.</param>
+        /// <param name="interpolationAmount">Amount of the end point to use.</param>
+        /// <returns>Interpolated intermediate quaternion.</returns>
+        public static Quaternion Slerp(Quaternion start, Quaternion end, float interpolationAmount)
         {
             Quaternion toReturn;
-            Conjugate(ref quaternion, out toReturn);
+            Slerp(ref start, ref end, interpolationAmount, out toReturn);
             return toReturn;
         }
+
 
         /// <summary>
         /// Computes the conjugate of the quaternion.
@@ -349,6 +343,47 @@ namespace BEPUutilities
             result.Y = -quaternion.Y;
             result.Z = -quaternion.Z;
             result.W = quaternion.W;
+        }
+
+        /// <summary>
+        /// Computes the conjugate of the quaternion.
+        /// </summary>
+        /// <param name="quaternion">Quaternion to conjugate.</param>
+        /// <returns>Conjugated quaternion.</returns>
+        public static Quaternion Conjugate(Quaternion quaternion)
+        {
+            Quaternion toReturn;
+            Conjugate(ref quaternion, out toReturn);
+            return toReturn;
+        }
+
+
+
+        /// <summary>
+        /// Computes the inverse of the quaternion.
+        /// </summary>
+        /// <param name="quaternion">Quaternion to invert.</param>
+        /// <param name="result">Result of the inversion.</param>
+        public static void Inverse(ref Quaternion quaternion, out Quaternion result)
+        {
+            float inverseSquaredNorm = quaternion.X * quaternion.X + quaternion.Y * quaternion.Y + quaternion.Z * quaternion.Z + quaternion.W * quaternion.W;
+            result.X = -quaternion.X * inverseSquaredNorm;
+            result.Y = -quaternion.Y * inverseSquaredNorm;
+            result.Z = -quaternion.Z * inverseSquaredNorm;
+            result.W = quaternion.W * inverseSquaredNorm;
+        }
+
+        /// <summary>
+        /// Computes the inverse of the quaternion.
+        /// </summary>
+        /// <param name="quaternion">Quaternion to invert.</param>
+        /// <returns>Result of the inversion.</returns>
+        public static Quaternion Inverse(Quaternion quaternion)
+        {
+            Quaternion result;
+            Inverse(ref quaternion, out result);
+            return result;
+
         }
 
         /// <summary>

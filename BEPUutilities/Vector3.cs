@@ -579,15 +579,16 @@ namespace BEPUutilities
             float wy2 = rotation.W * y2;
             float wz2 = rotation.W * z2;
             //Defer the component setting since they're used in computation.
-            float transformedX = v.X * ((1f - yy2) - zz2) + v.Y * (xy2 - wz2) + v.Z * (xz2 + wy2);
-            float transformedY = v.X * (xy2 + wz2) + v.Y * ((1f - xx2) - zz2) + v.Z * (yz2 - wx2);
-            float transformedZ = v.X * (xz2 - wy2) + v.Y * (yz2 + wx2) + v.Z * ((1f - xx2) - yy2);
+            float transformedX = v.X * (1f - yy2 - zz2) + v.Y * (xy2 - wz2) + v.Z * (xz2 + wy2);
+            float transformedY = v.X * (xy2 + wz2) + v.Y * (1f - xx2 - zz2) + v.Z * (yz2 - wx2);
+            float transformedZ = v.X * (xz2 - wy2) + v.Y * (yz2 + wx2) + v.Z * (1f - xx2 - yy2);
             result.X = transformedX;
             result.Y = transformedY;
             result.Z = transformedZ;
 
         }
 
+        
         /// <summary>
         /// Transforms the vector using a quaternion.
         /// </summary>
@@ -599,6 +600,98 @@ namespace BEPUutilities
             Vector3 toReturn;
             Transform(ref v, ref rotation, out toReturn);
             return toReturn;
+        }
+
+        /// <summary>
+        /// Transforms a vector using a quaternion. Specialized for x,0,0 vectors.
+        /// </summary>
+        /// <param name="x">X component of the vector to transform.</param>
+        /// <param name="rotation">Rotation to apply to the vector.</param>
+        /// <param name="result">Transformed vector.</param>
+        public static void TransformX(float x, ref Quaternion rotation, out Vector3 result)
+        {
+            //This operation is an optimized-down version of v' = q * v * q^-1.
+            //The expanded form would be to treat v as an 'axis only' quaternion
+            //and perform standard quaternion multiplication.  Assuming q is normalized,
+            //q^-1 can be replaced by a conjugation.
+            float y2 = rotation.Y + rotation.Y;
+            float z2 = rotation.Z + rotation.Z;
+            float xy2 = rotation.X * y2;
+            float xz2 = rotation.X * z2;
+            float yy2 = rotation.Y * y2;
+            float zz2 = rotation.Z * z2;
+            float wy2 = rotation.W * y2;
+            float wz2 = rotation.W * z2;
+            //Defer the component setting since they're used in computation.
+            float transformedX = x * (1f - yy2 - zz2);
+            float transformedY = x * (xy2 + wz2);
+            float transformedZ = x * (xz2 - wy2);
+            result.X = transformedX;
+            result.Y = transformedY;
+            result.Z = transformedZ;
+
+        }
+
+        /// <summary>
+        /// Transforms a vector using a quaternion. Specialized for 0,y,0 vectors.
+        /// </summary>
+        /// <param name="y">Y component of the vector to transform.</param>
+        /// <param name="rotation">Rotation to apply to the vector.</param>
+        /// <param name="result">Transformed vector.</param>
+        public static void TransformY(float y, ref Quaternion rotation, out Vector3 result)
+        {
+            //This operation is an optimized-down version of v' = q * v * q^-1.
+            //The expanded form would be to treat v as an 'axis only' quaternion
+            //and perform standard quaternion multiplication.  Assuming q is normalized,
+            //q^-1 can be replaced by a conjugation.
+            float x2 = rotation.X + rotation.X;
+            float y2 = rotation.Y + rotation.Y;
+            float z2 = rotation.Z + rotation.Z;
+            float xx2 = rotation.X * x2;
+            float xy2 = rotation.X * y2;
+            float yz2 = rotation.Y * z2;
+            float zz2 = rotation.Z * z2;
+            float wx2 = rotation.W * x2;
+            float wz2 = rotation.W * z2;
+            //Defer the component setting since they're used in computation.
+            float transformedX = y * (xy2 - wz2);
+            float transformedY = y * (1f - xx2 - zz2);
+            float transformedZ = y * (yz2 + wx2);
+            result.X = transformedX;
+            result.Y = transformedY;
+            result.Z = transformedZ;
+
+        }
+
+        /// <summary>
+        /// Transforms a vector using a quaternion. Specialized for 0,0,z vectors.
+        /// </summary>
+        /// <param name="z">Z component of the vector to transform.</param>
+        /// <param name="rotation">Rotation to apply to the vector.</param>
+        /// <param name="result">Transformed vector.</param>
+        public static void TransformZ(float z, ref Quaternion rotation, out Vector3 result)
+        {
+            //This operation is an optimized-down version of v' = q * v * q^-1.
+            //The expanded form would be to treat v as an 'axis only' quaternion
+            //and perform standard quaternion multiplication.  Assuming q is normalized,
+            //q^-1 can be replaced by a conjugation.
+            float x2 = rotation.X + rotation.X;
+            float y2 = rotation.Y + rotation.Y;
+            float z2 = rotation.Z + rotation.Z;
+            float xx2 = rotation.X * x2;
+            float xz2 = rotation.X * z2;
+            float yy2 = rotation.Y * y2;
+            float yz2 = rotation.Y * z2;
+            float wx2 = rotation.W * x2;
+            float wy2 = rotation.W * y2;
+            //Defer the component setting since they're used in computation.
+            float transformedX = z * (xz2 + wy2);
+            float transformedY = z * (yz2 - wx2);
+            float transformedZ = z * (1f - xx2 - yy2);
+            result.X = transformedX;
+            result.Y = transformedY;
+            result.Z = transformedZ;
+
         }
 
         /// <summary>

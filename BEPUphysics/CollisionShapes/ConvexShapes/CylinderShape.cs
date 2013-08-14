@@ -47,7 +47,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             Matrix3x3 o;
             Matrix3x3.CreateFromQuaternion(ref shapeTransform.Orientation, out o);
             //Sample the local directions from the orientation matrix, implicitly transposed.
-            //Notice only three directions are used.  Due to box symmetry, 'left' is just -right.
+            //Notice only three directions are used.  Due to cylinder symmetry, 'left' is just -right.
             var direction = new Vector3(o.M11, o.M21, o.M31);
             Vector3 right;
             GetLocalExtremePointWithoutMargin(ref direction, out right);
@@ -60,18 +60,18 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             Vector3 backward;
             GetLocalExtremePointWithoutMargin(ref direction, out backward);
 
-            Matrix3x3.Transform(ref right, ref o, out right);
-            Matrix3x3.Transform(ref up, ref o, out up);
-            Matrix3x3.Transform(ref backward, ref o, out backward);
-            //These right/up/backward represent the extreme points in world space along the world space axes.
+            //Rather than transforming each axis independently (and doing three times as many operations as required), just get the 3 required values directly.
+            Vector3 positive;
+            TransformLocalExtremePoints(ref right, ref up, ref backward, ref o, out positive);
 
-            boundingBox.Max.X = shapeTransform.Position.X + collisionMargin + right.X;
-            boundingBox.Max.Y = shapeTransform.Position.Y + collisionMargin + up.Y;
-            boundingBox.Max.Z = shapeTransform.Position.Z + collisionMargin + backward.Z;
+            //The positive and negative vectors represent the X, Y and Z coordinates of the extreme points in world space along the world space axes.
+            boundingBox.Max.X = shapeTransform.Position.X + positive.X + collisionMargin;
+            boundingBox.Max.Y = shapeTransform.Position.Y + positive.Y + collisionMargin;
+            boundingBox.Max.Z = shapeTransform.Position.Z + positive.Z + collisionMargin;
 
-            boundingBox.Min.X = shapeTransform.Position.X - collisionMargin - right.X;
-            boundingBox.Min.Y = shapeTransform.Position.Y - collisionMargin - up.Y;
-            boundingBox.Min.Z = shapeTransform.Position.Z - collisionMargin - backward.Z;
+            boundingBox.Min.X = shapeTransform.Position.X - positive.X - collisionMargin;
+            boundingBox.Min.Y = shapeTransform.Position.Y - positive.Y - collisionMargin;
+            boundingBox.Min.Z = shapeTransform.Position.Z - positive.Z - collisionMargin;
         }
 
 
