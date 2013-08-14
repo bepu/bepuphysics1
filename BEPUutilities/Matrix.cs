@@ -716,9 +716,12 @@ namespace BEPUutilities
         /// <param name="result">Transformed vector.</param>
         public static void Transform(ref Vector3 v, ref Matrix matrix, out Vector3 result)
         {
-            result.X = v.X * matrix.M11 + v.Y * matrix.M21 + v.Z * matrix.M31 + matrix.M41;
-            result.Y = v.X * matrix.M12 + v.Y * matrix.M22 + v.Z * matrix.M32 + matrix.M42;
-            result.Z = v.X * matrix.M13 + v.Y * matrix.M23 + v.Z * matrix.M33 + matrix.M43;
+            float vX = v.X;
+            float vY = v.Y;
+            float vZ = v.Z;
+            result.X = vX * matrix.M11 + vY * matrix.M21 + vZ * matrix.M31 + matrix.M41;
+            result.Y = vX * matrix.M12 + vY * matrix.M22 + vZ * matrix.M32 + matrix.M42;
+            result.Z = vX * matrix.M13 + vY * matrix.M23 + vZ * matrix.M33 + matrix.M43;
         }
 
         /// <summary>
@@ -729,9 +732,12 @@ namespace BEPUutilities
         /// <param name="result">Transformed vector.</param>
         public static void TransformTranspose(ref Vector3 v, ref Matrix matrix, out Vector3 result)
         {
-            result.X = v.X * matrix.M11 + v.Y * matrix.M12 + v.Z * matrix.M13 + matrix.M14;
-            result.Y = v.X * matrix.M21 + v.Y * matrix.M22 + v.Z * matrix.M23 + matrix.M24;
-            result.Z = v.X * matrix.M31 + v.Y * matrix.M32 + v.Z * matrix.M33 + matrix.M34;
+            float vX = v.X;
+            float vY = v.Y;
+            float vZ = v.Z;
+            result.X = vX * matrix.M11 + vY * matrix.M12 + vZ * matrix.M13 + matrix.M14;
+            result.Y = vX * matrix.M21 + vY * matrix.M22 + vZ * matrix.M23 + matrix.M24;
+            result.Z = vX * matrix.M31 + vY * matrix.M32 + vZ * matrix.M33 + matrix.M34;
         }
 
         /// <summary>
@@ -742,9 +748,12 @@ namespace BEPUutilities
         /// <param name="result">Transformed vector.</param>
         public static void TransformNormal(ref Vector3 v, ref Matrix matrix, out Vector3 result)
         {
-            result.X = v.X * matrix.M11 + v.Y * matrix.M21 + v.Z * matrix.M31 + matrix.M41;
-            result.Y = v.X * matrix.M12 + v.Y * matrix.M22 + v.Z * matrix.M32 + matrix.M42;
-            result.Z = v.X * matrix.M13 + v.Y * matrix.M23 + v.Z * matrix.M33 + matrix.M43;
+            float vX = v.X;
+            float vY = v.Y;
+            float vZ = v.Z;
+            result.X = vX * matrix.M11 + vY * matrix.M21 + vZ * matrix.M31 + matrix.M41;
+            result.Y = vX * matrix.M12 + vY * matrix.M22 + vZ * matrix.M32 + matrix.M42;
+            result.Z = vX * matrix.M13 + vY * matrix.M23 + vZ * matrix.M33 + matrix.M43;
         }
 
         /// <summary>
@@ -768,9 +777,12 @@ namespace BEPUutilities
         /// <param name="result">Transformed vector.</param>
         public static void TransformNormalTranspose(ref Vector3 v, ref Matrix matrix, out Vector3 result)
         {
-            result.X = v.X * matrix.M11 + v.Y * matrix.M12 + v.Z * matrix.M13 + matrix.M14;
-            result.Y = v.X * matrix.M21 + v.Y * matrix.M22 + v.Z * matrix.M23 + matrix.M24;
-            result.Z = v.X * matrix.M31 + v.Y * matrix.M32 + v.Z * matrix.M33 + matrix.M34;
+            float vX = v.X;
+            float vY = v.Y;
+            float vZ = v.Z;
+            result.X = vX * matrix.M11 + vY * matrix.M12 + vZ * matrix.M13 + matrix.M14;
+            result.Y = vX * matrix.M21 + vY * matrix.M22 + vZ * matrix.M23 + matrix.M24;
+            result.Z = vX * matrix.M31 + vY * matrix.M32 + vZ * matrix.M33 + matrix.M34;
         }
 
         /// <summary>
