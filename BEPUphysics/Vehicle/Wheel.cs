@@ -282,7 +282,7 @@ namespace BEPUphysics.Vehicle
                 {
                     Quaternion conjugate;
                     Quaternion.Conjugate(ref Vehicle.Body.orientation, out conjugate);
-                    Vector3.Transform(ref worldForwardDirection, ref conjugate, out localForwardDirection);
+                    Quaternion.Transform(ref worldForwardDirection, ref conjugate, out localForwardDirection);
                 }
                 else
                     localForwardDirection = worldForwardDirection;
@@ -293,7 +293,7 @@ namespace BEPUphysics.Vehicle
         internal void PreStep(float dt)
         {
             Matrix.CreateFromAxisAngle(ref suspension.localDirection, shape.steeringAngle, out shape.steeringTransform);
-            Vector3.TransformNormal(ref localForwardDirection, ref shape.steeringTransform, out worldForwardDirection);
+            Matrix.TransformNormal(ref localForwardDirection, ref shape.steeringTransform, out worldForwardDirection);
             Matrix3x3.Transform(ref worldForwardDirection, ref Vehicle.Body.orientationMatrix, out worldForwardDirection);
             if (HasSupport)
             {

@@ -141,7 +141,8 @@ namespace BEPUphysics.Paths.PathFollowing
             else
             {
                 LinearMotor.IsActive = false;
-                Vector3 worldMovedPoint = Vector3.Transform(LocalOffset, entity.WorldTransform);
+                Vector3 worldMovedPoint = Matrix3x3.Transform(LocalOffset, entity.orientationMatrix);
+                Vector3.Add(ref worldMovedPoint, ref entity.position, out worldMovedPoint);
                 Entity.LinearVelocity = GetLinearVelocity(worldMovedPoint, TargetPosition, dt);
             }
         }

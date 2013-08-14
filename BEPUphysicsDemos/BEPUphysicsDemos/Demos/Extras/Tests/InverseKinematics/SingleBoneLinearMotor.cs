@@ -17,15 +17,15 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
 
         public Vector3 Offset
         {
-            get { return Vector3.Transform(LocalOffset, TargetBone.Orientation); }
-            set { LocalOffset = Vector3.Transform(value, Quaternion.Conjugate(TargetBone.Orientation)); }
+            get { return Quaternion.Transform(LocalOffset, TargetBone.Orientation); }
+            set { LocalOffset = Quaternion.Transform(value, Quaternion.Conjugate(TargetBone.Orientation)); }
         }
 
         protected internal override void UpdateJacobiansAndVelocityBias()
         {
             linearJacobian = Matrix3x3.Identity;
             Vector3 r;
-            Vector3.Transform(ref LocalOffset, ref TargetBone.Orientation, out r);
+            Quaternion.Transform(ref LocalOffset, ref TargetBone.Orientation, out r);
             Matrix3x3.CreateCrossProduct(ref r, out angularJacobian);
             //Transposing a skew symmetric matrix is equivalent to negating it.
             Matrix3x3.Transpose(ref angularJacobian, out angularJacobian);

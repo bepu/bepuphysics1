@@ -383,8 +383,8 @@ namespace BEPUutilities
             float xz = axis.X * axis.Z;
             float yz = axis.Y * axis.Z;
 
-            float sinAngle = (float)System.Math.Sin(angle);
-            float oneMinusCosAngle = 1 - (float)System.Math.Cos(angle);
+            float sinAngle = (float)Math.Sin(angle);
+            float oneMinusCosAngle = 1 - (float)Math.Cos(angle);
 
             result.M11 = 1 + oneMinusCosAngle * (xx - 1);
             result.M21 = -axis.Z * sinAngle + oneMinusCosAngle * xy;
@@ -414,15 +414,18 @@ namespace BEPUutilities
         /// <param name="result">Rotation matrix created from the quaternion.</param>
         public static void CreateFromQuaternion(ref Quaternion quaternion, out Matrix result)
         {
-            float XX = 2 * quaternion.X * quaternion.X;
-            float YY = 2 * quaternion.Y * quaternion.Y;
-            float ZZ = 2 * quaternion.Z * quaternion.Z;
-            float XY = 2 * quaternion.X * quaternion.Y;
-            float XZ = 2 * quaternion.X * quaternion.Z;
-            float XW = 2 * quaternion.X * quaternion.W;
-            float YZ = 2 * quaternion.Y * quaternion.Z;
-            float YW = 2 * quaternion.Y * quaternion.W;
-            float ZW = 2 * quaternion.Z * quaternion.W;
+            float qX2 = quaternion.X + quaternion.X;
+            float qY2 = quaternion.Y + quaternion.Y;
+            float qZ2 = quaternion.Z + quaternion.Z;
+            float XX = qX2 * quaternion.X;
+            float YY = qY2 * quaternion.Y;
+            float ZZ = qZ2 * quaternion.Z;
+            float XY = qX2 * quaternion.Y;
+            float XZ = qX2 * quaternion.Z;
+            float XW = qX2 * quaternion.W;
+            float YZ = qY2 * quaternion.Z;
+            float YW = qY2 * quaternion.W;
+            float ZW = qZ2 * quaternion.W;
 
             result.M11 = 1 - YY - ZZ;
             result.M21 = XY - ZW;
@@ -588,6 +591,201 @@ namespace BEPUutilities
             Multiply(ref m, f, out result);
             return result;
         }
+
+        /// <summary>
+        /// Transforms a vector using a matrix.
+        /// </summary>
+        /// <param name="v">Vector to transform.</param>
+        /// <param name="matrix">Transform to apply to the vector.</param>
+        /// <param name="result">Transformed vector.</param>
+        public static void Transform(ref Vector4 v, ref Matrix matrix, out Vector4 result)
+        {
+            float vX = v.X;
+            float vY = v.Y;
+            float vZ = v.Z;
+            float vW = v.W;
+            result.X = vX * matrix.M11 + vY * matrix.M21 + vZ * matrix.M31 + vW * matrix.M41;
+            result.Y = vX * matrix.M12 + vY * matrix.M22 + vZ * matrix.M32 + vW * matrix.M42;
+            result.Z = vX * matrix.M13 + vY * matrix.M23 + vZ * matrix.M33 + vW * matrix.M43;
+            result.W = vX * matrix.M14 + vY * matrix.M24 + vZ * matrix.M34 + vW * matrix.M44;
+        }
+
+        /// <summary>
+        /// Transforms a vector using a matrix.
+        /// </summary>
+        /// <param name="v">Vector to transform.</param>
+        /// <param name="matrix">Transform to apply to the vector.</param>
+        /// <returns>Transformed vector.</returns>
+        public static Vector4 Transform(Vector4 v, Matrix matrix)
+        {
+            Vector4 toReturn;
+            Transform(ref v, ref matrix, out toReturn);
+            return toReturn;
+        }
+
+        /// <summary>
+        /// Transforms a vector using the transpose of a matrix.
+        /// </summary>
+        /// <param name="v">Vector to transform.</param>
+        /// <param name="matrix">Transform to tranpose and apply to the vector.</param>
+        /// <param name="result">Transformed vector.</param>
+        public static void TransformTranspose(ref Vector4 v, ref Matrix matrix, out Vector4 result)
+        {
+            float vX = v.X;
+            float vY = v.Y;
+            float vZ = v.Z;
+            float vW = v.W;
+            result.X = vX * matrix.M11 + vY * matrix.M12 + vZ * matrix.M13 + vW * matrix.M14;
+            result.Y = vX * matrix.M21 + vY * matrix.M22 + vZ * matrix.M23 + vW * matrix.M24;
+            result.Z = vX * matrix.M31 + vY * matrix.M32 + vZ * matrix.M33 + vW * matrix.M34;
+            result.W = vX * matrix.M41 + vY * matrix.M42 + vZ * matrix.M43 + vW * matrix.M44;
+        }
+
+        /// <summary>
+        /// Transforms a vector using the transpose of a matrix.
+        /// </summary>
+        /// <param name="v">Vector to transform.</param>
+        /// <param name="matrix">Transform to tranpose and apply to the vector.</param>
+        /// <returns>Transformed vector.</returns>
+        public static Vector4 TransformTranspose(Vector4 v, Matrix matrix)
+        {
+            Vector4 toReturn;
+            TransformTranspose(ref v, ref matrix, out toReturn);
+            return toReturn;
+        }
+
+        /// <summary>
+        /// Transforms a vector using a matrix.
+        /// </summary>
+        /// <param name="v">Vector to transform.</param>
+        /// <param name="matrix">Transform to apply to the vector.</param>
+        /// <param name="result">Transformed vector.</param>
+        public static void Transform(ref Vector3 v, ref Matrix matrix, out Vector4 result)
+        {
+            result.X = v.X * matrix.M11 + v.Y * matrix.M21 + v.Z * matrix.M31 + matrix.M41;
+            result.Y = v.X * matrix.M12 + v.Y * matrix.M22 + v.Z * matrix.M32 + matrix.M42;
+            result.Z = v.X * matrix.M13 + v.Y * matrix.M23 + v.Z * matrix.M33 + matrix.M43;
+            result.W = v.X * matrix.M14 + v.Y * matrix.M24 + v.Z * matrix.M34 + matrix.M44;
+        }
+
+        /// <summary>
+        /// Transforms a vector using a matrix.
+        /// </summary>
+        /// <param name="v">Vector to transform.</param>
+        /// <param name="matrix">Transform to apply to the vector.</param>
+        /// <returns>Transformed vector.</returns>
+        public static Vector4 Transform(Vector3 v, Matrix matrix)
+        {
+            Vector4 toReturn;
+            Transform(ref v, ref matrix, out toReturn);
+            return toReturn;
+        }
+
+        /// <summary>
+        /// Transforms a vector using the transpose of a matrix.
+        /// </summary>
+        /// <param name="v">Vector to transform.</param>
+        /// <param name="matrix">Transform to tranpose and apply to the vector.</param>
+        /// <param name="result">Transformed vector.</param>
+        public static void TransformTranspose(ref Vector3 v, ref Matrix matrix, out Vector4 result)
+        {
+            result.X = v.X * matrix.M11 + v.Y * matrix.M12 + v.Z * matrix.M13 + matrix.M14;
+            result.Y = v.X * matrix.M21 + v.Y * matrix.M22 + v.Z * matrix.M23 + matrix.M24;
+            result.Z = v.X * matrix.M31 + v.Y * matrix.M32 + v.Z * matrix.M33 + matrix.M34;
+            result.W = v.X * matrix.M41 + v.Y * matrix.M42 + v.Z * matrix.M43 + matrix.M44;
+        }
+
+        /// <summary>
+        /// Transforms a vector using the transpose of a matrix.
+        /// </summary>
+        /// <param name="v">Vector to transform.</param>
+        /// <param name="matrix">Transform to tranpose and apply to the vector.</param>
+        /// <returns>Transformed vector.</returns>
+        public static Vector4 TransformTranspose(Vector3 v, Matrix matrix)
+        {
+            Vector4 toReturn;
+            TransformTranspose(ref v, ref matrix, out toReturn);
+            return toReturn;
+        }
+
+        /// <summary>
+        /// Transforms a vector using a matrix.
+        /// </summary>
+        /// <param name="v">Vector to transform.</param>
+        /// <param name="matrix">Transform to apply to the vector.</param>
+        /// <param name="result">Transformed vector.</param>
+        public static void Transform(ref Vector3 v, ref Matrix matrix, out Vector3 result)
+        {
+            result.X = v.X * matrix.M11 + v.Y * matrix.M21 + v.Z * matrix.M31 + matrix.M41;
+            result.Y = v.X * matrix.M12 + v.Y * matrix.M22 + v.Z * matrix.M32 + matrix.M42;
+            result.Z = v.X * matrix.M13 + v.Y * matrix.M23 + v.Z * matrix.M33 + matrix.M43;
+        }
+
+        /// <summary>
+        /// Transforms a vector using the transpose of a matrix.
+        /// </summary>
+        /// <param name="v">Vector to transform.</param>
+        /// <param name="matrix">Transform to tranpose and apply to the vector.</param>
+        /// <param name="result">Transformed vector.</param>
+        public static void TransformTranspose(ref Vector3 v, ref Matrix matrix, out Vector3 result)
+        {
+            result.X = v.X * matrix.M11 + v.Y * matrix.M12 + v.Z * matrix.M13 + matrix.M14;
+            result.Y = v.X * matrix.M21 + v.Y * matrix.M22 + v.Z * matrix.M23 + matrix.M24;
+            result.Z = v.X * matrix.M31 + v.Y * matrix.M32 + v.Z * matrix.M33 + matrix.M34;
+        }
+
+        /// <summary>
+        /// Transforms a vector using a matrix.
+        /// </summary>
+        /// <param name="v">Vector to transform.</param>
+        /// <param name="matrix">Transform to apply to the vector.</param>
+        /// <param name="result">Transformed vector.</param>
+        public static void TransformNormal(ref Vector3 v, ref Matrix matrix, out Vector3 result)
+        {
+            result.X = v.X * matrix.M11 + v.Y * matrix.M21 + v.Z * matrix.M31 + matrix.M41;
+            result.Y = v.X * matrix.M12 + v.Y * matrix.M22 + v.Z * matrix.M32 + matrix.M42;
+            result.Z = v.X * matrix.M13 + v.Y * matrix.M23 + v.Z * matrix.M33 + matrix.M43;
+        }
+
+        /// <summary>
+        /// Transforms a vector using a matrix.
+        /// </summary>
+        /// <param name="v">Vector to transform.</param>
+        /// <param name="matrix">Transform to apply to the vector.</param>
+        /// <returns>Transformed vector.</returns>
+        public static Vector3 TransformNormal(Vector3 v, Matrix matrix)
+        {
+            Vector3 toReturn;
+            Transform(ref v, ref matrix, out toReturn);
+            return toReturn;
+        }
+
+        /// <summary>
+        /// Transforms a vector using the transpose of a matrix.
+        /// </summary>
+        /// <param name="v">Vector to transform.</param>
+        /// <param name="matrix">Transform to tranpose and apply to the vector.</param>
+        /// <param name="result">Transformed vector.</param>
+        public static void TransformNormalTranspose(ref Vector3 v, ref Matrix matrix, out Vector3 result)
+        {
+            result.X = v.X * matrix.M11 + v.Y * matrix.M12 + v.Z * matrix.M13 + matrix.M14;
+            result.Y = v.X * matrix.M21 + v.Y * matrix.M22 + v.Z * matrix.M23 + matrix.M24;
+            result.Z = v.X * matrix.M31 + v.Y * matrix.M32 + v.Z * matrix.M33 + matrix.M34;
+        }
+
+        /// <summary>
+        /// Transforms a vector using the transpose of a matrix.
+        /// </summary>
+        /// <param name="v">Vector to transform.</param>
+        /// <param name="matrix">Transform to tranpose and apply to the vector.</param>
+        /// <returns>Transformed vector.</returns>
+        public static Vector3 TransformNormalTranspose(Vector3 v, Matrix matrix)
+        {
+            Vector3 toReturn;
+            TransformTranspose(ref v, ref matrix, out toReturn);
+            return toReturn;
+        }
+
 
         /// <summary>
         /// Transposes the matrix.

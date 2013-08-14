@@ -190,9 +190,9 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             Quaternion.Conjugate(ref transform.Orientation, out conjugate);
             Vector3 localOrigin;
             Vector3.Subtract(ref ray.Position, ref transform.Position, out localOrigin);
-            Vector3.Transform(ref localOrigin, ref conjugate, out localOrigin);
+            Quaternion.Transform(ref localOrigin, ref conjugate, out localOrigin);
             Vector3 localDirection;
-            Vector3.Transform(ref ray.Direction, ref conjugate, out localDirection);
+            Quaternion.Transform(ref ray.Direction, ref conjugate, out localDirection);
             Vector3 normal = Toolbox.ZeroVector;
             float temp, tmin = 0, tmax = maximumLength;
 
@@ -259,7 +259,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             hit.T = tmin;
             Vector3.Multiply(ref ray.Direction, tmin, out hit.Location);
             Vector3.Add(ref hit.Location, ref ray.Position, out hit.Location);
-            Vector3.Transform(ref normal, ref transform.Orientation, out normal);
+            Quaternion.Transform(ref normal, ref transform.Orientation, out normal);
             hit.Normal = normal;
             return true;
         }

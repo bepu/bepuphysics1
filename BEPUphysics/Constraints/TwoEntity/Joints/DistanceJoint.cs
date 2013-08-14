@@ -116,7 +116,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Joints
             set
             {
                 anchorA = value;
-                localAnchorA = Vector3.Transform(anchorA - connectionA.position, Quaternion.Conjugate(connectionA.orientation));
+                localAnchorA = Quaternion.Transform(anchorA - connectionA.position, Quaternion.Conjugate(connectionA.orientation));
             }
         }
 
@@ -129,7 +129,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Joints
             set
             {
                 anchorB = value;
-                localAnchorB = Vector3.Transform(anchorB - connectionB.position, Quaternion.Conjugate(connectionB.orientation));
+                localAnchorB = Quaternion.Transform(anchorB - connectionB.position, Quaternion.Conjugate(connectionB.orientation));
             }
         }
 

@@ -238,7 +238,7 @@ namespace BEPUphysicsDemos.Demos
                 Box b = new Box(new Vector3(i * 1.5f + 3.5f, 10, 24), 1.5f, 1, 4);
                 float angle = -i * MathHelper.PiOver2 / numPads;
                 b.Orientation = Quaternion.CreateFromAxisAngle(Vector3.Right, angle);
-                b.Position += offset * .5f + Vector3.Transform(offset * .5f, b.Orientation);
+                b.Position += offset * .5f + Quaternion.Transform(offset * .5f, b.Orientation);
 
                 Space.Add(a);
                 Space.Add(b);

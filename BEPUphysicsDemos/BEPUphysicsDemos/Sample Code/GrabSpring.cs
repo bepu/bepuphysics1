@@ -72,7 +72,7 @@ namespace BEPUphysicsDemos.SampleCode
         public void Setup(Entity e, Vector3 grabLocation)
         {
             Entity = e;
-            localOffset = Vector3.Transform(grabLocation - e.Position, Quaternion.Conjugate(e.Orientation));
+            localOffset = Quaternion.Transform(grabLocation - e.Position, Quaternion.Conjugate(e.Orientation));
             GoalPosition = grabLocation;
         }
 

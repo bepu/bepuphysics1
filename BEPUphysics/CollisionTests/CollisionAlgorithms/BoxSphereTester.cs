@@ -77,7 +77,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                     contact.PenetrationDepth = penetrationDepths.X;
                 }
                 contact.PenetrationDepth += sphere.collisionMargin;
-                Vector3.Transform(ref contact.Normal, ref boxTransform.Orientation, out contact.Normal);
+                Quaternion.Transform(ref contact.Normal, ref boxTransform.Orientation, out contact.Normal);
             }
 
 

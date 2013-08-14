@@ -6144,16 +6144,16 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 else
                     bit = 1;
                 candidate = new Vector3(halfWidth, halfHeight, halfLength);
-                Vector3.Transform(ref candidate, ref worldTransform, out candidate);
+                Matrix.Transform(ref candidate, ref worldTransform, out candidate);
                 boxFace.V1 = candidate;
                 candidate = new Vector3(halfWidth, -halfHeight, halfLength);
-                Vector3.Transform(ref candidate, ref worldTransform, out candidate);
+                Matrix.Transform(ref candidate, ref worldTransform, out candidate);
                 boxFace.V2 = candidate;
                 candidate = new Vector3(halfWidth, -halfHeight, -halfLength);
-                Vector3.Transform(ref candidate, ref worldTransform, out candidate);
+                Matrix.Transform(ref candidate, ref worldTransform, out candidate);
                 boxFace.V3 = candidate;
                 candidate = new Vector3(halfWidth, halfHeight, -halfLength);
-                Vector3.Transform(ref candidate, ref worldTransform, out candidate);
+                Matrix.Transform(ref candidate, ref worldTransform, out candidate);
                 boxFace.V4 = candidate;
 
                 if (xDot < 0)
@@ -6180,16 +6180,16 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 else
                     bit = 2;
                 candidate = new Vector3(halfWidth, halfHeight, halfLength);
-                Vector3.Transform(ref candidate, ref worldTransform, out candidate);
+                Matrix.Transform(ref candidate, ref worldTransform, out candidate);
                 boxFace.V1 = candidate;
                 candidate = new Vector3(-halfWidth, halfHeight, halfLength);
-                Vector3.Transform(ref candidate, ref worldTransform, out candidate);
+                Matrix.Transform(ref candidate, ref worldTransform, out candidate);
                 boxFace.V2 = candidate;
                 candidate = new Vector3(-halfWidth, halfHeight, -halfLength);
-                Vector3.Transform(ref candidate, ref worldTransform, out candidate);
+                Matrix.Transform(ref candidate, ref worldTransform, out candidate);
                 boxFace.V3 = candidate;
                 candidate = new Vector3(halfWidth, halfHeight, -halfLength);
-                Vector3.Transform(ref candidate, ref worldTransform, out candidate);
+                Matrix.Transform(ref candidate, ref worldTransform, out candidate);
                 boxFace.V4 = candidate;
 
                 if (yDot < 0)
@@ -6216,16 +6216,16 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 else
                     bit = 4;
                 candidate = new Vector3(halfWidth, halfHeight, halfLength);
-                Vector3.Transform(ref candidate, ref worldTransform, out candidate);
+                Matrix.Transform(ref candidate, ref worldTransform, out candidate);
                 boxFace.V1 = candidate;
                 candidate = new Vector3(-halfWidth, halfHeight, halfLength);
-                Vector3.Transform(ref candidate, ref worldTransform, out candidate);
+                Matrix.Transform(ref candidate, ref worldTransform, out candidate);
                 boxFace.V2 = candidate;
                 candidate = new Vector3(-halfWidth, -halfHeight, halfLength);
-                Vector3.Transform(ref candidate, ref worldTransform, out candidate);
+                Matrix.Transform(ref candidate, ref worldTransform, out candidate);
                 boxFace.V3 = candidate;
                 candidate = new Vector3(halfWidth, -halfHeight, halfLength);
-                Vector3.Transform(ref candidate, ref worldTransform, out candidate);
+                Matrix.Transform(ref candidate, ref worldTransform, out candidate);
                 boxFace.V4 = candidate;
 
                 if (zDot < 0)

@@ -142,24 +142,14 @@ namespace BEPUutilities
         }
 
 
-        /// <summary>
-        /// Creates a quaternion from a rotation matrix.
-        /// </summary>
-        /// <param name="r">Rotation matrix used to create a new quaternion.</param>
-        /// <returns>Quaternion representing the same rotation as the matrix.</returns>
-        public static Quaternion CreateFromRotationMatrix(Matrix r)
-        {
-            Quaternion toReturn;
-            CreateFromRotationMatrix(ref r, out toReturn);
-            return toReturn;
-        }
+
 
         /// <summary>
         /// Constructs a quaternion from a rotation matrix.
         /// </summary>
         /// <param name="r">Rotation matrix to create the quaternion from.</param>
         /// <param name="q">Quaternion based on the rotation matrix.</param>
-        public static void CreateFromRotationMatrix(ref Matrix r, out Quaternion q)
+        public static void CreateFromRotationMatrix(ref Matrix3x3 r, out Quaternion q)
         {
             float trace = r.M11 + r.M22 + r.M33;
 #if !WINDOWS
@@ -194,7 +184,7 @@ namespace BEPUutilities
             }
             else
             {
-                var S = (float)System.Math.Sqrt(1.0 + r.M33 - r.M11 - r.M22) * 2; // S=4*qz
+                var S = (float)Math.Sqrt(1.0 + r.M33 - r.M11 - r.M22) * 2; // S=4*qz
                 var inverseS = 1 / S;
                 q.W = (r.M12 - r.M21) * inverseS;
                 q.X = (r.M31 + r.M13) * inverseS;
@@ -204,6 +194,43 @@ namespace BEPUutilities
         }
 
         /// <summary>
+        /// Creates a quaternion from a rotation matrix.
+        /// </summary>
+        /// <param name="r">Rotation matrix used to create a new quaternion.</param>
+        /// <returns>Quaternion representing the same rotation as the matrix.</returns>
+        public static Quaternion CreateFromRotationMatrix(Matrix3x3 r)
+        {
+            Quaternion toReturn;
+            CreateFromRotationMatrix(ref r, out toReturn);
+            return toReturn;
+        }
+
+        /// <summary>
+        /// Constructs a quaternion from a rotation matrix.
+        /// </summary>
+        /// <param name="r">Rotation matrix to create the quaternion from.</param>
+        /// <param name="q">Quaternion based on the rotation matrix.</param>
+        public static void CreateFromRotationMatrix(ref Matrix r, out Quaternion q)
+        {
+            Matrix3x3 downsizedMatrix;
+            Matrix3x3.CreateFromMatrix(ref r, out downsizedMatrix);
+            CreateFromRotationMatrix(ref downsizedMatrix, out q);
+        }
+
+        /// <summary>
+        /// Creates a quaternion from a rotation matrix.
+        /// </summary>
+        /// <param name="r">Rotation matrix used to create a new quaternion.</param>
+        /// <returns>Quaternion representing the same rotation as the matrix.</returns>
+        public static Quaternion CreateFromRotationMatrix(Matrix r)
+        {
+            Quaternion toReturn;
+            CreateFromRotationMatrix(ref r, out toReturn);
+            return toReturn;
+        }
+
+
+        /// <summary>
         /// Ensures the quaternion has unit length.
         /// </summary>
         /// <param name="quaternion">Quaternion to normalize.</param>
@@ -211,7 +238,7 @@ namespace BEPUutilities
         public static Quaternion Normalize(Quaternion quaternion)
         {
             Quaternion toReturn;
-            Quaternion.Normalize(ref quaternion, out toReturn);
+            Normalize(ref quaternion, out toReturn);
             return toReturn;
         }
 
@@ -222,7 +249,7 @@ namespace BEPUutilities
         /// <param name="toReturn">Normalized quaternion.</param>
         public static void Normalize(ref Quaternion quaternion, out Quaternion toReturn)
         {
-            float inverse = (float)(1 / System.Math.Sqrt(quaternion.X * quaternion.X + quaternion.Y * quaternion.Y + quaternion.Z * quaternion.Z + quaternion.W * quaternion.W));
+            float inverse = (float)(1 / Math.Sqrt(quaternion.X * quaternion.X + quaternion.Y * quaternion.Y + quaternion.Z * quaternion.Z + quaternion.W * quaternion.W));
             toReturn.X = quaternion.X * inverse;
             toReturn.Y = quaternion.Y * inverse;
             toReturn.Z = quaternion.Z * inverse;
@@ -290,10 +317,10 @@ namespace BEPUutilities
                 return;
             }
             // Calculate temporary values.
-            double halfTheta = System.Math.Acos(cosHalfTheta);
-            double sinHalfTheta = System.Math.Sqrt(1.0 - cosHalfTheta * cosHalfTheta);
+            double halfTheta = Math.Acos(cosHalfTheta);
+            double sinHalfTheta = Math.Sqrt(1.0 - cosHalfTheta * cosHalfTheta);
             //Check to see if we're 180 degrees away from the target.
-            if (System.Math.Abs(sinHalfTheta) < 0.00001)
+            if (Math.Abs(sinHalfTheta) < 0.00001)
             {
                 //Woops! There are an infinite number of ways to get to the goal.
                 //Pick one.
@@ -303,8 +330,8 @@ namespace BEPUutilities
                 result.W = (start.W + end.W) * .5f;
                 return;
             }
-            double aFraction = System.Math.Sin((1 - interpolationAmount) * halfTheta) / sinHalfTheta;
-            double bFraction = System.Math.Sin(interpolationAmount * halfTheta) / sinHalfTheta;
+            double aFraction = Math.Sin((1 - interpolationAmount) * halfTheta) / sinHalfTheta;
+            double bFraction = Math.Sin(interpolationAmount * halfTheta) / sinHalfTheta;
 
             //Blend the two quaternions to get the result!
             result.X = (float)(start.X * aFraction + end.X * bFraction);
@@ -448,6 +475,144 @@ namespace BEPUutilities
             return X.GetHashCode() + Y.GetHashCode() + Z.GetHashCode() + W.GetHashCode();
         }
 
+        /// <summary>
+        /// Transforms the vector using a quaternion.
+        /// </summary>
+        /// <param name="v">Vector to transform.</param>
+        /// <param name="rotation">Rotation to apply to the vector.</param>
+        /// <param name="result">Transformed vector.</param>
+        public static void Transform(ref Vector3 v, ref Quaternion rotation, out Vector3 result)
+        {
+            //This operation is an optimized-down version of v' = q * v * q^-1.
+            //The expanded form would be to treat v as an 'axis only' quaternion
+            //and perform standard quaternion multiplication.  Assuming q is normalized,
+            //q^-1 can be replaced by a conjugation.
+            float x2 = rotation.X + rotation.X;
+            float y2 = rotation.Y + rotation.Y;
+            float z2 = rotation.Z + rotation.Z;
+            float xx2 = rotation.X * x2;
+            float xy2 = rotation.X * y2;
+            float xz2 = rotation.X * z2;
+            float yy2 = rotation.Y * y2;
+            float yz2 = rotation.Y * z2;
+            float zz2 = rotation.Z * z2;
+            float wx2 = rotation.W * x2;
+            float wy2 = rotation.W * y2;
+            float wz2 = rotation.W * z2;
+            //Defer the component setting since they're used in computation.
+            float transformedX = v.X * (1f - yy2 - zz2) + v.Y * (xy2 - wz2) + v.Z * (xz2 + wy2);
+            float transformedY = v.X * (xy2 + wz2) + v.Y * (1f - xx2 - zz2) + v.Z * (yz2 - wx2);
+            float transformedZ = v.X * (xz2 - wy2) + v.Y * (yz2 + wx2) + v.Z * (1f - xx2 - yy2);
+            result.X = transformedX;
+            result.Y = transformedY;
+            result.Z = transformedZ;
+
+        }
+
+        /// <summary>
+        /// Transforms the vector using a quaternion.
+        /// </summary>
+        /// <param name="v">Vector to transform.</param>
+        /// <param name="rotation">Rotation to apply to the vector.</param>
+        /// <returns>Transformed vector.</returns>
+        public static Vector3 Transform(Vector3 v, Quaternion rotation)
+        {
+            Vector3 toReturn;
+            Transform(ref v, ref rotation, out toReturn);
+            return toReturn;
+        }
+
+        /// <summary>
+        /// Transforms a vector using a quaternion. Specialized for x,0,0 vectors.
+        /// </summary>
+        /// <param name="x">X component of the vector to transform.</param>
+        /// <param name="rotation">Rotation to apply to the vector.</param>
+        /// <param name="result">Transformed vector.</param>
+        public static void TransformX(float x, ref Quaternion rotation, out Vector3 result)
+        {
+            //This operation is an optimized-down version of v' = q * v * q^-1.
+            //The expanded form would be to treat v as an 'axis only' quaternion
+            //and perform standard quaternion multiplication.  Assuming q is normalized,
+            //q^-1 can be replaced by a conjugation.
+            float y2 = rotation.Y + rotation.Y;
+            float z2 = rotation.Z + rotation.Z;
+            float xy2 = rotation.X * y2;
+            float xz2 = rotation.X * z2;
+            float yy2 = rotation.Y * y2;
+            float zz2 = rotation.Z * z2;
+            float wy2 = rotation.W * y2;
+            float wz2 = rotation.W * z2;
+            //Defer the component setting since they're used in computation.
+            float transformedX = x * (1f - yy2 - zz2);
+            float transformedY = x * (xy2 + wz2);
+            float transformedZ = x * (xz2 - wy2);
+            result.X = transformedX;
+            result.Y = transformedY;
+            result.Z = transformedZ;
+
+        }
+
+        /// <summary>
+        /// Transforms a vector using a quaternion. Specialized for 0,y,0 vectors.
+        /// </summary>
+        /// <param name="y">Y component of the vector to transform.</param>
+        /// <param name="rotation">Rotation to apply to the vector.</param>
+        /// <param name="result">Transformed vector.</param>
+        public static void TransformY(float y, ref Quaternion rotation, out Vector3 result)
+        {
+            //This operation is an optimized-down version of v' = q * v * q^-1.
+            //The expanded form would be to treat v as an 'axis only' quaternion
+            //and perform standard quaternion multiplication.  Assuming q is normalized,
+            //q^-1 can be replaced by a conjugation.
+            float x2 = rotation.X + rotation.X;
+            float y2 = rotation.Y + rotation.Y;
+            float z2 = rotation.Z + rotation.Z;
+            float xx2 = rotation.X * x2;
+            float xy2 = rotation.X * y2;
+            float yz2 = rotation.Y * z2;
+            float zz2 = rotation.Z * z2;
+            float wx2 = rotation.W * x2;
+            float wz2 = rotation.W * z2;
+            //Defer the component setting since they're used in computation.
+            float transformedX = y * (xy2 - wz2);
+            float transformedY = y * (1f - xx2 - zz2);
+            float transformedZ = y * (yz2 + wx2);
+            result.X = transformedX;
+            result.Y = transformedY;
+            result.Z = transformedZ;
+
+        }
+
+        /// <summary>
+        /// Transforms a vector using a quaternion. Specialized for 0,0,z vectors.
+        /// </summary>
+        /// <param name="z">Z component of the vector to transform.</param>
+        /// <param name="rotation">Rotation to apply to the vector.</param>
+        /// <param name="result">Transformed vector.</param>
+        public static void TransformZ(float z, ref Quaternion rotation, out Vector3 result)
+        {
+            //This operation is an optimized-down version of v' = q * v * q^-1.
+            //The expanded form would be to treat v as an 'axis only' quaternion
+            //and perform standard quaternion multiplication.  Assuming q is normalized,
+            //q^-1 can be replaced by a conjugation.
+            float x2 = rotation.X + rotation.X;
+            float y2 = rotation.Y + rotation.Y;
+            float z2 = rotation.Z + rotation.Z;
+            float xx2 = rotation.X * x2;
+            float xz2 = rotation.X * z2;
+            float yy2 = rotation.Y * y2;
+            float yz2 = rotation.Y * z2;
+            float wx2 = rotation.W * x2;
+            float wy2 = rotation.W * y2;
+            //Defer the component setting since they're used in computation.
+            float transformedX = z * (xz2 + wy2);
+            float transformedY = z * (yz2 - wx2);
+            float transformedZ = z * (1f - xx2 - yy2);
+            result.X = transformedX;
+            result.Y = transformedY;
+            result.Z = transformedZ;
+
+        }
 
 
         /// <summary>
@@ -472,12 +637,12 @@ namespace BEPUutilities
         public static Quaternion CreateFromAxisAngle(Vector3 axis, float angle)
         {
             float halfAngle = angle * .5f;
-            float s = (float)System.Math.Sin(halfAngle);
+            float s = (float)Math.Sin(halfAngle);
             Quaternion q;
             q.X = axis.X * s;
             q.Y = axis.Y * s;
             q.Z = axis.Z * s;
-            q.W = (float)System.Math.Cos(halfAngle);
+            q.W = (float)Math.Cos(halfAngle);
             return q;
         }
 
@@ -490,11 +655,11 @@ namespace BEPUutilities
         public static void CreateFromAxisAngle(ref Vector3 axis, float angle, out Quaternion q)
         {
             float halfAngle = angle * .5f;
-            float s = (float)System.Math.Sin(halfAngle);
+            float s = (float)Math.Sin(halfAngle);
             q.X = axis.X * s;
             q.Y = axis.Y * s;
             q.Z = axis.Z * s;
-            q.W = (float)System.Math.Cos(halfAngle);
+            q.W = (float)Math.Cos(halfAngle);
         }
 
         /// <summary>
@@ -520,13 +685,13 @@ namespace BEPUutilities
         /// <param name="q">Quaternion representing the yaw, pitch, and roll.</param>
         public static void CreateFromYawPitchRoll(float yaw, float pitch, float roll, out Quaternion q)
         {
-            double cosYaw = System.Math.Cos(yaw * .5f);
-            double cosPitch = System.Math.Cos(pitch * .5f);
-            double cosRoll = System.Math.Cos(roll * .5f);
+            double cosYaw = Math.Cos(yaw * .5f);
+            double cosPitch = Math.Cos(pitch * .5f);
+            double cosRoll = Math.Cos(roll * .5f);
 
-            double sinYaw = System.Math.Sin(yaw * .5f);
-            double sinPitch = System.Math.Sin(pitch * .5f);
-            double sinRoll = System.Math.Sin(roll * .5f);
+            double sinYaw = Math.Sin(yaw * .5f);
+            double sinPitch = Math.Sin(pitch * .5f);
+            double sinRoll = Math.Sin(roll * .5f);
 
             double cosYawCosPitch = cosYaw * cosPitch;
             double cosYawSinPitch = cosYaw * sinPitch;
@@ -538,7 +703,5 @@ namespace BEPUutilities
             q.Y = (float)(cosYawSinPitch * cosRoll + sinYawCosPitch * sinRoll);
             q.Z = (float)(cosYawCosPitch * sinRoll - sinYawSinPitch * cosRoll);
         }
-
-
     }
 }

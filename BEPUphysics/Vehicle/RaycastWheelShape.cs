@@ -62,11 +62,11 @@ namespace BEPUphysics.Vehicle
             Vector3.Add(ref wheel.suspension.localAttachmentPoint, ref wheel.vehicle.Body.CollisionInformation.localPosition, out localAttach);
             worldTransform = Matrix3x3.ToMatrix4X4(wheel.vehicle.Body.BufferedStates.InterpolatedStates.OrientationMatrix);
 
-            Vector3.TransformNormal(ref localAttach, ref worldTransform, out worldAttachmentPoint);
+            Matrix.TransformNormal(ref localAttach, ref worldTransform, out worldAttachmentPoint);
             worldAttachmentPoint += wheel.vehicle.Body.BufferedStates.InterpolatedStates.Position;
 
             Vector3 worldDirection;
-            Vector3.Transform(ref wheel.suspension.localDirection, ref worldTransform, out worldDirection);
+            Matrix.Transform(ref wheel.suspension.localDirection, ref worldTransform, out worldDirection);
 
             float length = wheel.suspension.currentLength - graphicalRadius;
             newPosition.X = worldAttachmentPoint.X + worldDirection.X * length;
@@ -85,7 +85,7 @@ namespace BEPUphysics.Vehicle
             Matrix.Multiply(ref localTurnTransform, ref steeringTransform, out localTurnTransform);
             //Matrix.Multiply(ref localTurnTransform, ref spinTransform, out localTurnTransform);
             Matrix.Multiply(ref localTurnTransform, ref worldTransform, out worldTransform);
-            worldTransform.Translation = newPosition;
+            worldTransform.Translation += newPosition;
         }
 
         /// <summary>

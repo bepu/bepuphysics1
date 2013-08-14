@@ -53,7 +53,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             boundingBox = new BoundingBox();
 #endif
             Vector3 upExtreme;
-            Vector3.TransformY(halfLength, ref shapeTransform.Orientation, out upExtreme);
+            Quaternion.TransformY(halfLength, ref shapeTransform.Orientation, out upExtreme);
 
             if (upExtreme.X > 0)
             {
@@ -212,8 +212,8 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             Quaternion.Conjugate(ref transform.Orientation, out conjugate);
             Ray localRay;
             Vector3.Subtract(ref ray.Position, ref transform.Position, out localRay.Position);
-            Vector3.Transform(ref localRay.Position, ref conjugate, out localRay.Position);
-            Vector3.Transform(ref ray.Direction, ref conjugate, out localRay.Direction);
+            Quaternion.Transform(ref localRay.Position, ref conjugate, out localRay.Position);
+            Quaternion.Transform(ref ray.Direction, ref conjugate, out localRay.Direction);
 
             //Check for containment in the cylindrical portion of the capsule.
             if (localRay.Position.Y >= -halfLength && localRay.Position.Y <= halfLength && localRay.Position.X * localRay.Position.X + localRay.Position.Z * localRay.Position.Z <= collisionMargin * collisionMargin)
@@ -228,7 +228,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
                 else
                     hit.Normal = new Vector3();
                 //Pull the hit into world space.
-                Vector3.Transform(ref hit.Normal, ref transform.Orientation, out hit.Normal);
+                Quaternion.Transform(ref hit.Normal, ref transform.Orientation, out hit.Normal);
                 RigidTransform.Transform(ref hit.Location, ref transform, out hit.Location);
                 return true;
             }
@@ -294,7 +294,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
                 else
                     hit.Normal = new Vector3();
                 //Pull the hit into world space.
-                Vector3.Transform(ref hit.Normal, ref transform.Orientation, out hit.Normal);
+                Quaternion.Transform(ref hit.Normal, ref transform.Orientation, out hit.Normal);
                 RigidTransform.Transform(ref hit.Location, ref transform, out hit.Location);
                 return true;
             }
@@ -309,7 +309,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             if (Toolbox.RayCastSphere(ref localRay, ref spherePosition, collisionMargin, maximumLength, out hit))
             {
                 //Pull the hit into world space.
-                Vector3.Transform(ref hit.Normal, ref transform.Orientation, out hit.Normal);
+                Quaternion.Transform(ref hit.Normal, ref transform.Orientation, out hit.Normal);
                 RigidTransform.Transform(ref hit.Location, ref transform, out hit.Location);
                 return true;
             }
@@ -325,7 +325,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             if (Toolbox.RayCastSphere(ref localRay, ref spherePosition, collisionMargin, maximumLength, out hit))
             {
                 //Pull the hit into world space.
-                Vector3.Transform(ref hit.Normal, ref transform.Orientation, out hit.Normal);
+                Quaternion.Transform(ref hit.Normal, ref transform.Orientation, out hit.Normal);
                 RigidTransform.Transform(ref hit.Location, ref transform, out hit.Location);
                 return true;
             }

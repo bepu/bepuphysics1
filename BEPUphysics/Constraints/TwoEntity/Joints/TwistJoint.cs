@@ -88,7 +88,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Joints
                 worldAxisA = Vector3.Normalize(value);
                 Quaternion conjugate;
                 Quaternion.Conjugate(ref connectionA.orientation, out conjugate);
-                Vector3.Transform(ref worldAxisA, ref conjugate, out localAxisA);
+                Quaternion.Transform(ref worldAxisA, ref conjugate, out localAxisA);
                 Initialize();
             }
         }
@@ -104,7 +104,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Joints
                 worldAxisB = Vector3.Normalize(value);
                 Quaternion conjugate;
                 Quaternion.Conjugate(ref connectionA.orientation, out conjugate);
-                Vector3.Transform(ref worldAxisB, ref conjugate, out localAxisB);
+                Quaternion.Transform(ref worldAxisB, ref conjugate, out localAxisB);
                 Initialize();
             }
         }
@@ -245,7 +245,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Joints
 
             //Transform b's 'Y' axis so that it is perpendicular with a's 'X' axis for measurement.
             Vector3 twistMeasureAxis;
-            Vector3.Transform(ref bAxisY, ref rotation, out twistMeasureAxis);
+            Quaternion.Transform(ref bAxisY, ref rotation, out twistMeasureAxis);
 
             //By dotting the measurement vector with a 2d plane's axes, we can get a local X and Y value.
             float y, x;
@@ -345,7 +345,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Joints
             //Put the axis into the local space of A.
             Quaternion conjugate;
             Quaternion.Conjugate(ref connectionA.orientation, out conjugate);
-            Vector3.Transform(ref yAxis, ref conjugate, out aLocalAxisY);
+            Quaternion.Transform(ref yAxis, ref conjugate, out aLocalAxisY);
 
             //Complete A's basis.
             Vector3.Cross(ref localAxisA, ref aLocalAxisY, out aLocalAxisZ);
@@ -353,11 +353,11 @@ namespace BEPUphysics.Constraints.TwoEntity.Joints
             //Rotate the axis to B since it could be arbitrarily rotated.
             Quaternion rotation;
             Toolbox.GetQuaternionBetweenNormalizedVectors(ref worldAxisA, ref worldAxisB, out rotation);
-            Vector3.Transform(ref yAxis, ref rotation, out yAxis);
+            Quaternion.Transform(ref yAxis, ref rotation, out yAxis);
 
             //Put it into local space.
             Quaternion.Conjugate(ref connectionB.orientation, out conjugate);
-            Vector3.Transform(ref yAxis, ref conjugate, out bLocalAxisY);
+            Quaternion.Transform(ref yAxis, ref conjugate, out bLocalAxisY);
         }
     }
 }

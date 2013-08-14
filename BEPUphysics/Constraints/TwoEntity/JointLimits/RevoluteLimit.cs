@@ -367,11 +367,11 @@ namespace BEPUphysics.Constraints.TwoEntity.JointLimits
             //Compute the plane normals.
             Vector3 minPlaneNormal, maxPlaneNormal;
             //Rotate basisA y axis around the basisA primary axis.
-            Matrix rotation;
-            Matrix.CreateFromAxisAngle(ref basis.primaryAxis, minimumAngle + MathHelper.PiOver2, out rotation);
-            Vector3.TransformNormal(ref basis.xAxis, ref rotation, out minPlaneNormal);
-            Matrix.CreateFromAxisAngle(ref basis.primaryAxis, maximumAngle - MathHelper.PiOver2, out rotation);
-            Vector3.TransformNormal(ref basis.xAxis, ref rotation, out maxPlaneNormal);
+            Matrix3x3 rotation;
+            Matrix3x3.CreateFromAxisAngle(ref basis.primaryAxis, minimumAngle + MathHelper.PiOver2, out rotation);
+            Matrix3x3.Transform(ref basis.xAxis, ref rotation, out minPlaneNormal);
+            Matrix3x3.CreateFromAxisAngle(ref basis.primaryAxis, maximumAngle - MathHelper.PiOver2, out rotation);
+            Matrix3x3.Transform(ref basis.xAxis, ref rotation, out maxPlaneNormal);
 
             //Compute the errors along the two normals.
             float planePositionMin, planePositionMax;

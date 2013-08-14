@@ -36,8 +36,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         /// </summary>
         public Vector3 AxisA
         {
-            get { return Vector3.Transform(LocalAxisA, ConnectionA.Orientation); }
-            set { LocalAxisA = Vector3.Transform(value, Quaternion.Conjugate(ConnectionA.Orientation)); }
+            get { return Quaternion.Transform(LocalAxisA, ConnectionA.Orientation); }
+            set { LocalAxisA = Quaternion.Transform(value, Quaternion.Conjugate(ConnectionA.Orientation)); }
         }
 
         /// <summary>
@@ -46,8 +46,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         /// </summary>
         public Vector3 AxisB
         {
-            get { return Vector3.Transform(LocalAxisB, ConnectionB.Orientation); }
-            set { LocalAxisB = Vector3.Transform(value, Quaternion.Conjugate(ConnectionB.Orientation)); }
+            get { return Quaternion.Transform(LocalAxisB, ConnectionB.Orientation); }
+            set { LocalAxisB = Quaternion.Transform(value, Quaternion.Conjugate(ConnectionB.Orientation)); }
         }
 
         /// <summary>
@@ -57,8 +57,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         /// </summary>
         public Vector3 MeasurementAxisA
         {
-            get { return Vector3.Transform(LocalMeasurementAxisA, ConnectionA.Orientation); }
-            set { LocalMeasurementAxisA = Vector3.Transform(value, Quaternion.Conjugate(ConnectionA.Orientation)); }
+            get { return Quaternion.Transform(LocalMeasurementAxisA, ConnectionA.Orientation); }
+            set { LocalMeasurementAxisA = Quaternion.Transform(value, Quaternion.Conjugate(ConnectionA.Orientation)); }
         }
 
         /// <summary>
@@ -68,8 +68,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         /// </summary>
         public Vector3 MeasurementAxisB
         {
-            get { return Vector3.Transform(LocalMeasurementAxisB, ConnectionB.Orientation); }
-            set { LocalMeasurementAxisB = Vector3.Transform(value, Quaternion.Conjugate(ConnectionB.Orientation)); }
+            get { return Quaternion.Transform(LocalMeasurementAxisB, ConnectionB.Orientation); }
+            set { LocalMeasurementAxisB = Quaternion.Transform(value, Quaternion.Conjugate(ConnectionB.Orientation)); }
         }
 
         /// <summary>
@@ -79,8 +79,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         public void ComputeMeasurementAxes()
         {
             Vector3 axisA, axisB;
-            Vector3.Transform(ref LocalAxisA, ref ConnectionA.Orientation, out axisA);
-            Vector3.Transform(ref LocalAxisB, ref ConnectionB.Orientation, out axisB);
+            Quaternion.Transform(ref LocalAxisA, ref ConnectionA.Orientation, out axisA);
+            Quaternion.Transform(ref LocalAxisB, ref ConnectionB.Orientation, out axisB);
             //Pick an axis perpendicular to axisA to use as the measurement axis.
             Vector3 worldMeasurementAxisA;
             Vector3.Cross(ref Toolbox.UpVector, ref axisA, out worldMeasurementAxisA);
@@ -100,7 +100,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             Quaternion alignmentRotation;
             Toolbox.GetQuaternionBetweenNormalizedVectors(ref axisA, ref axisB, out alignmentRotation);
             Vector3 worldMeasurementAxisB;
-            Vector3.Transform(ref worldMeasurementAxisA, ref alignmentRotation, out worldMeasurementAxisB);
+            Quaternion.Transform(ref worldMeasurementAxisA, ref alignmentRotation, out worldMeasurementAxisB);
             //Plop them on!
             MeasurementAxisA = worldMeasurementAxisA;
             MeasurementAxisB = worldMeasurementAxisB;
@@ -132,19 +132,19 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
 
             //Compute the world axes.
             Vector3 axisA, axisB;
-            Vector3.Transform(ref LocalAxisA, ref ConnectionA.Orientation, out axisA);
-            Vector3.Transform(ref LocalAxisB, ref ConnectionB.Orientation, out axisB);
+            Quaternion.Transform(ref LocalAxisA, ref ConnectionA.Orientation, out axisA);
+            Quaternion.Transform(ref LocalAxisB, ref ConnectionB.Orientation, out axisB);
 
             Vector3 twistMeasureAxisA, twistMeasureAxisB;
-            Vector3.Transform(ref LocalMeasurementAxisA, ref ConnectionA.Orientation, out twistMeasureAxisA);
-            Vector3.Transform(ref LocalMeasurementAxisB, ref ConnectionB.Orientation, out twistMeasureAxisB);
+            Quaternion.Transform(ref LocalMeasurementAxisA, ref ConnectionA.Orientation, out twistMeasureAxisA);
+            Quaternion.Transform(ref LocalMeasurementAxisB, ref ConnectionB.Orientation, out twistMeasureAxisB);
 
             //Compute the shortest rotation to bring axisB into alignment with axisA.
             Quaternion alignmentRotation;
             Toolbox.GetQuaternionBetweenNormalizedVectors(ref axisB, ref axisA, out alignmentRotation);
 
             //Transform the measurement axis on B by the alignment quaternion.
-            Vector3.Transform(ref twistMeasureAxisB, ref alignmentRotation, out twistMeasureAxisB);
+            Quaternion.Transform(ref twistMeasureAxisB, ref alignmentRotation, out twistMeasureAxisB);
 
             //We can now compare the angle between the twist axes.
             float error;

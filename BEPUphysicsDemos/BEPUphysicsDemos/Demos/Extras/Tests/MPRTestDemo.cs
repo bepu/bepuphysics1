@@ -123,13 +123,13 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
         {
 
             if (Game.KeyboardInput.IsKeyDown(Keys.Left))
-                rayCastDirection = Vector3.Transform(rayCastDirection, Matrix.CreateFromAxisAngle(Vector3.Forward, .01f));
+                rayCastDirection = Matrix3x3.Transform(rayCastDirection, Matrix3x3.CreateFromAxisAngle(Vector3.Forward, .01f));
             if (Game.KeyboardInput.IsKeyDown(Keys.Right))
-                rayCastDirection = Vector3.Transform(rayCastDirection, Matrix.CreateFromAxisAngle(Vector3.Forward, -.01f));
+                rayCastDirection = Matrix3x3.Transform(rayCastDirection, Matrix3x3.CreateFromAxisAngle(Vector3.Forward, -.01f));
             if (Game.KeyboardInput.IsKeyDown(Keys.Down))
-                rayCastDirection = Vector3.Transform(rayCastDirection, Matrix.CreateFromAxisAngle(Vector3.Right, .01f));
+                rayCastDirection = Matrix3x3.Transform(rayCastDirection, Matrix3x3.CreateFromAxisAngle(Vector3.Right, .01f));
             if (Game.KeyboardInput.IsKeyDown(Keys.Up))
-                rayCastDirection = Vector3.Transform(rayCastDirection, Matrix.CreateFromAxisAngle(Vector3.Right, -.01f));
+                rayCastDirection = Matrix3x3.Transform(rayCastDirection, Matrix3x3.CreateFromAxisAngle(Vector3.Right, -.01f));
 
 
             if (Game.KeyboardInput.IsKeyDown(Keys.P))

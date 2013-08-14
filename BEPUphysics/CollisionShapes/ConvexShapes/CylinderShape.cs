@@ -195,8 +195,8 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             Quaternion.Conjugate(ref transform.Orientation, out conjugate);
             Ray localRay;
             Vector3.Subtract(ref ray.Position, ref transform.Position, out localRay.Position);
-            Vector3.Transform(ref localRay.Position, ref conjugate, out localRay.Position);
-            Vector3.Transform(ref ray.Direction, ref conjugate, out localRay.Direction);
+            Quaternion.Transform(ref localRay.Position, ref conjugate, out localRay.Position);
+            Quaternion.Transform(ref ray.Direction, ref conjugate, out localRay.Direction);
 
             //Check for containment.
             if (localRay.Position.Y >= -halfHeight && localRay.Position.Y <= halfHeight && localRay.Position.X * localRay.Position.X + localRay.Position.Z * localRay.Position.Z <= radius * radius)
@@ -211,7 +211,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
                 else
                     hit.Normal = new Vector3();
                 //Pull the hit into world space.
-                Vector3.Transform(ref hit.Normal, ref transform.Orientation, out hit.Normal);
+                Quaternion.Transform(ref hit.Normal, ref transform.Orientation, out hit.Normal);
                 RigidTransform.Transform(ref hit.Location, ref transform, out hit.Location);
                 return true;
             }
@@ -277,7 +277,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
                 else
                     hit.Normal = new Vector3();
                 //Pull the hit into world space.
-                Vector3.Transform(ref hit.Normal, ref transform.Orientation, out hit.Normal);
+                Quaternion.Transform(ref hit.Normal, ref transform.Orientation, out hit.Normal);
                 RigidTransform.Transform(ref hit.Location, ref transform, out hit.Location);
                 return true;
             }
@@ -300,7 +300,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             if(planeIntersection.X * planeIntersection.X + planeIntersection.Z * planeIntersection.Z < radius * radius + 1e-9 && t < maximumLength)
             {
                 //Pull the hit into world space.
-                Vector3.Transform(ref Toolbox.UpVector, ref transform.Orientation, out hit.Normal);
+                Quaternion.Transform(ref Toolbox.UpVector, ref transform.Orientation, out hit.Normal);
                 RigidTransform.Transform(ref planeIntersection, ref transform, out hit.Location);
                 hit.T = t;
                 return true;
@@ -323,7 +323,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             if (planeIntersection.X * planeIntersection.X + planeIntersection.Z * planeIntersection.Z < radius * radius + 1e-9 && t < maximumLength)
             {
                 //Pull the hit into world space.
-                Vector3.Transform(ref Toolbox.DownVector, ref transform.Orientation, out hit.Normal);
+                Quaternion.Transform(ref Toolbox.DownVector, ref transform.Orientation, out hit.Normal);
                 RigidTransform.Transform(ref planeIntersection, ref transform, out hit.Location);
                 hit.T = t;
                 return true;

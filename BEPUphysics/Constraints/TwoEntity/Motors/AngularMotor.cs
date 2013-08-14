@@ -237,7 +237,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
                 //Error = (GoalRelativeOrientation * ConnectionA.Orientation)^-1 * ConnectionB.Orientation
 
                 //ConnectionA.Orientation is replaced in the above by the world space basis orientation.
-                Quaternion worldBasis = Matrix3x3.CreateQuaternion(basis.WorldTransform);
+                Quaternion worldBasis = Quaternion.CreateFromRotationMatrix(basis.WorldTransform);
 
                 Quaternion bTarget;
                 Quaternion.Concatenate(ref settings.servo.goal, ref worldBasis, out bTarget);
