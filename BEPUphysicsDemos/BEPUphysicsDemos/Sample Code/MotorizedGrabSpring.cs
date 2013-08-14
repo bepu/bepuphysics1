@@ -133,7 +133,7 @@ namespace BEPUphysicsDemos.SampleCode
             linearMotor.Settings.MaximumForce = 1000 * e.Mass;
 
             Entity = e;
-            LocalOffset = Vector3.Transform(grabLocation - e.Position, Quaternion.Conjugate(e.Orientation));
+            LocalOffset = Quaternion.Transform(grabLocation - e.Position, Quaternion.Conjugate(e.Orientation));
             angularMotor.Settings.Servo.Goal = e.Orientation;
             GoalPosition = grabLocation;
 

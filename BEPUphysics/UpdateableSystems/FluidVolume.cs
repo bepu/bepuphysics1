@@ -416,8 +416,8 @@ namespace BEPUphysics.UpdateableSystems
             float lengthIncrement = (entityBoundingBox.Max.Z - entityBoundingBox.Min.Z) / samplePointsPerDimension;
             xSpacing = new Vector3(widthIncrement, 0, 0);
             zSpacing = new Vector3(0, 0, lengthIncrement);
-            Vector3.Transform(ref xSpacing, ref surfaceTransform.Orientation, out xSpacing);
-            Vector3.Transform(ref zSpacing, ref surfaceTransform.Orientation, out zSpacing);
+            Quaternion.Transform(ref xSpacing, ref surfaceTransform.Orientation, out xSpacing);
+            Quaternion.Transform(ref zSpacing, ref surfaceTransform.Orientation, out zSpacing);
             perColumnArea = widthIncrement * lengthIncrement;
 
 

@@ -232,7 +232,7 @@ namespace BEPUphysics.Constraints.TwoEntity.JointLimits
             //Rotate the axis to B since it could be arbitrarily rotated.
             Quaternion rotation;
             Toolbox.GetQuaternionBetweenNormalizedVectors(ref worldTwistAxisA, ref worldTwistAxisB, out rotation);
-            Vector3.Transform(ref worldXAxis, ref rotation, out worldXAxis);
+            Quaternion.Transform(ref worldXAxis, ref rotation, out worldXAxis);
 
             basisB.rotationMatrix = connectionB.orientationMatrix;
             basisB.SetWorldAxes(worldTwistAxisB, worldXAxis);
@@ -290,7 +290,7 @@ namespace BEPUphysics.Constraints.TwoEntity.JointLimits
 
             //Transform b's 'Y' axis so that it is perpendicular with a's 'X' axis for measurement.
             Vector3 twistMeasureAxis;
-            Vector3.Transform(ref basisB.xAxis, ref rotation, out twistMeasureAxis);
+            Quaternion.Transform(ref basisB.xAxis, ref rotation, out twistMeasureAxis);
 
             //By dotting the measurement vector with a 2d plane's axes, we can get a local X and Y value.
             float y, x;

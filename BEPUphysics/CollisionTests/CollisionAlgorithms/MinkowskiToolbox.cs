@@ -24,7 +24,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             Quaternion.Conjugate(ref transformA.Orientation, out conjugateOrientationA);
             Quaternion.Concatenate(ref transformB.Orientation, ref conjugateOrientationA, out localTransformB.Orientation);
             Vector3.Subtract(ref transformB.Position, ref transformA.Position, out localTransformB.Position);
-            Vector3.Transform(ref localTransformB.Position, ref conjugateOrientationA, out localTransformB.Position);
+            Quaternion.Transform(ref localTransformB.Position, ref conjugateOrientationA, out localTransformB.Position);
         }
 
         ///<summary>

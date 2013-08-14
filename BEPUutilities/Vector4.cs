@@ -474,38 +474,6 @@ namespace BEPUutilities
         }
 
         /// <summary>
-        /// Transforms a vector using a matrix.
-        /// </summary>
-        /// <param name="v">Vector to transform.</param>
-        /// <param name="matrix">Transform to apply to the vector.</param>
-        /// <param name="result">Transformed vector.</param>
-        public static void Transform(ref Vector4 v, ref Matrix matrix, out Vector4 result)
-        {
-            float vX = v.X;
-            float vY = v.Y;
-            float vZ = v.Z;
-            float vW = v.W;
-            result.X = vX * matrix.M11 + vY * matrix.M21 + vZ * matrix.M31 + vW * matrix.M41;
-            result.Y = vX * matrix.M12 + vY * matrix.M22 + vZ * matrix.M32 + vW * matrix.M42;
-            result.Z = vX * matrix.M13 + vY * matrix.M23 + vZ * matrix.M33 + vW * matrix.M43;
-            result.W = vX * matrix.M14 + vY * matrix.M24 + vZ * matrix.M34 + vW * matrix.M44;
-        }
-        /// <summary>
-        /// Transforms a vector using a matrix.
-        /// </summary>
-        /// <param name="v">Vector to transform.</param>
-        /// <param name="matrix">Transform to apply to the vector.</param>
-        /// <returns>Transformed vector.</returns>
-        public static Vector4 Transform(Vector4 v, Matrix matrix)
-        {
-            Vector4 toReturn;
-            Transform(ref v, ref matrix, out toReturn);
-            return toReturn;
-        }
-
-
-
-        /// <summary>
         /// Normalizes the given vector.
         /// </summary>
         /// <param name="v">Vector to normalize.</param>
@@ -638,6 +606,5 @@ namespace BEPUutilities
             Hermite(ref value1, ref tangent1, ref value2, ref tangent2, interpolationAmount, out toReturn);
             return toReturn;
         }
-
     }
 }

@@ -1249,68 +1249,7 @@ namespace BEPUutilities
             subMatrixCode = -1;
             return 0;
         }
-
-        /// <summary>
-        /// Constructs a quaternion from a 3x3 rotation matrix.
-        /// </summary>
-        /// <param name="r">Rotation matrix to create the quaternion from.</param>
-        /// <param name="q">Quaternion based on the rotation matrix.</param>
-        public static void CreateQuaternion(ref Matrix3x3 r, out Quaternion q)
-        {
-            float trace = r.M11 + r.M22 + r.M33;
-#if !WINDOWS
-            q = new Quaternion();
-#endif
-            if (trace >= 0)
-            {
-                var S = (float)System.Math.Sqrt(trace + 1.0) * 2; // S=4*qw 
-                var inverseS = 1 / S;
-                q.W = 0.25f * S;
-                q.X = (r.M23 - r.M32) * inverseS;
-                q.Y = (r.M31 - r.M13) * inverseS;
-                q.Z = (r.M12 - r.M21) * inverseS;
-            }
-            else if ((r.M11 > r.M22) & (r.M11 > r.M33))
-            {
-                var S = (float)System.Math.Sqrt(1.0 + r.M11 - r.M22 - r.M33) * 2; // S=4*qx 
-                var inverseS = 1 / S;
-                q.W = (r.M23 - r.M32) * inverseS;
-                q.X = 0.25f * S;
-                q.Y = (r.M21 + r.M12) * inverseS;
-                q.Z = (r.M31 + r.M13) * inverseS;
-            }
-            else if (r.M22 > r.M33)
-            {
-                var S = (float)System.Math.Sqrt(1.0 + r.M22 - r.M11 - r.M33) * 2; // S=4*qy
-                var inverseS = 1 / S;
-                q.W = (r.M31 - r.M13) * inverseS;
-                q.X = (r.M21 + r.M12) * inverseS;
-                q.Y = 0.25f * S;
-                q.Z = (r.M32 + r.M23) * inverseS;
-            }
-            else
-            {
-                var S = (float)System.Math.Sqrt(1.0 + r.M33 - r.M11 - r.M22) * 2; // S=4*qz
-                var inverseS = 1 / S;
-                q.W = (r.M12 - r.M21) * inverseS;
-                q.X = (r.M31 + r.M13) * inverseS;
-                q.Y = (r.M32 + r.M23) * inverseS;
-                q.Z = 0.25f * S;
-            }
-        }
-
-        /// <summary>
-        /// Constructs a quaternion from a 3x3 rotation matrix.
-        /// </summary>
-        /// <param name="r">Rotation matrix to create the quaternion from.</param>
-        /// <returns>Quaternion based on the rotation matrix.</returns>
-        public static Quaternion CreateQuaternion(Matrix3x3 r)
-        {
-            Quaternion result;
-            CreateQuaternion(ref r, out result);
-            return result;
-        }
-
+        
         /// <summary>
         /// Creates a 3x3 matrix representing the orientation stored in the quaternion.
         /// </summary>

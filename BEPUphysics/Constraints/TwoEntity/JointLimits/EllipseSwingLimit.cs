@@ -370,8 +370,8 @@ namespace BEPUphysics.Constraints.TwoEntity.JointLimits
             //Create a rotation which swings our basis 'out' to b's world orientation.
             Quaternion.Conjugate(ref relativeRotation, out relativeRotation);
             Vector3 sphereTangentX, sphereTangentY;
-            Vector3.Transform(ref basis.xAxis, ref relativeRotation, out sphereTangentX);
-            Vector3.Transform(ref basis.yAxis, ref relativeRotation, out sphereTangentY);
+            Quaternion.Transform(ref basis.xAxis, ref relativeRotation, out sphereTangentX);
+            Quaternion.Transform(ref basis.yAxis, ref relativeRotation, out sphereTangentY);
 
             Vector3.Multiply(ref sphereTangentX, tangent.X, out jacobianA); //not actually jA, just storing it there.
             Vector3.Multiply(ref sphereTangentY, tangent.Y, out jacobianB); //not actually jB, just storing it there.

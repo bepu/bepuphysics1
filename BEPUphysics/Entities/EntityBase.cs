@@ -95,7 +95,7 @@ namespace BEPUphysics.Entities
             }
             set
             {
-                Matrix3x3.CreateQuaternion(ref value, out orientation);
+                Quaternion.CreateFromRotationMatrix(ref value, out orientation);
                 Orientation = orientation; //normalizes and sets.
             }
         }

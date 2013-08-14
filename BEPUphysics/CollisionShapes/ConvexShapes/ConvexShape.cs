@@ -65,10 +65,10 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         {
             Quaternion conjugate;
             Quaternion.Conjugate(ref shapeTransform.Orientation, out conjugate);
-            Vector3.Transform(ref direction, ref conjugate, out direction);
+            Quaternion.Transform(ref direction, ref conjugate, out direction);
             GetLocalExtremePointWithoutMargin(ref direction, out extremePoint);
 
-            Vector3.Transform(ref extremePoint, ref shapeTransform.Orientation, out extremePoint);
+            Quaternion.Transform(ref extremePoint, ref shapeTransform.Orientation, out extremePoint);
             Vector3.Add(ref extremePoint, ref shapeTransform.Position, out extremePoint);
         }
 

@@ -22,8 +22,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         /// </summary>
         public Vector3 AxisA
         {
-            get { return Vector3.Transform(LocalAxisA, ConnectionA.Orientation); }
-            set { LocalAxisA = Vector3.Transform(value, Quaternion.Conjugate(ConnectionA.Orientation)); }
+            get { return Quaternion.Transform(LocalAxisA, ConnectionA.Orientation); }
+            set { LocalAxisA = Quaternion.Transform(value, Quaternion.Conjugate(ConnectionA.Orientation)); }
         }
 
         /// <summary>
@@ -31,8 +31,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         /// </summary>
         public Vector3 AxisB
         {
-            get { return Vector3.Transform(LocalAxisB, ConnectionB.Orientation); }
-            set { LocalAxisB = Vector3.Transform(value, Quaternion.Conjugate(ConnectionB.Orientation)); }
+            get { return Quaternion.Transform(LocalAxisB, ConnectionB.Orientation); }
+            set { LocalAxisB = Quaternion.Transform(value, Quaternion.Conjugate(ConnectionB.Orientation)); }
         }
 
         private float maximumAngle;
@@ -70,8 +70,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
 
             //Compute the world axes.
             Vector3 axisA, axisB;
-            Vector3.Transform(ref LocalAxisA, ref ConnectionA.Orientation, out axisA);
-            Vector3.Transform(ref LocalAxisB, ref ConnectionB.Orientation, out axisB);
+            Quaternion.Transform(ref LocalAxisA, ref ConnectionA.Orientation, out axisA);
+            Quaternion.Transform(ref LocalAxisB, ref ConnectionB.Orientation, out axisB);
 
             float dot;
             Vector3.Dot(ref axisA, ref axisB, out dot);

@@ -156,7 +156,7 @@ namespace BEPUphysics.Constraints.SingleEntity
             if (settings.mode == MotorMode.Servomechanism) //Only need to do the bulk of this work if it's a servo.
             {
                 Quaternion currentRelativeOrientation;
-                Matrix worldTransform = Matrix3x3.ToMatrix4X4(basis.WorldTransform);
+                var worldTransform = basis.WorldTransform;
                 Quaternion.CreateFromRotationMatrix(ref worldTransform, out currentRelativeOrientation);
 
 

@@ -97,7 +97,7 @@ namespace BEPUphysics.EntityStateManagement
             {
                 if (IsWriteBufferAccessible())
                 {
-                    Quaternion toSet = Quaternion.Normalize(Quaternion.CreateFromRotationMatrix(Matrix3x3.ToMatrix4X4(value)));
+                    Quaternion toSet = Quaternion.Normalize(Quaternion.CreateFromRotationMatrix(value));
                     WriteBuffer.EnqueueOrientation(bufferedStates.Entity, ref toSet);
                 }
                 else

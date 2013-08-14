@@ -732,8 +732,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             {
                 var boneA = bonesList[i];
                 var boneB = bonesList[(i + 1) % incrementCount];
-                var upA = Vector3.Transform(Vector3.Up, boneA.Orientation);
-                var upB = Vector3.Transform(Vector3.Up, boneB.Orientation);
+                var upA = Quaternion.Transform(Vector3.Up, boneA.Orientation);
+                var upB = Quaternion.Transform(Vector3.Up, boneB.Orientation);
                 joints.Add(new IKBallSocketJoint(boneA, boneB, (boneA.Position + upA * boneB.HalfHeight + boneB.Position - upB * boneB.HalfHeight) * .5f));
                 joints.Add(new IKSwingLimit(boneA, boneB, upA, upB, MathHelper.Pi * .5f));
             }
@@ -750,8 +750,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             {
                 var boneA = boneEntitiesList[i];
                 var boneB = boneEntitiesList[(i + 1) % incrementCount];
-                var upA = Vector3.Transform(Vector3.Up, boneA.Orientation);
-                var upB = Vector3.Transform(Vector3.Up, boneB.Orientation);
+                var upA = Quaternion.Transform(Vector3.Up, boneA.Orientation);
+                var upB = Quaternion.Transform(Vector3.Up, boneB.Orientation);
                 var joint = new BallSocketJoint(boneA, boneB, (boneA.Position + upA * boneB.Height * 0.5f + boneB.Position - upB * boneB.Height * 0.5f) * .5f);
                 var swingLimit = new SwingLimit(boneA, boneB, upA, upB, MathHelper.Pi * .5f);
                 Space.Add(swingLimit);
@@ -1050,8 +1050,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             Quaternion.Conjugate(ref transform.Orientation, out conjugate);
             Ray localRay;
             Vector3.Subtract(ref ray.Position, ref transform.Position, out localRay.Position);
-            Vector3.Transform(ref localRay.Position, ref conjugate, out localRay.Position);
-            Vector3.Transform(ref ray.Direction, ref conjugate, out localRay.Direction);
+            Quaternion.Transform(ref localRay.Position, ref conjugate, out localRay.Position);
+            Quaternion.Transform(ref ray.Direction, ref conjugate, out localRay.Direction);
 
             var halfHeight = bone.HalfHeight;
             var radius = bone.Radius;
@@ -1068,7 +1068,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                 else
                     hit.Normal = new Vector3();
                 //Pull the hit into world space.
-                Vector3.Transform(ref hit.Normal, ref transform.Orientation, out hit.Normal);
+                Quaternion.Transform(ref hit.Normal, ref transform.Orientation, out hit.Normal);
                 RigidTransform.Transform(ref hit.Location, ref transform, out hit.Location);
                 return true;
             }
@@ -1134,7 +1134,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                 else
                     hit.Normal = new Vector3();
                 //Pull the hit into world space.
-                Vector3.Transform(ref hit.Normal, ref transform.Orientation, out hit.Normal);
+                Quaternion.Transform(ref hit.Normal, ref transform.Orientation, out hit.Normal);
                 RigidTransform.Transform(ref hit.Location, ref transform, out hit.Location);
                 return true;
             }
@@ -1157,7 +1157,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             if (planeIntersection.X * planeIntersection.X + planeIntersection.Z * planeIntersection.Z < radius * radius + 1e-9)
             {
                 //Pull the hit into world space.
-                Vector3.Transform(ref Toolbox.UpVector, ref transform.Orientation, out hit.Normal);
+                Quaternion.Transform(ref Toolbox.UpVector, ref transform.Orientation, out hit.Normal);
                 RigidTransform.Transform(ref planeIntersection, ref transform, out hit.Location);
                 hit.T = t;
                 return true;
@@ -1180,7 +1180,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             if (planeIntersection.X * planeIntersection.X + planeIntersection.Z * planeIntersection.Z < radius * radius + 1e-9)
             {
                 //Pull the hit into world space.
-                Vector3.Transform(ref Toolbox.DownVector, ref transform.Orientation, out hit.Normal);
+                Quaternion.Transform(ref Toolbox.DownVector, ref transform.Orientation, out hit.Normal);
                 RigidTransform.Transform(ref planeIntersection, ref transform, out hit.Location);
                 hit.T = t;
                 return true;

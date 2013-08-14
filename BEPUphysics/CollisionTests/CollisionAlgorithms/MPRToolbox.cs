@@ -1329,7 +1329,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             Quaternion conjugateOrientationA;
             Quaternion.Conjugate(ref transformA.Orientation, out conjugateOrientationA);
             Vector3 localDirection;
-            Vector3.Transform(ref velocityWorld, ref conjugateOrientationA, out localDirection);
+            Quaternion.Transform(ref velocityWorld, ref conjugateOrientationA, out localDirection);
 
 
             //Sweeping two objects against each other is very similar to the local surface cast.
@@ -1402,9 +1402,9 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 //The ray is facing backwards.  The time of impact would be 0.
                 hit.T = 0;
                 Vector3.Normalize(ref localDirection, out hit.Normal);
-                Vector3.Transform(ref hit.Normal, ref transformA.Orientation, out hit.Normal);
+                Quaternion.Transform(ref hit.Normal, ref transformA.Orientation, out hit.Normal);
                 //hit.Location = hit.T * localDirection;
-                Vector3.Transform(ref hit.Location, ref transformA.Orientation, out hit.Location);
+                Quaternion.Transform(ref hit.Location, ref transformA.Orientation, out hit.Location);
                 Vector3.Add(ref hit.Location, ref transformA.Position, out hit.Location);
                 hit.Location += sweepA * hit.T;
                 return true;
@@ -1420,7 +1420,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 GetLocalPosition(shapeA, shapeB, ref localTransformB, ref minkowskiRayHit, out hit.Location);
                 //The hit location is still in local space, so transform it into world space using A's transform.
                 RigidTransform.Transform(ref hit.Location, ref transformA, out hit.Location);
-                Vector3.Transform(ref hit.Normal, ref transformA.Orientation, out hit.Normal);
+                Quaternion.Transform(ref hit.Normal, ref transformA.Orientation, out hit.Normal);
                 //Push the world space hit location relative to object A along A's sweep direction.
                 Vector3 temp;
                 Vector3.Multiply(ref sweepA, hit.T, out temp);
@@ -2233,8 +2233,8 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             Quaternion conjugate;
             Vector3.Subtract(ref ray.Position, ref transform.Position, out localRay.Position);
             Quaternion.Conjugate(ref transform.Orientation, out conjugate);
-            Vector3.Transform(ref localRay.Position, ref conjugate, out localRay.Position);
-            Vector3.Transform(ref ray.Direction, ref conjugate, out localRay.Direction);
+            Quaternion.Transform(ref localRay.Position, ref conjugate, out localRay.Position);
+            Quaternion.Transform(ref ray.Direction, ref conjugate, out localRay.Direction);
 
             //Note that we will be casting the ray *backwards* against the sweep-expanded surface of the shape.
             Vector3.Negate(ref localRay.Direction, out localRay.Direction);
@@ -2346,7 +2346,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                     Vector3.Multiply(ref ray.Direction, hit.T, out hit.Location);
                     Vector3.Add(ref hit.Location, ref ray.Position, out hit.Location);
                     //Transform the normal.
-                    Vector3.Transform(ref hit.Normal, ref transform.Orientation, out hit.Normal);
+                    Quaternion.Transform(ref hit.Normal, ref transform.Orientation, out hit.Normal);
                     return true;
                 }
             }
