@@ -149,22 +149,19 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             GetLocalExtremePointWithoutMargin(ref direction, out forward);
 
 
-            Matrix3x3.Transform(ref right, ref o, out right);
-            Matrix3x3.Transform(ref left, ref o, out left);
-            Matrix3x3.Transform(ref up, ref o, out up);
-            Matrix3x3.Transform(ref down, ref o, out down);
-            Matrix3x3.Transform(ref backward, ref o, out backward);
-            Matrix3x3.Transform(ref forward, ref o, out forward);
+            //Rather than transforming each axis independently (and doing three times as many operations as required), just get the 6 required values directly.
+            Vector3 positive, negative;
+            TransformLocalExtremePoints(ref right, ref up, ref backward, ref o, out positive);
+            TransformLocalExtremePoints(ref left, ref down, ref forward, ref o, out negative);
 
-            //These right/up/backward represent the extreme points in world space along the world space axes.
+            //The positive and negative vectors represent the X, Y and Z coordinates of the extreme points in world space along the world space axes.
+            boundingBox.Max.X = shapeTransform.Position.X + positive.X + collisionMargin;
+            boundingBox.Max.Y = shapeTransform.Position.Y + positive.Y + collisionMargin;
+            boundingBox.Max.Z = shapeTransform.Position.Z + positive.Z + collisionMargin;
 
-            boundingBox.Max.X = shapeTransform.Position.X + collisionMargin + right.X;
-            boundingBox.Max.Y = shapeTransform.Position.Y + collisionMargin + up.Y;
-            boundingBox.Max.Z = shapeTransform.Position.Z + collisionMargin + backward.Z;
-
-            boundingBox.Min.X = shapeTransform.Position.X - collisionMargin + left.X;
-            boundingBox.Min.Y = shapeTransform.Position.Y - collisionMargin + down.Y;
-            boundingBox.Min.Z = shapeTransform.Position.Z - collisionMargin + forward.Z;
+            boundingBox.Min.X = shapeTransform.Position.X + negative.X - collisionMargin;
+            boundingBox.Min.Y = shapeTransform.Position.Y + negative.Y - collisionMargin;
+            boundingBox.Min.Z = shapeTransform.Position.Z + negative.Z - collisionMargin;
 
         }
 
@@ -318,9 +315,10 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             boundingBox = new BoundingBox();
 #endif
             //TODO: This method peforms quite a few sqrts because the collision margin can get scaled, and so cannot be applied as a final step.
-            //There should be a better way to do this.
-            //Additionally, this bounding box is not consistent in all cases with the post-add version.  Adding the collision margin at the end can
-            //slightly overestimate the size of a margin expanded shape at the corners, which is fine (and actually important for the box-box special case).
+            //There should be a better way to do this. At the very least, it should be possible to avoid the 6 square roots involved currently.
+            //If this shows a a bottleneck, it might be best to virtualize this function and implement a per-shape variant.
+            //Also... It might be better just to have the internal function be a GetBoundingBox that takes an AffineTransform, and an outer function
+            //does the local space fiddling.
 
             //Move forward into convex's space, backwards into the new space's local space.
             AffineTransform transform;
@@ -353,24 +351,21 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             direction = new Vector3(-transform.LinearTransform.M13, -transform.LinearTransform.M23, -transform.LinearTransform.M33);
             GetLocalExtremePoint(direction, out forward);
 
+            //Rather than transforming each axis independently (and doing three times as many operations as required), just get the 6 required values directly.
+            Vector3 positive, negative;
+            TransformLocalExtremePoints(ref right, ref up, ref backward, ref transform.LinearTransform, out positive);
+            TransformLocalExtremePoints(ref left, ref down, ref forward, ref transform.LinearTransform, out negative);
 
-            //This could be optimized.  Unnecessary transformation information gets computed.
-            Matrix3x3.Transform(ref right, ref transform.LinearTransform, out right);
-            Matrix3x3.Transform(ref left, ref transform.LinearTransform, out left);
-            Matrix3x3.Transform(ref up, ref transform.LinearTransform, out up);
-            Matrix3x3.Transform(ref down, ref transform.LinearTransform, out down);
-            Matrix3x3.Transform(ref backward, ref transform.LinearTransform, out backward);
-            Matrix3x3.Transform(ref forward, ref transform.LinearTransform, out forward);
+            //The positive and negative vectors represent the X, Y and Z coordinates of the extreme points in world space along the world space axes.
+            boundingBox.Max.X = transform.Translation.X + positive.X;
+            boundingBox.Max.Y = transform.Translation.Y + positive.Y;
+            boundingBox.Max.Z = transform.Translation.Z + positive.Z;
 
-            //These right/up/backward represent the extreme points in world space along the world space axes.
-            boundingBox.Max.X = transform.Translation.X + right.X;
-            boundingBox.Max.Y = transform.Translation.Y + up.Y;
-            boundingBox.Max.Z = transform.Translation.Z + backward.Z;
-
-            boundingBox.Min.X = transform.Translation.X + left.X;
-            boundingBox.Min.Y = transform.Translation.Y + down.Y;
-            boundingBox.Min.Z = transform.Translation.Z + forward.Z;
+            boundingBox.Min.X = transform.Translation.X + negative.X;
+            boundingBox.Min.Y = transform.Translation.Y + negative.Y;
+            boundingBox.Min.Z = transform.Translation.Z + negative.Z;
         }
+
 
 
         ///<summary>

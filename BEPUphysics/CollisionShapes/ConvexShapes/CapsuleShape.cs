@@ -45,57 +45,51 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         public float Radius { get { return collisionMargin; } set { CollisionMargin = value; } }
 
 
+
+
         public override void GetBoundingBox(ref RigidTransform shapeTransform, out BoundingBox boundingBox)
         {
 #if !WINDOWS
             boundingBox = new BoundingBox();
 #endif
-            var upExtreme = new Vector3(0, halfLength, 0);
-            var downExtreme = new Vector3(0, -halfLength, 0);
+            Vector3 upExtreme;
+            Vector3.TransformY(halfLength, ref shapeTransform.Orientation, out upExtreme);
 
-            Vector3.Transform(ref upExtreme, ref shapeTransform.Orientation, out upExtreme);
-            Vector3.Transform(ref downExtreme, ref shapeTransform.Orientation, out downExtreme);
-
-            if (upExtreme.X > downExtreme.X)
+            if (upExtreme.X > 0)
             {
-                boundingBox.Max.X = upExtreme.X;
-                boundingBox.Min.X = downExtreme.X;
+                boundingBox.Max.X = upExtreme.X + collisionMargin;
+                boundingBox.Min.X = -upExtreme.X - collisionMargin;
             }
             else
             {
-                boundingBox.Max.X = downExtreme.X;
-                boundingBox.Min.X = upExtreme.X;
+                boundingBox.Max.X = -upExtreme.X + collisionMargin;
+                boundingBox.Min.X = upExtreme.X - collisionMargin;
             }
 
-            if (upExtreme.Y > downExtreme.Y)
+            if (upExtreme.Y > 0)
             {
-                boundingBox.Max.Y = upExtreme.Y;
-                boundingBox.Min.Y = downExtreme.Y;
+                boundingBox.Max.Y = upExtreme.Y + collisionMargin;
+                boundingBox.Min.Y = -upExtreme.Y - collisionMargin;
             }
             else
             {
-                boundingBox.Max.Y = downExtreme.Y;
-                boundingBox.Min.Y = upExtreme.Y;
+                boundingBox.Max.Y = -upExtreme.Y + collisionMargin;
+                boundingBox.Min.Y = upExtreme.Y - collisionMargin;
             }
 
-            if (upExtreme.Z > downExtreme.Z)
+            if (upExtreme.Z > 0)
             {
-                boundingBox.Max.Z = upExtreme.Z;
-                boundingBox.Min.Z = downExtreme.Z;
+                boundingBox.Max.Z = upExtreme.Z + collisionMargin;
+                boundingBox.Min.Z = -upExtreme.Z - collisionMargin;
             }
             else
             {
-                boundingBox.Max.Z = downExtreme.Z;
-                boundingBox.Min.Z = upExtreme.Z;
+                boundingBox.Max.Z = -upExtreme.Z + collisionMargin;
+                boundingBox.Min.Z = upExtreme.Z - collisionMargin;
             }
 
-
-            boundingBox.Min.X += shapeTransform.Position.X - collisionMargin;
-            boundingBox.Min.Y += shapeTransform.Position.Y - collisionMargin;
-            boundingBox.Min.Z += shapeTransform.Position.Z - collisionMargin;
-            boundingBox.Max.X += shapeTransform.Position.X + collisionMargin;
-            boundingBox.Max.Y += shapeTransform.Position.Y + collisionMargin;
-            boundingBox.Max.Z += shapeTransform.Position.Z + collisionMargin;
+            Vector3.Add(ref shapeTransform.Position, ref boundingBox.Min, out boundingBox.Min);
+            Vector3.Add(ref shapeTransform.Position, ref boundingBox.Max, out boundingBox.Max);
         }
 
 

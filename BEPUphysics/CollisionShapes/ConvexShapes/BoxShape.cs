@@ -105,18 +105,14 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
 
             var backward = new Vector3(Math.Sign(o.M13) * halfWidth, Math.Sign(o.M23) * halfHeight, Math.Sign(o.M33) * halfLength);
 
-            Matrix3x3.Transform(ref right, ref o, out right);
-            Matrix3x3.Transform(ref up, ref o, out up);
-            Matrix3x3.Transform(ref backward, ref o, out backward);
-            //These right/up/backward represent the extreme points in world space along the world space axes.
 
-            boundingBox.Max.X = shapeTransform.Position.X + right.X;
-            boundingBox.Max.Y = shapeTransform.Position.Y + up.Y;
-            boundingBox.Max.Z = shapeTransform.Position.Z + backward.Z;
+            //Rather than transforming each axis independently (and doing three times as many operations as required), just get the 3 required values directly.
+            Vector3 offset;
+            TransformLocalExtremePoints(ref right, ref up, ref backward, ref o, out offset);
 
-            boundingBox.Min.X = shapeTransform.Position.X - right.X;
-            boundingBox.Min.Y = shapeTransform.Position.Y - up.Y;
-            boundingBox.Min.Z = shapeTransform.Position.Z - backward.Z;
+            //The positive and negative vectors represent the X, Y and Z coordinates of the extreme points in world space along the world space axes.
+            Vector3.Add(ref shapeTransform.Position, ref offset, out boundingBox.Max);
+            Vector3.Subtract(ref shapeTransform.Position, ref offset, out boundingBox.Min);
 
         }
 

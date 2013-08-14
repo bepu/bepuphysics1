@@ -1016,6 +1016,26 @@ namespace BEPUutilities
             b.M43 = 0;
             return b;
         }
+        
+        /// <summary>
+        /// Transforms the vector by the matrix.
+        /// </summary>
+        /// <param name="v">Vector3 to transform.</param>
+        /// <param name="matrix">Matrix to use as the transformation.</param>
+        /// <param name="result">Product of the transformation.</param>
+        public static void Transform(ref Vector3 v, ref Matrix3x3 matrix, out Vector3 result)
+        {
+            float vX = v.X;
+            float vY = v.Y;
+            float vZ = v.Z;
+#if !WINDOWS
+            result = new Vector3();
+#endif
+            result.X = vX * matrix.M11 + vY * matrix.M21 + vZ * matrix.M31;
+            result.Y = vX * matrix.M12 + vY * matrix.M22 + vZ * matrix.M32;
+            result.Z = vX * matrix.M13 + vY * matrix.M23 + vZ * matrix.M33;
+        }
+
 
         /// <summary>
         /// Transforms the vector by the matrix.
@@ -1036,65 +1056,6 @@ namespace BEPUutilities
             result.X = vX * matrix.M11 + vY * matrix.M21 + vZ * matrix.M31;
             result.Y = vX * matrix.M12 + vY * matrix.M22 + vZ * matrix.M32;
             result.Z = vX * matrix.M13 + vY * matrix.M23 + vZ * matrix.M33;
-            return result;
-        }
-
-        /// <summary>
-        /// Transforms the vector by the matrix.
-        /// </summary>
-        /// <param name="v">Vector3 to transform.</param>
-        /// <param name="matrix">Matrix to use as the transformation.</param>
-        /// <param name="result">Product of the transformation.</param>
-        public static void Transform(ref Vector3 v, ref Matrix3x3 matrix, out Vector3 result)
-        {
-            float vX = v.X;
-            float vY = v.Y;
-            float vZ = v.Z;
-#if !WINDOWS
-            result = new Vector3();
-#endif
-            result.X = vX * matrix.M11 + vY * matrix.M21 + vZ * matrix.M31;
-            result.Y = vX * matrix.M12 + vY * matrix.M22 + vZ * matrix.M32;
-            result.Z = vX * matrix.M13 + vY * matrix.M23 + vZ * matrix.M33;
-        }
-
-        /// <summary>
-        /// Transforms the vector by the matrix.
-        /// </summary>
-        /// <param name="v">Vector3 to transform.</param>
-        /// <param name="matrix">Matrix to use as the transformation.</param>
-        /// <param name="result">Product of the transformation.</param>
-        public static void Transform(ref Vector3 v, ref Matrix matrix, out Vector3 result)
-        {
-            float vX = v.X;
-            float vY = v.Y;
-            float vZ = v.Z;
-#if !WINDOWS
-            result = new Vector3();
-#endif
-            result.X = vX * matrix.M11 + vY * matrix.M21 + vZ * matrix.M31;
-            result.Y = vX * matrix.M12 + vY * matrix.M22 + vZ * matrix.M32;
-            result.Z = vX * matrix.M13 + vY * matrix.M23 + vZ * matrix.M33;
-        }
-
-        /// <summary>
-        /// Transforms the vector by the matrix's transpose.
-        /// </summary>
-        /// <param name="v">Vector3 to transform.</param>
-        /// <param name="matrix">Matrix to use as the transformation transpose.</param>
-        /// <returns>Product of the transformation.</returns>
-        public static Vector3 TransformTranspose(Vector3 v, Matrix3x3 matrix)
-        {
-            float vX = v.X;
-            float vY = v.Y;
-            float vZ = v.Z;
-            Vector3 result;
-#if !WINDOWS
-            result = new Vector3();
-#endif
-            result.X = vX * matrix.M11 + vY * matrix.M12 + vZ * matrix.M13;
-            result.Y = vX * matrix.M21 + vY * matrix.M22 + vZ * matrix.M23;
-            result.Z = vX * matrix.M31 + vY * matrix.M32 + vZ * matrix.M33;
             return result;
         }
 
@@ -1122,18 +1083,20 @@ namespace BEPUutilities
         /// </summary>
         /// <param name="v">Vector3 to transform.</param>
         /// <param name="matrix">Matrix to use as the transformation transpose.</param>
-        /// <param name="result">Product of the transformation.</param>
-        public static void TransformTranspose(ref Vector3 v, ref Matrix matrix, out Vector3 result)
+        /// <returns>Product of the transformation.</returns>
+        public static Vector3 TransformTranspose(Vector3 v, Matrix3x3 matrix)
         {
             float vX = v.X;
             float vY = v.Y;
             float vZ = v.Z;
+            Vector3 result;
 #if !WINDOWS
             result = new Vector3();
 #endif
             result.X = vX * matrix.M11 + vY * matrix.M12 + vZ * matrix.M13;
             result.Y = vX * matrix.M21 + vY * matrix.M22 + vZ * matrix.M23;
             result.Z = vX * matrix.M31 + vY * matrix.M32 + vZ * matrix.M33;
+            return result;
         }
 
         /// <summary>
@@ -1355,16 +1318,18 @@ namespace BEPUutilities
         /// <param name="result">Matrix representing the quaternion's orientation.</param>
         public static void CreateFromQuaternion(ref Quaternion quaternion, out Matrix3x3 result)
         {
-
-            float XX = 2 * quaternion.X * quaternion.X;
-            float YY = 2 * quaternion.Y * quaternion.Y;
-            float ZZ = 2 * quaternion.Z * quaternion.Z;
-            float XY = 2 * quaternion.X * quaternion.Y;
-            float XZ = 2 * quaternion.X * quaternion.Z;
-            float XW = 2 * quaternion.X * quaternion.W;
-            float YZ = 2 * quaternion.Y * quaternion.Z;
-            float YW = 2 * quaternion.Y * quaternion.W;
-            float ZW = 2 * quaternion.Z * quaternion.W;
+            float qX2 = quaternion.X + quaternion.X;
+            float qY2 = quaternion.Y + quaternion.Y;
+            float qZ2 = quaternion.Z + quaternion.Z;
+            float XX = qX2 * quaternion.X;
+            float YY = qY2 * quaternion.Y;
+            float ZZ = qZ2 * quaternion.Z;
+            float XY = qX2 * quaternion.Y;
+            float XZ = qX2 * quaternion.Z;
+            float XW = qX2 * quaternion.W;
+            float YZ = qY2 * quaternion.Z;
+            float YW = qY2 * quaternion.W;
+            float ZW = qZ2 * quaternion.W;
 
             result.M11 = 1 - YY - ZZ;
             result.M21 = XY - ZW;
