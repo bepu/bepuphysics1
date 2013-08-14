@@ -13,6 +13,7 @@ namespace BEPUphysicsDemos.Demos
     /// </summary>
     public class PlanetDemo : StandardDemo
     {
+        private Vector3 planetPosition;
         /// <summary>
         /// Constructs a new demo.
         /// </summary>
@@ -25,7 +26,8 @@ namespace BEPUphysicsDemos.Demos
             //By pre-allocating a bunch of box-box pair handlers, the simulation will avoid having to allocate new ones at runtime.
             NarrowPhaseHelper.Factories.BoxBox.EnsureCount(1000);
 
-            var planet = new Sphere(new Vector3(0, 0, 0), 30);
+            planetPosition = new Vector3(0, 0, 0);
+            var planet = new Sphere(planetPosition, 30);
             Space.Add(planet);
 
             var field = new GravitationalField(new InfiniteForceFieldShape(), planet.Position, 66730 / 2f, 100);
@@ -56,6 +58,16 @@ namespace BEPUphysicsDemos.Demos
         public override string Name
         {
             get { return "Planet"; }
+        }
+
+        public override void Update(float dt)
+        {
+            //Orient the character to the surface of the planet.
+            if (character.IsActive)
+            {
+                character.CharacterController.Down = planetPosition - character.CharacterController.Body.Position;
+            }
+            base.Update(dt);
         }
     }
 }

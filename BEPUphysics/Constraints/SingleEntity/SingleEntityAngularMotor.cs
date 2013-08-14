@@ -170,7 +170,7 @@ namespace BEPUphysics.Constraints.SingleEntity
                 settings.servo.springSettings.ComputeErrorReductionAndSoftness(dt, out errorReduction, out usedSoftness);
 
                 //Turn this into an axis-angle representation.
-                Toolbox.GetAxisAngleFromQuaternion(ref errorOrientation, out axis, out angle);
+                Quaternion.GetAxisAngleFromQuaternion(ref errorOrientation, out axis, out angle);
 
                 //Scale the axis by the desired velocity if the angle is sufficiently large (epsilon).
                 if (angle > Toolbox.BigEpsilon)

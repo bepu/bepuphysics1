@@ -52,6 +52,9 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         Vector2 movementDirection;
         /// <summary>
         /// Gets or sets the goal movement direction.
+        /// The movement direction is based on the view direction.
+        /// Values of X are applied to the axis perpendicular to the HorizontalViewDirection and Down direction.
+        /// Values of Y are applied to the HorizontalViewDirection.
         /// </summary>
         public Vector2 MovementDirection
         {
@@ -250,8 +253,8 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         Vector2 positionCorrectionBias;
 
         Vector3 positionLocalOffset;
-        bool wasTryingToMove = false;
-        bool hadTraction = false;
+        bool wasTryingToMove;
+        bool hadTraction;
         Entity previousSupportEntity;
         float timeSinceTransition;
 
@@ -264,6 +267,11 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             this.character = characterController;
             SpeedScale = 1;
             CollectInvolvedEntities();
+        }
+
+        internal void GetMovementDirectionIn3D(out Vector3 movement3d)
+        {
+            movement3d = character.horizontalViewDirection * movementDirection.Y + character.StrafeDirection * movementDirection.X;
         }
 
 
@@ -283,7 +291,9 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         public override void Update(float dt)
         {
             //Collect references, pick the mode, and configure the coefficients to be used by the solver.
-            bool isTryingToMove = movementDirection.LengthSquared() > 0;
+            Vector3 movementDirectionIn3d;
+            GetMovementDirectionIn3D(out movementDirectionIn3d);
+            bool isTryingToMove = movementDirectionIn3d.LengthSquared() > 0;
             if (supportData.SupportObject != null)
             {
                 if (supportData.HasTraction)
@@ -318,7 +328,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
 
             //Compute the jacobians.  This is basically a PointOnLineJoint with motorized degrees of freedom.
-            Vector3 downDirection = character.Body.OrientationMatrix.Down;
+            Vector3 downDirection = character.Down;
 
             if (MovementMode != MovementMode.Floating)
             {
@@ -331,7 +341,8 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     //This projection is NOT along the support normal to the plane; that would cause the character to veer off course when moving on slopes.
                     //Instead, project along the sweep direction to the plane.
                     //For a 6DOF character controller, the lineStart would be different; it must be perpendicular to the local up.
-                    Vector3 lineStart = new Vector3(movementDirection.X, 0, movementDirection.Y);
+                    Vector3 lineStart = movementDirectionIn3d;
+
                     Vector3 lineEnd;
                     Vector3.Add(ref lineStart, ref downDirection, out lineEnd);
                     Plane plane = new Plane(supportData.Normal, 0);
@@ -409,12 +420,9 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             }
             else
             {
-                //If the character is floating, then the jacobians are simply the movement direction.
-                //Note that in a 6DOF character, this will change- but it will still be trivial.
-                //In that case, the movement direction will be a 3d vector, and the A2 jacobian will just be
-                //linearJacobianA1 x downDirection.
-                linearJacobianA1 = new Vector3(movementDirection.X, 0, movementDirection.Y);
-                linearJacobianA2 = new Vector3(movementDirection.Y, 0, -movementDirection.X);
+                //If the character is floating, then the jacobians are simply the 3d movement direction and the perpendicular direction on the character's horizontal plane.
+                linearJacobianA1 = movementDirectionIn3d;
+                linearJacobianA2 = Vector3.Cross(linearJacobianA1, character.Down);
 
 
             }

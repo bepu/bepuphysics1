@@ -110,7 +110,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     if (character.SupportFinder.HasSupport)
                     {
                         //Move the character towards the ground.
-                        newPosition = character.Body.Position + character.Body.OrientationMatrix.Down * ((StandingHeight - CrouchingHeight) * .5f);
+                        newPosition = character.Body.Position + character.Down * ((StandingHeight - CrouchingHeight) * .5f);
                         character.Body.Height = CrouchingHeight;
                         CurrentStance = Stance.Crouching;
                     }
@@ -133,7 +133,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                         //TODO: State queries can be expensive if the character is crouching beneath something really detailed.
                         //There are some situations where you may want to do an upwards-pointing ray cast first.  If it hits something,
                         //there's no need to do the full query.
-                        newPosition = character.Body.Position - character.Body.OrientationMatrix.Down * ((StandingHeight - CrouchingHeight) * .5f);
+                        newPosition = character.Body.Position - character.Down * ((StandingHeight - CrouchingHeight) * .5f);
                         character.QueryManager.QueryContacts(newPosition, Stance.Standing);
                         if (IsObstructed(character.QueryManager.SideContacts, character.QueryManager.HeadContacts))
                         {
@@ -157,7 +157,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                         int attempts = 0;
                         //Don't keep querying indefinitely.  If we fail to reach it in a few informed steps, it's probably not worth continuing.
                         //The bound size check prevents the system from continuing to search a meaninglessly tiny interval.
-                        Vector3 down = character.Body.OrientationMatrix.Down;
+                        Vector3 down = character.Down;
                         while (attempts++ < 5 && lowestBound - highestBound > Toolbox.BigEpsilon)
                         {
                             Vector3 candidatePosition = character.Body.Position + currentOffset * down;
@@ -254,13 +254,13 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 {
                     //We're done! The guess found a good spot to stand on.
                     //We need to have fairly good contacts after this process, so only push it up a bit.
-                    hintOffset = Math.Min(0, Vector3.Dot(supportContact.Normal, character.Body.OrientationMatrix.Down) * (CollisionDetectionSettings.AllowedPenetration * .5f - supportContact.PenetrationDepth));
+                    hintOffset = Math.Min(0, Vector3.Dot(supportContact.Normal, character.Down) * (CollisionDetectionSettings.AllowedPenetration * .5f - supportContact.PenetrationDepth));
                     return PositionState.Accepted;
                 }
                 else if (supportState == PositionState.TooDeep)
                 {
                     //Looks like we have to keep trying, but at least we found a good hint.
-                    hintOffset = Math.Min(0, Vector3.Dot(supportContact.Normal, character.Body.OrientationMatrix.Down) * (CollisionDetectionSettings.AllowedPenetration * .5f - supportContact.PenetrationDepth));
+                    hintOffset = Math.Min(0, Vector3.Dot(supportContact.Normal, character.Down) * (CollisionDetectionSettings.AllowedPenetration * .5f - supportContact.PenetrationDepth));
                     return PositionState.TooDeep;
                 }
                 else //if (supportState == SupportState.Separated)
@@ -268,7 +268,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     //It's not obstructed, but the support isn't quite right.
                     //It's got a negative penetration depth.
                     //We can use that as a hint.
-                    hintOffset = -.001f - Vector3.Dot(supportContact.Normal, character.Body.OrientationMatrix.Down) * supportContact.PenetrationDepth;
+                    hintOffset = -.001f - Vector3.Dot(supportContact.Normal, character.Down) * supportContact.PenetrationDepth;
                     return PositionState.NoHit;
                 }
             }

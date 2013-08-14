@@ -207,7 +207,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Joints
 
             float angle;
             Vector3 axis;
-            Toolbox.GetAxisAngleFromQuaternion(ref intermediate, out axis, out angle);
+            Quaternion.GetAxisAngleFromQuaternion(ref intermediate, out axis, out angle);
 
             error.X = axis.X * angle;
             error.Y = axis.Y * angle;

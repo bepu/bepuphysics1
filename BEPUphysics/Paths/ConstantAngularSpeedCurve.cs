@@ -35,7 +35,7 @@ namespace BEPUphysics.Paths
         {
             Quaternion.Conjugate(ref end, out end);
             Quaternion.Multiply(ref end, ref start, out end);
-            return Toolbox.GetAngleFromQuaternion(ref end);
+            return Quaternion.GetAngleFromQuaternion(ref end);
         }
     }
 }

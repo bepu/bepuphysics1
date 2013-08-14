@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
+using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.UpdateableSystems;
 using BEPUphysics;
@@ -50,6 +51,87 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         /// Gets the constraint used by the character to stay glued to surfaces it stands on.
         /// </summary>
         public VerticalMotionConstraint VerticalMotionConstraint { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the down direction of the character, defining its orientation.
+        /// </summary>
+        public Vector3 Down
+        {
+            get
+            {
+                return Body.OrientationMatrix.Down;
+            }
+            set
+            {
+                //Update the character's orientation to something compatible with the new direction.
+                Quaternion orientation;
+                float lengthSquared = value.LengthSquared();
+                if (lengthSquared < Toolbox.Epsilon)
+                    value = Body.OrientationMatrix.Down; //Silently fail. Assuming here that a dynamic process is setting this property; don't need to make a stink about it.
+                else
+                    Vector3.Divide(ref value, (float)Math.Sqrt(lengthSquared), out value);
+                Quaternion.GetQuaternionBetweenNormalizedVectors(ref Toolbox.DownVector, ref value, out orientation);
+                Body.Orientation = orientation;
+                UpdateHorizontalViewDirection();
+            }
+        }
+
+        internal Vector3 viewDirection;
+        internal Vector3 horizontalViewDirection;
+
+        /// <summary>
+        /// Gets the horizontal view direction computed using the Down vector and the ViewDirection.
+        /// </summary>
+        public Vector3 HorizontalViewDirection
+        {
+            get
+            {
+                return horizontalViewDirection;
+            }
+        }
+
+        /// <summary>
+        /// Gets the axis along which the character can strafe.
+        /// </summary>
+        public Vector3 StrafeDirection
+        {
+            get
+            {
+                return Vector3.Cross(Down, horizontalViewDirection);
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the view direction associated with the character.
+        /// Also sets the horizontal view direction internally based on the current down vector.
+        /// This is used to interpret the movement directions.
+        /// </summary>
+        public Vector3 ViewDirection
+        {
+            get
+            {
+                return viewDirection;
+            }
+            set
+            {
+                viewDirection = value;
+                UpdateHorizontalViewDirection();
+            }
+        }
+
+        void UpdateHorizontalViewDirection()
+        {
+            float dot = Vector3.Dot(viewDirection, Down);
+            Vector3 toRemove = Down * dot;
+            Vector3.Subtract(ref viewDirection, ref toRemove, out horizontalViewDirection);
+            float length = horizontalViewDirection.LengthSquared();
+            if (length > 0)
+            {
+                Vector3.Divide(ref horizontalViewDirection, (float)Math.Sqrt(length), out horizontalViewDirection);
+            }
+            else
+                horizontalViewDirection = new Vector3();
+        }
 
         private float jumpSpeed = 4.5f;
         /// <summary>
@@ -102,6 +184,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 jumpForceFactor = value;
             }
         }
+
 
         /// <summary>
         /// Gets or sets the radius of the body cylinder.  To change the height, use the StanceManager.StandingHeight and StanceManager.CrouchingHeight.
@@ -239,6 +322,11 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             }
         }
 
+
+        /// <summary>
+        /// Cylinder shape used to compute the expanded bounding box of the character.
+        /// </summary>
+        CylinderShape expandedShape = new CylinderShape(1, 1);
         void ExpandBoundingBox()
         {
             if (Body.ActivityInformation.IsActive)
@@ -246,20 +334,15 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 //This runs after the bounding box updater is run, but before the broad phase.
                 //Expanding the character's bounding box ensures that minor variations in velocity will not cause
                 //any missed information.
-                //For a character which is not bound to Vector3.Up (such as a character that needs to run around a spherical planet, a '6DOF' character),
-                //the bounding box expansion needs to be changed such that it includes the full motion of the character.
-                float radius = Body.CollisionInformation.Shape.CollisionMargin * 1.1f; //The character can teleport by its collision margin when stepping up.
-#if WINDOWS
-                Vector3 offset;
-#else
-                Vector3 offset = new Vector3();
-#endif
-                offset.X = radius;
-                offset.Y = StepManager.MaximumStepHeight;
-                offset.Z = radius;
-                BoundingBox box = Body.CollisionInformation.BoundingBox;
-                Vector3.Add(ref box.Max, ref offset, out box.Max);
-                Vector3.Subtract(ref box.Min, ref offset, out box.Min);
+
+                //TODO: seems a bit silly to do this work redundantly and sequentially. Would be better if it could run in parallel in the proper location AND leverage what was already computed.
+                
+                var transform = Body.CollisionInformation.WorldTransform;
+                BoundingBox box;
+                expandedShape.Radius = Body.CollisionInformation.Shape.Radius + Body.CollisionInformation.Shape.CollisionMargin * 1.1f; //The character can teleport by its collision margin when stepping up.
+                expandedShape.Height = Body.CollisionInformation.Shape.Height + 2 * StepManager.MaximumStepHeight;
+                expandedShape.CollisionMargin = Body.CollisionInformation.Shape.CollisionMargin;
+                expandedShape.GetBoundingBox(ref transform, out box);
                 Body.CollisionInformation.BoundingBox = box;
             }
 
