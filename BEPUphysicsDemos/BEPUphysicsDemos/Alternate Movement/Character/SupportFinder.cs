@@ -357,7 +357,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             HasSupport = false;
 
             var body = character.Body;
-            Vector3 downDirection = character.Down; //For a cylinder orientation-locked to the Up axis, this is always {0, -1, 0}.  Keeping it generic doesn't cost much.
+            Vector3 downDirection = character.Down;
 
 
             supports.Clear();
@@ -480,12 +480,14 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             }
 
             //If contacts and the center ray cast failed, try a ray offset in the movement direction.
-            bool tryingToMove = character.HorizontalMotionConstraint.MovementDirection.LengthSquared() > 0;
+            Vector3 movementDirection;
+            character.HorizontalMotionConstraint.GetMovementDirectionIn3D(out movementDirection);
+            bool tryingToMove = movementDirection.LengthSquared() > 0;
             if (!HasTraction && hadTraction && tryingToMove)
             {
-
-                Ray ray = new Ray(body.Position +
-                    new Vector3(character.HorizontalMotionConstraint.MovementDirection.X, 0, character.HorizontalMotionConstraint.MovementDirection.Y) * (character.Body.Radius - character.Body.CollisionInformation.Shape.CollisionMargin) +
+                Ray ray = new Ray(
+                    body.Position + 
+                    movementDirection * (character.Body.Radius - character.Body.CollisionInformation.Shape.CollisionMargin) +
                     downDirection * body.Height * .25f, downDirection);
 
                 //Have to test to make sure the ray doesn't get obstructed.  This could happen if the character is deeply embedded in a wall; we wouldn't want it detecting things inside the wall as a support!
@@ -521,8 +523,8 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             if (!HasTraction && hadTraction && tryingToMove)
             {
                 //Compute the horizontal offset direction.  Down direction and the movement direction are normalized and perpendicular, so the result is too.
-                Vector3 horizontalOffset = new Vector3(character.HorizontalMotionConstraint.MovementDirection.X, 0, character.HorizontalMotionConstraint.MovementDirection.Y);
-                Vector3.Cross(ref horizontalOffset, ref downDirection, out horizontalOffset);
+                Vector3 horizontalOffset;
+                Vector3.Cross(ref movementDirection, ref downDirection, out horizontalOffset);
                 Vector3.Multiply(ref horizontalOffset, character.Body.Radius - character.Body.CollisionInformation.Shape.CollisionMargin, out horizontalOffset);
                 Ray ray = new Ray(body.Position + horizontalOffset + downDirection * body.Height * .25f, downDirection);
 
@@ -559,8 +561,8 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             if (!HasTraction && hadTraction && tryingToMove)
             {
                 //Compute the horizontal offset direction.  Down direction and the movement direction are normalized and perpendicular, so the result is too.
-                Vector3 horizontalOffset = new Vector3(character.HorizontalMotionConstraint.MovementDirection.X, 0, character.HorizontalMotionConstraint.MovementDirection.Y);
-                Vector3.Cross(ref downDirection, ref horizontalOffset, out horizontalOffset);
+                Vector3 horizontalOffset;
+                Vector3.Cross(ref downDirection, ref movementDirection, out horizontalOffset);
                 Vector3.Multiply(ref horizontalOffset, character.Body.Radius - character.Body.CollisionInformation.Shape.CollisionMargin, out horizontalOffset);
                 Ray ray = new Ray(body.Position + horizontalOffset + downDirection * body.Height * .25f, downDirection);
 
