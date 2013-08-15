@@ -608,7 +608,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             {
                 //The head is obstructed.  This will define a maximum bound.
                 //Find the deepest contact on the head and use it to provide a hint.
-                Vector3 up = character.Body.OrientationMatrix.Up;
+                Vector3 up = -character.Down;
                 float dot;
                 Vector3.Dot(ref up, ref character.QueryManager.HeadContacts.Elements[0].Normal, out dot);
                 hintOffset = dot * character.QueryManager.HeadContacts.Elements[0].PenetrationDepth;
@@ -662,7 +662,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                         //First, we must ensure that the ray cast test origin is not obstructed.  Starting very close to the very top of the character is safe because the process has already validated
                         //this location as accepted, just without traction.
                         Ray obstructionTestRay;
-                        obstructionTestRay.Position = position + character.Body.OrientationMatrix.Up * (character.Body.Height * .5f);
+                        obstructionTestRay.Position = position - down * (character.Body.Height * .5f);
                         obstructionTestRay.Direction = downRay.Position - obstructionTestRay.Position;
 
                         if (!character.QueryManager.RayCastHitAnything(obstructionTestRay, 1))

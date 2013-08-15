@@ -4,6 +4,7 @@ using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
+using BEPUphysicsDemos.AlternateMovement.SphereCharacter;
 using BEPUphysicsDemos.SampleCode;
 using BEPUphysicsDrawer.Lines;
 using Microsoft.Xna.Framework.Graphics;
@@ -26,7 +27,7 @@ namespace BEPUphysicsDemos.Demos
     /// </summary>
     public abstract class StandardDemo : Demo
     {
-        protected CharacterControllerInput character;
+        protected SphereCharacterControllerInput character;
         protected float grabDistance;
         protected MotorizedGrabSpring grabber;
         protected LineDisplayObjectBase grabberGraphic;
@@ -40,7 +41,7 @@ namespace BEPUphysicsDemos.Demos
             : base(game)
         {
             //Creates the player character (C).
-            character = new CharacterControllerInput(Space, game.Camera);
+            character = new SphereCharacterControllerInput(Space, game.Camera);
 
             //Creates the drivable vehicle (V).
             var wheelModel = game.Content.Load<Model>("carWheel");

@@ -271,7 +271,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
         internal void GetMovementDirectionIn3D(out Vector3 movement3d)
         {
-            movement3d = character.horizontalViewDirection * movementDirection.Y + character.StrafeDirection * movementDirection.X;
+            movement3d = character.HorizontalViewDirection * movementDirection.Y + character.StrafeDirection * movementDirection.X;
         }
 
 

@@ -41,6 +41,84 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
         /// </summary>
         public VerticalMotionConstraint VerticalMotionConstraint { get; private set; }
 
+        private Vector3 down;
+        /// <summary>
+        /// Gets or sets the down direction of the character. Controls the interpretation of movement and support finding.
+        /// </summary>
+        public Vector3 Down
+        {
+            get
+            {
+                return down;
+            }
+            set
+            {
+                float lengthSquared = value.LengthSquared();
+                if (lengthSquared < Toolbox.Epsilon)
+                    return; //Silently fail. Assuming here that a dynamic process is setting this property; don't need to make a stink about it.
+                Vector3.Divide(ref value, (float)Math.Sqrt(lengthSquared), out value);
+                down = value;
+                UpdateHorizontalViewDirection();
+            }
+        }
+
+        Vector3 viewDirection;
+        Vector3 horizontalViewDirection;
+
+        /// <summary>
+        /// Gets the horizontal view direction computed using the Down vector and the ViewDirection.
+        /// </summary>
+        public Vector3 HorizontalViewDirection
+        {
+            get
+            {
+                return horizontalViewDirection;
+            }
+        }
+
+        /// <summary>
+        /// Gets the axis along which the character can strafe.
+        /// </summary>
+        public Vector3 StrafeDirection
+        {
+            get
+            {
+                return Vector3.Cross(Down, horizontalViewDirection);
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the view direction associated with the character.
+        /// Also sets the horizontal view direction internally based on the current down vector.
+        /// This is used to interpret the movement directions.
+        /// </summary>
+        public Vector3 ViewDirection
+        {
+            get
+            {
+                return viewDirection;
+            }
+            set
+            {
+                viewDirection = value;
+                UpdateHorizontalViewDirection();
+            }
+        }
+
+        void UpdateHorizontalViewDirection()
+        {
+            float dot = Vector3.Dot(viewDirection, Down);
+            Vector3 toRemove = Down * dot;
+            Vector3.Subtract(ref viewDirection, ref toRemove, out horizontalViewDirection);
+            float length = horizontalViewDirection.LengthSquared();
+            if (length > 0)
+            {
+                Vector3.Divide(ref horizontalViewDirection, (float)Math.Sqrt(length), out horizontalViewDirection);
+            }
+            else
+                horizontalViewDirection = new Vector3();
+        }
+
         private float jumpSpeed = 4.5f;
         /// <summary>
         /// Gets or sets the speed at which the character leaves the ground when it jumps.
@@ -217,20 +295,20 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
             {
                 //This runs after the bounding box updater is run, but before the broad phase.
                 //The expansion allows the downward pointing raycast to collect hit points.
-                Vector3 down = SupportFinder.MaximumAssistedDownStepHeight * Body.OrientationMatrix.Down;
+                Vector3 expansion = SupportFinder.MaximumAssistedDownStepHeight * down;
                 BoundingBox box = Body.CollisionInformation.BoundingBox;
                 if (down.X < 0)
-                    box.Min.X += down.X;
+                    box.Min.X += expansion.X;
                 else
-                    box.Max.X += down.X;
+                    box.Max.X += expansion.X;
                 if (down.Y < 0)
-                    box.Min.Y += down.Y;
+                    box.Min.Y += expansion.Y;
                 else
-                    box.Max.Y += down.Y;
+                    box.Max.Y += expansion.Y;
                 if (down.Z < 0)
-                    box.Min.Z += down.Z;
+                    box.Min.Z += expansion.Z;
                 else
-                    box.Max.Z += down.Z;
+                    box.Max.Z += expansion.Z;
                 Body.CollisionInformation.BoundingBox = box;
             }
 
@@ -297,10 +375,11 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
                     if (SupportFinder.HasTraction)
                     {
                         //The character has traction, so jump straight up.
-                        float currentUpVelocity = Vector3.Dot(Body.OrientationMatrix.Up, relativeVelocity);
+                        float currentDownVelocity;
+                        Vector3.Dot(ref down, ref relativeVelocity, out currentDownVelocity);
                         //Target velocity is JumpSpeed.
-                        float velocityChange = Math.Max(jumpSpeed - currentUpVelocity, 0);
-                        ApplyJumpVelocity(ref supportData, Body.OrientationMatrix.Up * velocityChange, ref relativeVelocity);
+                        float velocityChange = Math.Max(jumpSpeed + currentDownVelocity, 0);
+                        ApplyJumpVelocity(ref supportData, down * -velocityChange, ref relativeVelocity);
 
 
                         //Prevent any old contacts from hanging around and coming back with a negative depth.
@@ -498,7 +577,7 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
 
 
 
-        bool tryToJump = false;
+        bool tryToJump;
         /// <summary>
         /// Jumps the character off of whatever it's currently standing on.  If it has traction, it will go straight up.
         /// If it doesn't have traction, but is still supported by something, it will jump in the direction of the surface normal.

@@ -1,8 +1,5 @@
 using BEPUphysics;
-using System;
-using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUutilities;
-using ConversionHelper;
 using Microsoft.Xna.Framework.Input;
 
 namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
@@ -124,15 +121,12 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
                 Vector2 totalMovement = Vector2.Zero;
 
 #if XBOX360
-                Vector3 forward = Camera.WorldMatrix.Forward;
-                forward.Y = 0;
-                forward.Normalize();
-                Vector3 right = Camera.WorldMatrix.Right;
-                totalMovement += gamePadInput.ThumbSticks.Left.Y * new Vector2(forward.X, forward.Z);
-                totalMovement += gamePadInput.ThumbSticks.Left.X * new Vector2(right.X, right.Z);
+                totalMovement += new Vector2(gamePadInput.ThumbSticks.Left.X, gamePadInput.ThumbSticks.Left.Y);
 
                 CharacterController.HorizontalMotionConstraint.SpeedScale = Math.Min(totalMovement.Length(), 1); //Don't trust the game pad to output perfectly normalized values.
                 CharacterController.HorizontalMotionConstraint.MovementDirection = totalMovement;
+                
+                CharacterController.StanceManager.DesiredStance = gamePadInput.IsButtonDown(Buttons.RightStick) ? Stance.Crouching : Stance.Standing;
 
                 //Jumping
                 if (previousGamePadInput.IsButtonUp(Buttons.LeftStick) && gamePadInput.IsButtonDown(Buttons.LeftStick))
@@ -143,27 +137,21 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
 
                 //Collect the movement impulses.
 
-                Vector3 movementDir;
-
                 if (keyboardInput.IsKeyDown(Keys.E))
                 {
-                    movementDir = Camera.WorldMatrix.Forward;
-                    totalMovement += Vector2.Normalize(new Vector2(movementDir.X, movementDir.Z));
+                    totalMovement += new Vector2(0, 1);
                 }
                 if (keyboardInput.IsKeyDown(Keys.D))
                 {
-                    movementDir = Camera.WorldMatrix.Forward;
-                    totalMovement -= Vector2.Normalize(new Vector2(movementDir.X, movementDir.Z));
+                    totalMovement += new Vector2(0, -1);
                 }
                 if (keyboardInput.IsKeyDown(Keys.S))
                 {
-                    movementDir = Camera.WorldMatrix.Left;
-                    totalMovement += Vector2.Normalize(new Vector2(movementDir.X, movementDir.Z));
+                    totalMovement += new Vector2(-1, 0);
                 }
                 if (keyboardInput.IsKeyDown(Keys.F))
                 {
-                    movementDir = Camera.WorldMatrix.Right;
-                    totalMovement += Vector2.Normalize(new Vector2(movementDir.X, movementDir.Z));
+                    totalMovement += new Vector2(1, 0);
                 }
                 if (totalMovement == Vector2.Zero)
                     CharacterController.HorizontalMotionConstraint.MovementDirection = Vector2.Zero;
@@ -177,6 +165,7 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
                     CharacterController.Jump();
                 }
 #endif
+                CharacterController.ViewDirection = Camera.WorldMatrix.Forward;
 
             }
         }
