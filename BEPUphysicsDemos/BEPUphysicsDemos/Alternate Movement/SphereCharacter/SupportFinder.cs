@@ -451,12 +451,13 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
             }
 
             //If contacts and the center ray cast failed, try a ray offset in the movement direction.
-            bool tryingToMove = character.HorizontalMotionConstraint.MovementDirection.LengthSquared() > 0;
+            Vector3 movementDirection;
+            character.HorizontalMotionConstraint.GetMovementDirectionIn3D(out movementDirection);
+            bool tryingToMove = movementDirection.LengthSquared() > 0;
             if (!HasTraction && hadTraction && tryingToMove)
             {
 
-                Ray ray = new Ray(body.Position +
-                    new Vector3(character.HorizontalMotionConstraint.MovementDirection.X, 0, character.HorizontalMotionConstraint.MovementDirection.Y) * (character.Body.Radius), downDirection);
+                Ray ray = new Ray(body.Position + movementDirection * (character.Body.Radius), downDirection);
 
                 //Have to test to make sure the ray doesn't get obstructed.  This could happen if the character is deeply embedded in a wall; we wouldn't want it detecting things inside the wall as a support!
                 Ray obstructionRay;
@@ -491,8 +492,8 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
             if (!HasTraction && hadTraction && tryingToMove)
             {
                 //Compute the horizontal offset direction.  Down direction and the movement direction are normalized and perpendicular, so the result is too.
-                Vector3 horizontalOffset = new Vector3(character.HorizontalMotionConstraint.MovementDirection.X, 0, character.HorizontalMotionConstraint.MovementDirection.Y);
-                Vector3.Cross(ref horizontalOffset, ref downDirection, out horizontalOffset);
+                Vector3 horizontalOffset;
+                Vector3.Cross(ref movementDirection, ref downDirection, out horizontalOffset);
                 Vector3.Multiply(ref horizontalOffset, character.Body.Radius, out horizontalOffset);
                 Ray ray = new Ray(body.Position + horizontalOffset, downDirection);
 
@@ -529,8 +530,8 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
             if (!HasTraction && hadTraction && tryingToMove)
             {
                 //Compute the horizontal offset direction.  Down direction and the movement direction are normalized and perpendicular, so the result is too.
-                Vector3 horizontalOffset = new Vector3(character.HorizontalMotionConstraint.MovementDirection.X, 0, character.HorizontalMotionConstraint.MovementDirection.Y);
-                Vector3.Cross(ref downDirection, ref horizontalOffset, out horizontalOffset);
+                Vector3 horizontalOffset;
+                Vector3.Cross(ref downDirection, ref movementDirection, out horizontalOffset);
                 Vector3.Multiply(ref horizontalOffset, character.Body.Radius, out horizontalOffset);
                 Ray ray = new Ray(body.Position + horizontalOffset, downDirection);
 

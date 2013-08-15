@@ -27,7 +27,7 @@ namespace BEPUphysicsDemos.Demos
     /// </summary>
     public abstract class StandardDemo : Demo
     {
-        protected SphereCharacterControllerInput character;
+        protected CharacterControllerInput character;
         protected float grabDistance;
         protected MotorizedGrabSpring grabber;
         protected LineDisplayObjectBase grabberGraphic;
@@ -41,7 +41,7 @@ namespace BEPUphysicsDemos.Demos
             : base(game)
         {
             //Creates the player character (C).
-            character = new SphereCharacterControllerInput(Space, game.Camera);
+            character = new CharacterControllerInput(Space, game.Camera);
 
             //Creates the drivable vehicle (V).
             var wheelModel = game.Content.Load<Model>("carWheel");

@@ -307,14 +307,10 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         float upStepMargin = .1f;  //There's a little extra space above the maximum step height to start the obstruction and downcast test rays.  Helps when a step is very close to the max step height.
         void FindUpStepCandidates(RawList<ContactData> outputStepCandidates)
         {
+            Vector3 movementDirection;
+            character.HorizontalMotionConstraint.GetMovementDirectionIn3D(out movementDirection);
             foreach (var c in character.SupportFinder.sideContacts)
             {
-                //A 6DOF character will need to have a 3d movement direction.  It will replace this graduation of a 2d vector.
-                Vector3 movementDirection = new Vector3()
-                {
-                    X = character.HorizontalMotionConstraint.MovementDirection.X,
-                    Z = character.HorizontalMotionConstraint.MovementDirection.Y
-                };
                 //Check to see if the contact is sufficiently aligned with the movement direction to be considered for stepping.
                 //TODO: This could behave a bit odd when encountering steps or slopes near the base of rounded collision margin.
                 var contact = c.Contact;

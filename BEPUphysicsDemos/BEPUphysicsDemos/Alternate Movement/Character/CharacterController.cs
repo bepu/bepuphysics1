@@ -326,7 +326,6 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         /// <summary>
         /// Cylinder shape used to compute the expanded bounding box of the character.
         /// </summary>
-        CylinderShape expandedShape = new CylinderShape(1, 1);
         void ExpandBoundingBox()
         {
             if (Body.ActivityInformation.IsActive)
@@ -335,15 +334,69 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 //Expanding the character's bounding box ensures that minor variations in velocity will not cause
                 //any missed information.
 
-                //TODO: seems a bit silly to do this work redundantly and sequentially. Would be better if it could run in parallel in the proper location AND leverage what was already computed.
+                //TODO: seems a bit silly to do this work sequentially. Would be better if it could run in parallel in the proper location.
                 
-                var transform = Body.CollisionInformation.WorldTransform;
-                BoundingBox box;
-                expandedShape.Radius = Body.CollisionInformation.Shape.Radius + Body.CollisionInformation.Shape.CollisionMargin * 1.1f; //The character can teleport by its collision margin when stepping up.
-                expandedShape.Height = Body.CollisionInformation.Shape.Height + 2 * StepManager.MaximumStepHeight;
-                expandedShape.CollisionMargin = Body.CollisionInformation.Shape.CollisionMargin;
-                expandedShape.GetBoundingBox(ref transform, out box);
-                Body.CollisionInformation.BoundingBox = box;
+                var down = Down;
+                var boundingBox = Body.CollisionInformation.BoundingBox;
+                //Expand the bounding box up and down using the step height.
+                Vector3 expansion;
+                Vector3.Multiply(ref down, StepManager.MaximumStepHeight, out expansion);
+                expansion.X = Math.Abs(expansion.X);
+                expansion.Y = Math.Abs(expansion.Y);
+                expansion.Z = Math.Abs(expansion.Z);
+                Vector3.Add(ref expansion, ref boundingBox.Max, out boundingBox.Max);
+                Vector3.Subtract(ref boundingBox.Min, ref expansion, out boundingBox.Min);
+
+                //When the character climbs a step, it teleports horizontally a little to gain support. Expand the bounding box to accommodate the margin.
+                //Compute the expansion caused by the extra radius along each axis.
+                //There's a few ways to go about doing this.
+                //One option is to compute a direction perpendicular to the vertical axis pointing to the world axis under consideration.
+                //The dot product of this axis and the world axis are the amount of the collision expansion radius to apply on that axis.
+                
+                //TODO: This computation is not well optimized. Much of the work done by the cross products, for example, is not used at all.
+                //There should be a simpler approach.
+
+                var horizontalExpansion = Body.CollisionInformation.Shape.CollisionMargin * 1.1f;
+                Vector3 horizontalAxis;
+                Vector3.Cross(ref down, ref Toolbox.UpVector, out horizontalAxis);
+                float lengthSquared = horizontalAxis.LengthSquared();
+                if (lengthSquared > Toolbox.Epsilon)
+                {
+                    //This axis isn't perfectly aligned with the character's vertical axis; it will have some expansion.
+                    Vector3.Divide(ref horizontalAxis, (float) Math.Sqrt(lengthSquared), out horizontalAxis);
+                    Vector3.Cross(ref horizontalAxis, ref down, out horizontalAxis);
+                    var expansionAmount = Math.Abs(horizontalAxis.Y) * horizontalExpansion;
+                    boundingBox.Min.Y -= expansionAmount;
+                    boundingBox.Max.Y += expansionAmount;
+                }
+
+                Vector3.Cross(ref down, ref Toolbox.RightVector, out horizontalAxis);
+                lengthSquared = horizontalAxis.LengthSquared();
+                if (lengthSquared > Toolbox.Epsilon)
+                {
+                    //This axis isn't perfectly aligned with the character's vertical axis; it will have some expansion.
+                    Vector3.Divide(ref horizontalAxis, (float)Math.Sqrt(lengthSquared), out horizontalAxis);
+                    Vector3.Cross(ref horizontalAxis, ref down, out horizontalAxis);
+                    var expansionAmount = Math.Abs(horizontalAxis.X) * horizontalExpansion;
+                    boundingBox.Min.X -= expansionAmount;
+                    boundingBox.Max.X += expansionAmount;
+                }
+
+                Vector3.Cross(ref down, ref Toolbox.BackVector, out horizontalAxis);
+                lengthSquared = horizontalAxis.LengthSquared();
+                if (lengthSquared > Toolbox.Epsilon)
+                {
+                    //This axis isn't perfectly aligned with the character's vertical axis; it will have some expansion.
+                    Vector3.Divide(ref horizontalAxis, (float)Math.Sqrt(lengthSquared), out horizontalAxis);
+                    Vector3.Cross(ref horizontalAxis, ref down, out horizontalAxis);
+                    var expansionAmount = Math.Abs(horizontalAxis.Z) * horizontalExpansion;
+                    boundingBox.Min.Z -= expansionAmount;
+                    boundingBox.Max.Z += expansionAmount;
+                }
+
+
+                Body.CollisionInformation.BoundingBox = boundingBox;
+
             }
 
 
@@ -489,8 +542,9 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             //Vertical support data is different because it has the capacity to stop the character from moving unless
             //contacts are pruned appropriately.
             SupportData verticalSupportData;
-            Vector3 movement3d = new Vector3(HorizontalMotionConstraint.MovementDirection.X, 0, HorizontalMotionConstraint.MovementDirection.Y);
-            SupportFinder.GetTractionInDirection(ref movement3d, out verticalSupportData);
+            Vector3 movementDirection;
+            HorizontalMotionConstraint.GetMovementDirectionIn3D(out movementDirection);
+            SupportFinder.GetTractionInDirection(ref movementDirection, out verticalSupportData);
 
 
             //Warning:

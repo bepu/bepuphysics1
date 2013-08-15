@@ -442,7 +442,8 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
             //Vertical support data is different because it has the capacity to stop the character from moving unless
             //contacts are pruned appropriately.
             SupportData verticalSupportData;
-            Vector3 movement3d = new Vector3(HorizontalMotionConstraint.MovementDirection.X, 0, HorizontalMotionConstraint.MovementDirection.Y);
+            Vector3 movement3d;
+            HorizontalMotionConstraint.GetMovementDirectionIn3D(out movement3d);
             SupportFinder.GetTractionInDirection(ref movement3d, out verticalSupportData);
 
 
