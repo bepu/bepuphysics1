@@ -76,8 +76,8 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             }
         }
 
-        internal Vector3 viewDirection;
-        internal Vector3 horizontalViewDirection;
+        Vector3 viewDirection;
+        Vector3 horizontalViewDirection;
 
         /// <summary>
         /// Gets the horizontal view direction computed using the Down vector and the ViewDirection.
@@ -412,10 +412,10 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     if (SupportFinder.HasTraction)
                     {
                         //The character has traction, so jump straight up.
-                        float currentUpVelocity = Vector3.Dot(Body.OrientationMatrix.Up, relativeVelocity);
+                        float currentDownVelocity = Vector3.Dot(Down, relativeVelocity);
                         //Target velocity is JumpSpeed.
-                        float velocityChange = Math.Max(jumpSpeed - currentUpVelocity, 0);
-                        ApplyJumpVelocity(ref supportData, Body.OrientationMatrix.Up * velocityChange, ref relativeVelocity);
+                        float velocityChange = Math.Max(jumpSpeed + currentDownVelocity, 0);
+                        ApplyJumpVelocity(ref supportData, Down * -velocityChange, ref relativeVelocity);
 
 
                         //Prevent any old contacts from hanging around and coming back with a negative depth.
@@ -478,9 +478,9 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             //    maxVelocity = (maxVelocity + .01f) / dt;
 
             //    float targetVerticalVelocity = -3;
-            //    verticalVelocity = Vector3.Dot(Body.OrientationMatrix.Up, relativeVelocity);
+            //    verticalVelocity = -Vector3.Dot(Down, relativeVelocity);
             //    float change = MathHelper.Clamp(targetVerticalVelocity - verticalVelocity, -maxVelocity, 0);
-            //    ChangeVelocityUnilaterally(Body.OrientationMatrix.Up * change, ref relativeVelocity);
+            //    ChangeVelocityUnilaterally(Down * -change, ref relativeVelocity);
             //}
             //}
 
@@ -717,7 +717,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
 
 
-        bool tryToJump = false;
+        bool tryToJump;
         /// <summary>
         /// Jumps the character off of whatever it's currently standing on.  If it has traction, it will go straight up.
         /// If it doesn't have traction, but is still supported by something, it will jump in the direction of the surface normal.

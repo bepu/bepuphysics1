@@ -319,17 +319,7 @@ namespace BEPUutilities
             // Calculate temporary values.
             double halfTheta = Math.Acos(cosHalfTheta);
             double sinHalfTheta = Math.Sqrt(1.0 - cosHalfTheta * cosHalfTheta);
-            //Check to see if we're 180 degrees away from the target.
-            if (Math.Abs(sinHalfTheta) < 0.00001)
-            {
-                //Woops! There are an infinite number of ways to get to the goal.
-                //Pick one.
-                result.X = (start.X + end.X) * .5f;
-                result.Y = (start.Y + end.Y) * .5f;
-                result.Z = (start.Z + end.Z) * .5f;
-                result.W = (start.W + end.W) * .5f;
-                return;
-            }
+
             double aFraction = Math.Sin((1 - interpolationAmount) * halfTheta) / sinHalfTheta;
             double bFraction = Math.Sin(interpolationAmount * halfTheta) / sinHalfTheta;
 
@@ -768,13 +758,20 @@ namespace BEPUutilities
             //float w = dot + (float)Math.Sqrt(v1.LengthSquared() * v2.LengthSquared());
             if (dot < -0.9999f) //parallel, opposing direction
             {
+                //If this occurs, the rotation required is ~180 degrees.
+                //The problem is that we could choose any perpendicular axis for the rotation. It's not uniquely defined.
+                //The solution is to pick an arbitrary perpendicular axis.
                 //Project onto the plane which has the lowest component magnitude.
-                if (v1.X < v1.Y && v1.X < v1.Z)
+                //On that 2d plane, perform a 90 degree rotation.
+                float absX = Math.Abs(v1.X);
+                float absY = Math.Abs(v1.Y);
+                float absZ = Math.Abs(v1.Z);
+                if (absX < absY && absX < absZ)
                     q = new Quaternion(0, -v1.Z, v1.Y, 0);
-                else if (v1.Y < v1.Z)
+                else if (absY < absZ)
                     q = new Quaternion(-v1.Z, 0, v1.X, 0);
                 else
-                    q = new Quaternion(-v1.Y, -v1.X, 0, 0);
+                    q = new Quaternion(-v1.Y, v1.X, 0, 0);
             }
             else
             {
@@ -783,6 +780,35 @@ namespace BEPUutilities
                 q = new Quaternion(axis.X, axis.Y, axis.Z, dot + 1);
             }
             q.Normalize();
+        }
+
+        //The following two functions are highly similar, but it's a bit of a brain teaser to phrase one in terms of the other.
+        //Providing both simplifies things.
+
+        /// <summary>
+        /// Computes the rotation from the start orientation to the end orientation such that end = Quaternion.Concatenate(start, relative).
+        /// </summary>
+        /// <param name="start">Starting orientation.</param>
+        /// <param name="end">Ending orientation.</param>
+        /// <param name="relative">Relative rotation from the start to the end orientation.</param>
+        public static void GetRelativeRotation(ref Quaternion start, ref Quaternion end, out Quaternion relative)
+        {
+            Quaternion startInverse;
+            Conjugate(ref start, out startInverse);
+            Concatenate(ref startInverse, ref end, out relative);
+        }
+
+        /// <summary>
+        /// Transforms the rotation into the local space of the target basis such that rotation = Quaternion.Concatenate(localRotation, targetBasis)
+        /// </summary>
+        /// <param name="rotation">Rotation in the original frame of reference.</param>
+        /// <param name="targetBasis">Basis in the original frame of reference to transform the rotation into.</param>
+        /// <param name="localRotation">Rotation in the local space of the target basis.</param>
+        public static void GetLocalRotation(ref Quaternion rotation, ref Quaternion targetBasis, out Quaternion localRotation)
+        {
+            Quaternion basisInverse;
+            Conjugate(ref targetBasis, out basisInverse);
+            Concatenate(ref rotation, ref basisInverse, out localRotation);
         }
     }
 }

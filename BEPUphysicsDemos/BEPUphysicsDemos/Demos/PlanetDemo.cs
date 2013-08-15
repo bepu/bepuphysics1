@@ -1,8 +1,8 @@
-﻿using BEPUphysics.Entities;
+﻿using System;
+using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.UpdateableSystems.ForceFields;
 using BEPUphysicsDemos.SampleCode;
-using System.Collections.Generic;
 using BEPUphysics.NarrowPhaseSystems;
 using BEPUutilities;
 
@@ -50,6 +50,9 @@ namespace BEPUphysicsDemos.Demos
                         Space.Add(toAdd);
                     }
             game.Camera.Position = new Vector3(0, 0, 150);
+
+
+
         }
 
         /// <summary>

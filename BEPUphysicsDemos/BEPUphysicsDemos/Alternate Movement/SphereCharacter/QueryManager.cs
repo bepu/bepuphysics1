@@ -215,7 +215,7 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
 
         void CategorizeContacts(ref Vector3 position)
         {
-            Vector3 downDirection = character.Body.OrientationMatrix.Down;
+            Vector3 downDirection = character.Down;
             for (int i = 0; i < contacts.Count; i++)
             {
                 float dot;
