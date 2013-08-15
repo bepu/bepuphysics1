@@ -344,56 +344,34 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 expansion.X = Math.Abs(expansion.X);
                 expansion.Y = Math.Abs(expansion.Y);
                 expansion.Z = Math.Abs(expansion.Z);
-                Vector3.Add(ref expansion, ref boundingBox.Max, out boundingBox.Max);
-                Vector3.Subtract(ref boundingBox.Min, ref expansion, out boundingBox.Min);
 
                 //When the character climbs a step, it teleports horizontally a little to gain support. Expand the bounding box to accommodate the margin.
                 //Compute the expansion caused by the extra radius along each axis.
                 //There's a few ways to go about doing this.
-                //One option is to compute a direction perpendicular to the vertical axis pointing to the world axis under consideration.
-                //The dot product of this axis and the world axis are the amount of the collision expansion radius to apply on that axis.
+
+                //The following is heavily cooked, but it is based on the angle between the vertical axis and a particular axis.
+                //Given that, the amount of the radial expansion required along that axis can be computed.
+                //The dot product would provide the cos(angle) between the vertical axis and a chosen axis.
+                //Equivalently, it is how much expansion would be along that axis, if the vertical axis was the axis of expansion.
+                //However, it's not. The dot product actually gives us the expansion along an axis perpendicular to the chosen axis, pointing away from the character's vertical axis.
                 
-                //TODO: This computation is not well optimized. Much of the work done by the cross products, for example, is not used at all.
-                //There should be a simpler approach.
+                //What we need is actually given by the sin(angle), which is given by ||verticalAxis x testAxis||.
+                //The sin(angle) is the projected length of the verticalAxis (not the expansion!) on the axis perpendicular to the testAxis pointing away from the character's vertical axis.
+                //That projected length, however is equal to the expansion along the test axis, which is exactly what we want.
+                //To show this, try setting up the triangles at the corner of a cylinder with the world axes and cylinder axes.
 
-                var horizontalExpansion = Body.CollisionInformation.Shape.CollisionMargin * 1.1f;
-                Vector3 horizontalAxis;
-                Vector3.Cross(ref down, ref Toolbox.UpVector, out horizontalAxis);
-                float lengthSquared = horizontalAxis.LengthSquared();
-                if (lengthSquared > Toolbox.Epsilon)
-                {
-                    //This axis isn't perfectly aligned with the character's vertical axis; it will have some expansion.
-                    Vector3.Divide(ref horizontalAxis, (float) Math.Sqrt(lengthSquared), out horizontalAxis);
-                    Vector3.Cross(ref horizontalAxis, ref down, out horizontalAxis);
-                    var expansionAmount = Math.Abs(horizontalAxis.Y) * horizontalExpansion;
-                    boundingBox.Min.Y -= expansionAmount;
-                    boundingBox.Max.Y += expansionAmount;
-                }
+                //Since the test axes we're using are all standard directions ({0,0,1}, {0,1,0}, and {0,0,1}), most of the cross product logic simplifies out, and we are left with:
+                var horizontalExpansionAmount = Body.CollisionInformation.Shape.CollisionMargin * 1.1f;
+                Vector3 squaredDown;
+                squaredDown.X = down.X * down.X;
+                squaredDown.Y = down.Y * down.Y;
+                squaredDown.Z = down.Z * down.Z;
+                expansion.X += horizontalExpansionAmount * (float)Math.Sqrt(squaredDown.Y + squaredDown.Z);
+                expansion.Y += horizontalExpansionAmount * (float)Math.Sqrt(squaredDown.X + squaredDown.Z);
+                expansion.Z += horizontalExpansionAmount * (float)Math.Sqrt(squaredDown.X + squaredDown.Y);
 
-                Vector3.Cross(ref down, ref Toolbox.RightVector, out horizontalAxis);
-                lengthSquared = horizontalAxis.LengthSquared();
-                if (lengthSquared > Toolbox.Epsilon)
-                {
-                    //This axis isn't perfectly aligned with the character's vertical axis; it will have some expansion.
-                    Vector3.Divide(ref horizontalAxis, (float)Math.Sqrt(lengthSquared), out horizontalAxis);
-                    Vector3.Cross(ref horizontalAxis, ref down, out horizontalAxis);
-                    var expansionAmount = Math.Abs(horizontalAxis.X) * horizontalExpansion;
-                    boundingBox.Min.X -= expansionAmount;
-                    boundingBox.Max.X += expansionAmount;
-                }
-
-                Vector3.Cross(ref down, ref Toolbox.BackVector, out horizontalAxis);
-                lengthSquared = horizontalAxis.LengthSquared();
-                if (lengthSquared > Toolbox.Epsilon)
-                {
-                    //This axis isn't perfectly aligned with the character's vertical axis; it will have some expansion.
-                    Vector3.Divide(ref horizontalAxis, (float)Math.Sqrt(lengthSquared), out horizontalAxis);
-                    Vector3.Cross(ref horizontalAxis, ref down, out horizontalAxis);
-                    var expansionAmount = Math.Abs(horizontalAxis.Z) * horizontalExpansion;
-                    boundingBox.Min.Z -= expansionAmount;
-                    boundingBox.Max.Z += expansionAmount;
-                }
-
+                Vector3.Add(ref expansion, ref boundingBox.Max, out boundingBox.Max);
+                Vector3.Subtract(ref boundingBox.Min, ref expansion, out boundingBox.Min);
 
                 Body.CollisionInformation.BoundingBox = boundingBox;
 
