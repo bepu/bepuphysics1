@@ -65,12 +65,25 @@ namespace BEPUphysicsDemos.Demos
 
         public override void Update(float dt)
         {
-            //Orient the character to the surface of the planet.
+            //Orient the character and camera as needed.
             if (character.IsActive)
             {
-                character.CharacterController.Down = planetPosition - character.CharacterController.Body.Position;
+                var down = planetPosition - character.CharacterController.Body.Position;
+                character.CharacterController.Down = down;
+                Game.Camera.LockedUp = -down;
             }
+            else if (vehicle.IsActive)
+            {
+                Game.Camera.LockedUp = vehicle.Vehicle.Body.Position - planetPosition;
+            }
+            else
+            {
+                Game.Camera.LockedUp = Vector3.Up;
+            }
+
             base.Update(dt);
         }
+
+
     }
 }

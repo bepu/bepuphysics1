@@ -43,7 +43,7 @@ namespace BEPUphysicsDemos.Demos
                     }
 
             game.Camera.Position = new Vector3(0, 3, -10);
-            game.Camera.Yaw = -(float)Math.PI;
+            game.Camera.ViewDirection = new Vector3(0, 0, 1);
         }
 
         /// <summary>

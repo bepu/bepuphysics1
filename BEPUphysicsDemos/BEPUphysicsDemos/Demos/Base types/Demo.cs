@@ -3,6 +3,7 @@ using System;
 using System.Diagnostics;
 using BEPUphysics;
 using System.Threading;
+using BEPUutilities;
 
 namespace BEPUphysicsDemos.Demos
 {
@@ -36,8 +37,9 @@ namespace BEPUphysicsDemos.Demos
                 }
             }
 #endif
-            game.Camera.Yaw = 0;
-            game.Camera.Pitch = 0;
+            game.Camera.LockedUp = Vector3.Up;
+            game.Camera.ViewDirection = new Vector3(0, 0, -1);
+            
         }
 
         /// <summary>

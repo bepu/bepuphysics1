@@ -54,8 +54,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
 
 
             game.Camera.Position = new Vector3(-10, 5, 10);
-            game.Camera.Yaw = (float)Math.PI / -4f;
-            game.Camera.Pitch = -(float)Math.PI / 9f;
+            game.Camera.Yaw((float)Math.PI / -4f);
+            game.Camera.Pitch(-(float)Math.PI / 9f);
 
             //Starter ray.
             origin = new Vector3(10, 5, 0);

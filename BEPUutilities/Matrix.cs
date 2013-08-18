@@ -1113,9 +1113,40 @@ namespace BEPUutilities
         /// <param name="viewMatrix">Look at matrix.</param>
         public static void CreateLookAtRH(ref Vector3 position, ref Vector3 target, ref Vector3 upVector, out Matrix viewMatrix)
         {
+            Vector3 forward;
+            Vector3.Subtract(ref target, ref position, out forward);
+            CreateViewRH(ref position, ref forward, ref upVector, out viewMatrix);
+        }
+
+        /// <summary>
+        /// Creates a view matrix pointing from a position to a target with the given up vector.
+        /// </summary>
+        /// <param name="position">Position of the camera.</param>
+        /// <param name="target">Target of the camera.</param>
+        /// <param name="upVector">Up vector of the camera.</param>
+        /// <returns>Look at matrix.</returns>
+        public static Matrix CreateLookAtRH(Vector3 position, Vector3 target, Vector3 upVector)
+        {
+            Matrix lookAt;
+            Vector3 forward;
+            Vector3.Subtract(ref target, ref position, out forward);
+            CreateViewRH(ref position, ref forward, ref upVector, out lookAt);
+            return lookAt;
+        }
+
+
+        /// <summary>
+        /// Creates a view matrix pointing looking in a direction with a given up vector.
+        /// </summary>
+        /// <param name="position">Position of the camera.</param>
+        /// <param name="forward">Forward direction of the camera.</param>
+        /// <param name="upVector">Up vector of the camera.</param>
+        /// <param name="viewMatrix">Look at matrix.</param>
+        public static void CreateViewRH(ref Vector3 position, ref Vector3 forward, ref Vector3 upVector, out Matrix viewMatrix)
+        {
             Vector3 z;
-            Vector3.Subtract(ref position, ref target, out z);
-            z.Normalize();
+            float length = forward.Length();
+            Vector3.Divide(ref forward, -length, out z);
             Vector3 x;
             Vector3.Cross(ref upVector, ref z, out x);
             x.Normalize();
@@ -1145,18 +1176,75 @@ namespace BEPUutilities
         }
 
         /// <summary>
-        /// Creates a view matrix pointing from a position to a target with the given up vector.
+        /// Creates a view matrix pointing looking in a direction with a given up vector.
         /// </summary>
         /// <param name="position">Position of the camera.</param>
-        /// <param name="target">Target of the camera.</param>
+        /// <param name="forward">Forward direction of the camera.</param>
         /// <param name="upVector">Up vector of the camera.</param>
         /// <returns>Look at matrix.</returns>
-        public static Matrix CreateLookAtRH(Vector3 position, Vector3 target, Vector3 upVector)
+        public static Matrix CreateViewRH(Vector3 position, Vector3 forward, Vector3 upVector)
         {
             Matrix lookat;
-            CreateLookAtRH(ref position, ref target, ref upVector, out lookat);
+            CreateViewRH(ref position, ref forward, ref upVector, out lookat);
             return lookat;
         }
+
+
+
+        /// <summary>
+        /// Creates a world matrix pointing from a position to a target with the given up vector.
+        /// </summary>
+        /// <param name="position">Position of the transform.</param>
+        /// <param name="forward">Forward direction of the transformation.</param>
+        /// <param name="upVector">Up vector which is crossed against the forward vector to compute the transform's basis.</param>
+        /// <param name="worldMatrix">World matrix.</param>
+        public static void CreateWorldRH(ref Vector3 position, ref Vector3 forward, ref Vector3 upVector, out Matrix worldMatrix)
+        {
+            Vector3 z;
+            float length = forward.Length();
+            Vector3.Divide(ref forward, -length, out z);
+            Vector3 x;
+            Vector3.Cross(ref upVector, ref z, out x);
+            x.Normalize();
+            Vector3 y;
+            Vector3.Cross(ref z, ref x, out y);
+
+            worldMatrix.M11 = x.X;
+            worldMatrix.M12 = x.Y;
+            worldMatrix.M13 = x.Z;
+            worldMatrix.M14 = 0f;
+            worldMatrix.M21 = y.X;
+            worldMatrix.M22 = y.Y;
+            worldMatrix.M23 = y.Z;
+            worldMatrix.M24 = 0f;
+            worldMatrix.M31 = z.X;
+            worldMatrix.M32 = z.Y;
+            worldMatrix.M33 = z.Z;
+            worldMatrix.M34 = 0f;
+
+            worldMatrix.M41 = position.X;
+            worldMatrix.M42 = position.Y;
+            worldMatrix.M43 = position.Z;
+            worldMatrix.M44 = 1f;
+
+        }
+
+
+        /// <summary>
+        /// Creates a world matrix pointing from a position to a target with the given up vector.
+        /// </summary>
+        /// <param name="position">Position of the transform.</param>
+        /// <param name="forward">Forward direction of the transformation.</param>
+        /// <param name="upVector">Up vector which is crossed against the forward vector to compute the transform's basis.</param>
+        /// <returns>World matrix.</returns>
+        public static Matrix CreateWorldRH(Vector3 position, Vector3 forward, Vector3 upVector)
+        {
+            Matrix lookat;
+            CreateWorldRH(ref position, ref forward, ref upVector, out lookat);
+            return lookat;
+        }
+
+
 
         /// <summary>
         /// Creates a matrix representing a translation.
