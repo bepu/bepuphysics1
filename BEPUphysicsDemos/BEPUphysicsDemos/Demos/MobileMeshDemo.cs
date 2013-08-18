@@ -66,8 +66,6 @@ namespace BEPUphysicsDemos.Demos
 
             //Space.Add(new Box(new Vector3(0, -10, 0), 1, 1, 1));
             game.Camera.Position = new Vector3(0, -10, 5);
-            game.Camera.Yaw = 0;
-            game.Camera.Pitch = 0;
 
 
         }

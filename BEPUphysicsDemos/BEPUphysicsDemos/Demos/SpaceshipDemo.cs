@@ -60,7 +60,7 @@ namespace BEPUphysicsDemos.Demos
 
 
             game.Camera.Position = new Vector3(-14, 12, 25);
-            game.Camera.Yaw = (float)Math.PI / -4;
+            game.Camera.Yaw((float)Math.PI / -4);
         }
 
         /// <summary>

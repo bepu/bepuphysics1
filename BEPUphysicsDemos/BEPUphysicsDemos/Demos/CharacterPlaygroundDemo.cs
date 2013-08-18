@@ -29,7 +29,7 @@ namespace BEPUphysicsDemos.Demos
         {
 
             game.Camera.Position = new Vector3(-10, 7, 5);
-            game.Camera.Yaw = MathHelper.Pi;
+            game.Camera.ViewDirection = new Vector3(0, 0, 1);
             //Since this is the character playground, turn on the character by default.
             character.Activate();
             //Having the character body visible would be a bit distracting.

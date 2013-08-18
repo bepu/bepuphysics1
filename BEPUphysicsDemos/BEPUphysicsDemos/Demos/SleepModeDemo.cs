@@ -58,8 +58,8 @@ namespace BEPUphysicsDemos.Demos
             }
 
             game.Camera.Position = new Vector3(-30, 5, 25);
-            game.Camera.Yaw = (float) Math.PI / -3;
-            game.Camera.Pitch = -(float) Math.PI / -12;
+            game.Camera.Yaw((float) Math.PI / -3);
+            game.Camera.Pitch(-(float) Math.PI / -12);
         }
 
         /// <summary>

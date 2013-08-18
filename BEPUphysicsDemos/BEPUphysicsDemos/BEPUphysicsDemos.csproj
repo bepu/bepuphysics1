@@ -105,8 +105,8 @@
     <Compile Include="Alternate Movement\SimpleCharacter\SimpleCharacterControllerInput.cs" />
     <Compile Include="Alternate Movement\TankInput.cs" />
     <Compile Include="Alternate Movement\VehicleInput.cs" />
-    <Compile Include="Camera.cs" />
     <Compile Include="ConfigurationHelper.cs" />
+    <Compile Include="Camera.cs" />
     <Compile Include="DemosGame.cs" />
     <Compile Include="Demos\ActionFigureDemo.cs" />
     <Compile Include="Demos\Base types\Demo.cs" />
