@@ -193,7 +193,7 @@ namespace BEPUphysics.Constraints.Collision
                 bias = MathHelper.Min(
                     MathHelper.Max(0, contact.PenetrationDepth - CollisionDetectionSettings.AllowedPenetration) *
                     CollisionResponseSettings.PenetrationRecoveryStiffness / dt,
-                    CollisionResponseSettings.MaximumPenetrationCorrectionSpeed);
+                    CollisionResponseSettings.MaximumPenetrationRecoverySpeed);
 
                 if (contactManifoldConstraint.materialInteraction.Bounciness > 0)
                 {
