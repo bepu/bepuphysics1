@@ -3,6 +3,7 @@
 using System;
 using BEPUphysics.Entities;
 using BEPUphysicsDemos.Demos;
+using BEPUphysicsDemos.Demos.Extras;
 using BEPUphysicsDemos.SampleCode;
 using BEPUphysicsDrawer.Font;
 using BEPUphysicsDrawer.Lines;

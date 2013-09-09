@@ -48,7 +48,7 @@ namespace BEPUphysicsDemos
 
             //Set all the scaling settings back to their defaults.
             space.DeactivationManager.VelocityLowerLimit = 0.26f;
-            CollisionResponseSettings.MaximumPenetrationCorrectionSpeed = 2;
+            CollisionResponseSettings.MaximumPenetrationRecoverySpeed = 2;
             CollisionResponseSettings.BouncinessVelocityThreshold = 1;
             CollisionResponseSettings.StaticFrictionVelocityThreshold = .2f;
             CollisionDetectionSettings.ContactInvalidationLength = .1f;
@@ -153,7 +153,7 @@ namespace BEPUphysicsDemos
         {
             //Set all values to default values * scale.
             space.DeactivationManager.VelocityLowerLimit = 0.26f * scale;
-            CollisionResponseSettings.MaximumPenetrationCorrectionSpeed = 2 * scale;
+            CollisionResponseSettings.MaximumPenetrationRecoverySpeed = 2 * scale;
             CollisionResponseSettings.BouncinessVelocityThreshold = 1 * scale;
             CollisionResponseSettings.StaticFrictionVelocityThreshold = .2f * scale;
             CollisionDetectionSettings.ContactInvalidationLength = .1f * scale;

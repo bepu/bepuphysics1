@@ -164,7 +164,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             //Technically, there exists a better estimate of the necessary speed, but choosing the maximum position correction speed is a nice catch-all.
             //If you change that correction speed, watch out!!! It could significantly change the way the character behaves when trying to glue to surfaces.
             if (supportData.Depth > 0)
-                permittedVelocity = CollisionResponseSettings.MaximumPenetrationCorrectionSpeed;
+                permittedVelocity = CollisionResponseSettings.MaximumPenetrationRecoverySpeed;
             else
                 permittedVelocity = 0;
 

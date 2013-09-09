@@ -15,7 +15,7 @@
         /// Maximum speed at which interpenetrating objects will attempt to undo any overlap.
         /// Defaults to 2.
         /// </summary>
-        public static float MaximumPenetrationCorrectionSpeed = 2;
+        public static float MaximumPenetrationRecoverySpeed = 2;
 
         /// <summary>
         /// Fraction of position error to convert into corrective momentum.

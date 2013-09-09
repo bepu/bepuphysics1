@@ -66,9 +66,8 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
 
         /// <summary>
         /// Gets or sets what kind of motor this is.
-        /// 
-        /// If velocityMotor is chosen, the motor will try to achieve some velocity using the VelocityMotorSettings.
-        /// If servomechanism is chosen, the motor will try to reach some position using the ServoSettings.
+        /// <para>If velocityMotor is chosen, the motor will try to achieve some velocity using the VelocityMotorSettings.</para> 
+        /// <para>If servomechanism is chosen, the motor will try to reach some position using the ServoSettings.</para> 
         /// </summary>
         public MotorMode Mode
         {
@@ -442,8 +441,11 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
             get { return goalVelocity; }
             set
             {
-                goalVelocity = value;
-                motorSettings.WakeUpEntities();
+                if (value != goalVelocity)
+                {
+                    goalVelocity = value;
+                    motorSettings.WakeUpEntities();
+                }
             }
         }
     }
@@ -469,8 +471,11 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
             get { return goalVelocity; }
             set
             {
-                goalVelocity = value;
-                motorSettings.WakeUpEntities();
+                if (value != goalVelocity)
+                {
+                    goalVelocity = value;
+                    motorSettings.WakeUpEntities();
+                }
             }
         }
     }
