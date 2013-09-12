@@ -5,7 +5,6 @@ using BEPUphysics.CollisionTests.CollisionAlgorithms;
 using BEPUutilities.DataStructures;
 using BEPUutilities;
 using BEPUphysics.CollisionShapes.ConvexShapes;
-using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.NarrowPhaseSystems.Pairs
 {

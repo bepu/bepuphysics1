@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.Entities;
 using BEPUutilities.DataStructures;
-using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.UpdateableSystems.ForceFields
 {

@@ -1,7 +1,6 @@
 ﻿using BEPUutilities;
 using Microsoft.Xna.Framework.Graphics;
 using BEPUphysics.BroadPhaseEntries;
-using BEPUutilities;
 using BEPUphysics.Entities.Prefabs;
 
 namespace BEPUphysicsDemos.Demos

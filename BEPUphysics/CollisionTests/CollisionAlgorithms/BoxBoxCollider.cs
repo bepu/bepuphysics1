@@ -4,9 +4,6 @@ using BEPUutilities.DataStructures;
 using BEPUutilities;
  
 using BEPUphysics.CollisionShapes.ConvexShapes;
-using System.Diagnostics;
-using BEPUphysics.Settings;
-using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 {
@@ -46,7 +43,10 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
         #endregion
     }
 
-
+    /// <summary>
+    /// Basic storage structure for contact data.
+    /// Designed for performance critical code and pointer access.
+    /// </summary>
 #if WINDOWS
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
 #else
@@ -54,10 +54,6 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
     [StructLayout(LayoutKind.Sequential)]
 #endif
 #endif
-    /// <summary>
-    /// Basic storage structure for contact data.
-    /// Designed for performance critical code and pointer access.
-    /// </summary>
     public struct BoxContactDataCache
     {
         public BoxContactData D1;
@@ -2327,7 +2323,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 #if ALLOWUNSAFE
         internal static void GetEdgeEdgeContact(BoxShape a, BoxShape b, ref Vector3 positionA, ref Matrix3x3 orientationA, ref Vector3 positionB, ref Matrix3x3 orientationB, float depth, ref Vector3 mtd, out BoxContactDataCache contactData)
 #else
-        internal static void GetEdgeEdgeContact(BoxShape a, BoxShape b, ref Vector3 positionA, ref Matrix3X3 orientationA, ref Vector3 positionB, ref Matrix3X3 orientationB, float depth, ref Vector3 mtd, out TinyStructList<BoxContactData> contactData)
+        internal static void GetEdgeEdgeContact(BoxShape a, BoxShape b, ref Vector3 positionA, ref Matrix3x3 orientationA, ref Vector3 positionB, ref Matrix3x3 orientationB, float depth, ref Vector3 mtd, out TinyStructList<BoxContactData> contactData)
 #endif
         {
             //Edge-edge contacts conceptually can only create one contact in perfectly rigid collisions.
@@ -3394,7 +3390,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 #if ALLOWUNSAFE
         internal static void GetFaceContacts(BoxShape a, BoxShape b, ref Vector3 positionA, ref Matrix3x3 orientationA, ref Vector3 positionB, ref Matrix3x3 orientationB, bool aIsFaceOwner, ref Vector3 mtd, out BoxContactDataCache contactData)
 #else
-        internal static void GetFaceContacts(BoxShape a, BoxShape b, ref Vector3 positionA, ref Matrix3X3 orientationA, ref Vector3 positionB, ref Matrix3X3 orientationB, bool aIsFaceOwner, ref Vector3 mtd, out TinyStructList<BoxContactData> contactData)
+        internal static void GetFaceContacts(BoxShape a, BoxShape b, ref Vector3 positionA, ref Matrix3x3 orientationA, ref Vector3 positionB, ref Matrix3x3 orientationB, bool aIsFaceOwner, ref Vector3 mtd, out TinyStructList<BoxContactData> contactData)
 #endif
         {
             float aHalfWidth = a.halfWidth;

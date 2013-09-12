@@ -4,7 +4,6 @@ using BEPUphysics.Entities.Prefabs;
 using BEPUutilities;
 using BEPUutilities.DataStructures;
 using BEPUphysics.CollisionShapes;
-using BEPUutilities.DataStructures;
 
 namespace BEPUphysicsDemos.Demos.Extras.Tests
 {

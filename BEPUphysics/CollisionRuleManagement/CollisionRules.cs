@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using BEPUutilities.DataStructures;
-﻿using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.CollisionRuleManagement
 {

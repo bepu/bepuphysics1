@@ -5,7 +5,6 @@ using BEPUutilities.ResourceManagement;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
 using System;
-using BEPUutilities.ResourceManagement;
 
 namespace BEPUphysics.BroadPhaseEntries.MobileCollidables
 {

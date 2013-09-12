@@ -4,7 +4,6 @@ using BEPUutilities;
 using BEPUphysics.CollisionShapes;
 using System.Collections.Generic;
 using BEPUphysics.CollisionShapes.ConvexShapes;
-using BEPUutilities;
 using BEPUphysics.Entities;
 
 namespace BEPUphysicsDemos.Demos.Extras.Tests

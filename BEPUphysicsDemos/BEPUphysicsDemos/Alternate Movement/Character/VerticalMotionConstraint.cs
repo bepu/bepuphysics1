@@ -4,9 +4,7 @@ using BEPUphysics.Entities;
 using BEPUutilities;
 using BEPUutilities.DataStructures;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
-using BEPUutilities;
 using BEPUphysics.Settings;
-using BEPUutilities.DataStructures;
 
 namespace BEPUphysicsDemos.AlternateMovement.Character
 {

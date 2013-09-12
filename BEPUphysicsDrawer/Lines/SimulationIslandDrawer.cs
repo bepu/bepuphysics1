@@ -100,7 +100,6 @@
 
 using System.Collections.Generic;
 using BEPUutilities.DataStructures;
-using BEPUutilities.DataStructures;
 using Microsoft.Xna.Framework.Graphics;
 using BEPUphysics;
 using Microsoft.Xna.Framework;

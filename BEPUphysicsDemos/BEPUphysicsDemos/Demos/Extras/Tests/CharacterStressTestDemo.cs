@@ -1,10 +1,8 @@
 ﻿using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.CollisionShapes;
-using BEPUphysics.DataStructures;
 using BEPUphysics.Entities.Prefabs;
 using BEPUutilities;
 using Microsoft.Xna.Framework.Graphics;
-using BEPUutilities;
 using BEPUphysicsDemos.AlternateMovement.SphereCharacter;
 using System.Collections.Generic;
 using System;

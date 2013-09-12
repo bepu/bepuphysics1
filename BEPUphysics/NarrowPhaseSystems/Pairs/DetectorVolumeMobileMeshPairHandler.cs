@@ -5,7 +5,6 @@ using BEPUphysics.CollisionTests.CollisionAlgorithms;
 using BEPUutilities.DataStructures;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUutilities;
-using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.NarrowPhaseSystems.Pairs
 {

@@ -265,6 +265,7 @@ namespace BEPUphysics.DeactivationManagement
         }
         void FlushSplits()
         {
+
             //Only do a portion of the total splits.
             int maxAttempts = Math.Max(minimumSplitAttempts, (int)(splitAttempts.Count * maximumSplitAttemptsFraction));
             int attempts = 0;
@@ -303,13 +304,16 @@ namespace BEPUphysics.DeactivationManagement
 
         }
 
-
+        
         void DeactivateObjects()
         {
             //Deactivate only some objects each frame.
             int numberOfEntitiesDeactivated = 0;
             int numberOfIslandsChecked = 0;
             int originalIslandCount = simulationIslands.Count;
+
+   
+
             while (numberOfEntitiesDeactivated < maximumDeactivationAttemptsPerFrame && simulationIslands.Count > 0 && numberOfIslandsChecked < originalIslandCount)
             {
                 deactivationIslandIndex = (deactivationIslandIndex + 1) % simulationIslands.Count;
@@ -326,7 +330,7 @@ namespace BEPUphysics.DeactivationManagement
                     island.TryToDeactivate();
                     numberOfEntitiesDeactivated += island.memberCount;
                 }
-                numberOfIslandsChecked++;
+                ++numberOfIslandsChecked;
             }
         }
 

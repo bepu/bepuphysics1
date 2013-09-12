@@ -1,12 +1,8 @@
-﻿using BEPUphysics.BroadPhaseEntries;
-using BEPUphysics.BroadPhaseEntries.Events;
-using BEPUphysics.BroadPhaseSystems;
+﻿using BEPUphysics.BroadPhaseEntries.Events;
 using BEPUphysics.CollisionShapes;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
 using BEPUphysics.CollisionRuleManagement;
 using System;
-using BEPUutilities.DataStructures;
- 
 using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.BroadPhaseEntries

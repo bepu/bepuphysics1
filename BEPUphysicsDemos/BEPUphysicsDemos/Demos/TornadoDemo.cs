@@ -5,7 +5,6 @@ using BEPUphysics.Entities.Prefabs;
 using BEPUutilities;
 using BEPUphysics.UpdateableSystems.ForceFields;
 using BEPUphysicsDemos.SampleCode;
-using BEPUutilities;
 
 namespace BEPUphysicsDemos.Demos
 {

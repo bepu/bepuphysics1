@@ -3,7 +3,6 @@
 using BEPUphysics.Threading;
 using BEPUutilities;
 using BEPUutilities.DataStructures;
-using BEPUutilities;
 
 namespace BEPUphysics.OtherSpaceStages
 {

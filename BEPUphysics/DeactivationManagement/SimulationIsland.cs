@@ -91,7 +91,6 @@ namespace BEPUphysics.DeactivationManagement
         ///</summary>
         public void Activate()
         {
-            //TODO: CONSIDER ACTIVE ISLAND WITH FORCE-DEACTIVATED MEMBER.  ACTIVATING SIMULATION ISLAND WILL NOT WAKE FORCE-DEACTIVATED MEMBER.  DESIRED?
             if (!isActive)
             {
                 isActive = true;
@@ -107,7 +106,7 @@ namespace BEPUphysics.DeactivationManagement
         {
             if (allowDeactivation)
             {
-                //TODO: Check the deactivation count.  If it's a fully deactivated simulation island, then try to deactivate !:)
+                //Check the deactivation count.  If it's a fully deactivated simulation island, then try to deactivate !:)
                 //DO NOT WORRY ABOUT THREAD SAFETY HERE.
                 //TryToDeactivate will be called sequentially in a 'limited work per frame' scheme.
                 //Avoids load balancing problems and makes implementation easier.

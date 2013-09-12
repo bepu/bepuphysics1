@@ -5,10 +5,8 @@ using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.DataStructures;
 using BEPUutilities;
 using BEPUutilities.DataStructures;
-using BEPUutilities;
 using BEPUphysics.CollisionShapes;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
-using BEPUutilities.DataStructures;
 using BEPUutilities.ResourceManagement;
 
 namespace BEPUphysics.CollisionTests.Manifolds

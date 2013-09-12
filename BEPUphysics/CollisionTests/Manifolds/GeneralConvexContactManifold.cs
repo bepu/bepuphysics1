@@ -6,7 +6,6 @@ using BEPUutilities;
 using BEPUutilities.ResourceManagement;
 using BEPUphysics.Settings;
 using BEPUutilities.DataStructures;
-using BEPUutilities.ResourceManagement;
 
 namespace BEPUphysics.CollisionTests.Manifolds
 {

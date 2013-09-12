@@ -9,8 +9,6 @@ using System;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.BroadPhaseSystems.Hierarchies;
-using BEPUutilities;
-using BEPUutilities.DataStructures;
 
 namespace BEPUphysicsDemos.Demos.Extras.Tests
 {
