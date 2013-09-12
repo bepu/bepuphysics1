@@ -2,7 +2,6 @@
 using BEPUphysics.Constraints;
 using BEPUphysics.DeactivationManagement;
 using BEPUutilities.DataStructures;
-using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.Entities
 {

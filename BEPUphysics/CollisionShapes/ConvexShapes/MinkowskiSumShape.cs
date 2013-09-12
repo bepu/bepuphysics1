@@ -4,7 +4,6 @@ using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUutilities;
  
 using BEPUutilities.DataStructures;
-using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.CollisionShapes.ConvexShapes
 {

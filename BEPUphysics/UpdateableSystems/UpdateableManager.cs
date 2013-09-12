@@ -101,7 +101,7 @@ namespace BEPUphysics.UpdateableSystems
         /// Adds an updateable to the manager.
         ///</summary>
         ///<param name="updateable">Updateable to add.</param>
-        ///<exception cref="Exception">Thrown if the manager already contains the updateable.</exception>
+        ///<exception cref="ArgumentException">Thrown if the manager already contains the updateable.</exception>
         public void Add(T updateable)
         {
             if (!updateable.Managers.Contains(this))
@@ -122,7 +122,7 @@ namespace BEPUphysics.UpdateableSystems
         /// Removes an updateable from the manager.
         ///</summary>
         ///<param name="updateable">Updateable to remove.</param>
-        ///<exception cref="Exception">Thrown if the manager does not contain the updateable.</exception>
+        ///<exception cref="ArgumentException">Thrown if the manager does not contain the updateable.</exception>
         public void Remove(T updateable)
         {
             if (updateable.Managers.Contains(this))

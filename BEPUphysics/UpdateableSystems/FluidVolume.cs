@@ -225,8 +225,6 @@ namespace BEPUphysics.UpdateableSystems
         /// <param name="fluidDensity">Density of the fluid represented in the volume.</param>
         /// <param name="linearDamping">Fraction by which to reduce the linear momentum of floating objects each update, in addition to any of the body's own damping.</param>
         /// <param name="angularDamping">Fraction by which to reduce the angular momentum of floating objects each update, in addition to any of the body's own damping.</param>
-        /// <param name="queryAccelerator">System to accelerate queries to find nearby entities.</param>
-        /// <param name="threadManager">Thread manager used by the fluid volume.</param>
         public FluidVolume(Vector3 upVector, float gravity, List<Vector3[]> surfaceTriangles, float depth, float fluidDensity, float linearDamping, float angularDamping)
         {
             Gravity = gravity;

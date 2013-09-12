@@ -4,8 +4,6 @@ using BEPUutilities;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUutilities.DataStructures;
 using System;
-using BEPUutilities;
-using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.BroadPhaseSystems
 {

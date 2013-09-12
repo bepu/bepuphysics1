@@ -10,7 +10,6 @@ using BEPUutilities.ResourceManagement;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
-using BEPUutilities.ResourceManagement;
 
 namespace BEPUphysics.BroadPhaseEntries
 {

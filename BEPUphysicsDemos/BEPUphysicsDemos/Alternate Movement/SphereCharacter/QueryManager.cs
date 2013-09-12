@@ -8,7 +8,6 @@ using BEPUphysics.NarrowPhaseSystems;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.Settings;
-using BEPUutilities.DataStructures;
 
 namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
 {

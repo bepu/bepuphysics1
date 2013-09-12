@@ -4,7 +4,6 @@ using BEPUutilities;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System;
-using BEPUutilities;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using Microsoft.Xna.Framework.Graphics;
 using BEPUphysics.Settings;

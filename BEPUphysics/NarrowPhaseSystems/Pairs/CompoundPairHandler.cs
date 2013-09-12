@@ -1,14 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using BEPUphysics.BroadPhaseEntries;
-using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
-using BEPUphysics.Constraints;
-using BEPUphysics.Constraints.Collision;
 using BEPUphysics.DataStructures;
-using BEPUutilities.DataStructures;
-using BEPUphysics.CollisionRuleManagement;
-using BEPUphysics.CollisionTests;
 using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.NarrowPhaseSystems.Pairs

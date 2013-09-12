@@ -6,7 +6,6 @@ using BEPUphysics.NarrowPhaseSystems.Pairs;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.Materials;
 using BEPUphysics.SolverSystems;
-using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.Constraints.Collision
 {

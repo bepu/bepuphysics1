@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.Threading;
-using BEPUutilities;
 using BEPUutilities;
 using BEPUutilities.DataStructures;
 

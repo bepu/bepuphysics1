@@ -4,7 +4,6 @@ using BEPUphysics.Threading;
 using BEPUphysics.Constraints;
 using BEPUutilities;
 using BEPUutilities.DataStructures;
-using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.SolverSystems
 {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.Threading;
 using BEPUutilities.DataStructures;

@@ -2,7 +2,6 @@
 using BEPUutilities;
 using System.Diagnostics;
 using System;
-using BEPUutilities;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
 using BEPUutilities.DataStructures;

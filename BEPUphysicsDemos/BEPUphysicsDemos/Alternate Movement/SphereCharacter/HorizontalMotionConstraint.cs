@@ -4,8 +4,6 @@ using BEPUphysics.Entities;
 using BEPUutilities;
 using BEPUutilities.DataStructures;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
-using BEPUutilities;
-using BEPUutilities.DataStructures;
 
 namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
 {

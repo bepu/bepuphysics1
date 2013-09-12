@@ -9,8 +9,7 @@ using BEPUphysics.Constraints.TwoEntity.Joints;
 using BEPUphysics.Constraints.TwoEntity.JointLimits;
 using Microsoft.Xna.Framework.Input;
 using System;
-using BEPUutilities;
-using ConversionHelper;
+
 namespace BEPUphysicsDemos.Demos.Extras
 {
     /// <summary>
@@ -42,6 +41,7 @@ namespace BEPUphysicsDemos.Demos.Extras
             var body = new Box(new Vector3(0, 0, 0), 4, .5f, 5, 20);
             body.CollisionInformation.LocalPosition = new Vector3(0, .8f, 0);
             Space.Add(body);
+
 
             var treadDescription = new TreadSegmentDescription
                 {
@@ -75,7 +75,7 @@ namespace BEPUphysicsDemos.Demos.Extras
                     float x = i - xLength / 2;
                     float z = j - zLength / 2;
                     //heights[i,j] = (float)(x * y / 1000f);
-                    heights[i, j] = (float)(10 * (Math.Sin(x / 8) + Math.Sin(z / 8)));
+                    heights[i, j] = (float)(20 * (Math.Sin(x / 8) + Math.Sin(z / 8)));
                     //heights[i,j] = 3 * (float)Math.Sin(x * y / 100f);
                     //heights[i,j] = (x * x * x * y - y * y * y * x) / 1000f;
                 }
@@ -147,11 +147,12 @@ namespace BEPUphysicsDemos.Demos.Extras
             return segmentMotors;
         }
 
-        private void CreateTreadSegment(Vector3 segmentOffset, Entity body, TreadSegmentDescription treadSegmentDescription, out Entity segment, out RevoluteMotor motor)
+        private void CreateTreadSegment(Vector3 segmentPosition, Entity body, TreadSegmentDescription treadSegmentDescription, out Entity segment, out RevoluteMotor motor)
         {
-            segment = new Cylinder(body.Position + segmentOffset, treadSegmentDescription.Width, treadSegmentDescription.Radius, treadSegmentDescription.Mass);
+            segment = new Cylinder(segmentPosition, treadSegmentDescription.Width, treadSegmentDescription.Radius, treadSegmentDescription.Mass);
+
             segment.Material.KineticFriction = treadSegmentDescription.Friction;
-            segment.Material.StaticFriction = treadSegmentDescription.Friction;
+            segment.Material.StaticFriction = treadSegmentDescription.Friction * 10;
             segment.Orientation = Quaternion.CreateFromAxisAngle(Vector3.Forward, MathHelper.PiOver2);
 
             //Preventing the occasional pointless collision pair can speed things up.

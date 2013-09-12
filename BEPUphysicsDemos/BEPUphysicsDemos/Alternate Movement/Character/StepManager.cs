@@ -1,10 +1,8 @@
 ﻿using System;
 using BEPUutilities;
 using BEPUutilities.DataStructures;
-using BEPUutilities;
 using BEPUphysics.CollisionTests;
 using BEPUphysics.Settings;
-using BEPUutilities.DataStructures;
 
 namespace BEPUphysicsDemos.AlternateMovement.Character
 {

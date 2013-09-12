@@ -1,5 +1,4 @@
-﻿using System.Threading;
-using BEPUphysics;
+﻿using BEPUphysics;
 using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
 using BEPUutilities;
@@ -7,7 +6,6 @@ using BEPUphysics.NarrowPhaseSystems;
 using BEPUphysics.Threading;
 using BEPUphysics.UpdateableSystems.ForceFields;
 using BEPUphysicsDemos.SampleCode;
-using BEPUutilities;
 using System.Diagnostics;
 using System;
 

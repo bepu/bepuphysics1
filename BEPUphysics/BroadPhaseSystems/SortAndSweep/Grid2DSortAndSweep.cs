@@ -4,7 +4,6 @@ using BEPUphysics.Threading;
 using BEPUutilities;
 using BEPUutilities.DataStructures;
 using BEPUutilities.ResourceManagement;
-using BEPUutilities;
 
 namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
 {

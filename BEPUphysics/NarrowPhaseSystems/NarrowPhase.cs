@@ -195,13 +195,23 @@ namespace BEPUphysics.NarrowPhaseSystems
             }
         }
         /// <summary>
+        /// Gets the time used in scanning for out of date pairs.
+        /// </summary>
+        public double StaleOverlapRemovalTime
+        {
+            get
+            {
+                return (endStale - endPairs) / (double)Stopwatch.Frequency;
+            }
+        }
+        /// <summary>
         /// Gets the time used in flushing new pairs into the simulation.
         /// </summary>
         public double FlushNewPairsTime
         {
             get
             {
-                return (endFlushNew - endPairs) / (double)Stopwatch.Frequency;
+                return (endFlushNew - endStale) / (double)Stopwatch.Frequency;
             }
         }
         /// <summary>
@@ -215,16 +225,7 @@ namespace BEPUphysics.NarrowPhaseSystems
             }
         }
 
-        /// <summary>
-        /// Gets the time used in scanning for out of date pairs.
-        /// </summary>
-        public double StaleOverlapRemovalTime
-        {
-            get
-            {
-                return (endStale - endFlushSolverUpdateables) / (double)Stopwatch.Frequency;
-            }
-        }
+
         private long startPairs;
         private long endPairs;
         private long endFlushNew;
@@ -246,7 +247,15 @@ namespace BEPUphysics.NarrowPhaseSystems
             endPairs = Stopwatch.GetTimestamp();
 #endif
 
-            //The new narrow phase objects should be flushed before we get to the stale overlaps, or else the NeedsUpdate property might get into an invalid state.
+            //Remove stale objects BEFORE adding new objects. This ensures that simulation islands which will be activated 
+            //by new narrow phase pairs will not be momentarily considered stale.
+            //(The RemoveStale only considers islands that are active to be potentially stale.)
+            //If that happened, all the pairs would be remove and immediately recreated. Very wasteful!
+            RemoveStaleOverlaps();
+#if PROFILE
+            endStale = Stopwatch.GetTimestamp();
+#endif
+            //This sets NeedsUpdate to true for all new objects, ensuring that they are considered for staleness next time.
             AddNewNarrowPhaseObjects();
 
 #if PROFILE
@@ -259,12 +268,7 @@ namespace BEPUphysics.NarrowPhaseSystems
 #if PROFILE
             endFlushSolverUpdateables = Stopwatch.GetTimestamp();
 #endif
-            //By the time we get here, there's no more pending items in the queue, so the overlaps
-            //can be removed directly by the stale loop.
-            RemoveStaleOverlaps();
-#if PROFILE
-            endStale = Stopwatch.GetTimestamp();
-#endif
+
 
         }
 
@@ -284,8 +288,17 @@ namespace BEPUphysics.NarrowPhaseSystems
 #if PROFILE
             endPairs = Stopwatch.GetTimestamp();
 #endif
+            //Remove stale objects BEFORE adding new objects. This ensures that simulation islands which will be activated 
+            //by new narrow phase pairs will not be momentarily considered stale.
+            //(The RemoveStale only considers islands that are active to be potentially stale.)
+            //If that happened, all the pairs would be remove and immediately recreated. Very wasteful!
+            RemoveStaleOverlaps();
 
-            //The new narrow phase objects should be flushed before we get to the stale overlaps, or else the NeedsUpdate property might get into an invalid state.
+#if PROFILE
+            endStale = Stopwatch.GetTimestamp();
+#endif
+
+            //This sets NeedsUpdate to true for all new objects, ensuring that they are considered for staleness next time.
             AddNewNarrowPhaseObjects();
 
 #if PROFILE
@@ -299,13 +312,6 @@ namespace BEPUphysics.NarrowPhaseSystems
             endFlushSolverUpdateables = Stopwatch.GetTimestamp();
 #endif
 
-            //By the time we get here, there's no more pending items in the queue, so the overlaps
-            //can be removed directly by the stale loop.
-            RemoveStaleOverlaps();
-
-#if PROFILE
-            endStale = Stopwatch.GetTimestamp();
-#endif
 
         }
 
@@ -374,6 +380,11 @@ namespace BEPUphysics.NarrowPhaseSystems
             while (newNarrowPhasePairs.TryUnsafeDequeueFirst(out narrowPhaseObject))
             {
                 narrowPhasePairs.Add(narrowPhaseObject);
+                //Because this occurs AFTER a stale update, and because a new narrow phase object will have NeedsUpdate = false,
+                //set it to true here.
+                //This ensures that the pair will be removed by the stale remover in the next frame should it be necessary to do so.
+                //(If this wasn't set, it would only be removed 2 frames from now.)
+                narrowPhaseObject.NeedsUpdate = true;
                 OnCreatePair(narrowPhaseObject);
             }
         }

@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using BEPUutilities.DataStructures;
 using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.DeactivationManagement

@@ -5,7 +5,6 @@ using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using System.Collections.Generic;
 using BEPUphysics.CollisionShapes;
-using BEPUutilities;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.Materials;
 

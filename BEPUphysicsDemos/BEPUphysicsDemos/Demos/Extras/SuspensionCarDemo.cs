@@ -8,8 +8,7 @@ using BEPUphysics.Constraints.TwoEntity.Joints;
 using BEPUphysics.Constraints.TwoEntity.JointLimits;
 using Microsoft.Xna.Framework.Input;
 using System;
-using BEPUutilities;
-using ConversionHelper;
+
 namespace BEPUphysicsDemos.Demos.Extras
 {
     /// <summary>

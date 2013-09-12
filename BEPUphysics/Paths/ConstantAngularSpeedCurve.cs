@@ -1,7 +1,6 @@
 ﻿using BEPUutilities;
 
 
-using BEPUutilities;
 namespace BEPUphysics.Paths
 {
     /// <summary>

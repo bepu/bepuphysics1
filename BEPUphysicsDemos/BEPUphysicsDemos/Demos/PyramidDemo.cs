@@ -6,7 +6,7 @@ using BEPUutilities;
 namespace BEPUphysicsDemos.Demos
 {
     /// <summary>
-    /// Bunch of blocks arranged in a pyramid, waiting to be blown up.
+    /// Bunch of blocks arranged in a 2d pyramid, waiting to be blown up.
     /// </summary>
     public class PyramidDemo : StandardDemo
     {

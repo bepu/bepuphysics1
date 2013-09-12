@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using BEPUphysics.BroadPhaseEntries;
-using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.Entities;
- 
-using System.Collections.ObjectModel;
 using BEPUutilities.DataStructures;
 using BEPUutilities;
-using BEPUutilities.DataStructures;
 
 namespace BEPUphysics
 {
