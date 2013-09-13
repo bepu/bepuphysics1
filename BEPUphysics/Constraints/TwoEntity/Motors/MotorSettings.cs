@@ -59,7 +59,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
                 if (value != maximumForce)
                 {
                     maximumForce = value;
-                    WakeUpEntities();
+                    motor.ActivateInvolvedEntities();
                 }
             }
         }
@@ -77,24 +77,12 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
                 if (mode != value)
                 {
                     mode = value;
-                    WakeUpEntities();
+                    motor.ActivateInvolvedEntities();
                 }
             }
         }
 
-        internal void WakeUpEntities()
-        {
-            for (int i = 0; i < motor.involvedEntities.Count; i++)
-            {
-                if (motor.involvedEntities[i].isDynamic)
-                {
-                    //Only need to wake up one dynamic entity.  That will wake up the rest.
-                    //Wouldn't want to pointlessly force-wake a kinematic object.
-                    motor.involvedEntities[i].activityInformation.Activate();
-                    break;
-                }
-            }
-        }
+        
     }
 
     /// <summary>
@@ -239,7 +227,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
                 if (value != baseCorrectiveSpeed)
                 {
                     baseCorrectiveSpeed = value;
-                    motorSettings.WakeUpEntities();
+                    motorSettings.motor.ActivateInvolvedEntities();
                 }
             }
         }
@@ -264,7 +252,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
                     {
                         maxCorrectiveVelocitySquared = maxCorrectiveVelocity * maxCorrectiveVelocity;
                     }
-                    motorSettings.WakeUpEntities();
+                    motorSettings.motor.ActivateInvolvedEntities();
                 }
 
 
@@ -309,7 +297,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
                 if (goal != value)
                 {
                     goal = value;
-                    motorSettings.WakeUpEntities();
+                    motorSettings.motor.ActivateInvolvedEntities();
                 }
             }
         }
@@ -341,7 +329,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
                 if (goal != value)
                 {
                     goal = value;
-                    motorSettings.WakeUpEntities();
+                    motorSettings.motor.ActivateInvolvedEntities();
                 }
             }
         }
@@ -371,7 +359,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
                 if (goal != value)
                 {
                     goal = value;
-                    motorSettings.WakeUpEntities();
+                    motorSettings.motor.ActivateInvolvedEntities();
                 }
             }
         }
@@ -414,7 +402,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
                 if (softness != value)
                 {
                     softness = value;
-                    motorSettings.WakeUpEntities();
+                    motorSettings.motor.ActivateInvolvedEntities();
                 }
             }
         }
@@ -444,7 +432,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
                 if (value != goalVelocity)
                 {
                     goalVelocity = value;
-                    motorSettings.WakeUpEntities();
+                    motorSettings.motor.ActivateInvolvedEntities();
                 }
             }
         }
@@ -474,7 +462,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
                 if (value != goalVelocity)
                 {
                     goalVelocity = value;
-                    motorSettings.WakeUpEntities();
+                    motorSettings.motor.ActivateInvolvedEntities();
                 }
             }
         }

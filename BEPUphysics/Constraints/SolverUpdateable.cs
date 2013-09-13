@@ -20,7 +20,7 @@ namespace BEPUphysics.Constraints
         ///<summary>
         /// Gets the solver to which the solver updateable belongs.
         ///</summary>
-        public virtual Solver Solver
+        public virtual Solver Solver //Note: this is virtual because some child classes (SolverGroups) need to perform their own logic when a solver gets set.
         {
             get { return solver; }
             protected internal set { solver = value; }
@@ -82,7 +82,17 @@ namespace BEPUphysics.Constraints
         public bool IsActive
         {
             get { return isActive; }
-            set { isActive = value; }
+            set
+            {
+                if (value != isActive)
+                {
+                    //A constraint appearing or disappearing changes the constraint system.
+                    //Something that went to sleep because a constraint reached a rest state
+                    //could need to solve if the constraint turned on or off.
+                    ActivateInvolvedEntities();
+                    isActive = value;
+                }
+            }
         }
 
         protected internal bool isActiveInSolver = true;
@@ -96,6 +106,23 @@ namespace BEPUphysics.Constraints
             get
             {
                 return isActiveInSolver;
+            }
+        }
+
+        /// <summary>
+        /// Activates all entities involved with this solver updateable.
+        /// </summary>
+        public void ActivateInvolvedEntities()
+        {
+            for (int i = 0; i < involvedEntities.Count; i++)
+            {
+                if (involvedEntities[i].isDynamic)
+                {
+                    //Only need to wake up one dynamic entity.  That will wake up the rest.
+                    //Wouldn't want to pointlessly force-wake a kinematic object.
+                    involvedEntities[i].activityInformation.Activate();
+                    break;
+                }
             }
         }
 
