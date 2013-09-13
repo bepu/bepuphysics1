@@ -11,7 +11,7 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
     /// <summary>
     /// Keeps a character glued to the ground, if possible.
     /// </summary>
-    public class VerticalMotionConstraint : EntitySolverUpdateable
+    public class VerticalMotionConstraint : SolverUpdateable
     {
         SphereCharacterController character;
 

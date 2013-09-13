@@ -29,12 +29,12 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
     /// </summary>
     public abstract class MotorSettings
     {
-        internal EntitySolverUpdateable motor;
+        internal SolverUpdateable motor;
 
         internal float maximumForce = float.MaxValue;
         internal MotorMode mode = MotorMode.VelocityMotor;
 
-        internal MotorSettings(EntitySolverUpdateable motor)
+        internal MotorSettings(SolverUpdateable motor)
         {
             this.motor = motor;
         }
@@ -137,7 +137,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
         internal ServoSettings3D servo;
         internal VelocityMotorSettings3D velocityMotor;
 
-        internal MotorSettings3D(EntitySolverUpdateable motor)
+        internal MotorSettings3D(SolverUpdateable motor)
             : base(motor)
         {
             servo = new ServoSettings3D(this);
@@ -169,7 +169,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
         internal ServoSettingsOrientation servo;
         internal VelocityMotorSettings3D velocityMotor;
 
-        internal MotorSettingsOrientation(EntitySolverUpdateable motor)
+        internal MotorSettingsOrientation(SolverUpdateable motor)
             : base(motor)
         {
             servo = new ServoSettingsOrientation(this);

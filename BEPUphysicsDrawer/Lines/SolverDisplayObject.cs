@@ -1,4 +1,4 @@
-﻿using BEPUphysics.SolverSystems;
+﻿using BEPUphysics.Constraints;
 
 namespace BEPUphysicsDrawer.Lines
 {
@@ -6,7 +6,7 @@ namespace BEPUphysicsDrawer.Lines
     /// Line-based graphical representation of an object.
     /// </summary>
     /// <typeparam name="T">Type of the object to be displayed.</typeparam>
-    public abstract class SolverDisplayObject<T> : LineDisplayObject<T> where T:SolverUpdateable
+    public abstract class SolverDisplayObject<T> : LineDisplayObject<T> where T: SolverUpdateable
     {
         protected SolverDisplayObject(LineDrawer drawer, T lineObject)
             : base(drawer, lineObject)

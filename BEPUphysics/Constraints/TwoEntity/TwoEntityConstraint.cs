@@ -9,7 +9,7 @@ namespace BEPUphysics.Constraints.TwoEntity
     /// <summary>
     /// Abstract superclass of constraints involving two bodies.
     /// </summary>
-    public abstract class TwoEntityConstraint : EntitySolverUpdateable
+    public abstract class TwoEntityConstraint : SolverUpdateable
     {
         /// <summary>
         /// Entity that constraints connect to when they are given a null connection.

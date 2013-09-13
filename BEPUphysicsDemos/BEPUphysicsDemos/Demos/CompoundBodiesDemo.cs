@@ -21,7 +21,7 @@ namespace BEPUphysicsDemos.Demos
         {
 
             //Build the first body
-            var bodies = new List<CompoundShapeEntry>() 
+            var bodies = new List<CompoundShapeEntry>
             {
                 new CompoundShapeEntry(new SphereShape(.5f), new Vector3(0, 1, 0), 1),
                 new CompoundShapeEntry(new ConeShape(2, .5f), new Vector3(1, 1, 0), 1),
@@ -32,7 +32,7 @@ namespace BEPUphysicsDemos.Demos
 
 
             //Build the second body
-            bodies = new List<CompoundShapeEntry>() 
+            bodies = new List<CompoundShapeEntry>
             {
                 new CompoundShapeEntry(new BoxShape(1,1,1), new Vector3(0, 3, 0), 1),
                 new CompoundShapeEntry(new BoxShape(1,1,1), new Vector3(1, 3.5f, 0), 1),

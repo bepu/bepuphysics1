@@ -10,7 +10,7 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
     /// <summary>
     /// Manages the horizontal movement of a character.
     /// </summary>
-    public class HorizontalMotionConstraint : EntitySolverUpdateable
+    public class HorizontalMotionConstraint : SolverUpdateable
     {
         SphereCharacterController character;
 

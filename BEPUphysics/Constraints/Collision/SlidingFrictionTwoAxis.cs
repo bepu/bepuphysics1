@@ -10,7 +10,7 @@ namespace BEPUphysics.Constraints.Collision
     /// <summary>
     /// Computes the forces to slow down and stop sliding motion between two entities when centralized friction is active.
     /// </summary>
-    public class SlidingFrictionTwoAxis : EntitySolverUpdateable
+    public class SlidingFrictionTwoAxis : SolverUpdateable
     {
         private ConvexContactManifoldConstraint contactManifoldConstraint;
         ///<summary>

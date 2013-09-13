@@ -8,7 +8,7 @@ namespace BEPUphysics.Entities
     ///<summary>
     /// Convenience collection for easily scanning the two entity constraints connected to an entity.
     ///</summary>
-    public class EntitySolverUpdateableCollection : IEnumerable<EntitySolverUpdateable>
+    public class EntitySolverUpdateableCollection : IEnumerable<SolverUpdateable>
     {
         private RawList<SimulationIslandConnection> connections;
 
@@ -31,7 +31,7 @@ namespace BEPUphysics.Entities
             return new Enumerator(connections);
         }
 
-        IEnumerator<EntitySolverUpdateable> IEnumerable<EntitySolverUpdateable>.GetEnumerator()
+        IEnumerator<SolverUpdateable> IEnumerable<SolverUpdateable>.GetEnumerator()
         {
             return new Enumerator(connections);
         }
@@ -44,11 +44,11 @@ namespace BEPUphysics.Entities
         ///<summary>
         /// Enumerator for the EntityConstraintCollection.
         ///</summary>
-        public struct Enumerator : IEnumerator<EntitySolverUpdateable>
+        public struct Enumerator : IEnumerator<SolverUpdateable>
         {
             private RawList<SimulationIslandConnection> connections;
             private int index;
-            private EntitySolverUpdateable current;
+            private SolverUpdateable current;
 
             /// <summary>
             /// Constructs an enumerator for the solver updateables list.
@@ -67,7 +67,7 @@ namespace BEPUphysics.Entities
             /// <returns>
             /// The element in the collection at the current position of the enumerator.
             /// </returns>
-            public EntitySolverUpdateable Current
+            public SolverUpdateable Current
             {
                 get { return current; }
             }
@@ -98,7 +98,7 @@ namespace BEPUphysics.Entities
                 {
                     if (!connections.Elements[index].SlatedForRemoval)
                     {
-                        current = connections.Elements[index].Owner as EntitySolverUpdateable;
+                        current = connections.Elements[index].Owner as SolverUpdateable;
                         if (current != null)
                             return true;
                     }

@@ -216,7 +216,7 @@
     <Compile Include="Constraints\Collision\NonConvexContactManifoldConstraint.cs" />
     <Compile Include="Constraints\Collision\SlidingFrictionTwoAxis.cs" />
     <Compile Include="Constraints\Collision\TwistFrictionConstraint.cs" />
-    <Compile Include="Constraints\EntitySolverUpdateable.cs" />
+    <Compile Include="Constraints\SolverUpdateable.cs" />
     <Compile Include="Constraints\IJacobians.cs" />
     <Compile Include="Constraints\ISolverSettings.cs" />
     <Compile Include="Constraints\ISpringConstraint.cs" />
@@ -413,9 +413,8 @@
     <Compile Include="Settings\CollisionDetectionSettings.cs" />
     <Compile Include="Settings\CollisionResponseSettings.cs" />
     <Compile Include="Settings\MotionSettings.cs" />
-    <Compile Include="SolverSystems\Solver.cs" />
-    <Compile Include="SolverSystems\SolverUpdateable.cs" />
-    <Compile Include="SolverSystems\SolverUpdateableChange.cs" />
+    <Compile Include="Constraints\Solver.cs" />
+    <Compile Include="Constraints\SolverUpdateableChange.cs" />
     <Compile Include="Space.cs" />
     <Compile Include="BroadPhaseEntries\StaticMesh.cs" />
     <Compile Include="Threading\IThreadManager.cs" />
