@@ -67,6 +67,7 @@ namespace BEPUphysics.SolverSystems
             TimeStepSettings = timeStepSettings;
             DeactivationManager = deactivationManager;
             multithreadedPrestepDelegate = MultithreadedPrestep;
+            multithreadedExclusiveUpdateDelegate = MultithreadedExclusiveUpdate;
             multithreadedIterationDelegate = MultithreadedIteration;
             Enabled = true;
             PermutationMapper = new PermutationMapper();
@@ -147,7 +148,15 @@ namespace BEPUphysics.SolverSystems
                 updateable.SolverSettings.currentIterations = 0;
                 updateable.SolverSettings.iterationsAtZeroImpulse = 0;
                 updateable.Update(timeStepSettings.TimeStepDuration);
+            }
+        }
 
+        private Action<int> multithreadedExclusiveUpdateDelegate;
+        void MultithreadedExclusiveUpdate(int i)
+        {
+            var updateable = solverUpdateables.Elements[i];
+            if (updateable.isActiveInSolver)
+            {
                 updateable.EnterLock();
                 try
                 {
@@ -212,6 +221,9 @@ namespace BEPUphysics.SolverSystems
         protected override void UpdateMultithreaded()
         {
             ThreadManager.ForLoop(0, solverUpdateables.Count, multithreadedPrestepDelegate);
+            //By performing all velocity modifications after the prestep, the prestep is free to read velocities consistently.
+            //If the exclusive update was performed in the same call as the prestep, the velocities would enter inconsistent states based on update order.
+            ThreadManager.ForLoop(0, solverUpdateables.Count, multithreadedExclusiveUpdateDelegate);
             ++PermutationMapper.PermutationIndex;
             ThreadManager.ForLoop(0, iterationLimit * solverUpdateables.Count, multithreadedIterationDelegate);
         }
@@ -223,6 +235,13 @@ namespace BEPUphysics.SolverSystems
             for (int i = 0; i < totalUpdateableCount; i++)
             {
                 UnsafePrestep(solverUpdateables.Elements[i]);
+            }
+
+            //By performing all velocity modifications after the prestep, the prestep is free to read velocities consistently.
+            //If the exclusive update was performed in the same call as the prestep, the velocities would enter inconsistent states based on update order.
+            for (int i = 0; i < totalUpdateableCount; i++)
+            {
+                UnsafeExclusiveUpdate(solverUpdateables.Elements[i]);
             }
 
             int totalCount = iterationLimit * totalUpdateableCount;
@@ -244,10 +263,17 @@ namespace BEPUphysics.SolverSystems
                 solverSettings.currentIterations = 0;
                 solverSettings.iterationsAtZeroImpulse = 0;
                 updateable.Update(timeStepSettings.TimeStepDuration);
-                updateable.ExclusiveUpdate();
             }
         }
 
+        protected internal void UnsafeExclusiveUpdate(SolverUpdateable updateable)
+        {
+            if (updateable.isActiveInSolver)
+            {
+                updateable.ExclusiveUpdate();
+            }
+        }
+        
         protected internal void UnsafeSolveIteration(SolverUpdateable updateable)
         {
             if (updateable.isActiveInSolver)

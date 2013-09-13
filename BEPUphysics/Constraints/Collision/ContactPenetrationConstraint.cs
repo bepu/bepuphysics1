@@ -1,5 +1,4 @@
 ﻿using BEPUphysics.Entities;
- 
 using BEPUphysics.CollisionTests;
 using BEPUphysics.Settings;
 using BEPUutilities;
@@ -181,7 +180,7 @@ namespace BEPUphysics.Constraints.Collision
             //To counteract this, scale the softness value based on the effective mass felt by the constraint.
             //Larger effective masses should correspond to smaller softnesses so that the spring has the same positional behavior.
             //Fortunately, we're already computing the necessary values: the raw, unsoftened effective mass inverse shall be used to compute the softness.
-    
+
             float effectiveMassInverse = entryA + entryB;
             softness = CollisionResponseSettings.Softness * effectiveMassInverse;
             velocityToImpulse = -1 / (softness + effectiveMassInverse);
@@ -198,9 +197,14 @@ namespace BEPUphysics.Constraints.Collision
                 if (contactManifoldConstraint.materialInteraction.Bounciness > 0)
                 {
                     //Target a velocity which includes a portion of the incident velocity.
-                    float relativeVelocity = -RelativeVelocity;
-                    if (relativeVelocity > CollisionResponseSettings.BouncinessVelocityThreshold)
-                        bias = MathHelper.Max(relativeVelocity * contactManifoldConstraint.materialInteraction.Bounciness, bias);
+                    float bounceVelocity = -RelativeVelocity;
+                    if (bounceVelocity > 0)
+                    {
+                        var lowThreshold = CollisionResponseSettings.BouncinessVelocityThreshold * 0.3f;
+                        var velocityFraction = MathHelper.Clamp((bounceVelocity - lowThreshold) / (CollisionResponseSettings.BouncinessVelocityThreshold - lowThreshold + Toolbox.Epsilon), 0, 1);
+                        var bouncinessVelocity = velocityFraction * bounceVelocity * contactManifoldConstraint.materialInteraction.Bounciness;
+                        bias = MathHelper.Max(bouncinessVelocity, bias);
+                    }
                 }
             }
             else
@@ -212,7 +216,7 @@ namespace BEPUphysics.Constraints.Collision
                 //This implementation is going to ignore bounciness for now.
                 //Since it's not being used for CCD, these negative-depth contacts
                 //only really occur in situations where no bounce should occur.
-                
+
                 //if (contactManifoldConstraint.materialInteraction.Bounciness > 0)
                 //{
                 //    //Target a velocity which includes a portion of the incident velocity.
@@ -223,7 +227,7 @@ namespace BEPUphysics.Constraints.Collision
                 //        bias = relativeVelocity * contactManifoldConstraint.materialInteraction.Bounciness + bias;
                 //}
             }
- 
+
 
         }
 
@@ -280,7 +284,7 @@ namespace BEPUphysics.Constraints.Collision
             float previousAccumulatedImpulse = accumulatedImpulse;
             accumulatedImpulse = MathHelper.Max(0, accumulatedImpulse + lambda);
             lambda = accumulatedImpulse - previousAccumulatedImpulse;
- 
+
 
             //Apply the impulse
 #if !WINDOWS

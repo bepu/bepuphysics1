@@ -188,7 +188,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     effectiveMass += supportForceFactor * (effectiveMassContribution + supportEntity.InverseMass);
                 }
             }
-            effectiveMass = 1 / effectiveMass;
+            effectiveMass = 1f / effectiveMass;
             //So much nicer and shorter than the horizontal constraint!
 
         }
