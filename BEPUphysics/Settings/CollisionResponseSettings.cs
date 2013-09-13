@@ -6,7 +6,7 @@
     public static class CollisionResponseSettings
     {
         /// <summary>
-        /// Impact velocity above which the bouciness of the object pair is taken into account.  Below the threshold, no extra energy is added.
+        /// Impact velocity above which the full bounciness of a material pair is taken into account.  Below the threshold, the extra energy introduced by the bounce is reduced. The lower the velocity is relative to the threshold, the lower the effective bounciness.
         /// Defaults to 1.
         /// </summary>
         public static float BouncinessVelocityThreshold = 1;
