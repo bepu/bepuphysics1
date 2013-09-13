@@ -15,7 +15,7 @@
         /// Adds a new solver updateable to the solver group.
         /// </summary>
         /// <param name="solverUpdateable">Solver updateable to add.</param>
-        public new void Add(EntitySolverUpdateable solverUpdateable)
+        public new void Add(SolverUpdateable solverUpdateable)
         {
             base.Add(solverUpdateable);
         }
@@ -24,7 +24,7 @@
         /// Removes a solver updateable from the solver group.
         /// </summary>
         /// <param name="solverUpdateable">Solver updateable to remove.</param>
-        public new void Remove(EntitySolverUpdateable solverUpdateable)
+        public new void Remove(SolverUpdateable solverUpdateable)
         {
             base.Remove(solverUpdateable);
         }

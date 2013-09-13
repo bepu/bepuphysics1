@@ -152,7 +152,7 @@ namespace BEPUphysicsDemos.Demos.Extras
             segment = new Cylinder(segmentPosition, treadSegmentDescription.Width, treadSegmentDescription.Radius, treadSegmentDescription.Mass);
 
             segment.Material.KineticFriction = treadSegmentDescription.Friction;
-            segment.Material.StaticFriction = treadSegmentDescription.Friction * 10;
+            segment.Material.StaticFriction = treadSegmentDescription.Friction;
             segment.Orientation = Quaternion.CreateFromAxisAngle(Vector3.Forward, MathHelper.PiOver2);
 
             //Preventing the occasional pointless collision pair can speed things up.

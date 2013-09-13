@@ -24,13 +24,13 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         /// Called when a child attempts to add a solver updateable to the solver.
         ///</summary>
         ///<param name="addedItem">Item to add.</param>
-        void AddSolverUpdateable(EntitySolverUpdateable addedItem);
+        void AddSolverUpdateable(SolverUpdateable addedItem);
 
 
         ///<summary>
         /// Called when a child attempts to remove a solver updateable from the solver.
         ///</summary>
         ///<param name="removedItem">Item to remove.</param>
-        void RemoveSolverUpdateable(EntitySolverUpdateable removedItem);
+        void RemoveSolverUpdateable(SolverUpdateable removedItem);
     }
 }

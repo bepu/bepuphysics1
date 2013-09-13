@@ -27,7 +27,7 @@ namespace BEPUphysics.Constraints.Collision
         /// Adds a constraint to the group.
         ///</summary>
         ///<param name="manifoldConstraint">Constraint to add.</param>
-        public new void Add(EntitySolverUpdateable manifoldConstraint)
+        public new void Add(SolverUpdateable manifoldConstraint)
         {
             //This is a similar process to a normal solver group.
             //However, it does not attempt to change involved entities.
@@ -58,7 +58,7 @@ namespace BEPUphysics.Constraints.Collision
         /// Removes a constraint from the group.
         ///</summary>
         ///<param name="manifoldConstraint">Constraint to remove.</param>
-        public new void Remove(EntitySolverUpdateable manifoldConstraint)
+        public new void Remove(SolverUpdateable manifoldConstraint)
         {
             //This is a similar process to a normal solver group.
             //However, it does not attempt to change involved entities.

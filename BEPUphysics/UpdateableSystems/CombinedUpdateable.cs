@@ -6,7 +6,7 @@ namespace BEPUphysics.UpdateableSystems
     ///<summary>
     /// A class which is both a space updateable and a Solver Updateable.
     ///</summary>
-    public abstract class CombinedUpdateable : EntitySolverUpdateable, ISpaceUpdateable
+    public abstract class CombinedUpdateable : SolverUpdateable, ISpaceUpdateable
     {
         private bool isSequentiallyUpdated = true;
 

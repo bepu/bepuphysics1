@@ -1,11 +1,10 @@
 ﻿using System;
 using BEPUphysics.DeactivationManagement;
 using BEPUphysics.Threading;
-using BEPUphysics.Constraints;
 using BEPUutilities;
 using BEPUutilities.DataStructures;
 
-namespace BEPUphysics.SolverSystems
+namespace BEPUphysics.Constraints
 {
     ///<summary>
     /// Iteratively solves solver updateables, converging to a solution for simulated joints and collision pair contact constraints.
@@ -273,7 +272,7 @@ namespace BEPUphysics.SolverSystems
                 updateable.ExclusiveUpdate();
             }
         }
-        
+
         protected internal void UnsafeSolveIteration(SolverUpdateable updateable)
         {
             if (updateable.isActiveInSolver)

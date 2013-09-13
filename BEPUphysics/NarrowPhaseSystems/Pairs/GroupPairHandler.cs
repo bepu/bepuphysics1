@@ -267,7 +267,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         }
 
 
-        void IPairHandlerParent.AddSolverUpdateable(EntitySolverUpdateable addedItem)
+        void IPairHandlerParent.AddSolverUpdateable(SolverUpdateable addedItem)
         {
 
             manifoldConstraintGroup.Add(addedItem);
@@ -282,7 +282,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
 
         }
 
-        void IPairHandlerParent.RemoveSolverUpdateable(EntitySolverUpdateable removedItem)
+        void IPairHandlerParent.RemoveSolverUpdateable(SolverUpdateable removedItem)
         {
 
             manifoldConstraintGroup.Remove(removedItem);

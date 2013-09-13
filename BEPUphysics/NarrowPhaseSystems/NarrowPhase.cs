@@ -4,13 +4,8 @@ using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.Constraints;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
-using BEPUphysics.SolverSystems;
 using BEPUphysics.Threading;
-using BEPUutilities;
 using BEPUphysics.CollisionRuleManagement;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
-using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.NarrowPhaseSystems
@@ -474,14 +469,14 @@ namespace BEPUphysics.NarrowPhaseSystems
                     //It is technically possible for a constraint to be added twice, if certain systems interfere.
                     //The character controller is one such system.
                     //We should check the new constraint's solver status before adding it here.
-                    if (change.Item.solver == null)
+                    if (change.Item.Solver == null)
                     {
                         Solver.Add(change.Item);
                     }
                 }
                 else
                 {
-                    if (change.Item.solver != null)
+                    if (change.Item.Solver != null)
                     {
                         Solver.Remove(change.Item);
                     }

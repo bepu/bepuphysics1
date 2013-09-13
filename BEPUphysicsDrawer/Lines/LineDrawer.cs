@@ -192,7 +192,7 @@ namespace BEPUphysicsDrawer.Lines
             {
                 //Solver groups are special.  If no special type-specific display object 
                 //has been registered for a solver group, add every child individually.
-                foreach (EntitySolverUpdateable item in (o as SolverGroup).SolverUpdateables)
+                foreach (SolverUpdateable item in (o as SolverGroup).SolverUpdateables)
                 {
                     LineDisplayObjectBase objectAdded = Add(item);
                     if (objectAdded != null)
