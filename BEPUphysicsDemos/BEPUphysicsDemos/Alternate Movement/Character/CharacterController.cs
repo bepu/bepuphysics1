@@ -475,6 +475,17 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
                 //Try to step!
                 Vector3 newPosition;
+                //Note: downstepping is often not required.
+                //It's only really there for games that expect to be able to run down stairs at 40 miles an hour without zipping off into the void.
+                //Most of the time, you can just comment out downstepping, and so long as the character is running at a reasonable speed,
+                //gravity will do the work.
+                
+                //If your game would work without teleportation-based downstepping, it's probably a good idea to comment it out.
+                //Downstepping can be fairly expensive.
+
+                //You can also avoid doing upstepping by fattening up the character's margin, turning it into more of a capsule.
+                //Instead of teleporting up steps, it would slide up.
+                //Without teleportation-based upstepping, steps usually need to be quite a bit smaller (i.e. fairly normal sized, instead of 2 feet tall).
                 if (StepManager.TryToStepDown(out newPosition) ||
                     StepManager.TryToStepUp(out newPosition))
                 {

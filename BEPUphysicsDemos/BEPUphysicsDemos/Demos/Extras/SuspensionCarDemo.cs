@@ -91,7 +91,7 @@ namespace BEPUphysicsDemos.Demos.Extras
         {
             var wheel = new Cylinder(body.Position + wheelOffset, .2f, .5f, 5f);
             wheel.Material.KineticFriction = 2.5f;
-            wheel.Material.StaticFriction = 2.5f;
+            wheel.Material.StaticFriction = 3.5f;
             wheel.Orientation = Quaternion.CreateFromAxisAngle(Vector3.Forward, MathHelper.PiOver2);
 
             //Preventing the occasional pointless collision pair can speed things up.
@@ -119,9 +119,9 @@ namespace BEPUphysicsDemos.Demos.Extras
 
         Entity AddDriveWheel(Vector3 wheelOffset, Entity body, out RevoluteMotor drivingMotor, out RevoluteMotor steeringMotor)
         {
-            var wheel = new Cylinder(body.Position + wheelOffset, .2f, .5f, 5f);
+            var wheel = new Cylinder(body.Position + wheelOffset, .4f, .5f, 5f);
             wheel.Material.KineticFriction = 2.5f;
-            wheel.Material.StaticFriction = 2.5f;
+            wheel.Material.StaticFriction = 3.5f;
             wheel.Orientation = Quaternion.CreateFromAxisAngle(Vector3.Forward, MathHelper.PiOver2);
 
             //Preventing the occasional pointless collision pair can speed things up.
@@ -138,10 +138,6 @@ namespace BEPUphysicsDemos.Demos.Extras
             suspensionSpring.Settings.Servo.SpringSettings.DampingConstant = 70;
 
             var swivelHingeAngularJoint = new SwivelHingeAngularJoint(body, wheel, Vector3.Up, Vector3.Right);
-            //Make the swivel hinge extremely rigid.  There are going to be extreme conditions when the wheels get up to speed;
-            //we don't want the forces involved to torque the wheel off the frame!
-            swivelHingeAngularJoint.SpringSettings.DampingConstant *= 1000;
-            swivelHingeAngularJoint.SpringSettings.StiffnessConstant *= 1000;
             //Motorize the wheel.
             drivingMotor = new RevoluteMotor(body, wheel, Vector3.Left);
             drivingMotor.Settings.VelocityMotor.Softness = .3f;
@@ -170,11 +166,7 @@ namespace BEPUphysicsDemos.Demos.Extras
             steeringMotor.Basis.SetWorldAxes(Vector3.Up, Vector3.Right);
             steeringMotor.TestAxis = Vector3.Right;
 
-            //Disable the steering motor's spring effects.  Set it to maximum rigidity (0 softness)
-            //and use the base corrective speed to control its direction.
-            steeringMotor.Settings.Servo.SpringSettings.Advanced.UseAdvancedSettings = true;
-            steeringMotor.Settings.Servo.SpringSettings.Advanced.Softness = 0;
-            steeringMotor.Settings.Servo.SpringSettings.Advanced.ErrorReductionFactor = 0f;
+            steeringMotor.Settings.Servo.BaseCorrectiveSpeed = 5;
 
 
             //The revolute motor is weaker than some other types of constraints and maintaining a goal in the presence of extremely fast rotation and integration issues.
@@ -205,10 +197,6 @@ namespace BEPUphysicsDemos.Demos.Extras
 
         public override void Update(float dt)
         {
-            //Scale the corrective velocity by the wheel angular velocity to compensate for a long time step duration.
-            //If the simulation is running at a fast time step, this is probably not necessary.
-            steeringMotor1.Settings.Servo.BaseCorrectiveSpeed = 3 + 7 * Math.Min(steeringMotor1.ConnectionB.AngularVelocity.Length() / 100, 1);
-            steeringMotor2.Settings.Servo.BaseCorrectiveSpeed = 3 + 7 * Math.Min(steeringMotor2.ConnectionB.AngularVelocity.Length() / 100, 1);
 
             if (Game.KeyboardInput.IsKeyDown(Keys.NumPad8))
             {

@@ -45,7 +45,7 @@ namespace BEPUphysics.CollisionTests
                 else
                 {
                     //Depth refresh:
-                    //Find deviation (IE, (Ra-Rb)*N) and add to base depth.
+                    //Find deviation ((Ra-Rb)*N) and add to base depth.
                     Vector3.Dot(ref ab, ref contacts.Elements[k].Normal, out dot);
                     contacts.Elements[k].PenetrationDepth = data.BasePenetrationDepth - dot;
                     if (contacts.Elements[k].PenetrationDepth < -CollisionDetectionSettings.maximumContactDistance)

@@ -4,6 +4,7 @@ using BEPUphysics.Constraints;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.Materials;
 using BEPUphysics.Settings;
+using BEPUphysicsDemos.AlternateMovement.Character;
 using BEPUutilities;
 using Microsoft.Xna.Framework.Input;
 
@@ -24,7 +25,7 @@ namespace BEPUphysicsDemos.Demos.Extras
             float boxSize = 1f;
             int bottomBoxCount = 10;
 
-            var ground = new Box(new Vector3(0, -.5f, 0), bottomBoxCount * boxSize + 40, 1, 40);
+            var ground = new Box(new Vector3(0, -.5f, 0), 40, 1, 40);
             Space.Add(ground);
 
             float spacing = 0.05f;
@@ -55,8 +56,6 @@ namespace BEPUphysicsDemos.Demos.Extras
                     }
                 }
             }
-
-
 
             game.Camera.Position = new Vector3(-bottomBoxCount * boxSize, 2, bottomBoxCount * boxSize);
             game.Camera.Yaw((float)Math.PI / -4f);

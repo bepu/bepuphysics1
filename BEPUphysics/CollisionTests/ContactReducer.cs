@@ -182,6 +182,8 @@ namespace BEPUphysics.CollisionTests
 
         }
 
+        
+
 
         //This works in the specific case of 4 contacts and 1 contact candidate.
         ///<summary>
@@ -197,20 +199,7 @@ namespace BEPUphysics.CollisionTests
             if (contacts.Count != 4)
                 throw new ArgumentException("Can only use this method to reduce contact lists with four contacts and a contact candidate.");
 
-            //addCandidate = true;
-            //float min = float.MaxValue;
-            //int minIndex = 3;
-            //for (int i = 0; i < 4; i++)
-            //{
-            //    if (contacts.Elements[i].PenetrationDepth < min)
-            //    {
-            //        min = contacts.Elements[i].PenetrationDepth;
-            //        minIndex = i;
-            //    }
-            //}
-            //toRemove.Add(minIndex);
-            //return;
-
+            
             //Find the deepest point of all contacts/candidates, as well as a compounded 'normal' vector.
             float maximumDepth = -float.MaxValue;
             int deepestIndex = -1;

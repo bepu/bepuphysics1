@@ -58,10 +58,10 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         }
         float maximumForce;
 
-        float supportForceFactor = 1;
+        float supportForceFactor = 1f;
         /// <summary>
         /// Gets or sets the scaling factor of forces applied to the supporting object if it is a dynamic entity.
-        /// Low values (below 1) reduce the amount of motion imparted to the support object; it acts 'heavier' as far as horizontal motion is concerned.
+        /// Low values (below 1) reduce the amount of motion imparted to the support object; it acts 'heavier' as far as vertical motion is concerned.
         /// High values (above 1) increase the force applied to support objects, making them appear lighter.
         /// </summary>
         public float SupportForceFactor
@@ -78,6 +78,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             }
         }
 
+        
         /// <summary>
         /// Gets the effective mass felt by the constraint.
         /// </summary>
@@ -170,7 +171,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
             linearJacobianA = supportData.Normal;
             Vector3.Negate(ref linearJacobianA, out linearJacobianB);
-            effectiveMass = character.Body.InverseMass;
+            float inverseEffectiveMass = character.Body.InverseMass;
             if (supportEntity != null)
             {
                 Vector3 offsetB = supportData.Position - supportEntity.Position;
@@ -185,10 +186,10 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     float effectiveMassContribution;
                     Vector3.Dot(ref angularComponentB, ref angularJacobianB, out effectiveMassContribution);
 
-                    effectiveMass += supportForceFactor * (effectiveMassContribution + supportEntity.InverseMass);
+                    inverseEffectiveMass += supportForceFactor * (effectiveMassContribution + supportEntity.InverseMass);
                 }
             }
-            effectiveMass = 1f / effectiveMass;
+            effectiveMass = 1f / (inverseEffectiveMass);
             //So much nicer and shorter than the horizontal constraint!
 
         }

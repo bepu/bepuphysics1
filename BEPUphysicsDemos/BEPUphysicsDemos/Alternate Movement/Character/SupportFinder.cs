@@ -91,7 +91,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     //No support contacts; fall back to the raycast result...
                     if (SupportRayData != null)
                     {
-                        return new SupportData()
+                        return new SupportData
                         {
                             Position = SupportRayData.Value.HitData.Location,
                             Normal = SupportRayData.Value.HitData.Normal,

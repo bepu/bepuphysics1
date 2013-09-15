@@ -98,7 +98,7 @@ namespace BEPUphysicsDemos.Demos.Extras
 
             var wheel = new Cylinder(suspensionLeg.Position + new Vector3(leftSide ? -horizontalWheelOffset : horizontalWheelOffset, -suspensionLeg.HalfHeight, 0), .2f, .3f, 5f);
             wheel.Material.KineticFriction = 2.5f;
-            wheel.Material.StaticFriction = 2.5f;
+            wheel.Material.StaticFriction = 3.5f;
             wheel.Orientation = Quaternion.CreateFromAxisAngle(Vector3.Forward, MathHelper.PiOver2);
 
             //Preventing the occasional pointless collision pair can speed things up.
@@ -136,7 +136,7 @@ namespace BEPUphysicsDemos.Demos.Extras
 
             var wheel = new Cylinder(suspensionLeg.Position + new Vector3(leftSide ? -horizontalWheelOffset : horizontalWheelOffset, -suspensionLeg.HalfHeight, 0), .2f, .3f, 5f);
             wheel.Material.KineticFriction = 2.5f;
-            wheel.Material.StaticFriction = 2.5f;
+            wheel.Material.StaticFriction = 3.5f;
             wheel.Orientation = Quaternion.CreateFromAxisAngle(Vector3.Forward, MathHelper.PiOver2);
 
             //Preventing the occasional pointless collision pair can speed things up.
@@ -180,11 +180,9 @@ namespace BEPUphysicsDemos.Demos.Extras
             steeringMotor.Basis.SetWorldAxes(Vector3.Up, Vector3.Right);
             steeringMotor.TestAxis = Vector3.Right;
 
-            //Disable the steering motor's spring effects.  Set it to maximum rigidity (0 softness)
-            //and use the base corrective speed to control its direction.
-            steeringMotor.Settings.Servo.SpringSettings.Advanced.UseAdvancedSettings = true;
-            steeringMotor.Settings.Servo.SpringSettings.Advanced.Softness = 0;
-            steeringMotor.Settings.Servo.SpringSettings.Advanced.ErrorReductionFactor = 0f;
+            //To make the steering a little more responsive, set a base speed at which error gets corrected.
+            //This works on top of the default error reduction implied by the constraint's spring constants.
+            steeringMotor.Settings.Servo.BaseCorrectiveSpeed = 1;
 
 
             //The revolute motor is weaker than some other types of constraints and maintaining a goal in the presence of extremely fast rotation and integration issues.
@@ -223,10 +221,6 @@ namespace BEPUphysicsDemos.Demos.Extras
 
         public override void Update(float dt)
         {
-            //Scale the corrective velocity by the wheel angular velocity to compensate for a long time step duration.
-            //If the simulation is running at a fast time step, this is probably not necessary.
-            steeringMotor1.Settings.Servo.BaseCorrectiveSpeed = 3 + 7 * Math.Min(steeringMotor1.ConnectionB.AngularVelocity.Length() / 100, 1);
-            steeringMotor2.Settings.Servo.BaseCorrectiveSpeed = 3 + 7 * Math.Min(steeringMotor2.ConnectionB.AngularVelocity.Length() / 100, 1);
 
             if (Game.KeyboardInput.IsKeyDown(Keys.NumPad8))
             {
