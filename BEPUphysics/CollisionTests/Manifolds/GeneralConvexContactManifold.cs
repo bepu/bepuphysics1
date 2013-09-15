@@ -79,7 +79,21 @@ namespace BEPUphysics.CollisionTests.Manifolds
             ContactData contact;
             if (pairTester.GenerateContactCandidate(out contact))
             {
+                //Eliminate any old contacts which have normals which would fight with this new contact.
+                for (int i = 0; i < contacts.Count; ++i)
+                {
+                    float normalDot;
+                    Vector3.Dot(ref contacts.Elements[i].Normal, ref contact.Normal, out normalDot);
+                    if (normalDot < 0)
+                    {
+                        Remove(i);
+                        break;
+                    }
+                }
 
+                //If a contact is unique, add it to the manifold separately.
+                //If it is redundant, it will be used to update an existing contact... within the IsContactUnique call.
+                //In other words: THIS FUNCTION HAS IMPORTANT SNEAKY SIDE EFFECTS.
                 if (IsContactUnique(ref contact))
                 {
                     //Check if adding the new contact would overflow the manifold.

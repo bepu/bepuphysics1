@@ -121,6 +121,7 @@
     <Compile Include="Demos\ColosseumDemo.cs" />
     <Compile Include="Demos\CompoundBodiesDemo.cs" />
     <Compile Include="Demos\EntityConstructionDemo.cs" />
+    <Compile Include="Demos\Extras\Tests\PersistentManifoldStressTestDemo.cs" />
     <Compile Include="Demos\Extras\SolidPyramidDemo.cs" />
     <Compile Include="Demos\Extras\TankDemo.cs" />
     <Compile Include="Demos\Extras\SuspensionCarDemo2.cs" />
