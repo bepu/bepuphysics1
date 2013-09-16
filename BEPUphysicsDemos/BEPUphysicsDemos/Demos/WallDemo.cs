@@ -20,7 +20,7 @@ namespace BEPUphysicsDemos.Demos
             float blockWidth = 2f;
             float blockHeight = 1f;
             float blockLength = 1f;
-
+            
             for (int i = 0; i < width; i++)
             {
                 for (int j = 0; j < height; j++)

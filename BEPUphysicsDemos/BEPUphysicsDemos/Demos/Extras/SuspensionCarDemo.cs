@@ -89,7 +89,7 @@ namespace BEPUphysicsDemos.Demos.Extras
 
         void AddBackWheel(Vector3 wheelOffset, Entity body)
         {
-            var wheel = new Cylinder(body.Position + wheelOffset, .2f, .5f, 5f);
+            var wheel = new Cylinder(body.Position + wheelOffset, .4f, .5f, 5f);
             wheel.Material.KineticFriction = 2.5f;
             wheel.Material.StaticFriction = 3.5f;
             wheel.Orientation = Quaternion.CreateFromAxisAngle(Vector3.Forward, MathHelper.PiOver2);

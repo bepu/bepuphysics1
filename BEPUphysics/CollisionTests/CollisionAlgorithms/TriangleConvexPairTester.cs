@@ -729,7 +729,9 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 }
 
                 //Compute the actual depth of the contact.
-                MPRToolbox.LocalSurfaceCast(convex, triangle, ref Toolbox.RigidIdentity, ref contact.Normal, out contact.PenetrationDepth, out triangleNormal); //Trash the 'corrected' normal.  We want to use the spherical normal.
+                //This is conservative; the minimum radius is guaranteed to be no larger than the shape itself.
+                //But that's ok- this is strictly a deep contact protection scheme. Other contacts will make the objects separate.
+                contact.PenetrationDepth = convex.minimumRadius - length; 
                 contact.Id = -1;
                 return true;
             }
