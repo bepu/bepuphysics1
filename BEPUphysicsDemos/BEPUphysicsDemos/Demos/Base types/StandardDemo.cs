@@ -60,6 +60,7 @@ namespace BEPUphysicsDemos.Demos
             Space.Add(grabber);
             Space.Add(kapow);
 
+
             //IMPORTANT PERFORMANCE NOTE:
             //  BEPUphysics uses an iterative system to solve constraints.  You can tell it to do more or less iterations.
             //  Less iterations is faster; more iterations makes the result more accurate.
