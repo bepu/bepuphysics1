@@ -8,7 +8,7 @@ using BEPUphysics.EntityStateManagement;
 using BEPUphysics.OtherSpaceStages;
 using BEPUphysics.PositionUpdating;
 using BEPUphysics.Settings;
- 
+
 using BEPUutilities;
 using BEPUphysics.Materials;
 using BEPUphysics.CollisionShapes;
@@ -35,9 +35,10 @@ namespace BEPUphysics.Entities
         internal Quaternion orientation = Quaternion.Identity;
         internal Matrix3x3 orientationMatrix = Matrix3x3.Identity;
         internal Vector3 linearVelocity;
-        internal Vector3 linearMomentum;
         internal Vector3 angularVelocity;
+#if CONSERVE
         internal Vector3 angularMomentum;
+#endif
         internal bool isDynamic;
 
 
@@ -137,11 +138,13 @@ namespace BEPUphysics.Entities
             set
             {
                 angularVelocity = value;
+                MathChecker.Validate(angularVelocity);
+#if CONSERVE
                 Matrix3x3.Transform(ref value, ref inertiaTensor, out angularMomentum);
+                MathChecker.Validate(angularMomentum);
+#endif
                 activityInformation.Activate();
 
-                MathChecker.Validate(angularVelocity);
-                MathChecker.Validate(angularMomentum);
             }
         }
         /// <summary>
@@ -151,23 +154,24 @@ namespace BEPUphysics.Entities
         {
             get
             {
-                if (MotionSettings.ConserveAngularMomentum)
-                    return angularMomentum;
-                else
-                {
-                    Vector3 v;
-                    Matrix3x3.Transform(ref angularVelocity, ref inertiaTensor, out v);
-                    return v;
-                }
+#if CONSERVE
+                return angularMomentum;
+#else
+                Vector3 v;
+                Matrix3x3.Transform(ref angularVelocity, ref inertiaTensor, out v);
+                return v;
+#endif
             }
             set
             {
+#if CONSERVE
                 angularMomentum = value;
+                MathChecker.Validate(angularMomentum);
+#else
                 Matrix3x3.Transform(ref value, ref inertiaTensorInverse, out angularVelocity);
                 activityInformation.Activate();
-
+#endif
                 MathChecker.Validate(angularVelocity);
-                MathChecker.Validate(angularMomentum);
             }
         }
         /// <summary>
@@ -182,11 +186,9 @@ namespace BEPUphysics.Entities
             set
             {
                 linearVelocity = value;
-                Vector3.Multiply(ref linearVelocity, mass, out linearMomentum);
                 activityInformation.Activate();
 
                 MathChecker.Validate(linearVelocity);
-                MathChecker.Validate(linearMomentum);
             }
         }
         /// <summary>
@@ -196,16 +198,16 @@ namespace BEPUphysics.Entities
         {
             get
             {
-                return linearMomentum;
+                Vector3 momentum;
+                Vector3.Multiply(ref linearVelocity, mass, out momentum);
+                return momentum;
             }
             set
             {
-                linearMomentum = value;
-                Vector3.Multiply(ref linearMomentum, inverseMass, out linearVelocity);
+                Vector3.Multiply(ref value, inverseMass, out linearVelocity);
                 activityInformation.Activate();
 
                 MathChecker.Validate(linearVelocity);
-                MathChecker.Validate(linearMomentum);
             }
         }
         /// <summary>
@@ -772,18 +774,14 @@ namespace BEPUphysics.Entities
             //Some XNA math methods support SIMD on the phone.
             //This would most likely be inlined on the PC anyway, but the XBOX360 is a questionmark.
             //Just inline those platforms manually.
-            Vector3.Add(ref linearMomentum, ref impulse, out linearMomentum);
-            Vector3.Multiply(ref linearMomentum, inverseMass, out linearVelocity);
+            Vector3.Multiply(ref impulse, inverseMass, out velocityChange);
+            Vector3.Add(ref velocityChange, ref linearVelocity, out linearVelocity);
 #else
-            linearMomentum.X += impulse.X;
-            linearMomentum.Y += impulse.Y;
-            linearMomentum.Z += impulse.Z;
-            linearVelocity.X = linearMomentum.X * inverseMass;
-            linearVelocity.Y = linearMomentum.Y * inverseMass;
-            linearVelocity.Z = linearMomentum.Z * inverseMass;
+            linearVelocity.X += impulse.X * inverseMass;
+            linearVelocity.Y += impulse.Y * inverseMass;
+            linearVelocity.Z += impulse.Z * inverseMass;
 #endif
             MathChecker.Validate(linearVelocity);
-            MathChecker.Validate(linearMomentum);
 
         }
         /// <summary>
@@ -796,24 +794,22 @@ namespace BEPUphysics.Entities
         public void ApplyAngularImpulse(ref Vector3 impulse)
         {
             //There's some room here for SIMD-friendliness.  However, since the phone doesn't accelerate non-XNA types, the matrix3x3 operations don't gain much.
+#if CONSERVE
             angularMomentum.X += impulse.X;
             angularMomentum.Y += impulse.Y;
             angularMomentum.Z += impulse.Z;
-            if (MotionSettings.ConserveAngularMomentum)
-            {
-                angularVelocity.X = angularMomentum.X * inertiaTensorInverse.M11 + angularMomentum.Y * inertiaTensorInverse.M21 + angularMomentum.Z * inertiaTensorInverse.M31;
-                angularVelocity.Y = angularMomentum.X * inertiaTensorInverse.M12 + angularMomentum.Y * inertiaTensorInverse.M22 + angularMomentum.Z * inertiaTensorInverse.M32;
-                angularVelocity.Z = angularMomentum.X * inertiaTensorInverse.M13 + angularMomentum.Y * inertiaTensorInverse.M23 + angularMomentum.Z * inertiaTensorInverse.M33;
-            }
-            else
-            {
-                angularVelocity.X += impulse.X * inertiaTensorInverse.M11 + impulse.Y * inertiaTensorInverse.M21 + impulse.Z * inertiaTensorInverse.M31;
-                angularVelocity.Y += impulse.X * inertiaTensorInverse.M12 + impulse.Y * inertiaTensorInverse.M22 + impulse.Z * inertiaTensorInverse.M32;
-                angularVelocity.Z += impulse.X * inertiaTensorInverse.M13 + impulse.Y * inertiaTensorInverse.M23 + impulse.Z * inertiaTensorInverse.M33;
-            }
+            angularVelocity.X = angularMomentum.X * inertiaTensorInverse.M11 + angularMomentum.Y * inertiaTensorInverse.M21 + angularMomentum.Z * inertiaTensorInverse.M31;
+            angularVelocity.Y = angularMomentum.X * inertiaTensorInverse.M12 + angularMomentum.Y * inertiaTensorInverse.M22 + angularMomentum.Z * inertiaTensorInverse.M32;
+            angularVelocity.Z = angularMomentum.X * inertiaTensorInverse.M13 + angularMomentum.Y * inertiaTensorInverse.M23 + angularMomentum.Z * inertiaTensorInverse.M33;
+            
+            MathChecker.Validate(angularMomentum);
+#else
+            angularVelocity.X += impulse.X * inertiaTensorInverse.M11 + impulse.Y * inertiaTensorInverse.M21 + impulse.Z * inertiaTensorInverse.M31;
+            angularVelocity.Y += impulse.X * inertiaTensorInverse.M12 + impulse.Y * inertiaTensorInverse.M22 + impulse.Z * inertiaTensorInverse.M32;
+            angularVelocity.Z += impulse.X * inertiaTensorInverse.M13 + impulse.Y * inertiaTensorInverse.M23 + impulse.Z * inertiaTensorInverse.M33;
+#endif
 
             MathChecker.Validate(angularVelocity);
-            MathChecker.Validate(angularMomentum);
         }
 
         /// <summary>
@@ -959,22 +955,18 @@ namespace BEPUphysics.Entities
             }
             //When applying angular damping, the momentum or velocity is damped depending on the conservation setting.
             float angular = AngularDamping + angularDampingBoost;
-            if (angular > 0 && MotionSettings.ConserveAngularMomentum)
+            if (angular > 0)
             {
+#if CONSERVE
                 Vector3.Multiply(ref angularMomentum, (float)Math.Pow(MathHelper.Clamp(1 - angular, 0, 1), dt), out angularMomentum);
-            }
-            else if (angular > 0)
-            {
+#else
                 Vector3.Multiply(ref angularVelocity, (float)Math.Pow(MathHelper.Clamp(1 - angular, 0, 1), dt), out angularVelocity);
+#endif
             }
 
             linearDampingBoost = 0;
             angularDampingBoost = 0;
-
-            //Linear momentum
-            Vector3.Multiply(ref linearVelocity, mass, out linearMomentum);
-
-
+            
             //Update world inertia tensors.
             Matrix3x3 multiplied;
             Matrix3x3.MultiplyTransposed(ref orientationMatrix, ref localInertiaTensorInverse, out multiplied);
@@ -982,20 +974,15 @@ namespace BEPUphysics.Entities
             Matrix3x3.MultiplyTransposed(ref orientationMatrix, ref localInertiaTensor, out multiplied);
             Matrix3x3.Multiply(ref multiplied, ref orientationMatrix, out inertiaTensor);
 
-            //Update angular velocity or angular momentum.
-            if (MotionSettings.ConserveAngularMomentum)
-            {
-                Matrix3x3.Transform(ref angularMomentum, ref inertiaTensorInverse, out angularVelocity);
-            }
-            else
-            {
-                Matrix3x3.Transform(ref angularVelocity, ref inertiaTensor, out angularMomentum);
-            }
-
-            MathChecker.Validate(linearVelocity);
-            MathChecker.Validate(linearMomentum);
-            MathChecker.Validate(angularVelocity);
+#if CONSERVE
+            //Update angular velocity.
+            //Note that this doesn't play nice with singular inertia tensors.
+            //Locked tensors result in zero angular velocity.
+            Matrix3x3.Transform(ref angularMomentum, ref inertiaTensorInverse, out angularVelocity);
             MathChecker.Validate(angularMomentum);
+#endif
+            MathChecker.Validate(linearVelocity);
+            MathChecker.Validate(angularVelocity);
 
 
         }
@@ -1136,29 +1123,25 @@ namespace BEPUphysics.Entities
             if (PositionUpdated != null)
                 PositionUpdated(this);
 
-            MathChecker.Validate(linearMomentum);
             MathChecker.Validate(linearVelocity);
-            MathChecker.Validate(angularMomentum);
             MathChecker.Validate(angularVelocity);
             MathChecker.Validate(position);
             MathChecker.Validate(orientation);
+#if CONSERVE
+            MathChecker.Validate(angularMomentum);
+#endif
         }
 
         void IPositionUpdateable.PreUpdatePosition(float dt)
         {
             Vector3 increment;
-            if (MotionSettings.UseRk4AngularIntegration && isDynamic)
-            {
-                Toolbox.UpdateOrientationRK4(ref orientation, ref localInertiaTensorInverse, ref angularMomentum, dt, out orientation);
-            }
-            else
-            {
-                Vector3.Multiply(ref angularVelocity, dt * .5f, out increment);
-                var multiplier = new Quaternion(increment.X, increment.Y, increment.Z, 0);
-                Quaternion.Multiply(ref multiplier, ref orientation, out multiplier);
-                Quaternion.Add(ref orientation, ref multiplier, out orientation);
-                orientation.Normalize();
-            }
+
+            Vector3.Multiply(ref angularVelocity, dt * .5f, out increment);
+            var multiplier = new Quaternion(increment.X, increment.Y, increment.Z, 0);
+            Quaternion.Multiply(ref multiplier, ref orientation, out multiplier);
+            Quaternion.Add(ref orientation, ref multiplier, out orientation);
+            orientation.Normalize();
+
             Matrix3x3.CreateFromQuaternion(ref orientation, out orientationMatrix);
 
             //Only do the linear motion if this object doesn't obey CCD.
@@ -1174,13 +1157,13 @@ namespace BEPUphysics.Entities
             }
             collisionInformation.UpdateWorldTransform(ref position, ref orientation);
 
-            MathChecker.Validate(linearMomentum);
             MathChecker.Validate(linearVelocity);
-            MathChecker.Validate(angularMomentum);
             MathChecker.Validate(angularVelocity);
             MathChecker.Validate(position);
             MathChecker.Validate(orientation);
-
+#if CONSERVE
+            MathChecker.Validate(angularMomentum);
+#endif
         }
 
 

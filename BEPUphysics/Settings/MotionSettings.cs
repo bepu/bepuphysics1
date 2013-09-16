@@ -14,20 +14,6 @@ namespace BEPUphysics.Settings
     public static class MotionSettings
     {
         ///<summary>
-        /// Whether or not to use RK4 angular integration.  This can improve simulation quality sometimes, but not always.
-        /// It has a slight performance impact.  Enabling this when ConserveAngularMomentum is set to true may be helpful.
-        /// Defaults to false.
-        ///</summary>
-        public static bool UseRk4AngularIntegration;
-        ///<summary>
-        /// Whether or not to conserve angular momentum.
-        /// This produces slightly more realistic angular behavior, but can reduce stability.
-        /// Consider using a smaller timestep, enabling RK4 angular integration, or both.
-        /// Do not use singular inertia tensors while momentum conservation is enabled.
-        /// Defaults to false.
-        ///</summary>
-        public static bool ConserveAngularMomentum;
-        ///<summary>
         /// The scaling to apply to the core shapes used for continuous collision detection tests.
         /// Values should be between 0 and 0.99f.  The smaller the value, the smaller the shapes used
         /// to perform CCD are, and more collisions are missed.

@@ -38,9 +38,7 @@ namespace BEPUphysicsDemos
         /// <param name="space">Space to configure.</param>
         public static void ApplyDefaultSettings(Space space)
         {
-            MotionSettings.ConserveAngularMomentum = false;
             MotionSettings.DefaultPositionUpdateMode = PositionUpdateMode.Discrete;
-            MotionSettings.UseRk4AngularIntegration = false;
             SolverSettings.DefaultMinimumIterationCount = 1;
             space.Solver.IterationLimit = 10;
             GeneralConvexPairTester.UseSimplexCaching = false;
@@ -69,19 +67,6 @@ namespace BEPUphysicsDemos
 
         }
 
-        /// <summary>
-        /// Applies some rotation-related settings.
-        /// With these settings enabled, rotation generally behaves better with long shapes.
-        /// Angular motion is more realistic since the momentum is conserved.
-        /// However, these settings can also cause some instability to sneak into the simulation.
-        /// Try using these settings on the Saw Contraption demo to see an example of what can go
-        /// wrong when conservation is enabled.
-        /// </summary>
-        public static void ApplyRotationSettings()
-        {
-            MotionSettings.ConserveAngularMomentum = true;
-            MotionSettings.UseRk4AngularIntegration = true;
-        }
 
         /// <summary>
         /// Applies slightly higher speed settings.
@@ -178,3 +163,4 @@ namespace BEPUphysicsDemos
         }
     }
 }
+ 
