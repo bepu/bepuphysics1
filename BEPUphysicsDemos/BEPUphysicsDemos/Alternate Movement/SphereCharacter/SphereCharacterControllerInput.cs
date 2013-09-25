@@ -16,9 +16,9 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
         public Camera Camera;
 
         /// <summary>
-        /// Offset from the position of the character to the 'eyes'.
+        /// Gets the camera control scheme used by this input manager.
         /// </summary>
-        public float CameraOffset = .7f;
+        public FixedOffsetCameraControlScheme CameraControlScheme { get; private set; }
 
 
         /// <summary>
@@ -27,9 +27,9 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
         public SphereCharacterController CharacterController;
 
         /// <summary>
-        /// Whether or not to use the character controller's input.
+        /// Gets whether the character controller's input management is being used.
         /// </summary>
-        public bool IsActive = true;
+        public bool IsActive { get; private set; }
 
         /// <summary>
         /// Owning space of the character.
@@ -41,17 +41,16 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
         /// Constructs the character and internal physics character controller.
         /// </summary>
         /// <param name="owningSpace">Space to add the character to.</param>
-        /// <param name="cameraToUse">Camera to attach to the character.</param>
-        public SphereCharacterControllerInput(Space owningSpace, Camera cameraToUse)
+        /// <param name="camera">Camera to attach to the character.</param>
+        /// <param name="game">The running game.</param>
+        public SphereCharacterControllerInput(Space owningSpace, Camera camera, DemosGame game)
         {
             CharacterController = new SphereCharacterController();
+            CameraControlScheme = new FixedOffsetCameraControlScheme(CharacterController.Body, camera, game);
 
             Space = owningSpace;
             Space.Add(CharacterController);
 
-
-            Camera = cameraToUse;
-            Deactivate();
         }
 
         /// <summary>
@@ -62,9 +61,8 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
             if (!IsActive)
             {
                 IsActive = true;
-                Camera.UseMovementControls = false;
                 Space.Add(CharacterController);
-                CharacterController.Body.Position = Camera.Position - new Vector3(0, CameraOffset, 0);
+                CharacterController.Body.Position = Camera.Position - CameraControlScheme.CameraOffset;
             }
         }
 
@@ -76,7 +74,6 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
             if (IsActive)
             {
                 IsActive = false;
-                Camera.UseMovementControls = true;
                 Space.Remove(CharacterController);
             }
         }
@@ -94,29 +91,7 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
         {
             if (IsActive)
             {
-                //Note that the character controller's update method is not called here; this is because it is handled within its owning space.
-                //This method's job is simply to tell the character to move around based on the Camera and input.
-
-                ////Rotate the camera of the character based on the support velocity, if a support with velocity exists.
-                ////This can be very disorienting in some cases; that's why it is off by default!
-                //if (CharacterController.SupportFinder.HasSupport)
-                //{
-                //    SupportData? data;
-                //    if (CharacterController.SupportFinder.HasTraction)
-                //        data = CharacterController.SupportFinder.TractionData;
-                //    else
-                //        data = CharacterController.SupportFinder.SupportData;
-                //    EntityCollidable support = data.Value.SupportObject as EntityCollidable;
-                //    if (support != null && !support.Entity.IsDynamic) //Having the view turned by dynamic entities is extremely confusing for the most part.
-                //    {
-                //        float dot = Vector3.Dot(support.Entity.AngularVelocity, CharacterController.Body.OrientationMatrix.Up);
-                //        Camera.Yaw += dot * dt;
-                //    }
-                //}
-
-
-                Camera.Position = CharacterController.Body.Position + CameraOffset * CharacterController.Body.OrientationMatrix.Up;
-
+                CameraControlScheme.Update(dt);
 
                 Vector2 totalMovement = Vector2.Zero;
 

@@ -122,8 +122,7 @@ namespace BEPUphysicsDemos
 
             Graphics.PreferredBackBufferWidth = 1280;
             Graphics.PreferredBackBufferHeight = 720;
-            Camera = new Camera(this, BEPUutilities.Vector3.Zero, 10, 0, 0, BEPUutilities.Matrix.CreatePerspectiveFieldOfViewRH(MathHelper.PiOver4, Graphics.PreferredBackBufferWidth / (float)Graphics.PreferredBackBufferHeight, .1f, 10000));
-
+            Camera = new Camera(BEPUutilities.Vector3.Zero, 0, 0, BEPUutilities.Matrix.CreatePerspectiveFieldOfViewRH(MathHelper.PiOver4, Graphics.PreferredBackBufferWidth / (float)Graphics.PreferredBackBufferHeight, .1f, 10000));
 
             Exiting += DemosGameExiting;
         }
@@ -280,17 +279,7 @@ namespace BEPUphysicsDemos
             if (WasKeyPressed(Keys.Tab))
                 IsMouseVisible = !IsMouseVisible;
 
-            #region Camera
-
-            //Update the camera
-#if !WINDOWS
-
-            Camera.Update(dt, KeyboardInput, GamePadInput);
-#else
-            Camera.Update(dt, KeyboardInput, MouseInput, GamePadInput);
-#endif
-
-            #endregion
+     
 
             #region UI Toggles
 

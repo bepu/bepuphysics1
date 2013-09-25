@@ -116,10 +116,10 @@ namespace BEPUphysicsDemos.Demos.Extras
         public float MaximumPitch { get; set; }
 
 
-        private const double TimeBetweenFiring = 0.8f;
+        private const double TimeBetweenFiring = 1.8f;
         private double lastFireTime;
 
-        private const int MaximumShellCount = 10;
+        private const int MaximumShellCount = 3;
         private Queue<Sphere> shellPool;
 
         public Turret(Entity tankBody, Vector3 offset)
@@ -450,9 +450,9 @@ namespace BEPUphysicsDemos.Demos.Extras
 
             //Create a bunch of other tanks.
             autoTanks = new List<Tank>();
-            for (int i = 0; i < 5; ++i)
+            for (int i = 0; i < 10; ++i)
             {
-                for (int j = 0; j < 5; ++j)
+                for (int j = 0; j < 10; ++j)
                 {
                     var autoTank = new Tank(new Vector3(-30 + i * 10, 30, -30 + j * 10));
                     autoTanks.Add(autoTank);

@@ -26,16 +26,6 @@ namespace BEPUphysicsDemos.AlternateMovement
         public float BackwardSpeed = -13;
 
         /// <summary>
-        /// Camera to use for input.
-        /// </summary>
-        public Camera Camera;
-
-        /// <summary>
-        /// Current offset from the position of the Vehicle to the 'eyes.'
-        /// </summary>
-        public Vector3 CameraOffset;
-
-        /// <summary>
         /// Speed that the Vehicle tries to reach when moving forward.
         /// </summary>
         public float ForwardSpeed = 30;
@@ -76,23 +66,29 @@ namespace BEPUphysicsDemos.AlternateMovement
         /// </summary>
         public List<DisplayModel> WheelModels;
 
+        /// <summary>
+        /// Gets the camera control scheme ued by this input manager.
+        /// </summary>
+        public ChaseCameraControlScheme CameraControlScheme { get; private set; }
+
 
         /// <summary>
         /// Constructs the front end and the internal physics representation of the Vehicle.
         /// </summary>
         /// <param name="position">Position of the Vehicle.</param>
-        /// <param name="owningSpace">Space to add the Vehicle to.</param>
-        /// <param name="cameraToUse">Camera to attach to the Vehicle.</param>
+        /// <param name="space">Space to add the Vehicle to.</param>
+        /// <param name="camera">Camera to attach to the Vehicle.</param>
+        /// <param name="game">The running game.</param>
         /// <param name="drawer">Drawer used to draw the Vehicle.</param>
         /// <param name="wheelModel">Model of the wheels.</param>
         /// <param name="wheelTexture">Texture to use for the wheels.</param>
-        public VehicleInput(Vector3 position, Space owningSpace, Camera cameraToUse, ModelDrawer drawer, Model wheelModel, Texture2D wheelTexture)
+        public VehicleInput(Vector3 position, Space space, Camera camera, DemosGame game, ModelDrawer drawer, Model wheelModel, Texture2D wheelTexture)
         {
             var bodies = new List<CompoundShapeEntry>
-            {
-                new CompoundShapeEntry(new BoxShape(2.5f, .75f, 4.5f), new Vector3(0, 0, 0), 60),
-                new CompoundShapeEntry(new BoxShape(2.5f, .3f, 2f), new Vector3(0, .75f / 2 + .3f / 2, .5f), 1)
-            };
+                {
+                    new CompoundShapeEntry(new BoxShape(2.5f, .75f, 4.5f), new Vector3(0, 0, 0), 60),
+                    new CompoundShapeEntry(new BoxShape(2.5f, .3f, 2f), new Vector3(0, .75f / 2 + .3f / 2, .5f), 1)
+                };
             var body = new CompoundBody(bodies, 61);
             body.CollisionInformation.LocalPosition = new Vector3(0, .5f, 0);
             body.Position = position; //At first, just keep it out of the way.
@@ -144,7 +140,7 @@ namespace BEPUphysicsDemos.AlternateMovement
                 wheel.DrivingMotor.SolverSettings.MaximumIterationCount = 1;
             }
 
-            Space = owningSpace;
+            Space = space;
 
             Space.Add(Vehicle);
             ModelDrawer = drawer;
@@ -160,24 +156,24 @@ namespace BEPUphysicsDemos.AlternateMovement
             }
 
 
-            Camera = cameraToUse;
+
+            CameraControlScheme = new ChaseCameraControlScheme(Vehicle.Body, new Vector3(0, 0.6f, 0), true, 10, camera, game);
+
         }
 
         /// <summary>
         /// Gives the Vehicle control over the camera and movement input.
         /// </summary>
-        public void Activate()
+        public void Activate(Vector3 position)
         {
             if (!IsActive)
             {
                 IsActive = true;
-                Camera.UseMovementControls = false;
                 //Put the Vehicle where the camera is.
-                Vehicle.Body.Position = Camera.Position - CameraOffset;
+                Vehicle.Body.Position = position;
                 Vehicle.Body.LinearVelocity = Vector3.Zero;
                 Vehicle.Body.AngularVelocity = Vector3.Zero;
                 Vehicle.Body.Orientation = Quaternion.Identity;
-                Camera.ActivateChaseCameraMode(Vehicle.Body, new Vector3(0, .6f, 0), true, 10);
             }
         }
 
@@ -189,8 +185,6 @@ namespace BEPUphysicsDemos.AlternateMovement
             if (IsActive)
             {
                 IsActive = false;
-                Camera.UseMovementControls = true;
-                Camera.DeactivateChaseCameraMode();
             }
         }
 
@@ -212,6 +206,7 @@ namespace BEPUphysicsDemos.AlternateMovement
 
             if (IsActive)
             {
+                CameraControlScheme.Update(dt);
 #if XBOX360
                 float speed = gamePadInput.Triggers.Right * ForwardSpeed + gamePadInput.Triggers.Left * BackwardSpeed;
                 Vehicle.Wheels[1].DrivingMotor.TargetSpeed = speed;

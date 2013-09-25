@@ -102,8 +102,8 @@ namespace BEPUphysicsDemos.Demos.Extras
 
 
             game.Camera.Position = scale * new Vector3(0, 4, 10);
-            originalCameraSpeed = game.Camera.Speed;
-            game.Camera.Speed *= scale;
+            originalCameraSpeed = freeCameraControlScheme.Speed;
+            freeCameraControlScheme.Speed *= scale;
 
 
         }
@@ -120,7 +120,7 @@ namespace BEPUphysicsDemos.Demos.Extras
         private float originalCameraSpeed;
         public override void CleanUp()
         {
-            Game.Camera.Speed = originalCameraSpeed;
+            freeCameraControlScheme.Speed = originalCameraSpeed;
             base.CleanUp();
         }
 

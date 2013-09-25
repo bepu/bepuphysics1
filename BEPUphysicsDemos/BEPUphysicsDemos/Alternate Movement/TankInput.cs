@@ -40,16 +40,6 @@ namespace BEPUphysicsDemos.AlternateMovement
 
 
         /// <summary>
-        /// Camera to use for input.
-        /// </summary>
-        public Camera Camera;
-
-        /// <summary>
-        /// Current offset from the position of the vehicle to the 'eyes.'
-        /// </summary>
-        public Vector3 CameraOffset;
-
-        /// <summary>
         /// Speed that the vehicle tries to reach when moving forward.
         /// </summary>
         public float ForwardSpeed = 15;
@@ -93,15 +83,22 @@ namespace BEPUphysicsDemos.AlternateMovement
         }
 
         /// <summary>
+        /// Gets the camera control scheme ued by this input manager.
+        /// </summary>
+        public ChaseCameraControlScheme CameraControlScheme { get; private set; }
+
+
+        /// <summary>
         /// Constructs the front end and the internal physics representation of the vehicle.
         /// </summary>
         /// <param name="position">Position of the tank.</param>
         /// <param name="owningSpace">Space to add the vehicle to.</param>
-        /// <param name="cameraToUse">Camera to attach to the vehicle.</param>
+        /// <param name="camera">Camera to attach to the vehicle.</param>
+        /// <param name="game">Running game.</param>
         /// <param name="drawer">Drawer used to draw the tank.</param>
         /// <param name="wheelModel">Model to use for the 'wheels' of the tank.</param>
         /// <param name="wheelTexture">Texture of the wheels on the tank.</param>
-        public TankInput(Vector3 position, Space owningSpace, Camera cameraToUse, ModelDrawer drawer, Model wheelModel, Texture2D wheelTexture)
+        public TankInput(Vector3 position, Space owningSpace, Camera camera, DemosGame game, ModelDrawer drawer, Model wheelModel, Texture2D wheelTexture)
         {
             var bodies = new List<CompoundShapeEntry>()
             {
@@ -180,24 +177,24 @@ namespace BEPUphysicsDemos.AlternateMovement
             }
 
 
-            Camera = cameraToUse;
+
+            CameraControlScheme = new ChaseCameraControlScheme(Vehicle.Body, new Vector3(0, 0.6f, 0), true, 10, camera, game);
+
         }
 
         /// <summary>
         /// Gives the vehicle control over the camera and movement input.
         /// </summary>
-        public void Activate()
+        public void Activate(Vector3 position)
         {
             if (!IsActive)
             {
                 IsActive = true;
-                Camera.UseMovementControls = false;
                 //Put the vehicle where the camera is.
-                Vehicle.Body.Position = Camera.Position - CameraOffset;
+                Vehicle.Body.Position = position;
                 Vehicle.Body.LinearVelocity = Vector3.Zero;
                 Vehicle.Body.AngularVelocity = Vector3.Zero;
                 Vehicle.Body.Orientation = Quaternion.Identity;
-                Camera.ActivateChaseCameraMode(Vehicle.Body, new Vector3(0, .6f, 0), true, 10);
             }
         }
 
@@ -209,8 +206,6 @@ namespace BEPUphysicsDemos.AlternateMovement
             if (IsActive)
             {
                 IsActive = false;
-                Camera.UseMovementControls = true;
-                Camera.DeactivateChaseCameraMode();
             }
         }
 
@@ -231,6 +226,8 @@ namespace BEPUphysicsDemos.AlternateMovement
 
             if (IsActive)
             {
+                CameraControlScheme.Update(dt);
+
                 //The reason for the more complicated handling of turning is that real tanks'
                 //treads target a certain speed and will apply positive or negative forces
                 //to reach it.
