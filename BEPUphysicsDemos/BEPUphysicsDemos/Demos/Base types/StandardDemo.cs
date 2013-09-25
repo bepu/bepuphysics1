@@ -27,6 +27,7 @@ namespace BEPUphysicsDemos.Demos
     /// </summary>
     public abstract class StandardDemo : Demo
     {
+        protected FreeCameraControlScheme freeCameraControlScheme;
         protected CharacterControllerInput character;
         protected float grabDistance;
         protected MotorizedGrabSpring grabber;
@@ -40,14 +41,16 @@ namespace BEPUphysicsDemos.Demos
         public StandardDemo(DemosGame game)
             : base(game)
         {
+            freeCameraControlScheme = new FreeCameraControlScheme(10, game.Camera, game);
+
             //Creates the player character (C).
-            character = new CharacterControllerInput(Space, game.Camera);
+            character = new CharacterControllerInput(Space, game.Camera, game);
 
             //Creates the drivable vehicle (V).
             var wheelModel = game.Content.Load<Model>("carWheel");
             var wheelTexture = game.Content.Load<Texture2D>("wheel");
             whitePixel = game.Content.Load<Texture2D>("whitePixel");
-            vehicle = new VehicleInput(new Vector3(10000, 0, 0), Space, game.Camera, game.ModelDrawer, wheelModel, wheelTexture);
+            vehicle = new VehicleInput(new Vector3(10000, 0, 0), Space, game.Camera, game, game.ModelDrawer, wheelModel, wheelTexture);
             Space.ForceUpdater.Gravity = new Vector3(0, -9.81f, 0f); //If left unset, the default value is (0,0,0).
 
             //Create the tossable ball.
@@ -211,7 +214,7 @@ namespace BEPUphysicsDemos.Demos
                 if (!vehicle.IsActive)
                 {
                     character.Deactivate();
-                    vehicle.Activate();
+                    vehicle.Activate(Game.Camera.Position);
                 }
                 else
                     vehicle.Deactivate();
@@ -220,10 +223,13 @@ namespace BEPUphysicsDemos.Demos
 
             #endregion
 
-            base.Update(dt); //Base.update updates the space, which needs to be done before the character or vehicle are updated.
+            base.Update(dt); //Base.update updates the space, which needs to be done before the camera is updated.
 
             character.Update(dt, Game.PreviousKeyboardInput, Game.KeyboardInput, Game.PreviousGamePadInput, Game.GamePadInput);
             vehicle.Update(dt, Game.KeyboardInput, Game.GamePadInput);
+            //If neither are active, just use the default camera movement style.
+            if (!character.IsActive && !vehicle.IsActive)
+                freeCameraControlScheme.Update(dt);
         }
 
         public override void CleanUp()

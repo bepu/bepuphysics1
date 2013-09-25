@@ -184,7 +184,7 @@ namespace BEPUphysics.BroadPhaseEntries
                 boundingBox.Max.Z += thicknessOffset.Z;
         }
 
-   
+
 
         /// <summary>
         /// Tests a ray against the entry.
