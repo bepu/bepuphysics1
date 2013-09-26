@@ -1155,7 +1155,6 @@ namespace BEPUphysics.Entities
                 if (PositionUpdated != null)
                     PositionUpdated(this);
             }
-            collisionInformation.UpdateWorldTransform(ref position, ref orientation);
 
             MathChecker.Validate(linearVelocity);
             MathChecker.Validate(angularVelocity);
