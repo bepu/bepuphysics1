@@ -37,7 +37,7 @@ namespace BEPUphysicsDemos
             get { return Matrix.CreateWorldRH(Position, viewDirection, lockedUp); }
         }
 
-        private Vector3 viewDirection;
+        private Vector3 viewDirection = Vector3.Forward;
         /// <summary>
         /// Gets or sets the view direction of the camera.
         /// </summary>
@@ -46,14 +46,22 @@ namespace BEPUphysicsDemos
             get { return viewDirection; }
             set
             {
-                Vector3.Normalize(ref value, out value);
-                //Validate the input. A temporary violation of the maximum pitch is permitted as it will be fixed as the user looks around.
-                //However, we cannot allow a view direction parallel to the locked up direction.
-                float dot;
-                Vector3.Dot(ref value, ref lockedUp, out dot);
-                if (Math.Abs(dot) > 1 - Toolbox.BigEpsilon)
-                    throw new ArgumentException("The view direction must not be aligned with the locked up direction.");
-                viewDirection = value;
+                float lengthSquared = value.LengthSquared();
+                if (lengthSquared > Toolbox.Epsilon)
+                {
+                    Vector3.Divide(ref value, (float) Math.Sqrt(lengthSquared), out value);
+                    //Validate the input. A temporary violation of the maximum pitch is permitted as it will be fixed as the user looks around.
+                    //However, we cannot allow a view direction parallel to the locked up direction.
+                    float dot;
+                    Vector3.Dot(ref value, ref lockedUp, out dot);
+                    if (Math.Abs(dot) > 1 - Toolbox.BigEpsilon)
+                    {
+                        //The view direction must not be aligned with the locked up direction.
+                        //Silently fail without changing the view direction.
+                        return;
+                    }
+                    viewDirection = value;
+                }
             }
         }
 
@@ -74,7 +82,7 @@ namespace BEPUphysicsDemos
             }
         }
 
-        private Vector3 lockedUp;
+        private Vector3 lockedUp = Vector3.Up;
         /// <summary>
         /// Gets or sets the current locked up vector of the camera.
         /// </summary>
@@ -84,12 +92,16 @@ namespace BEPUphysicsDemos
             set
             {
                 var oldUp = lockedUp;
-                Vector3.Normalize(ref value, out lockedUp);
-                //Move the view direction with the transform. This helps guarantee that the view direction won't end up aligned with the up vector.
-                Quaternion rotation;
-                Quaternion.GetQuaternionBetweenNormalizedVectors(ref oldUp, ref lockedUp, out rotation);
-                Quaternion.Transform(ref viewDirection, ref rotation, out viewDirection);
-
+                float lengthSquared = value.LengthSquared();
+                if (lengthSquared > Toolbox.Epsilon)
+                {
+                    Vector3.Divide(ref value, (float)Math.Sqrt(lengthSquared), out lockedUp);
+                    //Move the view direction with the transform. This helps guarantee that the view direction won't end up aligned with the up vector.
+                    Quaternion rotation;
+                    Quaternion.GetQuaternionBetweenNormalizedVectors(ref oldUp, ref lockedUp, out rotation);
+                    Quaternion.Transform(ref viewDirection, ref rotation, out viewDirection);
+                }
+                //If the new up vector was a near-zero vector, silently fail without changing the up vector.
             }
         }
 
@@ -132,7 +144,7 @@ namespace BEPUphysicsDemos
         /// <summary>
         /// Moves the camera up.
         /// </summary>
-        /// <param name="distance">Distanec to move.</param>
+        /// <param name="distance">Distance to move.</param>
         public void MoveUp(float distance)
         {
             Position += new Vector3(0, distance, 0);
