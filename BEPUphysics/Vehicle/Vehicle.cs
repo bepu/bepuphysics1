@@ -97,7 +97,7 @@ namespace BEPUphysics.Vehicle
         /// Called automatically when the space adds the vehicle.
         /// </summary>
         /// <param name="newSpace">New owning space.</param>
-        public override void OnAdditionToSpace(ISpace newSpace)
+        public override void OnAdditionToSpace(Space newSpace)
         {
             newSpace.Add(body);
             foreach (Wheel wheel in Wheels)
@@ -110,7 +110,7 @@ namespace BEPUphysics.Vehicle
         /// Sets up the vehicle's information when being added to the space.
         /// Called automatically when the space adds the vehicle.
         /// </summary>
-        public override void OnRemovalFromSpace(ISpace oldSpace)
+        public override void OnRemovalFromSpace(Space oldSpace)
         {
             foreach (Wheel wheel in Wheels)
             {

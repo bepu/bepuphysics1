@@ -137,8 +137,8 @@ namespace BEPUphysics.BroadPhaseEntries
 
         
 
-        private ISpace space;
-        ISpace ISpaceObject.Space
+        private Space space;
+        Space ISpaceObject.Space
         {
             get
             {
@@ -153,7 +153,7 @@ namespace BEPUphysics.BroadPhaseEntries
         ///<summary>
         /// Space that owns the detector volume.
         ///</summary>
-        public ISpace Space
+        public Space Space
         {
             get
             {
@@ -326,12 +326,12 @@ namespace BEPUphysics.BroadPhaseEntries
         }
 
 
-        void ISpaceObject.OnAdditionToSpace(ISpace newSpace)
+        void ISpaceObject.OnAdditionToSpace(Space newSpace)
         {
 
         }
 
-        void ISpaceObject.OnRemovalFromSpace(ISpace oldSpace)
+        void ISpaceObject.OnRemovalFromSpace(Space oldSpace)
         {
 
         }

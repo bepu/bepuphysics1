@@ -515,15 +515,14 @@ namespace BEPUphysics.UpdateableSystems
             return 0;
         }
 
-        public override void OnAdditionToSpace(ISpace newSpace)
+        public override void OnAdditionToSpace(Space newSpace)
         {
             base.OnAdditionToSpace(newSpace);
-            Space space = newSpace as Space;
-            ThreadManager = space.ThreadManager;
-            QueryAccelerator = space.BroadPhase.QueryAccelerator;
+            ThreadManager = newSpace.ThreadManager;
+            QueryAccelerator = newSpace.BroadPhase.QueryAccelerator;
         }
 
-        public override void OnRemovalFromSpace(ISpace oldSpace)
+        public override void OnRemovalFromSpace(Space oldSpace)
         {
             base.OnRemovalFromSpace(oldSpace);
             ThreadManager = null;

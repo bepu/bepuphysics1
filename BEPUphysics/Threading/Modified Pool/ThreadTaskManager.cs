@@ -270,9 +270,6 @@ namespace BEPUphysics.Threading
                 this.threadStart = threadStart;
                 this.initializationInformation = initializationInformation;
                 UpdateIndex(index);
-                //#if WINDOWS
-                //                ResourcePool.addThreadID(thread.ManagedThreadId);
-                //#endif
                 thread.Start();
             }
 

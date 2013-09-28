@@ -132,10 +132,10 @@ namespace BEPUphysics.UpdateableSystems.ForceFields
         /// Called after the object is added to a space.
         /// </summary>
         /// <param name="newSpace">Space to which the field has been added.</param>
-        public override void OnAdditionToSpace(ISpace newSpace)
+        public override void OnAdditionToSpace(Space newSpace)
         {
             base.OnAdditionToSpace(newSpace);
-            var space = newSpace as Space;
+            var space = newSpace;
             if(space != null)
             {
                 ThreadManager = space.ThreadManager;
@@ -147,7 +147,7 @@ namespace BEPUphysics.UpdateableSystems.ForceFields
         /// Called before an object is removed from its space.
         /// </summary>
         /// <param name="oldSpace">Space from which the object has been removed.</param>
-        public override void OnRemovalFromSpace(ISpace oldSpace)
+        public override void OnRemovalFromSpace(Space oldSpace)
         {
             base.OnRemovalFromSpace(oldSpace);
             ThreadManager = null;

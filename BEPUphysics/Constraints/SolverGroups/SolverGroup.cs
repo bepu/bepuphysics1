@@ -216,7 +216,7 @@ namespace BEPUphysics.Constraints.SolverGroups
         /// Called after the object is added to a space.
         /// </summary>
         /// <param name="newSpace"></param>
-        public override void OnAdditionToSpace(ISpace newSpace)
+        public override void OnAdditionToSpace(Space newSpace)
         {
             for (int i = 0; i < solverUpdateables.Count; i++)
             {
@@ -227,7 +227,7 @@ namespace BEPUphysics.Constraints.SolverGroups
         /// <summary>
         /// Called before an object is removed from its space.
         /// </summary>
-        public override void OnRemovalFromSpace(ISpace oldSpace)
+        public override void OnRemovalFromSpace(Space oldSpace)
         {
             for (int i = 0; i < solverUpdateables.Count; i++)
             {

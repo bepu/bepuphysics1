@@ -56,7 +56,7 @@ namespace BEPUphysics.UpdateableSystems
         }
 
 
-        ISpace ISpaceObject.Space
+        Space ISpaceObject.Space
         {
             get;
             set;

@@ -1002,8 +1002,8 @@ namespace BEPUphysics.Entities
 
         #region ISpaceObject
 
-        ISpace space;
-        ISpace ISpaceObject.Space
+        Space space;
+        Space ISpaceObject.Space
         {
             get
             {
@@ -1017,7 +1017,7 @@ namespace BEPUphysics.Entities
         ///<summary>
         /// Gets the space that owns the entity.
         ///</summary>
-        public ISpace Space
+        public Space Space
         {
             get
             {
@@ -1026,21 +1026,21 @@ namespace BEPUphysics.Entities
         }
 
 
-        void ISpaceObject.OnAdditionToSpace(ISpace newSpace)
+        void ISpaceObject.OnAdditionToSpace(Space newSpace)
         {
             OnAdditionToSpace(newSpace);
         }
 
-        protected virtual void OnAdditionToSpace(ISpace newSpace)
+        protected virtual void OnAdditionToSpace(Space newSpace)
         {
         }
 
-        void ISpaceObject.OnRemovalFromSpace(ISpace oldSpace)
+        void ISpaceObject.OnRemovalFromSpace(Space oldSpace)
         {
             OnRemovalFromSpace(oldSpace);
         }
 
-        protected virtual void OnRemovalFromSpace(ISpace oldSpace)
+        protected virtual void OnRemovalFromSpace(Space oldSpace)
         {
         }
         #endregion

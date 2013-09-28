@@ -161,13 +161,13 @@ namespace BEPUphysicsDemos.SampleCode
             GrabbedPosition = Matrix3x3.Transform(LocalOffset, Entity.BufferedStates.InterpolatedStates.OrientationMatrix) + Entity.BufferedStates.InterpolatedStates.Position;
         }
 
-        public override void OnAdditionToSpace(ISpace newSpace)
+        public override void OnAdditionToSpace(Space newSpace)
         {
             newSpace.Add(linearMotor);
             newSpace.Add(angularMotor);
         }
 
-        public override void OnRemovalFromSpace(ISpace oldSpace)
+        public override void OnRemovalFromSpace(Space oldSpace)
         {
             oldSpace.Remove(linearMotor);
             oldSpace.Remove(angularMotor);
