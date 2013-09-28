@@ -110,7 +110,7 @@ namespace BEPUphysics.Paths.PathFollowing
         /// <summary>
         /// Adds the motors to the space.  Called automatically.
         /// </summary>
-        public override void OnAdditionToSpace(ISpace newSpace)
+        public override void OnAdditionToSpace(Space newSpace)
         {
             newSpace.Add(LinearMotor);
         }
@@ -118,7 +118,7 @@ namespace BEPUphysics.Paths.PathFollowing
         /// <summary>
         /// Removes the motors from the space.  Called automatically.
         /// </summary>
-        public override void OnRemovalFromSpace(ISpace oldSpace)
+        public override void OnRemovalFromSpace(Space oldSpace)
         {
             oldSpace.Remove(LinearMotor);
         }

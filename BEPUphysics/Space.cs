@@ -22,7 +22,7 @@ namespace BEPUphysics
     ///<summary>
     /// Main simulation class of BEPUphysics.  Contains various updating stages addition/removal methods for getting objects into the simulation.
     ///</summary>
-    public class Space : ISpace, IDisposable
+    public class Space : IDisposable
     {
         private TimeStepSettings timeStepSettings;
         ///<summary>
@@ -72,6 +72,11 @@ namespace BEPUphysics
                 EndOfFrameUpdateables.ThreadManager = value;
             }
         }
+
+        /// <summary>
+        /// Gets or sets whether the thread manager should be disposed when the Space is disposed.
+        /// </summary>
+        public bool OwnsThreadManager { get; set; }
 
         ///<summary>
         /// Gets or sets the space object buffer used by the space.
@@ -197,7 +202,16 @@ namespace BEPUphysics
         /// Uses the SpecializedThreadManager.
         ///</summary>
         public Space()
-            : this(new SpecializedThreadManager())
+            : this(new SpecializedThreadManager(), true)
+        {
+        }
+
+        ///<summary>
+        /// Constructs a new space for things to live in.
+        ///</summary>
+        ///<param name="threadManager">Thread manager to use with the space. Is not disposed by the space.</param>
+        public Space(IThreadManager threadManager)
+            : this(threadManager, false)
         {
         }
 
@@ -205,9 +219,11 @@ namespace BEPUphysics
         /// Constructs a new space for things to live in.
         ///</summary>
         ///<param name="threadManager">Thread manager to use with the space.</param>
-        public Space(IThreadManager threadManager)
+        ///<param name="ownsThreadManager">Whether the space should dispose the thread manager when the Space is disposed. True to have the Space dispose the thread manager, false otherwise.</param>
+        public Space(IThreadManager threadManager, bool ownsThreadManager)
         {
             timeStepSettings = new TimeStepSettings();
+            OwnsThreadManager = ownsThreadManager;
 
             this.threadManager = threadManager;
 
@@ -798,7 +814,8 @@ namespace BEPUphysics
             if (!disposed)
             {
                 disposed = true;
-                ThreadManager.Dispose();
+                if (OwnsThreadManager)
+                    ThreadManager.Dispose();
             }
         }
     }

@@ -98,7 +98,7 @@ namespace BEPUphysics.Paths.PathFollowing
         /// <summary>
         /// Adds the motors to the solver.  Called automatically.
         /// </summary>
-        public override void OnAdditionToSpace(ISpace newSpace)
+        public override void OnAdditionToSpace(Space newSpace)
         {
             newSpace.Add(AngularMotor);
         }
@@ -106,7 +106,7 @@ namespace BEPUphysics.Paths.PathFollowing
         /// <summary>
         /// Removes the motors from the solver.  Called automatically.
         /// </summary>
-        public override void OnRemovalFromSpace(ISpace oldSpace)
+        public override void OnRemovalFromSpace(Space oldSpace)
         {
             oldSpace.Remove(AngularMotor);
         }

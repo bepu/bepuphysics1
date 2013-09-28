@@ -590,26 +590,26 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
             tryToJump = true;
         }
 
-        public override void OnAdditionToSpace(ISpace newSpace)
+        public override void OnAdditionToSpace(Space newSpace)
         {
             //Add any supplements to the space too.
             newSpace.Add(Body);
             newSpace.Add(HorizontalMotionConstraint);
             newSpace.Add(VerticalMotionConstraint);
             //This character controller requires the standard implementation of Space.
-            ((Space)newSpace).BoundingBoxUpdater.Finishing += ExpandBoundingBox;
+            newSpace.BoundingBoxUpdater.Finishing += ExpandBoundingBox;
 
             Body.AngularVelocity = new Vector3();
             Body.LinearVelocity = new Vector3();
         }
-        public override void OnRemovalFromSpace(ISpace oldSpace)
+        public override void OnRemovalFromSpace(Space oldSpace)
         {
             //Remove any supplements from the space too.
             oldSpace.Remove(Body);
             oldSpace.Remove(HorizontalMotionConstraint);
             oldSpace.Remove(VerticalMotionConstraint);
             //This character controller requires the standard implementation of Space.
-            ((Space)oldSpace).BoundingBoxUpdater.Finishing -= ExpandBoundingBox;
+            oldSpace.BoundingBoxUpdater.Finishing -= ExpandBoundingBox;
             SupportFinder.ClearSupportData();
             Body.AngularVelocity = new Vector3();
             Body.LinearVelocity = new Vector3();

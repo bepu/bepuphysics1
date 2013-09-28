@@ -394,8 +394,8 @@ namespace BEPUphysics.Constraints
 
 
 
-        protected internal ISpace space;
-        ISpace ISpaceObject.Space
+        protected internal Space space;
+        Space ISpaceObject.Space
         {
             get
             {
@@ -417,14 +417,14 @@ namespace BEPUphysics.Constraints
         /// Called after the object is added to a space.
         /// </summary>
         /// <param name="newSpace">Space to which this object was added.</param>
-        public virtual void OnAdditionToSpace(ISpace newSpace)
+        public virtual void OnAdditionToSpace(Space newSpace)
         {
         }
 
         /// <summary>
         /// Called before an object is removed from its space.
         /// </summary>
-        public virtual void OnRemovalFromSpace(ISpace oldSpace)
+        public virtual void OnRemovalFromSpace(Space oldSpace)
         {
         }
 

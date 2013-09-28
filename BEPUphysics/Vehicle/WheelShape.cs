@@ -165,7 +165,7 @@ namespace BEPUphysics.Vehicle
         public abstract void UpdateWorldTransform();
 
 
-        internal void OnAdditionToSpace(ISpace space)
+        internal void OnAdditionToSpace(Space space)
         {
             detector.CollisionInformation.collisionRules.Specific.Add(wheel.vehicle.Body.CollisionInformation.collisionRules, CollisionRule.NoBroadPhase);
             detector.CollisionInformation.collisionRules.Personal = CollisionRule.NoNarrowPhaseUpdate;
@@ -173,7 +173,7 @@ namespace BEPUphysics.Vehicle
 
         }
 
-        internal void OnRemovalFromSpace(ISpace space)
+        internal void OnRemovalFromSpace(Space space)
         {
             detector.CollisionInformation.CollisionRules.Specific.Remove(wheel.vehicle.Body.CollisionInformation.collisionRules);
         }

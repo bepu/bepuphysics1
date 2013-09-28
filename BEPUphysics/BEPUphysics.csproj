@@ -303,7 +303,6 @@
     <Compile Include="EntityStateManagement\InterpolatedStatesAccessor.cs" />
     <Compile Include="EntityStateManagement\InterpolatedStatesManager.cs" />
     <Compile Include="EntityStateManagement\MotionState.cs" />
-    <Compile Include="ISpace.cs" />
     <Compile Include="ISpaceObject.cs" />
     <Compile Include="Materials\IMaterialOwner.cs" />
     <Compile Include="Materials\InteractionProperties.cs" />

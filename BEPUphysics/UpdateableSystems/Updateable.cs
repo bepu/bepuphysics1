@@ -61,7 +61,7 @@ namespace BEPUphysics.UpdateableSystems
         /// Called after the object is added to a space.
         /// </summary>
         /// <param name="newSpace">Space to which the object was added.</param>
-        public virtual void OnAdditionToSpace(ISpace newSpace)
+        public virtual void OnAdditionToSpace(Space newSpace)
         {
         }
 
@@ -70,12 +70,12 @@ namespace BEPUphysics.UpdateableSystems
         /// Called before an object is removed from its space.
         /// </summary>
         /// <param name="oldSpace">Space from which the object was removed.</param>
-        public virtual void OnRemovalFromSpace(ISpace oldSpace)
+        public virtual void OnRemovalFromSpace(Space oldSpace)
         {
         }
 
-        private ISpace space;
-        ISpace ISpaceObject.Space
+        private Space space;
+        Space ISpaceObject.Space
         {
             get
             {
@@ -90,7 +90,7 @@ namespace BEPUphysics.UpdateableSystems
         ///<summary>
         /// Space that owns the updateable.
         ///</summary>
-        public ISpace Space
+        public Space Space
         {
             get
             {

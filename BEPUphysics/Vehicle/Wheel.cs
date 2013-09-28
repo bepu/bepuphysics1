@@ -455,7 +455,7 @@ namespace BEPUphysics.Vehicle
                 suspension.currentLength = suspension.restLength;
         }
 
-        internal void OnAdditionToSpace(ISpace space)
+        internal void OnAdditionToSpace(Space space)
         {
             //Make sure it doesn't collide with anything.
 
@@ -466,7 +466,7 @@ namespace BEPUphysics.Vehicle
 
 
 
-        internal void OnRemovalFromSpace(ISpace space)
+        internal void OnRemovalFromSpace(Space space)
         {
             space.Remove(shape.detector);
 
@@ -476,7 +476,7 @@ namespace BEPUphysics.Vehicle
         internal void OnAddedToVehicle(Vehicle vehicle)
         {
             this.vehicle = vehicle;
-            ISpace space = (vehicle as ISpaceUpdateable).Space;
+            Space space = (vehicle as ISpaceUpdateable).Space;
             if (space != null)
             {
                 OnAdditionToSpace(space);
@@ -487,7 +487,7 @@ namespace BEPUphysics.Vehicle
 
         internal void OnRemovedFromVehicle()
         {
-            ISpace space = (vehicle as ISpaceUpdateable).Space;
+            Space space = (vehicle as ISpaceUpdateable).Space;
             if (space != null)
             {
                 OnRemovalFromSpace(space);
