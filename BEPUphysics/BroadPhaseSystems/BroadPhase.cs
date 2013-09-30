@@ -24,10 +24,10 @@ namespace BEPUphysics.BroadPhaseSystems
             Enabled = true;
         }
 
-        protected BroadPhase(IParallelLooper threadManager)
+        protected BroadPhase(IParallelLooper parallelLooper)
             : this()
         {
-            ThreadManager = threadManager;
+            ParallelLooper = parallelLooper;
             AllowMultithreading = true;
         }
         //TODO: Initial capacity?  Special collection type other than list due to structs? RawList? Clear at beginning of each frame?

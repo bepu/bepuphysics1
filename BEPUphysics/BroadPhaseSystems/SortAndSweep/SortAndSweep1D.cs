@@ -19,9 +19,9 @@ namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
         /// <summary>
         /// Constructs a new sort and sweep broad phase.
         /// </summary>
-        /// <param name="threadManager">Thread manager to use in the broad phase.</param>
-        public SortAndSweep1D(IParallelLooper threadManager)
-            : base(threadManager)
+        /// <param name="parallelLooper">Parallel loop provider to use in the broad phase.</param>
+        public SortAndSweep1D(IParallelLooper parallelLooper)
+            : base(parallelLooper)
         {
             sweepSegment = Sweep;
             backbuffer = new RawList<BroadPhaseEntry>();
@@ -134,7 +134,7 @@ namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
             //backbuffer = entries;
             //entries = temp;
 
-            ThreadManager.ForLoop(0, sweepSegmentCount, sweepSegment);
+            ParallelLooper.ForLoop(0, sweepSegmentCount, sweepSegment);
         }
 
         protected override void UpdateSingleThreaded()

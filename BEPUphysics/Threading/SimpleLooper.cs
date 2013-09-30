@@ -12,7 +12,7 @@ namespace BEPUphysics.Threading
     /// It is recommended that other thread managers are used instead of this one;
     /// it is kept for compatibility and a fallback in case of problems.
     /// </remarks>
-    public class SimpleLoopProvider : IParallelLooper
+    public class SimpleLooper : IParallelLooper
     {
         private readonly ManualResetEvent allThreadsIdleNotifier = new ManualResetEvent(false);
         private readonly object disposedLocker = new object();
@@ -34,7 +34,7 @@ namespace BEPUphysics.Threading
         /// <summary>
         /// Constructs the thread manager.
         /// </summary>
-        public SimpleLoopProvider()
+        public SimpleLooper()
         {
             LoopTasksPerThread = 1;
             doLoopSectionDelegate = new Action<object>(DoLoopSection);
@@ -43,7 +43,7 @@ namespace BEPUphysics.Threading
         /// <summary>
         /// Releases resources used by the object.
         /// </summary>
-        ~SimpleLoopProvider()
+        ~SimpleLooper()
         {
             Dispose();
         }
@@ -60,9 +60,7 @@ namespace BEPUphysics.Threading
                 RemakeLoopSections();
             }
         }
-
-        #region IThreadManager Members
-
+        
         /// <summary>
         /// Gets the number of threads currently handled by the manager.
         /// </summary>
@@ -179,7 +177,6 @@ namespace BEPUphysics.Threading
             }
         }
 
-        #endregion
 
         /// <summary>
         /// Enqueues a task.
@@ -260,7 +257,7 @@ namespace BEPUphysics.Threading
         {
             private readonly object disposedLocker = new object();
             private readonly object initializationInformation;
-            private readonly SimpleLoopProvider manager;
+            private readonly SimpleLooper manager;
             private readonly AutoResetEvent resetEvent = new AutoResetEvent(false);
             private readonly Queue<object> taskInformationQueue;
             private readonly Queue<Action<object>> taskQueue;
@@ -268,7 +265,7 @@ namespace BEPUphysics.Threading
             private readonly Action<object> threadStart;
             private bool disposed;
 
-            internal WorkerThread(SimpleLoopProvider manager, Action<object> threadStart, object initializationInformation)
+            internal WorkerThread(SimpleLooper manager, Action<object> threadStart, object initializationInformation)
             {
                 this.manager = manager;
                 Thread = new Thread(ThreadExecutionLoop);

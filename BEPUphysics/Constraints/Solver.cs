@@ -76,11 +76,11 @@ namespace BEPUphysics.Constraints
         ///</summary>
         ///<param name="timeStepSettings">Time step settings used by the solver.</param>
         ///<param name="deactivationManager">Deactivation manager used by the solver.</param>
-        /// <param name="threadManager">Thread manager used by the solver.</param>
-        public Solver(TimeStepSettings timeStepSettings, DeactivationManager deactivationManager, IParallelLooper threadManager)
+        /// <param name="parallelLooper">Parallel loop provider used by the solver.</param>
+        public Solver(TimeStepSettings timeStepSettings, DeactivationManager deactivationManager, IParallelLooper parallelLooper)
             : this(timeStepSettings, deactivationManager)
         {
-            ThreadManager = threadManager;
+            ParallelLooper = parallelLooper;
             AllowMultithreading = true;
         }
 
@@ -219,12 +219,12 @@ namespace BEPUphysics.Constraints
 
         protected override void UpdateMultithreaded()
         {
-            ThreadManager.ForLoop(0, solverUpdateables.Count, multithreadedPrestepDelegate);
+            ParallelLooper.ForLoop(0, solverUpdateables.Count, multithreadedPrestepDelegate);
             //By performing all velocity modifications after the prestep, the prestep is free to read velocities consistently.
             //If the exclusive update was performed in the same call as the prestep, the velocities would enter inconsistent states based on update order.
-            ThreadManager.ForLoop(0, solverUpdateables.Count, multithreadedExclusiveUpdateDelegate);
+            ParallelLooper.ForLoop(0, solverUpdateables.Count, multithreadedExclusiveUpdateDelegate);
             ++PermutationMapper.PermutationIndex;
-            ThreadManager.ForLoop(0, iterationLimit * solverUpdateables.Count, multithreadedIterationDelegate);
+            ParallelLooper.ForLoop(0, iterationLimit * solverUpdateables.Count, multithreadedIterationDelegate);
         }
 
         protected override void UpdateSingleThreaded()

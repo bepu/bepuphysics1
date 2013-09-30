@@ -423,7 +423,7 @@
     <Compile Include="Threading\Modified Pool\ParallelLoopWorker.cs" />
     <Compile Include="Threading\Modified Pool\SpecializedThreadManager.cs" />
     <Compile Include="Threading\Modified Pool\ThreadTaskManager.cs" />
-    <Compile Include="Threading\SimpleLoopProvider.cs" />
+    <Compile Include="Threading\SimpleLooper.cs" />
     <Compile Include="Threading\TPLLoopProvider.cs" />
     <Compile Include="TimeStepSettings.cs" />
     <Compile Include="UpdateableSystems\CombinedUpdateable.cs" />

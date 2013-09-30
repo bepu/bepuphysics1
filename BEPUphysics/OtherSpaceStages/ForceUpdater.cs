@@ -63,11 +63,11 @@ namespace BEPUphysics.OtherSpaceStages
         /// Constructs the force updater.
         ///</summary>
         ///<param name="timeStepSettings">Time step settings to use.</param>
-        /// <param name="threadManager">Thread manager to use.</param>
-        public ForceUpdater(TimeStepSettings timeStepSettings, IParallelLooper threadManager)
+        /// <param name="parallelLooper">Parallel loop provider to use.</param>
+        public ForceUpdater(TimeStepSettings timeStepSettings, IParallelLooper parallelLooper)
             : this(timeStepSettings)
         {
-            ThreadManager = threadManager;
+            ParallelLooper = parallelLooper;
             AllowMultithreading = true;
         }
         private Action<int> multithreadedLoopBodyDelegate;
@@ -80,7 +80,7 @@ namespace BEPUphysics.OtherSpaceStages
         protected override void UpdateMultithreaded()
         {
             Vector3.Multiply(ref gravity, timeStepSettings.TimeStepDuration, out gravityDt);
-            ThreadManager.ForLoop(0, dynamicObjects.Count, multithreadedLoopBodyDelegate);
+            ParallelLooper.ForLoop(0, dynamicObjects.Count, multithreadedLoopBodyDelegate);
         }
 
         protected override void UpdateSingleThreaded()

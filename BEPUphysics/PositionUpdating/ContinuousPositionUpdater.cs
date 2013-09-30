@@ -39,9 +39,9 @@ namespace BEPUphysics.PositionUpdating
         /// Constructs the position updater.
         ///</summary>
         ///<param name="timeStepSettings">Time step settings to use.</param>
-        /// <param name="threadManager">Thread manager to use.</param>
-        public ContinuousPositionUpdater(TimeStepSettings timeStepSettings, IParallelLooper threadManager)
-            : base(timeStepSettings, threadManager)
+        /// <param name="parallelLooper">Parallel loop provider to use.</param>
+        public ContinuousPositionUpdater(TimeStepSettings timeStepSettings, IParallelLooper parallelLooper)
+            : base(timeStepSettings, parallelLooper)
         {
             preUpdate = PreUpdate;
             updateTimeOfImpact = UpdateTimeOfImpact;
@@ -108,12 +108,12 @@ namespace BEPUphysics.PositionUpdating
             //In addition, go through the remaining non-discrete objects and perform their prestep.
             //This usually involves updating their angular motion, but not their linear motion.
             int count = discreteUpdateables.Count + passiveUpdateables.Count + continuousUpdateables.Count;
-            ThreadManager.ForLoop(0, count, preUpdate);
+            ParallelLooper.ForLoop(0, count, preUpdate);
 
             //Now go through the list of all full CCD objects.  These are responsible
             //for determining the TOI of collision pairs, if existent.
             if (continuousUpdateables.Count > MultithreadingThreshold)
-                ThreadManager.ForLoop(0, continuousUpdateables.Count, updateTimeOfImpact);
+                ParallelLooper.ForLoop(0, continuousUpdateables.Count, updateTimeOfImpact);
             else
                 for (int i = 0; i < continuousUpdateables.Count; i++)
                     UpdateTimeOfImpact(i);
@@ -122,7 +122,7 @@ namespace BEPUphysics.PositionUpdating
             //to their new positions.
             count = passiveUpdateables.Count + continuousUpdateables.Count;
             if (count > MultithreadingThreshold)
-                ThreadManager.ForLoop(0, count, updateContinuous);
+                ParallelLooper.ForLoop(0, count, updateContinuous);
             else
                 for (int i = 0; i < count; i++)
                     UpdateContinuousItem(i);
