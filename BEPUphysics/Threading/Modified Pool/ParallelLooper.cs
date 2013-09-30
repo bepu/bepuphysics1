@@ -8,13 +8,12 @@ namespace BEPUphysics.Threading
     /// Manages parallel for loops.
     /// Cannot handle general task-based parallelism.
     /// </summary>
-    public class ParallelLoopManager : IDisposable
+    public class ParallelLooper : IParallelLooper, IDisposable
     {
         private readonly AutoResetEvent loopFinished;
         private int workerCount;
 
         internal List<ParallelLoopWorker> workers = new List<ParallelLoopWorker>();
-        //internal SemaphoreSlim workerWaker;
 
         internal int currentBeginIndex, currentEndIndex;
         internal Action<int> currentLoopBody;
@@ -53,23 +52,40 @@ namespace BEPUphysics.Threading
         /// <summary>
         /// Constructs a new parallel loop manager.
         /// </summary>
-        public ParallelLoopManager()
+        public ParallelLooper()
         {
             loopFinished = new AutoResetEvent(false);
-            //workerWaker = new SemaphoreSlim(0);
         }
 
-        internal void AddThread()
+        /// <summary>
+        /// Gets the number of threads used by the looper.
+        /// </summary>
+        public int ThreadCount
         {
-            AddThread(null, null);
+            get { return workers.Count; }
         }
 
-        internal void AddThread(Action<object> threadStart, object threadStartInformation)
+        /// <summary>
+        /// Adds a thread to the manager.
+        /// </summary>
+        public void AddThread()
         {
-            workers.Add(new ParallelLoopWorker(this, threadStart, threadStartInformation));
+            AddThread(null);
         }
 
-        internal void RemoveThread()
+        /// <summary>
+        /// Adds a thread to the manager.
+        /// </summary>
+        /// <param name="threadStart">Initialization to run on the worker thread.</param>
+        public void AddThread(Action threadStart)
+        {
+            workers.Add(new ParallelLoopWorker(this, threadStart));
+        }
+
+        /// <summary>
+        /// Removes a thread from the manager.
+        /// </summary>
+        public void RemoveThread()
         {
             if (workers.Count > 0)
             {
@@ -133,7 +149,6 @@ namespace BEPUphysics.Threading
                 loopFinished.Set();
         }
 
-        #region IDisposable Members
 
         private bool disposed;
         private readonly object disposedLocker = new object();
@@ -161,11 +176,12 @@ namespace BEPUphysics.Threading
         /// <summary>
         /// Releases resources used by the object.
         /// </summary>
-        ~ParallelLoopManager()
+        ~ParallelLooper()
         {
             Dispose();
         }
 
-        #endregion
+
+
     }
 }

@@ -64,7 +64,7 @@ namespace BEPUphysics.OtherSpaceStages
         ///</summary>
         ///<param name="timeStepSettings">Time step settings to use.</param>
         /// <param name="threadManager">Thread manager to use.</param>
-        public ForceUpdater(TimeStepSettings timeStepSettings, IThreadManager threadManager)
+        public ForceUpdater(TimeStepSettings timeStepSettings, IParallelLooper threadManager)
             : this(timeStepSettings)
         {
             ThreadManager = threadManager;

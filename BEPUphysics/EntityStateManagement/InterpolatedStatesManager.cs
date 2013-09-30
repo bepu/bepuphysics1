@@ -95,7 +95,7 @@ namespace BEPUphysics.EntityStateManagement
         ///</summary>
         ///<param name="manager">Owning buffered states manager.</param>
         /// <param name="threadManager">Thread manager to use.</param>
-        public InterpolatedStatesManager(BufferedStatesManager manager, IThreadManager threadManager)
+        public InterpolatedStatesManager(BufferedStatesManager manager, IParallelLooper threadManager)
         {
             this.manager = manager;
             multithreadedWithReadBuffersDelegate = UpdateIndex;

@@ -132,7 +132,7 @@ namespace BEPUphysics.NarrowPhaseSystems
         ///<param name="timeStepSettings">Time step settings used by the narrow phase.</param>
         /// <param name="overlaps">Overlaps list used by the narrow phase to create pairs.</param>
         /// <param name="threadManager">Thread manager used by the narrow phase.</param>
-        public NarrowPhase(TimeStepSettings timeStepSettings, RawList<BroadPhaseOverlap> overlaps, IThreadManager threadManager)
+        public NarrowPhase(TimeStepSettings timeStepSettings, RawList<BroadPhaseOverlap> overlaps, IParallelLooper threadManager)
             : this(timeStepSettings, overlaps)
         {
             ThreadManager = threadManager;

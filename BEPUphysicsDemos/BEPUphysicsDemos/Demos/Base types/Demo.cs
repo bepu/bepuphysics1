@@ -3,6 +3,7 @@ using System;
 using System.Diagnostics;
 using BEPUphysics;
 using System.Threading;
+using BEPUphysics.Threading;
 using BEPUutilities;
 
 namespace BEPUphysicsDemos.Demos
@@ -15,28 +16,33 @@ namespace BEPUphysicsDemos.Demos
         private int accumulatedPhysicsFrames;
         private double accumulatedPhysicsTime;
         private double previousTimeMeasurement;
+        private ParallelLooper parallelLooper;
 
         protected Demo(DemosGame game)
         {
             Game = game;
-            Space = new Space();
+            parallelLooper = new ParallelLooper();
             //This section lets the engine know that it can make use of multithreaded systems
             //by adding threads to its thread pool.
 #if XBOX360
-            Space.ThreadManager.AddThread(delegate { Thread.CurrentThread.SetProcessorAffinity(new[] { 1 }); }, null);
-            Space.ThreadManager.AddThread(delegate { Thread.CurrentThread.SetProcessorAffinity(new[] { 3 }); }, null);
-            Space.ThreadManager.AddThread(delegate { Thread.CurrentThread.SetProcessorAffinity(new[] { 4 }); }, null);
-            Space.ThreadManager.AddThread(delegate { Thread.CurrentThread.SetProcessorAffinity(new[] { 5 }); }, null);
+            parallelLooper.AddThread(delegate { Thread.CurrentThread.SetProcessorAffinity(new[] { 1 }); });
+            parallelLooper.AddThread(delegate { Thread.CurrentThread.SetProcessorAffinity(new[] { 3 }); });
+            parallelLooper.AddThread(delegate { Thread.CurrentThread.SetProcessorAffinity(new[] { 4 }); });
+            parallelLooper.AddThread(delegate { Thread.CurrentThread.SetProcessorAffinity(new[] { 5 }); });
 
 #else
             if (Environment.ProcessorCount > 1)
             {
                 for (int i = 0; i < Environment.ProcessorCount; i++)
                 {
-                    Space.ThreadManager.AddThread();
+                    parallelLooper.AddThread();
                 }
             }
 #endif
+
+            Space = new Space(parallelLooper);
+
+
             game.Camera.LockedUp = Vector3.Up;
             game.Camera.ViewDirection = new Vector3(0, 0, -1);
             
@@ -124,7 +130,7 @@ namespace BEPUphysicsDemos.Demos
         {
             //Undo any in-demo configuration.
             ConfigurationHelper.ApplyDefaultSettings(Space);
-            Space.Dispose();
+            parallelLooper.Dispose();
         }
     }
 }

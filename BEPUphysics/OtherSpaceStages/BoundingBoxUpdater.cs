@@ -34,7 +34,7 @@ namespace BEPUphysics.OtherSpaceStages
         ///</summary>
         ///<param name="timeStepSettings">Time step setttings to be used by the updater.</param>
         /// <param name="threadManager">Thread manager to be used by the updater.</param>
-        public BoundingBoxUpdater(TimeStepSettings timeStepSettings, IThreadManager threadManager)
+        public BoundingBoxUpdater(TimeStepSettings timeStepSettings, IParallelLooper threadManager)
             : this(timeStepSettings)
         {
             ThreadManager = threadManager;

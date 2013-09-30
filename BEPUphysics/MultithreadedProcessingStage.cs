@@ -22,7 +22,7 @@ namespace BEPUphysics
         ///<summary>
         /// Gets or sets the thread manager used by the stage.
         ///</summary>
-        public IThreadManager ThreadManager { get; set; }
+        public IParallelLooper ThreadManager { get; set; }
 
         ///<summary>
         /// Fires when the processing stage begins working.

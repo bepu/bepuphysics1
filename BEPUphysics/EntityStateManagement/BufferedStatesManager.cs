@@ -74,7 +74,7 @@ namespace BEPUphysics.EntityStateManagement
         /// Constructs a new manager.
         ///</summary>
         ///<param name="threadManager">Thread manager to be used by the manager.</param>
-        public BufferedStatesManager(IThreadManager threadManager)
+        public BufferedStatesManager(IParallelLooper threadManager)
         {
             InterpolatedStates = new InterpolatedStatesManager(this, threadManager);
             ReadBuffers = new StateReadBuffers(this, threadManager);

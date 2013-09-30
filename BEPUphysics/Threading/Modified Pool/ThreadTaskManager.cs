@@ -8,7 +8,7 @@ namespace BEPUphysics.Threading
     /// <summary>
     /// Keeps track of the threads currently available to the physics engine.
     /// </summary>
-    public class ThreadTaskManager : IThreadManager
+    public class ThreadTaskManager : IParallelLooper, IDisposable
     {
         private readonly object disposedLocker = new object();
         private readonly Action<object> doLoopSectionDelegate;
@@ -57,7 +57,6 @@ namespace BEPUphysics.Threading
             }
         }
 
-        #region IThreadManager Members
 
         /// <summary>
         /// Gets the number of threads currently handled by the manager.
@@ -90,7 +89,7 @@ namespace BEPUphysics.Threading
         /// </summary>
         public void AddThread()
         {
-            AddThread(null, null);
+            AddThread(null);
         }
 
         /// <summary>
@@ -98,11 +97,11 @@ namespace BEPUphysics.Threading
         /// </summary>
         /// <param name="initialization">A function to run to perform any initialization on the new thread.</param>
         /// <param name="initializationInformation">Data to give the ParameterizedThreadStart for initialization.</param>
-        public void AddThread(Action<object> initialization, object initializationInformation)
+        public void AddThread(Action initialization)
         {
             lock (workers)
             {
-                var worker = new WorkerThread(workers.Count, this, initialization, initializationInformation);
+                var worker = new WorkerThread(workers.Count, this, initialization);
                 workers.Add(worker);
                 RemakeLoopSections();
             }
@@ -179,7 +178,6 @@ namespace BEPUphysics.Threading
             }
         }
 
-        #endregion
 
         /// <summary>
         /// Enqueues a task.
@@ -252,51 +250,26 @@ namespace BEPUphysics.Threading
         private class WorkerThread : IDisposable
         {
             private readonly object disposedLocker = new object();
-            private readonly object initializationInformation;
             private readonly ThreadTaskManager manager;
             private readonly ConcurrentDeque<TaskEntry> taskData;
             private readonly Thread thread;
-            private readonly Action<object> threadStart;
+            private readonly Action threadStart;
             private bool disposed;
             private int index;
             private AutoResetEvent resetEvent = new AutoResetEvent(false);
 
-            internal WorkerThread(int index, ThreadTaskManager manager, Action<object> threadStart, object initializationInformation)
+            internal WorkerThread(int index, ThreadTaskManager manager, Action threadStart)
             {
                 this.manager = manager;
                 thread = new Thread(ThreadExecutionLoop);
                 thread.IsBackground = true;
                 taskData = new ConcurrentDeque<TaskEntry>();
                 this.threadStart = threadStart;
-                this.initializationInformation = initializationInformation;
                 UpdateIndex(index);
                 thread.Start();
             }
 
-            ~WorkerThread()
-            {
-                Dispose();
-            }
-
-            #region IDisposable Members
-
-            public void Dispose()
-            {
-                lock (disposedLocker)
-                {
-                    if (!disposed)
-                    {
-                        disposed = true;
-                        resetEvent.Close();
-                        resetEvent = null;
-                        manager.workers.Remove(this);
-                        GC.SuppressFinalize(this);
-                    }
-                }
-            }
-
-            #endregion
-
+       
             internal void EnqueueTask(Action<object> task, object taskInformation)
             {
                 Interlocked.Increment(ref manager.tasksRemaining);
@@ -314,7 +287,7 @@ namespace BEPUphysics.Threading
             {
                 //Perform any initialization requested.
                 if (threadStart != null)
-                    threadStart(initializationInformation);
+                    threadStart();
                 TaskEntry task;
 
                 while (true)
@@ -360,6 +333,26 @@ namespace BEPUphysics.Threading
             private void UpdateIndex(int newIndex)
             {
                 index = newIndex;
+            }
+
+            ~WorkerThread()
+            {
+                Dispose();
+            }
+
+            public void Dispose()
+            {
+                lock (disposedLocker)
+                {
+                    if (!disposed)
+                    {
+                        disposed = true;
+                        resetEvent.Close();
+                        resetEvent = null;
+                        manager.workers.Remove(this);
+                        GC.SuppressFinalize(this);
+                    }
+                }
             }
         }
     }

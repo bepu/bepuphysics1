@@ -28,7 +28,7 @@ namespace BEPUphysics.UpdateableSystems
             Enabled = true;
         }
 
-        protected UpdateableManager(TimeStepSettings timeStepSettings, IThreadManager threadManager)
+        protected UpdateableManager(TimeStepSettings timeStepSettings, IParallelLooper threadManager)
             : this(timeStepSettings)
         {
             ThreadManager = threadManager;
@@ -63,7 +63,7 @@ namespace BEPUphysics.UpdateableSystems
             multithreadedUpdateDelegate = MultithreadedUpdate;
         }
 
-        protected UpdateableManager(TimeStepSettings timeStepSettings, IThreadManager threadManager)
+        protected UpdateableManager(TimeStepSettings timeStepSettings, IParallelLooper threadManager)
             : base(timeStepSettings, threadManager)
         {
             multithreadedUpdateDelegate = MultithreadedUpdate;

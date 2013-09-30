@@ -37,9 +37,9 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             BoundingBox box = new BoundingBox(new Vector3(-50, -50, -50), new Vector3(50, 50, 50));
 
             //DynamicHierarchyOld dhOld = new DynamicHierarchyOld(Space.ThreadManager);
-            DynamicHierarchy dh = new DynamicHierarchy(Space.ThreadManager);
-            SortAndSweep1D sas1d = new SortAndSweep1D(Space.ThreadManager);
-            Grid2DSortAndSweep grid2DSAS = new Grid2DSortAndSweep(Space.ThreadManager);
+            DynamicHierarchy dh = new DynamicHierarchy(Space.ParallelLooper);
+            SortAndSweep1D sas1d = new SortAndSweep1D(Space.ParallelLooper);
+            Grid2DSortAndSweep grid2DSAS = new Grid2DSortAndSweep(Space.ParallelLooper);
             //DynamicHierarchy dh = new DynamicHierarchy();
             //DynamicHierarchy4 dh4 = new DynamicHierarchy4();
             //SortAndSweep1D sas1d = new SortAndSweep1D();

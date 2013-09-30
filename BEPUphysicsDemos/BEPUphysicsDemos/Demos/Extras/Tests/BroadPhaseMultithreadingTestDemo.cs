@@ -120,15 +120,15 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
 
         }
 
-        double RunTest(int splitOffset, IThreadManager threadManager)
+        double RunTest(int splitOffset, IParallelLooper parallelLooper)
         {
             Entity toAdd;
             //BoundingBox box = new BoundingBox(new Vector3(-5, 1, 1), new Vector3(5, 7, 7));
             BoundingBox box = new BoundingBox(new Vector3(-500, -500, -500), new Vector3(500, 500, 500));
 
-            int splitDepth = splitOffset + (int)Math.Ceiling(Math.Log(threadManager.ThreadCount, 2));
+            int splitDepth = splitOffset + (int)Math.Ceiling(Math.Log(parallelLooper.ThreadCount, 2));
 
-            DynamicHierarchy dh = new DynamicHierarchy(threadManager);
+            DynamicHierarchy dh = new DynamicHierarchy(parallelLooper);
 
             Random rand = new Random(0);
 

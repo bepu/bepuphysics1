@@ -178,7 +178,7 @@ namespace BEPUphysics.UpdateableSystems
         ///<summary>
         /// Gets or sets the thread manager used by the fluid volume.
         ///</summary>
-        public IThreadManager ThreadManager { get; set; }
+        public IParallelLooper ThreadManager { get; set; }
 
         private List<Vector3[]> surfaceTriangles;
         /// <summary>
@@ -518,7 +518,7 @@ namespace BEPUphysics.UpdateableSystems
         public override void OnAdditionToSpace(Space newSpace)
         {
             base.OnAdditionToSpace(newSpace);
-            ThreadManager = newSpace.ThreadManager;
+            ThreadManager = newSpace.ParallelLooper;
             QueryAccelerator = newSpace.BroadPhase.QueryAccelerator;
         }
 

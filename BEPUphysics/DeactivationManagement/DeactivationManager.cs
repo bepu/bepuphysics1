@@ -119,7 +119,7 @@ namespace BEPUphysics.DeactivationManagement
         ///</summary>
         ///<param name="timeStepSettings">The time step settings used by the manager.</param>
         /// <param name="threadManager">Thread manager used by the manager.</param>
-        public DeactivationManager(TimeStepSettings timeStepSettings, IThreadManager threadManager)
+        public DeactivationManager(TimeStepSettings timeStepSettings, IParallelLooper threadManager)
             : this(timeStepSettings)
         {
             ThreadManager = threadManager;

@@ -94,7 +94,7 @@ namespace BEPUphysics.EntityStateManagement
         ///</summary>
         ///<param name="manager">Owning buffered states manager.</param>
         ///<param name="threadManager">Thread manager to use.</param>
-        public StateReadBuffers(BufferedStatesManager manager, IThreadManager threadManager)
+        public StateReadBuffers(BufferedStatesManager manager, IParallelLooper threadManager)
         {
             this.manager = manager;
             multithreadedStateUpdateDelegate = MultithreadedStateUpdate;

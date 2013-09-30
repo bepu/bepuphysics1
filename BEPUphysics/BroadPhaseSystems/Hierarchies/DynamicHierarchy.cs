@@ -34,7 +34,7 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
         /// Constructs a new dynamic hierarchy broad phase.
         /// </summary>
         /// <param name="threadManager">Thread manager to use in the broad phase.</param>
-        public DynamicHierarchy(IThreadManager threadManager)
+        public DynamicHierarchy(IParallelLooper threadManager)
             : base(threadManager)
         {
             multithreadedRefit = MultithreadedRefit;

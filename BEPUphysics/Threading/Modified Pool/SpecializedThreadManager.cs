@@ -10,11 +10,11 @@ namespace BEPUphysics.Threading
     /// into specialized systems.  Should have generally higher
     /// performance than the SimpleThreadManager.
     /// </remarks>
-    public class SpecializedThreadManager : IThreadManager
+    public class SpecializedThreadManager : IParallelLooper
     {
         private readonly object disposedLocker = new object();
         private bool disposed;
-        private ParallelLoopManager loopManager;
+        private ParallelLooper looper;
         private ThreadTaskManager taskManager;
 
         /// <summary>
@@ -24,7 +24,7 @@ namespace BEPUphysics.Threading
         public SpecializedThreadManager()
         {
             taskManager = new ThreadTaskManager();
-            loopManager = new ParallelLoopManager();
+            looper = new ParallelLooper();
         }
 
         /// <summary>
@@ -39,10 +39,10 @@ namespace BEPUphysics.Threading
         /// Gets or sets the loop manager used by this threading system.
         /// The loop manager is used to specifically parallelize forloops.
         /// </summary>
-        public ParallelLoopManager LoopManager
+        public ParallelLooper Looper
         {
-            get { return loopManager; }
-            set { loopManager = value; }
+            get { return looper; }
+            set { looper = value; }
         }
 
         /// <summary>
@@ -72,7 +72,7 @@ namespace BEPUphysics.Threading
         public void AddThread()
         {
             taskManager.AddThread();
-            loopManager.AddThread();
+            looper.AddThread();
         }
 
         /// <summary>
@@ -80,11 +80,10 @@ namespace BEPUphysics.Threading
         /// </summary>
         /// <param name="initialization">Function that each of the new threads will call before entering its work loop.  Note that this type of thread manager spawns two worker threads for each given thread;
         /// the initializer will run twice.</param>
-        /// <param name="initializationInformation">Data to give the initializer.</param>
-        public void AddThread(Action<object> initialization, object initializationInformation)
+        public void AddThread(Action initialization)
         {
-            taskManager.AddThread(initialization, initializationInformation);
-            loopManager.AddThread(initialization, initializationInformation);
+            taskManager.AddThread(initialization);
+            looper.AddThread(initialization);
         }
 
         /// <summary>
@@ -93,7 +92,7 @@ namespace BEPUphysics.Threading
         public void RemoveThread()
         {
             taskManager.RemoveThread();
-            loopManager.RemoveThread();
+            looper.RemoveThread();
         }
 
         /// <summary>
@@ -118,7 +117,7 @@ namespace BEPUphysics.Threading
         /// <param name="loopBody">Function that handles an individual iteration of the loop.</param>
         public void ForLoop(int startIndex, int endIndex, Action<int> loopBody)
         {
-            loopManager.ForLoop(startIndex, endIndex, loopBody);
+            looper.ForLoop(startIndex, endIndex, loopBody);
         }
 
         /// <summary>
@@ -140,7 +139,7 @@ namespace BEPUphysics.Threading
                 {
                     disposed = true;
                     taskManager.Dispose();
-                    loopManager.Dispose();
+                    looper.Dispose();
                     GC.SuppressFinalize(this);
                 }
             }

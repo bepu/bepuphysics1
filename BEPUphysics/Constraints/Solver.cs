@@ -77,7 +77,7 @@ namespace BEPUphysics.Constraints
         ///<param name="timeStepSettings">Time step settings used by the solver.</param>
         ///<param name="deactivationManager">Deactivation manager used by the solver.</param>
         /// <param name="threadManager">Thread manager used by the solver.</param>
-        public Solver(TimeStepSettings timeStepSettings, DeactivationManager deactivationManager, IThreadManager threadManager)
+        public Solver(TimeStepSettings timeStepSettings, DeactivationManager deactivationManager, IParallelLooper threadManager)
             : this(timeStepSettings, deactivationManager)
         {
             ThreadManager = threadManager;
