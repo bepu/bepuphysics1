@@ -10,9 +10,9 @@ namespace BEPUphysics.Threading
     /// <remarks>
     /// Uses a simple round-robin threadpool.
     /// It is recommended that other thread managers are used instead of this one;
-    /// it is kept for compatability and a fallback in case of problems.
+    /// it is kept for compatibility and a fallback in case of problems.
     /// </remarks>
-    public class SimpleThreadManager : IThreadManager
+    public class SimpleLoopProvider : IParallelLooper
     {
         private readonly ManualResetEvent allThreadsIdleNotifier = new ManualResetEvent(false);
         private readonly object disposedLocker = new object();
@@ -34,7 +34,7 @@ namespace BEPUphysics.Threading
         /// <summary>
         /// Constructs the thread manager.
         /// </summary>
-        public SimpleThreadManager()
+        public SimpleLoopProvider()
         {
             LoopTasksPerThread = 1;
             doLoopSectionDelegate = new Action<object>(DoLoopSection);
@@ -43,7 +43,7 @@ namespace BEPUphysics.Threading
         /// <summary>
         /// Releases resources used by the object.
         /// </summary>
-        ~SimpleThreadManager()
+        ~SimpleLoopProvider()
         {
             Dispose();
         }
@@ -260,7 +260,7 @@ namespace BEPUphysics.Threading
         {
             private readonly object disposedLocker = new object();
             private readonly object initializationInformation;
-            private readonly SimpleThreadManager manager;
+            private readonly SimpleLoopProvider manager;
             private readonly AutoResetEvent resetEvent = new AutoResetEvent(false);
             private readonly Queue<object> taskInformationQueue;
             private readonly Queue<Action<object>> taskQueue;
@@ -268,7 +268,7 @@ namespace BEPUphysics.Threading
             private readonly Action<object> threadStart;
             private bool disposed;
 
-            internal WorkerThread(SimpleThreadManager manager, Action<object> threadStart, object initializationInformation)
+            internal WorkerThread(SimpleLoopProvider manager, Action<object> threadStart, object initializationInformation)
             {
                 this.manager = manager;
                 Thread = new Thread(ThreadExecutionLoop);

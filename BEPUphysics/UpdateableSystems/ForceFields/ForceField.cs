@@ -31,7 +31,7 @@ namespace BEPUphysics.UpdateableSystems.ForceFields
         ///<summary>
         /// Gets or sets the thread manager used by the force field.
         ///</summary>
-        public IThreadManager ThreadManager { get; set; }
+        public IParallelLooper ThreadManager { get; set; }
 
         /// <summary>
         /// Constructs a force field.
@@ -138,7 +138,7 @@ namespace BEPUphysics.UpdateableSystems.ForceFields
             var space = newSpace;
             if(space != null)
             {
-                ThreadManager = space.ThreadManager;
+                ThreadManager = space.ParallelLooper;
                 QueryAccelerator = space.BroadPhase.QueryAccelerator;
             }
         }

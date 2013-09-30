@@ -24,7 +24,7 @@ namespace BEPUphysics.BroadPhaseSystems
             Enabled = true;
         }
 
-        protected BroadPhase(IThreadManager threadManager)
+        protected BroadPhase(IParallelLooper threadManager)
             : this()
         {
             ThreadManager = threadManager;

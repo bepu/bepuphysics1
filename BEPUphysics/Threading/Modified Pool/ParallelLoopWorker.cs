@@ -5,28 +5,25 @@ namespace BEPUphysics.Threading
 {
     internal class ParallelLoopWorker : IDisposable
     {
-        private readonly ParallelLoopManager manager;
+        private readonly ParallelLooper manager;
         internal bool disposed;
         internal object disposedLocker = new object();
         internal int finalIndex;
 
         internal AutoResetEvent getToWork;
-
-        private object initializationInformation;
-
+        
         internal int iterationsPerSteal;
         private Thread thread;
-        private Action<object> threadStart;
+        private Action threadStart;
 
-        internal ParallelLoopWorker(ParallelLoopManager manager, Action<object> threadStart, object initializationInformation)
+        internal ParallelLoopWorker(ParallelLooper manager, Action threadStart)
         {
             this.manager = manager;
             this.threadStart = threadStart;
-            this.initializationInformation = initializationInformation;
 
             getToWork = new AutoResetEvent(false);
 
-            thread = new Thread(Work) {IsBackground = true};
+            thread = new Thread(Work) { IsBackground = true };
             thread.Start();
         }
 
@@ -38,8 +35,6 @@ namespace BEPUphysics.Threading
         {
             Dispose();
         }
-
-        #region IDisposable Members
 
         /// <summary>
         /// Disposes the worker.
@@ -59,16 +54,14 @@ namespace BEPUphysics.Threading
             }
         }
 
-        #endregion
 
         internal void Work()
         {
             if (threadStart != null)
             {
-                threadStart(initializationInformation);
+                threadStart();
             }
             threadStart = null;
-            initializationInformation = null;
 
             while (true)
             {

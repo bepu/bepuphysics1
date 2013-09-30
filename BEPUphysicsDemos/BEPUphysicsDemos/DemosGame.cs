@@ -365,7 +365,6 @@ namespace BEPUphysicsDemos
 
                     if (simNumber <= demoTypes.Length)
                     {
-                        currentSimulation.Space.ThreadManager.Dispose(); //While it would clean up by itself, this gets it done a little quicker.
                         SwitchSimulation(simNumber);
                     }
                 }

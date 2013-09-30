@@ -212,7 +212,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
 #endif
         }
 
-        double RunTest(IThreadManager threadManager, Func<Space, int> simulationBuilder)
+        double RunTest(IParallelLooper threadManager, Func<Space, int> simulationBuilder)
         {
 
             Space space = new Space(threadManager);

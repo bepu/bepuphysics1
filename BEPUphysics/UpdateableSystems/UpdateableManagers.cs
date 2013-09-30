@@ -23,7 +23,7 @@ namespace BEPUphysics.UpdateableSystems
         ///</summary>
         ///<param name="timeStepSettings">Time step settings to use.</param>
         /// <param name="threadManager">Thread manager to use.</param>
-        public DuringForcesUpdateableManager(TimeStepSettings timeStepSettings, IThreadManager threadManager)
+        public DuringForcesUpdateableManager(TimeStepSettings timeStepSettings, IParallelLooper threadManager)
             : base(timeStepSettings, threadManager)
         {
         }
@@ -62,7 +62,7 @@ namespace BEPUphysics.UpdateableSystems
         ///</summary>
         ///<param name="timeStepSettings">Time step settings to use.</param>
         /// <param name="threadManager">Thread manager to use.</param>
-        public BeforeNarrowPhaseUpdateableManager(TimeStepSettings timeStepSettings, IThreadManager threadManager)
+        public BeforeNarrowPhaseUpdateableManager(TimeStepSettings timeStepSettings, IParallelLooper threadManager)
             : base(timeStepSettings, threadManager)
         {
         }
@@ -100,7 +100,7 @@ namespace BEPUphysics.UpdateableSystems
         ///</summary>
         ///<param name="timeStepSettings">Time step settings to use.</param>
         /// <param name="threadManager">Thread manager to use.</param>
-        public BeforeSolverUpdateableManager(TimeStepSettings timeStepSettings, IThreadManager threadManager)
+        public BeforeSolverUpdateableManager(TimeStepSettings timeStepSettings, IParallelLooper threadManager)
             : base(timeStepSettings, threadManager)
         {
         }
@@ -138,7 +138,7 @@ namespace BEPUphysics.UpdateableSystems
         ///</summary>
         ///<param name="timeStepSettings">Time step settings to use.</param>
         /// <param name="threadManager">Thread manager to use.</param>
-        public BeforePositionUpdateUpdateableManager(TimeStepSettings timeStepSettings, IThreadManager threadManager)
+        public BeforePositionUpdateUpdateableManager(TimeStepSettings timeStepSettings, IParallelLooper threadManager)
             : base(timeStepSettings, threadManager)
         {
         }
@@ -177,7 +177,7 @@ namespace BEPUphysics.UpdateableSystems
         ///</summary>
         ///<param name="timeStepSettings">Time step settings to use.</param>
         /// <param name="threadManager">Thread manager to use.</param>
-        public EndOfTimeStepUpdateableManager(TimeStepSettings timeStepSettings, IThreadManager threadManager)
+        public EndOfTimeStepUpdateableManager(TimeStepSettings timeStepSettings, IParallelLooper threadManager)
             : base(timeStepSettings, threadManager)
         {
         }
@@ -216,7 +216,7 @@ namespace BEPUphysics.UpdateableSystems
         ///</summary>
         ///<param name="timeStepSettings">Time step settings to use.</param>
         /// <param name="threadManager">Thread manager to use.</param>
-        public EndOfFrameUpdateableManager(TimeStepSettings timeStepSettings, IThreadManager threadManager)
+        public EndOfFrameUpdateableManager(TimeStepSettings timeStepSettings, IParallelLooper threadManager)
             : base(timeStepSettings, threadManager)
         {
         }

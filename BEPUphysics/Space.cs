@@ -22,7 +22,7 @@ namespace BEPUphysics
     ///<summary>
     /// Main simulation class of BEPUphysics.  Contains various updating stages addition/removal methods for getting objects into the simulation.
     ///</summary>
-    public class Space : IDisposable
+    public class Space
     {
         private TimeStepSettings timeStepSettings;
         ///<summary>
@@ -46,19 +46,19 @@ namespace BEPUphysics
             }
         }
 
-        IThreadManager threadManager;
+        IParallelLooper parallelLooper;
         ///<summary>
         /// Gets or sets the thread manager used by the space.
         ///</summary>
-        public IThreadManager ThreadManager
+        public IParallelLooper ParallelLooper
         {
             get
             {
-                return threadManager;
+                return parallelLooper;
             }
             set
             {
-                threadManager = value;
+                parallelLooper = value;
                 DeactivationManager.ThreadManager = value;
                 ForceUpdater.ThreadManager = value;
                 BoundingBoxUpdater.ThreadManager = value;
@@ -72,11 +72,6 @@ namespace BEPUphysics
                 EndOfFrameUpdateables.ThreadManager = value;
             }
         }
-
-        /// <summary>
-        /// Gets or sets whether the thread manager should be disposed when the Space is disposed.
-        /// </summary>
-        public bool OwnsThreadManager { get; set; }
 
         ///<summary>
         /// Gets or sets the space object buffer used by the space.
@@ -197,55 +192,36 @@ namespace BEPUphysics
             get { return BufferedStates.Entities; }
         }
 
-        ///<summary>
-        /// Constructs a new space for things to live in.
-        /// Uses the SpecializedThreadManager.
-        ///</summary>
-        public Space()
-            : this(new SpecializedThreadManager(), true)
-        {
-        }
-
+  
         ///<summary>
         /// Constructs a new space for things to live in.
         ///</summary>
-        ///<param name="threadManager">Thread manager to use with the space. Is not disposed by the space.</param>
-        public Space(IThreadManager threadManager)
-            : this(threadManager, false)
-        {
-        }
-
-        ///<summary>
-        /// Constructs a new space for things to live in.
-        ///</summary>
-        ///<param name="threadManager">Thread manager to use with the space.</param>
-        ///<param name="ownsThreadManager">Whether the space should dispose the thread manager when the Space is disposed. True to have the Space dispose the thread manager, false otherwise.</param>
-        public Space(IThreadManager threadManager, bool ownsThreadManager)
+        ///<param name="parallelLooper">Used by the space to perform multithreaded updates. Pass null if multithreading is not required.</param>
+        public Space(IParallelLooper parallelLooper)
         {
             timeStepSettings = new TimeStepSettings();
-            OwnsThreadManager = ownsThreadManager;
 
-            this.threadManager = threadManager;
+            this.parallelLooper = parallelLooper;
 
             SpaceObjectBuffer = new SpaceObjectBuffer(this);
             EntityStateWriteBuffer = new EntityStateWriteBuffer();
-            DeactivationManager = new DeactivationManager(TimeStepSettings, ThreadManager);
-            ForceUpdater = new ForceUpdater(TimeStepSettings, ThreadManager);
-            BoundingBoxUpdater = new BoundingBoxUpdater(TimeStepSettings, ThreadManager);
-            BroadPhase = new DynamicHierarchy(ThreadManager);
-            NarrowPhase = new NarrowPhase(TimeStepSettings, BroadPhase.Overlaps, ThreadManager);
-            Solver = new Solver(TimeStepSettings, DeactivationManager, ThreadManager);
+            DeactivationManager = new DeactivationManager(TimeStepSettings, ParallelLooper);
+            ForceUpdater = new ForceUpdater(TimeStepSettings, ParallelLooper);
+            BoundingBoxUpdater = new BoundingBoxUpdater(TimeStepSettings, ParallelLooper);
+            BroadPhase = new DynamicHierarchy(ParallelLooper);
+            NarrowPhase = new NarrowPhase(TimeStepSettings, BroadPhase.Overlaps, ParallelLooper);
+            Solver = new Solver(TimeStepSettings, DeactivationManager, ParallelLooper);
             NarrowPhase.Solver = Solver;
-            PositionUpdater = new ContinuousPositionUpdater(TimeStepSettings, ThreadManager);
-            BufferedStates = new BufferedStatesManager(ThreadManager);
+            PositionUpdater = new ContinuousPositionUpdater(TimeStepSettings, ParallelLooper);
+            BufferedStates = new BufferedStatesManager(ParallelLooper);
             DeferredEventDispatcher = new DeferredEventDispatcher();
 
-            DuringForcesUpdateables = new DuringForcesUpdateableManager(timeStepSettings, ThreadManager);
-            BeforeNarrowPhaseUpdateables = new BeforeNarrowPhaseUpdateableManager(timeStepSettings, ThreadManager);
-            BeforeSolverUpdateables = new BeforeSolverUpdateableManager(timeStepSettings, ThreadManager);
-            BeforePositionUpdateUpdateables = new BeforePositionUpdateUpdateableManager(timeStepSettings, ThreadManager);
-            EndOfTimeStepUpdateables = new EndOfTimeStepUpdateableManager(timeStepSettings, ThreadManager);
-            EndOfFrameUpdateables = new EndOfFrameUpdateableManager(timeStepSettings, ThreadManager);
+            DuringForcesUpdateables = new DuringForcesUpdateableManager(timeStepSettings, ParallelLooper);
+            BeforeNarrowPhaseUpdateables = new BeforeNarrowPhaseUpdateableManager(timeStepSettings, ParallelLooper);
+            BeforeSolverUpdateables = new BeforeSolverUpdateableManager(timeStepSettings, ParallelLooper);
+            BeforePositionUpdateUpdateables = new BeforePositionUpdateUpdateableManager(timeStepSettings, ParallelLooper);
+            EndOfTimeStepUpdateables = new EndOfTimeStepUpdateableManager(timeStepSettings, ParallelLooper);
+            EndOfFrameUpdateables = new EndOfFrameUpdateableManager(timeStepSettings, ParallelLooper);
 
         }
 
@@ -803,21 +779,6 @@ namespace BEPUphysics
         }
 
 
-        bool disposed;
-
-        /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-        /// </summary>
-        /// <filterpriority>2</filterpriority>
-        public void Dispose()
-        {
-            if (!disposed)
-            {
-                disposed = true;
-                if (OwnsThreadManager)
-                    ThreadManager.Dispose();
-            }
-        }
     }
 
 

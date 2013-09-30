@@ -40,7 +40,7 @@ namespace BEPUphysics.PositionUpdating
         ///</summary>
         ///<param name="timeStepSettings">Time step settings to use.</param>
         /// <param name="threadManager">Thread manager to use.</param>
-        public ContinuousPositionUpdater(TimeStepSettings timeStepSettings, IThreadManager threadManager)
+        public ContinuousPositionUpdater(TimeStepSettings timeStepSettings, IParallelLooper threadManager)
             : base(timeStepSettings, threadManager)
         {
             preUpdate = PreUpdate;

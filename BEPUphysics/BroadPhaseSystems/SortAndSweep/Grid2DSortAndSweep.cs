@@ -55,7 +55,7 @@ namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
         /// Constructs a grid-based sort and sweep broad phase.
         /// </summary>
         /// <param name="threadManager">Thread manager to use for the broad phase.</param>
-        public Grid2DSortAndSweep(IThreadManager threadManager)
+        public Grid2DSortAndSweep(IParallelLooper threadManager)
             :base(threadManager)
         {
             updateEntry = UpdateEntry;

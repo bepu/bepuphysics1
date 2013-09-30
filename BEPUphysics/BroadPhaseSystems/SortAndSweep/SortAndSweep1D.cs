@@ -20,7 +20,7 @@ namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
         /// Constructs a new sort and sweep broad phase.
         /// </summary>
         /// <param name="threadManager">Thread manager to use in the broad phase.</param>
-        public SortAndSweep1D(IThreadManager threadManager)
+        public SortAndSweep1D(IParallelLooper threadManager)
             : base(threadManager)
         {
             sweepSegment = Sweep;
