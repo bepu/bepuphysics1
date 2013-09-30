@@ -94,13 +94,13 @@ namespace BEPUphysics.EntityStateManagement
         /// Constructs a new interpolated states manager.
         ///</summary>
         ///<param name="manager">Owning buffered states manager.</param>
-        /// <param name="threadManager">Thread manager to use.</param>
-        public InterpolatedStatesManager(BufferedStatesManager manager, IParallelLooper threadManager)
+        /// <param name="parallelLooper">Parallel loop provider to use.</param>
+        public InterpolatedStatesManager(BufferedStatesManager manager, IParallelLooper parallelLooper)
         {
             this.manager = manager;
             multithreadedWithReadBuffersDelegate = UpdateIndex;
             FlipLocker = new object();
-            ThreadManager = threadManager;
+            ParallelLooper = parallelLooper;
             AllowMultithreading = true;
         }
 
@@ -142,7 +142,7 @@ namespace BEPUphysics.EntityStateManagement
 
         protected override void UpdateMultithreaded()
         {
-            ThreadManager.ForLoop(0, manager.entities.Count, multithreadedWithReadBuffersDelegate);
+            ParallelLooper.ForLoop(0, manager.entities.Count, multithreadedWithReadBuffersDelegate);
             FlipBuffers();
         }
 

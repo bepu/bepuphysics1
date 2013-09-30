@@ -24,10 +24,10 @@ namespace BEPUphysics.PositionUpdating
             }
         }
 
-        protected PositionUpdater(TimeStepSettings timeStepSettings, IParallelLooper threadManager)
+        protected PositionUpdater(TimeStepSettings timeStepSettings, IParallelLooper parallelLooper)
             :this(timeStepSettings)
         {
-            ThreadManager = threadManager;
+            ParallelLooper = parallelLooper;
             AllowMultithreading = true;
         }
 

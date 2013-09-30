@@ -22,9 +22,9 @@ namespace BEPUphysics.UpdateableSystems
         /// Constructs a manager.
         ///</summary>
         ///<param name="timeStepSettings">Time step settings to use.</param>
-        /// <param name="threadManager">Thread manager to use.</param>
-        public DuringForcesUpdateableManager(TimeStepSettings timeStepSettings, IParallelLooper threadManager)
-            : base(timeStepSettings, threadManager)
+        /// <param name="parallelLooper">Parallel loop provider to use.</param>
+        public DuringForcesUpdateableManager(TimeStepSettings timeStepSettings, IParallelLooper parallelLooper)
+            : base(timeStepSettings, parallelLooper)
         {
         }
 
@@ -61,9 +61,9 @@ namespace BEPUphysics.UpdateableSystems
         /// Constructs a manager.
         ///</summary>
         ///<param name="timeStepSettings">Time step settings to use.</param>
-        /// <param name="threadManager">Thread manager to use.</param>
-        public BeforeNarrowPhaseUpdateableManager(TimeStepSettings timeStepSettings, IParallelLooper threadManager)
-            : base(timeStepSettings, threadManager)
+        /// <param name="parallelLooper">Parallel loop provider to use.</param>
+        public BeforeNarrowPhaseUpdateableManager(TimeStepSettings timeStepSettings, IParallelLooper parallelLooper)
+            : base(timeStepSettings, parallelLooper)
         {
         }
 
@@ -99,9 +99,9 @@ namespace BEPUphysics.UpdateableSystems
         /// Constructs a manager.
         ///</summary>
         ///<param name="timeStepSettings">Time step settings to use.</param>
-        /// <param name="threadManager">Thread manager to use.</param>
-        public BeforeSolverUpdateableManager(TimeStepSettings timeStepSettings, IParallelLooper threadManager)
-            : base(timeStepSettings, threadManager)
+        /// <param name="parallelLooper">Parallel loop provider to use.</param>
+        public BeforeSolverUpdateableManager(TimeStepSettings timeStepSettings, IParallelLooper parallelLooper)
+            : base(timeStepSettings, parallelLooper)
         {
         }
 
@@ -137,9 +137,9 @@ namespace BEPUphysics.UpdateableSystems
         /// Constructs a manager.
         ///</summary>
         ///<param name="timeStepSettings">Time step settings to use.</param>
-        /// <param name="threadManager">Thread manager to use.</param>
-        public BeforePositionUpdateUpdateableManager(TimeStepSettings timeStepSettings, IParallelLooper threadManager)
-            : base(timeStepSettings, threadManager)
+        /// <param name="parallelLooper">Parallel loop provider to use.</param>
+        public BeforePositionUpdateUpdateableManager(TimeStepSettings timeStepSettings, IParallelLooper parallelLooper)
+            : base(timeStepSettings, parallelLooper)
         {
         }
 
@@ -176,9 +176,9 @@ namespace BEPUphysics.UpdateableSystems
         /// Constructs a manager.
         ///</summary>
         ///<param name="timeStepSettings">Time step settings to use.</param>
-        /// <param name="threadManager">Thread manager to use.</param>
-        public EndOfTimeStepUpdateableManager(TimeStepSettings timeStepSettings, IParallelLooper threadManager)
-            : base(timeStepSettings, threadManager)
+        /// <param name="parallelLooper">Parallel loop provider to use.</param>
+        public EndOfTimeStepUpdateableManager(TimeStepSettings timeStepSettings, IParallelLooper parallelLooper)
+            : base(timeStepSettings, parallelLooper)
         {
         }
 
@@ -215,9 +215,9 @@ namespace BEPUphysics.UpdateableSystems
         /// Constructs a manager.
         ///</summary>
         ///<param name="timeStepSettings">Time step settings to use.</param>
-        /// <param name="threadManager">Thread manager to use.</param>
-        public EndOfFrameUpdateableManager(TimeStepSettings timeStepSettings, IParallelLooper threadManager)
-            : base(timeStepSettings, threadManager)
+        /// <param name="parallelLooper">Parallel loop provider to use.</param>
+        public EndOfFrameUpdateableManager(TimeStepSettings timeStepSettings, IParallelLooper parallelLooper)
+            : base(timeStepSettings, parallelLooper)
         {
         }
 

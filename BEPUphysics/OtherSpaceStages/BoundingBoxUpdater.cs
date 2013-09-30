@@ -33,11 +33,11 @@ namespace BEPUphysics.OtherSpaceStages
         /// Constructs the bounding box updater.
         ///</summary>
         ///<param name="timeStepSettings">Time step setttings to be used by the updater.</param>
-        /// <param name="threadManager">Thread manager to be used by the updater.</param>
-        public BoundingBoxUpdater(TimeStepSettings timeStepSettings, IParallelLooper threadManager)
+        /// <param name="parallelLooper">Parallel loop provider to be used by the updater.</param>
+        public BoundingBoxUpdater(TimeStepSettings timeStepSettings, IParallelLooper parallelLooper)
             : this(timeStepSettings)
         {
-            ThreadManager = threadManager;
+            ParallelLooper = parallelLooper;
             AllowMultithreading = true;
 
         }
@@ -72,7 +72,7 @@ namespace BEPUphysics.OtherSpaceStages
         }
         protected override void UpdateMultithreaded()
         {
-            ThreadManager.ForLoop(0, entries.Count, multithreadedLoopBodyDelegate);
+            ParallelLooper.ForLoop(0, entries.Count, multithreadedLoopBodyDelegate);
         }
 
         protected override void UpdateSingleThreaded()

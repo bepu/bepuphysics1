@@ -118,11 +118,11 @@ namespace BEPUphysics.DeactivationManagement
         /// Constructs a deactivation manager.
         ///</summary>
         ///<param name="timeStepSettings">The time step settings used by the manager.</param>
-        /// <param name="threadManager">Thread manager used by the manager.</param>
-        public DeactivationManager(TimeStepSettings timeStepSettings, IParallelLooper threadManager)
+        /// <param name="parallelLooper">Parallel loop provider used by the manager.</param>
+        public DeactivationManager(TimeStepSettings timeStepSettings, IParallelLooper parallelLooper)
             : this(timeStepSettings)
         {
-            ThreadManager = threadManager;
+            ParallelLooper = parallelLooper;
             AllowMultithreading = true;
         }
         //TODO: Deactivation Candidate Detection
@@ -206,7 +206,7 @@ namespace BEPUphysics.DeactivationManagement
         {
             FlushSplits();
 
-            ThreadManager.ForLoop(0, simulationIslandMembers.Count, multithreadedCandidacyLoopDelegate);
+            ParallelLooper.ForLoop(0, simulationIslandMembers.Count, multithreadedCandidacyLoopDelegate);
 
             DeactivateObjects();
         }

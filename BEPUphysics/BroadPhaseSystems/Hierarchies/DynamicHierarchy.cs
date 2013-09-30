@@ -33,9 +33,9 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
         /// <summary>
         /// Constructs a new dynamic hierarchy broad phase.
         /// </summary>
-        /// <param name="threadManager">Thread manager to use in the broad phase.</param>
-        public DynamicHierarchy(IParallelLooper threadManager)
-            : base(threadManager)
+        /// <param name="parallelLooper">Parallel loop provider to use in the broad phase.</param>
+        public DynamicHierarchy(IParallelLooper parallelLooper)
+            : base(parallelLooper)
         {
             multithreadedRefit = MultithreadedRefit;
             multithreadedOverlap = MultithreadedOverlap;
@@ -88,7 +88,7 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
             {
                 root.CollectMultithreadingNodes(splitDepth, 1, multithreadingSourceNodes);
                 //Go through every node and refit it.
-                ThreadManager.ForLoop(0, multithreadingSourceNodes.Count, multithreadedRefit);
+                ParallelLooper.ForLoop(0, multithreadingSourceNodes.Count, multithreadedRefit);
                 multithreadingSourceNodes.Clear();
                 //Now that the subtrees belonging to the source nodes are refit, refit the top nodes.
                 //Sometimes, this will go deeper than necessary because the refit process may require an extremely high level (nonmultithreaded) revalidation.
@@ -110,7 +110,7 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
                 if (!root.IsLeaf) //If the root is a leaf, it's alone- nothing to collide against! This test is required by the assumptions of the leaf-leaf test.
                 {
                     root.GetMultithreadedOverlaps(root, splitDepth, 1, this, multithreadingSourceOverlaps);
-                    ThreadManager.ForLoop(0, multithreadingSourceOverlaps.Count, multithreadedOverlap);
+                    ParallelLooper.ForLoop(0, multithreadingSourceOverlaps.Count, multithreadedOverlap);
                     multithreadingSourceOverlaps.Clear();
                 }
             }
@@ -132,10 +132,10 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
                     //The depth to which we dive is offset by some precomputed values (when available) or a guess based on whether or not the 
                     //thread count is a power of 2.  Thread counts which are a power of 2 match well to the binary tree, while other thread counts
                     //require going deeper for better distributions.
-                    int offset = ThreadManager.ThreadCount <= threadSplitOffsets.Length
-                                     ? threadSplitOffsets[ThreadManager.ThreadCount - 1]
-                                     : (ThreadManager.ThreadCount & (ThreadManager.ThreadCount - 1)) == 0 ? 0 : 2;
-                    int splitDepth = offset + (int)Math.Ceiling(Math.Log(ThreadManager.ThreadCount, 2));
+                    int offset = ParallelLooper.ThreadCount <= threadSplitOffsets.Length
+                                     ? threadSplitOffsets[ParallelLooper.ThreadCount - 1]
+                                     : (ParallelLooper.ThreadCount & (ParallelLooper.ThreadCount - 1)) == 0 ? 0 : 2;
+                    int splitDepth = offset + (int)Math.Ceiling(Math.Log(ParallelLooper.ThreadCount, 2));
 #if PROFILE
                     startRefit = Stopwatch.GetTimestamp();
 #endif

@@ -20,9 +20,9 @@ namespace BEPUphysics
         public bool AllowMultithreading { get; set; }
 
         ///<summary>
-        /// Gets or sets the thread manager used by the stage.
+        /// Gets or sets the multithreaded loop provider used by the stage.
         ///</summary>
-        public IParallelLooper ThreadManager { get; set; }
+        public IParallelLooper ParallelLooper { get; set; }
 
         ///<summary>
         /// Fires when the processing stage begins working.
@@ -38,7 +38,7 @@ namespace BEPUphysics
         {
             get
             {
-                return AllowMultithreading && ThreadManager != null && ThreadManager.ThreadCount > 1;
+                return AllowMultithreading && ParallelLooper != null && ParallelLooper.ThreadCount > 1;
             }
         }
 

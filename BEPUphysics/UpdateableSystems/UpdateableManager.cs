@@ -28,10 +28,10 @@ namespace BEPUphysics.UpdateableSystems
             Enabled = true;
         }
 
-        protected UpdateableManager(TimeStepSettings timeStepSettings, IParallelLooper threadManager)
+        protected UpdateableManager(TimeStepSettings timeStepSettings, IParallelLooper parallelLooper)
             : this(timeStepSettings)
         {
-            ThreadManager = threadManager;
+            ParallelLooper = parallelLooper;
             AllowMultithreading = true;
         }
 
@@ -63,8 +63,8 @@ namespace BEPUphysics.UpdateableSystems
             multithreadedUpdateDelegate = MultithreadedUpdate;
         }
 
-        protected UpdateableManager(TimeStepSettings timeStepSettings, IParallelLooper threadManager)
-            : base(timeStepSettings, threadManager)
+        protected UpdateableManager(TimeStepSettings timeStepSettings, IParallelLooper parallelLooper)
+            : base(timeStepSettings, parallelLooper)
         {
             multithreadedUpdateDelegate = MultithreadedUpdate;
         }
@@ -146,7 +146,7 @@ namespace BEPUphysics.UpdateableSystems
             {
                 SequentialUpdate(i);
             }
-            ThreadManager.ForLoop(0, simultaneouslyUpdatedUpdateables.Count, multithreadedUpdateDelegate);
+            ParallelLooper.ForLoop(0, simultaneouslyUpdatedUpdateables.Count, multithreadedUpdateDelegate);
         }
 
         protected override void UpdateSingleThreaded()

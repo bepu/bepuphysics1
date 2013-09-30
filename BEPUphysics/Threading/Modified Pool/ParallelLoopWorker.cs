@@ -65,7 +65,7 @@ namespace BEPUphysics.Threading
 
             while (true)
             {
-                //When ThreadManager sees a loop available, it set it up and then wake me up.
+                //When the owning ParallelLooper is told to start a loop, it will notify the worker via this signal.
                 getToWork.WaitOne();
                 if (manager.currentLoopBody == null)
                 {

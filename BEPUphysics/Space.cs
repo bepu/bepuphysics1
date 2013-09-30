@@ -48,7 +48,7 @@ namespace BEPUphysics
 
         IParallelLooper parallelLooper;
         ///<summary>
-        /// Gets or sets the thread manager used by the space.
+        /// Gets or sets the parallel loop provider used by the space.
         ///</summary>
         public IParallelLooper ParallelLooper
         {
@@ -59,17 +59,17 @@ namespace BEPUphysics
             set
             {
                 parallelLooper = value;
-                DeactivationManager.ThreadManager = value;
-                ForceUpdater.ThreadManager = value;
-                BoundingBoxUpdater.ThreadManager = value;
-                BroadPhase.ThreadManager = value;
-                NarrowPhase.ThreadManager = value;
-                Solver.ThreadManager = value;
-                PositionUpdater.ThreadManager = value;
-                DuringForcesUpdateables.ThreadManager = value;
-                BeforeNarrowPhaseUpdateables.ThreadManager = value;
-                EndOfTimeStepUpdateables.ThreadManager = value;
-                EndOfFrameUpdateables.ThreadManager = value;
+                DeactivationManager.ParallelLooper = value;
+                ForceUpdater.ParallelLooper = value;
+                BoundingBoxUpdater.ParallelLooper = value;
+                BroadPhase.ParallelLooper = value;
+                NarrowPhase.ParallelLooper = value;
+                Solver.ParallelLooper = value;
+                PositionUpdater.ParallelLooper = value;
+                DuringForcesUpdateables.ParallelLooper = value;
+                BeforeNarrowPhaseUpdateables.ParallelLooper = value;
+                EndOfTimeStepUpdateables.ParallelLooper = value;
+                EndOfFrameUpdateables.ParallelLooper = value;
             }
         }
 
@@ -192,7 +192,15 @@ namespace BEPUphysics
             get { return BufferedStates.Entities; }
         }
 
-  
+        ///<summary>
+        /// Constructs a new space for things to live in.
+        /// This overload does not provide an IParallelLooper, so it makes the space single threaded. Use the other overload or set the Space.ParallelLooper property to use multiple threads.
+        ///</summary>
+        public Space()
+            : this(null)
+        {
+        }
+
         ///<summary>
         /// Constructs a new space for things to live in.
         ///</summary>

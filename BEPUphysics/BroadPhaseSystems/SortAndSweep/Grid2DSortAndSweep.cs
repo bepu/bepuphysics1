@@ -54,9 +54,9 @@ namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
         /// <summary>
         /// Constructs a grid-based sort and sweep broad phase.
         /// </summary>
-        /// <param name="threadManager">Thread manager to use for the broad phase.</param>
-        public Grid2DSortAndSweep(IParallelLooper threadManager)
-            :base(threadManager)
+        /// <param name="parallelLooper">Parallel loop provider to use for the broad phase.</param>
+        public Grid2DSortAndSweep(IParallelLooper parallelLooper)
+            :base(parallelLooper)
         {
             updateEntry = UpdateEntry;
             updateCell = UpdateCell;
@@ -134,9 +134,9 @@ namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
             {
                 Overlaps.Clear();
                 //Update the entries!
-                ThreadManager.ForLoop(0, entries.Count, updateEntry);
+                ParallelLooper.ForLoop(0, entries.Count, updateEntry);
                 //Update the cells!
-                ThreadManager.ForLoop(0, cellSet.count, updateCell);
+                ParallelLooper.ForLoop(0, cellSet.count, updateCell);
             }
         }
 

@@ -176,9 +176,9 @@ namespace BEPUphysics.UpdateableSystems
         IQueryAccelerator QueryAccelerator { get; set; }
 
         ///<summary>
-        /// Gets or sets the thread manager used by the fluid volume.
+        /// Gets or sets the parallel loop provider used by the fluid volume.
         ///</summary>
-        public IParallelLooper ThreadManager { get; set; }
+        public IParallelLooper ParallelLooper { get; set; }
 
         private List<Vector3[]> surfaceTriangles;
         /// <summary>
@@ -283,8 +283,8 @@ namespace BEPUphysics.UpdateableSystems
 
             //Don't always multithread.  For small numbers of objects, the overhead of using multithreading isn't worth it.
             //Could tune this value depending on platform for better performance.
-            if (broadPhaseEntries.Count > 30 && ThreadManager.ThreadCount > 1)
-                ThreadManager.ForLoop(0, broadPhaseEntries.Count, analyzeCollisionEntryDelegate);
+            if (broadPhaseEntries.Count > 30 && ParallelLooper != null && ParallelLooper.ThreadCount > 1)
+                ParallelLooper.ForLoop(0, broadPhaseEntries.Count, analyzeCollisionEntryDelegate);
             else
                 for (int i = 0; i < broadPhaseEntries.Count; i++)
                 {
@@ -518,14 +518,14 @@ namespace BEPUphysics.UpdateableSystems
         public override void OnAdditionToSpace(Space newSpace)
         {
             base.OnAdditionToSpace(newSpace);
-            ThreadManager = newSpace.ParallelLooper;
+            ParallelLooper = newSpace.ParallelLooper;
             QueryAccelerator = newSpace.BroadPhase.QueryAccelerator;
         }
 
         public override void OnRemovalFromSpace(Space oldSpace)
         {
             base.OnRemovalFromSpace(oldSpace);
-            ThreadManager = null;
+            ParallelLooper = null;
             QueryAccelerator = null;
         }
 
