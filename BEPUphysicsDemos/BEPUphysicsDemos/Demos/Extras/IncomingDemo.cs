@@ -2,7 +2,7 @@
 using BEPUphysics.Entities.Prefabs;
 using BEPUutilities;
 
-namespace BEPUphysicsDemos.Demos
+namespace BEPUphysicsDemos.Demos.Extras
 {
     /// <summary>
     /// Demo showing a tower of blocks being smashed by a sphere.

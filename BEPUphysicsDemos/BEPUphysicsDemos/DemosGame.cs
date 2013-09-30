@@ -1,10 +1,6 @@
-#region Using Statements
-
 using System;
 using BEPUphysics.Entities;
 using BEPUphysicsDemos.Demos;
-using BEPUphysicsDemos.Demos.Extras;
-using BEPUphysicsDemos.Demos.Extras.Tests;
 using BEPUphysicsDemos.SampleCode;
 using BEPUphysicsDrawer.Font;
 using BEPUphysicsDrawer.Lines;
@@ -13,8 +9,6 @@ using ConversionHelper;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-
-#endregion
 
 namespace BEPUphysicsDemos
 {
@@ -77,12 +71,12 @@ namespace BEPUphysicsDemos
         private readonly Type[] demoTypes = new[]
                                                 {
                                                     typeof (CharacterPlaygroundDemo),
+                                                    typeof (TankDemo),
                                                     typeof (WallDemo),
                                                     typeof (PyramidDemo),
                                                     typeof (ColosseumDemo),
                                                     typeof (LotsOSpheresDemo),
                                                     typeof (JengaDemo),
-                                                    typeof (IncomingDemo),
                                                     typeof (FancyShapesDemo),
                                                     typeof (CompoundBodiesDemo),
                                                     typeof (TerrainDemo),
