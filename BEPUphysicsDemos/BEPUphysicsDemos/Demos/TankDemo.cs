@@ -13,7 +13,7 @@ using BEPUphysics.Constraints.TwoEntity.JointLimits;
 using Microsoft.Xna.Framework.Input;
 using System;
 
-namespace BEPUphysicsDemos.Demos.Extras
+namespace BEPUphysicsDemos.Demos
 {
 
     public class Tank
@@ -75,25 +75,25 @@ namespace BEPUphysicsDemos.Demos.Extras
         /// <summary>
         /// Gets the turret arm. This is connected to the turret body.
         /// </summary>
-        public Cylinder Arm { get; private set; }
+        public Cylinder Barrel { get; private set; }
 
         /// <summary>
         /// Gets the constraint which binds the turret body to the tank body. 
         /// </summary>
-        public RevoluteJoint TurretToTankJoint { get; private set; }
+        public RevoluteJoint TankToTurretJoint { get; private set; }
 
         /// <summary>
         /// Gets the constraint which binds the turret arm to the body.
         /// </summary>
-        public RevoluteJoint TurretBodyToArmJoint { get; private set; }
+        public RevoluteJoint TurretBodyToBarrelJoint { get; private set; }
 
         /// <summary>
         /// Gets or sets the goal of the yaw motor. Convenience property; accesses TurretToTankJoint.Motor.Settings.Servo.Goal.
         /// </summary>
         public float YawGoal
         {
-            get { return TurretToTankJoint.Motor.Settings.Servo.Goal; }
-            set { TurretToTankJoint.Motor.Settings.Servo.Goal = value; }
+            get { return TankToTurretJoint.Motor.Settings.Servo.Goal; }
+            set { TankToTurretJoint.Motor.Settings.Servo.Goal = value; }
         }
 
         /// <summary>
@@ -101,8 +101,8 @@ namespace BEPUphysicsDemos.Demos.Extras
         /// </summary>
         public float PitchGoal
         {
-            get { return TurretBodyToArmJoint.Motor.Settings.Servo.Goal; }
-            set { TurretBodyToArmJoint.Motor.Settings.Servo.Goal = MathHelper.Clamp(value, MinimumPitch, MaximumPitch); }
+            get { return TurretBodyToBarrelJoint.Motor.Settings.Servo.Goal; }
+            set { TurretBodyToBarrelJoint.Motor.Settings.Servo.Goal = MathHelper.Clamp(value, MinimumPitch, MaximumPitch); }
         }
 
         /// <summary>
@@ -128,30 +128,33 @@ namespace BEPUphysicsDemos.Demos.Extras
             Body = new Cylinder(position, 0.7f, 0.8f, 8);
             //Position the center of the arm a bit further forward since it will be laying down.
             position.Z -= 2;
-            Arm = new Cylinder(position, 3, 0.2f, 3);
+            Barrel = new Cylinder(position, 3, 0.2f, 3);
             //Rotate the arm so that it points straight forward (that is, along {0, 0, -1}).
-            Arm.Orientation = Quaternion.CreateFromAxisAngle(new Vector3(1, 0, 0), MathHelper.PiOver2);
+            Barrel.Orientation = Quaternion.CreateFromAxisAngle(new Vector3(1, 0, 0), MathHelper.PiOver2);
 
-            TurretToTankJoint = new RevoluteJoint(Body, tankBody, Body.Position, Vector3.Up);
-            TurretBodyToArmJoint = new RevoluteJoint(Arm, Body, Body.Position + new Vector3(0, 0, -0.5f), Vector3.Left);
+            TankToTurretJoint = new RevoluteJoint(tankBody, Body, Body.Position, Vector3.Up);
+            TurretBodyToBarrelJoint = new RevoluteJoint(Body, Barrel, Body.Position + new Vector3(0, 0, -0.5f), Vector3.Left);
 
             //Turn on the control constraints. We'll put them into servo mode, but velocity mode would also work just fine.
-            TurretToTankJoint.Motor.IsActive = true;
-            TurretToTankJoint.Motor.Settings.Mode = MotorMode.Servomechanism;
-            TurretToTankJoint.Motor.Settings.Servo.BaseCorrectiveSpeed = 0.5f;
-            TurretToTankJoint.Motor.Settings.MaximumForce = 500;
-            TurretBodyToArmJoint.Motor.IsActive = true;
-            TurretBodyToArmJoint.Motor.Settings.Mode = MotorMode.Servomechanism;
-            TurretBodyToArmJoint.Motor.Settings.Servo.BaseCorrectiveSpeed = 0.5f;
+            TankToTurretJoint.Motor.IsActive = true;
+            TankToTurretJoint.Motor.Settings.Mode = MotorMode.Servomechanism;
+            TankToTurretJoint.Motor.Settings.Servo.BaseCorrectiveSpeed = 0.5f;
+            TankToTurretJoint.Motor.Settings.MaximumForce = 500;
+            TankToTurretJoint.Motor.Basis.SetLocalAxes(Vector3.Up, Vector3.Forward);
+
+            TurretBodyToBarrelJoint.Motor.IsActive = true;
+            TurretBodyToBarrelJoint.Motor.Settings.Mode = MotorMode.Servomechanism;
+            TurretBodyToBarrelJoint.Motor.Settings.Servo.BaseCorrectiveSpeed = 0.5f;
             //We take special care to limit this motor's force to stop the turret from smashing the tank body.
-            TurretBodyToArmJoint.Motor.Settings.MaximumForce = 300;
+            TurretBodyToBarrelJoint.Motor.Settings.MaximumForce = 300;
+            TurretBodyToBarrelJoint.Motor.Basis.SetLocalAxes(Vector3.Right, Vector3.Forward);
 
             //Don't let the directly connected objects generate collisions. The arm can still hit the tank body, though.
             CollisionRules.AddRule(Body, tankBody, CollisionRule.NoBroadPhase);
-            CollisionRules.AddRule(Arm, Body, CollisionRule.NoBroadPhase);
+            CollisionRules.AddRule(Barrel, Body, CollisionRule.NoBroadPhase);
 
             //Don't have a lot of leeway downards. The turret will quickly bump the tank body.
-            MinimumPitch = -MathHelper.Pi * 0.1f;
+            MinimumPitch = -MathHelper.Pi * 0.05f;
             MaximumPitch = MathHelper.Pi * 0.4f;
 
             //Build an ammunition pool.
@@ -173,17 +176,17 @@ namespace BEPUphysicsDemos.Demos.Extras
         public void AddToSpace(Space space)
         {
             space.Add(Body);
-            space.Add(Arm);
-            space.Add(TurretToTankJoint);
-            space.Add(TurretBodyToArmJoint);
+            space.Add(Barrel);
+            space.Add(TankToTurretJoint);
+            space.Add(TurretBodyToBarrelJoint);
         }
 
         public void RemoveFromSpace(Space space)
         {
             space.Remove(Body);
-            space.Remove(Arm);
-            space.Remove(TurretToTankJoint);
-            space.Remove(TurretBodyToArmJoint);
+            space.Remove(Barrel);
+            space.Remove(TankToTurretJoint);
+            space.Remove(TurretBodyToBarrelJoint);
         }
 
         /// <summary>
@@ -193,7 +196,7 @@ namespace BEPUphysicsDemos.Demos.Extras
         /// <returns>True if a shell was fired, false otherwise.</returns>
         public bool TryToFire(out Sphere shell)
         {
-            if (Arm.Space != null)
+            if (Barrel.Space != null)
             {
                 var currentTime = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
                 if (currentTime - lastFireTime > TimeBetweenFiring)
@@ -206,20 +209,20 @@ namespace BEPUphysicsDemos.Demos.Extras
                     if (shell.Space == null)
                     {
                         //This shell has never been added before.
-                        Arm.Space.Add(shell);
+                        Barrel.Space.Add(shell);
                     }
 
                     //Reset the angular state.
                     shell.Orientation = Quaternion.Identity;
-                    shell.AngularVelocity = new Vector3();
+                    shell.AngularVelocity = Barrel.AngularVelocity;
 
                     //Position the shell at the end of the turret.
-                    var firingDirection = Arm.OrientationMatrix.Down;
-                    shell.Position = Arm.Position + firingDirection * (Arm.Height * 0.5f + 0.2f * 1.1f);
+                    var firingDirection = Barrel.OrientationMatrix.Down;
+                    shell.Position = Barrel.Position + firingDirection * (Barrel.Height * 0.5f + 0.2f * 1.1f);
 
                     //Shoot it!
-                    shell.LinearVelocity = firingDirection * 100;
-                    Arm.LinearMomentum += -firingDirection * 20 * shell.Mass;
+                    shell.LinearVelocity = Barrel.LinearVelocity + firingDirection * 100;
+                    Barrel.LinearMomentum += -firingDirection * 20 * shell.Mass;
 
                     return true;
                 }
@@ -447,11 +450,13 @@ namespace BEPUphysicsDemos.Demos.Extras
             playerTank = new Tank(new Vector3(0, 0, 0));
             playerTank.AddToSpace(Space);
 
+
+
             //Create a bunch of other tanks.
             autoTanks = new List<Tank>();
-            for (int i = 0; i < 10; ++i)
+            for (int i = 0; i < 3; ++i)
             {
-                for (int j = 0; j < 10; ++j)
+                for (int j = 0; j < 3; ++j)
                 {
                     var autoTank = new Tank(new Vector3(-30 + i * 10, 30, -30 + j * 10));
                     autoTanks.Add(autoTank);
@@ -577,9 +582,9 @@ namespace BEPUphysicsDemos.Demos.Extras
             if (Game.KeyboardInput.IsKeyDown(Keys.NumPad5))
                 playerTank.Turret.PitchGoal -= 1.5f * dt;
             if (Game.KeyboardInput.IsKeyDown(Keys.NumPad4))
-                playerTank.Turret.YawGoal -= 1.5f * dt;
-            if (Game.KeyboardInput.IsKeyDown(Keys.NumPad6))
                 playerTank.Turret.YawGoal += 1.5f * dt;
+            if (Game.KeyboardInput.IsKeyDown(Keys.NumPad6))
+                playerTank.Turret.YawGoal -= 1.5f * dt;
 
             if (Game.KeyboardInput.IsKeyDown(Keys.NumPad0))
             {
@@ -589,6 +594,8 @@ namespace BEPUphysicsDemos.Demos.Extras
                     Game.ModelDrawer.Add(firedShell);
                 }
             }
+
+
 
             //Now tell the AI to do things.
             foreach (var autoTank in autoTanks)
@@ -657,8 +664,13 @@ namespace BEPUphysicsDemos.Demos.Extras
             base.Update(dt);
         }
 
+        public override void DrawUI()
+        {           
+            Game.DataTextDrawer.Draw("Use arrows/numpad to control your tank.", new Microsoft.Xna.Framework.Vector2(50, 50));
+            base.DrawUI();
+        }
+
         private Random aiRandom = new Random(5);
-
-
+    
     }
 }

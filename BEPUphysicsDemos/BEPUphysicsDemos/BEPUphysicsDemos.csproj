@@ -122,7 +122,7 @@
     <Compile Include="Demos\Extras\Tests\LotsOfBoxesTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\PersistentManifoldStressTestDemo.cs" />
     <Compile Include="Demos\Extras\SolidPyramidDemo.cs" />
-    <Compile Include="Demos\Extras\TankDemo.cs" />
+    <Compile Include="Demos\TankDemo.cs" />
     <Compile Include="Demos\Extras\SuspensionCarDemo2.cs" />
     <Compile Include="Demos\SpiderDemo.cs" />
     <Compile Include="Demos\Extras\Tests\BoxBoxTestDemo.cs" />
@@ -186,7 +186,7 @@
     <Compile Include="Demos\FancyShapesDemo.cs" />
     <Compile Include="Demos\FishInABarrelDemo.cs" />
     <Compile Include="Demos\PlanetDemo.cs" />
-    <Compile Include="Demos\IncomingDemo.cs" />
+    <Compile Include="Demos\Extras\IncomingDemo.cs" />
     <Compile Include="Demos\JengaDemo.cs" />
     <Compile Include="Demos\LotsOSpheresDemo.cs" />
     <Compile Include="Demos\PathFollowingDemo.cs" />
