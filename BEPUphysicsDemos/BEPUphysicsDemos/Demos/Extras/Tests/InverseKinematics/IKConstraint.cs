@@ -1,51 +1,63 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Xna.Framework;
 
 namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
 {
     public abstract class IKConstraint
     {
-        protected float softness = .05f;
+        protected float softness;
+
+        protected float errorCorrectionFactor;
+
+        private float dampingConstant = 16;
         /// <summary>
-        /// Gets or sets the softness of the constraint. The higher the softness is, the more the constraint can be violated. Must be nonnegative; 0 corresponds to complete rigidity.
+        /// Gets or sets the damping constant of the constraint.
         /// </summary>
-        public float Softness
+        public float DampingConstant
         {
-            get { return softness; }
-            set { softness = MathHelper.Max(value, 0); }
+            get { return dampingConstant; }
+            set { dampingConstant = Math.Max(0, value); }
         }
 
-        protected float errorCorrectionFactor = .2f;
+
+        private float stiffnessConstant = 4;
         /// <summary>
-        /// Gets or sets the error correction factor of the constraint. Values range from 0 to 1. 0 means the constraint will not attempt to correct any error.
-        /// 1 means the constraint will attempt to correct all error in a single iteration. This factor, combined with Softness, define the springlike behavior of a constraint.
+        /// Gets or sets the stiffness constant of the constraint.
         /// </summary>
-        public float ErrorCorrectionFactor
+        public float StiffnessConstant
         {
-            get { return errorCorrectionFactor; }
-            set { errorCorrectionFactor = MathHelper.Clamp(value, 0, 1); }
+            get { return stiffnessConstant; }
+            set { stiffnessConstant = Math.Max(0, value); }
         }
 
-        protected float maximumImpulse = float.MaxValue;
-        protected float maximumImpulseSquared = float.MaxValue;
+        protected float maximumImpulse;
+        protected float maximumImpulseSquared;
+        protected float maximumForce = float.MaxValue;
+
         /// <summary>
-        /// Gets or sets the maximum impulse that the constraint can apply.
-        /// Velocity error requiring a greater impulse will result in the impulse being clamped to the maximum impulse.
+        /// Gets or sets the maximum force that the constraint can apply.
         /// </summary>
-        public float MaximumImpulse
+        public float MaximumForce
         {
-            get { return (float)Math.Sqrt(maximumImpulseSquared); }
+            get { return maximumForce; }
             set
             {
-                maximumImpulse = Math.Max(value, 0);
-                if (maximumImpulse >= float.MaxValue)
-                    maximumImpulseSquared = float.MaxValue;
-                else
-                    maximumImpulseSquared = maximumImpulse * maximumImpulse;
+                maximumForce = Math.Max(value, 0);
             }
+        }
+
+        /// <summary>
+        /// Updates the softness, bias factor, and maximum impulse based on the current time step.
+        /// </summary>
+        /// <param name="dt">Time step duration.</param>
+        protected internal void Preupdate(float dt)
+        {
+            if (stiffnessConstant == 0 && dampingConstant == 0)
+                throw new InvalidOperationException("Constraints cannot have both 0 stiffness and 0 damping.");
+            errorCorrectionFactor = stiffnessConstant / (dt * stiffnessConstant + dampingConstant);
+            softness = 1 / (dt * (dt * stiffnessConstant + dampingConstant));
+            maximumImpulse = maximumForce * dt;
+            maximumImpulseSquared = maximumImpulse * maximumImpulse;
+
         }
 
         /// <summary>

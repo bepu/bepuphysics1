@@ -45,11 +45,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                 var ballSocket = new IKBallSocketJoint(previousBone, bone, anchor);
                 var angularJoint = new IKAngularJoint(previousBone, bone);
 
-                ballSocket.Softness = 0.05f;
-                ballSocket.ErrorCorrectionFactor = 0.2f;
-                angularJoint.Softness = 0.05f;
-                angularJoint.ErrorCorrectionFactor = 0.2f;
-
+   
                 previousBone = bone;
                 previousBoneEntity = boneEntity;
             }
@@ -83,9 +79,9 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             int boneCount = 10;
             BuildStick(new Vector3(0, 0.5f, 0), boneCount, out bones, out boneEntities);
 
-            DragControl dragger = new DragControl { TargetBone = bones[boneCount - 1], MaximumImpulse = 3.402823e38f };
-            dragger.LinearMotor.Softness = 0.05f;
-            dragger.LinearMotor.ErrorCorrectionFactor = 0.2f;
+            DragControl dragger = new DragControl { TargetBone = bones[boneCount - 1], MaximumForce = 3.402823e38f };
+            dragger.LinearMotor.DampingConstant = 16;
+            dragger.LinearMotor.StiffnessConstant = 4;
             dragger.LinearMotor.LocalOffset = new Vector3(0, 0.5f, 0);
             dragger.LinearMotor.TargetPosition = new Vector3(10, 0, 0);
 

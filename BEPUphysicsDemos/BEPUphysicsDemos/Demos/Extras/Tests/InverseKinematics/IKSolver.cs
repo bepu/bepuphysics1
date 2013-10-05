@@ -42,7 +42,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         public int VelocitySubiterationCount { get; set; }
 
         /// <summary>
-        /// Gets or sets whether or not to scale control impulses such that they fit well with the mass of objects and the number of iterations.
+        /// Gets or sets whether or not to scale control impulses such that they fit well with the mass of objects.
         /// </summary>
         public bool AutoscaleControlImpulses { get; set; }
 
@@ -50,6 +50,17 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         /// Gets or sets the maximum impulse the controls will try to push bones with when AutoscaleControlImpulses is enabled.
         /// </summary>
         public float AutoscaleControlMaximumForce { get; set; }
+
+        private float timeStepDuration = 1f;
+        /// <summary>
+        /// Gets or sets the time step duration elapsed by each position iteration.
+        /// </summary>
+        public float TimeStepDuration
+        {
+            get { return timeStepDuration; }
+            set { timeStepDuration = Math.Max(0, value); }
+        }
+
 
 
         private PermutationMapper permutationMapper = new PermutationMapper();
@@ -88,6 +99,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
                 //Update the per-constraint jacobians and effective mass for the current bone orientations and positions.
                 foreach (IKJoint joint in ActiveSet.joints)
                 {
+                    joint.Preupdate(TimeStepDuration);
                     joint.UpdateJacobiansAndVelocityBias();
                     joint.ComputeEffectiveMass();
                     joint.WarmStart();
@@ -108,7 +120,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
                 //Integrate the positions of the bones forward.
                 foreach (Bone bone in ActiveSet.bones)
                 {
-                    bone.UpdatePosition();
+                    bone.UpdatePosition(TimeStepDuration);
                 }
             }
 
@@ -134,7 +146,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
                 //Update the control strengths to match the mass of the target bones and the desired maximum force.
                 foreach (var control in controls)
                 {
-                    control.MaximumImpulse = control.TargetBone.Mass * (AutoscaleControlMaximumForce / ControlIterationCount);
+                    control.MaximumForce = control.TargetBone.Mass * AutoscaleControlMaximumForce;
                 }
             }
 
@@ -153,6 +165,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
                 //Update the per-constraint jacobians and effective mass for the current bone orientations and positions.
                 foreach (IKJoint joint in ActiveSet.joints)
                 {
+                    joint.Preupdate(TimeStepDuration);
                     joint.UpdateJacobiansAndVelocityBias();
                     joint.ComputeEffectiveMass();
                     joint.WarmStart();
@@ -162,6 +175,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
                 {
                     if (control.TargetBone.Pinned)
                         throw new InvalidOperationException("Pinned objects cannot be moved by controls.");
+                    control.Preupdate(TimeStepDuration);
                     control.UpdateJacobiansAndVelocityBias();
                     control.ComputeEffectiveMass();
                     control.WarmStart();
@@ -184,13 +198,13 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
                     //Increment to use the next permutation.
                     ++permutationMapper.PermutationIndex;
 
-                    
+
                 }
 
                 //Integrate the positions of the bones forward.
                 foreach (Bone bone in ActiveSet.bones)
                 {
-                    bone.UpdatePosition();
+                    bone.UpdatePosition(TimeStepDuration);
                 }
             }
 
@@ -210,6 +224,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
                 //Update the per-constraint jacobians and effective mass for the current bone orientations and positions.
                 foreach (IKJoint joint in ActiveSet.joints)
                 {
+                    joint.Preupdate(TimeStepDuration);
                     joint.UpdateJacobiansAndVelocityBias();
                     joint.ComputeEffectiveMass();
                     joint.WarmStart();
@@ -231,7 +246,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
                 //Integrate the positions of the bones forward.
                 foreach (Bone bone in ActiveSet.bones)
                 {
-                    bone.UpdatePosition();
+                    bone.UpdatePosition(TimeStepDuration);
                 }
             }
 
