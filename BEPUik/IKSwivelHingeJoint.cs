@@ -1,7 +1,7 @@
 ﻿using System;
 using BEPUutilities;
 
-namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
+namespace BEPUik
 {
     public class IKSwivelHingeJoint : IKJoint
     {

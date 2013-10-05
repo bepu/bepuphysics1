@@ -8,8 +8,8 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("BEPUphysicsDemos")]
 [assembly: AssemblyProduct("BEPUphysicsDemos")]
 [assembly: AssemblyDescription("")]
-[assembly: AssemblyCompany("Bepu Entertainment LLC.")]
-[assembly: AssemblyCopyright("Copyright © Bepu Entertainment LLC")]
+[assembly: AssemblyCompany("Bepu Entertainment LLC")]
+[assembly: AssemblyCopyright("Copyright © 2013, Bepu Entertainment LLC")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -35,3 +35,4 @@ using System.Runtime.InteropServices;
 //
 
 [assembly: AssemblyVersion("1.3.0.0")]
+[assembly: AssemblyFileVersionAttribute("0")]

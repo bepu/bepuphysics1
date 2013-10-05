@@ -1,7 +1,6 @@
-﻿using System;
-using BEPUutilities;
+﻿using BEPUutilities;
 
-namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
+namespace BEPUik
 {
     /// <summary>
     /// Keeps an anchor point on one bone between planes defined by another bone.

@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using BEPUutilities;
-using BEPUutilities.DataStructures;
 
-namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
+namespace BEPUik
 {
     /// <summary>
     /// <para>

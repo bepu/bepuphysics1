@@ -1,6 +1,7 @@
 ﻿#if WINDOWS
 using System;
 using System.Collections.Generic;
+using BEPUik;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.Constraints.TwoEntity.JointLimits;
 using BEPUphysics.Constraints.TwoEntity.Joints;
@@ -8,7 +9,6 @@ using BEPUphysics.Constraints.TwoEntity.Motors;
 using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.EntityStateManagement;
-using BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics;
 using BEPUphysicsDrawer.Models;
 using BEPUutilities;
 using System.Diagnostics;
