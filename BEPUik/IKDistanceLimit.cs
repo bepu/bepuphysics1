@@ -1,7 +1,7 @@
 ﻿using System;
 using BEPUutilities;
 
-namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
+namespace BEPUik
 {
     /// <summary>
     /// Tries to keep the anchor points on two bones within an allowed range of distances.

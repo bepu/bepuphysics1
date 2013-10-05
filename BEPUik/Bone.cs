@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using BEPUutilities;
 using BEPUutilities.DataStructures;
 
-namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
+namespace BEPUik
 {
     /// <summary>
     /// Piece of a character which is moved by constraints.

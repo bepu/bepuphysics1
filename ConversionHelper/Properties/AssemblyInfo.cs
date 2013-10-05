@@ -7,9 +7,9 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 [assembly: AssemblyTitle("ConversionHelper")]
 [assembly: AssemblyProduct("ConversionHelper")]
-[assembly: AssemblyDescription("")]
-[assembly: AssemblyCompany("Microsoft")]
-[assembly: AssemblyCopyright("Copyright © Microsoft 2011")]
+[assembly: AssemblyDescription("Simple math conversion helpers")]
+[assembly: AssemblyCompany("Bepu Entertainment, LLC")]
+[assembly: AssemblyCopyright("Copyright © 2013, Bepu Entertainment LLC")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

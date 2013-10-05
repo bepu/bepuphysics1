@@ -1,7 +1,7 @@
 ﻿using System;
 using BEPUutilities;
 
-namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
+namespace BEPUik
 {
     /// <summary>
     /// Prevents two bones from twisting beyond a certain angle away from each other as measured by the twist between two measurement axes.

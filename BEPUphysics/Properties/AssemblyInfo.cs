@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyProduct("BEPUphysics")]
 [assembly: AssemblyDescription("Real time physics simulation library")]
 [assembly: AssemblyCompany("Bepu Entertainment LLC")]
-[assembly: AssemblyCopyright("Copyright © Bepu Entertainment LLC")]
+[assembly: AssemblyCopyright("Copyright © 2013, Bepu Entertainment LLC")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -35,3 +35,4 @@ using System.Runtime.InteropServices;
 #if WINDOWS_PHONE
 [assembly: CodeGeneration(CodeGenerationFlags.EnableFPIntrinsicsUsingSIMD)]
 #endif
+[assembly: AssemblyFileVersionAttribute("0")]

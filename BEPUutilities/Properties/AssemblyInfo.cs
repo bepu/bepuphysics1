@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("BEPUutilities")]
 [assembly: AssemblyDescription("Extensions and helpers used by various bepu things.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Bepu Entertainment LLC.")]
+[assembly: AssemblyCompany("Bepu Entertainment LLC")]
 [assembly: AssemblyProduct("BEPUutilities")]
-[assembly: AssemblyCopyright("Copyright ©  2012")]
+[assembly: AssemblyCopyright("Copyright © 2013, Bepu Entertainment LLC")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

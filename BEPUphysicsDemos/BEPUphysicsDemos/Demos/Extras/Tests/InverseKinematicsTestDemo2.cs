@@ -1,9 +1,9 @@
 ﻿#if WINDOWS
 using System.Collections.Generic;
+using BEPUik;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
-using BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics;
 using BEPUutilities;
 
 namespace BEPUphysicsDemos.Demos.Extras.Tests

@@ -140,30 +140,6 @@
     <Compile Include="Demos\Extras\Tests\InverseKinematicsTestDemo2.cs" />
     <Compile Include="Demos\Extras\Tests\GeneralConvexPairStressDemo.cs" />
     <Compile Include="Demos\Extras\Tests\InverseKinematicsTestDemo.cs" />
-    <Compile Include="Demos\Extras\Tests\InverseKinematics\ActiveSet.cs" />
-    <Compile Include="Demos\Extras\Tests\InverseKinematics\Bone.cs" />
-    <Compile Include="Demos\Extras\Tests\InverseKinematics\Control.cs" />
-    <Compile Include="Demos\Extras\Tests\InverseKinematics\IKPointOnPlaneJoint.cs" />
-    <Compile Include="Demos\Extras\Tests\InverseKinematics\IKPointOnLineJoint.cs" />
-    <Compile Include="Demos\Extras\Tests\InverseKinematics\IKTwistJoint.cs" />
-    <Compile Include="Demos\Extras\Tests\InverseKinematics\IKLinearAxisLimit.cs" />
-    <Compile Include="Demos\Extras\Tests\InverseKinematics\IKDistanceLimit.cs" />
-    <Compile Include="Demos\Extras\Tests\InverseKinematics\IKTwistLimit.cs" />
-    <Compile Include="Demos\Extras\Tests\InverseKinematics\IKAngularJoint.cs" />
-    <Compile Include="Demos\Extras\Tests\InverseKinematics\IKSwivelHingeJoint.cs" />
-    <Compile Include="Demos\Extras\Tests\InverseKinematics\IKRevoluteJoint.cs" />
-    <Compile Include="Demos\Extras\Tests\InverseKinematics\IKLimit.cs" />
-    <Compile Include="Demos\Extras\Tests\InverseKinematics\IKSwingLimit.cs" />
-    <Compile Include="Demos\Extras\Tests\InverseKinematics\IKDistanceJoint.cs" />
-    <Compile Include="Demos\Extras\Tests\InverseKinematics\DragControl.cs" />
-    <Compile Include="Demos\Extras\Tests\InverseKinematics\IKBallSocketJoint.cs" />
-    <Compile Include="Demos\Extras\Tests\InverseKinematics\StateControl.cs" />
-    <Compile Include="Demos\Extras\Tests\InverseKinematics\IKConstraint.cs" />
-    <Compile Include="Demos\Extras\Tests\InverseKinematics\SingleBoneAngularMotor.cs" />
-    <Compile Include="Demos\Extras\Tests\InverseKinematics\SingleBoneConstraint.cs" />
-    <Compile Include="Demos\Extras\Tests\InverseKinematics\SingleBoneLinearMotor.cs" />
-    <Compile Include="Demos\Extras\Tests\InverseKinematics\IKSolver.cs" />
-    <Compile Include="Demos\Extras\Tests\InverseKinematics\IKJoint.cs" />
     <Compile Include="Demos\Extras\Tests\MultithreadedScalingTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\MobileMeshSolidityTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\KinematicActivityTestDemo.cs" />
@@ -229,6 +205,10 @@
     <Content Include="GameThumbnail.png" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\BEPUik\BEPUik.csproj">
+      <Project>{2D5A0344-623A-4BFA-AAB6-8AC64E2A4129}</Project>
+      <Name>BEPUik</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\BEPUphysicsDrawer\BEPUphysicsDrawer.csproj">
       <Project>{A7931B1B-6BF4-43C5-B924-6AEB732243BA}</Project>
       <Name>BEPUphysicsDrawer</Name>

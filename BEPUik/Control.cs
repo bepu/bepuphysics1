@@ -1,4 +1,4 @@
-﻿namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
+﻿namespace BEPUik
 {
     /// <summary>
     /// Constrains an individual bone in an attempt to reach some goal.
@@ -24,6 +24,6 @@
 
         protected internal abstract void ClearAccumulatedImpulses();
 
-        protected internal abstract float MaximumForce { get; set; }
+        public abstract float MaximumForce { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
+﻿namespace BEPUik
 {
     /// <summary>
     /// Constrains an individual bone in an attempt to reach some position and orientation goal.
@@ -85,7 +85,7 @@
             AngularMotor.ClearAccumulatedImpulses();
         }
 
-        protected internal override float MaximumForce
+        public override float MaximumForce
         {
             get { return LinearMotor.MaximumForce; }
             set

@@ -1,6 +1,6 @@
 ﻿using BEPUutilities;
 
-namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
+namespace BEPUik
 {
     /// <summary>
     /// Attempts to maintain the relative orientation between two bones.

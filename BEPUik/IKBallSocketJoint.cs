@@ -1,6 +1,6 @@
 ﻿using BEPUutilities;
 
-namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
+namespace BEPUik
 {
     //Keeps the anchors from two connections near each other.
     public class IKBallSocketJoint : IKJoint

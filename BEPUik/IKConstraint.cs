@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
+namespace BEPUik
 {
     public abstract class IKConstraint
     {

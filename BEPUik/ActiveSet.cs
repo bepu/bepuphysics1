@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using BEPUutilities.DataStructures;
 
-namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
+namespace BEPUik
 {
     /// <summary>
     /// Manages the subset of joints which potentially need solving.
