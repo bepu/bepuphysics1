@@ -186,7 +186,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         /// <summary>
         /// Integrates the position and orientation of the bone forward based upon the current linear and angular velocity.
         /// </summary>
-        internal void UpdatePosition()
+        /// <param name="dt">Time step used in position integration.</param>
+        internal void UpdatePosition(float dt)
         {
             //Update the position based on the linear velocity.
             Vector3.Add(ref linearVelocity, ref Position, out Position);

@@ -117,11 +117,11 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             //Incorporate the constraint softness into the effective mass denominator. This pushes the matrix away from singularity.
             //Softness will also be incorporated into the velocity solve iterations to complete the implementation.
             if (effectiveMass.M11 != 0)
-                effectiveMass.M11 += Softness;
+                effectiveMass.M11 += softness;
             if (effectiveMass.M22 != 0)
-                effectiveMass.M22 += Softness;
+                effectiveMass.M22 += softness;
             if (effectiveMass.M33 != 0)
-                effectiveMass.M33 += Softness;
+                effectiveMass.M33 += softness;
 
             //Invert! Takes us from J * M^-1 * JT to 1 / (J * M^-1 * JT).
             Matrix3x3.AdaptiveInvert(ref effectiveMass, out effectiveMass);

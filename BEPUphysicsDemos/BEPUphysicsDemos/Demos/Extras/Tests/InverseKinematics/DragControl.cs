@@ -29,7 +29,13 @@
         public DragControl()
         {
             LinearMotor = new SingleBoneLinearMotor();
-            LinearMotor.Softness = .2f;
+            LinearMotor.DampingConstant = 1;
+            LinearMotor.StiffnessConstant = 0.25f;
+        }
+
+        protected internal override void Preupdate(float dt)
+        {
+            LinearMotor.Preupdate(dt);
         }
 
         protected internal override void UpdateJacobiansAndVelocityBias()
@@ -57,12 +63,12 @@
             LinearMotor.ClearAccumulatedImpulses();
         }
 
-        protected internal override float MaximumImpulse
+        protected internal override float MaximumForce
         {
-            get { return LinearMotor.MaximumImpulse; }
+            get { return LinearMotor.MaximumForce; }
             set
             {
-                LinearMotor.MaximumImpulse = value;
+                LinearMotor.MaximumForce = value;
             }
         }
     }

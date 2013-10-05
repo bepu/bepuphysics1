@@ -12,6 +12,8 @@
         /// </summary>
         public abstract Bone TargetBone { get; set; }
 
+        protected internal abstract void Preupdate(float dt);
+
         protected internal abstract void UpdateJacobiansAndVelocityBias();
 
         protected internal abstract void ComputeEffectiveMass();
@@ -22,6 +24,6 @@
 
         protected internal abstract void ClearAccumulatedImpulses();
 
-        protected internal abstract float MaximumImpulse { get; set; }
+        protected internal abstract float MaximumForce { get; set; }
     }
 }

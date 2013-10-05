@@ -42,9 +42,18 @@
         {
             LinearMotor = new SingleBoneLinearMotor();
             AngularMotor = new SingleBoneAngularMotor();
-            LinearMotor.Softness = .2f;
-            AngularMotor.Softness = .2f;
+            LinearMotor.DampingConstant = 1;
+            LinearMotor.StiffnessConstant = 0.25f;
+            AngularMotor.DampingConstant = 1;
+            AngularMotor.StiffnessConstant = 0.25f;
         }
+
+        protected internal override void Preupdate(float dt)
+        {
+            LinearMotor.Preupdate(dt);
+            AngularMotor.Preupdate(dt);
+        }
+
 
         protected internal override void UpdateJacobiansAndVelocityBias()
         {
@@ -76,13 +85,13 @@
             AngularMotor.ClearAccumulatedImpulses();
         }
 
-        protected internal override float MaximumImpulse
+        protected internal override float MaximumForce
         {
-            get { return LinearMotor.MaximumImpulse; }
+            get { return LinearMotor.MaximumForce; }
             set
             {
-                LinearMotor.MaximumImpulse = value;
-                AngularMotor.MaximumImpulse = value;
+                LinearMotor.MaximumForce = value;
+                AngularMotor.MaximumForce = value;
             }
         }
     }

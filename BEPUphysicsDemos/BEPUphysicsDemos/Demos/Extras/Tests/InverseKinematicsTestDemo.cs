@@ -114,7 +114,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
 
         private IKSolver solver = new IKSolver();
 
-
+        private FreeCameraControlScheme cameraControl;
 
         private DragControl dragControl = new DragControl();
         private float distanceToGrabbedBone;
@@ -173,7 +173,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                 Space.Add(dynamicsBallSocketJoint);
                 Space.Add(dynamicsAngularFriction);
                 var ikBallSocketJoint = new IKBallSocketJoint(previousBone, bone, anchor); //(the joint is auto-added to the bones; no solver-add is needed)
-                var ikAngularFriction = new IKAngularJoint(previousBone, bone) { ErrorCorrectionFactor = 0, MaximumImpulse = 10 };
+                var ikAngularFriction = new IKAngularJoint(previousBone, bone) { StiffnessConstant = 0, MaximumForce = 10 };
                 joints.Add(ikBallSocketJoint);
                 joints.Add(ikAngularFriction);
 
@@ -416,49 +416,49 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             //Left arm
             joints.Add(new IKBallSocketJoint(bodyBone, upperLeftArmBone, bodyUpperLeftArmBallSocketAnchor));
             joints.Add(new IKSwingLimit(bodyBone, upperLeftArmBone, Vector3.Normalize(new Vector3(-1, 0, .3f)), Vector3.Left, MathHelper.Pi * .65f));
-            joints.Add(new IKTwistLimit(bodyBone, upperLeftArmBone, Vector3.Left, Vector3.Left, MathHelper.PiOver2) { Softness = 10 });
+            joints.Add(new IKTwistLimit(bodyBone, upperLeftArmBone, Vector3.Left, Vector3.Left, MathHelper.PiOver2) { StiffnessConstant = 0.02f, DampingConstant = 0.08f });
             joints.Add(new IKBallSocketJoint(upperLeftArmBone, lowerLeftArmBone, upperLeftArmLowerLeftArmBallSocketAnchor));
             joints.Add(new IKSwivelHingeJoint(upperLeftArmBone, lowerLeftArmBone, Vector3.Up, Vector3.Left));
             joints.Add(new IKSwingLimit(upperLeftArmBone, lowerLeftArmBone, Vector3.Normalize(new Vector3(-0.23f, 0, .97f)), Vector3.Left, MathHelper.Pi * 0.435f));
-            joints.Add(new IKTwistLimit(upperLeftArmBone, lowerLeftArmBone, Vector3.Left, Vector3.Left, MathHelper.PiOver4) { Softness = 10 });
+            joints.Add(new IKTwistLimit(upperLeftArmBone, lowerLeftArmBone, Vector3.Left, Vector3.Left, MathHelper.PiOver4) { StiffnessConstant = 0.02f, DampingConstant = 0.08f });
             joints.Add(new IKBallSocketJoint(lowerLeftArmBone, leftHandBone, lowerLeftArmLeftHandBallSocketAnchor));
             joints.Add(new IKSwingLimit(lowerLeftArmBone, leftHandBone, Vector3.Left, Vector3.Left, MathHelper.PiOver2));
-            joints.Add(new IKTwistLimit(lowerLeftArmBone, leftHandBone, Vector3.Left, Vector3.Left, MathHelper.PiOver4) { Softness = 10 });
+            joints.Add(new IKTwistLimit(lowerLeftArmBone, leftHandBone, Vector3.Left, Vector3.Left, MathHelper.PiOver4) { StiffnessConstant = 0.02f, DampingConstant = 0.08f });
 
             //Right arm
             joints.Add(new IKBallSocketJoint(bodyBone, upperRightArmBone, bodyUpperRightArmBallSocketAnchor));
             joints.Add(new IKSwingLimit(bodyBone, upperRightArmBone, Vector3.Normalize(new Vector3(1, 0, .3f)), Vector3.Right, MathHelper.Pi * .65f));
-            joints.Add(new IKTwistLimit(bodyBone, upperRightArmBone, Vector3.Right, Vector3.Right, MathHelper.PiOver2) { Softness = 10 });
+            joints.Add(new IKTwistLimit(bodyBone, upperRightArmBone, Vector3.Right, Vector3.Right, MathHelper.PiOver2) { StiffnessConstant = 0.02f, DampingConstant = 0.08f });
             joints.Add(new IKBallSocketJoint(upperRightArmBone, lowerRightArmBone, upperRightArmLowerRightArmBallSocketAnchor));
             joints.Add(new IKSwivelHingeJoint(upperRightArmBone, lowerRightArmBone, Vector3.Up, Vector3.Right));
             joints.Add(new IKSwingLimit(upperRightArmBone, lowerRightArmBone, Vector3.Normalize(new Vector3(0.23f, 0, .97f)), Vector3.Right, MathHelper.Pi * 0.435f));
-            joints.Add(new IKTwistLimit(upperRightArmBone, lowerRightArmBone, Vector3.Right, Vector3.Right, MathHelper.PiOver4) { Softness = 10 });
+            joints.Add(new IKTwistLimit(upperRightArmBone, lowerRightArmBone, Vector3.Right, Vector3.Right, MathHelper.PiOver4) { StiffnessConstant = 0.02f, DampingConstant = 0.08f });
             joints.Add(new IKBallSocketJoint(lowerRightArmBone, rightHandBone, lowerRightArmRightHandBallSocketAnchor));
             joints.Add(new IKSwingLimit(lowerRightArmBone, rightHandBone, Vector3.Right, Vector3.Right, MathHelper.PiOver2));
-            joints.Add(new IKTwistLimit(lowerRightArmBone, rightHandBone, Vector3.Right, Vector3.Right, MathHelper.PiOver4) { Softness = 10 });
+            joints.Add(new IKTwistLimit(lowerRightArmBone, rightHandBone, Vector3.Right, Vector3.Right, MathHelper.PiOver4) { StiffnessConstant = 0.02f, DampingConstant = 0.08f });
 
             //Left Leg
             joints.Add(new IKBallSocketJoint(bodyBone, upperLeftLegBone, bodyUpperLeftLegBallSocketAnchor));
             joints.Add(new IKSwingLimit(bodyBone, upperLeftLegBone, Vector3.Normalize(new Vector3(-.3f, -1, .6f)), Vector3.Down, MathHelper.Pi * 0.6f));
-            joints.Add(new IKTwistLimit(bodyBone, upperLeftLegBone, Vector3.Up, Vector3.Up, MathHelper.PiOver4) { MeasurementAxisA = Vector3.Normalize(new Vector3(-1, 0, 1)), Softness = 10 });
+            joints.Add(new IKTwistLimit(bodyBone, upperLeftLegBone, Vector3.Up, Vector3.Up, MathHelper.PiOver4) { MeasurementAxisA = Vector3.Normalize(new Vector3(-1, 0, 1)), StiffnessConstant = 0.02f, DampingConstant = 0.08f });
             joints.Add(new IKBallSocketJoint(upperLeftLegBone, lowerLeftLegBone, upperLeftLegLowerLeftLegBallSocketAnchor));
             joints.Add(new IKSwivelHingeJoint(upperLeftLegBone, lowerLeftLegBone, Vector3.Left, Vector3.Down));
-            joints.Add(new IKTwistLimit(upperLeftLegBone, lowerLeftLegBone, Vector3.Up, Vector3.Up, MathHelper.Pi * .1f) { Softness = 10 });
+            joints.Add(new IKTwistLimit(upperLeftLegBone, lowerLeftLegBone, Vector3.Up, Vector3.Up, MathHelper.Pi * .1f) { StiffnessConstant = 0.02f, DampingConstant = 0.08f });
             joints.Add(new IKSwingLimit(upperLeftLegBone, lowerLeftLegBone, Vector3.Normalize(new Vector3(0, -.23f, -.97f)), Vector3.Down, MathHelper.Pi * 0.435f));
             joints.Add(new IKBallSocketJoint(lowerLeftLegBone, leftFootBone, lowerLeftLegLeftFootBallSocketAnchor));
-            joints.Add(new IKTwistJoint(lowerLeftLegBone, leftFootBone, Vector3.Down, Vector3.Down) { Softness = 10 });
+            joints.Add(new IKTwistJoint(lowerLeftLegBone, leftFootBone, Vector3.Down, Vector3.Down) { StiffnessConstant = 0.02f, DampingConstant = 0.08f });
             joints.Add(new IKSwingLimit(lowerLeftLegBone, leftFootBone, Vector3.Normalize(new Vector3(0, -1, -.3f)), Vector3.Down, MathHelper.Pi * 0.22f));
 
             //Right leg
             joints.Add(new IKBallSocketJoint(bodyBone, upperRightLegBone, bodyUpperRightLegBallSocketAnchor));
             joints.Add(new IKSwingLimit(bodyBone, upperRightLegBone, Vector3.Normalize(new Vector3(.3f, -1, .6f)), Vector3.Down, MathHelper.Pi * 0.6f));
-            joints.Add(new IKTwistLimit(bodyBone, upperRightLegBone, Vector3.Up, Vector3.Up, MathHelper.PiOver4) { MeasurementAxisA = Vector3.Normalize(new Vector3(1, 0, 1)), Softness = 10 });
+            joints.Add(new IKTwistLimit(bodyBone, upperRightLegBone, Vector3.Up, Vector3.Up, MathHelper.PiOver4) { MeasurementAxisA = Vector3.Normalize(new Vector3(1, 0, 1)), StiffnessConstant = 0.02f, DampingConstant = 0.08f });
             joints.Add(new IKBallSocketJoint(upperRightLegBone, lowerRightLegBone, upperRightLegLowerRightLegBallSocketAnchor));
             joints.Add(new IKSwivelHingeJoint(upperRightLegBone, lowerRightLegBone, Vector3.Right, Vector3.Down));
-            joints.Add(new IKTwistLimit(upperRightLegBone, lowerRightLegBone, Vector3.Up, Vector3.Up, MathHelper.Pi * .1f) { Softness = 10 });
+            joints.Add(new IKTwistLimit(upperRightLegBone, lowerRightLegBone, Vector3.Up, Vector3.Up, MathHelper.Pi * .1f) { StiffnessConstant = 0.02f, DampingConstant = 0.08f });
             joints.Add(new IKSwingLimit(upperRightLegBone, lowerRightLegBone, Vector3.Normalize(new Vector3(0, -.23f, -.97f)), Vector3.Down, MathHelper.Pi * 0.435f));
             joints.Add(new IKBallSocketJoint(lowerRightLegBone, rightFootBone, lowerRightLegRightFootBallSocketAnchor));
-            joints.Add(new IKTwistJoint(lowerRightLegBone, rightFootBone, Vector3.Down, Vector3.Down) { Softness = 10 });
+            joints.Add(new IKTwistJoint(lowerRightLegBone, rightFootBone, Vector3.Down, Vector3.Down) { StiffnessConstant = 0.02f, DampingConstant = 0.08f });
             joints.Add(new IKSwingLimit(lowerRightLegBone, rightFootBone, Vector3.Normalize(new Vector3(0, -1, -.3f)), Vector3.Down, MathHelper.Pi * 0.22f));
 
 
@@ -797,7 +797,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             : base(game)
         {
 
-
+            cameraControl = new FreeCameraControlScheme(10, game.Camera, game);
             whitePixel = game.Content.Load<Texture2D>("whitePixel");
             game.Camera.Position = new Vector3(0, 3, 5);
             Box ground = new Box(new Vector3(0, 0, 0), 30, 1, 30);
@@ -812,7 +812,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             solver.ActiveSet.UseAutomass = true;
             solver.AutoscaleControlImpulses = true;
             solver.AutoscaleControlMaximumForce = 6;
-            solver.ControlIterationCount = 20;
+            solver.TimeStepDuration = 1;
+            solver.ControlIterationCount = 50;
             solver.FixerIterationCount = 0;
             solver.VelocitySubiterationCount = 3;
 
@@ -852,6 +853,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
 
         public override void Update(float dt)
         {
+            cameraControl.Update(dt);
+
             if (Game.WasKeyPressed(Keys.T))
             {
                 usingIK = !usingIK;
