@@ -89,21 +89,23 @@ namespace BEPUphysics.Constraints
         /// Automatically called by constraint presteps to compute their per-frame values.
         /// </summary>
         /// <param name="dt">Simulation timestep.</param>
+        /// <param name="updateRate">Inverse simulation timestep.</param>
         /// <param name="errorReduction">Error reduction factor to use this frame.</param>
         /// <param name="softness">Adjusted softness of the constraint for this frame.</param>
-        public void ComputeErrorReductionAndSoftness(float dt, out float errorReduction, out float softness)
+        public void ComputeErrorReductionAndSoftness(float dt, float updateRate, out float errorReduction, out float softness)
         {
             if (advanced.useAdvancedSettings)
             {
-                errorReduction = advanced.errorReductionFactor / dt;
-                softness = advanced.softness / dt;
+                errorReduction = advanced.errorReductionFactor * updateRate;
+                softness = advanced.softness * updateRate;
             }
             else
             {
                 if (stiffnessConstant == 0 && dampingConstant == 0)
                     throw new InvalidOperationException("Constraints cannot have both 0 stiffness and 0 damping.");
-                errorReduction = stiffnessConstant / (dt * stiffnessConstant + dampingConstant);
-                softness = 1 / (dt * (dt * stiffnessConstant + dampingConstant));
+                float multiplier = 1 / (dt * stiffnessConstant + dampingConstant);
+                errorReduction = stiffnessConstant * multiplier;
+                softness = updateRate * multiplier;
             }
         }
     }

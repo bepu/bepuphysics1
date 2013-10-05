@@ -49,14 +49,16 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         /// Updates the softness, bias factor, and maximum impulse based on the current time step.
         /// </summary>
         /// <param name="dt">Time step duration.</param>
-        protected internal void Preupdate(float dt)
+        /// <param name="updateRate">Inverse time step duration.</param>
+        protected internal void Preupdate(float dt, float updateRate)
         {
             if (stiffnessConstant == 0 && dampingConstant == 0)
                 throw new InvalidOperationException("Constraints cannot have both 0 stiffness and 0 damping.");
-            errorCorrectionFactor = stiffnessConstant / (dt * stiffnessConstant + dampingConstant);
-            softness = 1 / (dt * (dt * stiffnessConstant + dampingConstant));
+            float multiplier = 1 / (dt * stiffnessConstant + dampingConstant);
+            errorCorrectionFactor = stiffnessConstant * multiplier;
+            softness = updateRate * multiplier;
             maximumImpulse = maximumForce * dt;
-            maximumImpulseSquared = maximumImpulse * maximumImpulse;
+            maximumImpulseSquared = Math.Min(float.MaxValue, maximumImpulse * maximumImpulse);
 
         }
 

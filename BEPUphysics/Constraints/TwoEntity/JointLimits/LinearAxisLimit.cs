@@ -399,7 +399,7 @@ namespace BEPUphysics.Constraints.TwoEntity.JointLimits
 
             //Compute bias
             float errorReductionParameter;
-            springSettings.ComputeErrorReductionAndSoftness(dt, out errorReductionParameter, out softness);
+            springSettings.ComputeErrorReductionAndSoftness(dt, 1 / dt, out errorReductionParameter, out softness);
 
             biasVelocity = MathHelper.Clamp(errorReductionParameter * error, -maxCorrectiveVelocity, maxCorrectiveVelocity);
             if (bounciness > 0)

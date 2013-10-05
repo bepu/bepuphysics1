@@ -384,7 +384,7 @@ namespace BEPUphysics.Constraints.TwoEntity.JointLimits
 
 
             float errorReduction;
-            springSettings.ComputeErrorReductionAndSoftness(dt, out errorReduction, out softness);
+            springSettings.ComputeErrorReductionAndSoftness(dt, 1 / dt, out errorReduction, out softness);
 
             //Compute the error correcting velocity
             error = error - margin;

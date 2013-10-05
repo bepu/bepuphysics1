@@ -1,6 +1,6 @@
 ﻿using BEPUphysics.Constraints;
 using BEPUphysics.Entities;
- 
+
 using BEPUutilities;
 
 namespace BEPUphysics.Vehicle
@@ -241,7 +241,7 @@ namespace BEPUphysics.Vehicle
         internal float ApplyImpulse()
         {
             //Compute relative velocity
-            float lambda = (RelativeVelocity 
+            float lambda = (RelativeVelocity
                             + bias //Add in position correction
                             + softness * accumulatedImpulse) //Add in squishiness
                            * velocityToImpulse; //convert to impulse
@@ -355,7 +355,7 @@ namespace BEPUphysics.Vehicle
 
             //Convert spring constant and damping constant into ERP and CFM.
             float biasFactor;
-            springSettings.ComputeErrorReductionAndSoftness(dt, out biasFactor, out softness);
+            springSettings.ComputeErrorReductionAndSoftness(dt, 1 / dt, out biasFactor, out softness);
 
             velocityToImpulse = -1 / (entryA + entryB + softness);
 

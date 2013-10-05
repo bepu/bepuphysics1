@@ -277,7 +277,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Joints
             //****** VELOCITY BIAS ******//
             //Compute the correction velocity.
             float errorReduction;
-            springSettings.ComputeErrorReductionAndSoftness(dt, out errorReduction, out softness);
+            springSettings.ComputeErrorReductionAndSoftness(dt, 1 / dt, out errorReduction, out softness);
             biasVelocity = MathHelper.Clamp(-error * errorReduction, -maxCorrectiveVelocity, maxCorrectiveVelocity);
 
             //****** EFFECTIVE MASS MATRIX ******//

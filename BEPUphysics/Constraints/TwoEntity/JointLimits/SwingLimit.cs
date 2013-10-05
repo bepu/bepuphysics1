@@ -1,6 +1,6 @@
 ﻿using System;
 using BEPUphysics.Entities;
- 
+
 using BEPUutilities;
 
 namespace BEPUphysics.Constraints.TwoEntity.JointLimits
@@ -295,7 +295,7 @@ namespace BEPUphysics.Constraints.TwoEntity.JointLimits
 
 
             float errorReduction;
-            springSettings.ComputeErrorReductionAndSoftness(dt, out errorReduction, out softness);
+            springSettings.ComputeErrorReductionAndSoftness(dt, 1 / dt, out errorReduction, out softness);
 
             //Further away from 0 degrees is further negative; if the dot is below the minimum cosine, it means the angle is above the maximum angle.
             error = Math.Max(0, minimumCosine - dot - margin);

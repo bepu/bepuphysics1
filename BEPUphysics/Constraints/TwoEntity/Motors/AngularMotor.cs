@@ -249,7 +249,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
                 
 
                 float errorReduction;
-                settings.servo.springSettings.ComputeErrorReductionAndSoftness(dt, out errorReduction, out usedSoftness);
+                settings.servo.springSettings.ComputeErrorReductionAndSoftness(dt, 1 / dt, out errorReduction, out usedSoftness);
 
                 //Turn this into an axis-angle representation.
                 Quaternion.GetAxisAngleFromQuaternion(ref error, out axis, out angle);

@@ -32,7 +32,7 @@ namespace BEPUphysicsDemos.Demos
             Space.Add(toAdd);
             //Bouncy balls 
             toAdd = new Sphere(new Vector3(-8, 10, 0), 1, 1);
-            toAdd.Material = new Material(.8f, .8f, .92f);
+            toAdd.Material = new Material(.8f, .8f, .95f);
             Space.Add(toAdd);
             toAdd = new Sphere(new Vector3(-5, 10, 0), 1, 1);
             toAdd.Material = new Material(.8f, .8f, .5f);
@@ -66,6 +66,12 @@ namespace BEPUphysicsDemos.Demos
         public override string Name
         {
             get { return "Bounciness and Friction"; }
+        }
+
+        public override void CleanUp()
+        {
+            MaterialManager.MaterialBlender = MaterialManager.DefaultMaterialBlender;
+            base.CleanUp();
         }
     }
 }

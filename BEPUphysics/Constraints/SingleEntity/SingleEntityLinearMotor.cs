@@ -211,7 +211,7 @@ namespace BEPUphysics.Constraints.SingleEntity
             Matrix3x3.Transform(ref localPoint, ref entity.orientationMatrix, out r);
             Vector3.Add(ref r, ref entity.position, out worldPoint);
 
-
+            float updateRate = 1 / dt;
             if (settings.mode == MotorMode.Servomechanism)
             {
                 Vector3.Subtract(ref settings.servo.goal, ref worldPoint, out error);
@@ -219,11 +219,11 @@ namespace BEPUphysics.Constraints.SingleEntity
                 if (separationDistance > Toolbox.BigEpsilon)
                 {
                     float errorReduction;
-                    settings.servo.springSettings.ComputeErrorReductionAndSoftness(dt, out errorReduction, out usedSoftness);
+                    settings.servo.springSettings.ComputeErrorReductionAndSoftness(dt, updateRate, out errorReduction, out usedSoftness);
 
                     //The rate of correction can be based on a constant correction velocity as well as a 'spring like' correction velocity.
                     //The constant correction velocity could overshoot the destination, so clamp it.
-                    float correctionSpeed = MathHelper.Min(settings.servo.baseCorrectiveSpeed, separationDistance / dt) +
+                    float correctionSpeed = MathHelper.Min(settings.servo.baseCorrectiveSpeed, separationDistance * updateRate) +
                                             separationDistance * errorReduction;
 
                     Vector3.Multiply(ref error, correctionSpeed / separationDistance, out biasVelocity);
@@ -245,7 +245,7 @@ namespace BEPUphysics.Constraints.SingleEntity
             }
             else
             {
-                usedSoftness = settings.velocityMotor.softness / dt;
+                usedSoftness = settings.velocityMotor.softness * updateRate;
                 biasVelocity = settings.velocityMotor.goalVelocity;
                 error = Vector3.Zero;
             }

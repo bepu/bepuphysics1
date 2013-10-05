@@ -215,7 +215,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
             basis.ComputeWorldSpaceAxes();
             Matrix3x3.Transform(ref localTestAxis, ref connectionB.orientationMatrix, out worldTestAxis);
 
-
+            float updateRate = 1 / dt;
             if (settings.mode == MotorMode.Servomechanism)
             {
                 float y, x;
@@ -230,9 +230,9 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
                 error = GetDistanceFromGoal(angle);
 
 
-                float absErrorOverDt = Math.Abs(error / dt);
+                float absErrorOverDt = Math.Abs(error * updateRate);
                 float errorReduction;
-                settings.servo.springSettings.ComputeErrorReductionAndSoftness(dt, out errorReduction, out usedSoftness);
+                settings.servo.springSettings.ComputeErrorReductionAndSoftness(dt, updateRate, out errorReduction, out usedSoftness);
                 biasVelocity = Math.Sign(error) * MathHelper.Min(settings.servo.baseCorrectiveSpeed, absErrorOverDt) + error * errorReduction;
 
                 biasVelocity = MathHelper.Clamp(biasVelocity, -settings.servo.maxCorrectiveVelocity, settings.servo.maxCorrectiveVelocity);
@@ -240,7 +240,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
             else
             {
                 biasVelocity = settings.velocityMotor.goalVelocity;
-                usedSoftness = settings.velocityMotor.softness / dt;
+                usedSoftness = settings.velocityMotor.softness * updateRate;
                 error = 0;
             }
 

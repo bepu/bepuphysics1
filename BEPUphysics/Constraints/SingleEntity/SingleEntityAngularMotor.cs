@@ -153,6 +153,7 @@ namespace BEPUphysics.Constraints.SingleEntity
             basis.rotationMatrix = entity.orientationMatrix;
             basis.ComputeWorldSpaceAxes();
 
+            float updateRate = 1 / dt;
             if (settings.mode == MotorMode.Servomechanism) //Only need to do the bulk of this work if it's a servo.
             {
                 Quaternion currentRelativeOrientation;
@@ -167,7 +168,7 @@ namespace BEPUphysics.Constraints.SingleEntity
 
 
                 float errorReduction;
-                settings.servo.springSettings.ComputeErrorReductionAndSoftness(dt, out errorReduction, out usedSoftness);
+                settings.servo.springSettings.ComputeErrorReductionAndSoftness(dt, updateRate, out errorReduction, out usedSoftness);
 
                 //Turn this into an axis-angle representation.
                 Quaternion.GetAxisAngleFromQuaternion(ref errorOrientation, out axis, out angle);
@@ -175,7 +176,7 @@ namespace BEPUphysics.Constraints.SingleEntity
                 //Scale the axis by the desired velocity if the angle is sufficiently large (epsilon).
                 if (angle > Toolbox.BigEpsilon)
                 {
-                    float velocity = MathHelper.Min(settings.servo.baseCorrectiveSpeed, angle / dt) + angle * errorReduction;
+                    float velocity = MathHelper.Min(settings.servo.baseCorrectiveSpeed, angle * updateRate) + angle * errorReduction;
 
                     biasVelocity.X = axis.X * velocity;
                     biasVelocity.Y = axis.Y * velocity;
@@ -200,7 +201,7 @@ namespace BEPUphysics.Constraints.SingleEntity
             }
             else
             {
-                usedSoftness = settings.velocityMotor.softness / dt;
+                usedSoftness = settings.velocityMotor.softness * updateRate;
                 angle = 0; //Zero out the error;
                 Matrix3x3 transform = basis.WorldTransform;
                 Matrix3x3.Transform(ref settings.velocityMotor.goalVelocity, ref transform, out biasVelocity);

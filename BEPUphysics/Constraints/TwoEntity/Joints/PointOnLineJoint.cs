@@ -424,7 +424,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Joints
             Vector3.Dot(ref error3D, ref worldRestrictedAxis2, out error.Y);
 
             float errorReduction;
-            springSettings.ComputeErrorReductionAndSoftness(dt, out errorReduction, out softness);
+            springSettings.ComputeErrorReductionAndSoftness(dt, 1 / dt, out errorReduction, out softness);
             float bias = -errorReduction;
 
 

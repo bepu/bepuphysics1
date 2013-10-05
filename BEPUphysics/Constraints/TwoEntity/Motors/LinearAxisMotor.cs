@@ -1,6 +1,6 @@
 ﻿using System;
 using BEPUphysics.Entities;
- 
+
 using BEPUutilities;
 
 namespace BEPUphysics.Constraints.TwoEntity.Motors
@@ -150,10 +150,10 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
             get { return worldOffsetA; }
             set
             {
-                worldOffsetA = value; 
+                worldOffsetA = value;
                 worldAnchorA = connectionA.position + worldOffsetA;
                 Matrix3x3.TransformTranspose(ref worldOffsetA, ref connectionA.orientationMatrix, out localAnchorA); //Looks weird, but localAnchorA is "localOffsetA."
-                
+
             }
         }
 
@@ -327,6 +327,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
             Vector3.Subtract(ref worldAnchorB, ref connectionA.position, out rA);
             Matrix3x3.Transform(ref localAxis, ref connectionA.orientationMatrix, out worldAxis);
 
+            float updateRate = 1 / dt;
             if (settings.mode == MotorMode.Servomechanism)
             {
                 //Compute error
@@ -346,16 +347,16 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
 
 
                 //Compute bias
-                float absErrorOverDt = Math.Abs(error / dt);
+                float absErrorOverDt = Math.Abs(error * updateRate);
                 float errorReduction;
-                settings.servo.springSettings.ComputeErrorReductionAndSoftness(dt, out errorReduction, out usedSoftness);
+                settings.servo.springSettings.ComputeErrorReductionAndSoftness(dt, updateRate, out errorReduction, out usedSoftness);
                 biasVelocity = Math.Sign(error) * MathHelper.Min(settings.servo.baseCorrectiveSpeed, absErrorOverDt) + error * errorReduction;
                 biasVelocity = MathHelper.Clamp(biasVelocity, -settings.servo.maxCorrectiveVelocity, settings.servo.maxCorrectiveVelocity);
             }
             else
             {
                 biasVelocity = -settings.velocityMotor.goalVelocity;
-                usedSoftness = settings.velocityMotor.softness / dt;
+                usedSoftness = settings.velocityMotor.softness * updateRate;
                 error = 0;
             }
 
@@ -392,7 +393,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
             ComputeMaxForces(settings.maximumForce, dt);
 
 
-            
+
         }
 
         /// <summary>

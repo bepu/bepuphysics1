@@ -1,5 +1,5 @@
 ﻿using BEPUphysics.Entities;
- 
+
 using BEPUutilities;
 
 namespace BEPUphysics.Constraints.TwoEntity.Joints
@@ -324,7 +324,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Joints
             Vector3.Subtract(ref worldPointAnchor, ref closestPointOnPlane, out offset);
             Vector3.Dot(ref offset, ref worldPlaneNormal, out error);
             float errorReduction;
-            springSettings.ComputeErrorReductionAndSoftness(dt, out errorReduction, out softness);
+            springSettings.ComputeErrorReductionAndSoftness(dt, 1 / dt, out errorReduction, out softness);
             biasVelocity = MathHelper.Clamp(-errorReduction * error, -maxCorrectiveVelocity, maxCorrectiveVelocity);
 
             if (connectionA.IsDynamic && connectionB.IsDynamic)
