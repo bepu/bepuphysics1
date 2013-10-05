@@ -186,11 +186,10 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
         /// <summary>
         /// Integrates the position and orientation of the bone forward based upon the current linear and angular velocity.
         /// </summary>
-        /// <param name="dt">Time step used in position integration.</param>
-        internal void UpdatePosition(float dt)
+        internal void UpdatePosition()
         {
             //Update the position based on the linear velocity.
-            Vector3.Add(ref linearVelocity, ref Position, out Position);
+            Vector3.Add(ref Position, ref linearVelocity, out Position);
 
             //Update the orientation based on the angular velocity.
             Vector3 increment;
@@ -205,6 +204,12 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests.InverseKinematics
             //(Well, that and the whole lack of collision detection...)
             linearVelocity = new Vector3();
             angularVelocity = new Vector3();
+
+            //Note: Unlike a regular dynamics simulation, we do not include any 'dt' parameter in the above integration.
+            //Setting the velocity to 0 every update means that no more than a single iteration's worth of velocity accumulates.
+            //Since the softness of constraints already varies with the time step and bones never accelerate for more than one frame,
+            //scaling the velocity for position integration actually turns out generally worse.
+            //This is not a rigorously justifiable approach, but this isn't a regular dynamic simulation anyway.
         }
 
         internal void ApplyLinearImpulse(ref Vector3 impulse)

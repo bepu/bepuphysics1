@@ -1,7 +1,7 @@
 ﻿using System;
 using BEPUphysics.Entities;
 using BEPUutilities;
- 
+
 
 namespace BEPUphysics.Constraints.TwoEntity.Joints
 {
@@ -273,7 +273,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Joints
             Vector3.Dot(ref error, ref worldConstrainedAxis1, out this.error.X);
             Vector3.Dot(ref error, ref worldConstrainedAxis2, out this.error.Y);
             float errorReduction;
-            springSettings.ComputeErrorReductionAndSoftness(dt, out errorReduction, out softness);
+            springSettings.ComputeErrorReductionAndSoftness(dt, 1 / dt, out errorReduction, out softness);
             errorReduction = -errorReduction;
             biasVelocity.X = errorReduction * this.error.X;
             biasVelocity.Y = errorReduction * this.error.Y;
@@ -283,7 +283,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Joints
             float length = biasVelocity.LengthSquared();
             if (length > maxCorrectiveVelocitySquared)
             {
-                float multiplier = maxCorrectiveVelocity / (float) Math.Sqrt(length);
+                float multiplier = maxCorrectiveVelocity / (float)Math.Sqrt(length);
                 biasVelocity.X *= multiplier;
                 biasVelocity.Y *= multiplier;
             }
@@ -321,7 +321,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Joints
             Matrix2x2.Invert(ref effectiveMassMatrix, out effectiveMassMatrix);
             Matrix2x2.Negate(ref effectiveMassMatrix, out effectiveMassMatrix);
 
-   
+
         }
 
         /// <summary>

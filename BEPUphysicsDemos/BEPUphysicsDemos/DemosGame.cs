@@ -1,6 +1,7 @@
 using System;
 using BEPUphysics.Entities;
 using BEPUphysicsDemos.Demos;
+using BEPUphysicsDemos.Demos.Extras.Tests;
 using BEPUphysicsDemos.SampleCode;
 using BEPUphysicsDrawer.Font;
 using BEPUphysicsDrawer.Lines;
@@ -168,7 +169,7 @@ namespace BEPUphysicsDemos
             currentSimulation = (Demo)demoType.GetConstructor(new[] { typeof(DemosGame) }).Invoke(new object[] { this });
 
 #else
-            currentSimulation = (Demo)Activator.CreateInstance(demoType, new object[] { this });
+            currentSimulation = new InverseKinematicsTestDemo(this);// (Demo)Activator.CreateInstance(demoType, new object[] { this });
 #endif
             #region DisplayObject creation
 

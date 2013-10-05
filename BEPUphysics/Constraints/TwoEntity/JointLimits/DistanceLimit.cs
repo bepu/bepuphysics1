@@ -1,6 +1,6 @@
 using System;
 using BEPUphysics.Entities;
- 
+
 using BEPUutilities;
 
 namespace BEPUphysics.Constraints.TwoEntity.JointLimits
@@ -399,7 +399,7 @@ namespace BEPUphysics.Constraints.TwoEntity.JointLimits
             }
 
             float errorReduction;
-            springSettings.ComputeErrorReductionAndSoftness(dt, out errorReduction, out softness);
+            springSettings.ComputeErrorReductionAndSoftness(dt, 1 / dt, out errorReduction, out softness);
 
             velocityToImpulse = 1 / (softness + velocityToImpulse);
             //Finish computing jacobian; it's down here as an optimization (since it didn't need to be negated in mass matrix)
@@ -428,7 +428,7 @@ namespace BEPUphysics.Constraints.TwoEntity.JointLimits
                     biasVelocity = Math.Max(biasVelocity, -relativeVelocity * bounciness);
             }
 
-            
+
         }
 
         /// <summary>

@@ -465,7 +465,7 @@ namespace BEPUphysics.Constraints.TwoEntity.JointLimits
             //****** VELOCITY BIAS ******//
             //Compute the correction velocity
             float errorReduction;
-            springSettings.ComputeErrorReductionAndSoftness(dt, out errorReduction, out softness);
+            springSettings.ComputeErrorReductionAndSoftness(dt, 1 / dt, out errorReduction, out softness);
 
             //Compute the jacobians
             if (minIsActive)

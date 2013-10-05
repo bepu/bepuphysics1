@@ -12,7 +12,7 @@
         /// </summary>
         public abstract Bone TargetBone { get; set; }
 
-        protected internal abstract void Preupdate(float dt);
+        protected internal abstract void Preupdate(float dt, float updateRate);
 
         protected internal abstract void UpdateJacobiansAndVelocityBias();
 

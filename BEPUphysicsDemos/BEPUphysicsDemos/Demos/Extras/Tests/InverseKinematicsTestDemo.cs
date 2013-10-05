@@ -811,8 +811,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
 
             solver.ActiveSet.UseAutomass = true;
             solver.AutoscaleControlImpulses = true;
-            solver.AutoscaleControlMaximumForce = 6;
-            solver.TimeStepDuration = 1;
+            solver.AutoscaleControlMaximumForce = float.MaxValue;
+            solver.TimeStepDuration = 1f;
             solver.ControlIterationCount = 50;
             solver.FixerIterationCount = 0;
             solver.VelocitySubiterationCount = 3;

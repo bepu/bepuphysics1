@@ -214,7 +214,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Joints
 
 
             float errorReductionParameter;
-            springSettings.ComputeErrorReductionAndSoftness(dt, out errorReductionParameter, out softness);
+            springSettings.ComputeErrorReductionAndSoftness(dt, 1 / dt, out errorReductionParameter, out softness);
 
             //Mass Matrix
             Matrix3x3 k;
