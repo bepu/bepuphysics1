@@ -386,14 +386,14 @@ namespace BEPUphysicsDemos.Demos
             SuspensionSpring = new LinearAxisMotor(body, Entity, Entity.Position, Entity.Position, Vector3.Down);
             SuspensionSpring.Settings.Mode = MotorMode.Servomechanism;
             SuspensionSpring.Settings.Servo.Goal = 0;
-            SuspensionSpring.Settings.Servo.SpringSettings.StiffnessConstant = treadSegmentDescription.SuspensionStiffness;
-            SuspensionSpring.Settings.Servo.SpringSettings.DampingConstant = treadSegmentDescription.SuspensionDamping;
+            SuspensionSpring.Settings.Servo.SpringSettings.Stiffness = treadSegmentDescription.SuspensionStiffness;
+            SuspensionSpring.Settings.Servo.SpringSettings.Damping = treadSegmentDescription.SuspensionDamping;
 
             SuspensionAngularJoint = new RevoluteAngularJoint(body, Entity, Vector3.Right);
             //Make the joint extremely rigid.  There are going to be extreme conditions when the wheels get up to speed;
             //we don't want the forces involved to torque the wheel off the frame!
-            SuspensionAngularJoint.SpringSettings.DampingConstant *= Entity.Mass * 50;
-            SuspensionAngularJoint.SpringSettings.StiffnessConstant *= Entity.Mass * 50;
+            SuspensionAngularJoint.SpringSettings.Damping *= Entity.Mass * 50;
+            SuspensionAngularJoint.SpringSettings.Stiffness *= Entity.Mass * 50;
             //Motorize the wheel.
             Motor = new RevoluteMotor(body, Entity, Vector3.Left);
             Motor.Settings.VelocityMotor.Softness = treadSegmentDescription.MotorSoftness;

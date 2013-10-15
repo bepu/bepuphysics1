@@ -32,7 +32,7 @@ namespace BEPUphysics.Constraints.TwoEntity.JointLimits
         /// </summary>
         public EllipseSwingLimit()
         {
-            SpringSettings.StiffnessConstant /= 5;
+            SpringSettings.Stiffness /= 5;
             SpringSettings.Advanced.ErrorReductionFactor /= 5;
             Margin = .05f;
 
@@ -58,7 +58,7 @@ namespace BEPUphysics.Constraints.TwoEntity.JointLimits
             MaximumAngleX = maximumAngleX;
             MaximumAngleY = maximumAngleY;
 
-            SpringSettings.StiffnessConstant /= 5;
+            SpringSettings.Stiffness /= 5;
             SpringSettings.Advanced.ErrorReductionFactor /= 5;
             Margin = .05f;
         }
@@ -76,7 +76,7 @@ namespace BEPUphysics.Constraints.TwoEntity.JointLimits
             ConnectionB = connectionB;
 
 
-            SpringSettings.StiffnessConstant /= 5;
+            SpringSettings.Stiffness /= 5;
             SpringSettings.Advanced.ErrorReductionFactor /= 5;
             Margin = .05f;
         }

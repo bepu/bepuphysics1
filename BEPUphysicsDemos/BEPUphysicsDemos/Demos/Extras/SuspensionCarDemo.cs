@@ -104,8 +104,8 @@ namespace BEPUphysicsDemos.Demos.Extras
             var suspensionSpring = new LinearAxisMotor(body, wheel, wheel.Position, wheel.Position, Vector3.Down);
             suspensionSpring.Settings.Mode = MotorMode.Servomechanism;
             suspensionSpring.Settings.Servo.Goal = 0;
-            suspensionSpring.Settings.Servo.SpringSettings.StiffnessConstant = 300;
-            suspensionSpring.Settings.Servo.SpringSettings.DampingConstant = 70;
+            suspensionSpring.Settings.Servo.SpringSettings.Stiffness = 300;
+            suspensionSpring.Settings.Servo.SpringSettings.Damping = 70;
 
             var revoluteAngularJoint = new RevoluteAngularJoint(body, wheel, Vector3.Right);
 
@@ -134,8 +134,8 @@ namespace BEPUphysicsDemos.Demos.Extras
             var suspensionSpring = new LinearAxisMotor(body, wheel, wheel.Position, wheel.Position, Vector3.Down);
             suspensionSpring.Settings.Mode = MotorMode.Servomechanism;
             suspensionSpring.Settings.Servo.Goal = 0;
-            suspensionSpring.Settings.Servo.SpringSettings.StiffnessConstant = 300;
-            suspensionSpring.Settings.Servo.SpringSettings.DampingConstant = 70;
+            suspensionSpring.Settings.Servo.SpringSettings.Stiffness = 300;
+            suspensionSpring.Settings.Servo.SpringSettings.Damping = 70;
 
             var swivelHingeAngularJoint = new SwivelHingeAngularJoint(body, wheel, Vector3.Up, Vector3.Right);
             //Motorize the wheel.

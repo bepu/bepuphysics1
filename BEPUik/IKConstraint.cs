@@ -8,25 +8,25 @@ namespace BEPUik
 
         protected float errorCorrectionFactor;
 
-        private float dampingConstant = 16;
+        private float damping = 16;
         /// <summary>
-        /// Gets or sets the damping constant of the constraint.
+        /// Gets or sets the damping coefficient of the constraint. Acts like the damping coefficient of a spring.
         /// </summary>
-        public float DampingConstant
+        public float Damping
         {
-            get { return dampingConstant; }
-            set { dampingConstant = Math.Max(0, value); }
+            get { return damping; }
+            set { damping = Math.Max(0, value); }
         }
 
 
-        private float stiffnessConstant = 4;
+        private float stiffness = 4;
         /// <summary>
-        /// Gets or sets the stiffness constant of the constraint.
+        /// Gets or sets the stiffness coefficient of the constraint. Acts like the stiffness coefficient of a spring.
         /// </summary>
-        public float StiffnessConstant
+        public float Stiffness
         {
-            get { return stiffnessConstant; }
-            set { stiffnessConstant = Math.Max(0, value); }
+            get { return stiffness; }
+            set { stiffness = Math.Max(0, value); }
         }
 
         protected float maximumImpulse;
@@ -52,10 +52,10 @@ namespace BEPUik
         /// <param name="updateRate">Inverse time step duration.</param>
         protected internal void Preupdate(float dt, float updateRate)
         {
-            if (stiffnessConstant == 0 && dampingConstant == 0)
+            if (stiffness == 0 && damping == 0)
                 throw new InvalidOperationException("Constraints cannot have both 0 stiffness and 0 damping.");
-            float multiplier = 1 / (dt * stiffnessConstant + dampingConstant);
-            errorCorrectionFactor = stiffnessConstant * multiplier;
+            float multiplier = 1 / (dt * stiffness + damping);
+            errorCorrectionFactor = stiffness * multiplier;
             softness = updateRate * multiplier;
             maximumImpulse = maximumForce * dt;
             maximumImpulseSquared = Math.Min(float.MaxValue, maximumImpulse * maximumImpulse);

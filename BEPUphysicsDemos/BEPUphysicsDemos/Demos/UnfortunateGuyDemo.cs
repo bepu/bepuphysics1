@@ -59,8 +59,8 @@ namespace BEPUphysicsDemos.Demos
 
             //Upper arms can't spin around forever.
             var twistLimit = new TwistLimit(torso, upperArm, Vector3.Up, Vector3.Up, -MathHelper.PiOver4 / 2, MathHelper.PiOver4);
-            twistLimit.SpringSettings.StiffnessConstant = 100;
-            twistLimit.SpringSettings.DampingConstant = 100;
+            twistLimit.SpringSettings.Stiffness = 100;
+            twistLimit.SpringSettings.Damping = 100;
             Space.Add(twistLimit);
 
 
@@ -74,8 +74,8 @@ namespace BEPUphysicsDemos.Demos
             elbow.TwistLimit.IsActive = true;
             elbow.TwistLimit.MinimumAngle = -MathHelper.PiOver4 / 2;
             elbow.TwistLimit.MaximumAngle = MathHelper.PiOver4 / 2;
-            elbow.TwistLimit.SpringSettings.DampingConstant = 100;
-            elbow.TwistLimit.SpringSettings.StiffnessConstant = 100;
+            elbow.TwistLimit.SpringSettings.Damping = 100;
+            elbow.TwistLimit.SpringSettings.Stiffness = 100;
 
 
             //The elbow is like a hinge, but it can't hyperflex.
@@ -96,8 +96,8 @@ namespace BEPUphysicsDemos.Demos
 
             //Allow a little extra twist beyond the forearm.
             twistLimit = new TwistLimit(lowerArm, hand, Vector3.Up, Vector3.Up, -MathHelper.PiOver4 / 2, MathHelper.PiOver4 / 2);
-            twistLimit.SpringSettings.StiffnessConstant = 100;
-            twistLimit.SpringSettings.DampingConstant = 100;
+            twistLimit.SpringSettings.Stiffness = 100;
+            twistLimit.SpringSettings.Damping = 100;
             Space.Add(twistLimit);
 
             //The hand is pretty floppy without some damping.

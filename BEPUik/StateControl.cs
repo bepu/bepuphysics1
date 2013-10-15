@@ -42,10 +42,10 @@
         {
             LinearMotor = new SingleBoneLinearMotor();
             AngularMotor = new SingleBoneAngularMotor();
-            LinearMotor.DampingConstant = 1;
-            LinearMotor.StiffnessConstant = 0.25f;
-            AngularMotor.DampingConstant = 1;
-            AngularMotor.StiffnessConstant = 0.25f;
+            LinearMotor.Damping = 1;
+            LinearMotor.Stiffness = 0.25f;
+            AngularMotor.Damping = 1;
+            AngularMotor.Stiffness = 0.25f;
         }
 
         protected internal override void Preupdate(float dt, float updateRate)
