@@ -115,8 +115,8 @@ namespace BEPUphysicsDemos.Demos
             clawHingeA.Motor.Settings.Mode = MotorMode.Servomechanism;
             clawHingeA.Motor.Settings.Servo.Goal = -MathHelper.PiOver2;
             //Weaken the claw to prevent it from crushing the boxes.
-            clawHingeA.Motor.Settings.Servo.SpringSettings.DampingConstant /= 100;
-            clawHingeA.Motor.Settings.Servo.SpringSettings.StiffnessConstant /= 100;
+            clawHingeA.Motor.Settings.Servo.SpringSettings.Damping /= 100;
+            clawHingeA.Motor.Settings.Servo.SpringSettings.Stiffness /= 100;
 
             clawHingeA.Limit.IsActive = true;
             clawHingeA.Limit.MinimumAngle = -MathHelper.PiOver2;
@@ -140,8 +140,8 @@ namespace BEPUphysicsDemos.Demos
             clawHingeB.Motor.Settings.Mode = MotorMode.Servomechanism;
             clawHingeB.Motor.Settings.Servo.Goal = MathHelper.PiOver2;
             //Weaken the claw to prevent it from crushing the boxes.
-            clawHingeB.Motor.Settings.Servo.SpringSettings.DampingConstant /= 100;
-            clawHingeB.Motor.Settings.Servo.SpringSettings.StiffnessConstant /= 100;
+            clawHingeB.Motor.Settings.Servo.SpringSettings.Damping /= 100;
+            clawHingeB.Motor.Settings.Servo.SpringSettings.Stiffness /= 100;
 
             clawHingeB.Limit.IsActive = true;
             clawHingeB.Limit.MinimumAngle = MathHelper.Pi / 6;

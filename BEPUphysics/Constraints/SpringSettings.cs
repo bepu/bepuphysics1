@@ -55,8 +55,8 @@ namespace BEPUphysics.Constraints
     {
         private readonly SpringAdvancedSettings advanced = new SpringAdvancedSettings();
 
-        internal float dampingConstant = 90000;
-        internal float stiffnessConstant = 600000;
+        internal float damping = 90000;
+        internal float stiffness = 600000;
 
         /// <summary>
         /// Gets an object containing the solver's direct view of the spring behavior.
@@ -67,21 +67,21 @@ namespace BEPUphysics.Constraints
         }
 
         /// <summary>
-        /// Gets or sets the damping constant of this spring.  Higher values reduce oscillation more.
+        /// Gets or sets the damping coefficient of this spring.  Higher values reduce oscillation more.
         /// </summary>
-        public float DampingConstant
+        public float Damping
         {
-            get { return dampingConstant; }
-            set { dampingConstant = MathHelper.Max(0, value); }
+            get { return damping; }
+            set { damping = MathHelper.Max(0, value); }
         }
 
         /// <summary>
-        /// Gets or sets the spring constant of this spring.  Higher values make the spring stiffer.
+        /// Gets or sets the stiffness coefficient of this spring.  Higher values make the spring stiffer.
         /// </summary>
-        public float StiffnessConstant
+        public float Stiffness
         {
-            get { return stiffnessConstant; }
-            set { stiffnessConstant = Math.Max(0, value); }
+            get { return stiffness; }
+            set { stiffness = Math.Max(0, value); }
         }
 
         /// <summary>
@@ -101,10 +101,10 @@ namespace BEPUphysics.Constraints
             }
             else
             {
-                if (stiffnessConstant == 0 && dampingConstant == 0)
+                if (stiffness == 0 && damping == 0)
                     throw new InvalidOperationException("Constraints cannot have both 0 stiffness and 0 damping.");
-                float multiplier = 1 / (dt * stiffnessConstant + dampingConstant);
-                errorReduction = stiffnessConstant * multiplier;
+                float multiplier = 1 / (dt * stiffness + damping);
+                errorReduction = stiffness * multiplier;
                 softness = updateRate * multiplier;
             }
         }

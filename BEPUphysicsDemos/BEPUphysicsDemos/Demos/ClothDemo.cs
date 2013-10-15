@@ -59,24 +59,24 @@ namespace BEPUphysicsDemos.Demos
                     if (i + 1 < numRows)
                     {
                         distanceJoint = new DistanceJoint(lattice[i, j], lattice[i + 1, j], lattice[i, j].Position, lattice[i + 1, j].Position);
-                        distanceJoint.SpringSettings.StiffnessConstant = 1000;
-                        distanceJoint.SpringSettings.DampingConstant = 1000;
+                        distanceJoint.SpringSettings.Stiffness = 1000;
+                        distanceJoint.SpringSettings.Damping = 1000;
                         distanceJoint.SolverSettings.MaximumIterationCount = clothIterations;
                         Space.Add(distanceJoint);
 
                         if (j + 1 < numColumns)
                         {
                             distanceJoint = new DistanceJoint(lattice[i, j], lattice[i + 1, j + 1], lattice[i, j].Position, lattice[i + 1, j + 1].Position);
-                            distanceJoint.SpringSettings.StiffnessConstant = 1000;
-                            distanceJoint.SpringSettings.DampingConstant = 1000;
+                            distanceJoint.SpringSettings.Stiffness = 1000;
+                            distanceJoint.SpringSettings.Damping = 1000;
                             distanceJoint.SolverSettings.MaximumIterationCount = clothIterations;
                             Space.Add(distanceJoint);
                         }
                         if (j - 1 >= 0)
                         {
                             distanceJoint = new DistanceJoint(lattice[i, j], lattice[i + 1, j - 1], lattice[i, j].Position, lattice[i + 1, j - 1].Position);
-                            distanceJoint.SpringSettings.StiffnessConstant = 1000;
-                            distanceJoint.SpringSettings.DampingConstant = 1000;
+                            distanceJoint.SpringSettings.Stiffness = 1000;
+                            distanceJoint.SpringSettings.Damping = 1000;
                             distanceJoint.SolverSettings.MaximumIterationCount = clothIterations;
                             Space.Add(distanceJoint);
                         }
@@ -84,8 +84,8 @@ namespace BEPUphysicsDemos.Demos
                     if (j + 1 < numColumns)
                     {
                         distanceJoint = new DistanceJoint(lattice[i, j], lattice[i, j + 1], lattice[i, j].Position, lattice[i, j + 1].Position);
-                        distanceJoint.SpringSettings.StiffnessConstant = 1000;
-                        distanceJoint.SpringSettings.DampingConstant = 1000;
+                        distanceJoint.SpringSettings.Stiffness = 1000;
+                        distanceJoint.SpringSettings.Damping = 1000;
                         distanceJoint.SolverSettings.MaximumIterationCount = clothIterations;
                         Space.Add(distanceJoint);
                     }

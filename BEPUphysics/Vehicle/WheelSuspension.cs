@@ -51,8 +51,8 @@ namespace BEPUphysics.Vehicle
         /// <param name="localAttachmentPoint">Place where the suspension hooks up to the body of the vehicle.</param>
         public WheelSuspension(float stiffnessConstant, float dampingConstant, Vector3 localDirection, float restLength, Vector3 localAttachmentPoint)
         {
-            SpringSettings.StiffnessConstant = stiffnessConstant;
-            SpringSettings.DampingConstant = dampingConstant;
+            SpringSettings.Stiffness = stiffnessConstant;
+            SpringSettings.Damping = dampingConstant;
             LocalDirection = localDirection;
             RestLength = restLength;
             LocalAttachmentPoint = localAttachmentPoint;

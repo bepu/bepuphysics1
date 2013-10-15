@@ -119,8 +119,8 @@ namespace BEPUphysicsDemos.Demos
             bodyToUpper.Motor.Basis.SetWorldAxes(legTransform.OrientationMatrix.Forward, legTransform.OrientationMatrix.Left);
             bodyToUpper.Motor.Settings.Mode = MotorMode.Servomechanism;
             //Weaken the spring to prevent it from launching too much.
-            bodyToUpper.Motor.Settings.Servo.SpringSettings.StiffnessConstant *= .01f;
-            bodyToUpper.Motor.Settings.Servo.SpringSettings.DampingConstant *= .01f;
+            bodyToUpper.Motor.Settings.Servo.SpringSettings.Stiffness *= .01f;
+            bodyToUpper.Motor.Settings.Servo.SpringSettings.Damping *= .01f;
             Space.Add(bodyToUpper);
 
             //Connect the upper leg to the lower leg.
@@ -138,8 +138,8 @@ namespace BEPUphysicsDemos.Demos
             upperToLower.Motor.Basis.SetWorldAxes(legTransform.OrientationMatrix.Forward, legTransform.OrientationMatrix.Down);
             upperToLower.Motor.Settings.Mode = MotorMode.Servomechanism;
             //Weaken the spring to prevent it from launching too much.
-            upperToLower.Motor.Settings.Servo.SpringSettings.StiffnessConstant *= .01f;
-            upperToLower.Motor.Settings.Servo.SpringSettings.DampingConstant *= .01f;
+            upperToLower.Motor.Settings.Servo.SpringSettings.Stiffness *= .01f;
+            upperToLower.Motor.Settings.Servo.SpringSettings.Damping *= .01f;
             Space.Add(upperToLower);
 
             legJoints.Add(upperToLower);

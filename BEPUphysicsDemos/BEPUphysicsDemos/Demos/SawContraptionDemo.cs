@@ -56,9 +56,9 @@ namespace BEPUphysicsDemos.Demos
             //This piston, by default, moves at a constant speed, but...
             piston.Motor.Settings.Servo.BaseCorrectiveSpeed = 1;
             //... if the stiffness constant is changed to a positive value, it can also act like a spring.
-            piston.Motor.Settings.Servo.SpringSettings.StiffnessConstant = 0;
+            piston.Motor.Settings.Servo.SpringSettings.Stiffness = 0;
             //For a non-springy constraint like the piston, the dampingConstant can also be thought of as inverse 'softness.'
-            piston.Motor.Settings.Servo.SpringSettings.DampingConstant = 1000;
+            piston.Motor.Settings.Servo.SpringSettings.Damping = 1000;
 
             //Add the piston to the space.
             Space.Add(piston);

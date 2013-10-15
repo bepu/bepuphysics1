@@ -110,8 +110,8 @@ namespace BEPUphysicsDemos.Demos.Extras
             var bodyToSuspension = new PrismaticJoint(body, suspensionLeg, suspensionLeg.Position, Vector3.Down, suspensionLeg.Position);
             bodyToSuspension.Motor.Settings.Mode = MotorMode.Servomechanism;
             bodyToSuspension.Motor.IsActive = true;
-            bodyToSuspension.Motor.Settings.Servo.SpringSettings.StiffnessConstant = 300;
-            bodyToSuspension.Motor.Settings.Servo.SpringSettings.DampingConstant = 70;
+            bodyToSuspension.Motor.Settings.Servo.SpringSettings.Stiffness = 300;
+            bodyToSuspension.Motor.Settings.Servo.SpringSettings.Damping = 70;
 
             bodyToSuspension.Limit.IsActive = true;
             bodyToSuspension.Limit.Minimum = -0.5f;
@@ -154,8 +154,8 @@ namespace BEPUphysicsDemos.Demos.Extras
             bodyToSuspension.Motor.IsActive = true;
             bodyToSuspension.Motor.Settings.Mode = MotorMode.Servomechanism;
             bodyToSuspension.Motor.Settings.Servo.Goal = 0;
-            bodyToSuspension.Motor.Settings.Servo.SpringSettings.StiffnessConstant = 300;
-            bodyToSuspension.Motor.Settings.Servo.SpringSettings.DampingConstant = 70;
+            bodyToSuspension.Motor.Settings.Servo.SpringSettings.Stiffness = 300;
+            bodyToSuspension.Motor.Settings.Servo.SpringSettings.Damping = 70;
             
 
             steeringMotor = new RevoluteMotor(body, suspensionLeg, Vector3.Up);

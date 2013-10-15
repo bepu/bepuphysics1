@@ -153,8 +153,8 @@ namespace BEPUphysicsDemos.Demos
             divingBoardJoint.Motor.IsActive = true;
             divingBoardJoint.Motor.Settings.Mode = MotorMode.Servomechanism;
             divingBoardJoint.Motor.Settings.Servo.Goal = 0;
-            divingBoardJoint.Motor.Settings.Servo.SpringSettings.StiffnessConstant = 5000;
-            divingBoardJoint.Motor.Settings.Servo.SpringSettings.DampingConstant = 0;
+            divingBoardJoint.Motor.Settings.Servo.SpringSettings.Stiffness = 5000;
+            divingBoardJoint.Motor.Settings.Servo.SpringSettings.Damping = 0;
 
             Space.Add(divingBoardBase);
             Space.Add(divingBoard);
@@ -168,8 +168,8 @@ namespace BEPUphysicsDemos.Demos
             divingBoardJoint2.Motor.IsActive = true;
             divingBoardJoint2.Motor.Settings.Mode = MotorMode.Servomechanism;
             divingBoardJoint2.Motor.Settings.Servo.Goal = 0;
-            divingBoardJoint2.Motor.Settings.Servo.SpringSettings.StiffnessConstant = 10000;
-            divingBoardJoint2.Motor.Settings.Servo.SpringSettings.DampingConstant = 0;
+            divingBoardJoint2.Motor.Settings.Servo.SpringSettings.Stiffness = 10000;
+            divingBoardJoint2.Motor.Settings.Servo.SpringSettings.Damping = 0;
 
             Space.Add(divingBoard2);
             Space.Add(divingBoardJoint2);
