@@ -50,15 +50,19 @@ namespace BEPUik
             }
         }
 
-        private float massPerStressPath = 1;
+        private float automassTarget = 1;
         /// <summary>
-        /// Gets or sets the multiplier to apply to a bone's stress path count to find the mass.
-        /// Used only when UseAutomass is set to true.
+        /// Gets or sets the mass that the heaviest bones will have when automass is enabled.
         /// </summary>
-        public float MassPerStressPath
+        public float AutomassTarget
         {
-            get { return massPerStressPath; }
-            set { massPerStressPath = Math.Max(value, 0); }
+            get { return automassTarget; }
+            set
+            {
+                if (value <= 0)
+                    throw new ArgumentException("Mass must be positive.");
+                automassTarget = value;
+            }
         }
 
         //Stores data about an in-process BFS.
@@ -324,7 +328,7 @@ namespace BEPUik
                 var bone = bonesToVisit.Dequeue();
                 if (bone.stressCount == 0)
                 {
-                    bone.Mass = massPerStressPath * automassUnstressedFalloff;
+                    bone.Mass = automassUnstressedFalloff;
                     //This is an unstressed bone. We should start a DFS to identify any cycles in the unstressed graph.
                     FindCycles(bone);
                     //Once the cycles are marked, we can proceed through the unstressed graph component and give child bones mass.
@@ -335,7 +339,7 @@ namespace BEPUik
                 else
                 {
                     //The mass of stressed bones is a multiplier on the number of stressed paths overlapping the bone.
-                    bone.Mass = massPerStressPath * bone.stressCount;
+                    bone.Mass = bone.stressCount;
                 }
                 //This bone is not an unstressed branch root. Continue the breadth first search!
                 foreach (var joint in bone.joints)
@@ -357,22 +361,29 @@ namespace BEPUik
                 }
             }
 
-            //Clean the bones up!
-            for (int i = 0; i < bones.Count; i++)
+            //Normalize the masses of objects so that the heaviest bones have AutomassTarget mass.
+            float lowestInverseMass = float.MaxValue;
+            foreach (var bone in bones)
             {
-                //Use this to visualize the flags for debugging purposes.
-                //if (bones[i].stressCount > 0)
-                //    bones[i].Mass = 2;
-                //else if (bones[i].unstressedCycle)
-                //    bones[i].Mass = .5f;
-                //else
-                //    bones[i].Mass = 0.01f;
-                bones[i].IsActive = false;
-                bones[i].traversed = false;
-                bones[i].stressCount = 0;
-                bones[i].unstressedCycle = false;
-                bones[i].predecessors.Clear();
+                if (bone.inverseMass < lowestInverseMass)
+                    lowestInverseMass = bone.inverseMass;
             }
+
+            float inverseMassScale = 1 / (AutomassTarget * lowestInverseMass);
+
+            foreach (var bone in bones)
+            {
+                //Normalize the mass to the AutomassTarget.
+                bone.inverseMass *= inverseMassScale;
+
+                //Also clear the traversal flags while we're at it.
+                bone.IsActive = false;
+                bone.traversed = false;
+                bone.stressCount = 0;
+                bone.unstressedCycle = false;
+                bone.predecessors.Clear();
+            }
+
             bones.Clear();
         }
 
@@ -429,7 +440,7 @@ namespace BEPUik
             {
                 for (int i = 0; i < bones.Count; ++i)
                 {
-                    bones[i].Mass = massPerStressPath;
+                    bones[i].Mass = automassTarget;
                 }
             }
 

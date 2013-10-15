@@ -56,7 +56,12 @@ namespace BEPUik
         public float TimeStepDuration
         {
             get { return timeStepDuration; }
-            set { timeStepDuration = Math.Max(0, value); }
+            set
+            {
+                if (value <= 0)
+                    throw new ArgumentException("Time step duration must be positive.");
+                timeStepDuration = value;
+            }
         }
 
 
