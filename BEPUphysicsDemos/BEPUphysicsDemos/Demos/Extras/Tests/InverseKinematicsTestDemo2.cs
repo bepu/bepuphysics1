@@ -80,8 +80,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             BuildStick(new Vector3(0, 0.5f, 0), boneCount, out bones, out boneEntities);
 
             DragControl dragger = new DragControl { TargetBone = bones[boneCount - 1], MaximumForce = 3.402823e38f };
-            dragger.LinearMotor.Damping = 16;
-            dragger.LinearMotor.Stiffness = 4;
+            dragger.LinearMotor.Rigidity = 16;
             dragger.LinearMotor.LocalOffset = new Vector3(0, 0.5f, 0);
             dragger.LinearMotor.TargetPosition = new Vector3(10, 0, 0);
 

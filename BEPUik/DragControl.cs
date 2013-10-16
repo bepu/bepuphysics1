@@ -29,8 +29,7 @@
         public DragControl()
         {
             LinearMotor = new SingleBoneLinearMotor();
-            LinearMotor.Damping = 1;
-            LinearMotor.Stiffness = 0.25f;
+            LinearMotor.Rigidity = 1;
         }
 
         protected internal override void Preupdate(float dt, float updateRate)

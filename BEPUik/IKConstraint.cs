@@ -8,25 +8,37 @@ namespace BEPUik
 
         protected float errorCorrectionFactor;
 
-        private float damping = 16;
-        /// <summary>
-        /// Gets or sets the damping coefficient of the constraint. Acts like the damping coefficient of a spring.
-        /// </summary>
-        public float Damping
-        {
-            get { return damping; }
-            set { damping = Math.Max(0, value); }
-        }
 
-
-        private float stiffness = 4;
         /// <summary>
-        /// Gets or sets the stiffness coefficient of the constraint. Acts like the stiffness coefficient of a spring.
+        /// The rigidity of a constraint is used to derive the stiffness and damping coefficients using a fixed stiffness:damping ratio.
         /// </summary>
-        public float Stiffness
+        /// <remarks>
+        /// This is used over independent coefficients because IK usages of the constraints don't really vary in behavior, just strength.
+        /// </remarks>
+        private const float StiffnessOverDamping = 0.25f;
+
+        private float rigidity = 16;
+        /// <summary>
+        /// Gets the rigidity of the constraint. Higher values correspond to more rigid constraints, lower values to less rigid constraints. Must be positive.
+        /// </summary>
+        /// <remarks>
+        /// Scaling up the rigidity is like preparing the constraint to handle a heavier load. If the load is proportionally heavier, the damping ratio stays the same. 
+        /// If the load stays the same but the rigidity increases, the result is a more rigid joint, but with a slightly different damping ratio.
+        /// In other words, modifying rigidity without modifying the effective mass of the system results in a variable damping ratio. 
+        /// This isn't a huge problem in practice- there is a massive ultra-damping hack in IK bone position integration that make a little physical deviation or underdamping irrelevant.
+        /// </remarks>
+        public float Rigidity
         {
-            get { return stiffness; }
-            set { stiffness = Math.Max(0, value); }
+            get
+            {
+                return rigidity;
+            }
+            set
+            {
+                if (value <= 0)
+                    throw new ArgumentException("Rigidity must be positive.");
+                rigidity = value;
+            }
         }
 
         protected float maximumImpulse;
@@ -52,8 +64,8 @@ namespace BEPUik
         /// <param name="updateRate">Inverse time step duration.</param>
         protected internal void Preupdate(float dt, float updateRate)
         {
-            if (stiffness == 0 && damping == 0)
-                throw new InvalidOperationException("Constraints cannot have both 0 stiffness and 0 damping.");
+            float stiffness = StiffnessOverDamping * rigidity;
+            float damping = rigidity;
             float multiplier = 1 / (dt * stiffness + damping);
             errorCorrectionFactor = stiffness * multiplier;
             softness = updateRate * multiplier;
