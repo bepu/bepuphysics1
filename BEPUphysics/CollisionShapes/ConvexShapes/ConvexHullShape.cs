@@ -38,7 +38,8 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
                 throw new ArgumentException("Vertices list used to create a ConvexHullShape cannot be empty.");
 
             var surfaceVertices = CommonResources.GetVectorList();
-            ComputeCenter(vertices, surfaceVertices);
+            float volume;
+            ComputeCenter(vertices, out volume, surfaceVertices);
             this.vertices = new RawList<Vector3>(surfaceVertices);
             CommonResources.GiveBack(surfaceVertices);
 
@@ -58,7 +59,8 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
                 throw new ArgumentException("Vertices list used to create a ConvexHullShape cannot be empty.");
 
             var surfaceVertices = CommonResources.GetVectorList();
-            center = ComputeCenter(vertices, surfaceVertices);
+            float volume;
+            center = ComputeCenter(vertices, out volume, surfaceVertices);
             this.vertices = new RawList<Vector3>(surfaceVertices);
             CommonResources.GiveBack(surfaceVertices);
 
@@ -71,20 +73,60 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         ///</summary>
         ///<param name="vertices">Point set to use to construct the convex hull.</param>
         /// <param name="center">Computed center of the convex hull shape prior to recentering.</param>
+        /// <param name="volume">Volume of the shape.</param>
+        ///<exception cref="ArgumentException">Thrown when the point set is empty.</exception>
+        public ConvexHullShape(IList<Vector3> vertices, out Vector3 center, out float volume)
+        {
+            if (vertices.Count == 0)
+                throw new ArgumentException("Vertices list used to create a ConvexHullShape cannot be empty.");
+
+            var localSurfaceVertices = CommonResources.GetVectorList();
+            center = ComputeCenter(vertices, out volume, localSurfaceVertices);
+            this.vertices = new RawList<Vector3>(localSurfaceVertices);
+            CommonResources.GiveBack(localSurfaceVertices);
+
+            OnShapeChanged();
+        }
+
+        ///<summary>
+        /// Constructs a new convex hull shape.
+        /// The point set will be recentered on the local origin.
+        ///</summary>
+        ///<param name="vertices">Point set to use to construct the convex hull.</param>
+        /// <param name="center">Computed center of the convex hull shape prior to recentering.</param>
+        /// <param name="volume">Volume of the shape.</param>
         /// <param name="outputHullTriangleIndices">Triangle indices computed on the surface of the point set.</param>
         /// <param name="outputUniqueSurfaceVertices">Unique vertices on the surface of the convex hull.</param>
         ///<exception cref="ArgumentException">Thrown when the point set is empty.</exception>
-        public ConvexHullShape(IList<Vector3> vertices, out Vector3 center, IList<int> outputHullTriangleIndices, IList<Vector3> outputUniqueSurfaceVertices)
+        public ConvexHullShape(IList<Vector3> vertices, out Vector3 center, out float volume, IList<int> outputHullTriangleIndices, IList<Vector3> outputUniqueSurfaceVertices)
         {
             if (vertices.Count == 0)
                 throw new ArgumentException("Vertices list used to create a ConvexHullShape cannot be empty.");
 
 
             //Ensure that the convex hull is centered on its local origin.
-            center = ComputeCenter(vertices, outputHullTriangleIndices, outputUniqueSurfaceVertices);
+            center = ComputeCenter(vertices, out volume, outputHullTriangleIndices, outputUniqueSurfaceVertices);
             this.vertices = new RawList<Vector3>(outputUniqueSurfaceVertices);
 
             OnShapeChanged();
+        }
+
+
+        /// <summary>
+        /// Creates a ConvexHullShape from cached information. Assumes all data provided is accurate- no pre-processing is performed.
+        /// </summary>
+        /// <param name="localSurfaceVertices">List of vertex positions on the surface of the convex hull shape, centered on the desired origin. These vertices are used as-is for the shape representation; no additional processing occurs.</param>
+        /// <param name="minimumRadius">Minimum radius of the convex hull.</param>
+        /// <param name="maximumRadius">Maximum radius of the convex hull.</param>
+        public ConvexHullShape(IList<Vector3> localSurfaceVertices, float minimumRadius, float maximumRadius)
+        {
+            if (localSurfaceVertices.Count == 0)
+                throw new ArgumentException("Vertices list used to create a ConvexHullShape cannot be empty.");
+
+            vertices = new RawList<Vector3>(localSurfaceVertices);
+            this.minimumRadius = minimumRadius;
+            this.maximumRadius = maximumRadius;
+
         }
 
 
@@ -272,11 +314,11 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         /// Computes the center and surface triangles of a convex hull defined by a point set.
         ///</summary>
         ///<param name="vertices">Point set defining the convex hull.</param>
+        /// <param name="volume">Volume of the shape.</param>
         ///<param name="outputLocalSurfaceVertices">Local positions of vertices on the convex hull.</param>
         ///<returns>Center of the convex hull.</returns>
-        public static Vector3 ComputeCenter(IList<Vector3> vertices, IList<Vector3> outputLocalSurfaceVertices)
+        public static Vector3 ComputeCenter(IList<Vector3> vertices, out float volume, IList<Vector3> outputLocalSurfaceVertices)
         {
-            float volume;
             var indices = CommonResources.GetIntList();
             Vector3 toReturn = ComputeCenter(vertices, out volume, indices, outputLocalSurfaceVertices);
             CommonResources.GiveBack(indices);
@@ -314,7 +356,6 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             }
             centroid /= vertices.Count;
 
-            //Toolbox.GetConvexHull(vertices, outputSurfaceTriangles, outputLocalSurfaceVertices);
             ConvexHullHelper.GetConvexHull(vertices, outputSurfaceTriangles, outputLocalSurfaceVertices);
 
             volume = 0;
