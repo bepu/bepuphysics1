@@ -119,7 +119,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                         Normal = rayHit.Normal,
                         Position = convex.worldTransform.Position,
                         Id = 2,
-                        PenetrationDepth = -rayHit.T * dot + convex.Shape.minimumRadius
+                        PenetrationDepth = -rayHit.T * dot + convex.Shape.MinimumRadius
                     };
                     newContact.Validate();
                     bool found = false;

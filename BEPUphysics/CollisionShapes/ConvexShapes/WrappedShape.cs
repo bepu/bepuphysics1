@@ -83,16 +83,6 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             }
         }
 
-        void Recenter(out Vector3 center)
-        {
-            //When first constructed, a wrapped shape may not actually be centered on its local origin.
-            //It is helpful to many systems if this is addressed.
-            center = ComputeCenter();
-            for (int i = 0; i < shapes.Count; i++)
-            {
-                shapes.WrappedList.Elements[i].Transform.Position -= center;
-            }
-        }
 
         ///<summary>
         /// Constructs a wrapped shape.
@@ -106,9 +96,8 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             shapes.Add(firstShape);
             shapes.Add(secondShape);
 
-            OnShapeChanged();
-            Vector3 v;
-            Recenter(out v);
+            Vector3 center;
+            UpdateConvexShapeInfo(out center);
 
             shapes.Changed += ShapesChanged;
         }
@@ -126,8 +115,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             shapes.Add(firstShape);
             shapes.Add(secondShape);
 
-            OnShapeChanged();
-            Recenter(out center);
+            UpdateConvexShapeInfo(out center);
 
             shapes.Changed += ShapesChanged;
         }
@@ -146,10 +134,9 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             {
                 shapes.Add(shapeEntries[i]);
             }
-            Vector3 v;
-            OnShapeChanged();
-            Recenter(out v);
 
+            Vector3 center;
+            UpdateConvexShapeInfo(out center);
             shapes.Changed += ShapesChanged;
         }
 
@@ -169,16 +156,65 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
                 shapes.Add(shapeEntries[i]);
             }
 
-            OnShapeChanged();
-            Recenter(out center);
-
+            UpdateConvexShapeInfo(out center);
             shapes.Changed += ShapesChanged;
+        }
+
+        ///<summary>
+        /// Constructs a wrapped shape from cached data.
+        ///</summary>
+        ///<param name="shapeEntries">Already centered shape entries used to construct the shape.</param>
+        /// <param name="description">Cached information about the shape. Assumed to be correct; no extra processing or validation is performed.</param>
+        ///<exception cref="Exception">Thrown when the shape list is empty.</exception>
+        public WrappedShape(IList<ConvexShapeEntry> shapeEntries, ConvexShapeDescription description)
+        {
+            if (shapeEntries.Count == 0)
+                throw new ArgumentException("Cannot create a wrapped shape with no contained shapes."); 
+            for (int i = 0; i < shapeEntries.Count; i++)
+            {
+                shapes.Add(shapeEntries[i]);
+            }
+
+            UpdateConvexShapeInfo(description);
+            shapes.Changed += ShapesChanged;
+        }
+
+
+        protected override void OnShapeChanged()
+        {
+            Vector3 center;
+            UpdateConvexShapeInfo(out center);
+            base.OnShapeChanged();
         }
 
         void ShapesChanged(ObservableList<ConvexShapeEntry> list)
         {
             OnShapeChanged();
         }
+
+
+        /// <summary>
+        /// Computes and applies a convex shape description for this WrappedShape.
+        /// </summary>
+        /// <param name="center">Computed center of the shape before recentering.</param>
+        public void UpdateConvexShapeInfo(out Vector3 center)
+        {
+            //This is gross, but an estimate of the maximum radius is currently required by the raycasts used by the InertiaHelper.
+            //TODO: This will no longer be necessary when the InertiaHelper gets updated to use approximate tetrahedral integration.
+            MaximumRadius = ComputeMaximumRadius();
+            center = InertiaHelper.ComputeCenter(this);
+            for (int i = 0; i < shapes.Count; i++)
+            {
+                shapes.WrappedList.Elements[i].Transform.Position -= center;
+            }
+            MinimumRadius = ComputeMinimumRadius();
+            MaximumRadius = ComputeMaximumRadius();
+
+            float volume;
+            volumeDistribution = InertiaHelper.ComputeVolumeDistribution(this, out volume);
+            Volume = volume;
+        }
+
 
 
         /// <summary>
@@ -241,26 +277,32 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         /// it is simply an approximation that avoids underestimating.
         /// </summary>
         /// <returns>Maximum radius of the shape.</returns>
-        public override float ComputeMaximumRadius()
+        public float ComputeMaximumRadius()
         {
             //This can overestimate the actual maximum radius, but such is the defined behavior of the ComputeMaximumRadius function.  It's not exact; it's an upper bound on the actual maximum.
             float maxRadius = 0;
             for (int i = 0; i < shapes.Count; i++)
             {
-                float radius = shapes.WrappedList.Elements[i].CollisionShape.ComputeMaximumRadius() +
+                float radius = shapes.WrappedList.Elements[i].CollisionShape.MaximumRadius +
                                shapes.WrappedList.Elements[i].Transform.Position.Length();
                 if (radius > maxRadius)
                     maxRadius = radius;
             }
             return maxRadius + collisionMargin;
         }
-        public override float ComputeMinimumRadius()
+        /// <summary>
+        /// Computes the minimum radius of the shape.
+        /// This is often smaller than the actual minimum radius;
+        /// it is simply an approximation that avoids overestimating.
+        /// </summary>
+        /// <returns>Minimum radius of the shape.</returns>
+        public float ComputeMinimumRadius()
         {
             //Could also use the tetrahedron approximation approach.
             float minRadius = 0;
             for (int i = 0; i < shapes.Count; i++)
             {
-                float radius = shapes.WrappedList.Elements[i].CollisionShape.ComputeMinimumRadius();
+                float radius = shapes.WrappedList.Elements[i].CollisionShape.MinimumRadius;
                 if (radius < minRadius)
                     minRadius = radius;
             }

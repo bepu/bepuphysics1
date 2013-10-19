@@ -113,7 +113,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     sidedness = TriangleSidedness.DoubleSided;
                     break;
                 default:
-                    sidedness = mesh.Shape.solidSidedness;
+                    sidedness = mesh.Shape.SidednessWhenSolid;
                     break;
             }
             localTriangleShape.sidedness = sidedness;
@@ -192,7 +192,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
 
                     float factor;
                     Vector3.Dot(ref ray.Direction, ref newContact.Normal, out factor);
-                    newContact.PenetrationDepth = -factor * hit.T + convex.Shape.minimumRadius;
+                    newContact.PenetrationDepth = -factor * hit.T + convex.Shape.MinimumRadius;
 
                     Matrix3x3.Transform(ref newContact.Normal, ref orientation, out newContact.Normal);
 

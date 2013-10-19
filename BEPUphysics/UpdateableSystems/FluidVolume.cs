@@ -327,7 +327,7 @@ namespace BEPUphysics.UpdateableSystems
                 if (submergedVolume > 0)
                 {              
 
-                    float fractionSubmerged = submergedVolume / entityCollidable.entity.volume;
+                    float fractionSubmerged = submergedVolume / entityCollidable.entity.CollisionInformation.Shape.Volume;
 
                     //Divide the volume by the density multiplier if present.
                     float densityMultiplier;
@@ -373,7 +373,7 @@ namespace BEPUphysics.UpdateableSystems
             }
             if (entityBoundingBox.Max.Y < 0)
             {
-                submergedVolume = collidable.entity.volume;
+                submergedVolume = collidable.entity.CollisionInformation.Shape.Volume;
                 submergedCenter = collidable.worldTransform.Position;
                 return;
             }

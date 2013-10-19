@@ -1,6 +1,6 @@
 ﻿using System;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
- 
+
 using BEPUutilities;
 
 namespace BEPUphysics.CollisionShapes.ConvexShapes
@@ -53,8 +53,44 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         public TransformableShape(ConvexShape shape, Matrix3x3 transform)
         {
             this.shape = shape;
-            Transform = transform;
+            this.transform = transform;
 
+            UpdateConvexShapeInfo();
+
+        }        
+        
+        ///<summary>
+        /// Constructs a new transformable shape.
+        ///</summary>
+        /// <param name="shape">Base shape to transform.</param>
+        /// <param name="transform">Transform to use.</param>
+        /// <param name="description">Cached information about the shape. Assumed to be correct; no extra processing or validation is performed.</param>
+        public TransformableShape(ConvexShape shape, Matrix3x3 transform, ConvexShapeDescription description)
+        {
+            this.shape = shape;
+            this.transform = transform;
+
+            UpdateConvexShapeInfo(description);
+        }
+
+        protected override void OnShapeChanged()
+        {
+            UpdateConvexShapeInfo();
+            base.OnShapeChanged();
+        }
+
+        /// <summary>
+        /// Computes a convex shape description for a TransformableShape and applies it.
+        /// </summary>
+        public void UpdateConvexShapeInfo()
+        {            
+            //An estimate of the maximum radius is currently required by the raycasts used by the InertiaHelper. Radii computation must come first.
+            //TODO: This will no longer be required when the InertiaHelper gets updated to use approximate tetrahedral integration.
+            MinimumRadius = ComputeMinimumRadius();
+            MaximumRadius = ComputeMaximumRadius();
+            float volume;
+            volumeDistribution = InertiaHelper.ComputeVolumeDistribution(this, out volume);
+            Volume = volume;
         }
 
 
@@ -78,16 +114,16 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         /// it is simply an approximation that avoids underestimating.
         /// </summary>
         /// <returns>Maximum radius of the shape.</returns>
-        public override float ComputeMaximumRadius()
+        public float ComputeMaximumRadius()
         {
             //This will overestimate the actual maximum radius, but such is the defined behavior of the ComputeMaximumRadius function.  It's not exact; it's an upper bound on the actual maximum.
-            RigidTransform transform = RigidTransform.Identity;
+            RigidTransform identity = RigidTransform.Identity;
             BoundingBox boundingBox;
-            GetBoundingBox(ref transform, out boundingBox);
+            GetBoundingBox(ref identity, out boundingBox);
             Vector3 diameter;
             Vector3.Subtract(ref boundingBox.Max, ref boundingBox.Min, out diameter);
             return diameter.Length();
-            
+
         }
 
         ///<summary>
@@ -96,7 +132,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         /// it is simply an approximation that avoids overestimating.
         ///</summary>
         ///<returns>Minimum radius of the shape.</returns>
-        public override float ComputeMinimumRadius()
+        public float ComputeMinimumRadius()
         {
             //Sample the shape in directions pointing to the vertices of a regular tetrahedron.
             Vector3 a, b, c, d;
@@ -135,30 +171,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         }
 
 
-        /// <summary>
-        /// Computes the center of the shape.  This can be considered its 
-        /// center of mass.
-        /// </summary>
-        /// <returns>Center of the shape.</returns>
-        public override Vector3 ComputeCenter()
-        {
-            //All convexes under acceptably normal circumstances are centered on the local origin.
-            //The linear transform performs rotation, scaling, and shearing.  All of these operations will not move the origin.
-            return Vector3.Zero;
-        }
-
-        /// <summary>
-        /// Computes the center of the shape.  This can be considered its 
-        /// center of mass.  This calculation is often associated with the 
-        /// volume calculation, which is given by this method as well.
-        /// </summary>
-        /// <param name="volume">Volume of the shape.</param>
-        /// <returns>Center of the shape.</returns>
-        public override Vector3 ComputeCenter(out float volume)
-        {
-            volume = ComputeVolume();
-            return ComputeCenter();
-        }
+       
 
         /// <summary>
         /// Retrieves an instance of an EntityCollidable that uses this EntityShape.  Mainly used by compound bodies.

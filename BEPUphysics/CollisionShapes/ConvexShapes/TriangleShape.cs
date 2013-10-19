@@ -14,50 +14,6 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         internal Vector3 vA, vB, vC;
 
         ///<summary>
-        /// Constructs a triangle shape without initializing it.
-        /// This is useful for systems that re-use a triangle shape repeatedly.
-        ///</summary>
-        public TriangleShape()
-        {
-            //Triangles are often used in special situations where the vertex locations are changed directly.  This constructor assists with that.
-        }
-
-        ///<summary>
-        /// Constructs a triangle shape.
-        /// The vertices will be recentered.
-        ///</summary>
-        ///<param name="vA">First vertex in the triangle.</param>
-        ///<param name="vB">Second vertex in the triangle.</param>
-        ///<param name="vC">Third vertex in the triangle.</param>
-        ///<param name="center">Computed center of the triangle.</param>
-        public TriangleShape(Vector3 vA, Vector3 vB, Vector3 vC, out Vector3 center)
-        {
-            //Recenter.  Convexes should contain the origin.
-            center = (vA + vB + vC) / 3;
-            this.vA = vA - center;
-            this.vB = vB - center;
-            this.vC = vC - center;
-            OnShapeChanged();
-        }
-
-        ///<summary>
-        /// Constructs a triangle shape.
-        /// The vertices will be recentered.  If the center is needed, use the other constructor.
-        ///</summary>
-        ///<param name="vA">First vertex in the triangle.</param>
-        ///<param name="vB">Second vertex in the triangle.</param>
-        ///<param name="vC">Third vertex in the triangle.</param>
-        public TriangleShape(Vector3 vA, Vector3 vB, Vector3 vC)
-        {
-            //Recenter.  Convexes should contain the origin.
-            Vector3 center = (vA + vB + vC) / 3;
-            this.vA = vA - center;
-            this.vB = vB - center;
-            this.vC = vC - center;
-            OnShapeChanged();
-        }
-
-        ///<summary>
         /// Gets or sets the first vertex of the triangle shape.
         ///</summary>
         public Vector3 VertexA
@@ -119,6 +75,89 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             }
         }
 
+        ///<summary>
+        /// Constructs a triangle shape without initializing it.
+        /// This is useful for systems that re-use a triangle shape repeatedly and do not care about its properties.
+        ///</summary>
+        public TriangleShape()
+        {
+            //Triangles are often used in special situations where the vertex locations are changed directly.  This constructor assists with that.
+        }
+
+        ///<summary>
+        /// Constructs a triangle shape.
+        /// The vertices will be recentered.  If the center is needed, use the other constructor.
+        ///</summary>
+        ///<param name="vA">First vertex in the triangle.</param>
+        ///<param name="vB">Second vertex in the triangle.</param>
+        ///<param name="vC">Third vertex in the triangle.</param>
+        public TriangleShape(Vector3 vA, Vector3 vB, Vector3 vC)
+        {
+            //Recenter.  Convexes should contain the origin.
+            Vector3 center = (vA + vB + vC) / 3;
+            this.vA = vA - center;
+            this.vB = vB - center;
+            this.vC = vC - center;
+            UpdateConvexShapeInfo(ComputeDescription(vA, vB, vC, collisionMargin));
+        }
+
+        ///<summary>
+        /// Constructs a triangle shape.
+        /// The vertices will be recentered.
+        ///</summary>
+        ///<param name="vA">First vertex in the triangle.</param>
+        ///<param name="vB">Second vertex in the triangle.</param>
+        ///<param name="vC">Third vertex in the triangle.</param>
+        ///<param name="center">Computed center of the triangle.</param>
+        public TriangleShape(Vector3 vA, Vector3 vB, Vector3 vC, out Vector3 center)
+        {
+            //Recenter.  Convexes should contain the origin.
+            center = (vA + vB + vC) / 3;
+            this.vA = vA - center;
+            this.vB = vB - center;
+            this.vC = vC - center;
+            UpdateConvexShapeInfo(ComputeDescription(vA, vB, vC, collisionMargin));
+        }
+
+        ///<summary>
+        /// Constructs a triangle shape from cached data.
+        ///</summary>
+        ///<param name="vA">First vertex in the triangle.</param>
+        ///<param name="vB">Second vertex in the triangle.</param>
+        ///<param name="vC">Third vertex in the triangle.</param>
+        /// <param name="description">Cached information about the shape. Assumed to be correct; no extra processing or validation is performed.</param>
+        public TriangleShape(Vector3 vA, Vector3 vB, Vector3 vC, ConvexShapeDescription description)
+        {
+            //Recenter.  Convexes should contain the origin.
+            var center = (vA + vB + vC) / 3;
+            this.vA = vA - center;
+            this.vB = vB - center;
+            this.vC = vC - center;
+            UpdateConvexShapeInfo(description);
+        }
+
+
+
+
+        /// <summary>
+        /// Computes a convex shape description for a TransformableShape.
+        /// </summary>
+        ///<param name="vA">First local vertex in the triangle.</param>
+        ///<param name="vB">Second local vertex in the triangle.</param>
+        ///<param name="vC">Third local vertex in the triangle.</param>
+        ///<param name="collisionMargin">Collision margin of the shape.</param>
+        /// <returns>Description required to define a convex shape.</returns>
+        public static ConvexShapeDescription ComputeDescription(Vector3 vA, Vector3 vB, Vector3 vC, float collisionMargin)
+        {
+            ConvexShapeDescription description;
+            description.EntityShapeVolume.Volume = Vector3.Cross(vB - vA, vC - vA).Length() * collisionMargin; // ratherapproximate.
+            description.EntityShapeVolume.VolumeDistribution = new Matrix3x3();
+            description.MinimumRadius = collisionMargin;
+            description.MaximumRadius = collisionMargin + Math.Max(vA.Length(), Math.Max(vB.Length(), vC.Length()));
+            description.CollisionMargin = collisionMargin;
+            return description;
+        }
+
         /// <summary>
         /// Gets the bounding box of the shape given a transform.
         /// </summary>
@@ -175,39 +214,17 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         }
 
         /// <summary>
-        /// Computes the maximum radius of the shape.
-        /// This is often larger than the actual maximum radius;
-        /// it is simply an approximation that avoids underestimating.
-        /// </summary>
-        /// <returns>Maximum radius of the shape.</returns>
-        public override float ComputeMaximumRadius()
-        {
-            Vector3 center = ComputeCenter();
-            return collisionMargin + Math.Max((vA - center).Length(), Math.Max((vB - center).Length(), (vC - center).Length()));
-        }
-
-        ///<summary>
-        /// Computes the minimum radius of the shape.
-        /// This is often smaller than the actual minimum radius;
-        /// it is simply an approximation that avoids overestimating.
-        ///</summary>
-        ///<returns>Minimum radius of the shape.</returns>
-        public override float ComputeMinimumRadius()
-        {
-            return 0;
-        }
-
-        /// <summary>
-        /// Computes the volume distribution of the shape as well as its volume.
+        /// Computes the volume distribution of the triangle.
         /// The volume distribution can be used to compute inertia tensors when
         /// paired with mass and other tuning factors.
         /// </summary>
-        /// <param name="volume">Volume of the shape.</param>
+        ///<param name="vA">First vertex in the triangle.</param>
+        ///<param name="vB">Second vertex in the triangle.</param>
+        ///<param name="vC">Third vertex in the triangle.</param>
         /// <returns>Volume distribution of the shape.</returns>
-        public override Matrix3x3 ComputeVolumeDistribution(out float volume)
+        public static Matrix3x3 ComputeVolumeDistribution(Vector3 vA, Vector3 vB, Vector3 vC)
         {
-            Vector3 center = ComputeCenter();
-            volume = ComputeVolume(); //Just approximate.
+            Vector3 center = (vA + vB + vC) * (1 / 3f);
 
             //Calculate distribution of mass.
 
@@ -223,15 +240,15 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             float k = vA.Z - center.Z;
             //localInertiaTensor += new Matrix(j * j + k * k, -j * j, -j * k, 0, -j * j, j * j + k * k, -j * k, 0, -j * k, -j * k, j * j + j * j, 0, 0, 0, 0, 0); //No mass per point.
             var volumeDistribution = new Matrix3x3(massPerPoint * (j * j + k * k), massPerPoint * (-i * j), massPerPoint * (-i * k),
-                                                         massPerPoint * (-i * j), massPerPoint * (i * i + k * k), massPerPoint * (-j * k),
-                                                         massPerPoint * (-i * k), massPerPoint * (-j * k), massPerPoint * (i * i + j * j));
+                                                   massPerPoint * (-i * j), massPerPoint * (i * i + k * k), massPerPoint * (-j * k),
+                                                   massPerPoint * (-i * k), massPerPoint * (-j * k), massPerPoint * (i * i + j * j));
 
             i = vB.X - center.X;
             j = vB.Y - center.Y;
             k = vB.Z - center.Z;
             var pointContribution = new Matrix3x3(massPerPoint * (j * j + k * k), massPerPoint * (-i * j), massPerPoint * (-i * k),
-                                                        massPerPoint * (-i * j), massPerPoint * (i * i + k * k), massPerPoint * (-j * k),
-                                                        massPerPoint * (-i * k), massPerPoint * (-j * k), massPerPoint * (i * i + j * j));
+                                                  massPerPoint * (-i * j), massPerPoint * (i * i + k * k), massPerPoint * (-j * k),
+                                                  massPerPoint * (-i * k), massPerPoint * (-j * k), massPerPoint * (i * i + j * j));
             Matrix3x3.Add(ref volumeDistribution, ref pointContribution, out volumeDistribution);
 
             i = vC.X - center.X;
@@ -242,38 +259,6 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
                                               massPerPoint * (-i * k), massPerPoint * (-j * k), massPerPoint * (i * i + j * j));
             Matrix3x3.Add(ref volumeDistribution, ref pointContribution, out volumeDistribution);
             return volumeDistribution;
-        }
-
-        /// <summary>
-        /// Computes the center of the shape.  This can be considered its 
-        /// center of mass.
-        /// </summary>
-        /// <returns>Center of the shape.</returns>
-        public override Vector3 ComputeCenter()
-        {
-            return (vA + vB + vC) / 3;
-        }
-
-        /// <summary>
-        /// Computes the center of the shape.  This can be considered its 
-        /// center of mass.  This calculation is often associated with the 
-        /// volume calculation, which is given by this method as well.
-        /// </summary>
-        /// <param name="volume">Volume of the shape.</param>
-        /// <returns>Center of the shape.</returns>
-        public override Vector3 ComputeCenter(out float volume)
-        {
-            volume = ComputeVolume();
-            return ComputeCenter();
-        }
-
-        /// <summary>
-        /// Computes the volume of the shape.
-        /// </summary>
-        /// <returns>Volume of the shape.</returns>
-        public override float ComputeVolume()
-        {
-            return Vector3.Cross(vB - vA, vC - vA).Length() * collisionMargin;
         }
 
         ///<summary>

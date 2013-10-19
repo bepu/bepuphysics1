@@ -1371,7 +1371,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 Vector3.Dot(ref localTransformB.Position, ref localDirection, out sweepLength);
                 sweepLength /= rayLengthSquared;
                 //Scale the sweep length by the margins.  Divide by the length to pull the margin into terms of the length of the ray.
-                sweepLength += (shapeA.maximumRadius + shapeB.maximumRadius) / (float)Math.Sqrt(rayLengthSquared);
+                sweepLength += (shapeA.MaximumRadius + shapeB.MaximumRadius) / (float)Math.Sqrt(rayLengthSquared);
             }
             else
             {
@@ -2270,7 +2270,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             //a huge amount to match could manifest numerical issues.  Instead, pull the ray up close to the object.
             RayHit sphereHit;
 
-            if (Toolbox.RayCastSphere(ref ray, ref transform.Position, shape.maximumRadius, maximumLength, out sphereHit))
+            if (Toolbox.RayCastSphere(ref ray, ref transform.Position, shape.MaximumRadius, maximumLength, out sphereHit))
             {
                 //We can scoot ourselves almost all the way up to the intersection with the outer sphere.
                 //Stop just short to prevent a possible erroneous 'just-barely-contained' result.
@@ -2301,7 +2301,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 //Ray length isn't necessarily normalized...
                 sweepLength /= rayLengthSquared;
                 //Scale the sweep length by the margins.  Divide by the length to pull the margin into terms of the length of the ray.
-                sweepLength += shape.maximumRadius / (float)Math.Sqrt(rayLengthSquared);
+                sweepLength += shape.MaximumRadius / (float)Math.Sqrt(rayLengthSquared);
             }
             else
             {

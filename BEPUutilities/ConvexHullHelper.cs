@@ -16,9 +16,9 @@ namespace BEPUutilities
         /// Identifies the indices of points in a set which are on the outer convex hull of the set.
         /// </summary>
         /// <param name="points">List of points in the set.</param>
-        /// <param name="indices">List of indices composing the triangulated surface of the convex hull.
+        /// <param name="outputTriangleIndices">List of indices into the input point set composing the triangulated surface of the convex hull.
         /// Each group of 3 indices represents a triangle on the surface of the hull.</param>
-        public static void GetConvexHull(IList<Vector3> points, IList<int> indices)
+        public static void GetConvexHull(IList<Vector3> points, IList<int> outputTriangleIndices)
         {
             var rawPoints = CommonResources.GetVectorList();
             var rawIndices = CommonResources.GetIntList();
@@ -27,7 +27,7 @@ namespace BEPUutilities
             CommonResources.GiveBack(rawPoints);
             for (int i = 0; i < rawIndices.Count; i++)
             {
-                indices.Add(rawIndices[i]);
+                outputTriangleIndices.Add(rawIndices[i]);
             }
             CommonResources.GiveBack(rawIndices);
         }
@@ -61,10 +61,10 @@ namespace BEPUutilities
         /// Identifies the points on the surface of hull.
         /// </summary>
         /// <param name="points">List of points in the set.</param>
-        /// <param name="outputIndices">List of indices composing the triangulated surface of the convex hull.
+        /// <param name="outputTriangleIndices">List of indices into the input point set composing the triangulated surface of the convex hull.
         /// Each group of 3 indices represents a triangle on the surface of the hull.</param>
         /// <param name="outputSurfacePoints">Unique points on the surface of the convex hull.</param>
-        public static void GetConvexHull(IList<Vector3> points, IList<int> outputIndices, IList<Vector3> outputSurfacePoints)
+        public static void GetConvexHull(IList<Vector3> points, IList<int> outputTriangleIndices, IList<Vector3> outputSurfacePoints)
         {
             var rawPoints = CommonResources.GetVectorList();
             var rawIndices = CommonResources.GetIntList();
@@ -73,7 +73,7 @@ namespace BEPUutilities
             CommonResources.GiveBack(rawPoints);
             for (int i = 0; i < rawIndices.Count; i++)
             {
-                outputIndices.Add(rawIndices[i]);
+                outputTriangleIndices.Add(rawIndices[i]);
             }
             CommonResources.GiveBack(rawIndices);
         }
@@ -82,7 +82,7 @@ namespace BEPUutilities
         /// Identifies the points on the surface of hull.
         /// </summary>
         /// <param name="points">List of points in the set.</param>
-        /// <param name="outputTriangleIndices">List of indices composing the triangulated surface of the convex hull.
+        /// <param name="outputTriangleIndices">List of indices into the input point set composing the triangulated surface of the convex hull.
         /// Each group of 3 indices represents a triangle on the surface of the hull.</param>
         /// <param name="outputSurfacePoints">Unique points on the surface of the convex hull.</param>
         public static void GetConvexHull(RawList<Vector3> points, RawList<int> outputTriangleIndices, IList<Vector3> outputSurfacePoints)
@@ -109,7 +109,7 @@ namespace BEPUutilities
         /// Identifies the indices of points in a set which are on the outer convex hull of the set.
         /// </summary>
         /// <param name="points">List of points in the set.</param>
-        /// <param name="outputTriangleIndices">List of indices composing the triangulated surface of the convex hull.
+        /// <param name="outputTriangleIndices">List of indices into the input point set composing the triangulated surface of the convex hull.
         /// Each group of 3 indices represents a triangle on the surface of the hull.</param>
         public static void GetConvexHull(RawList<Vector3> points, RawList<int> outputTriangleIndices)
         {

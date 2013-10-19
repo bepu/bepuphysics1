@@ -684,7 +684,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             Vector3 closestPoint;
             Toolbox.GetClosestPointOnTriangleToPoint(ref triangle.vA, ref triangle.vB, ref triangle.vC, ref Toolbox.ZeroVector, out closestPoint);
             float length = closestPoint.LengthSquared();
-            float minimumRadius = convex.minimumRadius * (MotionSettings.CoreShapeScaling + .01f);
+            float minimumRadius = convex.MinimumRadius * (MotionSettings.CoreShapeScaling + .01f);
             if (length < minimumRadius * minimumRadius)
             {
                 Vector3 triangleNormal, ab, ac;
@@ -731,7 +731,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 //Compute the actual depth of the contact.
                 //This is conservative; the minimum radius is guaranteed to be no larger than the shape itself.
                 //But that's ok- this is strictly a deep contact protection scheme. Other contacts will make the objects separate.
-                contact.PenetrationDepth = convex.minimumRadius - length; 
+                contact.PenetrationDepth = convex.MinimumRadius - length; 
                 contact.Id = -1;
                 return true;
             }

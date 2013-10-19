@@ -138,6 +138,8 @@
     <Compile Include="BroadPhaseEntries\MobileCollidables\CompoundHelper.cs" />
     <Compile Include="BroadPhaseEntries\MobileCollidables\MobileMeshCollidable.cs" />
     <Compile Include="CollisionRuleManagement\ICollisionRulesOwner.cs" />
+    <Compile Include="CollisionShapes\ConvexShapes\ConvexShapeDescription.cs" />
+    <Compile Include="CollisionShapes\EntityShapeVolumeDescription.cs" />
     <Compile Include="CollisionShapes\StaticGroupShape.cs" />
     <Compile Include="BroadPhaseEntries\CollidableCollection.cs" />
     <Compile Include="BroadPhaseEntries\CollidablePair.cs" />

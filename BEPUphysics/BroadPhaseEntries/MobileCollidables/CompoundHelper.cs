@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using BEPUphysics.CollisionShapes;
- 
+
 using BEPUutilities;
 using BEPUphysics.Entities;
 using BEPUphysics.CollisionShapes.ConvexShapes;
@@ -15,6 +15,7 @@ namespace BEPUphysics.BroadPhaseEntries.MobileCollidables
     /// </summary>
     public static class CompoundHelper
     {
+
         /// <summary>
         /// Splits a single compound collidable into two separate compound collidables and computes information needed by the simulation.
         /// </summary>
@@ -25,41 +26,25 @@ namespace BEPUphysics.BroadPhaseEntries.MobileCollidables
         public static bool SplitCompound(Func<CompoundChild, bool> splitPredicate,
             Entity<CompoundCollidable> a, out Entity<CompoundCollidable> b)
         {
-            var childContributions = a.CollisionInformation.Shape.ComputeChildContributions();
-            return SplitCompound(childContributions, splitPredicate, a, out b);
-        }
-        /// <summary>
-        /// Splits a single compound collidable into two separate compound collidables and computes information needed by the simulation.
-        /// </summary>
-        /// <param name="childContributions">List of distribution information associated with each child shape of the whole compound shape used by the compound being split.</param>
-        /// <param name="splitPredicate">Delegate which determines if a child in the original compound should be moved to the new compound.</param>
-        /// <param name="a">Original compound to be split.  Children in this compound will be removed and added to the other compound.</param>
-        /// <param name="b">Compound to receive children removed from the original compound.</param>
-        /// <returns>Whether or not the predicate returned true for any element in the original compound and split the compound.</returns>
-        public static bool SplitCompound(IList<ShapeDistributionInformation> childContributions, Func<CompoundChild, bool> splitPredicate,
-            Entity<CompoundCollidable> a, out Entity<CompoundCollidable> b)
-        {
 
             ShapeDistributionInformation distributionInfoA, distributionInfoB;
-            if (SplitCompound(childContributions, splitPredicate, a, out b, out distributionInfoA, out distributionInfoB))
+            if (SplitCompound(splitPredicate, a, out b, out distributionInfoA, out distributionInfoB))
             {
                 return true;
             }
-            else
-                return false;
+            return false;
         }
 
         /// <summary>
         /// Splits a single compound collidable into two separate compound collidables and computes information needed by the simulation.
         /// </summary>
-        /// <param name="childContributions">List of distribution information associated with each child shape of the whole compound shape used by the compound being split.</param>
         /// <param name="splitPredicate">Delegate which determines if a child in the original compound should be moved to the new compound.</param>
         /// <param name="a">Original compound to be split.  Children in this compound will be removed and added to the other compound.</param>
         /// <param name="b">Compound to receive children removed from the original compound.</param>
         /// <param name="distributionInfoA">Volume, volume distribution, and center information about the new form of the original compound collidable.</param>
         /// <param name="distributionInfoB">Volume, volume distribution, and center information about the new compound collidable.</param>
         /// <returns>Whether or not the predicate returned true for any element in the original compound and split the compound.</returns>
-        public static bool SplitCompound(IList<ShapeDistributionInformation> childContributions, Func<CompoundChild, bool> splitPredicate,
+        public static bool SplitCompound(Func<CompoundChild, bool> splitPredicate,
                         Entity<CompoundCollidable> a, out Entity<CompoundCollidable> b,
                         out ShapeDistributionInformation distributionInfoA, out ShapeDistributionInformation distributionInfoB)
         {
@@ -68,7 +53,7 @@ namespace BEPUphysics.BroadPhaseEntries.MobileCollidables
 
 
             float weightA, weightB;
-            if (SplitCompound(childContributions, splitPredicate, a.CollisionInformation, bCollidable, out distributionInfoA, out distributionInfoB, out weightA, out weightB))
+            if (SplitCompound(splitPredicate, a.CollisionInformation, bCollidable, out distributionInfoA, out distributionInfoB, out weightA, out weightB))
             {
                 //Reconfigure the entities using the data computed in the split.
                 float originalMass = a.mass;
@@ -76,21 +61,20 @@ namespace BEPUphysics.BroadPhaseEntries.MobileCollidables
                 {
                     float newMassA = (weightA / (weightA + weightB)) * originalMass;
                     Matrix3x3.Multiply(ref distributionInfoA.VolumeDistribution, newMassA * InertiaHelper.InertiaTensorScale, out distributionInfoA.VolumeDistribution);
-                    a.Initialize(a.CollisionInformation, newMassA, distributionInfoA.VolumeDistribution, distributionInfoA.Volume);
+                    a.Initialize(a.CollisionInformation, newMassA, distributionInfoA.VolumeDistribution);
                 }
                 if (bCollidable.children.Count > 0)
                 {
                     float newMassB = (weightB / (weightA + weightB)) * originalMass;
                     Matrix3x3.Multiply(ref distributionInfoB.VolumeDistribution, newMassB * InertiaHelper.InertiaTensorScale, out distributionInfoB.VolumeDistribution);
                     b = new Entity<CompoundCollidable>();
-                    b.Initialize(bCollidable, newMassB, distributionInfoB.VolumeDistribution, distributionInfoB.Volume);
+                    b.Initialize(bCollidable, newMassB, distributionInfoB.VolumeDistribution);
                 }
 
                 SplitReposition(a, b, ref distributionInfoA, ref distributionInfoB, weightA, weightB);
                 return true;
             }
-            else
-                return false;
+            return false;
         }
 
         static void SplitReposition(Entity a, Entity b, ref ShapeDistributionInformation distributionInfoA, ref ShapeDistributionInformation distributionInfoB, float weightA, float weightB)
@@ -138,52 +122,29 @@ namespace BEPUphysics.BroadPhaseEntries.MobileCollidables
         public static bool SplitCompound(Func<CompoundChild, bool> splitPredicate,
             Entity<CompoundCollidable> a, Entity<CompoundCollidable> b)
         {
-            var childContributions = a.CollisionInformation.Shape.ComputeChildContributions();
-            if (SplitCompound(childContributions, splitPredicate, a, b))
-            {
-                return true;
-            }
-            else
-                return false;
-        }
-
-
-        /// <summary>
-        /// Splits a single compound collidable into two separate compound collidables and computes information needed by the simulation.
-        /// </summary>
-        /// <param name="childContributions">List of distribution information associated with each child shape of the whole compound shape used by the compound being split.</param>
-        /// <param name="splitPredicate">Delegate which determines if a child in the original compound should be moved to the new compound.</param>
-        /// <param name="a">Original compound to be split.  Children in this compound will be removed and added to the other compound.</param>
-        /// <param name="b">Compound to receive children removed from the original compound.</param>
-        /// <returns>Whether or not the predicate returned true for any element in the original compound and split the compound.</returns>
-        public static bool SplitCompound(IList<ShapeDistributionInformation> childContributions, Func<CompoundChild, bool> splitPredicate,
-            Entity<CompoundCollidable> a, Entity<CompoundCollidable> b)
-        {
             ShapeDistributionInformation distributionInfoA, distributionInfoB;
-            if (SplitCompound(childContributions, splitPredicate, a, b, out distributionInfoA, out distributionInfoB))
+            if (SplitCompound(splitPredicate, a, b, out distributionInfoA, out distributionInfoB))
             {
                 return true;
             }
-            else
-                return false;
+            return false;
         }
 
         /// <summary>
         /// Splits a single compound collidable into two separate compound collidables and computes information needed by the simulation.
         /// </summary>
-        /// <param name="childContributions">List of distribution information associated with each child shape of the whole compound shape used by the compound being split.</param>
         /// <param name="splitPredicate">Delegate which determines if a child in the original compound should be moved to the new compound.</param>
         /// <param name="distributionInfoA">Volume, volume distribution, and center information about the new form of the original compound collidable.</param>
         /// <param name="distributionInfoB">Volume, volume distribution, and center information about the new compound collidable.</param>
         /// <param name="a">Original compound to be split.  Children in this compound will be removed and added to the other compound.</param>
         /// <param name="b">Compound to receive children removed from the original compound.</param>
         /// <returns>Whether or not the predicate returned true for any element in the original compound and split the compound.</returns>
-        public static bool SplitCompound(IList<ShapeDistributionInformation> childContributions, Func<CompoundChild, bool> splitPredicate,
+        public static bool SplitCompound(Func<CompoundChild, bool> splitPredicate,
                         Entity<CompoundCollidable> a, Entity<CompoundCollidable> b,
                         out ShapeDistributionInformation distributionInfoA, out ShapeDistributionInformation distributionInfoB)
         {
             float weightA, weightB;
-            if (SplitCompound(childContributions, splitPredicate, a.CollisionInformation, b.CollisionInformation, out distributionInfoA, out distributionInfoB, out weightA, out weightB))
+            if (SplitCompound(splitPredicate, a.CollisionInformation, b.CollisionInformation, out distributionInfoA, out distributionInfoB, out weightA, out weightB))
             {
                 //Reconfigure the entities using the data computed in the split.
                 float originalMass = a.mass;
@@ -191,28 +152,26 @@ namespace BEPUphysics.BroadPhaseEntries.MobileCollidables
                 {
                     float newMassA = (weightA / (weightA + weightB)) * originalMass;
                     Matrix3x3.Multiply(ref distributionInfoA.VolumeDistribution, newMassA * InertiaHelper.InertiaTensorScale, out distributionInfoA.VolumeDistribution);
-                    a.Initialize(a.CollisionInformation, newMassA, distributionInfoA.VolumeDistribution, distributionInfoA.Volume);
+                    a.Initialize(a.CollisionInformation, newMassA, distributionInfoA.VolumeDistribution);
                 }
 
                 if (b.CollisionInformation.children.Count > 0)
                 {
                     float newMassB = (weightB / (weightA + weightB)) * originalMass;
                     Matrix3x3.Multiply(ref distributionInfoB.VolumeDistribution, newMassB * InertiaHelper.InertiaTensorScale, out distributionInfoB.VolumeDistribution);
-                    b.Initialize(b.CollisionInformation, newMassB, distributionInfoB.VolumeDistribution, distributionInfoB.Volume);
+                    b.Initialize(b.CollisionInformation, newMassB, distributionInfoB.VolumeDistribution);
                 }
 
                 SplitReposition(a, b, ref distributionInfoA, ref distributionInfoB, weightA, weightB);
 
                 return true;
             }
-            else
-                return false;
+            return false;
         }
 
         /// <summary>
         /// Splits a single compound collidable into two separate compound collidables and computes information needed by the simulation.
         /// </summary>
-        /// <param name="childContributions">List of distribution information associated with each child shape of the whole compound shape used by the compound being split.</param>
         /// <param name="splitPredicate">Delegate which determines if a child in the original compound should be moved to the new compound.</param>
         /// <param name="a">Original compound to be split.  Children in this compound will be removed and added to the other compound.</param>
         /// <param name="b">Compound to receive children removed from the original compound.</param>
@@ -221,7 +180,7 @@ namespace BEPUphysics.BroadPhaseEntries.MobileCollidables
         /// <param name="weightA">Total weight associated with the new form of the original compound collidable.</param>
         /// <param name="weightB">Total weight associated with the new compound collidable.</param>
         /// <returns>Whether or not the predicate returned true for any element in the original compound and split the compound.</returns>
-        public static bool SplitCompound(IList<ShapeDistributionInformation> childContributions, Func<CompoundChild, bool> splitPredicate,
+        public static bool SplitCompound(Func<CompoundChild, bool> splitPredicate,
             CompoundCollidable a, CompoundCollidable b,
             out ShapeDistributionInformation distributionInfoA, out ShapeDistributionInformation distributionInfoB,
             out float weightA, out float weightB)
@@ -262,22 +221,20 @@ namespace BEPUphysics.BroadPhaseEntries.MobileCollidables
             {
                 var child = a.children.Elements[i];
                 var entry = child.Entry;
-                var contribution = childContributions[child.shapeIndex];
-                Vector3.Add(ref contribution.Center, ref entry.LocalTransform.Position, out contribution.Center);
-                Vector3.Multiply(ref contribution.Center, child.Entry.Weight, out contribution.Center);
-                Vector3.Add(ref contribution.Center, ref distributionInfoA.Center, out distributionInfoA.Center);
-                distributionInfoA.Volume += contribution.Volume;
+                Vector3 weightedCenter;
+                Vector3.Multiply(ref entry.LocalTransform.Position, entry.Weight, out weightedCenter);
+                Vector3.Add(ref weightedCenter, ref distributionInfoA.Center, out distributionInfoA.Center);
+                distributionInfoA.Volume += entry.Shape.Volume;
                 weightA += entry.Weight;
             }
             for (int i = b.children.Count - 1; i >= 0; i--)
             {
                 var child = b.children.Elements[i];
                 var entry = child.Entry;
-                var contribution = childContributions[child.shapeIndex];
-                Vector3.Add(ref contribution.Center, ref entry.LocalTransform.Position, out contribution.Center);
-                Vector3.Multiply(ref contribution.Center, child.Entry.Weight, out contribution.Center);
-                Vector3.Add(ref contribution.Center, ref distributionInfoB.Center, out distributionInfoB.Center);
-                distributionInfoB.Volume += contribution.Volume;
+                Vector3 weightedCenter;
+                Vector3.Multiply(ref entry.LocalTransform.Position, entry.Weight, out weightedCenter);
+                Vector3.Add(ref weightedCenter, ref distributionInfoB.Center, out distributionInfoB.Center);
+                distributionInfoB.Volume += entry.Shape.Volume;
                 weightB += entry.Weight;
             }
 
@@ -306,10 +263,9 @@ namespace BEPUphysics.BroadPhaseEntries.MobileCollidables
                 Quaternion.Conjugate(ref entry.LocalTransform.Orientation, out conjugate);
                 Quaternion.Transform(ref offsetA, ref conjugate, out transformedOffset);
                 child.CollisionInformation.localPosition = transformedOffset;
-                var contribution = childContributions[child.shapeIndex];
-                CompoundShape.TransformContribution(ref entry.LocalTransform, ref distributionInfoA.Center, ref contribution.VolumeDistribution, entry.Weight, out contribution.VolumeDistribution);
-                //Vector3.Add(ref entry.LocalTransform.Position, ref offsetA, out entry.LocalTransform.Position);
-                Matrix3x3.Add(ref contribution.VolumeDistribution, ref distributionInfoA.VolumeDistribution, out distributionInfoA.VolumeDistribution);
+                Matrix3x3 contribution;
+                CompoundShape.TransformContribution(ref entry.LocalTransform, ref distributionInfoA.Center, ref entry.Shape.volumeDistribution, entry.Weight, out contribution);
+                Matrix3x3.Add(ref contribution, ref distributionInfoA.VolumeDistribution, out distributionInfoA.VolumeDistribution);
             }
             for (int i = b.children.Count - 1; i >= 0; i--)
             {
@@ -320,10 +276,9 @@ namespace BEPUphysics.BroadPhaseEntries.MobileCollidables
                 Quaternion.Conjugate(ref entry.LocalTransform.Orientation, out conjugate);
                 Quaternion.Transform(ref offsetB, ref conjugate, out transformedOffset);
                 child.CollisionInformation.localPosition = transformedOffset;
-                var contribution = childContributions[child.shapeIndex];
-                CompoundShape.TransformContribution(ref entry.LocalTransform, ref distributionInfoB.Center, ref contribution.VolumeDistribution, entry.Weight, out contribution.VolumeDistribution);
-                //Vector3.Add(ref entry.LocalTransform.Position, ref offsetB, out entry.LocalTransform.Position);
-                Matrix3x3.Add(ref contribution.VolumeDistribution, ref distributionInfoB.VolumeDistribution, out distributionInfoB.VolumeDistribution);
+                Matrix3x3 contribution;
+                CompoundShape.TransformContribution(ref entry.LocalTransform, ref distributionInfoB.Center, ref entry.Shape.volumeDistribution, entry.Weight, out contribution);
+                Matrix3x3.Add(ref contribution, ref distributionInfoB.VolumeDistribution, out distributionInfoB.VolumeDistribution);
             }
 
             //Normalize the volume distribution.
@@ -407,7 +362,7 @@ namespace BEPUphysics.BroadPhaseEntries.MobileCollidables
                     float originalMass = compound.mass;
                     float newMass = (weight / (weight + removedWeight)) * originalMass;
                     Matrix3x3.Multiply(ref distributionInfo.VolumeDistribution, newMass * InertiaHelper.InertiaTensorScale, out distributionInfo.VolumeDistribution);
-                    compound.Initialize(compound.CollisionInformation, newMass, distributionInfo.VolumeDistribution, distributionInfo.Volume);
+                    compound.Initialize(compound.CollisionInformation, newMass, distributionInfo.VolumeDistribution);
 
                     RemoveReposition(compound, ref distributionInfo, weight, removedWeight, ref removedCenter);
                 }
@@ -525,7 +480,7 @@ namespace BEPUphysics.BroadPhaseEntries.MobileCollidables
         {
             if (childIndices.Count == 0)
                 throw new ArgumentException("Cannot create a compound from zero shapes.");
-            
+
             CompoundCollidable compound = new CompoundCollidable();
             Vector3 center = new Vector3();
             float totalWeight = 0;

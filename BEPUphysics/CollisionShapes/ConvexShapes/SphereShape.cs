@@ -1,6 +1,6 @@
 ﻿using System;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
- 
+
 using BEPUutilities;
 
 namespace BEPUphysics.CollisionShapes.ConvexShapes
@@ -10,6 +10,13 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
     ///</summary>
     public class SphereShape : ConvexShape
     {
+
+        //This is a convenience method.  People expect to see a 'radius' of some kind.
+        ///<summary>
+        /// Gets or sets the radius of the sphere.
+        ///</summary>
+        public float Radius { get { return collisionMargin; } set { CollisionMargin = value; } }
+
         ///<summary>
         /// Constructs a new sphere shape.
         ///</summary>
@@ -17,13 +24,48 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         public SphereShape(float radius)
         {
             Radius = radius;
+
+            UpdateConvexShapeInfo(ComputeDescription(radius));
         }
 
-        //This is a convenience method.  People expect to see a 'radius' of some kind.
+
         ///<summary>
-        /// Gets or sets the radius of the sphere.
+        /// Constructs a new sphere shape.
         ///</summary>
-        public float Radius { get { return collisionMargin; } set { CollisionMargin = value; } }
+        /// <param name="description">Cached information about the shape. Assumed to be correct; no extra processing or validation is performed.</param>
+        public SphereShape(ConvexShapeDescription description)
+        {
+            UpdateConvexShapeInfo(description);
+        }
+
+        protected override void OnShapeChanged()
+        {
+            UpdateConvexShapeInfo(ComputeDescription(Radius));
+            base.OnShapeChanged();
+        }
+
+        /// <summary>
+        /// Computes a convex shape description for a SphereShape.
+        /// </summary>
+        ///<param name="radius">Radius of the sphere.</param>
+        /// <returns>Description required to define a convex shape.</returns>
+        public static ConvexShapeDescription ComputeDescription(float radius)
+        {
+            ConvexShapeDescription description;
+            description.EntityShapeVolume.Volume = 1.333333f * MathHelper.Pi * radius * radius * radius;
+            description.EntityShapeVolume.VolumeDistribution = new Matrix3x3();
+            float diagValue = ((2f / 5f) * radius * radius);
+            description.EntityShapeVolume.VolumeDistribution.M11 = diagValue;
+            description.EntityShapeVolume.VolumeDistribution.M22 = diagValue;
+            description.EntityShapeVolume.VolumeDistribution.M33 = diagValue;
+
+            description.MinimumRadius = radius;
+            description.MaximumRadius = radius;
+
+            description.CollisionMargin = radius;
+            return description;
+        }
+
 
         /// <summary>
         /// Gets the bounding box of the shape given a transform.
@@ -55,47 +97,6 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             extremePoint = Toolbox.ZeroVector;
         }
 
-        /// <summary>
-        /// Computes the maximum radius of the shape.
-        /// This is often larger than the actual maximum radius;
-        /// it is simply an approximation that avoids underestimating.
-        /// </summary>
-        /// <returns>Maximum radius of the shape.</returns>
-        public override float ComputeMaximumRadius()
-        {
-            return Radius;
-        }
-
-        ///<summary>
-        /// Computes the minimum radius of the shape.
-        /// This is often smaller than the actual minimum radius;
-        /// it is simply an approximation that avoids overestimating.
-        ///</summary>
-        ///<returns>Minimum radius of the shape.</returns>
-        public override float ComputeMinimumRadius()
-        {
-            return Radius;
-        }
-
-        /// <summary>
-        /// Computes the volume distribution of the shape as well as its volume.
-        /// The volume distribution can be used to compute inertia tensors when
-        /// paired with mass and other tuning factors.
-        /// </summary>
-        /// <param name="volume">Volume of the shape.</param>
-        /// <returns>Volume distribution of the shape.</returns>
-        public override Matrix3x3 ComputeVolumeDistribution(out float volume)
-        {
-            var volumeDistribution = new Matrix3x3();
-            float diagValue = ((2f / 5f) * Radius * Radius);
-            volumeDistribution.M11 = diagValue;
-            volumeDistribution.M22 = diagValue;
-            volumeDistribution.M33 = diagValue;
-
-            volume = ComputeVolume();
-            return volumeDistribution;
-        }
-
 
         /// <summary>
         /// Gets the intersection between the sphere and the ray.
@@ -108,65 +109,8 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         public override bool RayTest(ref Ray ray, ref RigidTransform transform, float maximumLength, out RayHit hit)
         {
             return Toolbox.RayCastSphere(ref ray, ref transform.Position, collisionMargin, maximumLength, out hit);
-            //Vector3 normalizedDirection;
-            //float length = ray.Direction.Length();
-            //Vector3.Divide(ref ray.Direction, length, out normalizedDirection);
-            //maximumLength *= length;
-            //hit = new RayHit();
-            //Vector3 m;
-            //Vector3.Subtract(ref ray.Position, ref transform.Position, out m);
-            //float b = Vector3.Dot(m, normalizedDirection);
-            //float c = m.LengthSquared() - collisionMargin * collisionMargin;
-
-            //if (c > 0 && b > 0)
-            //    return false;
-            //float discriminant = b * b - c;
-            //if (discriminant < 0)
-            //    return false;
-
-            //hit.T = -b - (float)Math.Sqrt(discriminant);
-            //if (hit.T < 0)
-            //    hit.T = 0;
-            //if (hit.T > maximumLength)
-            //    return false;
-            //Vector3.Multiply(ref normalizedDirection, hit.T, out hit.Location);
-            //Vector3.Add(ref hit.Location, ref ray.Position, out hit.Location);
-            //Vector3.Subtract(ref hit.Location, ref transform.Position, out hit.Normal);
-            //hit.Normal.Normalize();
-            //return true;
         }
 
-        /// <summary>
-        /// Computes the center of the shape.  This can be considered its 
-        /// center of mass.
-        /// </summary>
-        /// <returns>Center of the shape.</returns>
-        public override Vector3 ComputeCenter()
-        {
-            return Vector3.Zero;
-        }
-
-        /// <summary>
-        /// Computes the center of the shape.  This can be considered its 
-        /// center of mass.  This calculation is often associated with the 
-        /// volume calculation, which is given by this method as well.
-        /// </summary>
-        /// <param name="volume">Volume of the shape.</param>
-        /// <returns>Center of the shape.</returns>
-        public override Vector3 ComputeCenter(out float volume)
-        {
-            volume = ComputeVolume();
-            return ComputeCenter();
-        }
-
-        /// <summary>
-        /// Computes the volume of the shape.
-        /// </summary>
-        /// <returns>Volume of the shape.</returns>
-        public override float ComputeVolume()
-        {
-            return (float)(1.333333 * Math.PI * Radius * Radius * Radius);
-        }
 
         /// <summary>
         /// Retrieves an instance of an EntityCollidable that uses this EntityShape.  Mainly used by compound bodies.

@@ -79,7 +79,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                 Vector3.Multiply(ref velocity, dt, out velocity);
                 float velocitySquared = velocity.LengthSquared();
 
-                var minimumRadiusA = collidableA.Shape.minimumRadius * MotionSettings.CoreShapeScaling;
+                var minimumRadiusA = collidableA.Shape.MinimumRadius * MotionSettings.CoreShapeScaling;
                 timeOfImpact = 1;
                 if (minimumRadiusA * minimumRadiusA < velocitySquared)
                 {
@@ -89,7 +89,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                         timeOfImpact = rayHit.T;
                 }
 
-                var minimumRadiusB = collidableB.Shape.minimumRadius * MotionSettings.CoreShapeScaling;
+                var minimumRadiusB = collidableB.Shape.MinimumRadius * MotionSettings.CoreShapeScaling;
                 if (minimumRadiusB * minimumRadiusB < velocitySquared)
                 {
                     //Spherecast B against A.

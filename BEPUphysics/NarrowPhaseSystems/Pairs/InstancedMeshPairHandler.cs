@@ -122,7 +122,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                 Vector3.Multiply(ref convex.entity.linearVelocity, dt, out velocity);
                 float velocitySquared = velocity.LengthSquared();
 
-                var minimumRadius = convex.Shape.minimumRadius * MotionSettings.CoreShapeScaling;
+                var minimumRadius = convex.Shape.MinimumRadius * MotionSettings.CoreShapeScaling;
                 timeOfImpact = 1;
                 if (minimumRadius * minimumRadius < velocitySquared)
                 {
