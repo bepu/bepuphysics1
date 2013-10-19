@@ -54,17 +54,6 @@ namespace BEPUphysics.Entities
         {
         }
 
-        ///<summary>
-        /// Constructs a new morphable entity.
-        ///</summary>
-        ///<param name="collisionInformation">Collidable to use with the entity.</param>
-        ///<param name="mass">Mass of the entity.</param>
-        /// <param name="inertiaTensor">Inertia tensor of the entity.</param>
-        /// <param name="volume">Volume of the entity.</param>
-        public MorphableEntity(EntityCollidable collisionInformation, float mass, Matrix3x3 inertiaTensor, float volume)
-            : base(collisionInformation, mass, inertiaTensor, volume)
-        {
-        }
 
         ///<summary>
         /// Constructs a new morphable entity.
@@ -96,17 +85,6 @@ namespace BEPUphysics.Entities
         {
         }
 
-        ///<summary>
-        /// Constructs a new morphable entity.
-        ///</summary>
-        ///<param name="shape">Shape to use with the entity.</param>
-        ///<param name="mass">Mass of the entity.</param>
-        /// <param name="inertiaTensor">Inertia tensor of the entity.</param>
-        /// <param name="volume">Volume of the entity.</param>
-        public MorphableEntity(EntityShape shape, float mass, Matrix3x3 inertiaTensor, float volume)
-            : base(shape, mass, inertiaTensor, volume)
-        {
-        }
 
         /// <summary>
         /// Sets the collision information of the entity to another collidable.

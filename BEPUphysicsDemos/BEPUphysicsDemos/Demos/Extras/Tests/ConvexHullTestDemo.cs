@@ -47,8 +47,6 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             ConvexHullHelper.GetConvexHull(vertices, hullVertices);
 
             ConvexHull hull = new ConvexHull(vertices, 5);
-            ShapeDistributionInformation shapeInfo;
-            hull.CollisionInformation.Shape.ComputeDistributionInformation(out shapeInfo);
             Space.Add(hull);
 
             Box ground = new Box(new Vector3(0, -.5f, 0), 50, 1, 50);

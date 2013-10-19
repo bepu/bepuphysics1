@@ -1,4 +1,4 @@
-﻿ 
+﻿
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.DataStructures;
 using BEPUutilities;
@@ -90,7 +90,7 @@ namespace BEPUphysics.CollisionShapes
                     case MobileMeshSolidity.DoubleSided:
                         return TriangleSidedness.DoubleSided;
                     case MobileMeshSolidity.Solid:
-                        return solidSidedness;
+                        return SidednessWhenSolid;
 
                 }
                 return TriangleSidedness.DoubleSided;
@@ -98,7 +98,7 @@ namespace BEPUphysics.CollisionShapes
             set
             {
                 if (solidity == MobileMeshSolidity.Solid)
-                    solidSidedness = value;
+                    SidednessWhenSolid = value;
                 else
                 {
                     switch (value)
@@ -128,16 +128,13 @@ namespace BEPUphysics.CollisionShapes
         {
             this.solidity = solidity;
             var data = new TransformableMeshData(vertices, indices, localTransform);
-            ShapeDistributionInformation distributionInfo;
-            ComputeShapeInformation(data, out distributionInfo);
+            var shapeDistributionInformation = RecenterAndComputeVolumeDistribution(data);
 
-            for (int i = 0; i < surfaceVertices.Count; i++)
-            {
-                Vector3.Subtract(ref surfaceVertices.Elements[i], ref distributionInfo.Center, out surfaceVertices.Elements[i]);
-            }
             triangleMesh = new TriangleMesh(data);
 
             ComputeSolidSidedness();
+
+            UpdateEntityShapeVolume(new EntityShapeVolumeDescription { Volume = shapeDistributionInformation.Volume, VolumeDistribution = shapeDistributionInformation.VolumeDistribution });
         }
 
         ///<summary>
@@ -147,30 +144,47 @@ namespace BEPUphysics.CollisionShapes
         ///<param name="indices">Indices of the mesh.</param>
         ///<param name="localTransform">Local transform to apply to the shape.</param>
         ///<param name="solidity">Solidity state of the shape.</param>
-        ///<param name="distributionInfo">Information computed about the shape during construction.</param>
-        public MobileMeshShape(Vector3[] vertices, int[] indices, AffineTransform localTransform, MobileMeshSolidity solidity, out ShapeDistributionInformation distributionInfo)
+        /// <param name="center">Center of the shape.</param>
+        public MobileMeshShape(Vector3[] vertices, int[] indices, AffineTransform localTransform, MobileMeshSolidity solidity, out Vector3 center)
         {
             this.solidity = solidity;
             var data = new TransformableMeshData(vertices, indices, localTransform);
-            ComputeShapeInformation(data, out distributionInfo);
+            var shapeDistributionInformation = RecenterAndComputeVolumeDistribution(data);
+            center = shapeDistributionInformation.Center;
 
-            for (int i = 0; i < surfaceVertices.Count; i++)
-            {
-                Vector3.Subtract(ref surfaceVertices.Elements[i], ref distributionInfo.Center, out surfaceVertices.Elements[i]);
-            }
             triangleMesh = new TriangleMesh(data);
 
             ComputeSolidSidedness();
-            //ComputeBoundingHull();
+
+            UpdateEntityShapeVolume(new EntityShapeVolumeDescription {Volume = shapeDistributionInformation.Volume, VolumeDistribution = shapeDistributionInformation.VolumeDistribution});
         }
 
+        ///<summary>
+        /// Constructs a new mobile mesh shape from cached data.
+        ///</summary>
+        ///<param name="meshData">Mesh data reprsenting the shape. Should already be properly centered.</param>
+        ///<param name="solidity">Solidity state of the shape.</param>
+        /// <param name="sidednessWhenSolid">Triangle sidedness to use when the shape is solid.</param>
+        /// <param name="collisionMargin">Collision margin used to expand the mesh triangles.</param>
+        /// <param name="volumeDescription">Description of the volume and its distribution in the shape. Assumed to be correct; no processing or validation is performed.</param>
+        public MobileMeshShape(TransformableMeshData meshData, MobileMeshSolidity solidity, TriangleSidedness sidednessWhenSolid, float collisionMargin, EntityShapeVolumeDescription volumeDescription)
+        {
+            triangleMesh = new TriangleMesh(meshData);
+            meshCollisionMargin = collisionMargin;
+            this.solidity = solidity;
+            SidednessWhenSolid = sidednessWhenSolid;
+
+            UpdateEntityShapeVolume(volumeDescription);
+        }
+
+
         /// <summary>
-        /// Sidedness required if the mesh is in solid mode.
+        /// Gets the triangle sidedness required if the mesh is in solid mode.
         /// If the windings were reversed or double sided,
         /// the solidity would fight against shell contacts,
         /// leading to very bad jittering.
         /// </summary>
-        internal TriangleSidedness solidSidedness;
+        public TriangleSidedness SidednessWhenSolid { get; private set; }
 
 
         /// <summary>
@@ -206,7 +220,7 @@ namespace BEPUphysics.CollisionShapes
                 CommonResources.GiveBack(overlapList);
 
                 //If the mesh is hit from behind by the ray on the first hit, then the ray is inside.
-                return hit.T < float.MaxValue && ((solidSidedness == TriangleSidedness.Clockwise && !minimumClockwise) || (solidSidedness == TriangleSidedness.Counterclockwise && minimumClockwise));
+                return hit.T < float.MaxValue && ((SidednessWhenSolid == TriangleSidedness.Clockwise && !minimumClockwise) || (SidednessWhenSolid == TriangleSidedness.Counterclockwise && minimumClockwise));
             }
             CommonResources.GiveBack(overlapList);
             return false;
@@ -250,31 +264,10 @@ namespace BEPUphysics.CollisionShapes
             ray.Direction = (vA + vB + vC) / 3;
             ray.Direction.Normalize();
 
-            solidSidedness = ComputeSolidSidednessHelper(ray);
-            //TODO: Positions need to be valid for the verifying directions to work properly.
-            ////Find another direction and test it to corroborate the first test.
-            //Ray alternateRay;
-            //alternateRay.Position = ray.Position;
-            //Vector3.Cross(ref ray.Direction, ref Toolbox.UpVector, out alternateRay.Direction);
-            //float lengthSquared = alternateRay.Direction.LengthSquared();
-            //if (lengthSquared < Toolbox.Epsilon)
-            //{
-            //    Vector3.Cross(ref ray.Direction, ref Toolbox.RightVector, out alternateRay.Direction);
-            //    lengthSquared = alternateRay.Direction.LengthSquared();
-            //}
-            //Vector3.Divide(ref alternateRay.Direction, (float)Math.Sqrt(lengthSquared), out alternateRay.Direction);
-            //var sidednessCandidate2 = ComputeSolidSidednessHelper(alternateRay);
-            //if (sidednessCandidate == sidednessCandidate2)
-            //{
-            //    //The two tests agreed! It's very likely that the sidedness is, in fact, in this direction.
-            //    solidSidedness = sidednessCandidate;
-            //}
-            //else
-            //{
-            //    //The two tests disagreed.  Tiebreaker!
-            //    Vector3.Cross(ref alternateRay.Direction, ref ray.Direction, out alternateRay.Direction);
-            //    solidSidedness = ComputeSolidSidednessHelper(alternateRay);
-            //}
+            SidednessWhenSolid = ComputeSolidSidednessHelper(ray);
+            //ComputeSolidSidednessHelper is separated into another function just in case multiple queries were desired for validation.
+            //If multiple rays returned different sidednesses, the shape would be inconsistent.
+
         }
 
         TriangleSidedness ComputeSolidSidednessHelper(Ray ray)
@@ -344,9 +337,15 @@ namespace BEPUphysics.CollisionShapes
             return toReturn;
         }
 
-        void ComputeShapeInformation(TransformableMeshData data, out ShapeDistributionInformation shapeInformation)
+        /// <summary>
+        /// Recenters the triangle data and computes the volume distribution.
+        /// </summary>
+        /// <param name="data">Mesh data to analyze.</param>
+        /// <returns>Computed center, volume, and volume distribution.</returns>
+        private ShapeDistributionInformation RecenterAndComputeVolumeDistribution(TransformableMeshData data)
         {
             //Compute the surface vertices of the shape.
+            ShapeDistributionInformation shapeInformation;
             surfaceVertices.Clear();
             try
             {
@@ -431,7 +430,7 @@ namespace BEPUphysics.CollisionShapes
                     Vector3 v2, v3, v4;
                     data.GetTriangle(i, out v2, out v3, out v4);
 
-                    //Determinant is 6 * volume.  It's signed, though; this is because the mesh isn't necessarily convex nor centered on the origin.
+                    //Determinant is 6 * volume.  It's signed, though; the mesh isn't necessarily convex.
                     float tetrahedronVolume = v2.X * (v3.Y * v4.Z - v3.Z * v4.Y) -
                                               v3.X * (v2.Y * v4.Z - v2.Z * v4.Y) +
                                               v4.X * (v2.Y * v3.Z - v2.Z * v3.Y);
@@ -529,17 +528,7 @@ namespace BEPUphysics.CollisionShapes
                 Matrix3x3.Multiply(ref shapeInformation.VolumeDistribution, 1 / (6 * totalWeight), out shapeInformation.VolumeDistribution);
             }
 
-            ////Configure the inertia tensor to be local.
-            //Vector3 finalOffset = shapeInformation.Center;
-            //Matrix3X3 finalInnerProduct;
-            //Matrix3X3.CreateScale(finalOffset.LengthSquared(), out finalInnerProduct);
-            //Matrix3X3 finalOuterProduct;
-            //Matrix3X3.CreateOuterProduct(ref finalOffset, ref finalOffset, out finalOuterProduct);
-
-            //Matrix3X3 finalContribution;
-            //Matrix3X3.Subtract(ref finalInnerProduct, ref finalOuterProduct, out finalContribution);
-
-            //Matrix3X3.Subtract(ref shapeInformation.VolumeDistribution, ref finalContribution, out shapeInformation.VolumeDistribution);
+            return shapeInformation;
         }
 
         ///// <summary>
@@ -760,14 +749,6 @@ namespace BEPUphysics.CollisionShapes
         }
 
 
-        /// <summary>
-        /// Computes the volume, center of mass, and volume distribution of the shape.
-        /// </summary>
-        /// <param name="shapeInfo">Data about the shape.</param>
-        public override void ComputeDistributionInformation(out ShapeDistributionInformation shapeInfo)
-        {
-            ComputeShapeInformation(this.TriangleMesh.Data as TransformableMeshData, out shapeInfo);
-        }
 
         public override EntityCollidable GetCollidableInstance()
         {
@@ -776,7 +757,7 @@ namespace BEPUphysics.CollisionShapes
 
 
 
-      
+
     }
 
     ///<summary>

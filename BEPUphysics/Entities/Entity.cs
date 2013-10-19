@@ -55,20 +55,6 @@ namespace BEPUphysics.Entities
             Initialize(collisionInformation, mass, inertiaTensor);
         }
 
-        ///<summary>
-        /// Constructs a dynamic Entity.
-        ///</summary>
-        ///<param name="collisionInformation">Collidable for the entity.</param>
-        /// <param name="mass">Mass of the entity.</param>
-        /// <param name="inertiaTensor">Inertia of the entity.</param>
-        /// <param name="volume">Volume of the entity.</param>
-        public Entity(T collisionInformation, float mass, Matrix3x3 inertiaTensor, float volume)
-        {
-            Initialize(collisionInformation, mass, inertiaTensor, volume);
-        }
-
-
-
 
     }
 }

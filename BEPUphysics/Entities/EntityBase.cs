@@ -399,15 +399,6 @@ namespace BEPUphysics.Entities
         }
 
 
-        internal float volume;
-        /// <summary>
-        /// Gets the volume of the entity.
-        /// This is computed along with other physical properties at initialization,
-        /// but it's only used for auxiliary systems like the FluidVolume.
-        /// </summary>
-        public float Volume { get { return volume; } }
-
-
 
         ///<summary>
         /// Fires when the entity's position and orientation is updated.
@@ -567,18 +558,6 @@ namespace BEPUphysics.Entities
         {
             Initialize(collisionInformation, mass, inertiaTensor);
         }
-        ///<summary>
-        /// Constructs a new entity.
-        ///</summary>
-        ///<param name="collisionInformation">Collidable to use with the entity.</param>
-        ///<param name="mass">Mass of the entity. If positive, the entity will be dynamic. Otherwise, it will be kinematic.</param>
-        /// <param name="inertiaTensor">Inertia tensor of the entity. Only used for a dynamic entity.</param>
-        /// <param name="volume">Volume of the entity.</param>
-        public Entity(EntityCollidable collisionInformation, float mass, Matrix3x3 inertiaTensor, float volume)
-            : this()
-        {
-            Initialize(collisionInformation, mass, inertiaTensor, volume);
-        }
 
         ///<summary>
         /// Constructs a new kinematic entity.
@@ -613,18 +592,6 @@ namespace BEPUphysics.Entities
             Initialize(shape.GetCollidableInstance(), mass, inertiaTensor);
         }
 
-        ///<summary>
-        /// Constructs a new entity.
-        ///</summary>
-        ///<param name="shape">Shape to use with the entity.</param>
-        ///<param name="mass">Mass of the entity. If positive, the entity will be dynamic. Otherwise, it will be kinematic.</param>
-        /// <param name="inertiaTensor">Inertia tensor of the entity. Only used for a dynamic entity.</param>
-        /// <param name="volume">Volume of the entity.</param>
-        public Entity(EntityShape shape, float mass, Matrix3x3 inertiaTensor, float volume)
-            : this()
-        {
-            Initialize(shape.GetCollidableInstance(), mass, inertiaTensor, volume);
-        }
 
 
 
@@ -643,17 +610,10 @@ namespace BEPUphysics.Entities
 
             if (mass > 0)
             {
-                ShapeDistributionInformation shapeInfo;
-                collisionInformation.Shape.ComputeDistributionInformation(out shapeInfo);
-                Matrix3x3.Multiply(ref shapeInfo.VolumeDistribution, mass * InertiaHelper.InertiaTensorScale, out shapeInfo.VolumeDistribution);
-
-                volume = shapeInfo.Volume;
-
-                BecomeDynamic(mass, shapeInfo.VolumeDistribution);
+                BecomeDynamic(mass, collisionInformation.Shape.VolumeDistribution * (mass * InertiaHelper.InertiaTensorScale));
             }
             else
             {
-                volume = collisionInformation.Shape.ComputeVolume();
                 BecomeKinematic();
             }
 
@@ -663,9 +623,7 @@ namespace BEPUphysics.Entities
         protected internal void Initialize(EntityCollidable collisionInformation, float mass, Matrix3x3 inertiaTensor)
         {
             CollisionInformation = collisionInformation;
-
-            volume = collisionInformation.Shape.ComputeVolume();
-
+            
             if (mass > 0)
                 BecomeDynamic(mass, inertiaTensor);
             else
@@ -674,17 +632,6 @@ namespace BEPUphysics.Entities
             collisionInformation.Entity = this;
         }
 
-        protected internal void Initialize(EntityCollidable collisionInformation, float mass, Matrix3x3 inertiaTensor, float volume)
-        {
-            CollisionInformation = collisionInformation;
-            this.volume = volume;
-            if (mass > 0)
-                BecomeDynamic(mass, inertiaTensor);
-            else
-                BecomeKinematic();
-
-            collisionInformation.Entity = this;
-        }
 
         #endregion
 
@@ -824,13 +771,9 @@ namespace BEPUphysics.Entities
             {
                 //When the shape changes, force the entity awake so that it performs any necessary updates.
                 activityInformation.Activate();
-                ShapeDistributionInformation shapeInfo;
-                collisionInformation.Shape.ComputeDistributionInformation(out shapeInfo);
-                volume = shapeInfo.Volume;
                 if (isDynamic)
                 {
-                    Matrix3x3.Multiply(ref shapeInfo.VolumeDistribution, InertiaHelper.InertiaTensorScale * mass, out shapeInfo.VolumeDistribution);
-                    LocalInertiaTensor = shapeInfo.VolumeDistribution;
+                    LocalInertiaTensor = collisionInformation.Shape.VolumeDistribution * (InertiaHelper.InertiaTensorScale * mass);
                 }
                 else
                 {
@@ -880,9 +823,7 @@ namespace BEPUphysics.Entities
         ///<param name="mass">Mass to use for the entity.</param>
         public void BecomeDynamic(float mass)
         {
-            Matrix3x3 inertiaTensor = collisionInformation.Shape.ComputeVolumeDistribution();
-            Matrix3x3.Multiply(ref inertiaTensor, mass * InertiaHelper.InertiaTensorScale, out inertiaTensor);
-            BecomeDynamic(mass, inertiaTensor);
+            BecomeDynamic(mass, collisionInformation.Shape.VolumeDistribution * (mass * InertiaHelper.InertiaTensorScale));
         }
 
         ///<summary>

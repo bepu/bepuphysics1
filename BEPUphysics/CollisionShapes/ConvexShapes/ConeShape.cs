@@ -1,6 +1,6 @@
 ﻿using System;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
- 
+
 using BEPUutilities;
 
 namespace BEPUphysics.CollisionShapes.ConvexShapes
@@ -11,7 +11,6 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
     public class ConeShape : ConvexShape
     {
 
-        float radius;
         float height;
         ///<summary>
         /// Gets or sets the height of the cone.
@@ -25,6 +24,8 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
                 OnShapeChanged();
             }
         }
+
+        float radius;
         ///<summary>
         /// Gets or sets the radius of the cone base.
         ///</summary>
@@ -46,7 +47,59 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         public ConeShape(float height, float radius)
         {
             this.height = height;
-            Radius = radius;
+            this.radius = radius;
+
+            UpdateConvexShapeInfo(ComputeDescription(height, radius, collisionMargin));
+        }
+
+        ///<summary>
+        /// Constructs a new cone shape.
+        ///</summary>
+        ///<param name="height">Height of the cone.</param>
+        ///<param name="radius">Radius of the cone base.</param>
+        /// <param name="description">Cached information about the shape. Assumed to be correct; no extra processing or validation is performed.</param>
+        public ConeShape(float height, float radius, ConvexShapeDescription description)
+        {
+            this.height = height;
+            this.radius = radius;
+
+            UpdateConvexShapeInfo(description);
+        }
+
+
+        protected override void OnShapeChanged()
+        {
+            UpdateConvexShapeInfo(ComputeDescription(height, radius, collisionMargin));
+            base.OnShapeChanged();
+        }
+
+
+        /// <summary>
+        /// Computes a convex shape description for a ConeShape.
+        /// </summary>
+        ///<param name="height">Height of the cone.</param>
+        ///<param name="radius">Radius of the cone base.</param>
+        ///<param name="collisionMargin">Collision margin of the shape.</param>
+        /// <returns>Description required to define a convex shape.</returns>
+        public static ConvexShapeDescription ComputeDescription(float height, float radius, float collisionMargin)
+        {
+            ConvexShapeDescription description;
+            description.EntityShapeVolume.Volume = (float)(.333333 * Math.PI * radius * radius * height);
+
+            description.EntityShapeVolume.VolumeDistribution = new Matrix3x3();
+            float diagValue = (.1f * height * height + .15f * radius * radius);
+            description.EntityShapeVolume.VolumeDistribution.M11 = diagValue;
+            description.EntityShapeVolume.VolumeDistribution.M22 = .3f * radius * radius;
+            description.EntityShapeVolume.VolumeDistribution.M33 = diagValue;
+
+            description.MaximumRadius = (float)(collisionMargin + Math.Max(.75 * height, Math.Sqrt(.0625f * height * height + radius * radius)));
+
+            double denominator = radius / height;
+            denominator = denominator / Math.Sqrt(denominator * denominator + 1);
+            description.MinimumRadius = (float)(collisionMargin + Math.Min(.25f * height, denominator * .75 * height));
+
+            description.CollisionMargin = collisionMargin;
+            return description;
         }
 
 
@@ -78,83 +131,6 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
 
         }
 
-        ///<summary>
-        /// Computes the minimum radius of the shape.
-        /// This is often smaller than the actual minimum radius;
-        /// it is simply an approximation that avoids overestimating.
-        ///</summary>
-        ///<returns>Minimum radius of the shape.</returns>
-        public override float ComputeMinimumRadius()
-        {
-            double denominator = radius / height;
-            denominator = denominator / Math.Sqrt(denominator * denominator + 1);
-            return (float)(collisionMargin + Math.Min(.25f * height, denominator * .75 * height));
-        }
-
-        /// <summary>
-        /// Computes the maximum radius of the shape.
-        /// This is often larger than the actual maximum radius;
-        /// it is simply an approximation that avoids underestimating.
-        /// </summary>
-        /// <returns>Maximum radius of the shape.</returns>
-        public override float ComputeMaximumRadius()
-        {
-            return (float)(collisionMargin + Math.Max(.75 * Height, Math.Sqrt(.0625f * Height * Height + Radius * Radius)));
-        }
-
-        /// <summary>
-        /// Computes the volume distribution of the shape as well as its volume.
-        /// The volume distribution can be used to compute inertia tensors when
-        /// paired with mass and other tuning factors.
-        /// </summary>
-        /// <param name="volume">Volume of the shape.</param>
-        /// <returns>Volume distribution of the shape.</returns>
-        public override Matrix3x3 ComputeVolumeDistribution(out float volume)
-        {
-            volume = ComputeVolume();
-
-            //Calculate inertia tensor.
-            var volumeDistribution = new Matrix3x3();
-            float diagValue = (.1f * Height * Height + .15f * Radius * Radius);
-            volumeDistribution.M11 = diagValue;
-            volumeDistribution.M22 = .3f * Radius * Radius;
-            volumeDistribution.M33 = diagValue;
-
-            return volumeDistribution;
-        }
-
-
-        /// <summary>
-        /// Computes the center of the shape.  This can be considered its 
-        /// center of mass.
-        /// </summary>
-        /// <returns>Center of the shape.</returns>
-        public override Vector3 ComputeCenter()
-        {
-            return Vector3.Zero;
-        }
-
-        /// <summary>
-        /// Computes the center of the shape.  This can be considered its 
-        /// center of mass.  This calculation is often associated with the 
-        /// volume calculation, which is given by this method as well.
-        /// </summary>
-        /// <param name="volume">Volume of the shape.</param>
-        /// <returns>Center of the shape.</returns>
-        public override Vector3 ComputeCenter(out float volume)
-        {
-            volume = ComputeVolume();
-            return ComputeCenter();
-        }
-
-        /// <summary>
-        /// Computes the volume of the shape.
-        /// </summary>
-        /// <returns>Volume of the shape.</returns>
-        public override float ComputeVolume()
-        {
-            return (float)(.333333 * Math.PI * Radius * Radius * Height);
-        }
 
         /// <summary>
         /// Retrieves an instance of an EntityCollidable that uses this EntityShape.  Mainly used by compound bodies.

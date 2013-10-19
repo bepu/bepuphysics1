@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUutilities;
- 
+
 using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.CollisionShapes.ConvexShapes
@@ -78,6 +78,22 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         /// <summary>
         /// Constructs a minkowski sum shape.
         /// A minkowski sum can be created from more than two objects; use the other constructors.
+        /// The sum will be recentered on its local origin.  The computed center is outputted by the other constructor.
+        /// </summary>
+        /// <param name="firstShape">First entry in the sum.</param>
+        /// <param name="secondShape">Second entry in the sum.</param>
+        public MinkowskiSumShape(OrientedConvexShapeEntry firstShape, OrientedConvexShapeEntry secondShape)
+        {
+            shapes.Add(firstShape);
+            shapes.Add(secondShape);
+            UpdateConvexShapeInfo();
+            shapes.Changed += ShapesChanged;
+        }
+
+
+        /// <summary>
+        /// Constructs a minkowski sum shape.
+        /// A minkowski sum can be created from more than two objects; use the other constructors.
         /// The sum will be recentered on its local origin.
         /// </summary>
         /// <param name="firstShape">First entry in the sum.</param>
@@ -87,34 +103,6 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             : this(firstShape, secondShape)
         {
             center = -localOffset;
-        }
-
-        /// <summary>
-        /// Constructs a minkowski sum shape.
-        /// The sum will be recentered on its local origin.
-        /// </summary>
-        /// <param name="shapeEntries">Entries composing the minkowski sum.</param>
-        /// <param name="center">Center of the minkowski sum computed pre-recentering.</param>
-        public MinkowskiSumShape(IList<OrientedConvexShapeEntry> shapeEntries, out Vector3 center)
-            : this(shapeEntries)
-        {
-            center = -localOffset;
-        }
-
-        /// <summary>
-        /// Constructs a minkowski sum shape.
-        /// A minkowski sum can be created from more than two objects; use the other constructors.
-        /// The sum will be recentered on its local origin.  The computed center is outputted by the other constructor.
-        /// </summary>
-        /// <param name="firstShape">First entry in the sum.</param>
-        /// <param name="secondShape">Second entry in the sum.</param>
-        public MinkowskiSumShape(OrientedConvexShapeEntry firstShape, OrientedConvexShapeEntry secondShape)
-        {
-            shapes.Add(firstShape);
-            shapes.Add(secondShape);
-            shapes.Changed += ShapesChanged;
-            OnShapeChanged();
-            localOffset = -ComputeCenter();
         }
 
         /// <summary>
@@ -130,21 +118,81 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             {
                 shapes.Add(shapeEntries[i]);
             }
+            UpdateConvexShapeInfo();
             shapes.Changed += ShapesChanged;
-            OnShapeChanged();
-            localOffset = -ComputeCenter();
         }
+
+        /// <summary>
+        /// Constructs a minkowski sum shape.
+        /// The sum will be recentered on its local origin.
+        /// </summary>
+        /// <param name="shapeEntries">Entries composing the minkowski sum.</param>
+        /// <param name="center">Center of the minkowski sum computed pre-recentering.</param>
+        public MinkowskiSumShape(IList<OrientedConvexShapeEntry> shapeEntries, out Vector3 center)
+            : this(shapeEntries)
+        {
+            center = -localOffset;
+        }
+        /// <summary>
+        /// Constructs a minkowski sum shape from cached data.
+        /// </summary>
+        /// <param name="shapeEntries">Entries composing the minkowski sum.</param>
+        /// <param name="localOffset">Local offset of the elements in the minkowski sum.</param>
+        /// <param name="description">Cached information about the shape. Assumed to be correct; no extra processing or validation is performed.</param>
+        public MinkowskiSumShape(IList<OrientedConvexShapeEntry> shapeEntries, Vector3 localOffset, ConvexShapeDescription description)
+        {
+            for (int i = 0; i < shapeEntries.Count; i++)
+            {
+                shapes.Add(shapeEntries[i]);
+            }
+            this.localOffset = localOffset;
+            UpdateConvexShapeInfo(description);
+            shapes.Changed += ShapesChanged;
+        }
+
+
 
         void ShapesChanged(ObservableList<OrientedConvexShapeEntry> list)
         {
             OnShapeChanged();
-            //Computing the center uses extreme point calculations.
-            //Extreme point calculations make use of the localOffset.
-            //So, set the local offset to zero before doing the computation.
-            //The new offset is then computed.
-            localOffset = new Vector3();
-            localOffset = -ComputeCenter();
         }
+
+        protected override void OnShapeChanged()
+        {
+            UpdateConvexShapeInfo();
+            base.OnShapeChanged();
+        }
+
+
+        /// <summary>
+        /// Computes and applies a convex shape description for this MinkowskiSumShape.
+        /// </summary>
+        /// <returns>Description required to define a convex shape.</returns>
+        public void UpdateConvexShapeInfo()
+        {
+            //An estimate of the maximum radius is currently required by the raycasts used by the InertiaHelper. Radii computation must come first.
+            //TODO: This will no longer be required when the InertiaHelper gets updated to use approximate tetrahedral integration.
+            float minRadius = 0, maxRadius = 0;
+            for (int i = 0; i < shapes.Count; i++)
+            {
+                minRadius += shapes.WrappedList.Elements[i].CollisionShape.MinimumRadius;
+                maxRadius += shapes.WrappedList.Elements[i].CollisionShape.MaximumRadius;
+            }
+
+            MinimumRadius = minRadius + collisionMargin;
+            MaximumRadius = maxRadius + collisionMargin;
+
+            //Eliminate the previously used offset to ensure that only the shapes influence the computed center.
+            localOffset = new Vector3();
+            localOffset = -InertiaHelper.ComputeCenter(this);
+
+            //Now that localOffset is set, the GetLocalExtremePointWithoutMargin method will return properly centered results.
+            float volume;
+            volumeDistribution = InertiaHelper.ComputeVolumeDistribution(this, out volume);
+            Volume = volume;
+
+        }
+
 
 
         ///<summary>
@@ -164,40 +212,6 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
                 Vector3.Add(ref extremePoint, ref temp, out extremePoint);
             }
             Vector3.Add(ref extremePoint, ref localOffset, out extremePoint);
-        }
-
-        ///<summary>
-        /// Computes the minimum radius of the shape.
-        /// This is often smaller than the actual minimum radius;
-        /// it is simply an approximation that avoids overestimating.
-        ///</summary>
-        ///<returns>Minimum radius of the shape.</returns>
-        public override float ComputeMinimumRadius()
-        {
-            float minRadius = 0;
-            for (int i = 0; i < shapes.Count; i++)
-            {
-                minRadius += shapes.WrappedList.Elements[i].CollisionShape.ComputeMinimumRadius();
-            }
-            return minRadius + collisionMargin;
-        }
-
-
-        /// <summary>
-        /// Computes the maximum radius of the shape.
-        /// This is often larger than the actual maximum radius;
-        /// it is simply an approximation that avoids underestimating.
-        /// </summary>
-        /// <returns>Maximum radius of the shape.</returns>
-        public override float ComputeMaximumRadius()
-        {
-            //This can overestimate the actual maximum radius, but such is the defined behavior of the ComputeMaximumRadius function.  It's not exact; it's an upper bound on the actual maximum.
-            float maxRadius = 0;
-            for (int i = 0; i < shapes.Count; i++)
-            {
-                maxRadius += shapes.WrappedList.Elements[i].CollisionShape.ComputeMaximumRadius();
-            }
-            return maxRadius + collisionMargin;
         }
 
 

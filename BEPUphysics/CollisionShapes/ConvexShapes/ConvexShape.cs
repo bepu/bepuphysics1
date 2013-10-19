@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Diagnostics;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
-using BEPUphysics.CollisionTests.CollisionAlgorithms.GJK;
 using BEPUutilities;
 using BEPUphysics.Settings;
 
@@ -12,6 +10,17 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
     ///</summary>
     public abstract class ConvexShape : EntityShape
     {
+
+        protected void UpdateConvexShapeInfo(ConvexShapeDescription description)
+        {
+            UpdateEntityShapeVolume(description.EntityShapeVolume);
+            MinimumRadius = description.MinimumRadius;
+            MaximumRadius = description.MaximumRadius;
+            collisionMargin = description.CollisionMargin;
+        }
+
+
+
         protected internal float collisionMargin = CollisionDetectionSettings.DefaultMargin;
         ///<summary>
         /// Collision margin of the convex shape.  The margin is a small spherical expansion around
@@ -33,20 +42,18 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             }
         }
 
-        protected internal float minimumRadius;
         /// <summary>
         /// Gets or sets the minimum radius of the collidable's shape.  This is initialized to a value that is
         /// guaranteed to be equal to or smaller than the actual minimum radius.  When setting this property,
         /// ensure that the inner sphere formed by the new minimum radius is fully contained within the shape.
         /// </summary>
-        public float MinimumRadius { get { return minimumRadius; } set { minimumRadius = value; } }
+        public float MinimumRadius { get; internal set; }
 
-        protected internal float maximumRadius;
         /// <summary>
         /// Gets the maximum radius of the collidable's shape.  This is initialized to a value that is
         /// guaranteed to be equal to or larger than the actual maximum radius.
         /// </summary>
-        public float MaximumRadius { get { return maximumRadius; } }
+        public float MaximumRadius { get; internal set; }
 
         ///<summary>
         /// Gets the extreme point of the shape in local space in a given direction.
@@ -175,101 +182,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         /// <returns>Whether or not the ray hit the target.</returns>
         public virtual bool RayTest(ref Ray ray, ref RigidTransform transform, float maximumLength, out RayHit hit)
         {
-            
-            //RayHit newHit;
-            //bool newBool = GJKToolbox.RayCast(ray, this, ref transform, maximumLength, out newHit);
-            //RayHit oldHit;
-            //bool oldBool = OldGJKVerifier.RayCastGJK(ray.Position, ray.Direction, maximumLength, this, transform, out oldHit.Location, out oldHit.Normal, out oldHit.T);
-            //bool mprBool = MPRToolbox.RayCast(ray, maximumLength, this, ref transform, out hit);
-            ////if (newBool != oldBool || ((newBool && oldBool) && Vector3.DistanceSquared(newHit.Location, hit.Location) > .01f))
-            ////    Debug.WriteLine("break.");
-            //return mprBool;
-
-            //if (GJKToolbox.RayCast(ray, this, ref transform, maximumLength, out hit))
-            //{
-            //    //GJK toolbox doesn't normalize the hit normal; it's unnecessary for some other systems so it just saves on time.
-            //    //It would be nice if ray tests always normalized it though.
-            //    float length = hit.Normal.LengthSquared();
-            //    if (length > Toolbox.Epsilon)
-            //        Vector3.Divide(ref hit.Normal, (float) Math.Sqrt(length), out hit.Normal);
-            //    else
-            //        hit.Normal = new Vector3();
-            //    return true;
-            //}
-
-            //return false;
-
             return MPRToolbox.RayCast(ray, maximumLength, this, ref transform, out hit);
-        }
-
-        /// <summary>
-        /// Computes the center of the shape.  This can be considered its 
-        /// center of mass.
-        /// </summary>
-        /// <returns>Center of the shape.</returns>
-        public override Vector3 ComputeCenter()
-        {
-            return InertiaHelper.ComputeCenter(this);
-        }
-
-        /// <summary>
-        /// Computes the center of the shape.  This can be considered its 
-        /// center of mass.  This calculation is often associated with the 
-        /// volume calculation, which is given by this method as well.
-        /// </summary>
-        /// <param name="volume">Volume of the shape.</param>
-        /// <returns>Center of the shape.</returns>
-        public override Vector3 ComputeCenter(out float volume)
-        {
-            return InertiaHelper.ComputeCenter(this, out volume);
-        }
-
-        /// <summary>
-        /// Computes the volume of the shape.
-        /// </summary>
-        /// <returns>Volume of the shape.</returns>
-        public override float ComputeVolume()
-        {
-            float volume;
-            ComputeVolumeDistribution(out volume);
-            return volume;
-        }
-
-        /// <summary>
-        /// Computes the volume distribution of the shape as well as its volume.
-        /// The volume distribution can be used to compute inertia tensors when
-        /// paired with mass and other tuning factors.
-        /// </summary>
-        /// <param name="volume">Volume of the shape.</param>
-        /// <returns>Volume distribution of the shape.</returns>
-        public override Matrix3x3 ComputeVolumeDistribution(out float volume)
-        {
-            return InertiaHelper.ComputeVolumeDistribution(this, out volume);
-        }
-
-        protected override void OnShapeChanged()
-        {
-            minimumRadius = ComputeMinimumRadius();
-            maximumRadius = ComputeMaximumRadius();
-            base.OnShapeChanged();
-        }
-
-        /// <summary>
-        /// Computes the volume distribution of the shape.
-        /// The volume distribution can be used to compute inertia tensors when
-        /// paired with mass and other tuning factors.
-        /// </summary>
-        /// <returns>Volume distribution of the shape.</returns>
-        public override Matrix3x3 ComputeVolumeDistribution()
-        {
-            float volume;
-            return ComputeVolumeDistribution(out volume);
-        }
-
-        public override void ComputeDistributionInformation(out ShapeDistributionInformation shapeInfo)
-        {
-            shapeInfo.VolumeDistribution = ComputeVolumeDistribution(out shapeInfo.Volume);
-            shapeInfo.Center = ComputeCenter();
         }
 
         /// <summary>
@@ -367,20 +280,5 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         }
 
 
-
-        ///<summary>
-        /// Computes the minimum radius of the shape.
-        /// This is often smaller than the actual minimum radius;
-        /// it is simply an approximation that avoids overestimating.
-        ///</summary>
-        ///<returns>Minimum radius of the shape.</returns>
-        public abstract float ComputeMinimumRadius();
-        /// <summary>
-        /// Computes the maximum radius of the shape.
-        /// This is often larger than the actual maximum radius;
-        /// it is simply an approximation that avoids underestimating.
-        /// </summary>
-        /// <returns>Maximum radius of the shape.</returns>
-        public abstract float ComputeMaximumRadius();
     }
 }
