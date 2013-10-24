@@ -670,6 +670,11 @@ namespace BEPUphysics.CollisionTests.Manifolds
             {
                 return (edge.A == A && edge.B == B) || (edge.A == B && edge.B == A);
             }
+
+            public override string ToString()
+            {
+                return "{" + A + ", " + B + "}";
+            }
         }
 
         ///<summary>
