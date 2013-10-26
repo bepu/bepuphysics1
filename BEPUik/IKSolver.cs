@@ -92,6 +92,10 @@ namespace BEPUik
             permutationMapper.PermutationIndex = 0;
 
             float updateRate = 1 / TimeStepDuration;
+            foreach (var joint in ActiveSet.joints)
+            {
+                joint.Preupdate(TimeStepDuration, updateRate);
+            }
 
             for (int i = 0; i < FixerIterationCount; i++)
             {
@@ -104,7 +108,6 @@ namespace BEPUik
                 //Update the per-constraint jacobians and effective mass for the current bone orientations and positions.
                 foreach (IKJoint joint in ActiveSet.joints)
                 {
-                    joint.Preupdate(TimeStepDuration, updateRate);
                     joint.UpdateJacobiansAndVelocityBias();
                     joint.ComputeEffectiveMass();
                     joint.WarmStart();
@@ -159,6 +162,14 @@ namespace BEPUik
             permutationMapper.PermutationIndex = 0;
 
             float updateRate = 1 / TimeStepDuration;
+            foreach (var joint in ActiveSet.joints)
+            {
+                joint.Preupdate(TimeStepDuration, updateRate);
+            }
+            foreach (var control in controls)
+            {
+                control.Preupdate(TimeStepDuration, updateRate);
+            }
 
             //Go through the set of controls and active joints, updating the state of bones.
             for (int i = 0; i < ControlIterationCount; i++)
@@ -172,7 +183,6 @@ namespace BEPUik
                 //Update the per-constraint jacobians and effective mass for the current bone orientations and positions.
                 foreach (IKJoint joint in ActiveSet.joints)
                 {
-                    joint.Preupdate(TimeStepDuration, updateRate);
                     joint.UpdateJacobiansAndVelocityBias();
                     joint.ComputeEffectiveMass();
                     joint.WarmStart();
@@ -182,7 +192,6 @@ namespace BEPUik
                 {
                     if (control.TargetBone.Pinned)
                         throw new InvalidOperationException("Pinned objects cannot be moved by controls.");
-                    control.Preupdate(TimeStepDuration, updateRate);
                     control.UpdateJacobiansAndVelocityBias();
                     control.ComputeEffectiveMass();
                     control.WarmStart();
@@ -215,6 +224,15 @@ namespace BEPUik
                 }
             }
 
+            //Clear out the control iteration accumulated impulses; they should not persist through to the fixer iterations since the stresses are (potentially) totally different.
+            //This just helps stability in some corner cases. Without clearing this, previous high stress would prime the fixer iterations with bad guesses,
+            //making the system harder to solve (i.e. introducing instability and requiring more iterations).
+            for (int j = 0; j < ActiveSet.joints.Count; j++)
+            {
+                ActiveSet.joints[j].ClearAccumulatedImpulses();
+            }
+
+
             //The previous loop may still have significant errors in the active joints due to 
             //unreachable targets. Run a secondary pass without the influence of the controls to
             //fix the errors without interference from impossible goals
@@ -231,7 +249,6 @@ namespace BEPUik
                 //Update the per-constraint jacobians and effective mass for the current bone orientations and positions.
                 foreach (IKJoint joint in ActiveSet.joints)
                 {
-                    joint.Preupdate(TimeStepDuration, updateRate);
                     joint.UpdateJacobiansAndVelocityBias();
                     joint.ComputeEffectiveMass();
                     joint.WarmStart();
