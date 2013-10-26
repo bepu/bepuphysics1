@@ -89,6 +89,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             var samples = CommonResources.GetVectorList();
             if (samples.Capacity < InertiaHelper.SampleDirections.Length)
                 samples.Capacity = InertiaHelper.SampleDirections.Length;
+            samples.Count = InertiaHelper.SampleDirections.Length;
             for (int i = 0; i < InertiaHelper.SampleDirections.Length; ++i)
             {
                 shape.GetLocalExtremePointWithoutMargin(ref InertiaHelper.SampleDirections[i], out samples.Elements[i]);
@@ -98,12 +99,12 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             ConvexHullHelper.GetConvexHull(samples, triangles);
 
             float volume;
-            Matrix3x3 newDistribution;
-            InertiaHelper.ComputeShapeDistribution(samples, triangles, out volume, out newDistribution);
+            InertiaHelper.ComputeShapeDistribution(samples, triangles, out volume, out volumeDistribution);
             Volume = volume;
 
             //Estimate the minimum radius based on the surface mesh.
-            MinimumRadius = InertiaHelper.ComputeMinimumRadius(samples, triangles, ref Toolbox.ZeroVector);
+            MinimumRadius = InertiaHelper.ComputeMinimumRadius(samples, triangles, ref Toolbox.ZeroVector) + collisionMargin;
+            MaximumRadius = ComputeMaximumRadius();
             CommonResources.GiveBack(samples);
             CommonResources.GiveBack(triangles);
 
@@ -143,50 +144,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
 
         }
 
-        ///<summary>
-        /// Computes the minimum radius of the shape.
-        /// This is often smaller than the actual minimum radius;
-        /// it is simply an approximation that avoids overestimating.
-        ///</summary>
-        ///<returns>Minimum radius of the shape.</returns>
-        public float ComputeMinimumRadius()
-        {
-            //Sample the shape in directions pointing to the vertices of a regular tetrahedron.
-            Vector3 a, b, c, d;
-            var direction = new Vector3(1, 1, 1);
-            GetLocalExtremePointWithoutMargin(ref direction, out a);
-            direction = new Vector3(-1, -1, 1);
-            GetLocalExtremePointWithoutMargin(ref direction, out b);
-            direction = new Vector3(-1, 1, -1);
-            GetLocalExtremePointWithoutMargin(ref direction, out c);
-            direction = new Vector3(1, -1, -1);
-            GetLocalExtremePointWithoutMargin(ref direction, out d);
-            Vector3 ab, cb, ac, ad, cd;
-            Vector3.Subtract(ref b, ref a, out ab);
-            Vector3.Subtract(ref b, ref c, out cb);
-            Vector3.Subtract(ref c, ref a, out ac);
-            Vector3.Subtract(ref d, ref a, out ad);
-            Vector3.Subtract(ref d, ref c, out cd);
-            //Find normals of triangles: ABC, CBD, ACD, ADB
-            Vector3 nABC, nCBD, nACD, nADB;
-            Vector3.Cross(ref ac, ref ab, out nABC);
-            Vector3.Cross(ref cd, ref cb, out nCBD);
-            Vector3.Cross(ref ad, ref ac, out nACD);
-            Vector3.Cross(ref ab, ref ad, out nADB);
-            //Find distances to planes.
-            float dABC, dCBD, dACD, dADB;
-            Vector3.Dot(ref a, ref nABC, out dABC);
-            Vector3.Dot(ref c, ref nCBD, out dCBD);
-            Vector3.Dot(ref a, ref nACD, out dACD);
-            Vector3.Dot(ref a, ref nADB, out dADB);
-            dABC /= nABC.Length();
-            dCBD /= nCBD.Length();
-            dACD /= nACD.Length();
-            dADB /= nADB.Length();
-
-            return collisionMargin + Math.Min(dABC, Math.Min(dCBD, Math.Min(dACD, dADB)));
-        }
-
+        
 
        
 

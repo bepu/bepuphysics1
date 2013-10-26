@@ -1,9 +1,5 @@
-﻿using BEPUphysics.CollisionShapes.ConvexShapes;
-using BEPUphysics.Entities;
-using BEPUphysics.Entities.Prefabs;
+﻿using BEPUphysics.Entities.Prefabs;
 using BEPUutilities;
-using BEPUutilities.DataStructures;
-using BEPUutilities.ResourceManagement;
 
 namespace BEPUphysicsDemos.Demos
 {
@@ -43,52 +39,6 @@ namespace BEPUphysicsDemos.Demos
             Box ground = new Box(new Vector3(0, -.5f, 0), 50, 1, 50);
             Space.Add(ground);
             game.Camera.Position = new Vector3(0, 6, 15);
-
-            //Vector3[] vertices = new[]
-            //    {
-            //        new Vector3(0, 0, 0),
-            //        new Vector3(0, 0, 1),
-            //        new Vector3(0, 1, 0),
-            //        new Vector3(0, 1, 1),
-            //        new Vector3(1, 0, 0),
-            //        new Vector3(1, 0, 1),
-            //        new Vector3(1, 1, 0),
-            //        new Vector3(1, 1, 1),
-            //    };
-            //for (int i = 0; i < vertices.Length; ++i)
-            //    vertices[i] *= 4;
-            //var shape = new ConvexHullShape(vertices);
-
-
-            //var shape = new ConeShape(1, 1);
-            //var shape = new CylinderShape(1, 1);
-            var shape = new BoxShape(1, 1, 1);
-
-            float volume;
-            var distribution = InertiaHelper.ComputeVolumeDistribution(shape, out volume);
-
-
-            var samples = CommonResources.GetVectorList();
-            if (samples.Capacity < InertiaHelper.SampleDirections.Length)
-                samples.Capacity = InertiaHelper.SampleDirections.Length;
-            for (int i = 0; i < InertiaHelper.SampleDirections.Length; ++i)
-            {
-                shape.GetLocalExtremePointWithoutMargin(ref InertiaHelper.SampleDirections[i], out samples.Elements[i]);
-            }
-
-            var triangles = CommonResources.GetIntList();
-            ConvexHullHelper.GetConvexHull(samples, triangles);
-
-            float newVolume;
-            Vector3 newCenter;
-            Matrix3x3 newDistribution;
-            InertiaHelper.ComputeShapeDistribution(samples, triangles, out newCenter, out newVolume, out newDistribution);
-
-            var minimumRadius = InertiaHelper.ComputeMinimumRadius(samples, triangles, ref newCenter);
-            CommonResources.GiveBack(samples);
-            CommonResources.GiveBack(triangles);
-
-            Space.Add(new Entity(shape, 1) { Position = new Vector3(0, 12, 0) });
 
         }
 
