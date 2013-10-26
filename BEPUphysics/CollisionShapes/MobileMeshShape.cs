@@ -1,5 +1,7 @@
 ﻿
+using System.Collections.Generic;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
+using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.DataStructures;
 using BEPUutilities;
 using System;
@@ -58,7 +60,15 @@ namespace BEPUphysics.CollisionShapes
             }
         }
 
-        RawList<Vector3> surfaceVertices = new RawList<Vector3>();
+        RawList<Vector3> hullVertices = new RawList<Vector3>();
+
+        /// <summary>
+        /// Gets the list of vertices on the convex hull of the mesh used to compute the bounding box.
+        /// </summary>
+        public ReadOnlyList<Vector3> HullVertices
+        {
+            get { return new ReadOnlyList<Vector3>(hullVertices); }
+        }
 
         internal MobileMeshSolidity solidity = MobileMeshSolidity.DoubleSided;
         ///<summary>
@@ -128,11 +138,14 @@ namespace BEPUphysics.CollisionShapes
         {
             this.solidity = solidity;
             var data = new TransformableMeshData(vertices, indices, localTransform);
-            var shapeDistributionInformation = RecenterAndComputeVolumeDistribution(data);
+            var shapeDistributionInformation = ComputeVolumeDistribution(data);
+            data.worldTransform.Translation -= shapeDistributionInformation.Center;
 
             triangleMesh = new TriangleMesh(data);
 
             ComputeSolidSidedness();
+
+            UpdateSurfaceVertices();
 
             UpdateEntityShapeVolume(new EntityShapeVolumeDescription { Volume = shapeDistributionInformation.Volume, VolumeDistribution = shapeDistributionInformation.VolumeDistribution });
         }
@@ -149,27 +162,32 @@ namespace BEPUphysics.CollisionShapes
         {
             this.solidity = solidity;
             var data = new TransformableMeshData(vertices, indices, localTransform);
-            var shapeDistributionInformation = RecenterAndComputeVolumeDistribution(data);
+            var shapeDistributionInformation = ComputeVolumeDistribution(data);
+            data.worldTransform.Translation -= shapeDistributionInformation.Center;
             center = shapeDistributionInformation.Center;
 
             triangleMesh = new TriangleMesh(data);
 
             ComputeSolidSidedness();
 
-            UpdateEntityShapeVolume(new EntityShapeVolumeDescription {Volume = shapeDistributionInformation.Volume, VolumeDistribution = shapeDistributionInformation.VolumeDistribution});
+            UpdateSurfaceVertices();
+
+            UpdateEntityShapeVolume(new EntityShapeVolumeDescription { Volume = shapeDistributionInformation.Volume, VolumeDistribution = shapeDistributionInformation.VolumeDistribution });
         }
 
         ///<summary>
         /// Constructs a new mobile mesh shape from cached data.
         ///</summary>
         ///<param name="meshData">Mesh data reprsenting the shape. Should already be properly centered.</param>
+        /// <param name="hullVertices">Outer hull vertices of the mobile mesh shape used to quickly compute the bounding box.</param>
         ///<param name="solidity">Solidity state of the shape.</param>
         /// <param name="sidednessWhenSolid">Triangle sidedness to use when the shape is solid.</param>
         /// <param name="collisionMargin">Collision margin used to expand the mesh triangles.</param>
         /// <param name="volumeDescription">Description of the volume and its distribution in the shape. Assumed to be correct; no processing or validation is performed.</param>
-        public MobileMeshShape(TransformableMeshData meshData, MobileMeshSolidity solidity, TriangleSidedness sidednessWhenSolid, float collisionMargin, EntityShapeVolumeDescription volumeDescription)
+        public MobileMeshShape(TransformableMeshData meshData, IList<Vector3> hullVertices, MobileMeshSolidity solidity, TriangleSidedness sidednessWhenSolid, float collisionMargin, EntityShapeVolumeDescription volumeDescription)
         {
             triangleMesh = new TriangleMesh(meshData);
+            this.hullVertices = new RawList<Vector3>(hullVertices);
             meshCollisionMargin = collisionMargin;
             this.solidity = solidity;
             SidednessWhenSolid = sidednessWhenSolid;
@@ -337,34 +355,32 @@ namespace BEPUphysics.CollisionShapes
             return toReturn;
         }
 
-        /// <summary>
-        /// Recenters the triangle data and computes the volume distribution.
-        /// </summary>
-        /// <param name="data">Mesh data to analyze.</param>
-        /// <returns>Computed center, volume, and volume distribution.</returns>
-        private ShapeDistributionInformation RecenterAndComputeVolumeDistribution(TransformableMeshData data)
+        private void UpdateSurfaceVertices()
         {
-            //Compute the surface vertices of the shape.
-            ShapeDistributionInformation shapeInformation;
-            surfaceVertices.Clear();
+            hullVertices.Clear();
             try
             {
-                ConvexHullHelper.GetConvexHull(data.vertices, surfaceVertices);
-                for (int i = 0; i < surfaceVertices.Count; i++)
+                ConvexHullHelper.GetConvexHull(triangleMesh.Data.vertices, hullVertices);
+                var transformableData = triangleMesh.Data as TransformableMeshData;
+                if (transformableData != null)
                 {
-                    AffineTransform.Transform(ref surfaceVertices.Elements[i], ref data.worldTransform, out surfaceVertices.Elements[i]);
+                    var transform = transformableData.worldTransform;
+                    for (int i = 0; i < hullVertices.Count; i++)
+                    {
+                        AffineTransform.Transform(ref hullVertices.Elements[i], ref transform, out hullVertices.Elements[i]);
+                    }
                 }
             }
             catch
             {
-                surfaceVertices.Clear();
+                hullVertices.Clear();
                 //If the convex hull failed, then the point set has no volume.  A mobile mesh is allowed to have zero volume, however.
                 //In this case, compute the bounding box of all points.
                 BoundingBox box = new BoundingBox();
-                for (int i = 0; i < data.vertices.Length; i++)
+                for (int i = 0; i < triangleMesh.Data.vertices.Length; i++)
                 {
                     Vector3 v;
-                    data.GetVertexPosition(i, out v);
+                    triangleMesh.Data.GetVertexPosition(i, out v);
                     if (v.X > box.Max.X)
                         box.Max.X = v.X;
                     if (v.X < box.Min.X)
@@ -379,95 +395,49 @@ namespace BEPUphysics.CollisionShapes
                         box.Min.Z = v.Z;
                 }
                 //Add the corners.  This will overestimate the size of the surface a bit.
-                surfaceVertices.Add(box.Min);
-                surfaceVertices.Add(box.Max);
-                surfaceVertices.Add(new Vector3(box.Min.X, box.Min.Y, box.Max.Z));
-                surfaceVertices.Add(new Vector3(box.Min.X, box.Max.Y, box.Min.Z));
-                surfaceVertices.Add(new Vector3(box.Max.X, box.Min.Y, box.Min.Z));
-                surfaceVertices.Add(new Vector3(box.Min.X, box.Max.Y, box.Max.Z));
-                surfaceVertices.Add(new Vector3(box.Max.X, box.Max.Y, box.Min.Z));
-                surfaceVertices.Add(new Vector3(box.Max.X, box.Min.Y, box.Max.Z));
+                hullVertices.Add(box.Min);
+                hullVertices.Add(box.Max);
+                hullVertices.Add(new Vector3(box.Min.X, box.Min.Y, box.Max.Z));
+                hullVertices.Add(new Vector3(box.Min.X, box.Max.Y, box.Min.Z));
+                hullVertices.Add(new Vector3(box.Max.X, box.Min.Y, box.Min.Z));
+                hullVertices.Add(new Vector3(box.Min.X, box.Max.Y, box.Max.Z));
+                hullVertices.Add(new Vector3(box.Max.X, box.Max.Y, box.Min.Z));
+                hullVertices.Add(new Vector3(box.Max.X, box.Min.Y, box.Max.Z));
             }
-            shapeInformation.Center = new Vector3();
+        }
 
+        /// <summary>
+        /// Recenters the triangle data and computes the volume distribution.
+        /// </summary>
+        /// <param name="data">Mesh data to analyze.</param>
+        /// <returns>Computed center, volume, and volume distribution.</returns>
+        private ShapeDistributionInformation ComputeVolumeDistribution(TransformableMeshData data)
+        {
+            //Compute the surface vertices of the shape.
+            ShapeDistributionInformation shapeInformation;
             if (solidity == MobileMeshSolidity.Solid)
             {
 
                 //The following inertia tensor calculation assumes a closed mesh.
-
-                shapeInformation.Volume = 0;
-                for (int i = 0; i < data.indices.Length; i += 3)
+                var transformedVertices = CommonResources.GetVectorList();
+                if (transformedVertices.Capacity < data.vertices.Length)
+                    transformedVertices.Capacity = data.vertices.Length;
+                transformedVertices.Count = InertiaHelper.SampleDirections.Length;
+                for (int i = 0; i < data.vertices.Length; ++i)
                 {
-                    Vector3 v2, v3, v4;
-                    data.GetTriangle(i, out v2, out v3, out v4);
-
-                    //Determinant is 6 * volume.  It's signed, though; this is because the mesh isn't necessarily convex nor centered on the origin.
-                    float tetrahedronVolume = v2.X * (v3.Y * v4.Z - v3.Z * v4.Y) -
-                                              v3.X * (v2.Y * v4.Z - v2.Z * v4.Y) +
-                                              v4.X * (v2.Y * v3.Z - v2.Z * v3.Y);
-
-                    shapeInformation.Volume += tetrahedronVolume;
-                    shapeInformation.Center += tetrahedronVolume * (v2 + v3 + v4);
+                    data.GetVertexPosition(i, out transformedVertices.Elements[i]);
                 }
-                shapeInformation.Center /= shapeInformation.Volume * 4;
-                shapeInformation.Volume /= 6;
-                shapeInformation.Volume = Math.Abs(shapeInformation.Volume);
-
-                data.worldTransform.Translation -= shapeInformation.Center;
-
-                //Source: Explicit Exact Formulas for the 3-D Tetrahedron Inertia Tensor in Terms of its Vertex Coordinates
-                //http://www.scipub.org/fulltext/jms2/jms2118-11.pdf
-                //x1, x2, x3, x4 are origin, triangle1, triangle2, triangle3
-                //Looking to find inertia tensor matrix of the form
-                // [  a  -b' -c' ]
-                // [ -b'  b  -a' ]
-                // [ -c' -a'  c  ]
-                float a = 0, b = 0, c = 0, ao = 0, bo = 0, co = 0;
-
-                float totalWeight = 0;
-                for (int i = 0; i < data.indices.Length; i += 3)
-                {
-                    Vector3 v2, v3, v4;
-                    data.GetTriangle(i, out v2, out v3, out v4);
-
-                    //Determinant is 6 * volume.  It's signed, though; the mesh isn't necessarily convex.
-                    float tetrahedronVolume = v2.X * (v3.Y * v4.Z - v3.Z * v4.Y) -
-                                              v3.X * (v2.Y * v4.Z - v2.Z * v4.Y) +
-                                              v4.X * (v2.Y * v3.Z - v2.Z * v3.Y);
-
-                    totalWeight += tetrahedronVolume;
-
-                    a += tetrahedronVolume * (v2.Y * v2.Y + v2.Y * v3.Y + v3.Y * v3.Y + v2.Y * v4.Y + v3.Y * v4.Y + v4.Y * v4.Y +
-                                              v2.Z * v2.Z + v2.Z * v3.Z + v3.Z * v3.Z + v2.Z * v4.Z + v3.Z * v4.Z + v4.Z * v4.Z);
-                    b += tetrahedronVolume * (v2.X * v2.X + v2.X * v3.X + v3.X * v3.X + v2.X * v4.X + v3.X * v4.X + v4.X * v4.X +
-                                              v2.Z * v2.Z + v2.Z * v3.Z + v3.Z * v3.Z + v2.Z * v4.Z + v3.Z * v4.Z + v4.Z * v4.Z);
-                    c += tetrahedronVolume * (v2.X * v2.X + v2.X * v3.X + v3.X * v3.X + v2.X * v4.X + v3.X * v4.X + v4.X * v4.X +
-                                              v2.Y * v2.Y + v2.Y * v3.Y + v3.Y * v3.Y + v2.Y * v4.Y + v3.Y * v4.Y + v4.Y * v4.Y);
-                    ao += tetrahedronVolume * (2 * v2.Y * v2.Z + v3.Y * v2.Z + v4.Y * v2.Z + v2.Y * v3.Z + 2 * v3.Y * v3.Z + v4.Y * v3.Z + v2.Y * v4.Z + v3.Y * v4.Z + 2 * v4.Y * v4.Z);
-                    bo += tetrahedronVolume * (2 * v2.X * v2.Z + v3.X * v2.Z + v4.X * v2.Z + v2.X * v3.Z + 2 * v3.X * v3.Z + v4.X * v3.Z + v2.X * v4.Z + v3.X * v4.Z + 2 * v4.X * v4.Z);
-                    co += tetrahedronVolume * (2 * v2.X * v2.Y + v3.X * v2.Y + v4.X * v2.Y + v2.X * v3.Y + 2 * v3.X * v3.Y + v4.X * v3.Y + v2.X * v4.Y + v3.X * v4.Y + 2 * v4.X * v4.Y);
-                }
-                float density = 1 / totalWeight;
-                float diagonalFactor = density / 10;
-                float offFactor = -density / 20;
-                a *= diagonalFactor;
-                b *= diagonalFactor;
-                c *= diagonalFactor;
-                ao *= offFactor;
-                bo *= offFactor;
-                co *= offFactor;
-                shapeInformation.VolumeDistribution = new Matrix3x3(a, bo, co,
-                                                                    bo, b, ao,
-                                                                    co, ao, c);
-
-
+                InertiaHelper.ComputeShapeDistribution(transformedVertices, data.indices, out shapeInformation.Center, out shapeInformation.Volume, out shapeInformation.VolumeDistribution);
+                CommonResources.GiveBack(transformedVertices);
             }
             else
             {
                 shapeInformation.Center = new Vector3();
+                shapeInformation.VolumeDistribution = new Matrix3x3();
                 float totalWeight = 0;
                 for (int i = 0; i < data.indices.Length; i += 3)
-                { //Configure the inertia tensor to be local.
+                {
+                    //Compute the center contribution.
                     Vector3 vA, vB, vC;
                     data.GetTriangle(i, out vA, out vB, out vC);
                     Vector3 vAvB;
@@ -481,51 +451,31 @@ namespace BEPUphysics.CollisionShapes
 
                     shapeInformation.Center += weight * (vA + vB + vC) / 3;
 
+                    //Compute the inertia contribution of this triangle.
+                    //Approximate it using pointmasses positioned at the triangle vertices.
+                    //(There exists a direct solution, but this approximation will do plenty fine.)
+                    Matrix3x3 aContribution, bContribution, cContribution;
+                    InertiaHelper.GetPointContribution(weight, ref Toolbox.ZeroVector, ref vA, out aContribution);
+                    InertiaHelper.GetPointContribution(weight, ref Toolbox.ZeroVector, ref vB, out bContribution);
+                    InertiaHelper.GetPointContribution(weight, ref Toolbox.ZeroVector, ref vC, out cContribution);
+                    Matrix3x3.Add(ref aContribution, ref shapeInformation.VolumeDistribution, out shapeInformation.VolumeDistribution);
+                    Matrix3x3.Add(ref bContribution, ref shapeInformation.VolumeDistribution, out shapeInformation.VolumeDistribution);
+                    Matrix3x3.Add(ref cContribution, ref shapeInformation.VolumeDistribution, out shapeInformation.VolumeDistribution);
+
 
                 }
                 shapeInformation.Center /= totalWeight;
+
+                //The division of 6 is used because 1) the cross product length above introduced a factor of two, and 2) the full weight was used for each of the three vertices.
+                Matrix3x3.Multiply(ref shapeInformation.VolumeDistribution, 1 / (6 * totalWeight), out shapeInformation.VolumeDistribution);
+                
+                //Move the inertia tensor into position according to the center.
+                Matrix3x3 additionalInertia;
+                InertiaHelper.GetPointContribution(1, ref Toolbox.ZeroVector, ref shapeInformation.Center, out additionalInertia);
+                Matrix3x3.Subtract(ref shapeInformation.VolumeDistribution, ref additionalInertia, out shapeInformation.VolumeDistribution);
+
                 shapeInformation.Volume = 0;
 
-
-                data.worldTransform.Translation -= shapeInformation.Center;
-
-                shapeInformation.VolumeDistribution = new Matrix3x3();
-                for (int i = 0; i < data.indices.Length; i += 3)
-                { //Configure the inertia tensor to be local.
-                    Vector3 vA, vB, vC;
-                    data.GetTriangle(i, out vA, out vB, out vC);
-                    Vector3 vAvB;
-                    Vector3 vAvC;
-                    Vector3.Subtract(ref vB, ref vA, out vAvB);
-                    Vector3.Subtract(ref vC, ref vA, out vAvC);
-                    Vector3 cross;
-                    Vector3.Cross(ref vAvB, ref vAvC, out cross);
-                    float weight = cross.Length();
-                    totalWeight += weight;
-
-                    Matrix3x3 innerProduct;
-                    Matrix3x3.CreateScale(vA.LengthSquared(), out innerProduct);
-                    Matrix3x3 outerProduct;
-                    Matrix3x3.CreateOuterProduct(ref vA, ref vA, out outerProduct);
-                    Matrix3x3 contribution;
-                    Matrix3x3.Subtract(ref innerProduct, ref outerProduct, out contribution);
-                    Matrix3x3.Multiply(ref contribution, weight, out contribution);
-                    Matrix3x3.Add(ref shapeInformation.VolumeDistribution, ref contribution, out shapeInformation.VolumeDistribution);
-
-                    Matrix3x3.CreateScale(vB.LengthSquared(), out innerProduct);
-                    Matrix3x3.CreateOuterProduct(ref vB, ref vB, out outerProduct);
-                    Matrix3x3.Subtract(ref innerProduct, ref outerProduct, out outerProduct);
-                    Matrix3x3.Multiply(ref contribution, weight, out contribution);
-                    Matrix3x3.Add(ref shapeInformation.VolumeDistribution, ref contribution, out shapeInformation.VolumeDistribution);
-
-                    Matrix3x3.CreateScale(vC.LengthSquared(), out innerProduct);
-                    Matrix3x3.CreateOuterProduct(ref vC, ref vC, out outerProduct);
-                    Matrix3x3.Subtract(ref innerProduct, ref outerProduct, out contribution);
-                    Matrix3x3.Multiply(ref contribution, weight, out contribution);
-                    Matrix3x3.Add(ref shapeInformation.VolumeDistribution, ref contribution, out shapeInformation.VolumeDistribution);
-
-                }
-                Matrix3x3.Multiply(ref shapeInformation.VolumeDistribution, 1 / (6 * totalWeight), out shapeInformation.VolumeDistribution);
             }
 
             return shapeInformation;
@@ -617,12 +567,12 @@ namespace BEPUphysics.CollisionShapes
             int right = 0, left = 0, up = 0, down = 0, backward = 0, forward = 0;
             float minX = float.MaxValue, maxX = -float.MaxValue, minY = float.MaxValue, maxY = -float.MaxValue, minZ = float.MaxValue, maxZ = -float.MaxValue;
 
-            for (int i = 0; i < surfaceVertices.Count; i++)
+            for (int i = 0; i < hullVertices.Count; i++)
             {
                 float dotX, dotY, dotZ;
-                Vector3.Dot(ref rightDirection, ref surfaceVertices.Elements[i], out dotX);
-                Vector3.Dot(ref upDirection, ref surfaceVertices.Elements[i], out dotY);
-                Vector3.Dot(ref backDirection, ref surfaceVertices.Elements[i], out dotZ);
+                Vector3.Dot(ref rightDirection, ref hullVertices.Elements[i], out dotX);
+                Vector3.Dot(ref upDirection, ref hullVertices.Elements[i], out dotY);
+                Vector3.Dot(ref backDirection, ref hullVertices.Elements[i], out dotZ);
                 if (dotX < minX)
                 {
                     minX = dotX;
@@ -663,12 +613,12 @@ namespace BEPUphysics.CollisionShapes
             Vector3.Multiply(ref upDirection, meshCollisionMargin / (float)Math.Sqrt(upDirection.Length()), out upDirection);
             Vector3.Multiply(ref backDirection, meshCollisionMargin / (float)Math.Sqrt(backDirection.Length()), out backDirection);
 
-            var rightElement = surfaceVertices.Elements[right];
-            var leftElement = surfaceVertices.Elements[left];
-            var upElement = surfaceVertices.Elements[up];
-            var downElement = surfaceVertices.Elements[down];
-            var backwardElement = surfaceVertices.Elements[backward];
-            var forwardElement = surfaceVertices.Elements[forward];
+            var rightElement = hullVertices.Elements[right];
+            var leftElement = hullVertices.Elements[left];
+            var upElement = hullVertices.Elements[up];
+            var downElement = hullVertices.Elements[down];
+            var backwardElement = hullVertices.Elements[backward];
+            var forwardElement = hullVertices.Elements[forward];
             Vector3.Add(ref rightElement, ref rightDirection, out rightElement);
             Vector3.Subtract(ref leftElement, ref rightDirection, out leftElement);
             Vector3.Add(ref upElement, ref upDirection, out upElement);

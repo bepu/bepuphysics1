@@ -204,6 +204,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             var samples = CommonResources.GetVectorList();
             if (samples.Capacity < InertiaHelper.SampleDirections.Length)
                 samples.Capacity = InertiaHelper.SampleDirections.Length;
+            samples.Count = InertiaHelper.SampleDirections.Length;
             for (int i = 0; i < InertiaHelper.SampleDirections.Length; ++i)
             {
                 GetLocalExtremePoint(InertiaHelper.SampleDirections[i], out samples.Elements[i]);

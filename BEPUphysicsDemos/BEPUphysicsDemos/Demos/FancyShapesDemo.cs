@@ -20,8 +20,8 @@ namespace BEPUphysicsDemos.Demos
         {
 
 
-
             var points = new List<Vector3>();
+
 
             //Setup a random distribution in a cube and compute a convex hull.
             var random = new Random(0);
@@ -75,7 +75,7 @@ namespace BEPUphysicsDemos.Demos
             //Wrapped objects use an implicit convex hull around a set of shapes.
 
             //Oblique cone:
-            var cone = new List<ConvexShapeEntry>()
+            var cone = new List<ConvexShapeEntry>
             {
                 new ConvexShapeEntry(new CylinderShape(0, 1)),
                 new ConvexShapeEntry(new RigidTransform(new Vector3(1f, 2, 0)), new SphereShape(0)) 
@@ -105,7 +105,7 @@ namespace BEPUphysicsDemos.Demos
             transform.M13 = .5f;
             var transformable = new TransformableEntity(new Vector3(0, 0, 4), new BoxShape(1, 1, 1), transform, 10);
             Space.Add(transformable);
-            
+
 
             Space.Add(new Box(new Vector3(0, -10, 0), 70, 5, 70));
 

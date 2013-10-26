@@ -149,152 +149,31 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         /// <param name="center">Computed center of the convex hull shape. Used as the origin of the outputUniqueSurfaceVertices.</param>
         /// <param name="outputHullTriangleIndices">Computed list of indices into the input point set composing the triangulated surface of the convex hull.
         /// Each group of 3 indices represents a triangle on the surface of the hull.</param>
-        /// <param name="outputUniqueSurfaceVertices">Computed nonredundant list of vertices composing the outer shell of the input point set.</param>
+        /// <param name="outputUniqueSurfaceVertices">Computed nonredundant list of vertices composing the outer shell of the input point set. Recentered on the local origin.</param>
         /// <returns>Description required to define a convex shape.</returns>
         public static ConvexShapeDescription ComputeDescription(IList<Vector3> vertices, float collisionMargin, out Vector3 center, IList<int> outputHullTriangleIndices, IList<Vector3> outputUniqueSurfaceVertices)
         {
             if (outputHullTriangleIndices.Count != 0 || outputUniqueSurfaceVertices.Count != 0)
                 throw new ArgumentException("Output lists must start empty.");
 
+
+            ConvexShapeDescription description;
             ConvexHullHelper.GetConvexHull(vertices, outputHullTriangleIndices, outputUniqueSurfaceVertices);
 
-            //Grab the center and volume.
-            ConvexShapeDescription description;
-            ComputeCenterAndVolume(vertices, outputHullTriangleIndices, out center, out description.EntityShapeVolume.Volume);
-
-            //Recenter the surface vertices. This puts the vertices into the shape's local space.
+            InertiaHelper.ComputeShapeDistribution(vertices, outputHullTriangleIndices, out center, out description.EntityShapeVolume.Volume, out description.EntityShapeVolume.VolumeDistribution);
+            //Recenter the surface vertices.
             for (int i = 0; i < outputUniqueSurfaceVertices.Count; ++i)
             {
                 outputUniqueSurfaceVertices[i] -= center;
             }
 
-            description.EntityShapeVolume.VolumeDistribution = ComputeVolumeDistribution(vertices, outputHullTriangleIndices, center, description.EntityShapeVolume.Volume, collisionMargin, out description.MinimumRadius);
-
+            description.MinimumRadius = InertiaHelper.ComputeMinimumRadius(vertices, outputHullTriangleIndices, ref center) + collisionMargin;
             description.MaximumRadius = ComputeMaximumRadius(outputUniqueSurfaceVertices, collisionMargin);
 
             description.CollisionMargin = collisionMargin;
             return description;
         }
 
-
-        /// <summary>
-        /// Computes the center and volume of a convex hull.
-        /// </summary>
-        /// <param name="vertices">Vertices used as input to the convex hull.</param>
-        /// <param name="hullTriangleIndices">List of indices into the input point set composing the triangulated surface of the convex hull.
-        /// Each group of 3 indices represents a triangle on the surface of the hull.</param>
-        /// <param name="center">Center of the hull.</param>
-        /// <param name="volume">Volume of the hull.</param>
-        public static void ComputeCenterAndVolume(IList<Vector3> vertices, IList<int> hullTriangleIndices, out Vector3 center, out float volume)
-        {
-            volume = 0;
-            var volumes = CommonResources.GetFloatList();
-            var centroids = CommonResources.GetVectorList();
-            for (int k = 0; k < hullTriangleIndices.Count; k += 3)
-            {
-                //Compute the signed volume of each tetrahedron.
-                //The fourth vertex is chosen to be (0,0,0).
-                //Since that's potentially outside of the hull, some of the volumes will be negative.
-                //That's perfectly fine! Some weights should be negative. Once everything is summed together, it comes out correct.
-                float subvolume = Vector3.Dot(
-                    Vector3.Cross(vertices[hullTriangleIndices[k + 1]] - vertices[hullTriangleIndices[k]],
-                                  vertices[hullTriangleIndices[k + 2]] - vertices[hullTriangleIndices[k]]),
-                    -vertices[hullTriangleIndices[k]]);
-                volumes.Add(subvolume);
-                volume += subvolume;
-                centroids.Add((vertices[hullTriangleIndices[k]] + vertices[hullTriangleIndices[k + 1]] + vertices[hullTriangleIndices[k + 2]]) / 4);
-            }
-            //Perform a weighted sum of the centroids.
-            center = Toolbox.ZeroVector;
-            for (int k = 0; k < centroids.Count; k++)
-            {
-                center += centroids[k] * (volumes[k] / volume);
-            }
-            //The computed volume was for a parallelepiped. Apply a scaling factor to get down to the tetrahedron's volume.
-            //[The scale factor cancels out in the above computation; correctness is unaffected by deferring the division.]
-            volume /= 6;
-            CommonResources.GiveBack(centroids);
-            CommonResources.GiveBack(volumes);
-        }
-
-        /// <summary>
-        /// Computes a volume distribution for the given convex hull data.
-        /// </summary>
-        /// <param name="vertices">Vertices used as input to the convex hull.</param>
-        /// <param name="hullTriangleIndices">List of indices into the input point set composing the triangulated surface of the convex hull.
-        /// Each group of 3 indices represents a triangle on the surface of the hull.</param>
-        /// <param name="center">Center of the hull.</param>
-        /// <param name="volume">Volume of the hull.</param>
-        /// <param name="collisionMargin">Collision margin of the shape.</param>
-        /// <param name="minimumRadius">Computed minimum radius of the shape.</param>
-        /// <returns>Volume distribution of the convex hull.</returns>
-        public static Matrix3x3 ComputeVolumeDistribution(IList<Vector3> vertices, IList<int> hullTriangleIndices, Vector3 center, float volume, float collisionMargin, out float minimumRadius)
-        {
-            //Source: Explicit Exact Formulas for the 3-D Tetrahedron Inertia Tensor in Terms of its Vertex Coordinates
-            //http://www.scipub.org/fulltext/jms2/jms2118-11.pdf
-            //x1, x2, x3, x4 are origin, triangle1, triangle2, triangle3
-            //Looking to find inertia tensor matrix of the form
-            // [  a  -b' -c' ]
-            // [ -b'  b  -a' ]
-            // [ -c' -a'  c  ]
-            float a = 0, b = 0, c = 0, ao = 0, bo = 0, co = 0;
-            Vector3 v2, v3, v4;
-            float density = 1 / volume;
-            float diagonalFactor = density / 60;
-            float offFactor = -density / 120;
-            minimumRadius = float.MaxValue;
-            for (int i = 0; i < hullTriangleIndices.Count; i += 3)
-            {
-                v2 = vertices[hullTriangleIndices[i]];
-                v3 = vertices[hullTriangleIndices[i + 1]];
-                v4 = vertices[hullTriangleIndices[i + 2]];
-                Vector3.Subtract(ref v2, ref center, out v2);
-                Vector3.Subtract(ref v3, ref center, out v3);
-                Vector3.Subtract(ref v4, ref center, out v4);
-
-                //The determinant of the jacobian referred to by the paper above can be thought of as the volume of a parallelepiped created from the tetrahedron's edges.
-                //The volume of a tetrahedron is 1/6 that of a parallelepiped sharing the same edges.
-                //That scaling factor's compensation is included in the final multipliers.
-
-                //More importantly, we can share work: the minimum radius requires knowing the shortest distance from the center to each plane.
-                //Since everything has been shifted to the local origin, the shortest distance is dot(N, v2) / ||N||, where N is cross(v2v3, v2v4).
-                //dot(cross(v2v3, v2v4), a) is the volume of the parallelepiped, and is the determinant!
-                Vector3 v2v3, v2v4;
-                Vector3.Subtract(ref v3, ref v2, out v2v3);
-                Vector3.Subtract(ref v4, ref v2, out v2v4);
-                Vector3 n;
-                Vector3.Cross(ref v2v4, ref v2v3, out n);
-                float determinant;
-                Vector3.Dot(ref v2, ref n, out determinant);
-                float distanceFromOriginToTriangle = determinant / n.Length();
-                if (distanceFromOriginToTriangle < minimumRadius)
-                    minimumRadius = distanceFromOriginToTriangle;
-
-                a += determinant * (v2.Y * v2.Y + v2.Y * v3.Y + v3.Y * v3.Y + v2.Y * v4.Y + v3.Y * v4.Y + v4.Y * v4.Y +
-                                    v2.Z * v2.Z + v2.Z * v3.Z + v3.Z * v3.Z + v2.Z * v4.Z + v3.Z * v4.Z + v4.Z * v4.Z);
-                b += determinant * (v2.X * v2.X + v2.X * v3.X + v3.X * v3.X + v2.X * v4.X + v3.X * v4.X + v4.X * v4.X +
-                                    v2.Z * v2.Z + v2.Z * v3.Z + v3.Z * v3.Z + v2.Z * v4.Z + v3.Z * v4.Z + v4.Z * v4.Z);
-                c += determinant * (v2.X * v2.X + v2.X * v3.X + v3.X * v3.X + v2.X * v4.X + v3.X * v4.X + v4.X * v4.X +
-                                    v2.Y * v2.Y + v2.Y * v3.Y + v3.Y * v3.Y + v2.Y * v4.Y + v3.Y * v4.Y + v4.Y * v4.Y);
-                ao += determinant * (2 * v2.Y * v2.Z + v3.Y * v2.Z + v4.Y * v2.Z + v2.Y * v3.Z + 2 * v3.Y * v3.Z + v4.Y * v3.Z + v2.Y * v4.Z + v3.Y * v4.Z + 2 * v4.Y * v4.Z);
-                bo += determinant * (2 * v2.X * v2.Z + v3.X * v2.Z + v4.X * v2.Z + v2.X * v3.Z + 2 * v3.X * v3.Z + v4.X * v3.Z + v2.X * v4.Z + v3.X * v4.Z + 2 * v4.X * v4.Z);
-                co += determinant * (2 * v2.X * v2.Y + v3.X * v2.Y + v4.X * v2.Y + v2.X * v3.Y + 2 * v3.X * v3.Y + v4.X * v3.Y + v2.X * v4.Y + v3.X * v4.Y + 2 * v4.X * v4.Y);
-
-            }
-            minimumRadius += collisionMargin;
-
-            a *= diagonalFactor;
-            b *= diagonalFactor;
-            c *= diagonalFactor;
-            ao *= offFactor;
-            bo *= offFactor;
-            co *= offFactor;
-            var distribution = new Matrix3x3(a, bo, co,
-                                             bo, b, ao,
-                                             co, ao, c);
-
-            return distribution;
-        }
 
         /// <summary>
         /// Computes the minimum radius for the given convex hull data.
