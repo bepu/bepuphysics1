@@ -184,15 +184,18 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
         void BuildStick(Vector3 position)
         {
             //Set up a bone chain.
-            int linkCount = 10;
-            var previousBoneEntity = new Cylinder(position, 1, .2f, 100);
+            float fullLength = 20;
+            int linkCount = 20;
+            float linkLength = fullLength / linkCount;
+            float linkRadius = linkLength * 0.2f;
+            var previousBoneEntity = new Cylinder(position, linkLength, linkRadius, 100);
             var previousBone = new Bone(previousBoneEntity.Position, previousBoneEntity.Orientation, previousBoneEntity.Radius, previousBoneEntity.Height);
             bones.Add(new BoneRelationship(previousBone, previousBoneEntity));
             Space.Add(previousBoneEntity);
 
             for (int i = 1; i < linkCount; i++)
             {
-                var boneEntity = new Cylinder(previousBone.Position + new Vector3(0, 1, 0), 1, .2f, 100);
+                var boneEntity = new Cylinder(previousBone.Position + new Vector3(0, linkLength, 0), linkLength, linkRadius, 100);
                 var bone = new Bone(boneEntity.Position, boneEntity.Orientation, boneEntity.Radius, boneEntity.Height);
                 bones.Add(new BoneRelationship(bone, boneEntity));
                 Space.Add(boneEntity);
@@ -205,9 +208,9 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                 Space.Add(dynamicsBallSocketJoint);
                 Space.Add(dynamicsAngularFriction);
                 var ikBallSocketJoint = new IKBallSocketJoint(previousBone, bone, anchor); //(the joint is auto-added to the bones; no solver-add is needed)
-                var ikAngularFriction = new IKAngularJoint(previousBone, bone);
+                var ikAngularJoint = new IKAngularJoint(previousBone, bone);
                 joints.Add(ikBallSocketJoint);
-                joints.Add(ikAngularFriction);
+                joints.Add(ikAngularJoint);
 
                 previousBone = bone;
                 previousBoneEntity = boneEntity;
@@ -810,9 +813,9 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             solver.ActiveSet.UseAutomass = true;
             solver.AutoscaleControlImpulses = true;
             solver.AutoscaleControlMaximumForce = float.MaxValue;
-            solver.TimeStepDuration = 1f;
-            solver.ControlIterationCount = 50;
-            solver.FixerIterationCount = 0;
+            solver.TimeStepDuration = .1f;
+            solver.ControlIterationCount = 100;
+            solver.FixerIterationCount = 10;
             solver.VelocitySubiterationCount = 3;
 
 
