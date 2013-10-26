@@ -4,6 +4,7 @@ using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUutilities;
 
 using BEPUutilities.DataStructures;
+using BEPUutilities.ResourceManagement;
 
 namespace BEPUphysics.CollisionShapes.ConvexShapes
 {
@@ -170,8 +171,29 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         /// <returns>Description required to define a convex shape.</returns>
         public void UpdateConvexShapeInfo()
         {
-            //An estimate of the maximum radius is currently required by the raycasts used by the InertiaHelper. Radii computation must come first.
-            //TODO: This will no longer be required when the InertiaHelper gets updated to use approximate tetrahedral integration.
+            //Compute the volume distribution.
+            var samples = CommonResources.GetVectorList();
+            if (samples.Capacity < InertiaHelper.SampleDirections.Length)
+                samples.Capacity = InertiaHelper.SampleDirections.Length;
+            for (int i = 0; i < InertiaHelper.SampleDirections.Length; ++i)
+            {
+                GetLocalExtremePoint(InertiaHelper.SampleDirections[i], out samples.Elements[i]);
+            }
+
+            var triangles = CommonResources.GetIntList();
+            ConvexHullHelper.GetConvexHull(samples, triangles);
+
+            float volume;
+            Vector3 center;
+            InertiaHelper.ComputeShapeDistribution(samples, triangles, out center, out volume, out volumeDistribution);
+            Volume = volume;
+
+            //Recenter the shape.
+            localOffset = -center;
+            CommonResources.GiveBack(samples);
+            CommonResources.GiveBack(triangles);
+
+            //Compute the radii.
             float minRadius = 0, maxRadius = 0;
             for (int i = 0; i < shapes.Count; i++)
             {
@@ -182,14 +204,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             MinimumRadius = minRadius + collisionMargin;
             MaximumRadius = maxRadius + collisionMargin;
 
-            //Eliminate the previously used offset to ensure that only the shapes influence the computed center.
-            localOffset = new Vector3();
-            localOffset = -InertiaHelper.ComputeCenter(this);
 
-            //Now that localOffset is set, the GetLocalExtremePointWithoutMargin method will return properly centered results.
-            float volume;
-            volumeDistribution = InertiaHelper.ComputeVolumeDistribution(this, out volume);
-            Volume = volume;
 
         }
 

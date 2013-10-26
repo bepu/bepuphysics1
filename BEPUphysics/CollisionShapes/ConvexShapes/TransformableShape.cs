@@ -2,6 +2,7 @@
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 
 using BEPUutilities;
+using BEPUutilities.ResourceManagement;
 
 namespace BEPUphysics.CollisionShapes.ConvexShapes
 {
@@ -83,14 +84,30 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         /// Computes a convex shape description for a TransformableShape and applies it.
         /// </summary>
         public void UpdateConvexShapeInfo()
-        {            
-            //An estimate of the maximum radius is currently required by the raycasts used by the InertiaHelper. Radii computation must come first.
-            //TODO: This will no longer be required when the InertiaHelper gets updated to use approximate tetrahedral integration.
-            MinimumRadius = ComputeMinimumRadius();
-            MaximumRadius = ComputeMaximumRadius();
+        {
+            //Compute the volume distribution.
+            var samples = CommonResources.GetVectorList();
+            if (samples.Capacity < InertiaHelper.SampleDirections.Length)
+                samples.Capacity = InertiaHelper.SampleDirections.Length;
+            for (int i = 0; i < InertiaHelper.SampleDirections.Length; ++i)
+            {
+                shape.GetLocalExtremePointWithoutMargin(ref InertiaHelper.SampleDirections[i], out samples.Elements[i]);
+            }
+
+            var triangles = CommonResources.GetIntList();
+            ConvexHullHelper.GetConvexHull(samples, triangles);
+
             float volume;
-            volumeDistribution = InertiaHelper.ComputeVolumeDistribution(this, out volume);
+            Matrix3x3 newDistribution;
+            InertiaHelper.ComputeShapeDistribution(samples, triangles, out volume, out newDistribution);
             Volume = volume;
+
+            //Estimate the minimum radius based on the surface mesh.
+            MinimumRadius = InertiaHelper.ComputeMinimumRadius(samples, triangles, ref Toolbox.ZeroVector);
+            CommonResources.GiveBack(samples);
+            CommonResources.GiveBack(triangles);
+
+
         }
 
 

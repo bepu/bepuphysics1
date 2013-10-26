@@ -265,9 +265,21 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
 
 
 
+        /// <summary>
+        /// Set of directions sampled by the inertia helper when constructing a mesh representation of a convex object.
+        /// </summary>
+        public static Vector3[] SampleDirections;
+
+        /// <summary>
+        /// Set of triangles represented by groups of three indices into the SampleDirections array.
+        /// </summary>
+        public static int[] SampleTriangleIndices;
 
 
-
+        static InertiaHelper()
+        {
+            GenerateSphere(3, out SampleDirections, out SampleTriangleIndices);
+        }
 
 
         /// <summary>
@@ -343,7 +355,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             //Create the regular icosahedron vertices.
             //Vector3[] vertices = new Vector3[12];
             var goldenRatio = (1 + (float)Math.Sqrt(5)) / 2;
-            float length = (float) Math.Sqrt(1 + goldenRatio * goldenRatio);
+            float length = (float)Math.Sqrt(1 + goldenRatio * goldenRatio);
             float x = 1 / length;
             float y = goldenRatio / length;
             vertices[0] = new Vector3(0, x, y);
@@ -532,45 +544,68 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
 
         private static int GetExpectedVertexCount(int subdivisionCount)
         {
-            //2 + 2^(2n + 1)
-            return 2 + 5 * (1 << (2 * subdivisionCount + 1));// 2 + (1 << (2 * subdivisionCount + 1));
+            return 2 + 5 * (1 << (2 * subdivisionCount + 1));
         }
 
-        private static int GetHighestIndex(int[] indices)
+
+        /// <summary>
+        /// Computes the center, volume, and volume distribution of a shape represented by a mesh.
+        /// </summary>
+        /// <param name="vertices">Vertices of the mesh.</param>
+        /// <param name="triangleIndices">Groups of 3 indices into the vertices array which represent the triangles of the mesh.</param>
+        /// <param name="volume">Volume of the shape.</param>
+        /// <param name="volumeDistribution">Distribution of the volume as measured from the computed center.</param>
+        public static void ComputeShapeDistribution(IList<Vector3> vertices, IList<int> triangleIndices, out float volume, out Matrix3x3 volumeDistribution)
         {
-            int highest = 0;
-            foreach (var index in indices)
+            //TODO: Whole bunch of repeat code here. If you ever need to change this, refactor the two methods to share.
+            //Explanation for the tetrahedral integration bits: Explicit Exact Formulas for the 3-D Tetrahedron Inertia Tensor in Terms of its Vertex Coordinates
+            //http://www.scipub.org/fulltext/jms2/jms2118-11.pdf
+            //x1, x2, x3, x4 are origin, triangle1, triangle2, triangle3
+            //Looking to find inertia tensor matrix of the form
+            // [  a  -b' -c' ]
+            // [ -b'  b  -a' ]
+            // [ -c' -a'  c  ]
+            float a = 0, b = 0, c = 0, ao = 0, bo = 0, co = 0;
+
+            float scaledVolume = 0;
+            for (int i = 0; i < triangleIndices.Count; i += 3)
             {
-                if (index > highest)
-                    highest = index;
+                Vector3 v2 = vertices[triangleIndices[i]];
+                Vector3 v3 = vertices[triangleIndices[i + 1]];
+                Vector3 v4 = vertices[triangleIndices[i + 2]];
+
+                //Determinant is 6 * volume.  It's signed, though; the mesh isn't necessarily convex and the origin isn't necessarily in the mesh even if it is convex.
+                float scaledTetrahedronVolume = v2.X * (v3.Z * v4.Y - v3.Y * v4.Z) -
+                                                v3.X * (v2.Z * v4.Y - v2.Y * v4.Z) +
+                                                v4.X * (v2.Z * v3.Y - v2.Y * v3.Z);
+
+                scaledVolume += scaledTetrahedronVolume;
+
+                a += scaledTetrahedronVolume * (v2.Y * v2.Y + v2.Y * v3.Y + v3.Y * v3.Y + v2.Y * v4.Y + v3.Y * v4.Y + v4.Y * v4.Y +
+                                                v2.Z * v2.Z + v2.Z * v3.Z + v3.Z * v3.Z + v2.Z * v4.Z + v3.Z * v4.Z + v4.Z * v4.Z);
+                b += scaledTetrahedronVolume * (v2.X * v2.X + v2.X * v3.X + v3.X * v3.X + v2.X * v4.X + v3.X * v4.X + v4.X * v4.X +
+                                                v2.Z * v2.Z + v2.Z * v3.Z + v3.Z * v3.Z + v2.Z * v4.Z + v3.Z * v4.Z + v4.Z * v4.Z);
+                c += scaledTetrahedronVolume * (v2.X * v2.X + v2.X * v3.X + v3.X * v3.X + v2.X * v4.X + v3.X * v4.X + v4.X * v4.X +
+                                                v2.Y * v2.Y + v2.Y * v3.Y + v3.Y * v3.Y + v2.Y * v4.Y + v3.Y * v4.Y + v4.Y * v4.Y);
+                ao += scaledTetrahedronVolume * (2 * v2.Y * v2.Z + v3.Y * v2.Z + v4.Y * v2.Z + v2.Y * v3.Z + 2 * v3.Y * v3.Z + v4.Y * v3.Z + v2.Y * v4.Z + v3.Y * v4.Z + 2 * v4.Y * v4.Z);
+                bo += scaledTetrahedronVolume * (2 * v2.X * v2.Z + v3.X * v2.Z + v4.X * v2.Z + v2.X * v3.Z + 2 * v3.X * v3.Z + v4.X * v3.Z + v2.X * v4.Z + v3.X * v4.Z + 2 * v4.X * v4.Z);
+                co += scaledTetrahedronVolume * (2 * v2.X * v2.Y + v3.X * v2.Y + v4.X * v2.Y + v2.X * v3.Y + 2 * v3.X * v3.Y + v4.X * v3.Y + v2.X * v4.Y + v3.X * v4.Y + 2 * v4.X * v4.Y);
             }
-            return highest;
-        }
+            volume = scaledVolume / 6;
+            float scaledDensity = 1 / volume;
+            float diagonalFactor = scaledDensity / 60;
+            float offFactor = -scaledDensity / 120;
+            a *= diagonalFactor;
+            b *= diagonalFactor;
+            c *= diagonalFactor;
+            ao *= offFactor;
+            bo *= offFactor;
+            co *= offFactor;
+            volumeDistribution = new Matrix3x3(a, bo, co,
+                                               bo, b, ao,
+                                               co, ao, c);
 
-        /// <summary>
-        /// Set of directions sampled by the inertia helper when constructing a mesh representation of a convex object.
-        /// </summary>
-        public static Vector3[] SampleDirections;
 
-        /// <summary>
-        /// Set of triangles represented by groups of three indices into the SampleDirections array.
-        /// </summary>
-        public static int[] SampleTriangleIndices;
-
-        /// <summary>
-        /// Fills an array with the samples taken according to the SampleDirections.
-        /// </summary>
-        /// <param name="shape">Shape to compute samples for. Must be initialized enough to support extreme point queries.</param>
-        /// <param name="samples">Array to fill with samples.</param>
-        public static void ComputeSamples(ConvexShape shape, Vector3[] samples)
-        {
-            if (SampleDirections.Length > samples.Length)
-                throw new ArgumentException("Samples array must be large enough to contain all samples.", "samples");
-
-            for (int i = 0; i < SampleDirections.Length; ++i)
-            {
-                shape.GetLocalExtremePointWithoutMargin(ref SampleDirections[i], out samples[i]);
-            }
         }
 
         /// <summary>
@@ -581,7 +616,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         /// <param name="center">Computed center of the shape's volume.</param>
         /// <param name="volume">Volume of the shape.</param>
         /// <param name="volumeDistribution">Distribution of the volume as measured from the computed center.</param>
-        public static void ComputeShapeDistribution(Vector3[] vertices, int[] triangleIndices, out Vector3 center, out float volume, out Matrix3x3 volumeDistribution)
+        public static void ComputeShapeDistribution(IList<Vector3> vertices, IList<int> triangleIndices, out Vector3 center, out float volume, out Matrix3x3 volumeDistribution)
         {
             //Explanation for the tetrahedral integration bits: Explicit Exact Formulas for the 3-D Tetrahedron Inertia Tensor in Terms of its Vertex Coordinates
             //http://www.scipub.org/fulltext/jms2/jms2118-11.pdf
@@ -594,16 +629,16 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
 
             Vector3 summedCenter = new Vector3();
             float scaledVolume = 0;
-            for (int i = 0; i < triangleIndices.Length; i += 3)
+            for (int i = 0; i < triangleIndices.Count; i += 3)
             {
                 Vector3 v2 = vertices[triangleIndices[i]];
                 Vector3 v3 = vertices[triangleIndices[i + 1]];
                 Vector3 v4 = vertices[triangleIndices[i + 2]];
 
                 //Determinant is 6 * volume.  It's signed, though; the mesh isn't necessarily convex and the origin isn't necessarily in the mesh even if it is convex.
-                float scaledTetrahedronVolume = v2.X * (v3.Y * v4.Z - v3.Z * v4.Y) -
-                                                v3.X * (v2.Y * v4.Z - v2.Z * v4.Y) +
-                                                v4.X * (v2.Y * v3.Z - v2.Z * v3.Y);
+                float scaledTetrahedronVolume = v2.X * (v3.Z * v4.Y - v3.Y * v4.Z) -
+                                                v3.X * (v2.Z * v4.Y - v2.Y * v4.Z) +
+                                                v4.X * (v2.Z * v3.Y - v2.Y * v3.Z);
 
                 scaledVolume += scaledTetrahedronVolume;
 
@@ -641,18 +676,27 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             //The volume distribution, as computed, is currently offset from the origin.
             //There's a operation that moves a local inertia tensor to a displaced position.
             //The inverse of that operation can be computed and applied to the displaced inertia to center it on the origin.
-            //Fortunately, it's pretty simple.
-            volumeDistribution.M11 -= center.Y * center.Y + center.Z * center.Z;
-            volumeDistribution.M12 += center.X * center.Y;
-            volumeDistribution.M13 += center.X * center.Z;
 
-            volumeDistribution.M21 += center.Y * center.X;
-            volumeDistribution.M22 -= center.X * center.X + center.Z * center.Z;
-            volumeDistribution.M23 += center.Y * center.Z;
+            Matrix3x3 additionalInertia;
+            GetInertiaOffset(-center, 1, out additionalInertia);
+            Matrix3x3.Add(ref volumeDistribution, ref additionalInertia, out volumeDistribution);
 
-            volumeDistribution.M31 += center.Z * center.X;
-            volumeDistribution.M32 += center.Z * center.Y;
-            volumeDistribution.M33 -= center.X * center.X + center.Y * center.Y;
+
+        }
+
+        public static void GetInertiaOffset(Vector3 offset, float mass, out Matrix3x3 additionalInertia)
+        {
+            additionalInertia.M11 = mass * (offset.Y * offset.Y + offset.Z * offset.Z);
+            additionalInertia.M12 = -mass * offset.X * offset.Y;
+            additionalInertia.M13 = -mass * offset.X * offset.Z;
+
+            additionalInertia.M21 = -mass * offset.Y * offset.X;
+            additionalInertia.M22 = mass * (offset.X * offset.X + offset.Z * offset.Z);
+            additionalInertia.M23 = -mass * offset.Y * offset.Z;
+
+            additionalInertia.M31 = -mass * offset.Z * offset.X;
+            additionalInertia.M32 = -mass * offset.Z * offset.Y;
+            additionalInertia.M33 = mass * (offset.X * offset.X + offset.Y * offset.Y);
 
             //The derivation for the above goes something like this, with lots of details left out:
             //Consider the usual form of the tensor, created from the summation of a bunch of pointmasses representing the shape.
@@ -667,8 +711,6 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             //2) sum(mi * by) and sum(mi * bz) are zero, because 'by' and 'bz' are offsets from the center of mass. In other words, if you averaged all of the offsets, it would equal (0,0,0).
             //(uniform density assumed)
             //With a little more massaging, the constant c terms can be fully separated into an additive term on each matrix element.
-            //(The volume distribution assumes mass is 1, hence the lack of any mass term in the implementation above.)
-
         }
 
 
@@ -682,7 +724,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         /// <param name="vertices">Vertices of the convex mesh.</param>
         /// <param name="triangleIndices">Groups of 3 indices into the vertices array which represent the triangles of the convex mesh.</param>
         /// <param name="center">Center of the convex shape.</param>
-        public static float ComputeMinimumRadius(Vector3[] vertices, int[] triangleIndices, ref Vector3 center)
+        public static float ComputeMinimumRadius(IList<Vector3> vertices, IList<int> triangleIndices, ref Vector3 center)
         {
             //Walk through all of the triangles. Treat them as a bunch of planes which bound the shape.
             //The closest distance on any of those planes to the center is the radius of the largest sphere,
@@ -691,7 +733,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             //While this shares a lot of math with the volume distribution computation (volume of a parallelepiped),
             //it requires that a center be available. So, it's a separate calculation.
             float minimumDistance = float.MaxValue;
-            for (int i = 0; i < triangleIndices.Length; i += 3)
+            for (int i = 0; i < triangleIndices.Count; i += 3)
             {
                 Vector3 v2 = vertices[triangleIndices[i]];
                 Vector3 v3 = vertices[triangleIndices[i + 1]];
@@ -704,7 +746,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
                 Vector3.Subtract(ref v3, ref v2, out v2v3);
                 Vector3.Subtract(ref v4, ref v2, out v2v4);
                 Vector3 normal;
-                Vector3.Cross(ref v2v3, ref v2v4, out normal);
+                Vector3.Cross(ref v2v4, ref v2v3, out normal);
 
                 //Watch out: this could very easily be a degenerate triangle; the sampling approach tends to create them.
                 float lengthSquared = normal.LengthSquared();

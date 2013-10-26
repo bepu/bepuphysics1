@@ -4,6 +4,7 @@ using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUutilities;
  
 using BEPUutilities.DataStructures;
+using BEPUutilities.ResourceManagement;
 
 namespace BEPUphysics.CollisionShapes.ConvexShapes
 {
@@ -199,10 +200,26 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         /// <param name="center">Computed center of the shape before recentering.</param>
         public void UpdateConvexShapeInfo(out Vector3 center)
         {
-            //This is gross, but an estimate of the maximum radius is currently required by the raycasts used by the InertiaHelper.
-            //TODO: This will no longer be necessary when the InertiaHelper gets updated to use approximate tetrahedral integration.
-            MaximumRadius = ComputeMaximumRadius();
-            center = InertiaHelper.ComputeCenter(this);
+            //Compute the volume distribution.
+            var samples = CommonResources.GetVectorList();
+            if (samples.Capacity < InertiaHelper.SampleDirections.Length)
+                samples.Capacity = InertiaHelper.SampleDirections.Length;
+            for (int i = 0; i < InertiaHelper.SampleDirections.Length; ++i)
+            {
+                GetLocalExtremePoint(InertiaHelper.SampleDirections[i], out samples.Elements[i]);
+            }
+
+            var triangles = CommonResources.GetIntList();
+            ConvexHullHelper.GetConvexHull(samples, triangles);
+
+            float volume;
+            InertiaHelper.ComputeShapeDistribution(samples, triangles, out center, out volume, out volumeDistribution);
+            Volume = volume;
+
+            CommonResources.GiveBack(samples);
+            CommonResources.GiveBack(triangles);
+
+            //Now recenter the shape and compute the radii estimates.
             for (int i = 0; i < shapes.Count; i++)
             {
                 shapes.WrappedList.Elements[i].Transform.Position -= center;
@@ -210,9 +227,6 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
             MinimumRadius = ComputeMinimumRadius();
             MaximumRadius = ComputeMaximumRadius();
 
-            float volume;
-            volumeDistribution = InertiaHelper.ComputeVolumeDistribution(this, out volume);
-            Volume = volume;
         }
 
 
