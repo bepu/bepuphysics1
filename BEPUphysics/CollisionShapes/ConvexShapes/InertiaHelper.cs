@@ -446,45 +446,59 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
                 bo += scaledTetrahedronVolume * (2 * v2.X * v2.Z + v3.X * v2.Z + v4.X * v2.Z + v2.X * v3.Z + 2 * v3.X * v3.Z + v4.X * v3.Z + v2.X * v4.Z + v3.X * v4.Z + 2 * v4.X * v4.Z);
                 co += scaledTetrahedronVolume * (2 * v2.X * v2.Y + v3.X * v2.Y + v4.X * v2.Y + v2.X * v3.Y + 2 * v3.X * v3.Y + v4.X * v3.Y + v2.X * v4.Y + v3.X * v4.Y + 2 * v4.X * v4.Y);
             }
-            Vector3.Multiply(ref summedCenter, 0.25f / scaledVolume, out center);
-            volume = scaledVolume / 6;
-            float scaledDensity = 1 / volume;
-            float diagonalFactor = scaledDensity / 60;
-            float offFactor = -scaledDensity / 120;
-            a *= diagonalFactor;
-            b *= diagonalFactor;
-            c *= diagonalFactor;
-            ao *= offFactor;
-            bo *= offFactor;
-            co *= offFactor;
-            //volumeDistribution = new Matrix3x3(a, bo, co,
-            //                                   bo, b, ao,
-            //                                   co, ao, c);
-            volumeDistribution = new Matrix3x3(a, co, bo,
-                                               co, b, ao,
-                                               bo, ao, c);
+            if (scaledVolume < Toolbox.Epsilon)
+            {
+                //This function works on the assumption that there is volume.
+                //If there is no volume, then volume * density is 0, so the mass is considered to be zero.
+                //If the mass is zero, then a zero matrix is the consistent result.
+                //In other words, this function shouldn't be used with things with no volume.
+                //A special case should be used instead.
+                volumeDistribution = new Matrix3x3();
+                volume = 0;
+                center = new Vector3();
+            }
+            else
+            {
+                Vector3.Multiply(ref summedCenter, 0.25f / scaledVolume, out center);
+                volume = scaledVolume / 6;
+                float scaledDensity = 1 / volume;
+                float diagonalFactor = scaledDensity / 60;
+                float offFactor = -scaledDensity / 120;
+                a *= diagonalFactor;
+                b *= diagonalFactor;
+                c *= diagonalFactor;
+                ao *= offFactor;
+                bo *= offFactor;
+                co *= offFactor;
+                //volumeDistribution = new Matrix3x3(a, bo, co,
+                //                                   bo, b, ao,
+                //                                   co, ao, c);
+                volumeDistribution = new Matrix3x3(a, co, bo,
+                                                   co, b, ao,
+                                                   bo, ao, c);
 
-            //The volume distribution, as computed, is currently offset from the origin.
-            //There's a operation that moves a local inertia tensor to a displaced position.
-            //The inverse of that operation can be computed and applied to the displaced inertia to center it on the origin.
+                //The volume distribution, as computed, is currently offset from the origin.
+                //There's a operation that moves a local inertia tensor to a displaced position.
+                //The inverse of that operation can be computed and applied to the displaced inertia to center it on the origin.
 
-            Matrix3x3 additionalInertia;
-            GetPointContribution(1, ref Toolbox.ZeroVector, ref center, out additionalInertia);
-            Matrix3x3.Subtract(ref volumeDistribution, ref additionalInertia, out volumeDistribution);
+                Matrix3x3 additionalInertia;
+                GetPointContribution(1, ref Toolbox.ZeroVector, ref center, out additionalInertia);
+                Matrix3x3.Subtract(ref volumeDistribution, ref additionalInertia, out volumeDistribution);
 
-            //The derivation that shows the above point mass usage is valid goes something like this, with lots of details left out:
-            //Consider the usual form of the tensor, created from the summation of a bunch of pointmasses representing the shape.
-            //Each sum contribution relies on a particular offset, r. When the center of mass isn't aligned with (0,0,0), 
-            //r = c + b, where c is the center of mass and b is the offset of r from the center of mass.
-            //So, each term of the matrix (like M11 = sum(mi * (ry*ry + rz*rz))) can be rephrased in terms of the center and the offset:
-            //M11 = sum(mi * ((cy + by) * (cy + by) + (cz + bz) * (cz + bz)))
-            //Expanding that gets you to:
-            //M11 = sum(mi * (cycy + 2cyby + byby + czcz + 2czbz + bzbz))
-            //A couple of observations move things along.
-            //1) Since it's constant over the summation, the c terms can be pulled out of a sum.
-            //2) sum(mi * by) and sum(mi * bz) are zero, because 'by' and 'bz' are offsets from the center of mass. In other words, if you averaged all of the offsets, it would equal (0,0,0).
-            //(uniform density assumed)
-            //With a little more massaging, the constant c terms can be fully separated into an additive term on each matrix element.
+                //The derivation that shows the above point mass usage is valid goes something like this, with lots of details left out:
+                //Consider the usual form of the tensor, created from the summation of a bunch of pointmasses representing the shape.
+                //Each sum contribution relies on a particular offset, r. When the center of mass isn't aligned with (0,0,0), 
+                //r = c + b, where c is the center of mass and b is the offset of r from the center of mass.
+                //So, each term of the matrix (like M11 = sum(mi * (ry*ry + rz*rz))) can be rephrased in terms of the center and the offset:
+                //M11 = sum(mi * ((cy + by) * (cy + by) + (cz + bz) * (cz + bz)))
+                //Expanding that gets you to:
+                //M11 = sum(mi * (cycy + 2cyby + byby + czcz + 2czbz + bzbz))
+                //A couple of observations move things along.
+                //1) Since it's constant over the summation, the c terms can be pulled out of a sum.
+                //2) sum(mi * by) and sum(mi * bz) are zero, because 'by' and 'bz' are offsets from the center of mass. In other words, if you averaged all of the offsets, it would equal (0,0,0).
+                //(uniform density assumed)
+                //With a little more massaging, the constant c terms can be fully separated into an additive term on each matrix element.
+            }
 
         }
 

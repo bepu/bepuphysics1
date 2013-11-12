@@ -422,137 +422,65 @@ namespace BEPUphysics.CollisionShapes
                 var transformedVertices = CommonResources.GetVectorList();
                 if (transformedVertices.Capacity < data.vertices.Length)
                     transformedVertices.Capacity = data.vertices.Length;
-                transformedVertices.Count = InertiaHelper.SampleDirections.Length;
+                transformedVertices.Count = data.vertices.Length;
                 for (int i = 0; i < data.vertices.Length; ++i)
                 {
                     data.GetVertexPosition(i, out transformedVertices.Elements[i]);
                 }
                 InertiaHelper.ComputeShapeDistribution(transformedVertices, data.indices, out shapeInformation.Center, out shapeInformation.Volume, out shapeInformation.VolumeDistribution);
                 CommonResources.GiveBack(transformedVertices);
+                if (shapeInformation.Volume > 0)
+                    return shapeInformation;
+                throw new ArgumentException("A solid mesh must have volume.");
             }
-            else
+            shapeInformation.Center = new Vector3();
+            shapeInformation.VolumeDistribution = new Matrix3x3();
+            float totalWeight = 0;
+            for (int i = 0; i < data.indices.Length; i += 3)
             {
-                shapeInformation.Center = new Vector3();
-                shapeInformation.VolumeDistribution = new Matrix3x3();
-                float totalWeight = 0;
-                for (int i = 0; i < data.indices.Length; i += 3)
-                {
-                    //Compute the center contribution.
-                    Vector3 vA, vB, vC;
-                    data.GetTriangle(i, out vA, out vB, out vC);
-                    Vector3 vAvB;
-                    Vector3 vAvC;
-                    Vector3.Subtract(ref vB, ref vA, out vAvB);
-                    Vector3.Subtract(ref vC, ref vA, out vAvC);
-                    Vector3 cross;
-                    Vector3.Cross(ref vAvB, ref vAvC, out cross);
-                    float weight = cross.Length();
-                    totalWeight += weight;
+                //Compute the center contribution.
+                Vector3 vA, vB, vC;
+                data.GetTriangle(i, out vA, out vB, out vC);
+                Vector3 vAvB;
+                Vector3 vAvC;
+                Vector3.Subtract(ref vB, ref vA, out vAvB);
+                Vector3.Subtract(ref vC, ref vA, out vAvC);
+                Vector3 cross;
+                Vector3.Cross(ref vAvB, ref vAvC, out cross);
+                float weight = cross.Length();
+                totalWeight += weight;
 
-                    shapeInformation.Center += weight * (vA + vB + vC) / 3;
+                shapeInformation.Center += weight * (vA + vB + vC) / 3;
 
-                    //Compute the inertia contribution of this triangle.
-                    //Approximate it using pointmasses positioned at the triangle vertices.
-                    //(There exists a direct solution, but this approximation will do plenty fine.)
-                    Matrix3x3 aContribution, bContribution, cContribution;
-                    InertiaHelper.GetPointContribution(weight, ref Toolbox.ZeroVector, ref vA, out aContribution);
-                    InertiaHelper.GetPointContribution(weight, ref Toolbox.ZeroVector, ref vB, out bContribution);
-                    InertiaHelper.GetPointContribution(weight, ref Toolbox.ZeroVector, ref vC, out cContribution);
-                    Matrix3x3.Add(ref aContribution, ref shapeInformation.VolumeDistribution, out shapeInformation.VolumeDistribution);
-                    Matrix3x3.Add(ref bContribution, ref shapeInformation.VolumeDistribution, out shapeInformation.VolumeDistribution);
-                    Matrix3x3.Add(ref cContribution, ref shapeInformation.VolumeDistribution, out shapeInformation.VolumeDistribution);
+                //Compute the inertia contribution of this triangle.
+                //Approximate it using pointmasses positioned at the triangle vertices.
+                //(There exists a direct solution, but this approximation will do plenty fine.)
+                Matrix3x3 aContribution, bContribution, cContribution;
+                InertiaHelper.GetPointContribution(weight, ref Toolbox.ZeroVector, ref vA, out aContribution);
+                InertiaHelper.GetPointContribution(weight, ref Toolbox.ZeroVector, ref vB, out bContribution);
+                InertiaHelper.GetPointContribution(weight, ref Toolbox.ZeroVector, ref vC, out cContribution);
+                Matrix3x3.Add(ref aContribution, ref shapeInformation.VolumeDistribution, out shapeInformation.VolumeDistribution);
+                Matrix3x3.Add(ref bContribution, ref shapeInformation.VolumeDistribution, out shapeInformation.VolumeDistribution);
+                Matrix3x3.Add(ref cContribution, ref shapeInformation.VolumeDistribution, out shapeInformation.VolumeDistribution);
 
-
-                }
-                shapeInformation.Center /= totalWeight;
-
-                //The division of 6 is used because 1) the cross product length above introduced a factor of two, and 2) the full weight was used for each of the three vertices.
-                Matrix3x3.Multiply(ref shapeInformation.VolumeDistribution, 1 / (6 * totalWeight), out shapeInformation.VolumeDistribution);
-                
-                //Move the inertia tensor into position according to the center.
-                Matrix3x3 additionalInertia;
-                InertiaHelper.GetPointContribution(1, ref Toolbox.ZeroVector, ref shapeInformation.Center, out additionalInertia);
-                Matrix3x3.Subtract(ref shapeInformation.VolumeDistribution, ref additionalInertia, out shapeInformation.VolumeDistribution);
-
-                shapeInformation.Volume = 0;
 
             }
+            shapeInformation.Center /= totalWeight;
+
+            //The division of 6 is used because 1) the cross product length above introduced a factor of two, and 2) the full weight was used for each of the three vertices.
+            Matrix3x3.Multiply(ref shapeInformation.VolumeDistribution, 1 / (6 * totalWeight), out shapeInformation.VolumeDistribution);
+
+            //Move the inertia tensor into position according to the center.
+            Matrix3x3 additionalInertia;
+            InertiaHelper.GetPointContribution(1, ref Toolbox.ZeroVector, ref shapeInformation.Center, out additionalInertia);
+            Matrix3x3.Subtract(ref shapeInformation.VolumeDistribution, ref additionalInertia, out shapeInformation.VolumeDistribution);
+
+            shapeInformation.Volume = 0;
+
 
             return shapeInformation;
         }
 
-        ///// <summary>
-        ///// Defines two planes that bound the mesh shape in local space.
-        ///// </summary>
-        //struct Extent
-        //{
-        //    internal Vector3 Direction;
-        //    internal float Minimum;
-        //    internal float Maximum;
-
-        //    internal void Clamp(ref Vector3 v)
-        //    {
-        //        float dot;
-        //        Vector3.Dot(ref v, ref Direction, out dot);
-        //        float difference;
-        //        if (dot < Minimum)
-        //        {
-        //            difference = dot - Minimum;
-        //        }
-        //        else if (dot > Maximum)
-        //        {
-        //            difference = dot - Maximum;
-        //        }
-        //        else return;
-
-        //        //Subtract the component of v which is parallel to the normal.
-        //        v.X -= difference * Direction.X;
-        //        v.Y -= difference * Direction.Y;
-        //        v.Z -= difference * Direction.Z;
-        //    }
-
-        //}
-
-        //RawList<Extent> extents = new RawList<Extent>();
-
-        //void ComputeBoundingHull()
-        //{
-        //    //TODO:
-        //    //While we have computed a convex hull of the shape already, we don't really
-        //    //need the full tightness of the convex hull.
-        //    extents.Add(new Extent() { Direction = new Vector3(1, 0, 0) });
-        //    extents.Add(new Extent() { Direction = new Vector3(0, 1, 0) });
-        //    extents.Add(new Extent() { Direction = new Vector3(0, 0, 1) });
-        //    //extents.Add(new Extent() { Direction = new Vector3(1, 1, 0) });
-        //    //extents.Add(new Extent() { Direction = new Vector3(-1, 1, 0) });
-        //    //extents.Add(new Extent() { Direction = new Vector3(0, 1, 1) });
-        //    //extents.Add(new Extent() { Direction = new Vector3(0, 1, -1) });
-        //    extents.Add(new Extent() { Direction = Vector3.Normalize(new Vector3(1, 0, 1)) });
-        //    extents.Add(new Extent() { Direction = Vector3.Normalize(new Vector3(1, 0, -1)) });
-        //    //Add more extents for a tighter volume
-
-        //    //Initialize the max and mins.
-        //    for (int i = 0; i < extents.count; i++)
-        //    {
-        //        extents.Elements[i].Minimum = float.MaxValue;
-        //        extents.Elements[i].Maximum = -float.MaxValue;
-        //    }
-
-        //    for (int i = 0; i < triangleMesh.Data.vertices.Length; i++)
-        //    {
-        //        Vector3 v;
-        //        triangleMesh.Data.GetVertexPosition(i, out v);
-        //        for (int j = 0; j < extents.count; j++)
-        //        {
-        //            float dot;
-        //            Vector3.Dot(ref v, ref extents.Elements[j].Direction, out dot);
-        //            if (dot < extents.Elements[j].Minimum)
-        //                extents.Elements[j].Minimum = dot;
-        //            if (dot > extents.Elements[j].Maximum)
-        //                extents.Elements[j].Maximum = dot;
-        //        }
-        //    }
-        //}
 
         private void GetBoundingBox(ref Matrix3x3 o, out BoundingBox boundingBox)
         {
