@@ -143,11 +143,12 @@ namespace BEPUphysics.CollisionShapes
 
             triangleMesh = new TriangleMesh(data);
 
+            UpdateEntityShapeVolume(new EntityShapeVolumeDescription { Volume = shapeDistributionInformation.Volume, VolumeDistribution = shapeDistributionInformation.VolumeDistribution });
+
             ComputeSolidSidedness();
 
             UpdateSurfaceVertices();
 
-            UpdateEntityShapeVolume(new EntityShapeVolumeDescription { Volume = shapeDistributionInformation.Volume, VolumeDistribution = shapeDistributionInformation.VolumeDistribution });
         }
 
         ///<summary>
@@ -168,11 +169,12 @@ namespace BEPUphysics.CollisionShapes
 
             triangleMesh = new TriangleMesh(data);
 
+            UpdateEntityShapeVolume(new EntityShapeVolumeDescription { Volume = shapeDistributionInformation.Volume, VolumeDistribution = shapeDistributionInformation.VolumeDistribution });
+
             ComputeSolidSidedness();
 
             UpdateSurfaceVertices();
 
-            UpdateEntityShapeVolume(new EntityShapeVolumeDescription { Volume = shapeDistributionInformation.Volume, VolumeDistribution = shapeDistributionInformation.VolumeDistribution });
         }
 
         ///<summary>
@@ -358,7 +360,7 @@ namespace BEPUphysics.CollisionShapes
         private void UpdateSurfaceVertices()
         {
             hullVertices.Clear();
-            try
+            if (Volume > 0)
             {
                 ConvexHullHelper.GetConvexHull(triangleMesh.Data.vertices, hullVertices);
                 var transformableData = triangleMesh.Data as TransformableMeshData;
@@ -371,10 +373,10 @@ namespace BEPUphysics.CollisionShapes
                     }
                 }
             }
-            catch
+            else
             {
                 hullVertices.Clear();
-                //If the convex hull failed, then the point set has no volume.  A mobile mesh is allowed to have zero volume, however.
+                //A mobile mesh is allowed to have zero volume, so long as it isn't solid.
                 //In this case, compute the bounding box of all points.
                 BoundingBox box = new BoundingBox();
                 for (int i = 0; i < triangleMesh.Data.vertices.Length; i++)
@@ -450,15 +452,16 @@ namespace BEPUphysics.CollisionShapes
                 float weight = cross.Length();
                 totalWeight += weight;
 
-                shapeInformation.Center += weight * (vA + vB + vC) / 3;
+                float perVertexWeight = weight * (1f / 3f);
+                shapeInformation.Center += perVertexWeight * (vA + vB + vC);
 
                 //Compute the inertia contribution of this triangle.
                 //Approximate it using pointmasses positioned at the triangle vertices.
                 //(There exists a direct solution, but this approximation will do plenty fine.)
                 Matrix3x3 aContribution, bContribution, cContribution;
-                InertiaHelper.GetPointContribution(weight, ref Toolbox.ZeroVector, ref vA, out aContribution);
-                InertiaHelper.GetPointContribution(weight, ref Toolbox.ZeroVector, ref vB, out bContribution);
-                InertiaHelper.GetPointContribution(weight, ref Toolbox.ZeroVector, ref vC, out cContribution);
+                InertiaHelper.GetPointContribution(perVertexWeight, ref Toolbox.ZeroVector, ref vA, out aContribution);
+                InertiaHelper.GetPointContribution(perVertexWeight, ref Toolbox.ZeroVector, ref vB, out bContribution);
+                InertiaHelper.GetPointContribution(perVertexWeight, ref Toolbox.ZeroVector, ref vC, out cContribution);
                 Matrix3x3.Add(ref aContribution, ref shapeInformation.VolumeDistribution, out shapeInformation.VolumeDistribution);
                 Matrix3x3.Add(ref bContribution, ref shapeInformation.VolumeDistribution, out shapeInformation.VolumeDistribution);
                 Matrix3x3.Add(ref cContribution, ref shapeInformation.VolumeDistribution, out shapeInformation.VolumeDistribution);
@@ -467,12 +470,12 @@ namespace BEPUphysics.CollisionShapes
             }
             shapeInformation.Center /= totalWeight;
 
-            //The division of 6 is used because 1) the cross product length above introduced a factor of two, and 2) the full weight was used for each of the three vertices.
-            Matrix3x3.Multiply(ref shapeInformation.VolumeDistribution, 1 / (6 * totalWeight), out shapeInformation.VolumeDistribution);
+            //The extra factor of 2 is used because the cross product length was twice the actual area.
+            Matrix3x3.Multiply(ref shapeInformation.VolumeDistribution, 1 / (2 * totalWeight), out shapeInformation.VolumeDistribution);
 
             //Move the inertia tensor into position according to the center.
             Matrix3x3 additionalInertia;
-            InertiaHelper.GetPointContribution(1, ref Toolbox.ZeroVector, ref shapeInformation.Center, out additionalInertia);
+            InertiaHelper.GetPointContribution(0.5f, ref Toolbox.ZeroVector, ref shapeInformation.Center, out additionalInertia);
             Matrix3x3.Subtract(ref shapeInformation.VolumeDistribution, ref additionalInertia, out shapeInformation.VolumeDistribution);
 
             shapeInformation.Volume = 0;
