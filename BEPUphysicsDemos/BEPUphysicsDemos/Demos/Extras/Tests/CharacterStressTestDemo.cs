@@ -141,8 +141,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             for (int i = 0; i < characters.Count; i++)
             {
                 characters[i].HorizontalMotionConstraint.MovementDirection = new Vector2((float)(random.NextDouble() * 2 - 1), (float)(random.NextDouble() * 2 - 1));
-                if (random.NextDouble() < .01f)
-                    characters[i].Jump();
+                //if (random.NextDouble() < .01f)
+                //    characters[i].Jump();
 
                 //var next = random.NextDouble();
                 //if (next < .01)

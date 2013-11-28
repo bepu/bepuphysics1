@@ -76,8 +76,8 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             }
         }
 
-        Vector3 viewDirection;
-        Vector3 horizontalViewDirection;
+        Vector3 viewDirection = new Vector3(0, 0, -1);
+        Vector3 horizontalViewDirection = new Vector3(0, 0, -1);
 
         /// <summary>
         /// Gets the horizontal view direction computed using the Down vector and the ViewDirection.
@@ -335,7 +335,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 //any missed information.
 
                 //TODO: seems a bit silly to do this work sequentially. Would be better if it could run in parallel in the proper location.
-                
+
                 var down = Down;
                 var boundingBox = Body.CollisionInformation.BoundingBox;
                 //Expand the bounding box up and down using the step height.
@@ -354,7 +354,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 //The dot product would provide the cos(angle) between the vertical axis and a chosen axis.
                 //Equivalently, it is how much expansion would be along that axis, if the vertical axis was the axis of expansion.
                 //However, it's not. The dot product actually gives us the expansion along an axis perpendicular to the chosen axis, pointing away from the character's vertical axis.
-                
+
                 //What we need is actually given by the sin(angle), which is given by ||verticalAxis x testAxis||.
                 //The sin(angle) is the projected length of the verticalAxis (not the expansion!) on the axis perpendicular to the testAxis pointing away from the character's vertical axis.
                 //That projected length, however is equal to the expansion along the test axis, which is exactly what we want.
@@ -479,7 +479,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 //It's only really there for games that expect to be able to run down stairs at 40 miles an hour without zipping off into the void.
                 //Most of the time, you can just comment out downstepping, and so long as the character is running at a reasonable speed,
                 //gravity will do the work.
-                
+
                 //If your game would work without teleportation-based downstepping, it's probably a good idea to comment it out.
                 //Downstepping can be fairly expensive.
 
@@ -558,7 +558,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
 
         }
-        
+
         void TeleportToPosition(Vector3 newPosition, float dt)
         {
 
