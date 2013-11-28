@@ -313,8 +313,6 @@ namespace BEPUphysics.NarrowPhaseSystems
 
         void RemoveStaleOverlaps()
         {
-            //We don't need to do any synchronization or queueing here; just remove everything directly.
-            ApplySolverUpdateableChangesDirectly = true;
 
             //Remove stale objects.
             for (int i = narrowPhasePairs.Count - 1; i >= 0; i--)
@@ -362,7 +360,6 @@ namespace BEPUphysics.NarrowPhaseSystems
 
             }
 
-            ApplySolverUpdateableChangesDirectly = false;
 
 
         }
@@ -417,26 +414,13 @@ namespace BEPUphysics.NarrowPhaseSystems
         ConcurrentDeque<SolverUpdateableChange> solverUpdateableChanges = new ConcurrentDeque<SolverUpdateableChange>();
 
 
-        /// <summary>
-        /// If true, solver updateables added and removed from narrow phase pairs will be added directly to the solver
-        /// without any synchronization or queueing.
-        /// </summary>
-        bool ApplySolverUpdateableChangesDirectly { get; set; }
-
         ///<summary>
         /// Enqueues a solver updateable created by some pair for flushing into the solver later.
         ///</summary>
         ///<param name="addedItem">Updateable to add.</param>
         public void NotifyUpdateableAdded(SolverUpdateable addedItem)
         {
-            if (ApplySolverUpdateableChangesDirectly)
-            {
-                Solver.Add(addedItem);
-            }
-            else
-            {
-                solverUpdateableChanges.Enqueue(new SolverUpdateableChange(true, addedItem));
-            }
+            solverUpdateableChanges.Enqueue(new SolverUpdateableChange(true, addedItem));
         }
         ///<summary>
         /// Enqueues a solver updateable removed by some pair for flushing into the solver later.
@@ -444,20 +428,12 @@ namespace BEPUphysics.NarrowPhaseSystems
         ///<param name="removedItem">Solver updateable to remove.</param>
         public void NotifyUpdateableRemoved(SolverUpdateable removedItem)
         {
-            if (ApplySolverUpdateableChangesDirectly)
-            {
-                Solver.Remove(removedItem);
-            }
-            else
-            {
-                solverUpdateableChanges.Enqueue(new SolverUpdateableChange(false, removedItem));
-            }
+            solverUpdateableChanges.Enqueue(new SolverUpdateableChange(false, removedItem));
         }
 
 
         /// <summary>
         /// Flushes the new solver updateables into the solver.
-        /// They are 'flux' updateables, so this uses the solver's flux add method.
         /// </summary>
         public void FlushGeneratedSolverUpdateables()
         {

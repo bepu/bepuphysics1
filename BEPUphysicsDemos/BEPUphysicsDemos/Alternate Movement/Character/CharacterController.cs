@@ -558,7 +558,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
 
         }
-
+        
         void TeleportToPosition(Vector3 newPosition, float dt)
         {
 

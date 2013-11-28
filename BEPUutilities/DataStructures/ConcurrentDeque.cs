@@ -79,7 +79,6 @@ namespace BEPUutilities.DataStructures
             finally
             {
                 locker.Exit();
-                //locker.Exit();
             }
         }
 
