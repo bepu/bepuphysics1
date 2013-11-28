@@ -13,7 +13,7 @@ using Microsoft.Xna.Framework.Graphics;
 namespace BEPUphysicsDemos.Demos.Extras.Tests
 {
     /// <summary>
-    /// A nice driveble landscape.
+    /// A nice landscape full of stranger people.
     /// </summary>
     public class CharacterStressierTestDemo : StandardDemo
     {
