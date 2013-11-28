@@ -6,7 +6,7 @@ using BEPUphysics.Entities.Prefabs;
 namespace BEPUphysicsDemos.Demos
 {
     /// <summary>
-    /// A nice driveble landscape.
+    /// A nice driveable landscape.
     /// </summary>
     public class StaticMeshDemo : StandardDemo
     {

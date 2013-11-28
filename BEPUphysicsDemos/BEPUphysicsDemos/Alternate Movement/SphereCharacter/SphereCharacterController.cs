@@ -41,7 +41,7 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
         /// </summary>
         public VerticalMotionConstraint VerticalMotionConstraint { get; private set; }
 
-        private Vector3 down;
+        private Vector3 down = new Vector3(0, -1, 0);
         /// <summary>
         /// Gets or sets the down direction of the character. Controls the interpretation of movement and support finding.
         /// </summary>

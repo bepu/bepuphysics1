@@ -6,7 +6,7 @@ using BEPUutilities;
 namespace BEPUphysicsDemos.Demos.Extras
 {
     /// <summary>
-    /// A nice driveble landscape.
+    /// Demonstrates tuning settings for handling different world scales.
     /// </summary>
     public class ScaleDemo : StandardDemo
     {

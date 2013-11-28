@@ -1,6 +1,7 @@
 ﻿using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.CollisionShapes;
 using BEPUphysics.Entities.Prefabs;
+using BEPUphysics.Threading;
 using BEPUutilities;
 using Microsoft.Xna.Framework.Graphics;
 using BEPUphysicsDemos.AlternateMovement.SphereCharacter;
@@ -11,7 +12,7 @@ using BEPUphysicsDemos.AlternateMovement.Character;
 namespace BEPUphysicsDemos.Demos.Extras.Tests
 {
     /// <summary>
-    /// A nice driveble landscape.
+    /// A nice landscape full of strange people.
     /// </summary>
     public class CharacterStressTestDemo : StandardDemo
     {
@@ -22,6 +23,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
         public CharacterStressTestDemo(DemosGame game)
             : base(game)
         {
+            Space.ParallelLooper = new ParallelLooper();
             //Load in mesh data and create the group.
             Vector3[] staticTriangleVertices;
             int[] staticTriangleIndices;
@@ -57,7 +59,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             var numColumns = 16;
             var numRows = 16;
             var numHigh = 8;
-            float separation = 64;
+            float separation = 16;
 
             for (int i = 0; i < numRows; i++)
                 for (int j = 0; j < numColumns; j++)
@@ -75,26 +77,26 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                         Space.Add(character);
                     }
 
-            //Now drop the ball-characters on it!
-            numColumns = 16;
-            numRows = 16;
-            numHigh = 8;
-            separation = 64;
-            for (int i = 0; i < numRows; i++)
-                for (int j = 0; j < numColumns; j++)
-                    for (int k = 0; k < numHigh; k++)
-                    {
-                        var character = new SphereCharacterController();
-                        character.Body.Position =
-                            new Vector3(
-                            separation * i - numRows * separation / 2,
-                            48f + k * separation,
-                            separation * j - numColumns * separation / 2);
+            ////Now drop the ball-characters on it!
+            //numColumns = 16;
+            //numRows = 16;
+            //numHigh = 8;
+            //separation = 64;
+            //for (int i = 0; i < numRows; i++)
+            //    for (int j = 0; j < numColumns; j++)
+            //        for (int k = 0; k < numHigh; k++)
+            //        {
+            //            var character = new SphereCharacterController();
+            //            character.Body.Position =
+            //                new Vector3(
+            //                separation * i - numRows * separation / 2,
+            //                48f + k * separation,
+            //                separation * j - numColumns * separation / 2);
 
-                        sphereCharacters.Add(character);
+            //            sphereCharacters.Add(character);
 
-                        Space.Add(character);
-                    }
+            //            Space.Add(character);
+            //        }
 
 
             game.Camera.Position = new Vector3(0, 10, 40);
@@ -102,8 +104,8 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             //Dump some boxes on top of the characters for fun.
             numColumns = 16;
             numRows = 16;
-            numHigh = 4;
-            separation = 64;
+            numHigh = 8;
+            separation = 16;
             for (int i = 0; i < numRows; i++)
                 for (int j = 0; j < numColumns; j++)
                     for (int k = 0; k < numHigh; k++)
@@ -142,24 +144,24 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                 if (random.NextDouble() < .01f)
                     characters[i].Jump();
 
-                var next = random.NextDouble();
-                if (next < .01)
-                {
-                    //Note: The character's graphic won't represent the crouching process properly since we're not remove/readding it.
-                    if (next < .005f && characters[i].StanceManager.CurrentStance == Stance.Standing)
-                        characters[i].StanceManager.DesiredStance = Stance.Crouching;
-                    else
-                        characters[i].StanceManager.DesiredStance = Stance.Standing;
-                }
+                //var next = random.NextDouble();
+                //if (next < .01)
+                //{
+                //    //Note: The character's graphic won't represent the crouching process properly since we're not remove/readding it.
+                //    if (next < .005f && characters[i].StanceManager.CurrentStance == Stance.Standing)
+                //        characters[i].StanceManager.DesiredStance = Stance.Crouching;
+                //    else
+                //        characters[i].StanceManager.DesiredStance = Stance.Standing;
+                //}
             }
 
-            //Tell the sphere characters to run around too.
-            for (int i = 0; i < sphereCharacters.Count; i++)
-            {
-                sphereCharacters[i].HorizontalMotionConstraint.MovementDirection = new Vector2((float)(random.NextDouble() * 2 - 1), (float)(random.NextDouble() * 2 - 1));
-                if (random.NextDouble() < .01f)
-                    sphereCharacters[i].Jump();
-            }
+            ////Tell the sphere characters to run around too.
+            //for (int i = 0; i < sphereCharacters.Count; i++)
+            //{
+            //    sphereCharacters[i].HorizontalMotionConstraint.MovementDirection = new Vector2((float)(random.NextDouble() * 2 - 1), (float)(random.NextDouble() * 2 - 1));
+            //    if (random.NextDouble() < .01f)
+            //        sphereCharacters[i].Jump();
+            //}
 
 
             base.Update(dt);
