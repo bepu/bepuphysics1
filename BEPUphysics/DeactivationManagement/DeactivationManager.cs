@@ -304,7 +304,7 @@ namespace BEPUphysics.DeactivationManagement
 
         }
 
-        
+
         void DeactivateObjects()
         {
             //Deactivate only some objects each frame.
@@ -312,7 +312,7 @@ namespace BEPUphysics.DeactivationManagement
             int numberOfIslandsChecked = 0;
             int originalIslandCount = simulationIslands.Count;
 
-   
+
 
             while (numberOfEntitiesDeactivated < maximumDeactivationAttemptsPerFrame && simulationIslands.Count > 0 && numberOfIslandsChecked < originalIslandCount)
             {
@@ -437,7 +437,15 @@ namespace BEPUphysics.DeactivationManagement
                 //Don't immediately do the removal.
                 //Defer them!
 
+                if (connection == null)
+                    Console.WriteLine("Hello friends");
                 splitAttempts.Enqueue(connection);
+
+                foreach (var attempt in splitAttempts)
+                {
+                    if (attempt == null)
+                        Console.WriteLine("Might you wish to partake of a cup of tea");
+                }
 
                 //connection.RemoveReferencesFromConnectedMembers();
                 //for (int i = 0; i < connection.members.count; i++)

@@ -23,7 +23,6 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
         public CharacterStressTestDemo(DemosGame game)
             : base(game)
         {
-            Space.ParallelLooper = new ParallelLooper();
             //Load in mesh data and create the group.
             Vector3[] staticTriangleVertices;
             int[] staticTriangleIndices;
