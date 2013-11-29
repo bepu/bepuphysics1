@@ -24,7 +24,7 @@ namespace BEPUphysics.DeactivationManagement
         internal bool allowDeactivation = true;
         internal bool isActive = true;
         ///<summary>
-        /// Gets whether or not the island is currently active.
+        /// Gets or sets whether or not the island is currently active.
         ///</summary>
         public bool IsActive
         {
@@ -70,7 +70,7 @@ namespace BEPUphysics.DeactivationManagement
         Action<SimulationIslandMember> memberActivatedDelegate;
         void MemberActivated(SimulationIslandMember member)
         {
-            Activate();
+            IsActive = true;
         }
 
         Action<SimulationIslandMember> becameDeactivationCandidateDelegate;
@@ -86,20 +86,9 @@ namespace BEPUphysics.DeactivationManagement
             Interlocked.Decrement(ref deactivationCandidateCount);
         }
 
-        ///<summary>
-        /// Activates the simulation island.
-        ///</summary>
-        public void Activate()
-        {
-            if (!isActive)
-            {
-                isActive = true;
-            }
-        }
-
 
         ///<summary>
-        /// Attempts to deactivate the simulation island.
+        /// Attempts to deactivate the simulation island. Only deactivates if the island is settled and ready to go to sleep.
         ///</summary>
         ///<returns>Whether or not the simulation island was successfully deactivated.</returns>
         public bool TryToDeactivate()

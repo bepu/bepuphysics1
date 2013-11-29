@@ -144,7 +144,7 @@ namespace BEPUphysics.DeactivationManagement
                                     //do not automatically wake up touching dynamic entities, we must do so manually.
                                     //This is safe because the island.Activate command is a single boolean set.
                                     //We're also inside the island change locker, so we don't have to worry about the island changing beneath our feet.
-                                    island.Activate();
+                                    island.IsActive = true;
                                     island.allowDeactivation = false;
                                 }
                                 connectedMembers.Elements[j].Member.simulationIslandChangeLocker.Exit();

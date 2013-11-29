@@ -106,6 +106,7 @@
     <Compile Include="Camera.cs" />
     <Compile Include="CameraControlScheme.cs" />
     <Compile Include="CharacterCameraControlScheme.cs" />
+    <Compile Include="Demos\Extras\Tests\CharacterAddRemoveStressTestDemo.cs" />
     <Compile Include="FixedOffsetCameraControlScheme.cs" />
     <Compile Include="DemosGame.cs" />
     <Compile Include="Demos\ActionFigureDemo.cs" />

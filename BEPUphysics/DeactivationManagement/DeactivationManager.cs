@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using BEPUphysics.Threading;
+using BEPUutilities;
 using BEPUutilities.DataStructures;
 using BEPUutilities.ResourceManagement;
 
@@ -224,7 +225,7 @@ namespace BEPUphysics.DeactivationManagement
         }
 
 
-        Queue<SimulationIslandConnection> splitAttempts = new Queue<SimulationIslandConnection>();
+        ConcurrentDeque<SimulationIslandConnection> splitAttempts = new ConcurrentDeque<SimulationIslandConnection>();
 
         static float maximumSplitAttemptsFraction = .01f;
         /// <summary>
@@ -269,9 +270,9 @@ namespace BEPUphysics.DeactivationManagement
             //Only do a portion of the total splits.
             int maxAttempts = Math.Max(minimumSplitAttempts, (int)(splitAttempts.Count * maximumSplitAttemptsFraction));
             int attempts = 0;
-            while (attempts < maxAttempts && splitAttempts.Count > 0)
+            SimulationIslandConnection attempt;
+            while (attempts < maxAttempts && splitAttempts.TryUnsafeDequeueFirst(out attempt))
             {
-                var attempt = splitAttempts.Dequeue();
                 if (attempt.SlatedForRemoval) //If it was re-added, don't split!
                 {
                     attempt.SlatedForRemoval = false; //Reset the removal state so that future adds will add back references, since we're about to remove them.
@@ -334,6 +335,9 @@ namespace BEPUphysics.DeactivationManagement
             }
         }
 
+        //Merges must be performed sequentially.
+        private SpinLock addLocker = new SpinLock();
+
         ///<summary>
         /// Adds a simulation island connection to the deactivation manager.
         ///</summary>
@@ -344,6 +348,7 @@ namespace BEPUphysics.DeactivationManagement
             //DO A MERGE IF NECESSARY
             if (connection.DeactivationManager == null)
             {
+                addLocker.Enter();
                 connection.DeactivationManager = this;
                 if (connection.entries.Count > 0)
                 {
@@ -364,8 +369,9 @@ namespace BEPUphysics.DeactivationManagement
                         connection.SlatedForRemoval = false; //If it was slated for removal, that means connections are still present.  Just set the flag and the removal system will ignore the removal order.
                     else
                         connection.AddReferencesToConnectedMembers();
-                    //debugConnections.Add(connection);
                 }
+
+                addLocker.Exit();
             }
             else
             {
@@ -383,13 +389,13 @@ namespace BEPUphysics.DeactivationManagement
             if (s1 == null)
             {
                 //Should still activate the island, though.
-                s2.Activate();
+                s2.IsActive = true;
                 return s2;
             }
             if (s2 == null)
             {
                 //Should still activate the island, though.
-                s1.Activate();
+                s1.IsActive = true;
                 return s1;
             }
 
@@ -401,7 +407,7 @@ namespace BEPUphysics.DeactivationManagement
                 s1 = biggerIsland;
             }
 
-            s1.Activate();
+            s1.IsActive = true;
             s2.immediateParent = s1;
 
             //This is a bit like a 'union by rank.'
@@ -424,6 +430,7 @@ namespace BEPUphysics.DeactivationManagement
         ///<exception cref="ArgumentException">Thrown if the connection does not belong to this manager.</exception>
         public void Remove(SimulationIslandConnection connection)
         {
+
             if (connection.DeactivationManager == this)
             {
                 connection.DeactivationManager = null; //TODO: Should it remove here, or in the deferred final case? probably here, since otherwise Add-Remove-Add would throw an exception!
@@ -437,15 +444,7 @@ namespace BEPUphysics.DeactivationManagement
                 //Don't immediately do the removal.
                 //Defer them!
 
-                if (connection == null)
-                    Console.WriteLine("Hello friends");
                 splitAttempts.Enqueue(connection);
-
-                foreach (var attempt in splitAttempts)
-                {
-                    if (attempt == null)
-                        Console.WriteLine("Might you wish to partake of a cup of tea");
-                }
 
                 //connection.RemoveReferencesFromConnectedMembers();
                 //for (int i = 0; i < connection.members.count; i++)
@@ -464,7 +463,6 @@ namespace BEPUphysics.DeactivationManagement
             {
                 throw new ArgumentException("Cannot remove connection from activity manager; it is owned by a different or no activity manager.");
             }
-
 
 
         }

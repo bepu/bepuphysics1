@@ -36,15 +36,15 @@ namespace BEPUphysics
             SimulationIslandConnections = new LockingResourcePool<SimulationIslandConnection>();
         }
 
-        static ResourcePool<RawList<RayCastResult>> SubPoolRayCastResultList;
-        static ResourcePool<RawList<BroadPhaseEntry>> SubPoolBroadPhaseEntryList;
-        static ResourcePool<RawList<Collidable>> SubPoolCollidableList;
-        static ResourcePool<RawList<Entity>> SubPoolEntityRawList;
-        static ResourcePool<TriangleShape> SubPoolTriangleShape;
-        static ResourcePool<RawList<CompoundChild>> SubPoolCompoundChildList;
-        static ResourcePool<TriangleCollidable> SubPoolTriangleCollidables;
-        static ResourcePool<RawList<TriangleMeshConvexContactManifold.TriangleIndices>> SubPoolTriangleIndicesList;
-        static ResourcePool<SimulationIslandConnection> SimulationIslandConnections;
+        static LockingResourcePool<RawList<RayCastResult>> SubPoolRayCastResultList;
+        static LockingResourcePool<RawList<BroadPhaseEntry>> SubPoolBroadPhaseEntryList;
+        static LockingResourcePool<RawList<Collidable>> SubPoolCollidableList;
+        static LockingResourcePool<RawList<Entity>> SubPoolEntityRawList;
+        static LockingResourcePool<TriangleShape> SubPoolTriangleShape;
+        static LockingResourcePool<RawList<CompoundChild>> SubPoolCompoundChildList;
+        static LockingResourcePool<TriangleCollidable> SubPoolTriangleCollidables;
+        static LockingResourcePool<RawList<TriangleMeshConvexContactManifold.TriangleIndices>> SubPoolTriangleIndicesList;
+        static LockingResourcePool<SimulationIslandConnection> SimulationIslandConnections;
         //#endif
         /// <summary>
         /// Retrieves a ray cast result list from the resource pool.

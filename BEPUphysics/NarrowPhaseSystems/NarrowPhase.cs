@@ -389,7 +389,6 @@ namespace BEPUphysics.NarrowPhaseSystems
         ///</summary>
         public event Action<NarrowPhasePair> RemovingPair;
 
-        private SpinLock solverUpdateableLocker = new SpinLock();
 
         ///<summary>
         /// Enqueues a solver updateable created by some pair for flushing into the solver later.
@@ -397,19 +396,16 @@ namespace BEPUphysics.NarrowPhaseSystems
         ///<param name="addedItem">Updateable to add.</param>
         public void NotifyUpdateableAdded(SolverUpdateable addedItem)
         {
-            solverUpdateableLocker.Enter();
             Solver.Add(addedItem);
-            solverUpdateableLocker.Exit();
         }
+
         ///<summary>
         /// Enqueues a solver updateable removed by some pair for flushing into the solver later.
         ///</summary>
         ///<param name="removedItem">Solver updateable to remove.</param>
         public void NotifyUpdateableRemoved(SolverUpdateable removedItem)
         {
-            solverUpdateableLocker.Enter();
             Solver.Remove(removedItem);
-            solverUpdateableLocker.Exit();
         }
 
 

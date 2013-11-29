@@ -24,11 +24,6 @@ namespace BEPUphysicsDemos.AlternateMovement
     /// </summary>
     public class CharacterSynchronizer : ICharacterTag
     {
-        /// <summary>
-        /// This object is locked by the characters when performing any constraint changes.  There's no strong conceptual reason for this locker
-        /// to be within the ICharacterTag implementation; it's just a convenient shared location for both the SphereCharacterController and CharacterController.
-        /// </summary>
-        public static SpinLock ConstraintAccessLocker = new SpinLock();
 
         Entity body;
 
