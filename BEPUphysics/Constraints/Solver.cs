@@ -124,7 +124,6 @@ namespace BEPUphysics.Constraints
                 }
                 solverUpdateables.Elements[solverUpdateables.Count] = null;
 
-
                 DeactivationManager.Remove(item.simulationIslandConnection);
                 item.OnRemovalFromSolver(this);
             }

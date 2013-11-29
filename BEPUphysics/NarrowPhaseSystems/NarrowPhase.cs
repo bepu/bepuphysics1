@@ -6,6 +6,7 @@ using BEPUphysics.Constraints;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
 using BEPUphysics.Threading;
 using BEPUphysics.CollisionRuleManagement;
+using BEPUutilities;
 using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.NarrowPhaseSystems
@@ -209,23 +210,12 @@ namespace BEPUphysics.NarrowPhaseSystems
                 return (endFlushNew - endStale) / (double)Stopwatch.Frequency;
             }
         }
-        /// <summary>
-        /// Gets the time used in flushing changes to solver updateables managed by the pairs.
-        /// </summary>
-        public double FlushSolverUpdateableChangesTime
-        {
-            get
-            {
-                return (endFlushSolverUpdateables - endFlushNew) / (double)Stopwatch.Frequency;
-            }
-        }
 
 
         private long startPairs;
         private long endPairs;
-        private long endFlushNew;
-        private long endFlushSolverUpdateables;
         private long endStale;
+        private long endFlushNew;
 
 #endif
 
@@ -257,12 +247,6 @@ namespace BEPUphysics.NarrowPhaseSystems
             endFlushNew = Stopwatch.GetTimestamp();
 #endif
 
-            //Flush away every change accumulated since the last flush.
-            FlushGeneratedSolverUpdateables();
-
-#if PROFILE
-            endFlushSolverUpdateables = Stopwatch.GetTimestamp();
-#endif
 
 
         }
@@ -300,12 +284,6 @@ namespace BEPUphysics.NarrowPhaseSystems
             endFlushNew = Stopwatch.GetTimestamp();
 #endif
 
-            //Flush away every change accumulated since the last flush.
-            FlushGeneratedSolverUpdateables();
-
-#if PROFILE
-            endFlushSolverUpdateables = Stopwatch.GetTimestamp();
-#endif
 
 
         }
@@ -411,8 +389,7 @@ namespace BEPUphysics.NarrowPhaseSystems
         ///</summary>
         public event Action<NarrowPhasePair> RemovingPair;
 
-        ConcurrentDeque<SolverUpdateableChange> solverUpdateableChanges = new ConcurrentDeque<SolverUpdateableChange>();
-
+        private SpinLock solverUpdateableLocker = new SpinLock();
 
         ///<summary>
         /// Enqueues a solver updateable created by some pair for flushing into the solver later.
@@ -420,7 +397,9 @@ namespace BEPUphysics.NarrowPhaseSystems
         ///<param name="addedItem">Updateable to add.</param>
         public void NotifyUpdateableAdded(SolverUpdateable addedItem)
         {
-            solverUpdateableChanges.Enqueue(new SolverUpdateableChange(true, addedItem));
+            solverUpdateableLocker.Enter();
+            Solver.Add(addedItem);
+            solverUpdateableLocker.Exit();
         }
         ///<summary>
         /// Enqueues a solver updateable removed by some pair for flushing into the solver later.
@@ -428,38 +407,13 @@ namespace BEPUphysics.NarrowPhaseSystems
         ///<param name="removedItem">Solver updateable to remove.</param>
         public void NotifyUpdateableRemoved(SolverUpdateable removedItem)
         {
-            solverUpdateableChanges.Enqueue(new SolverUpdateableChange(false, removedItem));
+            solverUpdateableLocker.Enter();
+            Solver.Remove(removedItem);
+            solverUpdateableLocker.Exit();
         }
 
 
-        /// <summary>
-        /// Flushes the new solver updateables into the solver.
-        /// </summary>
-        public void FlushGeneratedSolverUpdateables()
-        {
-            SolverUpdateableChange change;
-            while (solverUpdateableChanges.TryUnsafeDequeueFirst(out change))
-            {
-                if (change.ShouldAdd)
-                {
-                    //It is technically possible for a constraint to be added twice, if certain systems interfere.
-                    //The character controller is one such system.
-                    //We should check the new constraint's solver status before adding it here.
-                    if (change.Item.Solver == null)
-                    {
-                        Solver.Add(change.Item);
-                    }
-                }
-                else
-                {
-                    if (change.Item.Solver != null)
-                    {
-                        Solver.Remove(change.Item);
-                    }
-                }
-            }
 
-        }
 
 
 
