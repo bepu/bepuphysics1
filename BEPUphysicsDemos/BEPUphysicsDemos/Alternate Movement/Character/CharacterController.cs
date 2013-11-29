@@ -536,23 +536,10 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             SupportFinder.GetTractionInDirection(ref movementDirection, out verticalSupportData);
 
 
-            //Warning:
-            //Changing a constraint's support data is not thread safe; it modifies simulation islands!
-            //If something other than a CharacterController can modify simulation islands is running
-            //simultaneously (in the IBeforeSolverUpdateable.Update stage), it will need to be synchronized.
-
-            //We don't need to synchronize this all the time- only when the support object changes.
-            bool needToLock = HorizontalMotionConstraint.SupportData.SupportObject != supportData.SupportObject ||
-                              VerticalMotionConstraint.SupportData.SupportObject != verticalSupportData.SupportObject;
-
-            if (needToLock)
-                CharacterSynchronizer.ConstraintAccessLocker.Enter();
-
+ 
             HorizontalMotionConstraint.SupportData = supportData;
             VerticalMotionConstraint.SupportData = verticalSupportData;
 
-            if (needToLock)
-                CharacterSynchronizer.ConstraintAccessLocker.Exit();
 
 
 

@@ -24,11 +24,11 @@ namespace BEPUutilities.ResourceManagement
 
         }
 
-        static ResourcePool<RawList<RayHit>> SubPoolRayHitList;
-        static ResourcePool<RawList<int>> SubPoolIntList;
-        static ResourcePool<HashSet<int>> SubPoolIntSet;
-        static ResourcePool<RawList<float>> SubPoolFloatList;
-        static ResourcePool<RawList<Vector3>> SubPoolVectorList;
+        static LockingResourcePool<RawList<RayHit>> SubPoolRayHitList;
+        static LockingResourcePool<RawList<int>> SubPoolIntList;
+        static LockingResourcePool<HashSet<int>> SubPoolIntSet;
+        static LockingResourcePool<RawList<float>> SubPoolFloatList;
+        static LockingResourcePool<RawList<Vector3>> SubPoolVectorList;
 
         /// <summary>
         /// Retrieves a ray hit list from the resource pool.

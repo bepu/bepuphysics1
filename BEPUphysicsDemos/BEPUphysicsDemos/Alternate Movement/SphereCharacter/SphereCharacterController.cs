@@ -62,8 +62,8 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
             }
         }
 
-        Vector3 viewDirection;
-        Vector3 horizontalViewDirection;
+        Vector3 viewDirection = new Vector3(0, 0, -1);
+        Vector3 horizontalViewDirection = new Vector3(0, 0, -1);
 
         /// <summary>
         /// Gets the horizontal view direction computed using the Down vector and the ViewDirection.
@@ -447,23 +447,10 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
             SupportFinder.GetTractionInDirection(ref movement3d, out verticalSupportData);
 
 
-            //Warning:
-            //Changing a constraint's support data is not thread safe; it modifies simulation islands!
-            //If something other than a CharacterController can modify simulation islands is running
-            //simultaneously (in the IBeforeSolverUpdateable.Update stage), it will need to be synchronized.
-
-            //We don't need to synchronize this all the time- only when the support object changes.
-            bool needToLock = HorizontalMotionConstraint.SupportData.SupportObject != supportData.SupportObject ||
-                              VerticalMotionConstraint.SupportData.SupportObject != verticalSupportData.SupportObject;
-
-            if (needToLock)
-                CharacterSynchronizer.ConstraintAccessLocker.Enter();
 
             HorizontalMotionConstraint.SupportData = supportData;
             VerticalMotionConstraint.SupportData = verticalSupportData;
 
-            if (needToLock)
-                CharacterSynchronizer.ConstraintAccessLocker.Exit();
 
 
 
