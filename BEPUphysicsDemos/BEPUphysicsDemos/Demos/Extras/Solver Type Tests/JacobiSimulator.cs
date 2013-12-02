@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using BEPUphysics.Threading;
@@ -47,15 +48,23 @@ namespace BEPUphysicsDemos.Demos.Extras.SolverTypeTests
             dynamic.UpdatePosition(dt);
         }
 
+
+
+
         private float inverseDt;
         private float dt;
         public override void Update(float dt)
         {
+
+            var wholeStartTime = Stopwatch.GetTimestamp();
+
             this.dt = dt;
             inverseDt = 1 / dt;
 
+
             ApplyGravity(dt);
 
+            var solverStartTime = Stopwatch.GetTimestamp();
             foreach (var constraint in constraints)
             {
                 constraint.Preupdate(inverseDt);
@@ -64,6 +73,8 @@ namespace BEPUphysicsDemos.Demos.Extras.SolverTypeTests
             {
                 ApplyAccumulatedImpulses(i);
             }
+
+
 
             for (int iterationIndex = 0; iterationIndex < IterationCount; ++iterationIndex)
             {
@@ -76,21 +87,29 @@ namespace BEPUphysicsDemos.Demos.Extras.SolverTypeTests
                     ApplyImpulse(dynamicIndex);
                 }
             }
+            var solverEndTime = Stopwatch.GetTimestamp();
 
             foreach (var dynamic in dynamics)
             {
                 dynamic.UpdatePosition(dt);
             }
+
+            var wholeEndTime = Stopwatch.GetTimestamp();
+
+            SolveTime = (solverEndTime - solverStartTime) / (double)Stopwatch.Frequency;
+            TotalTime = (wholeEndTime - wholeStartTime) / (double)Stopwatch.Frequency;
         }
 
         public override void Update(float dt, IParallelLooper looper)
         {
+            var wholeStartTime = Stopwatch.GetTimestamp();
             this.dt = dt;
             inverseDt = 1 / dt;
 
 
             ApplyGravity(dt, looper);
 
+            var solverStartTime = Stopwatch.GetTimestamp();
             looper.ForLoop(0, constraints.Count, Preupdate);
             looper.ForLoop(0, dynamics.Count, ApplyAccumulatedImpulses);
 
@@ -99,10 +118,15 @@ namespace BEPUphysicsDemos.Demos.Extras.SolverTypeTests
                 looper.ForLoop(0, constraints.Count, SolveIteration);
                 looper.ForLoop(0, dynamics.Count, ApplyImpulse);
             }
+            var solverEndTime = Stopwatch.GetTimestamp();
 
-            looper.ForLoop(0, constraints.Count, UpdatePosition);
+            looper.ForLoop(0, dynamics.Count, UpdatePosition);
+            var wholeEndTime = Stopwatch.GetTimestamp();
+
+            SolveTime = (solverEndTime - solverStartTime) / (double)Stopwatch.Frequency;
+            TotalTime = (wholeEndTime - wholeStartTime) / (double)Stopwatch.Frequency;
         }
 
-        
+
     }
 }

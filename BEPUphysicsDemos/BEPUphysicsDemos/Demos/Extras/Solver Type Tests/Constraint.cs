@@ -9,7 +9,7 @@ namespace BEPUphysicsDemos.Demos.Extras.SolverTypeTests
     abstract class Constraint
     {
 
-        public float Softness = 0.1f;
+        public float Softness = 1f;
         public float BiasFactor = 0.2f;
 
         public abstract void Preupdate(float inverseDt);

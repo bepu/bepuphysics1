@@ -61,10 +61,10 @@ namespace BEPUphysicsDemos
 #endif
 
         //Display Booleans        
-        private bool displayEntities = true;
-        private bool displayUI = true;
-        private bool displayActiveEntityCount = true;
-        private bool displayConstraints = true;
+        public bool displayEntities = true;
+        public bool displayUI = true;
+        public bool displayActiveEntityCount = true;
+        public bool displayConstraints = true;
         private bool displayMenu;
         private bool displayContacts;
         private bool displayBoundingBoxes;

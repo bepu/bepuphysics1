@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.Entities;
@@ -50,11 +52,11 @@ namespace BEPUphysicsDemos.Demos.Extras.SolverTypeTests
         private void BuildSimulation(Vector3 offset, Simulator simulator)
         {
             //Create a lattice of dynamic objects.
-            int width = 5;
+            int width = 30;
             int height = 5;
-            int length = 5;
+            int length = 30;
             float spacing = 3;
-            var dynamics = new LinearDynamic[5, 5, 5];
+            var dynamics = new LinearDynamic[width, height, length];
             for (int widthIndex = 0; widthIndex < width; ++widthIndex)
             {
                 for (int heightIndex = 0; heightIndex < height; ++heightIndex)
@@ -112,6 +114,7 @@ namespace BEPUphysicsDemos.Demos.Extras.SolverTypeTests
             }
         }
 
+
         /// <summary>
         /// Constructs a new demo.
         /// </summary>
@@ -122,8 +125,8 @@ namespace BEPUphysicsDemos.Demos.Extras.SolverTypeTests
             jacobiSimulator = new JacobiSimulator();
             sequentialImpulsesSimulator = new SequentialImpulsesSimulator();
 
-            BuildSimulation(new Vector3(-20, 0, 0), jacobiSimulator);
-            BuildSimulation(new Vector3(20, 0, 0), sequentialImpulsesSimulator);
+            BuildSimulation(new Vector3(-65, 0, 0), jacobiSimulator);
+            BuildSimulation(new Vector3(65, 0, 0), sequentialImpulsesSimulator);
 
             //Build some visualizers for the simulators.
             var jacobiDynamics = jacobiSimulator.Dynamics;
@@ -145,13 +148,11 @@ namespace BEPUphysicsDemos.Demos.Extras.SolverTypeTests
             jacobiConstraintLines = new VertexPositionColor[jacobiSimulator.Constraints.Count * 2];
             sequentialImpulsesConstraintLines = new VertexPositionColor[sequentialImpulsesSimulator.Constraints.Count * 2];
 
+            //jacobiSimulator.Gravity = new Vector3();
+            //sequentialImpulsesSimulator.Gravity = new Vector3();
 
-
-            game.Camera.Position = new Vector3(0, 6, 30);
+            game.Camera.Position = new Vector3(0, 36, 200);
         }
-
-        private double jacobiTime;
-        private double sequentialImpulsesTime;
 
         private void UpdateConstraintLine(int index, VertexPositionColor[] lines, Constraint constraint)
         {
@@ -174,14 +175,14 @@ namespace BEPUphysicsDemos.Demos.Extras.SolverTypeTests
                     if (distance > 0)
                     {
                         //We're near enough to see it, but not penetrating.
-                        Color.Lerp(new Color(1, 1, 1), new Color(1, 0, 0), (threshold - distance) / threshold);
+                        color = Color.Lerp(new Color(1f, 1f, 1f), new Color(1f, 0f, 0f), (threshold - distance) / threshold);
                         lines[index] = new VertexPositionColor(MathConverter.Convert(planeConstraint.Dynamic.Position), color);
                         lines[index + 1] = new VertexPositionColor(MathConverter.Convert(planeConstraint.Dynamic.Position - planeConstraint.Plane.Normal * distance), color);
                     }
                     else
                     {
                         //Negative! Penetrating.
-                        var penetratingColor = new Color(1, 0, 0);
+                        var penetratingColor = new Color(1f, 0f, 0f);
                         lines[index] = new VertexPositionColor(MathConverter.Convert(planeConstraint.Dynamic.Position), penetratingColor);
                         lines[index + 1] = new VertexPositionColor(MathConverter.Convert(planeConstraint.Dynamic.Position - planeConstraint.Plane.Normal * distance), penetratingColor);
                     }
@@ -195,38 +196,54 @@ namespace BEPUphysicsDemos.Demos.Extras.SolverTypeTests
             }
         }
 
+
+        private Random random = new Random(10);
+        private void ShakeDynamics<T>(T dynamics) where T : IList<LinearDynamic>
+        {
+            for (int i = 0; i < dynamics.Count; ++i)
+            {
+                dynamics[i].Velocity += 5 * new Vector3(2 * (float)random.NextDouble() - 1, (float)random.NextDouble(), 2 * (float)random.NextDouble() - 1);
+            }
+        }
+
+
         public override void Update(float dt)
         {
-            var start = Stopwatch.GetTimestamp();
-            jacobiSimulator.Update(1/60f);
-            var end = Stopwatch.GetTimestamp();
-            jacobiTime = (1000.0 * (end - start)) / Stopwatch.Frequency;
+            if (Game.WasKeyPressed(Microsoft.Xna.Framework.Input.Keys.P))
+            {
+                ShakeDynamics(jacobiSimulator.Dynamics);
+                ShakeDynamics(sequentialImpulsesSimulator.Dynamics);
+            }
 
-            start = Stopwatch.GetTimestamp();
-            sequentialImpulsesSimulator.Update(1 / 60f);
-            end = Stopwatch.GetTimestamp();
-            sequentialImpulsesTime = (1000.0 * (end - start)) / Stopwatch.Frequency;
+            jacobiSimulator.Update(1 / 60f, Space.ParallelLooper);
+            sequentialImpulsesSimulator.Update(1 / 60f, Space.ParallelLooper);
 
             //Update the dynamics visualizers.
-            foreach (var visualizer in jacobiDynamicVisualizers)
+            if (Game.displayEntities)
             {
-                visualizer.UpdateDisplay();
-            }
-            foreach (var visualizer in sequentialImpulsesDynamicVisualizers)
-            {
-                visualizer.UpdateDisplay();
+                foreach (var visualizer in jacobiDynamicVisualizers)
+                {
+                    visualizer.UpdateDisplay();
+                }
+                foreach (var visualizer in sequentialImpulsesDynamicVisualizers)
+                {
+                    visualizer.UpdateDisplay();
+                }
             }
 
-            //Update the constraint visualizers.
-            var jacobiConstraints = jacobiSimulator.Constraints;
-            for (int i = 0; i < jacobiConstraints.Count; ++i)
+            if (Game.displayConstraints)
             {
-                UpdateConstraintLine(i, jacobiConstraintLines, jacobiConstraints[i]);
-            }
-            var sequentialImpulsesConstraints = sequentialImpulsesSimulator.Constraints;
-            for (int i = 0; i < sequentialImpulsesConstraints.Count; ++i)
-            {
-                UpdateConstraintLine(i, sequentialImpulsesConstraintLines, sequentialImpulsesConstraints[i]);
+                //Update the constraint visualizers.
+                var jacobiConstraints = jacobiSimulator.Constraints;
+                for (int i = 0; i < jacobiConstraints.Count; ++i)
+                {
+                    UpdateConstraintLine(i, jacobiConstraintLines, jacobiConstraints[i]);
+                }
+                var sequentialImpulsesConstraints = sequentialImpulsesSimulator.Constraints;
+                for (int i = 0; i < sequentialImpulsesConstraints.Count; ++i)
+                {
+                    UpdateConstraintLine(i, sequentialImpulsesConstraintLines, sequentialImpulsesConstraints[i]);
+                }
             }
 
             base.Update(dt);
@@ -235,19 +252,24 @@ namespace BEPUphysicsDemos.Demos.Extras.SolverTypeTests
 
         public override void DrawUI()
         {
-            Game.DataTextDrawer.Draw("Jacobi time (ms): ", jacobiTime, 2, new Microsoft.Xna.Framework.Vector2(10f, 20f));
-            Game.DataTextDrawer.Draw("Sequential time (ms): ", sequentialImpulsesTime, 2, new Microsoft.Xna.Framework.Vector2(10, 40));
+            Game.DataTextDrawer.Draw("Jacobi total time (ms): ", 1000 * jacobiSimulator.TotalTime, 2, new Microsoft.Xna.Framework.Vector2(10f, 20f));
+            Game.DataTextDrawer.Draw("Jacobi solve time (ms): ", 1000 * jacobiSimulator.SolveTime, 2, new Microsoft.Xna.Framework.Vector2(10f, 40f));
+            Game.DataTextDrawer.Draw("Sequential total time (ms): ", 1000 * sequentialImpulsesSimulator.TotalTime, 2, new Microsoft.Xna.Framework.Vector2(10, 70));
+            Game.DataTextDrawer.Draw("Sequential solve time (ms): ", 1000 * sequentialImpulsesSimulator.SolveTime, 2, new Microsoft.Xna.Framework.Vector2(10, 90));
             base.DrawUI();
         }
 
         public override void Draw()
         {
-            var effect = Game.LineDrawer;
-            foreach (var pass in effect.CurrentTechnique.Passes)
+            if (Game.displayConstraints)
             {
-                pass.Apply();
-                Game.GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, jacobiConstraintLines, 0, jacobiConstraintLines.Length / 2);
-                Game.GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, sequentialImpulsesConstraintLines, 0, sequentialImpulsesConstraintLines.Length / 2);
+                var effect = Game.LineDrawer;
+                foreach (var pass in effect.CurrentTechnique.Passes)
+                {
+                    pass.Apply();
+                    Game.GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, jacobiConstraintLines, 0, jacobiConstraintLines.Length / 2);
+                    Game.GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, sequentialImpulsesConstraintLines, 0, sequentialImpulsesConstraintLines.Length / 2);
+                }
             }
             base.Draw();
         }

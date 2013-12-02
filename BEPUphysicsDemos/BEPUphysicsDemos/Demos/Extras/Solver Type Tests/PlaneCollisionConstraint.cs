@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using BEPUutilities;
 
 namespace BEPUphysicsDemos.Demos.Extras.SolverTypeTests
@@ -50,15 +51,15 @@ namespace BEPUphysicsDemos.Demos.Extras.SolverTypeTests
 
             effectiveMass = 1 / (Dynamic.InverseMass + Softness);
 
-            float error = Math.Max(0, d + plane.D);
+            float error = d + plane.D;
             if (error > 0)
             {
                 //Allow the dynamic to approach the plane, but no closer.
-                biasVelocity = -error * inverseDt;
+                biasVelocity = error * inverseDt;
             }
             else
             {
-                biasVelocity = -error * BiasFactor * inverseDt;
+                biasVelocity = error * BiasFactor * inverseDt;
             }
         }
 
@@ -68,7 +69,7 @@ namespace BEPUphysicsDemos.Demos.Extras.SolverTypeTests
             Vector3.Dot(ref Dynamic.Velocity, ref plane.Normal, out velocityAlongJacobian);
 
 
-            float changeInVelocity = velocityAlongJacobian + biasVelocity + Softness * accumulatedImpulse;
+            float changeInVelocity = -velocityAlongJacobian - biasVelocity - Softness * accumulatedImpulse;
 
             float newImpulse = changeInVelocity * effectiveMass;
 
@@ -77,6 +78,7 @@ namespace BEPUphysicsDemos.Demos.Extras.SolverTypeTests
 
             impulse = newAccumulatedImpulse - accumulatedImpulse;
             accumulatedImpulse = newAccumulatedImpulse;
+
         }
 
         public override void ApplyImpulse(LinearDynamic dynamic)

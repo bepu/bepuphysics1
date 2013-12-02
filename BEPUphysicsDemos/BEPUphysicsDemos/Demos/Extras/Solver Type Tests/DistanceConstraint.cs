@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using BEPUutilities;
 
 namespace BEPUphysicsDemos.Demos.Extras.SolverTypeTests
@@ -48,7 +49,8 @@ namespace BEPUphysicsDemos.Demos.Extras.SolverTypeTests
 
             effectiveMass = 1 / (A.InverseMass + B.InverseMass + Softness);
 
-            biasVelocity = (currentDistance - distance) * BiasFactor * inverseDt;
+            accumulatedImpulse = 0;
+            biasVelocity = (distance - currentDistance) * BiasFactor * inverseDt;
 
         }
 
@@ -60,7 +62,7 @@ namespace BEPUphysicsDemos.Demos.Extras.SolverTypeTests
             Vector3.Dot(ref relativeVelocity, ref jacobian, out relativeVelocityAlongJacobian);
 
 
-            float changeInVelocity = relativeVelocityAlongJacobian + biasVelocity + Softness * accumulatedImpulse;
+            float changeInVelocity = relativeVelocityAlongJacobian - biasVelocity - Softness * accumulatedImpulse;
 
             impulse = changeInVelocity * effectiveMass;
 
@@ -83,13 +85,14 @@ namespace BEPUphysicsDemos.Demos.Extras.SolverTypeTests
             Vector3 worldSpaceImpulse;
             if (A == dynamic)
             {
-                Vector3.Multiply(ref jacobian, impulse, out worldSpaceImpulse);
+                Vector3.Multiply(ref jacobian, impulseToApply, out worldSpaceImpulse);
             }
             else
             {
-                Vector3.Multiply(ref jacobian, -impulse, out worldSpaceImpulse);
+                Vector3.Multiply(ref jacobian, -impulseToApply, out worldSpaceImpulse);
             }
             dynamic.ApplyImpulse(ref worldSpaceImpulse);
+
         }
 
         public override void ApplyImpulses()
