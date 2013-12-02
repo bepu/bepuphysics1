@@ -33,6 +33,9 @@ namespace BEPUphysicsDemos.Demos.Extras.SolverTypeTests
             constraint.AddToConnections();
         }
 
+        public double TotalTime { get; protected set; }
+        public double SolveTime { get; protected set; }
+
         public abstract void Update(float dt);
 
         public abstract void Update(float dt, IParallelLooper looper);
