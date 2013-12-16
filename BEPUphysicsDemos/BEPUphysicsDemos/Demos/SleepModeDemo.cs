@@ -10,6 +10,9 @@ namespace BEPUphysicsDemos.Demos
     /// </summary>
     public class SleepModeDemo : StandardDemo
     {
+        private int rowIndex;
+        private int updatesSinceLastRow;
+
         /// <summary>
         /// Constructs a new demo.
         /// </summary>
@@ -17,49 +20,80 @@ namespace BEPUphysicsDemos.Demos
         public SleepModeDemo(DemosGame game)
             : base(game)
         {
-            //Create a bunch of blocks.
-            int zOffset = 5;
-            int numRows = 1;
-
-            int numColumns = 40;
-
-            Entity toAdd;
-            for (int i = 0; i < numRows; i++)
-            {
-                for (int j = 0; j < numColumns; j++)
-                {
-                    for (int k = 1; k <= 7; k++)
-                    {
-                        if (k % 2 == 1)
-                        {
-                            toAdd = new Box(new Vector3(j * 10 + -3, j * 10 + 3 * k, i * 10 + zOffset), 1, 1, 7, 20);
-                            toAdd.LinearDamping = .9f;
-                            toAdd.AngularDamping = .9f;
-                            Space.Add(toAdd);
-                            toAdd = new Box(new Vector3(j * 10 + 3, j * 10 + 3 * k, i * 10 + zOffset), 1, 1, 7, 20);
-                            toAdd.LinearDamping = .9f;
-                            toAdd.AngularDamping = .9f;
-                            Space.Add(toAdd);
-                        }
-                        else
-                        {
-                            toAdd = new Box(new Vector3(j * 10 + 0, j * 10 + 3 * k, i * 10 + zOffset - 3), 7, 1, 1, 20);
-                            toAdd.LinearDamping = .9f;
-                            toAdd.AngularDamping = .9f;
-                            Space.Add(toAdd);
-                            toAdd = new Box(new Vector3(j * 10 + 0, j * 10 + 3 * k, i * 10 + zOffset + 3), 7, 1, 1, 20);
-                            toAdd.LinearDamping = .9f;
-                            toAdd.AngularDamping = .9f;
-                            Space.Add(toAdd);
-                        }
-                    }
-                    Space.Add(new Box(new Vector3(10 * j, -.5f, i * 10 + zOffset), 10, 1f, 10));
-                }
-            }
+            SpawnRow();
 
             game.Camera.Position = new Vector3(-30, 5, 25);
-            game.Camera.Yaw((float) Math.PI / -3);
-            game.Camera.Pitch(-(float) Math.PI / -12);
+            game.Camera.Yaw((float)Math.PI / -3);
+            game.Camera.Pitch(-(float)Math.PI / -12);
+        }
+
+        void SpawnRow()
+        {
+            //Create a bunch of blocks.
+            int zOffset = 5;
+
+            int numColumns = 20;
+
+            float damping = 0.3f;
+            float verticalOffsetPerColumn = 0.5f;
+            float verticalSpacing = 1.5f;
+
+            Entity toAdd;
+            for (int j = 0; j < numColumns; j++)
+            {
+                for (int k = 1; k <= 7; k++)
+                {
+                    if (k % 2 == 1)
+                    {
+                        toAdd = new Box(new Vector3(j * 10 + -3, -0.5f + j * verticalOffsetPerColumn + verticalSpacing * k, rowIndex * 10 + zOffset), 1, 1, 7, 20);
+                        toAdd.LinearDamping = damping;
+                        toAdd.AngularDamping = damping;
+                        Space.Add(toAdd);
+                        Game.ModelDrawer.Add(toAdd);
+                        toAdd.Tag = "noDisplayObject";
+                        toAdd = new Box(new Vector3(j * 10 + 3, -0.5f + j * verticalOffsetPerColumn + verticalSpacing * k, rowIndex * 10 + zOffset), 1, 1, 7, 20);
+                        toAdd.LinearDamping = damping;
+                        toAdd.AngularDamping = damping;
+                        Space.Add(toAdd);
+                        Game.ModelDrawer.Add(toAdd);
+                        toAdd.Tag = "noDisplayObject";
+                    }
+                    else
+                    {
+                        toAdd = new Box(new Vector3(j * 10 + 0, -0.5f + j * verticalOffsetPerColumn + verticalSpacing * k, rowIndex * 10 + zOffset - 3), 7, 1, 1, 20);
+                        toAdd.LinearDamping = damping;
+                        toAdd.AngularDamping = damping;
+                        Space.Add(toAdd);
+                        Game.ModelDrawer.Add(toAdd);
+                        toAdd.Tag = "noDisplayObject";
+                        toAdd = new Box(new Vector3(j * 10 + 0, -0.5f + j * verticalOffsetPerColumn + verticalSpacing * k, rowIndex * 10 + zOffset + 3), 7, 1, 1, 20);
+                        toAdd.LinearDamping = damping;
+                        toAdd.AngularDamping = damping;
+                        Space.Add(toAdd);
+                        Game.ModelDrawer.Add(toAdd);
+                        toAdd.Tag = "noDisplayObject";
+                    }
+                }
+            }
+            var ground = new Box(new Vector3(10 * numColumns * 0.5f - 5, -.5f, rowIndex * 10 + zOffset), 10 * numColumns, 1f, 10);
+            Space.Add(ground);
+            Game.ModelDrawer.Add(ground);
+            ground.Tag = "noDisplayObject";
+            ++rowIndex;
+        }
+
+        public override void Update(float dt)
+        {
+            if (rowIndex < 20)
+            {
+                updatesSinceLastRow++;
+                if (updatesSinceLastRow > 120)
+                {
+                    updatesSinceLastRow = 0;
+                    SpawnRow();
+                }
+            }
+            base.Update(dt);
         }
 
         /// <summary>

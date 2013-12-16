@@ -1,6 +1,6 @@
 ﻿using System;
 using BEPUphysics.Entities;
- 
+
 using BEPUutilities;
 
 namespace BEPUphysics.Constraints.TwoEntity.JointLimits
@@ -32,10 +32,6 @@ namespace BEPUphysics.Constraints.TwoEntity.JointLimits
         /// </summary>
         public EllipseSwingLimit()
         {
-            SpringSettings.Stiffness /= 5;
-            SpringSettings.Advanced.ErrorReductionFactor /= 5;
-            Margin = .05f;
-
             IsActive = false;
         }
 
@@ -57,10 +53,6 @@ namespace BEPUphysics.Constraints.TwoEntity.JointLimits
             SetupJointTransforms(twistAxis);
             MaximumAngleX = maximumAngleX;
             MaximumAngleY = maximumAngleY;
-
-            SpringSettings.Stiffness /= 5;
-            SpringSettings.Advanced.ErrorReductionFactor /= 5;
-            Margin = .05f;
         }
 
         /// <summary>
@@ -74,11 +66,6 @@ namespace BEPUphysics.Constraints.TwoEntity.JointLimits
         {
             ConnectionA = connectionA;
             ConnectionB = connectionB;
-
-
-            SpringSettings.Stiffness /= 5;
-            SpringSettings.Advanced.ErrorReductionFactor /= 5;
-            Margin = .05f;
         }
 
         /// <summary>
@@ -255,6 +242,175 @@ namespace BEPUphysics.Constraints.TwoEntity.JointLimits
             TwistAxisB = twistAxis;
         }
 
+
+        ///<summary>
+        /// Performs the frame's configuration step.
+        ///</summary>
+        ///<param name="dt">Timestep duration.</param>
+        public override void Update(float dt)
+        {
+            //Transform the axes into world space.
+            basis.rotationMatrix = connectionA.orientationMatrix;
+            basis.ComputeWorldSpaceAxes();
+            Matrix3x3.Transform(ref localTwistAxisB, ref connectionB.orientationMatrix, out worldTwistAxisB);
+
+            //Compute the individual swing angles.
+            Quaternion relativeRotation;
+            Quaternion.GetQuaternionBetweenNormalizedVectors(ref worldTwistAxisB, ref basis.primaryAxis, out relativeRotation);
+            Vector3 axis;
+            float angle;
+            Quaternion.GetAxisAngleFromQuaternion(ref relativeRotation, out axis, out angle);
+
+#if !WINDOWS
+            Vector3 axisAngle = new Vector3();
+#else
+            Vector3 axisAngle;
+#endif
+            //This combined axis-angle representation is similar to angular velocity in describing a rotation.
+            //Just like you can dot an axis with angular velocity to get a velocity around that axis,
+            //dotting an axis with the axis-angle representation gets the angle of rotation around that axis.
+            //(As far as the constraint is concerned, anyway.)
+            axisAngle.X = axis.X * angle;
+            axisAngle.Y = axis.Y * angle;
+            axisAngle.Z = axis.Z * angle;
+
+            float angleX;
+            Vector3.Dot(ref axisAngle, ref basis.xAxis, out angleX);
+            float angleY;
+            Vector3.Dot(ref axisAngle, ref basis.yAxis, out angleY);
+
+
+            //The position constraint states that the angles must be within an ellipse. The following is just a reorganization of the x^2 / a^2 + y^2 / b^2 <= 1 definition of an ellipse's area.
+            float maxAngleXSquared = maximumAngleX * maximumAngleX;
+            float maxAngleYSquared = maximumAngleY * maximumAngleY;
+            error = angleX * angleX * maxAngleYSquared + angleY * angleY * maxAngleXSquared - maxAngleXSquared * maxAngleYSquared;
+            
+            if (error <= 0)
+            {
+                isActiveInSolver = false;
+                error = 0;
+                accumulatedImpulse = 0;
+                isLimitActive = false;
+                return;
+            }
+            isLimitActive = true;
+
+
+            //Derive the position constraint with respect to time to get the velocity constraint.
+            //d/dt(x^2 / a^2 + y^2 / b^2) <= d/dt(1)
+            //(2x / a^2) * d/dt(x) + (2y / b^2) * d/dt(y) <= 0
+            //d/dt(x) is dot(angularVelocity, xAxis).
+            //d/dt(y) is dot(angularVelocity, yAxis).
+            //By the scalar multiplication properties of dot products, this can be written as:
+            //dot((2x / a^2) * xAxis, angularVelocity) + dot((2y / b^2) * yAxis, angularVelocity) <= 0
+            //And by the distribute property, rewrite it as:
+            //dot((2x / a^2) * xAxis + (2y / b^2) * yAxis, angularVelocity) <= 0
+            //So, by inspection, the jacobian is:
+            //(2x / a^2) * xAxis + (2y / b^2) * yAxis
+
+            //[some handwaving in the above: 'angularVelocity' is actually the angular velocities of the involved entities combined.
+            //Splitting it out fully would reveal two dot products with equivalent but negated jacobians.]
+
+            //The jacobian is implemented by first considering the local values (2x / a^2) and (2y / b^2).
+#if !WINDOWS
+            Vector2 tangent = new Vector2();
+#else
+            Vector2 tangent;
+#endif
+            tangent.X = 2 * angleX / maxAngleXSquared;
+            tangent.Y = 2 * angleY / maxAngleYSquared;
+
+            //The tangent is then taken into world space using the basis.
+
+            //Create a rotation which swings our basis 'out' to b's world orientation.
+            Quaternion.Conjugate(ref relativeRotation, out relativeRotation);
+            Vector3 sphereTangentX, sphereTangentY;
+            Quaternion.Transform(ref basis.xAxis, ref relativeRotation, out sphereTangentX);
+            Quaternion.Transform(ref basis.yAxis, ref relativeRotation, out sphereTangentY);
+
+            Vector3.Multiply(ref sphereTangentX, tangent.X, out jacobianA); //not actually jA, just storing it there.
+            Vector3.Multiply(ref sphereTangentY, tangent.Y, out jacobianB); //not actually jB, just storing it there.
+            Vector3.Add(ref jacobianA, ref jacobianB, out jacobianA);
+
+            jacobianB.X = -jacobianA.X;
+            jacobianB.Y = -jacobianA.Y;
+            jacobianB.Z = -jacobianA.Z;
+
+
+            float errorReduction;
+            springSettings.ComputeErrorReductionAndSoftness(dt, 1 / dt, out errorReduction, out softness);
+
+            //Compute the error correcting velocity
+            error = error - margin;
+            biasVelocity = MathHelper.Min(Math.Max(error, 0) * errorReduction, maxCorrectiveVelocity);
+
+
+
+            if (bounciness > 0)
+            {
+                float relativeVelocity;
+                float dot;
+                //Find the velocity contribution from each connection
+                Vector3.Dot(ref connectionA.angularVelocity, ref jacobianA, out relativeVelocity);
+                Vector3.Dot(ref connectionB.angularVelocity, ref jacobianB, out dot);
+                relativeVelocity += dot;
+                var lowThreshold = bounceVelocityThreshold * 0.3f;
+                var velocityFraction = MathHelper.Clamp((relativeVelocity - lowThreshold) / (bounceVelocityThreshold - lowThreshold + Toolbox.Epsilon), 0, 1);
+                var bouncinessVelocity = velocityFraction * relativeVelocity * Bounciness;
+                biasVelocity = MathHelper.Max(biasVelocity, bouncinessVelocity);
+            }
+
+
+            //****** EFFECTIVE MASS MATRIX ******//
+            //Connection A's contribution to the mass matrix
+            float entryA;
+            Vector3 transformedAxis;
+            if (connectionA.isDynamic)
+            {
+                Matrix3x3.Transform(ref jacobianA, ref connectionA.inertiaTensorInverse, out transformedAxis);
+                Vector3.Dot(ref transformedAxis, ref jacobianA, out entryA);
+            }
+            else
+                entryA = 0;
+
+            //Connection B's contribution to the mass matrix
+            float entryB;
+            if (connectionB.isDynamic)
+            {
+                Matrix3x3.Transform(ref jacobianB, ref connectionB.inertiaTensorInverse, out transformedAxis);
+                Vector3.Dot(ref transformedAxis, ref jacobianB, out entryB);
+            }
+            else
+                entryB = 0;
+
+            //Compute the inverse mass matrix
+            velocityToImpulse = 1 / (softness + entryA + entryB);
+
+
+        }
+
+        /// <summary>
+        /// Performs any pre-solve iteration work that needs exclusive
+        /// access to the members of the solver updateable.
+        /// Usually, this is used for applying warmstarting impulses.
+        /// </summary>
+        public override void ExclusiveUpdate()
+        {
+            //****** WARM STARTING ******//
+            //Apply accumulated impulse
+            Vector3 impulse;
+            if (connectionA.isDynamic)
+            {
+                Vector3.Multiply(ref jacobianA, accumulatedImpulse, out impulse);
+                connectionA.ApplyAngularImpulse(ref impulse);
+            }
+            if (connectionB.isDynamic)
+            {
+                Vector3.Multiply(ref jacobianB, accumulatedImpulse, out impulse);
+                connectionB.ApplyAngularImpulse(ref impulse);
+            }
+        }
+
         /// <summary>
         /// Computes one iteration of the constraint to meet the solver updateable's goal.
         /// </summary>
@@ -292,165 +448,5 @@ namespace BEPUphysics.Constraints.TwoEntity.JointLimits
             return (Math.Abs(lambda));
         }
 
-        ///<summary>
-        /// Performs the frame's configuration step.
-        ///</summary>
-        ///<param name="dt">Timestep duration.</param>
-        public override void Update(float dt)
-        {
-            //Transform the axes into world space.
-            basis.rotationMatrix = connectionA.orientationMatrix;
-            basis.ComputeWorldSpaceAxes();
-            Matrix3x3.Transform(ref localTwistAxisB, ref connectionB.orientationMatrix, out worldTwistAxisB);
-
-            //Compute the individual swing angles.
-            Quaternion relativeRotation;
-            Quaternion.GetQuaternionBetweenNormalizedVectors(ref worldTwistAxisB, ref basis.primaryAxis, out relativeRotation);
-            Vector3 axis;
-            float angle;
-            Quaternion.GetAxisAngleFromQuaternion(ref relativeRotation, out axis, out angle);
-
-#if !WINDOWS
-            Vector3 axisAngle = new Vector3();
-#else
-            Vector3 axisAngle;
-#endif
-            axisAngle.X = axis.X * angle;
-            axisAngle.Y = axis.Y * angle;
-            axisAngle.Z = axis.Z * angle;
-
-            float angleX;
-            Vector3.Dot(ref axisAngle, ref basis.xAxis, out angleX);
-            float angleY;
-            Vector3.Dot(ref axisAngle, ref basis.yAxis, out angleY);
-
-
-            float maxAngleXSquared = maximumAngleX * maximumAngleX;
-            float maxAngleYSquared = maximumAngleY * maximumAngleY;
-            error = angleX * angleX * maxAngleYSquared + angleY * angleY * maxAngleXSquared - maxAngleXSquared * maxAngleYSquared;
-
-
-            //float ellipseAngle = (float)Math.Atan2(angleY, angleX) + MathHelper.PiOver2;
-            ////This angle may need to have pi/2 added to it, since it is perpendicular
-
-            ////Compute the maximum angle, based on the ellipse
-            //float cosAngle = (float)Math.Cos(ellipseAngle);
-            //float sinAngle = (float)Math.Sin(ellipseAngle);
-            //float denominator = myMaximumAngleX * cosAngle;
-            //denominator *= denominator;
-            //float denominator2 = myMaximumAngleY * sinAngle;
-            //denominator += denominator2 * denominator2;
-            //denominator = (float)Math.Sqrt(denominator);
-
-            //float maximumAngle = myMaximumAngleX * myMaximumAngleY / denominator;
-            //myError = angle - maximumAngle;
-
-            //myError = angleX * angleX / (myMaximumAngleX * myMaximumAngleX) + angleY * angleY / (myMaximumAngleY * myMaximumAngleY) - 1;
-            if (error <= 0)
-            {
-                isActiveInSolver = false;
-                error = 0;
-                accumulatedImpulse = 0;
-                isLimitActive = false;
-                return;
-            }
-            isLimitActive = true;
-
-#if !WINDOWS
-            Vector2 tangent = new Vector2();
-#else
-            Vector2 tangent;
-#endif
-            //tangent.X = angleX * myMaximumAngleY / myMaximumAngleX;
-            //tangent.Y = angleY * myMaximumAngleX / myMaximumAngleY;
-            tangent.X = angleX / maxAngleXSquared;
-            tangent.Y = angleY / maxAngleYSquared;
-            tangent.Normalize();
-
-            //Create a rotation which swings our basis 'out' to b's world orientation.
-            Quaternion.Conjugate(ref relativeRotation, out relativeRotation);
-            Vector3 sphereTangentX, sphereTangentY;
-            Quaternion.Transform(ref basis.xAxis, ref relativeRotation, out sphereTangentX);
-            Quaternion.Transform(ref basis.yAxis, ref relativeRotation, out sphereTangentY);
-
-            Vector3.Multiply(ref sphereTangentX, tangent.X, out jacobianA); //not actually jA, just storing it there.
-            Vector3.Multiply(ref sphereTangentY, tangent.Y, out jacobianB); //not actually jB, just storing it there.
-            Vector3.Add(ref jacobianA, ref jacobianB, out jacobianA);
-            //jacobianA = tangent.X * sphereTangentX + tangent.Y * sphereTangentY;
-
-            jacobianB.X = -jacobianA.X;
-            jacobianB.Y = -jacobianA.Y;
-            jacobianB.Z = -jacobianA.Z;
-
-
-            float errorReduction;
-            springSettings.ComputeErrorReductionAndSoftness(dt, 1 / dt, out errorReduction, out softness);
-
-            //Compute the error correcting velocity
-            error = error - margin;
-            biasVelocity = MathHelper.Min(Math.Max(error, 0) * errorReduction, maxCorrectiveVelocity);
-            if (bounciness > 0)
-            {
-                float relativeVelocity;
-                float dot;
-                //Find the velocity contribution from each connection
-                Vector3.Dot(ref connectionA.angularVelocity, ref jacobianA, out relativeVelocity);
-                Vector3.Dot(ref connectionB.angularVelocity, ref jacobianB, out dot);
-                relativeVelocity += dot;
-                relativeVelocity /= 5; //HEEAAAAACK
-                if (relativeVelocity > bounceVelocityThreshold)
-                    biasVelocity = MathHelper.Max(biasVelocity, bounciness * relativeVelocity);
-            }
-
-
-            //****** EFFECTIVE MASS MATRIX ******//
-            //Connection A's contribution to the mass matrix
-            float entryA;
-            Vector3 transformedAxis;
-            if (connectionA.isDynamic)
-            {
-                Matrix3x3.Transform(ref jacobianA, ref connectionA.inertiaTensorInverse, out transformedAxis);
-                Vector3.Dot(ref transformedAxis, ref jacobianA, out entryA);
-            }
-            else
-                entryA = 0;
-
-            //Connection B's contribution to the mass matrix
-            float entryB;
-            if (connectionB.isDynamic)
-            {
-                Matrix3x3.Transform(ref jacobianB, ref connectionB.inertiaTensorInverse, out transformedAxis);
-                Vector3.Dot(ref transformedAxis, ref jacobianB, out entryB);
-            }
-            else
-                entryB = 0;
-
-            //Compute the inverse mass matrix
-            velocityToImpulse = 1 / (softness + entryA + entryB);
-
-            
-        }
-
-        /// <summary>
-        /// Performs any pre-solve iteration work that needs exclusive
-        /// access to the members of the solver updateable.
-        /// Usually, this is used for applying warmstarting impulses.
-        /// </summary>
-        public override void ExclusiveUpdate()
-        {
-            //****** WARM STARTING ******//
-            //Apply accumulated impulse
-            Vector3 impulse;
-            if (connectionA.isDynamic)
-            {
-                Vector3.Multiply(ref jacobianA, accumulatedImpulse, out impulse);
-                connectionA.ApplyAngularImpulse(ref impulse);
-            }
-            if (connectionB.isDynamic)
-            {
-                Vector3.Multiply(ref jacobianB, accumulatedImpulse, out impulse);
-                connectionB.ApplyAngularImpulse(ref impulse);
-            }
-        }
     }
 }
