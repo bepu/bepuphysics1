@@ -729,7 +729,7 @@ namespace BEPUutilities
                 qz = -qz;
                 qw = -qw;
             }
-            if (qw > 1 - 1e-12)
+            if (qw > 1 - 1e-6)
             {
                 axis = Toolbox.UpVector;
                 angle = 0;

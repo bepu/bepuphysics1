@@ -115,6 +115,7 @@
     <Compile Include="Demos\Extras\Solver Type Tests\JacobiSimulator.cs" />
     <Compile Include="Demos\Extras\Solver Type Tests\Simulator.cs" />
     <Compile Include="Demos\Extras\Tests\CharacterAddRemoveStressTestDemo.cs" />
+    <Compile Include="Demos\Extras\Tests\JointLimitTestDemo.cs" />
     <Compile Include="FixedOffsetCameraControlScheme.cs" />
     <Compile Include="DemosGame.cs" />
     <Compile Include="Demos\ActionFigureDemo.cs" />
