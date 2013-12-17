@@ -284,8 +284,8 @@ namespace BEPUphysics.Constraints.TwoEntity.JointLimits
             float maxAngleXSquared = maximumAngleX * maximumAngleX;
             float maxAngleYSquared = maximumAngleY * maximumAngleY;
             error = angleX * angleX * maxAngleYSquared + angleY * angleY * maxAngleXSquared - maxAngleXSquared * maxAngleYSquared;
-            
-            if (error <= 0)
+
+            if (error < 0)
             {
                 isActiveInSolver = false;
                 error = 0;
@@ -338,12 +338,12 @@ namespace BEPUphysics.Constraints.TwoEntity.JointLimits
 
 
             float errorReduction;
-            springSettings.ComputeErrorReductionAndSoftness(dt, 1 / dt, out errorReduction, out softness);
+            float inverseDt = 1 / dt;
+            springSettings.ComputeErrorReductionAndSoftness(dt, inverseDt, out errorReduction, out softness);
 
             //Compute the error correcting velocity
             error = error - margin;
             biasVelocity = MathHelper.Min(Math.Max(error, 0) * errorReduction, maxCorrectiveVelocity);
-
 
 
             if (bounciness > 0)
@@ -354,11 +354,10 @@ namespace BEPUphysics.Constraints.TwoEntity.JointLimits
                 Vector3.Dot(ref connectionA.angularVelocity, ref jacobianA, out relativeVelocity);
                 Vector3.Dot(ref connectionB.angularVelocity, ref jacobianB, out dot);
                 relativeVelocity += dot;
-                var lowThreshold = bounceVelocityThreshold * 0.3f;
-                var velocityFraction = MathHelper.Clamp((relativeVelocity - lowThreshold) / (bounceVelocityThreshold - lowThreshold + Toolbox.Epsilon), 0, 1);
-                var bouncinessVelocity = velocityFraction * relativeVelocity * Bounciness;
-                biasVelocity = MathHelper.Max(biasVelocity, bouncinessVelocity);
+                biasVelocity = MathHelper.Max(biasVelocity, ComputeBounceVelocity(relativeVelocity));
+
             }
+
 
 
             //****** EFFECTIVE MASS MATRIX ******//
@@ -388,6 +387,7 @@ namespace BEPUphysics.Constraints.TwoEntity.JointLimits
 
 
         }
+
 
         /// <summary>
         /// Performs any pre-solve iteration work that needs exclusive

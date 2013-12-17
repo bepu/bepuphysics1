@@ -62,5 +62,18 @@ namespace BEPUphysics.Constraints.TwoEntity.JointLimits
             get { return margin; }
             set { margin = MathHelper.Max(value, 0); }
         }
+
+        /// <summary>
+        /// Computes the bounce velocity for this limit.
+        /// </summary>
+        /// <param name="impactVelocity">Velocity of the impact on the limit.</param>
+        /// <returns>The resulting bounce velocity of the impact.</returns>
+        protected float ComputeBounceVelocity(float impactVelocity)
+        {
+            var lowThreshold = bounceVelocityThreshold * 0.3f;
+            var velocityFraction = MathHelper.Clamp((impactVelocity - lowThreshold) / (bounceVelocityThreshold - lowThreshold + Toolbox.Epsilon), 0, 1);
+            return velocityFraction * impactVelocity * Bounciness;
+        }
+
     }
 }

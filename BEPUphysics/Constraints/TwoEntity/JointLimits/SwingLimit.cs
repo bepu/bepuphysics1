@@ -271,25 +271,16 @@ namespace BEPUphysics.Constraints.TwoEntity.JointLimits
             //Hinge axis is actually the jacobian entry for angular A (negative angular B).
             Vector3.Cross(ref worldAxisA, ref worldAxisB, out hingeAxis);
             float lengthSquared = hingeAxis.LengthSquared();
-            if (lengthSquared > Toolbox.Epsilon)
-            {
-                //Vector3.Divide(ref hingeAxis, (float)Math.Sqrt(lengthSquared), out hingeAxis);
-            }
-            else
+            if (lengthSquared < Toolbox.Epsilon)
             {
                 //They're parallel; for the sake of continuity, pick some axis which is perpendicular to both that ISN'T the zero vector.
                 Vector3.Cross(ref worldAxisA, ref Toolbox.UpVector, out hingeAxis);
                 lengthSquared = hingeAxis.LengthSquared();
-                if (lengthSquared > Toolbox.Epsilon)
-                {
-                    //Vector3.Divide(ref hingeAxis, (float)Math.Sqrt(lengthSquared), out hingeAxis);
-                }
-                else
+                if (lengthSquared < Toolbox.Epsilon)
                 {
                     //That's improbable; b's world axis was apparently parallel with the up vector!
                     //So just use the right vector (it can't be parallel with both the up and right vectors).
                     Vector3.Cross(ref worldAxisA, ref Toolbox.RightVector, out hingeAxis);
-                    //hingeAxis.Normalize();
                 }
             }
 
@@ -308,10 +299,8 @@ namespace BEPUphysics.Constraints.TwoEntity.JointLimits
                 Vector3 relativeVelocity;
                 Vector3.Subtract(ref connectionA.angularVelocity, ref connectionB.angularVelocity, out relativeVelocity);
                 Vector3.Dot(ref relativeVelocity, ref hingeAxis, out relativeSpeed);
-                if (relativeSpeed < -bounceVelocityThreshold)
-                {
-                    biasVelocity = Math.Max(biasVelocity, bounciness * relativeSpeed);
-                }
+
+                biasVelocity = MathHelper.Max(biasVelocity, ComputeBounceVelocity(-relativeSpeed));
             }
 
             //Connection A's contribution to the mass matrix
