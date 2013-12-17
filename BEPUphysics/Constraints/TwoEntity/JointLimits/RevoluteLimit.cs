@@ -1,7 +1,7 @@
 ﻿using System;
 using BEPUphysics.Entities;
 using BEPUutilities;
- 
+
 
 namespace BEPUphysics.Constraints.TwoEntity.JointLimits
 {
@@ -509,8 +509,7 @@ namespace BEPUphysics.Constraints.TwoEntity.JointLimits
                     Vector3.Dot(ref connectionA.angularVelocity, ref jacobianMinA, out relativeVelocity);
                     Vector3.Dot(ref connectionB.angularVelocity, ref jacobianMinB, out dot);
                     relativeVelocity += dot;
-                    if (-relativeVelocity > bounceVelocityThreshold)
-                        biasVelocity.X = MathHelper.Max(biasVelocity.X, -bounciness * relativeVelocity);
+                    biasVelocity.X = MathHelper.Max(biasVelocity.X, ComputeBounceVelocity(-relativeVelocity));
                 }
             }
             if (maxIsActive)
@@ -526,8 +525,7 @@ namespace BEPUphysics.Constraints.TwoEntity.JointLimits
                         float dot;
                         Vector3.Dot(ref connectionB.angularVelocity, ref jacobianMaxB, out dot);
                         relativeVelocity += dot;
-                        if (-relativeVelocity > bounceVelocityThreshold)
-                            biasVelocity.Y = MathHelper.Max(biasVelocity.Y, -bounciness * relativeVelocity);
+                        biasVelocity.Y = MathHelper.Max(biasVelocity.Y, ComputeBounceVelocity(-relativeVelocity));
                     }
                 }
             }
@@ -588,7 +586,7 @@ namespace BEPUphysics.Constraints.TwoEntity.JointLimits
             velocityToImpulse.X = 1 / (softness + minEntryA + minEntryB);
             velocityToImpulse.Y = 1 / (softness + maxEntryA + maxEntryB);
 
-            
+
         }
 
         /// <summary>

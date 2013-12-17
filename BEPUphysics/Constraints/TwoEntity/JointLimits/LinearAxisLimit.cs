@@ -414,9 +414,9 @@ namespace BEPUphysics.Constraints.TwoEntity.JointLimits
                 Vector3.Dot(ref jAngularB, ref connectionB.angularVelocity, out dot);
                 relativeVelocity += dot;
                 if (unadjustedError > 0 && -relativeVelocity > bounceVelocityThreshold)
-                    biasVelocity = Math.Max(biasVelocity, -relativeVelocity * bounciness);
+                    biasVelocity = Math.Max(biasVelocity, ComputeBounceVelocity(-relativeVelocity));
                 else if (unadjustedError < 0 && relativeVelocity > bounceVelocityThreshold)
-                    biasVelocity = Math.Min(biasVelocity, -relativeVelocity * bounciness);
+                    biasVelocity = Math.Min(biasVelocity, -ComputeBounceVelocity(relativeVelocity));
             }
 
 

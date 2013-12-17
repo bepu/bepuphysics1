@@ -361,8 +361,7 @@ namespace BEPUphysics.Constraints.TwoEntity.JointLimits
                 Vector3.Dot(ref connectionA.angularVelocity, ref jacobianA, out relativeVelocity);
                 Vector3.Dot(ref connectionB.angularVelocity, ref jacobianB, out dot);
                 relativeVelocity += dot;
-                if (-relativeVelocity > bounceVelocityThreshold)
-                    biasVelocity = MathHelper.Max(biasVelocity, -bounciness * relativeVelocity);
+                biasVelocity = MathHelper.Max(biasVelocity, ComputeBounceVelocity(-relativeVelocity));
             }
 
             //The nice thing about this approach is that the jacobian entry doesn't flip.
