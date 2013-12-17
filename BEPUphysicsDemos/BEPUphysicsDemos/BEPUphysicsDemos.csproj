@@ -106,6 +106,7 @@
     <Compile Include="Camera.cs" />
     <Compile Include="CameraControlScheme.cs" />
     <Compile Include="CharacterCameraControlScheme.cs" />
+    <Compile Include="Demos\RagdollDemo.cs" />
     <Compile Include="Demos\Extras\Solver Type Tests\Constraint.cs" />
     <Compile Include="Demos\Extras\Solver Type Tests\SimulatorTestDemo.cs" />
     <Compile Include="Demos\Extras\Solver Type Tests\PlaneCollisionConstraint.cs" />
@@ -192,7 +193,7 @@
     <Compile Include="Demos\Extras\Tests\AddRemoveStressDemo.cs" />
     <Compile Include="Demos\Extras\Tests\MutableCompoundDemo.cs" />
     <Compile Include="Demos\TornadoDemo.cs" />
-    <Compile Include="Demos\UnfortunateGuyDemo.cs" />
+    <Compile Include="Demos\Extras\UnfortunateGuyDemo.cs" />
     <Compile Include="Demos\DiscreteVsContinuousDemo.cs" />
     <Compile Include="Demos\WallDemo.cs" />
     <Compile Include="Extra Display Types\DisplayMotorizedGrabSpring.cs" />
