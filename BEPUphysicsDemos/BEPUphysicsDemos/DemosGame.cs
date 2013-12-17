@@ -92,7 +92,7 @@ namespace BEPUphysicsDemos
                                                     typeof (EarthquakeDemo),
                                                     typeof (BridgeDemo),
                                                     typeof (ActionFigureDemo),
-                                                    typeof (UnfortunateGuyDemo),
+                                                    typeof (RagdollDemo),
                                                     typeof (SawContraptionDemo),
                                                     typeof (DogbotDemo),
                                                     typeof (RobotArmDemo),

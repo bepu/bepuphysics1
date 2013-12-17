@@ -10,7 +10,7 @@ using BEPUphysics.CollisionShapes.ConvexShapes;
 using System.Collections.Generic;
 using BEPUutilities;
 
-namespace BEPUphysicsDemos.Demos
+namespace BEPUphysicsDemos.Demos.Extras
 {
     /// <summary>
     /// A one-armed guy flops on the ground.  Involves a detailed ragdoll-like limb with appropriate limits.
