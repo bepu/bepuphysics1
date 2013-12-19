@@ -365,10 +365,18 @@ namespace BEPUphysics.DeactivationManagement
 
                     }
 
+
+                    //If it was slated for removal, that means the flush stage will try to split it.
+                    //Since it was just added back, splitting is known to be pointless.
+                    //Just set the flag and the flush will ignore the split attempt.
                     if (connection.SlatedForRemoval)
-                        connection.SlatedForRemoval = false; //If it was slated for removal, that means connections are still present.  Just set the flag and the removal system will ignore the removal order.
+                        connection.SlatedForRemoval = false;
                     else
+                    {
+                        //If the connection was NOT slated for removal, that means the reference don't currently exist.
+                        //(If the connection was slated for removal, that would imply the connection existed previously, so it must have had references.)
                         connection.AddReferencesToConnectedMembers();
+                    }
                 }
 
                 addLocker.Exit();
@@ -433,30 +441,14 @@ namespace BEPUphysics.DeactivationManagement
 
             if (connection.DeactivationManager == this)
             {
-                connection.DeactivationManager = null; //TODO: Should it remove here, or in the deferred final case? probably here, since otherwise Add-Remove-Add would throw an exception!
-                //Try to split by examining the connections and breadth-first searching outward.
-                //If it is determined that a split is required, grab a new island and add it.
-                //This is a little tricky because it's a theoretically N-way split.
+                connection.DeactivationManager = null;
 
-                //For two members which have the same simulation island (they will initially), try to split.
-                //debugConnections.Remove(connection);
                 connection.SlatedForRemoval = true;
-                //Don't immediately do the removal.
-                //Defer them!
 
+                //Don't immediately do simulation island management.
+                //Defer the splits!
                 splitAttempts.Enqueue(connection);
 
-                //connection.RemoveReferencesFromConnectedMembers();
-                //for (int i = 0; i < connection.members.count; i++)
-                //{
-                //    for (int j = i + 1; j < connection.members.count; j++)
-                //    {
-                //        //Notice that the splits are not performed immediately! They are deferred and spread over multiple frames.
-                //        //Split operations aren't cheap, and overdoing them can lead to pointless re-merging and re-splitting.
-                //        splitAttempts.Enqueue(new SplitAttempt() { a = connection.members.Elements[i], b = connection.members.Elements[j] });
-                //        //TryToSplit(connection.ConnectedMembers[i], connection.ConnectedMembers[j]);
-                //    }
-                //}
 
             }
             else
@@ -633,8 +625,6 @@ namespace BEPUphysics.DeactivationManagement
                 island.Remove(member);
                 if (island.memberCount == 0)
                 {
-                    simulationIslands.Remove(island);
-                    GiveBackIsland(island);
                     //Even though we appear to have connections, the island was only me!
                     //We can stop now.
                     //Note that we do NOT remove the island from the simulation islands list here.

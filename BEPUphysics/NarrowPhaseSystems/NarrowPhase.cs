@@ -323,8 +323,6 @@ namespace BEPUphysics.NarrowPhaseSystems
                     narrowPhasePairs.FastRemoveAt(i);
                     overlapMapping.Remove(pair.BroadPhaseOverlap);
                     //The clean up will issue an order to get rid of the solver updateable if it is active.
-                    //To avoid a situation where the solver updateable outlives the pair but is available for re-use
-                    //because of the factory giveback here, the updateable is removed directly (ApplySolverUpdateableChangesDirectly = true).
                     pair.CleanUp();
                     pair.Factory.GiveBack(pair);
 
