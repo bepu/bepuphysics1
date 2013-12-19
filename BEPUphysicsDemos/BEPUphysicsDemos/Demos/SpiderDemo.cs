@@ -159,7 +159,7 @@ namespace BEPUphysicsDemos.Demos
         public override void DrawUI()
         {
             base.DrawUI();
-            Game.DataTextDrawer.Draw("QWRT to extend, OPKL to retract.  Good luck!", new Microsoft.Xna.Framework.Vector2(50, 50));
+            Game.DataTextDrawer.Draw("QWRT to retract, OPKL to extend.  Good luck!", new Microsoft.Xna.Framework.Vector2(50, 50));
         }
 
         public override void Update(float dt)

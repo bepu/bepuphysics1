@@ -125,7 +125,7 @@
     <Compile Include="Demos\BridgeDemo.cs" />
     <Compile Include="Demos\BroadPhaseDemo.cs" />
     <Compile Include="Demos\BuoyancyDemo.cs" />
-    <Compile Include="Demos\ClothDemo.cs" />
+    <Compile Include="Demos\Extras\ClothJointLatticeDemo.cs" />
     <Compile Include="Demos\CoefficientsDemo.cs" />
     <Compile Include="Demos\CollisionFilteringDemo.cs" />
     <Compile Include="Demos\ColosseumDemo.cs" />
@@ -141,7 +141,7 @@
     <Compile Include="Demos\Extras\Tests\CharacterStressTestDemo.cs" />
     <Compile Include="Demos\Extras\GraphicMatchingDemo.cs" />
     <Compile Include="Demos\Extras\ReverseTrikeDemo.cs" />
-    <Compile Include="Demos\Extras\SelfCollidingClothDemo.cs" />
+    <Compile Include="Demos\SelfCollidingClothDemo.cs" />
     <Compile Include="Demos\Extras\Tests\AccumulationTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\BroadPhaseMultithreadingTestDemo.cs" />
     <Compile Include="Demos\Extras\Tests\BooleanConvexTestDemo.cs" />

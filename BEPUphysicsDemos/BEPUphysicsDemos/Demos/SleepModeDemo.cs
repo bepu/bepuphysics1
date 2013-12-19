@@ -22,9 +22,9 @@ namespace BEPUphysicsDemos.Demos
         {
             SpawnRow();
 
-            game.Camera.Position = new Vector3(-30, 5, 25);
-            game.Camera.Yaw((float)Math.PI / -3);
-            game.Camera.Pitch(-(float)Math.PI / -12);
+            game.Camera.Position = new Vector3(-30, 30, -30);
+            game.Camera.Yaw((float)(-3 * Math.PI / 4));
+            game.Camera.Pitch(-(float)Math.PI / 12);
         }
 
         void SpawnRow()

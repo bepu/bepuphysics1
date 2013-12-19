@@ -3,18 +3,18 @@ using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
 using BEPUutilities;
 
-namespace BEPUphysicsDemos.Demos
+namespace BEPUphysicsDemos.Demos.Extras
 {
     /// <summary>
     /// A basic lattice of constraints acting like cloth.
     /// </summary>
-    public class ClothDemo : StandardDemo
+    public class ClothJointLatticeDemo : StandardDemo
     {
         /// <summary>
         /// Constructs a new demo.
         /// </summary>
         /// <param name="game">Game owning this demo.</param>
-        public ClothDemo(DemosGame game)
+        public ClothJointLatticeDemo(DemosGame game)
             : base(game)
         {
             //Joints can also act like springs by modifying their springSettings.
@@ -106,7 +106,7 @@ namespace BEPUphysicsDemos.Demos
         /// </summary>
         public override string Name
         {
-            get { return "Cloth Lattice"; }
+            get { return "Cloth Joint Lattice"; }
         }
     }
 }
