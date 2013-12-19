@@ -5,7 +5,7 @@ using BEPUutilities;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.NarrowPhaseSystems;
 
-namespace BEPUphysicsDemos.Demos.Extras
+namespace BEPUphysicsDemos.Demos
 {
     /// <summary>
     /// A basic lattice of constraints acting like cloth.
@@ -26,13 +26,13 @@ namespace BEPUphysicsDemos.Demos.Extras
             Entity latticePiece;
             BallSocketJoint joint;
 
-            NarrowPhaseHelper.Factories.BoxBox.Count = 10000;
-            NarrowPhaseHelper.Factories.BoxSphere.Count = 5000;
+            NarrowPhaseHelper.Factories.BoxBox.Count = 4000;
+            NarrowPhaseHelper.Factories.BoxSphere.Count = 1000;
             
-            int numColumns = 70;
-            int numRows = 70;
-            float xSpacing = .5f;
-            float zSpacing = .5f;
+            int numColumns = 40;
+            int numRows = 40;
+            float xSpacing = 1.0f;
+            float zSpacing = 1.0f;
             var lattice = new Entity[numRows, numColumns];
             for (int i = 0; i < numRows; i++)
                 for (int j = 0; j < numColumns; j++)
@@ -42,7 +42,7 @@ namespace BEPUphysicsDemos.Demos.Extras
                             xSpacing * i - (numRows - 1) * xSpacing / 2f,
                             15.58f,
                             2 + zSpacing * j - (numColumns - 1) * zSpacing / 2f),
-                        xSpacing, .1f, zSpacing, 1);
+                        xSpacing, .2f, zSpacing, 10);
 
                     lattice[i, j] = latticePiece;
 
@@ -50,12 +50,12 @@ namespace BEPUphysicsDemos.Demos.Extras
                 }
             //The joints composing the cloth can have their max iterations set independently from the solver iterations.
             //More iterations (up to the solver's own max) will increase the quality at the cost of speed.
-            int clothIterations = 10;
-            //So while the above prevents joints from using more than 1 iteration, setting the solver's iteration limit can lower the
+            int clothIterations = 3;
+            //So while the above clamps joint iterations, setting the solver's iteration limit can lower the
             //rest of the solving load (collisions).
             Space.Solver.IterationLimit = 10;
 
-            float damping = 5000, stiffness = 5000;
+            float damping = 20000, stiffness = 20000;
             float starchDamping = 5000, starchStiffness = 500;
 
             //Loop through the grid and set up the joints.
@@ -163,7 +163,7 @@ namespace BEPUphysicsDemos.Demos.Extras
         /// </summary>
         public override string Name
         {
-            get { return "Cloth Lattice"; }
+            get { return "Self-Colliding Burlap"; }
         }
     }
 }

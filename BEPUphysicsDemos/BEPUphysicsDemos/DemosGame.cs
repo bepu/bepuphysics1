@@ -89,7 +89,7 @@ namespace BEPUphysicsDemos
                                                     typeof (StaticGroupDemo),
                                                     typeof (EntityConstructionDemo),
                                                     typeof (SpiderDemo),
-                                                    typeof (ClothDemo),
+                                                    typeof (SelfCollidingClothDemo),
                                                     typeof (EarthquakeDemo),
                                                     typeof (BridgeDemo),
                                                     typeof (ActionFigureDemo),
