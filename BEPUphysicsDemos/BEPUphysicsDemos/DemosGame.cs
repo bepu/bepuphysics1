@@ -1,6 +1,7 @@
 using System;
 using BEPUphysics.Entities;
 using BEPUphysicsDemos.Demos;
+using BEPUphysicsDemos.Demos.Extras;
 using BEPUphysicsDemos.Demos.Extras.SolverTypeTests;
 using BEPUphysicsDemos.Demos.Extras.Tests;
 using BEPUphysicsDemos.SampleCode;

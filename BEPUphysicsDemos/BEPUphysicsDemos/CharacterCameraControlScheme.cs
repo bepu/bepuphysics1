@@ -69,7 +69,11 @@ namespace BEPUphysicsDemos
                 //First, find where the camera is expected to be based on the last position and the current velocity.
                 //Note: if the character were a free-floating 6DOF character, this would need to include an angular velocity contribution.
                 //And of course, the camera orientation would be based on the character's orientation.
-                Camera.Position = Camera.Position + Character.Body.LinearVelocity * dt;
+
+                //We use the space's time step since, in the demos, the simulation moves forward one time step per frame.
+                //The passed-in dt, in contrast, does not necessarily correspond to a simulated state and tends to make the camera jittery.
+                var spaceDt = Character.Space != null ? Character.Space.TimeStepSettings.TimeStepDuration : dt;
+                Camera.Position = Camera.Position + Character.Body.LinearVelocity * spaceDt;
                 //Now compute where it should be according the physical body of the character.
                 Vector3 up = Character.Body.OrientationMatrix.Up;
                 Vector3 bodyPosition = Character.Body.BufferedStates.InterpolatedStates.Position;
