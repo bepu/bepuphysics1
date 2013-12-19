@@ -8,6 +8,7 @@ using BEPUphysics.Entities;
 using BEPUphysics.UpdateableSystems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Matrix = BEPUutilities.Matrix;
 
 namespace BEPUphysicsDrawer.Models
 {

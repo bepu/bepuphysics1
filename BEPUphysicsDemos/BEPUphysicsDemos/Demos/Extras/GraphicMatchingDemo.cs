@@ -60,13 +60,13 @@ namespace BEPUphysicsDemos.Demos.Extras
             //But for now, let's just use the prefab entity type.  As mentioned earlier, the constructor set the entity's Position using the computed center.
             //Since we didn't overwrite it with some other position yet, we can still use it.
             graphic = new DisplayEntityModel(hull, model, game.ModelDrawer);
-            graphic.LocalTransform = MathConverter.Convert(Matrix.CreateTranslation(-hull.Position));
+            graphic.LocalTransform = Matrix.CreateTranslation(-hull.Position);
             game.ModelDrawer.Add(graphic);
 
             //This graphic is perfectly aligned with the collision shape!  Hooray!
 
 
-            Box ground = new Box(new BEPUutilities.Vector3(0, -1.5f, 0), 50, 1, 50);
+            Box ground = new Box(new Vector3(0, -1.5f, 0), 50, 1, 50);
             Space.Add(ground);
             game.Camera.Position = new Vector3(0, 6, 15);
         }

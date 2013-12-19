@@ -1,7 +1,8 @@
-﻿using BEPUphysics.Entities;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿
+using BEPUphysics.Entities;
+using BEPUutilities;
 using ConversionHelper;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace BEPUphysicsDrawer.Models
 {
@@ -17,7 +18,7 @@ namespace BEPUphysicsDrawer.Models
         /// <summary>
         /// Bone transformations of meshes in the model.
         /// </summary>
-        private Matrix[] transforms;
+        private Microsoft.Xna.Framework.Matrix[] transforms;
 
         /// <summary>
         /// Constructs a new display model.
@@ -47,7 +48,7 @@ namespace BEPUphysicsDrawer.Models
             set
             {
                 myModel = value;
-                transforms = new Matrix[myModel.Bones.Count];
+                transforms = new Microsoft.Xna.Framework.Matrix[myModel.Bones.Count];
                 for (int i = 0; i < Model.Meshes.Count; i++)
                 {
                     for (int j = 0; j < Model.Meshes[i].Effects.Count; j++)
@@ -104,7 +105,7 @@ namespace BEPUphysicsDrawer.Models
         /// </summary>
         public override void Update()
         {
-            WorldTransform = LocalTransform * MathConverter.Convert(Entity.WorldTransform);
+            WorldTransform = LocalTransform * Entity.WorldTransform;
         }
 
         /// <summary>
@@ -124,9 +125,9 @@ namespace BEPUphysicsDrawer.Models
                     var effect = Model.Meshes[i].Effects[j] as BasicEffect;
                     if (effect != null)
                     {
-                        effect.World = transforms[Model.Meshes[i].ParentBone.Index] * WorldTransform;
-                        effect.View = viewMatrix;
-                        effect.Projection = projectionMatrix;
+                        effect.World = transforms[Model.Meshes[i].ParentBone.Index] * MathConverter.Convert(WorldTransform);
+                        effect.View = MathConverter.Convert(viewMatrix);
+                        effect.Projection = MathConverter.Convert(projectionMatrix);
                     }
                 }
                 Model.Meshes[i].Draw();

@@ -201,7 +201,7 @@ namespace BEPUphysicsDemos.AlternateMovement
             //Update the wheel's graphics.
             for (int k = 0; k < 4; k++)
             {
-                WheelModels[k].WorldTransform = MathConverter.Convert(Vehicle.Wheels[k].Shape.WorldTransform);
+                WheelModels[k].WorldTransform = Vehicle.Wheels[k].Shape.WorldTransform;
             }
 
             if (IsActive)

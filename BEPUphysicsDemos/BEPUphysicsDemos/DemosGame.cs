@@ -390,8 +390,8 @@ namespace BEPUphysicsDemos
         {
             GraphicsDevice.Clear(new Color(.41f, .41f, .45f, 1));
 
-            var viewMatrix = MathConverter.Convert(Camera.ViewMatrix);
-            var projectionMatrix = MathConverter.Convert(Camera.ProjectionMatrix);
+            var viewMatrix = Camera.ViewMatrix;
+            var projectionMatrix = Camera.ProjectionMatrix;
             if (displayEntities)
                 ModelDrawer.Draw(viewMatrix, projectionMatrix);
 
@@ -401,8 +401,8 @@ namespace BEPUphysicsDemos
             LineDrawer.LightingEnabled = false;
             LineDrawer.VertexColorEnabled = true;
             LineDrawer.World = Matrix.Identity;
-            LineDrawer.View = viewMatrix;
-            LineDrawer.Projection = projectionMatrix;
+            LineDrawer.View = MathConverter.Convert(viewMatrix);
+            LineDrawer.Projection = MathConverter.Convert(projectionMatrix);
 
             if (displayContacts)
                 ContactDrawer.Draw(LineDrawer, currentSimulation.Space);
