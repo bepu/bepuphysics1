@@ -972,7 +972,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
                     Matrix.CreateFromQuaternion(ref bones[i].Bone.Orientation, out transform);
                     Matrix.Multiply(ref localTransform, ref transform, out transform);
                     transform.Translation = bones[i].Bone.Position;
-                    bones[i].DisplayBone.WorldTransform = MathConverter.Convert(transform);
+                    bones[i].DisplayBone.WorldTransform = transform;
 
                     if (bones[i].Bone.Pinned)
                         bones[i].DisplayBone.Color = new Microsoft.Xna.Framework.Vector3(0, 0, 1);
@@ -1015,7 +1015,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
         {
             if (usingIK)
             {
-                drawer.Draw(MathConverter.Convert(Game.Camera.ViewMatrix), MathConverter.Convert(Game.Camera.ProjectionMatrix));
+                drawer.Draw(Game.Camera.ViewMatrix, Game.Camera.ProjectionMatrix);
             }
             base.Draw();
         }

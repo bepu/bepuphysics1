@@ -1,7 +1,10 @@
-﻿using System.Collections.Generic;
+﻿
+using System.Collections.Generic;
+using ConversionHelper;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Matrix = BEPUutilities.Matrix;
 
 namespace BEPUphysicsDrawer.Models
 {
@@ -109,8 +112,8 @@ namespace BEPUphysicsDrawer.Models
         /// <param name="projectionMatrix">Projection matrix to use to draw the objects.</param>
         protected override void DrawManagedModels(Matrix viewMatrix, Matrix projectionMatrix)
         {
-            viewParameter.SetValue(viewMatrix);
-            projectionParameter.SetValue(projectionMatrix);
+            viewParameter.SetValue(MathConverter.Convert(viewMatrix));
+            projectionParameter.SetValue(MathConverter.Convert(projectionMatrix));
 
             for (int i = 0; i < instancingEffect.CurrentTechnique.Passes.Count; i++)
             {
