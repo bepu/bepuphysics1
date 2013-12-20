@@ -19,6 +19,7 @@ syntax: glob
 *.sbr
 *.scc
 *.orig
+*.cachefile
 [Bb]in
 [Dd]ebug*/
 obj/
