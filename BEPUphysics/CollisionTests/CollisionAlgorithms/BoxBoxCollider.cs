@@ -47,13 +47,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
     /// Basic storage structure for contact data.
     /// Designed for performance critical code and pointer access.
     /// </summary>
-#if WINDOWS
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-#else
-#if XBOX360
     [StructLayout(LayoutKind.Sequential)]
-#endif
-#endif
     public struct BoxContactDataCache
     {
         public BoxContactData D1;
@@ -66,15 +60,6 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
         public BoxContactData D7;
         public BoxContactData D8;
 
-        //internal BoxContactData d9;
-        //internal BoxContactData d10;
-        //internal BoxContactData d11;
-        //internal BoxContactData d12;
-
-        //internal BoxContactData d13;
-        //internal BoxContactData d14;
-        //internal BoxContactData d15;
-        //internal BoxContactData d16;
 
         /// <summary>
         /// Number of elements in the cache.
@@ -3672,135 +3657,6 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             //output.Add(ref itemA);
             //input.Get(maximumIndex, out itemA);
             //output.Add(ref itemA);
-        }
-#endif
-#if EXCLUDED
-        private static unsafe void clipFacesSH(ref BoxFace clipFace, ref BoxFace face, ref Vector3 mtd, out BoxContactDataCache outputData)
-        {
-            BoxContactDataCache contactDataCache = new BoxContactDataCache();
-            BoxContactData* data = &contactDataCache.d1;
-
-            //Set up the initial face list.
-            data[0].position = face.v1;
-            data[0].id = face.id1;
-            data[1].position = face.v2;
-            data[1].id = face.id2;
-            data[2].position = face.v3;
-            data[2].id = face.id3;
-            data[3].position = face.v4;
-            data[3].id = face.id4;
-            contactDataCache.count = 4;
-
-            BoxContactDataCache temporaryCache;
-            BoxContactData* temp = &temporaryCache.d1;
-            FaceEdge clippingEdge;
-            Vector3 intersection;
-            for (int i = 0; i < 4; i++)
-            {//For each clipping edge (edges of face a)
-
-                clipFace.GetEdge(i, ref mtd, out clippingEdge);
-
-                temporaryCache = contactDataCache;
-
-                contactDataCache.count = 0;
-
-                Vector3 start = temp[temporaryCache.count - 1].position;
-                int startId = temp[temporaryCache.count - 1].id;
-
-
-                for (int j = 0; j < temporaryCache.count; j++)
-                {//For each point in the input list
-                    Vector3 end = temp[j].position;
-                    int endId = temp[j].id;
-                    if (clippingEdge.isPointInside(ref end))
-                    {
-                        if (!clippingEdge.isPointInside(ref start))
-                        {
-                            ComputeIntersection(ref start, ref end, ref mtd, ref clippingEdge, out intersection);
-                            if (contactDataCache.count < 8)
-                            {
-                                data[contactDataCache.count].position = intersection;
-                                data[contactDataCache.count].id = GetContactId(startId, endId, ref clippingEdge);
-                                contactDataCache.count++;
-                            }
-                            else
-                            {
-                                data[contactDataCache.count - 1].position = intersection;
-                                data[contactDataCache.count - 1].id = GetContactId(startId, endId, ref clippingEdge);
-                            }
-                        }
-                        if (contactDataCache.count < 8)
-                        {
-                            data[contactDataCache.count].position = end;
-                            data[contactDataCache.count].id = endId;
-                            contactDataCache.count++;
-                        }
-                        else
-                        {
-                            data[contactDataCache.count - 1].position = end;
-                            data[contactDataCache.count - 1].id = endId;
-                        }
-                    }
-                    else if (clippingEdge.isPointInside(ref start))
-                    {
-                        ComputeIntersection(ref start, ref end, ref mtd, ref clippingEdge, out intersection);
-                        if (contactDataCache.count < 8)
-                        {
-                            data[contactDataCache.count].position = intersection;
-                            data[contactDataCache.count].id = GetContactId(startId, endId, ref clippingEdge);
-                            contactDataCache.count++;
-                        }
-                        else
-                        {
-                            data[contactDataCache.count - 1].position = intersection;
-                            data[contactDataCache.count - 1].id = GetContactId(startId, endId, ref clippingEdge);
-                        }
-                    }
-                    start = end;
-                    startId = endId;
-                }
-            }
-            temporaryCache = contactDataCache;
-            contactDataCache.count = 0;
-
-            float depth;
-            float a, b;
-            Vector3.Dot(ref clipFace.v1, ref mtd, out a);
-            for (int i = 0; i < temporaryCache.count; i++)
-            {
-                Vector3.Dot(ref temp[i].position, ref mtd, out b);
-                depth = b - a;
-                if (depth <= 0)
-                {
-                    data[contactDataCache.count].position = temp[i].position;
-                    data[contactDataCache.count].id = temp[i].id;
-                    contactDataCache.count++;
-                }
-            }
-
-            outputData = contactDataCache;
-
-            /*
-             * 
-  List outputList = subjectPolygon;
-  for (Edge clipEdge in clipPolygon) do
-     List inputList = outputList;
-     outputList.clear();
-     Point S = inputList.last;
-     for (Point E in inputList) do
-        if (E inside clipEdge) then
-           if (S not inside clipEdge) then
-              outputList.add(ComputeIntersection(S,E,clipEdge));
-           end if
-           outputList.add(E);
-        else if (S inside clipEdge) then
-           outputList.add(ComputeIntersection(S,E,clipEdge));
-        end if
-        S = E;
-     done
-  done
-             */
-
         }
 #endif
 
