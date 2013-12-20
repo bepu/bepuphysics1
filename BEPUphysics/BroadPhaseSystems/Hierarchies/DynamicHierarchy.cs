@@ -48,8 +48,8 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
         /// Going above the tested core count theoretically benefits from a '0 if power of 2, 2 otherwise' rule of thumb.
         /// </summary>
         private int[] threadSplitOffsets = new[]
-#if !XBOX360
- { 0, 0, 4, 1, 2, 2, 2, 0, 2, 2, 2, 2 };
+#if WINDOWS
+        { 0, 0, 4, 1, 2, 2, 2, 0, 2, 2, 2, 2 };
 #else
         { 2, 2, 2, 1};
 #endif

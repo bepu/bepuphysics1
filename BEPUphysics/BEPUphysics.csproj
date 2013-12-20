@@ -378,6 +378,9 @@
     <Compile Include="BroadPhaseEntries\Events\CollisionEventTypes.cs" />
     <Compile Include="BroadPhaseEntries\DetectorVolume.cs" />
     <Compile Include="PhysicsChecker.cs" />
+    <Compile Include="UpdateableSystems\CombinedUpdateable.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="UpdateableSystems\ForceFields\BoundingSphereForceFieldShape.cs" />
     <Compile Include="Vehicle\CylinderCastWheelShape.cs" />
     <Compile Include="Vehicle\WheelFrictionBlender.cs" />
@@ -429,7 +432,6 @@
     <Compile Include="Threading\SimpleLooper.cs" />
     <Compile Include="Threading\TPLLoopProvider.cs" />
     <Compile Include="TimeStepSettings.cs" />
-    <Compile Include="UpdateableSystems\CombinedUpdateable.cs" />
     <Compile Include="UpdateableSystems\FluidVolume.cs" />
     <Compile Include="UpdateableSystems\ForceFields\BoundingBoxForceFieldShape.cs" />
     <Compile Include="UpdateableSystems\ForceFields\ForceField.cs" />

@@ -11,7 +11,11 @@ namespace ConversionHelper
         //Vector2
         public static Vector2 Convert(BEPUutilities.Vector2 bepuVector)
         {
+#if XBOX360
+            Vector2 toReturn = new Vector2();
+#else
             Vector2 toReturn;
+#endif
             toReturn.X = bepuVector.X;
             toReturn.Y = bepuVector.Y;
             return toReturn;
@@ -19,6 +23,9 @@ namespace ConversionHelper
 
         public static void Convert(ref BEPUutilities.Vector2 bepuVector, out Vector2 xnaVector)
         {
+#if XBOX360
+            xnaVector = new Vector2();
+#endif
             xnaVector.X = bepuVector.X;
             xnaVector.Y = bepuVector.Y;
         }
@@ -40,7 +47,11 @@ namespace ConversionHelper
         //Vector3
         public static Vector3 Convert(BEPUutilities.Vector3 bepuVector)
         {
+#if XBOX360
+            Vector3 toReturn = new Vector3();
+#else 
             Vector3 toReturn;
+#endif
             toReturn.X = bepuVector.X;
             toReturn.Y = bepuVector.Y;
             toReturn.Z = bepuVector.Z;
@@ -49,6 +60,9 @@ namespace ConversionHelper
 
         public static void Convert(ref BEPUutilities.Vector3 bepuVector, out Vector3 xnaVector)
         {
+#if XBOX360
+            xnaVector = new Vector3();
+#endif
             xnaVector.X = bepuVector.X;
             xnaVector.Y = bepuVector.Y;
             xnaVector.Z = bepuVector.Z;
@@ -109,6 +123,9 @@ namespace ConversionHelper
 
         public static void Convert(ref BEPUutilities.Matrix matrix, out Matrix xnaMatrix)
         {
+#if XBOX360
+            xnaMatrix = new Matrix();
+#endif
             xnaMatrix.M11 = matrix.M11;
             xnaMatrix.M12 = matrix.M12;
             xnaMatrix.M13 = matrix.M13;
@@ -164,6 +181,9 @@ namespace ConversionHelper
 
         public static void Convert(ref BEPUutilities.Matrix3x3 matrix, out Matrix xnaMatrix)
         {
+#if XBOX360
+            xnaMatrix = new Matrix();
+#endif
             xnaMatrix.M11 = matrix.M11;
             xnaMatrix.M12 = matrix.M12;
             xnaMatrix.M13 = matrix.M13;
@@ -204,7 +224,11 @@ namespace ConversionHelper
         //Quaternion
         public static Quaternion Convert(BEPUutilities.Quaternion quaternion)
         {
+#if XBOX360
+            Quaternion toReturn = new Quaternion();
+#else
             Quaternion toReturn;
+#endif
             toReturn.X = quaternion.X;
             toReturn.Y = quaternion.Y;
             toReturn.Z = quaternion.Z;
@@ -224,6 +248,9 @@ namespace ConversionHelper
 
         public static void Convert(ref BEPUutilities.Quaternion bepuQuaternion, out Quaternion quaternion)
         {
+#if XBOX360
+            quaternion = new Quaternion();
+#endif
             quaternion.X = bepuQuaternion.X;
             quaternion.Y = bepuQuaternion.Y;
             quaternion.Z = bepuQuaternion.Z;
