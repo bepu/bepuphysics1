@@ -717,17 +717,9 @@ namespace BEPUphysics.Entities
         /// <param name="impulse">Impulse to apply.</param>
         public void ApplyLinearImpulse(ref Vector3 impulse)
         {
-#if WINDOWS_PHONE
-            //Some XNA math methods support SIMD on the phone.
-            //This would most likely be inlined on the PC anyway, but the XBOX360 is a questionmark.
-            //Just inline those platforms manually.
-            Vector3.Multiply(ref impulse, inverseMass, out velocityChange);
-            Vector3.Add(ref velocityChange, ref linearVelocity, out linearVelocity);
-#else
             linearVelocity.X += impulse.X * inverseMass;
             linearVelocity.Y += impulse.Y * inverseMass;
             linearVelocity.Z += impulse.Z * inverseMass;
-#endif
             MathChecker.Validate(linearVelocity);
 
         }
