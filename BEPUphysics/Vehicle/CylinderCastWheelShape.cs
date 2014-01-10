@@ -49,7 +49,11 @@ namespace BEPUphysics.Vehicle
         public override sealed float Radius
         {
             get { return shape.Radius; }
-            set { shape.Radius = MathHelper.Max(value, 0); }
+            set
+            {
+                shape.Radius = MathHelper.Max(value, 0);
+                Initialize();
+            }
         }
 
         /// <summary>
@@ -58,7 +62,11 @@ namespace BEPUphysics.Vehicle
         public float Width
         {
             get { return shape.Height; }
-            set { shape.Height = MathHelper.Max(value, 0); }
+            set
+            {
+                shape.Height = MathHelper.Max(value, 0);
+                Initialize();
+            }
         }
 
         /// <summary>
