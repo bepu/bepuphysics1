@@ -85,7 +85,9 @@
     <Compile Include="IKTwistJoint.cs" />
     <Compile Include="IKTwistLimit.cs" />
     <Compile Include="SingleBoneAngularMotor.cs" />
-    <Compile Include="SingleBoneConstraint.cs" />
+    <Compile Include="SingleBoneConstraint.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="SingleBoneLinearMotor.cs" />
     <Compile Include="StateControl.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

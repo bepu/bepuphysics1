@@ -75,7 +75,7 @@ namespace BEPUphysics.Vehicle
 
         /// <summary>
         /// Gets the the current length of the suspension.
-        /// This will be less than the restLength if the suspension is compressed.
+        /// This will be less than the RestLength if the suspension is compressed.
         /// </summary>
         public float CurrentLength
         {
@@ -94,28 +94,14 @@ namespace BEPUphysics.Vehicle
                 if (wheel != null && wheel.vehicle != null)
                 {
                     RigidTransform.Transform(ref localAttachmentPoint, ref wheel.vehicle.Body.CollisionInformation.worldTransform, out worldAttachmentPoint);
+
                 }
                 else
                     worldAttachmentPoint = localAttachmentPoint;
             }
         }
 
-        /// <summary>
-        /// Gets or sets the direction of the wheel suspension in the local space of the vehicle body.
-        /// A normal, straight suspension would be (0,-1,0).
-        /// </summary>
-        public Vector3 LocalDirection
-        {
-            get { return localDirection; }
-            set
-            {
-                localDirection = Vector3.Normalize(value);
-                if (wheel != null && wheel.vehicle != null)
-                    Matrix3x3.Transform(ref localDirection, ref wheel.vehicle.Body.orientationMatrix, out worldDirection);
-                else
-                    worldDirection = localDirection;
-            }
-        }
+
 
         /// <summary>
         /// Gets or sets the maximum speed at which the suspension will try to return the suspension to rest length.
@@ -141,7 +127,12 @@ namespace BEPUphysics.Vehicle
         public float RestLength
         {
             get { return restLength; }
-            set { restLength = value; }
+            set
+            {
+                restLength = value;
+                if (wheel != null)
+                    wheel.shape.Initialize();
+            }
         }
 
         /// <summary>
@@ -180,6 +171,25 @@ namespace BEPUphysics.Vehicle
         }
 
         /// <summary>
+        /// Gets or sets the direction of the wheel suspension in the local space of the vehicle body.
+        /// A normal, straight suspension would be (0,-1,0).
+        /// </summary>
+        public Vector3 LocalDirection
+        {
+            get { return localDirection; }
+            set
+            {
+                localDirection = Vector3.Normalize(value);
+                if (wheel != null)
+                    wheel.shape.Initialize();
+                if (wheel != null && wheel.vehicle != null)
+                    Matrix3x3.Transform(ref localDirection, ref wheel.vehicle.Body.orientationMatrix, out worldDirection);
+                else
+                    worldDirection = localDirection;
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the direction of the wheel suspension in the world space of the vehicle body.
         /// </summary>
         public Vector3 WorldDirection
@@ -188,10 +198,10 @@ namespace BEPUphysics.Vehicle
             set
             {
                 worldDirection = Vector3.Normalize(value);
+                if (wheel != null)
+                    wheel.shape.Initialize();
                 if (wheel != null && wheel.vehicle != null)
-                {
                     Matrix3x3.TransformTranspose(ref worldDirection, ref wheel.Vehicle.Body.orientationMatrix, out localDirection);
-                }
                 else
                     localDirection = worldDirection;
             }

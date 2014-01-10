@@ -2,7 +2,7 @@
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.Entities;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
- 
+
 using BEPUphysics.CollisionRuleManagement;
 using BEPUutilities;
 using BEPUphysics.Materials;
@@ -41,7 +41,11 @@ namespace BEPUphysics.Vehicle
         public override sealed float Radius
         {
             get { return graphicalRadius; }
-            set { graphicalRadius = Math.Max(value, 0); }
+            set
+            {
+                graphicalRadius = Math.Max(value, 0);
+                Initialize();
+            }
         }
 
         /// <summary>
