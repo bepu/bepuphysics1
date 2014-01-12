@@ -124,7 +124,6 @@ namespace BEPUphysicsDemos.AlternateMovement
                                  new WheelSlidingFriction(4, 5)));
 
 
-
             foreach (Wheel wheel in Vehicle.Wheels)
             {
                 //This is a cosmetic setting that makes it looks like the car doesn't have antilock brakes.

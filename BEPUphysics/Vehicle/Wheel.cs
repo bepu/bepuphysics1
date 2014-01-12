@@ -1,7 +1,7 @@
 ﻿using System;
 using BEPUphysics.Entities;
 using BEPUphysics.UpdateableSystems;
- 
+
 using BEPUutilities;
 using BEPUphysics.Materials;
 using BEPUphysics.BroadPhaseEntries;
@@ -154,13 +154,21 @@ namespace BEPUphysics.Vehicle
             set
             {
                 if (shape != null)
+                {
+                    //if the vehicle is already in the space, replacing the shape removes the existing shape from the space.
+                    if (vehicle != null && vehicle.space != null)
+                        shape.OnRemovalFromSpace(vehicle.space);
                     shape.Wheel = null;
+                }
                 if (value != null)
                 {
                     if (value.Wheel == null)
                     {
                         value.Wheel = this;
                         value.Initialize();
+                        //If the vehicle is already in the space, replacing the shape adds the new shape to the space.
+                        if (vehicle != null && vehicle.space != null)
+                            value.OnAdditionToSpace(vehicle.space);
                     }
                     else
                         throw new InvalidOperationException("Can't use a wheel shape object that already belongs to another wheel.");
@@ -460,16 +468,13 @@ namespace BEPUphysics.Vehicle
             //Make sure it doesn't collide with anything.
 
             shape.OnAdditionToSpace(space);
-            shape.UpdateDetectorPosition(); //Need to put the detectors in appropriate locations before adding since otherwise overloads the broadphase
-            space.Add(shape.detector);
+
         }
 
 
 
         internal void OnRemovalFromSpace(Space space)
         {
-            space.Remove(shape.detector);
-
             shape.OnRemovalFromSpace(space);
         }
 

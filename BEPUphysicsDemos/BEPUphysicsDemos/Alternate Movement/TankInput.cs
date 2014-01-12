@@ -369,7 +369,10 @@ namespace BEPUphysicsDemos.AlternateMovement
                     if (keyboardInput.IsKeyDown(Keys.S))
                     {
                         //Turn left while going forward
-                        wheelsToAccelerate = rightTrack;
+                        foreach (Wheel wheel in rightTrack)
+                        {
+                            wheel.DrivingMotor.TargetSpeed = ForwardSpeed;
+                        }
                         foreach (Wheel wheel in leftTrack)
                         {
                             //Tell one of the tracks to reverse direction, but don't let it 
@@ -385,8 +388,11 @@ namespace BEPUphysicsDemos.AlternateMovement
                     }
                     else if (keyboardInput.IsKeyDown(Keys.F))
                     {
-                        //Turn right while going forward
-                        wheelsToAccelerate = leftTrack;
+                        //Turn right while going forward            
+                        foreach (Wheel wheel in leftTrack)
+                        {
+                            wheel.DrivingMotor.TargetSpeed = ForwardSpeed;
+                        }
                         foreach (Wheel wheel in rightTrack)
                         {
                             wheel.DrivingMotor.TargetSpeed = BackwardSpeed;
@@ -396,21 +402,22 @@ namespace BEPUphysicsDemos.AlternateMovement
                     }
                     else
                     {
-                        wheelsToAccelerate = Vehicle.Wheels;
+                        foreach (Wheel wheel in Vehicle.Wheels)
+                        {
+                            wheel.DrivingMotor.TargetSpeed = ForwardSpeed;
+                        }
                     }
 
-                    //Drive
-                    foreach (Wheel wheel in wheelsToAccelerate)
-                    {
-                        wheel.DrivingMotor.TargetSpeed = ForwardSpeed;
-                    }
                 }
                 else if (keyboardInput.IsKeyDown(Keys.D))
                 {
                     if (keyboardInput.IsKeyDown(Keys.F))
                     {
                         //Turn right while going back
-                        wheelsToAccelerate = rightTrack;
+                        foreach (var wheel in rightTrack)
+                        {
+                            wheel.DrivingMotor.TargetSpeed = BackwardSpeed;
+                        }
                         foreach (Wheel wheel in leftTrack)
                         {
                             wheel.DrivingMotor.TargetSpeed = ForwardSpeed;
@@ -421,7 +428,10 @@ namespace BEPUphysicsDemos.AlternateMovement
                     else if (keyboardInput.IsKeyDown(Keys.S))
                     {
                         //Turn left while going back
-                        wheelsToAccelerate = leftTrack;
+                        foreach (var wheel in leftTrack)
+                        {
+                            wheel.DrivingMotor.TargetSpeed = BackwardSpeed;
+                        }
                         foreach (Wheel wheel in rightTrack)
                         {
                             wheel.DrivingMotor.TargetSpeed = ForwardSpeed;
@@ -431,13 +441,12 @@ namespace BEPUphysicsDemos.AlternateMovement
                     }
                     else
                     {
-                        wheelsToAccelerate = Vehicle.Wheels;
+                        foreach (Wheel wheel in Vehicle.Wheels)
+                        {
+                            wheel.DrivingMotor.TargetSpeed = BackwardSpeed;
+                        }
                     }
-                    //Reverse                    
-                    foreach (Wheel wheel in wheelsToAccelerate)
-                    {
-                        wheel.DrivingMotor.TargetSpeed = BackwardSpeed;
-                    }
+      
                 }
                 else if (keyboardInput.IsKeyDown(Keys.S))
                 {

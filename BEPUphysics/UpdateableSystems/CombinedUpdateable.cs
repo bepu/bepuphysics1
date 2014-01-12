@@ -56,17 +56,6 @@ namespace BEPUphysics.UpdateableSystems
         }
 
 
-        Space ISpaceObject.Space
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Gets or sets the user data associated with this object.
-        /// </summary>
-        public new object Tag { get; set; }
-
         #endregion
 
     }
