@@ -86,9 +86,9 @@ namespace BEPUphysics.Vehicle
         /// <summary>
         /// Gets the list of wheels supporting the vehicle.
         /// </summary>
-        public List<Wheel> Wheels
+        public ReadOnlyList<Wheel> Wheels
         {
-            get { return wheels; }
+            get { return new ReadOnlyList<Wheel>(wheels); }
         }
 
 
@@ -171,7 +171,7 @@ namespace BEPUphysics.Vehicle
         {
             if (wheel.vehicle == null)
             {
-                Wheels.Add(wheel);
+                wheels.Add(wheel);
                 wheel.OnAddedToVehicle(this);
             }
             else
@@ -187,7 +187,7 @@ namespace BEPUphysics.Vehicle
             if (wheel.vehicle == this)
             {
                 wheel.OnRemovedFromVehicle();
-                Wheels.Remove(wheel);
+                wheels.Remove(wheel);
             }
             else
                 throw new InvalidOperationException("Can't remove a wheel from a vehicle that does not own it.");
