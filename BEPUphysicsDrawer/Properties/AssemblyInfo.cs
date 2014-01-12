@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyProduct("BEPUphysicsDrawer")]
 [assembly: AssemblyDescription("Debug visualizer for BEPUphysics")]
 [assembly: AssemblyCompany("Bepu Entertainment LLC")]
-[assembly: AssemblyCopyright("Copyright © 2013, Bepu Entertainment LLC")]
+[assembly: AssemblyCopyright("Copyright © 2014, Bepu Entertainment LLC")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -34,5 +34,5 @@ using System.Runtime.InteropServices;
 //      Revision
 //
 
-[assembly: AssemblyVersion("1.3.0.0")]
+[assembly: AssemblyVersion("1.4.0.0")]
 [assembly: AssemblyFileVersionAttribute("0")]

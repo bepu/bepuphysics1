@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyProduct("BEPUphysics")]
 [assembly: AssemblyDescription("Real time physics simulation library")]
 [assembly: AssemblyCompany("Bepu Entertainment LLC")]
-[assembly: AssemblyCopyright("Copyright © 2013, Bepu Entertainment LLC")]
+[assembly: AssemblyCopyright("Copyright © 2014, Bepu Entertainment LLC")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -31,7 +31,7 @@ using System.Runtime.InteropServices;
 //      Build Number
 //      Revision
 //
-[assembly: AssemblyVersion("1.3.0.0")]
+[assembly: AssemblyVersion("1.4.0.0")]
 #if WINDOWS_PHONE
 [assembly: CodeGeneration(CodeGenerationFlags.EnableFPIntrinsicsUsingSIMD)]
 #endif
