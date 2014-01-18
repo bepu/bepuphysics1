@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace BEPUutilities.DataStructures
 {
     ///<summary>
-    /// WRaps an enumerable in a temporary enumeration struct.
+    /// Wraps an enumerable in a temporary enumeration struct.
     ///</summary>
     ///<typeparam name="T">Type of the enumerable being iterated.</typeparam>
     public struct ReadOnlyEnumerable<T> : IEnumerable<T>
