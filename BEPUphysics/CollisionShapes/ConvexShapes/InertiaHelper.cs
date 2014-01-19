@@ -563,7 +563,7 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
                 float distance;
                 Vector3.Dot(ref normal, ref fromCenterToPlane, out distance);
                 if (distance < 0)
-                    throw new ArgumentException("Invalid distance: mesh may not be concave, winding may not be consistent, or the center may be outside the mesh.");
+                    throw new ArgumentException("Invalid distance. Ensure the mesh is convex, has consistent winding, and contains the passed-in center.");
 
                 if (distance < minimumDistance)
                     minimumDistance = distance;
