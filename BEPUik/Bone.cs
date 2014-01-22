@@ -151,7 +151,7 @@ namespace BEPUik
         /// <param name="height">Height of the bone.</param>
         public Bone(Vector3 position, Quaternion orientation, float radius, float height)
         {
-            inverseMass = 1;
+            Mass = 1;
             Position = position;
             Orientation = orientation;
             Radius = radius;
