@@ -94,7 +94,7 @@ namespace BEPUphysics.Vehicle
         /// </summary>
         public Vector3 ForceAxis
         {
-            get { return ForceAxis; }
+            get { return forceAxis; }
         }
 
         /// <summary>
