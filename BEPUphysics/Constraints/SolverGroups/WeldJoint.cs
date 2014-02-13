@@ -1,6 +1,7 @@
 ﻿using BEPUphysics.Constraints.TwoEntity;
 using BEPUphysics.Constraints.TwoEntity.Joints;
 using BEPUphysics.Entities;
+using BEPUutilities;
 
 namespace BEPUphysics.Constraints.SolverGroups
 {
@@ -23,19 +24,50 @@ namespace BEPUphysics.Constraints.SolverGroups
             Add(NoRotationJoint);
         }
 
+        private static Vector3 GetAnchorGuess(Entity connectionA, Entity connectionB)
+        {
+            var anchor = new Vector3();
+            if (connectionA != null)
+                anchor += connectionA.position;
+            if (connectionB != null)
+                anchor += connectionB.position;
+            if (connectionA != null && connectionB != null)
+                anchor *= 0.5f;
+            return anchor;
+        }
 
         /// <summary>
         /// Constructs a new constraint which restricts the linear and angular motion between two entities.
+        /// Uses the average of the two entity positions for the anchor.
         /// </summary>
         /// <param name="connectionA">First entity of the constraint pair.</param>
         /// <param name="connectionB">Second entity of the constraint pair.</param>
         public WeldJoint(Entity connectionA, Entity connectionB)
+            :this(connectionA, connectionB, GetAnchorGuess(connectionA, connectionB))
         {
             if (connectionA == null)
                 connectionA = TwoEntityConstraint.WorldEntity;
             if (connectionB == null)
                 connectionB = TwoEntityConstraint.WorldEntity;
             BallSocketJoint = new BallSocketJoint(connectionA, connectionB, (connectionA.position + connectionB.position) * .5f);
+            NoRotationJoint = new NoRotationJoint(connectionA, connectionB);
+            Add(BallSocketJoint);
+            Add(NoRotationJoint);
+        }
+
+        /// <summary>
+        /// Constructs a new constraint which restricts the linear and angular motion between two entities.
+        /// </summary>
+        /// <param name="connectionA">First entity of the constraint pair.</param>
+        /// <param name="connectionB">Second entity of the constraint pair.</param>
+        /// <param name="anchor">The location of the weld.</param>
+        public WeldJoint(Entity connectionA, Entity connectionB, Vector3 anchor)
+        {
+            if (connectionA == null)
+                connectionA = TwoEntityConstraint.WorldEntity;
+            if (connectionB == null)
+                connectionB = TwoEntityConstraint.WorldEntity;
+            BallSocketJoint = new BallSocketJoint(connectionA, connectionB, anchor);
             NoRotationJoint = new NoRotationJoint(connectionA, connectionB);
             Add(BallSocketJoint);
             Add(NoRotationJoint);
