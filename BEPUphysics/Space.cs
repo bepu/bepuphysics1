@@ -11,11 +11,11 @@ using BEPUphysics.Entities;
 using BEPUphysics.EntityStateManagement;
 using BEPUphysics.OtherSpaceStages;
 using BEPUphysics.PositionUpdating;
-using BEPUphysics.Threading;
 using BEPUutilities;
 using BEPUphysics.NarrowPhaseSystems;
 using BEPUphysics.UpdateableSystems;
 using BEPUutilities.DataStructures;
+using BEPUutilities.Threading;
 
 namespace BEPUphysics
 {

@@ -2,9 +2,8 @@
 using System;
 using System.Diagnostics;
 using BEPUphysics;
-using System.Threading;
-using BEPUphysics.Threading;
 using BEPUutilities;
+using BEPUutilities.Threading;
 
 namespace BEPUphysicsDemos.Demos
 {

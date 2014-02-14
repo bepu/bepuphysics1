@@ -3,11 +3,11 @@ using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
 using BEPUutilities;
 using BEPUphysics.NarrowPhaseSystems;
-using BEPUphysics.Threading;
 using BEPUphysics.UpdateableSystems.ForceFields;
 using BEPUphysicsDemos.SampleCode;
 using System.Diagnostics;
 using System;
+using BEPUutilities.Threading;
 
 namespace BEPUphysicsDemos.Demos.Extras.Tests
 {
@@ -42,16 +42,16 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             for (int i = 0; i < reruns; i++)
             {
                 GC.Collect();
-                var threadManager = new SpecializedThreadManager();
+                var looper = new ParallelLooper();
 
 
 
                 //Try different thread counts.
                 for (int j = 0; j < coreCountMax; j++)
                 {
-                    threadManager.AddThread();
+                    looper.AddThread();
                     for (int k = 0; k < simulationBuilders.Length; k++)
-                        testResults[j, k] = RunTest(threadManager, simulationBuilders[k]);
+                        testResults[j, k] = RunTest(looper, simulationBuilders[k]);
                     GC.Collect();
 
                 }

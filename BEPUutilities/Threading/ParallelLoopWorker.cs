@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 
-namespace BEPUphysics.Threading
+namespace BEPUutilities.Threading
 {
     internal class ParallelLoopWorker : IDisposable
     {
@@ -28,31 +28,7 @@ namespace BEPUphysics.Threading
         }
 
 
-        /// <summary>
-        /// Releases resources used by the object.
-        /// </summary>
-        ~ParallelLoopWorker()
-        {
-            Dispose();
-        }
 
-        /// <summary>
-        /// Disposes the worker.
-        /// </summary>
-        public void Dispose()
-        {
-            lock (disposedLocker)
-            {
-                if (!disposed)
-                {
-                    disposed = true;
-                    getToWork.Close();
-                    getToWork = null;
-                    thread = null;
-                    GC.SuppressFinalize(this);
-                }
-            }
-        }
 
 
         internal void Work()
@@ -91,6 +67,34 @@ namespace BEPUphysics.Threading
 
                 manager.OnWorkerFinish();
             }
+        }
+
+
+
+        /// <summary>
+        /// Disposes the worker.
+        /// </summary>
+        public void Dispose()
+        {
+            lock (disposedLocker)
+            {
+                if (!disposed)
+                {
+                    disposed = true;
+                    getToWork.Dispose();
+                    getToWork = null;
+                    thread = null;
+                    GC.SuppressFinalize(this);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Releases resources used by the object.
+        /// </summary>
+        ~ParallelLoopWorker()
+        {
+            Dispose();
         }
     }
 }
