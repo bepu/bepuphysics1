@@ -1,7 +1,7 @@
 ﻿using System;
-using BEPUphysics.Threading;
 using BEPUphysics.Entities;
 using BEPUutilities.DataStructures;
+using BEPUutilities.Threading;
 
 namespace BEPUphysics.EntityStateManagement
 {

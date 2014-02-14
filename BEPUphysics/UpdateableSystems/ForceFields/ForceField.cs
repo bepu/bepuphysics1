@@ -2,9 +2,8 @@ using System;
 using System.Collections.Generic;
 using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.Entities;
- 
-using BEPUphysics.Threading;
 using BEPUutilities;
+using BEPUutilities.Threading;
 
 namespace BEPUphysics.UpdateableSystems.ForceFields
 {

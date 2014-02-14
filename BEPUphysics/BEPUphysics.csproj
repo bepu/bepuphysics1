@@ -424,13 +424,6 @@
     <Compile Include="Constraints\SolverUpdateableChange.cs" />
     <Compile Include="Space.cs" />
     <Compile Include="BroadPhaseEntries\StaticMesh.cs" />
-    <Compile Include="Threading\IParallelLooper.cs" />
-    <Compile Include="Threading\Modified Pool\ParallelLooper.cs" />
-    <Compile Include="Threading\Modified Pool\ParallelLoopWorker.cs" />
-    <Compile Include="Threading\Modified Pool\SpecializedThreadManager.cs" />
-    <Compile Include="Threading\Modified Pool\ThreadTaskManager.cs" />
-    <Compile Include="Threading\SimpleLooper.cs" />
-    <Compile Include="Threading\TPLLoopProvider.cs" />
     <Compile Include="TimeStepSettings.cs" />
     <Compile Include="UpdateableSystems\FluidVolume.cs" />
     <Compile Include="UpdateableSystems\ForceFields\BoundingBoxForceFieldShape.cs" />

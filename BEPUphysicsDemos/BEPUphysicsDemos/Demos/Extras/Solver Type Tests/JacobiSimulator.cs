@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using BEPUphysics.Threading;
-using BEPUutilities.DataStructures;
+﻿using System.Diagnostics;
+using BEPUutilities.Threading;
 
 namespace BEPUphysicsDemos.Demos.Extras.SolverTypeTests
 {

@@ -96,6 +96,9 @@
     <Compile Include="ConvexHullHelper.cs" />
     <Compile Include="ConvexHullHelper.Pruning.cs" />
     <Compile Include="PermutationMapper.cs" />
+    <Compile Include="Threading\IParallelLooper.cs" />
+    <Compile Include="Threading\ParallelLooper.cs" />
+    <Compile Include="Threading\ParallelLoopWorker.cs" />
     <Compile Include="Vector4.cs" />
     <Compile Include="DataStructures\ConcurrentDeque.cs" />
     <Compile Include="AffineTransform.cs" />

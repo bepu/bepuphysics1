@@ -1,7 +1,6 @@
 ﻿using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
-using BEPUphysics.Threading;
 using BEPUutilities;
 using BEPUutilities.DataStructures;
 using System.Diagnostics;
@@ -9,6 +8,7 @@ using System;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.BroadPhaseSystems.Hierarchies;
+using BEPUutilities.Threading;
 
 namespace BEPUphysicsDemos.Demos.Extras.Tests
 {
@@ -47,18 +47,18 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             for (int i = 0; i < reruns; i++)
             {
                 GC.Collect();
-                var threadManager = new SpecializedThreadManager();
+                var looper = new ParallelLooper();
 
 
 
                 //Try different thread counts.
                 for (int j = 0; j < coreCountMax; j++)
                 {
-                    threadManager.AddThread();
+                    looper.AddThread();
                     //Try different split levels.);
                     for (int k = 0; k <= splitOffsetMax; k++)
                     {
-                        testResults[j, k] += RunTest(k, threadManager);
+                        testResults[j, k] += RunTest(k, looper);
                         GC.Collect();
                     }
                 }

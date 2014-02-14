@@ -4,10 +4,9 @@ using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.Constraints;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
-using BEPUphysics.Threading;
 using BEPUphysics.CollisionRuleManagement;
-using BEPUutilities;
 using BEPUutilities.DataStructures;
+using BEPUutilities.Threading;
 
 namespace BEPUphysics.NarrowPhaseSystems
 {

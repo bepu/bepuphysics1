@@ -5,7 +5,6 @@ using BEPUphysics.CollisionShapes;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using System.Collections.Generic;
 using BEPUphysics.NarrowPhaseSystems;
-using BEPUphysics.Threading;
 using BEPUutilities;
 using BEPUutilities.DataStructures;
 

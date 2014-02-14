@@ -1,9 +1,9 @@
 ﻿using System;
 using BEPUphysics.BroadPhaseEntries;
-using BEPUphysics.Threading;
 using BEPUutilities;
 using BEPUutilities.DataStructures;
 using BEPUutilities.ResourceManagement;
+using BEPUutilities.Threading;
 
 namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
 {

@@ -1,6 +1,6 @@
-﻿using BEPUphysics.Threading;
-using BEPUutilities;
+﻿using BEPUutilities;
 using BEPUutilities.DataStructures;
+using BEPUutilities.Threading;
 
 namespace BEPUphysicsDemos.Demos.Extras.SolverTypeTests
 {

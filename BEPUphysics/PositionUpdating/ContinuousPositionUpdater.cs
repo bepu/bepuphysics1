@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using BEPUphysics.Settings;
-using BEPUphysics.Threading;
-using BEPUutilities;
 using BEPUutilities.DataStructures;
+using BEPUutilities.Threading;
 
 namespace BEPUphysics.PositionUpdating
 {

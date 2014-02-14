@@ -1,9 +1,9 @@
 ﻿using BEPUphysics.BroadPhaseEntries;
-using BEPUphysics.Threading;
 using BEPUutilities;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUutilities.DataStructures;
 using System;
+using BEPUutilities.Threading;
 
 namespace BEPUphysics.BroadPhaseSystems
 {
