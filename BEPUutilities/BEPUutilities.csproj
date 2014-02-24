@@ -96,6 +96,9 @@
     <Compile Include="ConvexHullHelper.cs" />
     <Compile Include="ConvexHullHelper.Pruning.cs" />
     <Compile Include="PermutationMapper.cs" />
+    <Compile Include="ResourceManagement\BufferPool.cs" />
+    <Compile Include="ResourceManagement\BufferPools.cs" />
+    <Compile Include="ResourceManagement\LockingBufferPool.cs" />
     <Compile Include="Threading\IParallelLooper.cs" />
     <Compile Include="Threading\ParallelLooper.cs" />
     <Compile Include="Threading\ParallelLoopWorker.cs" />

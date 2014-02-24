@@ -47,10 +47,13 @@ namespace BEPUik
             get { return 1 / inverseMass; }
             set
             {
-                if (value > 0)
-                    inverseMass = 1 / value;
+                //Long chains could produce exceptionally small values.
+                //Attempting to invert them would result in NaNs.
+                //Clamp the lowest mass to 1e-7f.
+                if (value > Toolbox.Epsilon)
+                    inverseMass = 1f / value;
                 else
-                    throw new ArgumentException("Mass must be positive.");
+                    inverseMass = 1e7f;
                 ComputeLocalInertiaTensor();
             }
         }
