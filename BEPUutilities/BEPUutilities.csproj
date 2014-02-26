@@ -95,6 +95,10 @@
     <Compile Include="ContainmentType.cs" />
     <Compile Include="ConvexHullHelper.cs" />
     <Compile Include="ConvexHullHelper.Pruning.cs" />
+    <Compile Include="DataStructures\QuickDictionary.cs" />
+    <Compile Include="DataStructures\QuickList.cs" />
+    <Compile Include="DataStructures\QuickQueue.cs" />
+    <Compile Include="DataStructures\QuickSet.cs" />
     <Compile Include="PermutationMapper.cs" />
     <Compile Include="ResourceManagement\BufferPool.cs" />
     <Compile Include="ResourceManagement\BufferPools.cs" />
