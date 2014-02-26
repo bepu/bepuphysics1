@@ -39,7 +39,7 @@ namespace BEPUutilities.ResourceManagement
         /// <returns>Exponent associated with the buffer pool which would hold the given count of elements.</returns>
         public static int GetPoolIndex(int count)
         {
-            Debug.Assert(count > 0 && count < (1 << MaximumPoolIndex), "Count must be from 1 to " + ((1u << MaximumPoolIndex) - 1) + ", inclusive.");
+            Debug.Assert(count > 0 && count < (1u << MaximumPoolIndex), "Count must be from 1 to " + ((1u << MaximumPoolIndex) - 1) + ", inclusive.");
             //We want the buffer which would fully contain the count, so it should be effectively Ceiling(Log(count)).
             //Doubling the value (and subtracting one, to avoid the already-a-power-of-two case) takes care of this.
             count = (count << 1) - 1;
