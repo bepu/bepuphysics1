@@ -16,10 +16,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
     public abstract class TriangleMeshConvexContactManifold : ContactManifold
     {
         protected RawValueList<ContactSupplementData> supplementData = new RawValueList<ContactSupplementData>(4);
-        //Dictionary<TriangleIndices, TrianglePairTester> activePairTesters = new Dictionary<TriangleIndices, TrianglePairTester>(8);
         private QuickDictionary<TriangleIndices, TrianglePairTester> activePairTesters;
-        //RawValueList<ContactData> candidatesToAdd;
-        //RawValueList<ContactData> reducedCandidates = new RawValueList<ContactData>(4);
         protected TriangleShape localTriangleShape = new TriangleShape();
 
 
