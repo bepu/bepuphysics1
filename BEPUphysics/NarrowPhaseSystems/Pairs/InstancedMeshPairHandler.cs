@@ -126,7 +126,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                 timeOfImpact = 1;
                 if (minimumRadius * minimumRadius < velocitySquared)
                 {
-                    var triangle = PhysicsResources.GetTriangle();
+                    var triangle = PhysicsThreadResources.GetTriangle();
                     triangle.collisionMargin = 0;
                     //Spherecast against all triangles to find the earliest time.
                     for (int i = 0; i < MeshManifold.overlappedTriangles.Count; i++)
@@ -170,7 +170,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                             }
                         }
                     }
-                    PhysicsResources.GiveBack(triangle);
+                    PhysicsThreadResources.GiveBack(triangle);
                 }
 
 

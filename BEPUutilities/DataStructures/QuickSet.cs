@@ -81,7 +81,7 @@ namespace BEPUutilities.DataStructures
         public QuickSet(BufferPool<T> elementPool, BufferPool<int> tablePool, int initialElementPoolIndex = 2, int tableSizePower = 2)
         {
             if (tableSizePower <= 0)
-                throw new ArgumentException("The hash table must be larger than the element array.", "initialTablePoolIndex");
+                throw new ArgumentException("The hash table must be larger than the element array.", "tableSizePower");
             if (initialElementPoolIndex < 0)
                 throw new ArgumentException("Initial pool index must be nonnegative.", "initialElementPoolIndex");
             this.tablePool = tablePool;
@@ -100,7 +100,7 @@ namespace BEPUutilities.DataStructures
         {
             //Just double the size of the set.
             var oldSet = this;
-            this = new QuickSet<T>(elementPool, tablePool, newObjectPoolIndex, newTablePoolIndex);
+            this = new QuickSet<T>(elementPool, tablePool, newObjectPoolIndex, newTablePoolIndex - newObjectPoolIndex);
             for (int i = oldSet.count - 1; i >= 0; --i)
             {
                 Add(oldSet.Elements[i]);

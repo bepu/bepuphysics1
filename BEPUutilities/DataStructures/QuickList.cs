@@ -33,7 +33,7 @@ namespace BEPUutilities.DataStructures
             get { return count; }
             set
             {
-                Debug.Assert(value >= 0 && value < Elements.Length, "Count should fit in the current backing array length.");
+                Debug.Assert(value >= 0 && value <= Elements.Length, "Count should fit in the current backing array length.");
                 count = value;
             }
         }

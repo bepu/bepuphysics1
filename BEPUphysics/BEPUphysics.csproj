@@ -266,6 +266,7 @@
     <Compile Include="Constraints\TwoEntity\Motors\RevoluteMotor.cs" />
     <Compile Include="Constraints\TwoEntity\Motors\TwistMotor.cs" />
     <Compile Include="Constraints\TwoEntity\TwoEntityConstraint.cs" />
+    <Compile Include="PhysicsThreadResources.cs" />
     <Compile Include="DataStructures\BoundingBoxTree.cs" />
     <Compile Include="DataStructures\MeshBoundingBoxTree.cs" />
     <Compile Include="DataStructures\MeshBoundingBoxTreeData.cs" />
