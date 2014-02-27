@@ -1,6 +1,7 @@
 ﻿using System;
 using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
+using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUutilities;
 using BEPUutilities.DataStructures;
 
@@ -62,7 +63,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
             return overlappedTriangles.Count;
         }
 
-        protected override bool ConfigureTriangle(int i, out TriangleIndices indices)
+        protected override bool ConfigureTriangle(int i, TriangleShape localTriangleShape, out TriangleIndices indices)
         {
             indices = overlappedTriangles.Elements[i];
             terrain.Shape.GetTriangle(ref indices, ref terrain.worldTransform, out localTriangleShape.vA, out localTriangleShape.vB, out localTriangleShape.vC);
@@ -98,7 +99,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
         }
 
 
-        protected override void ProcessCandidates(RawValueList<ContactData> candidates)
+        protected override void ProcessCandidates(ref QuickList<ContactData> candidates)
         {
             //If the candidates list is empty, then let's see if the convex is in the 'thickness' of the terrain.
             if (candidates.Count == 0 & terrain.thickness > 0)

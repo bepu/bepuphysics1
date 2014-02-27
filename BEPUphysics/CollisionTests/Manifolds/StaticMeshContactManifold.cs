@@ -1,6 +1,7 @@
 ﻿using System;
 using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
+using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.CollisionTests.Manifolds
@@ -33,7 +34,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
             return overlappedTriangles.Count;
         }
 
-        protected override bool ConfigureTriangle(int i, out TriangleIndices indices)
+        protected override bool ConfigureTriangle(int i, TriangleShape localTriangleShape, out TriangleIndices indices)
         {
             int triangleIndex = overlappedTriangles.Elements[i];
             mesh.Mesh.Data.GetTriangle(triangleIndex, out localTriangleShape.vA, out localTriangleShape.vB, out localTriangleShape.vC);

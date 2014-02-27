@@ -16,7 +16,7 @@ namespace BEPUutilities.DataStructures
     /// A generous table capacity is recommended; this trades some memory for simplicity and runtime performance.</para></remarks>
     /// <typeparam name="TKey">Type of key held by the container.</typeparam>
     /// <typeparam name="TValue">Type of value held by the container.</typeparam>
-    public struct QuickDictionary<TKey, TValue> : IDisposable, IEnumerable<System.Collections.Generic.KeyValuePair<TKey, TValue>> where TKey : IEquatable<TKey>
+    public struct QuickDictionary<TKey, TValue> : IDisposable, IEnumerable<KeyValuePair<TKey, TValue>> where TKey : IEquatable<TKey>
     {
         private int count;
         /// <summary>
@@ -92,7 +92,7 @@ namespace BEPUutilities.DataStructures
         public QuickDictionary(BufferPool<TKey> keyPool, BufferPool<TValue> valuePool, BufferPool<int> tablePool, int initialElementPoolIndex = 2, int tableSizePower = 2)
         {
             if (tableSizePower <= 0)
-                throw new ArgumentException("The hash table must be larger than the element array.", "initialTablePoolIndex");
+                throw new ArgumentException("The hash table must be larger than the element array.", "tableSizePower");
             if (initialElementPoolIndex < 0)
                 throw new ArgumentException("Initial pool index must be nonnegative.", "initialElementPoolIndex");
             this.tablePool = tablePool;
@@ -113,7 +113,7 @@ namespace BEPUutilities.DataStructures
         {
             //Just double the size of the set.
             var oldSet = this;
-            this = new QuickDictionary<TKey, TValue>(keyPool, valuePool, tablePool, newObjectPoolIndex, newTablePoolIndex);
+            this = new QuickDictionary<TKey, TValue>(keyPool, valuePool, tablePool, newObjectPoolIndex, newTablePoolIndex - newObjectPoolIndex);
             for (int i = oldSet.count - 1; i >= 0; --i)
             {
                 Add(oldSet.Keys[i], oldSet.Values[i]);
@@ -175,6 +175,25 @@ namespace BEPUutilities.DataStructures
             Validate();
             int tableIndex, objectIndex;
             return GetIndices(key, out tableIndex, out objectIndex);
+        }
+
+        /// <summary>
+        /// Tries to retrieve the value associated with a key if it exists.
+        /// </summary>
+        /// <param name="key">Key to look up.</param>
+        /// <param name="value">Value associated with the specified key.</param>
+        /// <returns>True if a value was found, false otherwise.</returns>
+        public bool TryGetValue(TKey key, out TValue value)
+        {
+            Validate();
+            int tableIndex, elementIndex;
+            if (GetIndices(key, out tableIndex, out elementIndex))
+            {
+                value = Values[elementIndex];
+                return true;
+            }
+            value = default(TValue);
+            return false;
         }
 
         /// <summary>
@@ -421,6 +440,7 @@ namespace BEPUutilities.DataStructures
             table = null;
 #endif
         }
+
 
 
 

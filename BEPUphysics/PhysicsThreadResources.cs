@@ -1,8 +1,9 @@
-﻿using BEPUphysics.BroadPhaseEntries;
+﻿using System;
+using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.CollisionTests.Manifolds;
 using BEPUphysics.Entities;
- 
+
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.DeactivationManagement;
 using BEPUutilities.DataStructures;
@@ -14,37 +15,26 @@ namespace BEPUphysics
     /// <summary>
     /// Handles allocation and management of commonly used resources.
     /// </summary>
-    public static class PhysicsResources
+    public static class PhysicsThreadResources
     {
-        static PhysicsResources()
-        {
-            ResetPools();
-        }
-
-        public static void ResetPools()
-        {
-
-            SubPoolRayCastResultList = new LockingResourcePool<RawList<RayCastResult>>();
-            SubPoolBroadPhaseEntryList = new LockingResourcePool<RawList<BroadPhaseEntry>>();
-            SubPoolCollidableList = new LockingResourcePool<RawList<Collidable>>();
-            SubPoolCompoundChildList = new LockingResourcePool<RawList<CompoundChild>>();
-
-            SubPoolEntityRawList = new LockingResourcePool<RawList<Entity>>(16);
-            SubPoolTriangleShape = new LockingResourcePool<TriangleShape>();
-            SubPoolTriangleCollidables = new LockingResourcePool<TriangleCollidable>();
-            SubPoolTriangleIndicesList = new LockingResourcePool<RawList<TriangleMeshConvexContactManifold.TriangleIndices>>();
-            SimulationIslandConnections = new LockingResourcePool<SimulationIslandConnection>();
-        }
-
-        static LockingResourcePool<RawList<RayCastResult>> SubPoolRayCastResultList;
-        static LockingResourcePool<RawList<BroadPhaseEntry>> SubPoolBroadPhaseEntryList;
-        static LockingResourcePool<RawList<Collidable>> SubPoolCollidableList;
-        static LockingResourcePool<RawList<Entity>> SubPoolEntityRawList;
-        static LockingResourcePool<TriangleShape> SubPoolTriangleShape;
-        static LockingResourcePool<RawList<CompoundChild>> SubPoolCompoundChildList;
-        static LockingResourcePool<TriangleCollidable> SubPoolTriangleCollidables;
-        static LockingResourcePool<RawList<TriangleMeshConvexContactManifold.TriangleIndices>> SubPoolTriangleIndicesList;
-        static LockingResourcePool<SimulationIslandConnection> SimulationIslandConnections;
+        [ThreadStatic]
+        static UnsafeResourcePool<RawList<RayCastResult>> SubPoolRayCastResultList;
+        [ThreadStatic]
+        static UnsafeResourcePool<RawList<BroadPhaseEntry>> SubPoolBroadPhaseEntryList;
+        [ThreadStatic]
+        static UnsafeResourcePool<RawList<Collidable>> SubPoolCollidableList;
+        [ThreadStatic]
+        static UnsafeResourcePool<RawList<Entity>> SubPoolEntityRawList;
+        [ThreadStatic]
+        static UnsafeResourcePool<TriangleShape> SubPoolTriangleShape;
+        [ThreadStatic]
+        static UnsafeResourcePool<RawList<CompoundChild>> SubPoolCompoundChildList;
+        [ThreadStatic]
+        static UnsafeResourcePool<TriangleCollidable> SubPoolTriangleCollidables;
+        [ThreadStatic]
+        static UnsafeResourcePool<RawList<TriangleMeshConvexContactManifold.TriangleIndices>> SubPoolTriangleIndicesList;
+        [ThreadStatic]
+        static UnsafeResourcePool<SimulationIslandConnection> SimulationIslandConnections;
         //#endif
         /// <summary>
         /// Retrieves a ray cast result list from the resource pool.
@@ -52,6 +42,8 @@ namespace BEPUphysics
         /// <returns>Empty ray cast result list.</returns>
         public static RawList<RayCastResult> GetRayCastResultList()
         {
+            if (SubPoolRayCastResultList == null)
+                SubPoolRayCastResultList = new UnsafeResourcePool<RawList<RayCastResult>>();
             return SubPoolRayCastResultList.Take();
         }
 
@@ -61,6 +53,8 @@ namespace BEPUphysics
         /// <param name="list">List to return.</param>
         public static void GiveBack(RawList<RayCastResult> list)
         {
+            if (SubPoolRayCastResultList == null)
+                SubPoolRayCastResultList = new UnsafeResourcePool<RawList<RayCastResult>>();
             list.Clear();
             SubPoolRayCastResultList.GiveBack(list);
         }
@@ -71,6 +65,8 @@ namespace BEPUphysics
         /// <returns>Empty BroadPhaseEntry list.</returns>
         public static RawList<BroadPhaseEntry> GetBroadPhaseEntryList()
         {
+            if (SubPoolBroadPhaseEntryList == null)
+                SubPoolBroadPhaseEntryList = new UnsafeResourcePool<RawList<BroadPhaseEntry>>();
             return SubPoolBroadPhaseEntryList.Take();
         }
 
@@ -80,6 +76,8 @@ namespace BEPUphysics
         /// <param name="list">List to return.</param>
         public static void GiveBack(RawList<BroadPhaseEntry> list)
         {
+            if (SubPoolBroadPhaseEntryList == null)
+                SubPoolBroadPhaseEntryList = new UnsafeResourcePool<RawList<BroadPhaseEntry>>();
             list.Clear();
             SubPoolBroadPhaseEntryList.GiveBack(list);
         }
@@ -90,6 +88,8 @@ namespace BEPUphysics
         /// <returns>Empty Collidable list.</returns>
         public static RawList<Collidable> GetCollidableList()
         {
+            if (SubPoolCollidableList == null)
+                SubPoolCollidableList = new UnsafeResourcePool<RawList<Collidable>>();
             return SubPoolCollidableList.Take();
         }
 
@@ -99,6 +99,8 @@ namespace BEPUphysics
         /// <param name="list">List to return.</param>
         public static void GiveBack(RawList<Collidable> list)
         {
+            if (SubPoolCollidableList == null)
+                SubPoolCollidableList = new UnsafeResourcePool<RawList<Collidable>>();
             list.Clear();
             SubPoolCollidableList.GiveBack(list);
         }
@@ -109,6 +111,8 @@ namespace BEPUphysics
         /// <returns>Empty information list.</returns>
         public static RawList<CompoundChild> GetCompoundChildList()
         {
+            if (SubPoolCompoundChildList == null)
+                SubPoolCompoundChildList = new UnsafeResourcePool<RawList<CompoundChild>>();
             return SubPoolCompoundChildList.Take();
         }
 
@@ -118,11 +122,13 @@ namespace BEPUphysics
         /// <param name="list">List to return.</param>
         public static void GiveBack(RawList<CompoundChild> list)
         {
+            if (SubPoolCompoundChildList == null)
+                SubPoolCompoundChildList = new UnsafeResourcePool<RawList<CompoundChild>>();
             list.Clear();
             SubPoolCompoundChildList.GiveBack(list);
         }
 
-      
+
 
         /// <summary>
         /// Retrieves an Entity RawList from the resource pool.
@@ -130,6 +136,8 @@ namespace BEPUphysics
         /// <returns>Empty Entity raw list.</returns>
         public static RawList<Entity> GetEntityRawList()
         {
+            if (SubPoolEntityRawList == null)
+                SubPoolEntityRawList = new UnsafeResourcePool<RawList<Entity>>();
             return SubPoolEntityRawList.Take();
         }
 
@@ -139,11 +147,58 @@ namespace BEPUphysics
         /// <param name="list">List to return.</param>
         public static void GiveBack(RawList<Entity> list)
         {
+            if (SubPoolEntityRawList == null)
+                SubPoolEntityRawList = new UnsafeResourcePool<RawList<Entity>>();
             list.Clear();
             SubPoolEntityRawList.GiveBack(list);
         }
-        
-      
+
+        /// <summary>
+        /// Retrieves a Triangle shape from the resource pool.
+        /// </summary>
+        /// <returns>Initialized TriangleShape.</returns>
+        public static TriangleShape GetTriangle()
+        {
+            if (SubPoolTriangleShape == null)
+                SubPoolTriangleShape = new UnsafeResourcePool<TriangleShape>();
+            return SubPoolTriangleShape.Take();
+        }
+
+        /// <summary>
+        /// Returns a resource to the pool.
+        /// </summary>
+        /// <param name="triangle">Triangle to return.</param>
+        public static void GiveBack(TriangleShape triangle)
+        {
+            if (SubPoolTriangleShape == null)
+                SubPoolTriangleShape = new UnsafeResourcePool<TriangleShape>();
+            triangle.collisionMargin = 0;
+            triangle.sidedness = TriangleSidedness.DoubleSided;
+            SubPoolTriangleShape.GiveBack(triangle);
+        }
+
+
+        /// <summary>
+        /// Retrieves a TriangleCollidable from the resource pool.
+        /// </summary>
+        /// <param name="a">First vertex in the triangle.</param>
+        /// <param name="b">Second vertex in the triangle.</param>
+        /// <param name="c">Third vertex in the triangle.</param>
+        /// <returns>Initialized TriangleCollidable.</returns>
+        public static TriangleCollidable GetTriangleCollidable(ref Vector3 a, ref Vector3 b, ref Vector3 c)
+        {
+            if (SubPoolTriangleCollidables == null)
+                SubPoolTriangleCollidables = new UnsafeResourcePool<TriangleCollidable>();
+            var tri = SubPoolTriangleCollidables.Take();
+            var shape = tri.Shape;
+            shape.vA = a;
+            shape.vB = b;
+            shape.vC = c;
+            var identity = RigidTransform.Identity;
+            tri.UpdateBoundingBoxForTransform(ref identity);
+            return tri;
+
+        }
 
         /// <summary>
         /// Retrieves a TriangleCollidable from the resource pool.
@@ -151,6 +206,8 @@ namespace BEPUphysics
         /// <returns>Initialized TriangleCollidable.</returns>
         public static TriangleCollidable GetTriangleCollidable()
         {
+            if (SubPoolTriangleCollidables == null)
+                SubPoolTriangleCollidables = new UnsafeResourcePool<TriangleCollidable>();
             return SubPoolTriangleCollidables.Take();
         }
 
@@ -160,6 +217,8 @@ namespace BEPUphysics
         /// <param name="triangle">Triangle collidable to return.</param>
         public static void GiveBack(TriangleCollidable triangle)
         {
+            if (SubPoolTriangleCollidables == null)
+                SubPoolTriangleCollidables = new UnsafeResourcePool<TriangleCollidable>();
             triangle.CleanUp();
             SubPoolTriangleCollidables.GiveBack(triangle);
         }
@@ -170,6 +229,8 @@ namespace BEPUphysics
         /// <returns>TriangleIndices list.</returns>
         public static RawList<TriangleMeshConvexContactManifold.TriangleIndices> GetTriangleIndicesList()
         {
+            if (SubPoolTriangleIndicesList == null)
+                SubPoolTriangleIndicesList = new UnsafeResourcePool<RawList<TriangleMeshConvexContactManifold.TriangleIndices>>();
             return SubPoolTriangleIndicesList.Take();
         }
 
@@ -179,6 +240,8 @@ namespace BEPUphysics
         /// <param name="triangleIndices">TriangleIndices list to return.</param>
         public static void GiveBack(RawList<TriangleMeshConvexContactManifold.TriangleIndices> triangleIndices)
         {
+            if (SubPoolTriangleIndicesList == null)
+                SubPoolTriangleIndicesList = new UnsafeResourcePool<RawList<TriangleMeshConvexContactManifold.TriangleIndices>>();
             triangleIndices.Clear();
             SubPoolTriangleIndicesList.GiveBack(triangleIndices);
         }
@@ -189,6 +252,8 @@ namespace BEPUphysics
         /// <returns>Uninitialized simulation island connection.</returns>
         public static SimulationIslandConnection GetSimulationIslandConnection()
         {
+            if (SimulationIslandConnections == null)
+                SimulationIslandConnections = new UnsafeResourcePool<SimulationIslandConnection>();
             return SimulationIslandConnections.Take();
 
         }
@@ -199,6 +264,8 @@ namespace BEPUphysics
         /// <param name="connection">Connection to return.</param>
         public static void GiveBack(SimulationIslandConnection connection)
         {
+            if (SimulationIslandConnections == null)
+                SimulationIslandConnections = new UnsafeResourcePool<SimulationIslandConnection>();
             connection.CleanUp();
             SimulationIslandConnections.GiveBack(connection);
 

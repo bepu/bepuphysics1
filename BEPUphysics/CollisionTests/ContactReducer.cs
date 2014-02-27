@@ -19,7 +19,7 @@ namespace BEPUphysics.CollisionTests
         ///<param name="contactsToRemove">Contacts that need to removed to reach the reduced state.</param>
         ///<param name="toAdd">Contact candidates that should be added to reach the reduced state.</param>
         ///<exception cref="InvalidOperationException">Thrown when the set being reduced is empty.</exception>
-        public static void ReduceContacts(RawList<Contact> contacts, RawValueList<ContactData> contactCandidates, RawList<int> contactsToRemove, RawValueList<ContactData> toAdd)
+        public static void ReduceContacts(RawList<Contact> contacts, ref QuickList<ContactData> contactCandidates, RawList<int> contactsToRemove, ref QuickList<ContactData> toAdd)
         {
             //Find the deepest point of all contacts/candidates, as well as a compounded 'normal' vector.
             float maximumDepth = -float.MaxValue;
