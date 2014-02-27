@@ -405,7 +405,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
 
 
 
-            candidatesToAdd.Clear();
+            candidatesToAdd.Dispose();
 
         }
 
