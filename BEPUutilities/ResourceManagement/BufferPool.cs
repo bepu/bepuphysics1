@@ -112,9 +112,12 @@ namespace BEPUutilities.ResourceManagement
         {
 #if DEBUG          
             Debug.Assert(outstandingResources.Remove(buffer), "The buffer being returned must come from this pool, and buffers should only be returned once.");
-            for (int i = 0; i < buffer.Length; ++i)
+            if (!suppressCleanBufferAsserts)
             {
-                Debug.Assert(EqualityComparer<T>.Default.Equals(buffer[i], default(T)), "Buffers being returned to the pool should be clean. Every index should hold default(T).");
+                for (int i = 0; i < buffer.Length; ++i)
+                {
+                    Debug.Assert(EqualityComparer<T>.Default.Equals(buffer[i], default(T)), "Buffers being returned to the pool should be clean. Every index should hold default(T).");
+                }
             }
 #endif
             pools[poolIndex].Push(buffer);
@@ -150,5 +153,21 @@ namespace BEPUutilities.ResourceManagement
                 pools[i].Clear();
             }
         }
+
+        /// <summary>
+        /// Sets whether to suppress the GiveBack function's checks for buffer clearing.
+        /// </summary>
+        /// <param name="shouldSuppress">True if the cleanliness asserts should be suppressed, false otherwise.</param>
+        [Conditional("DEBUG")]
+        public void SetSuppressCleanBufferAsserts(bool shouldSuppress)
+        {
+#if DEBUG
+            suppressCleanBufferAsserts = shouldSuppress;
+#endif
+        }
+
+#if DEBUG
+        private bool suppressCleanBufferAsserts;
+#endif
     }
 }

@@ -89,7 +89,6 @@ namespace BEPUutilities.DataStructures
             }
         }
 
-
         /// <summary>
         /// Creates a new queue.
         /// </summary>
