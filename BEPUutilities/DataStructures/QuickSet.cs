@@ -71,6 +71,7 @@ namespace BEPUutilities.DataStructures
         private int tableMask;
 
 
+
         /// <summary>
         /// Creates a new set.
         /// </summary>

@@ -80,7 +80,6 @@ namespace BEPUutilities.DataStructures
         private int tablePoolIndex;
         private int tableMask;
 
-
         /// <summary>
         /// Creates a new set.
         /// </summary>

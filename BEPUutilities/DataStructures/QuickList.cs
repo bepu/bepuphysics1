@@ -71,7 +71,6 @@ namespace BEPUutilities.DataStructures
             }
         }
 
-
         /// <summary>
         /// Creates a new list.
         /// </summary>

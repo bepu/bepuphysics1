@@ -1125,7 +1125,7 @@ namespace BEPUphysics.Entities
         }
         ///<summary>
         /// Gets or sets the linear damping of the entity.
-        /// Values range from 0 to 1, correspondong to a fraction of linear momentum removed
+        /// Values range from 0 to 1, corresponding to a fraction of linear momentum removed
         /// from the entity over a unit of time.
         ///</summary>
         public float LinearDamping
