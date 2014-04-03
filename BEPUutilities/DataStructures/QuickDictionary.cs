@@ -88,7 +88,7 @@ namespace BEPUutilities.DataStructures
         /// <param name="valuePool">Pool from which to retrieve TValue arrays.</param>
         /// <param name="initialElementPoolIndex">Initial pool index to pull the object buffer from. The size of the initial buffer will be 2^initialElementPoolIndex.</param>
         /// <param name="tableSizePower">Initial pool index to pull the object buffer from. The size of the initial table buffer will be 2^(initialElementPoolIndex + tableSizePower).</param>
-        public QuickDictionary(BufferPool<TKey> keyPool, BufferPool<TValue> valuePool, BufferPool<int> tablePool, int initialElementPoolIndex = 2, int tableSizePower = 2)
+        public QuickDictionary(BufferPool<TKey> keyPool, BufferPool<TValue> valuePool, BufferPool<int> tablePool, int initialElementPoolIndex = 2, int tableSizePower = 5)
         {
             if (tableSizePower <= 0)
                 throw new ArgumentException("The hash table must be larger than the element array.", "tableSizePower");

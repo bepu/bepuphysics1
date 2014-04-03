@@ -32,8 +32,6 @@ namespace BEPUphysics
         [ThreadStatic]
         static UnsafeResourcePool<TriangleCollidable> SubPoolTriangleCollidables;
         [ThreadStatic]
-        static UnsafeResourcePool<RawList<TriangleMeshConvexContactManifold.TriangleIndices>> SubPoolTriangleIndicesList;
-        [ThreadStatic]
         static UnsafeResourcePool<SimulationIslandConnection> SimulationIslandConnections;
         //#endif
         /// <summary>
@@ -223,28 +221,6 @@ namespace BEPUphysics
             SubPoolTriangleCollidables.GiveBack(triangle);
         }
 
-        /// <summary>
-        /// Retrieves a TriangleIndices list from the resource pool.
-        /// </summary>
-        /// <returns>TriangleIndices list.</returns>
-        public static RawList<TriangleMeshConvexContactManifold.TriangleIndices> GetTriangleIndicesList()
-        {
-            if (SubPoolTriangleIndicesList == null)
-                SubPoolTriangleIndicesList = new UnsafeResourcePool<RawList<TriangleMeshConvexContactManifold.TriangleIndices>>();
-            return SubPoolTriangleIndicesList.Take();
-        }
-
-        /// <summary>
-        /// Returns a resource to the pool.
-        /// </summary>
-        /// <param name="triangleIndices">TriangleIndices list to return.</param>
-        public static void GiveBack(RawList<TriangleMeshConvexContactManifold.TriangleIndices> triangleIndices)
-        {
-            if (SubPoolTriangleIndicesList == null)
-                SubPoolTriangleIndicesList = new UnsafeResourcePool<RawList<TriangleMeshConvexContactManifold.TriangleIndices>>();
-            triangleIndices.Clear();
-            SubPoolTriangleIndicesList.GiveBack(triangleIndices);
-        }
 
         /// <summary>
         /// Retrieves a simulation island connection from the resource pool.

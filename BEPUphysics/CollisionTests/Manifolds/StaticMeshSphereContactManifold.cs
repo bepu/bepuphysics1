@@ -10,7 +10,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
     {
 
 
-        UnsafeResourcePool<TriangleSpherePairTester> testerPool = new UnsafeResourcePool<TriangleSpherePairTester>();
+        static LockingResourcePool<TriangleSpherePairTester> testerPool = new LockingResourcePool<TriangleSpherePairTester>();
         protected override void GiveBackTester(TrianglePairTester tester)
         {
             testerPool.GiveBack((TriangleSpherePairTester)tester);

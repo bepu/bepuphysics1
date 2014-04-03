@@ -14,7 +14,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
     {
         protected Terrain terrain;
 
-        internal RawList<TriangleIndices> overlappedTriangles = new RawList<TriangleIndices>(4);
+        internal RawList<int> overlappedTriangles = new RawList<int>(4);
 
         ///<summary>
         /// Gets the terrain associated with this pair.
@@ -31,7 +31,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
         {
             BoundingBox boundingBox;
             convex.Shape.GetLocalBoundingBox(ref convex.worldTransform, ref terrain.worldTransform, out boundingBox);
-            
+
 
             if (convex.entity != null)
             {
@@ -59,35 +59,35 @@ namespace BEPUphysics.CollisionTests.Manifolds
             }
 
 
-            terrain.Shape.GetOverlaps(boundingBox, overlappedTriangles);
+            terrain.Shape.GetOverlaps(boundingBox, ref overlappedTriangles);
             return overlappedTriangles.Count;
         }
 
-        protected override bool ConfigureTriangle(int i, TriangleShape localTriangleShape, out TriangleIndices indices)
+        /// <summary>
+        /// Precomputes the transform to bring triangles from their native local space to the local space of the convex.
+        /// </summary>
+        /// <param name="convexInverseWorldTransform">Inverse of the world transform of the convex shape.</param>
+        /// <param name="fromMeshLocalToConvexLocal">Transform to apply to native local triangles to bring them into the local space of the convex.</param>
+        protected override void PrecomputeTriangleTransform(ref AffineTransform convexInverseWorldTransform, out AffineTransform fromMeshLocalToConvexLocal)
         {
-            indices = overlappedTriangles.Elements[i];
-            terrain.Shape.GetTriangle(ref indices, ref terrain.worldTransform, out localTriangleShape.vA, out localTriangleShape.vB, out localTriangleShape.vC);
+            AffineTransform.Multiply(ref terrain.worldTransform, ref convexInverseWorldTransform, out fromMeshLocalToConvexLocal);
+        }
+
+        protected override bool ConfigureLocalTriangle(int i, TriangleShape localTriangleShape, out TriangleIndices indices)
+        {
+            TerrainVertexIndices a, b, c;
+            terrain.Shape.GetLocalIndices(overlappedTriangles[i], out a, out b, out c);
+            int terrainWidth = terrain.Shape.Heights.GetLength(0);
+            indices.A = a.ToSequentialIndex(terrainWidth);
+            indices.B = b.ToSequentialIndex(terrainWidth);
+            indices.C = c.ToSequentialIndex(terrainWidth);
+            terrain.Shape.GetLocalPosition(a.ColumnIndex, a.RowIndex, out localTriangleShape.vA);
+            terrain.Shape.GetLocalPosition(b.ColumnIndex, b.RowIndex, out localTriangleShape.vB);
+            terrain.Shape.GetLocalPosition(c.ColumnIndex, c.RowIndex, out localTriangleShape.vC);
             localTriangleShape.collisionMargin = 0;
 
-            //Calibrate the sidedness of the triangle such that it's always facing up.
-            //TODO: There's quite a bit of redundancy in here with other systems.
-
-            Vector3 AB, AC, normal;
-            Vector3.Subtract(ref localTriangleShape.vB, ref localTriangleShape.vA, out AB);
-            Vector3.Subtract(ref localTriangleShape.vC, ref localTriangleShape.vA, out AC);
-            Vector3.Cross(ref AB, ref AC, out normal);
-
-            Vector3 terrainUp = new Vector3(terrain.worldTransform.LinearTransform.M21, terrain.worldTransform.LinearTransform.M22, terrain.worldTransform.LinearTransform.M23);
-            float dot;
-            Vector3.Dot(ref terrainUp, ref normal, out dot);
-            if (dot > 0)
-            {
-                localTriangleShape.sidedness = TriangleSidedness.Clockwise;
-            }
-            else
-            {
-                localTriangleShape.sidedness = TriangleSidedness.Counterclockwise;
-            }
+            localTriangleShape.sidedness = terrain.sidedness;
+ 
             //Unlike other 'instanced' geometries, terrains are almost always axis aligned in some way and/or have low triangle density relative to what they are colliding with.
             //Instead of performing additional tests, just assume that it's a fairly regular situation.
             return true;

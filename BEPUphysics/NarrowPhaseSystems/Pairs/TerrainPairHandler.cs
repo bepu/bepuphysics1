@@ -133,7 +133,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
                     //Spherecast against all triangles to find the earliest time.
                     for (int i = 0; i < TerrainManifold.overlappedTriangles.Count; i++)
                     {
-                        terrain.Shape.GetTriangle(ref TerrainManifold.overlappedTriangles.Elements[i], ref terrain.worldTransform, out triangle.vA, out triangle.vB, out triangle.vC);
+                        terrain.Shape.GetTriangle(TerrainManifold.overlappedTriangles.Elements[i], ref terrain.worldTransform, out triangle.vA, out triangle.vB, out triangle.vC);
                         //Put the triangle into 'localish' space of the convex.
                         Vector3.Subtract(ref triangle.vA, ref convex.worldTransform.Position, out triangle.vA);
                         Vector3.Subtract(ref triangle.vB, ref convex.worldTransform.Position, out triangle.vB);

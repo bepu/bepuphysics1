@@ -78,16 +78,30 @@ namespace BEPUphysics.CollisionTests.Manifolds
             return overlappedTriangles.Count;
         }
 
-        protected override bool ConfigureTriangle(int i, TriangleShape localTriangleShape, out TriangleIndices indices)
+
+        /// <summary>
+        /// Precomputes the transform to bring triangles from their native local space to the local space of the convex.
+        /// </summary>
+        /// <param name="convexInverseWorldTransform">Inverse of the world transform of the convex shape.</param>
+        /// <param name="fromMeshLocalToConvexLocal">Transform to apply to native local triangles to bring them into the local space of the convex.</param>
+        protected override void PrecomputeTriangleTransform(ref AffineTransform convexInverseWorldTransform, out AffineTransform fromMeshLocalToConvexLocal)
         {
-            MeshBoundingBoxTreeData data = mesh.Shape.TriangleMesh.Data;
+            var data = ((TransformableMeshData)mesh.Shape.TriangleMesh.Data);
+            //The mobile mesh has a shape-based transform followed by the rigid body transform.
+            AffineTransform mobileMeshWorldTransform;
+            AffineTransform.CreateFromRigidTransform(ref mesh.worldTransform, out mobileMeshWorldTransform);
+            AffineTransform combinedMobileMeshWorldTransform;
+            AffineTransform.Multiply(ref data.worldTransform, ref mobileMeshWorldTransform, out combinedMobileMeshWorldTransform);
+            AffineTransform.Multiply(ref combinedMobileMeshWorldTransform, ref convexInverseWorldTransform, out fromMeshLocalToConvexLocal);
+        }
+
+        protected override bool ConfigureLocalTriangle(int i, TriangleShape localTriangleShape, out TriangleIndices indices)
+        {
+            var data = mesh.Shape.TriangleMesh.Data;
             int triangleIndex = overlappedTriangles.Elements[i];
-            data.GetTriangle(triangleIndex, out localTriangleShape.vA, out localTriangleShape.vB, out localTriangleShape.vC);
-            AffineTransform transform;
-            AffineTransform.CreateFromRigidTransform(ref mesh.worldTransform, out transform);
-            AffineTransform.Transform(ref localTriangleShape.vA, ref transform, out localTriangleShape.vA);
-            AffineTransform.Transform(ref localTriangleShape.vB, ref transform, out localTriangleShape.vB);
-            AffineTransform.Transform(ref localTriangleShape.vC, ref transform, out localTriangleShape.vC);
+            localTriangleShape.vA = data.vertices[data.indices[triangleIndex]];
+            localTriangleShape.vB = data.vertices[data.indices[triangleIndex + 1]];
+            localTriangleShape.vC = data.vertices[data.indices[triangleIndex + 2]];
             //In instanced meshes, the bounding box we found in local space could collect more triangles than strictly necessary.
             //By doing a second pass, we should be able to prune out quite a few of them.
             BoundingBox triangleAABB;
@@ -182,7 +196,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                 RayHit hit;
                 if (mesh.Shape.IsLocalRayOriginInMesh(ref ray, out hit))
                 {
-                    ContactData newContact = new ContactData {Id = 2};
+                    ContactData newContact = new ContactData { Id = 2 };
                     //Give it a special id so that we know that it came from the inside.
                     Matrix3x3.Transform(ref ray.Position, ref orientation, out newContact.Position);
                     Vector3.Add(ref newContact.Position, ref mesh.worldTransform.Position, out newContact.Position);
@@ -265,7 +279,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
 
         }
 
-        UnsafeResourcePool<TriangleConvexPairTester> testerPool = new UnsafeResourcePool<TriangleConvexPairTester>();
+        static LockingResourcePool<TriangleConvexPairTester> testerPool = new LockingResourcePool<TriangleConvexPairTester>();
         protected override void GiveBackTester(TrianglePairTester tester)
         {
             testerPool.GiveBack((TriangleConvexPairTester)tester);

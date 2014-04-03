@@ -1,6 +1,7 @@
 ﻿using System;
 using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
+using BEPUutilities.DataStructures;
 using BEPUutilities.ResourceManagement;
 using BEPUutilities;
 
@@ -114,19 +115,19 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
 
         protected override void UpdateContainedPairs(float dt)
         {
-            var overlappedElements = CommonResources.GetIntList();
+            var overlappedElements = new QuickList<int>(BufferPools<int>.Thread);
             BoundingBox localBoundingBox;
 
             Vector3 sweep;
             Vector3.Multiply(ref mobileMesh.entity.linearVelocity, dt, out sweep);
             mobileMesh.Shape.GetSweptLocalBoundingBox(ref mobileMesh.worldTransform, ref mesh.worldTransform, ref sweep, out localBoundingBox);
-            mesh.Shape.GetOverlaps(localBoundingBox, overlappedElements);
+            mesh.Shape.GetOverlaps(localBoundingBox, ref overlappedElements);
             for (int i = 0; i < overlappedElements.Count; i++)
             {
                 TryToAdd(overlappedElements.Elements[i]);
             }
 
-            CommonResources.GiveBack(overlappedElements);
+            overlappedElements.Dispose();
 
         }
 

@@ -362,7 +362,7 @@ namespace BEPUphysics.UpdateableSystems
             BoundingBox entityBoundingBox;
 
             RigidTransform localTransform;
-            RigidTransform.TransformByInverse(ref collidable.worldTransform, ref surfaceTransform, out localTransform);
+            RigidTransform.MultiplyByInverse(ref collidable.worldTransform, ref surfaceTransform, out localTransform);
             collidable.Shape.GetBoundingBox(ref localTransform, out entityBoundingBox);
             if (entityBoundingBox.Min.Y > 0)
             {

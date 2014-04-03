@@ -9,7 +9,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
     public class InstancedMeshSphereContactManifold : InstancedMeshContactManifold
     {
 
-        UnsafeResourcePool<TriangleSpherePairTester> testerPool = new UnsafeResourcePool<TriangleSpherePairTester>();
+        static LockingResourcePool<TriangleSpherePairTester> testerPool = new LockingResourcePool<TriangleSpherePairTester>();
         protected override void GiveBackTester(TrianglePairTester tester)
         {
             testerPool.GiveBack((TriangleSpherePairTester)tester);

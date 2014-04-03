@@ -2,6 +2,8 @@
 using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.CollisionShapes.ConvexShapes;
+using BEPUphysics.DataStructures;
+using BEPUutilities;
 using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.CollisionTests.Manifolds
@@ -34,17 +36,31 @@ namespace BEPUphysics.CollisionTests.Manifolds
             return overlappedTriangles.Count;
         }
 
-        protected override bool ConfigureTriangle(int i, TriangleShape localTriangleShape, out TriangleIndices indices)
+        /// <summary>
+        /// Precomputes the transform to bring triangles from their native local space to the local space of the convex.
+        /// </summary>
+        /// <param name="convexInverseWorldTransform">Inverse of the world transform of the convex shape.</param>
+        /// <param name="fromMeshLocalToConvexLocal">Transform to apply to native local triangles to bring them into the local space of the convex.</param>
+        protected override void PrecomputeTriangleTransform(ref AffineTransform convexInverseWorldTransform, out AffineTransform fromMeshLocalToConvexLocal)
+        {
+            var data = ((TransformableMeshData) mesh.Mesh.Data);
+            AffineTransform.Multiply(ref data.worldTransform, ref convexInverseWorldTransform, out fromMeshLocalToConvexLocal);
+        }
+
+        protected override bool ConfigureLocalTriangle(int i, TriangleShape localTriangleShape, out TriangleIndices indices)
         {
             int triangleIndex = overlappedTriangles.Elements[i];
-            mesh.Mesh.Data.GetTriangle(triangleIndex, out localTriangleShape.vA, out localTriangleShape.vB, out localTriangleShape.vC);
+            var data = mesh.Mesh.Data;
+            localTriangleShape.vA = data.vertices[data.indices[triangleIndex]];
+            localTriangleShape.vB = data.vertices[data.indices[triangleIndex + 1]];
+            localTriangleShape.vC = data.vertices[data.indices[triangleIndex + 2]];
             localTriangleShape.sidedness = mesh.sidedness;
             localTriangleShape.collisionMargin = 0;
             indices = new TriangleIndices
                           {
-                              A = mesh.Mesh.Data.indices[triangleIndex],
-                              B = mesh.Mesh.Data.indices[triangleIndex + 1],
-                              C = mesh.Mesh.Data.indices[triangleIndex + 2]
+                              A = data.indices[triangleIndex],
+                              B = data.indices[triangleIndex + 1],
+                              C = data.indices[triangleIndex + 2]
                           };
             return true;
         }

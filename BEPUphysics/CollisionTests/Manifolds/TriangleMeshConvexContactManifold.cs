@@ -83,7 +83,14 @@ namespace BEPUphysics.CollisionTests.Manifolds
 
         protected abstract bool UseImprovedBoundaryHandling { get; }
         protected internal abstract int FindOverlappingTriangles(float dt);
-        protected abstract bool ConfigureTriangle(int i, TriangleShape localTriangleShape, out TriangleIndices indices);
+
+        /// <summary>
+        /// Precomputes the transform to bring triangles from their native local space to the local space of the convex.
+        /// </summary>
+        /// <param name="convexInverseWorldTransform">Inverse of the world transform of the convex shape.</param>
+        /// <param name="fromMeshLocalToConvexLocal">Transform to apply to native local triangles to bring them into the local space of the convex.</param>
+        protected abstract void PrecomputeTriangleTransform(ref AffineTransform convexInverseWorldTransform, out AffineTransform fromMeshLocalToConvexLocal);
+        protected abstract bool ConfigureLocalTriangle(int i, TriangleShape localTriangleShape, out TriangleIndices indices);
         protected internal abstract void CleanUpOverlappingTriangles();
 
         ///<summary>
@@ -119,6 +126,14 @@ namespace BEPUphysics.CollisionTests.Manifolds
             //A single triangle shape will be reused for all operations. It's pulled from a thread local pool to avoid holding a TriangleShape around for every single contact manifold or pair tester.
             var localTriangleShape = PhysicsThreadResources.GetTriangle();
 
+            //Precompute the transform to take triangles from their native local space to the convex's local space.
+            RigidTransform inverseConvexWorldTransform;
+            RigidTransform.Invert(ref convex.worldTransform, out inverseConvexWorldTransform);
+            AffineTransform convexInverseWorldTransform;
+            AffineTransform.CreateFromRigidTransform(ref inverseConvexWorldTransform, out convexInverseWorldTransform);
+            AffineTransform fromMeshLocalToConvexLocal;
+            PrecomputeTriangleTransform(ref convexInverseWorldTransform, out fromMeshLocalToConvexLocal);
+
             Matrix3x3 orientation;
             Matrix3x3.CreateFromQuaternion(ref convex.worldTransform.Orientation, out orientation);
             var guaranteedContacts = 0;
@@ -126,8 +141,12 @@ namespace BEPUphysics.CollisionTests.Manifolds
             {
                 //Initialize the local triangle.
                 TriangleIndices indices;
-                if (ConfigureTriangle(i, localTriangleShape, out indices))
+                if (ConfigureLocalTriangle(i, localTriangleShape, out indices))
                 {
+                    //Put the triangle into the local space of the convex.
+                    AffineTransform.Transform(ref localTriangleShape.vA, ref fromMeshLocalToConvexLocal, out localTriangleShape.vA);
+                    AffineTransform.Transform(ref localTriangleShape.vB, ref fromMeshLocalToConvexLocal, out localTriangleShape.vB);
+                    AffineTransform.Transform(ref localTriangleShape.vC, ref fromMeshLocalToConvexLocal, out localTriangleShape.vC);
 
                     //Find a pairtester for the triangle.
                     TrianglePairTester pairTester;
@@ -139,14 +158,6 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     }
                     pairTester.Updated = true;
 
-
-                    //Put the triangle into the local space of the convex.
-                    Vector3.Subtract(ref localTriangleShape.vA, ref convex.worldTransform.Position, out localTriangleShape.vA);
-                    Vector3.Subtract(ref localTriangleShape.vB, ref convex.worldTransform.Position, out localTriangleShape.vB);
-                    Vector3.Subtract(ref localTriangleShape.vC, ref convex.worldTransform.Position, out localTriangleShape.vC);
-                    Matrix3x3.TransformTranspose(ref localTriangleShape.vA, ref orientation, out localTriangleShape.vA);
-                    Matrix3x3.TransformTranspose(ref localTriangleShape.vB, ref orientation, out localTriangleShape.vB);
-                    Matrix3x3.TransformTranspose(ref localTriangleShape.vC, ref orientation, out localTriangleShape.vC);
 
                     //Now, generate a contact between the two shapes.
                     TinyStructList<ContactData> contactList;

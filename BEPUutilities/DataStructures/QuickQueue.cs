@@ -94,7 +94,7 @@ namespace BEPUutilities.DataStructures
         /// </summary>
         /// <param name="pool">Pool from which to retrieve typed arrays.</param>
         /// <param name="initialPoolIndex">Initial pool index to pull the backing array from. The size of the initial buffer will be 2^initialPoolIndex.</param>
-        public QuickQueue(BufferPool<T> pool, int initialPoolIndex = 2)
+        public QuickQueue(BufferPool<T> pool, int initialPoolIndex = 5)
         {
             this.pool = pool;
             poolIndex = initialPoolIndex;

@@ -218,7 +218,7 @@ namespace BEPUphysics.BroadPhaseEntries.MobileCollidables
             for (int i = 0; i < children.Count; i++)
             {
                 RigidTransform transform;
-                RigidTransform.Transform(ref shapeList.Elements[children.Elements[i].shapeIndex].LocalTransform, ref worldTransform, out transform);
+                RigidTransform.Multiply(ref shapeList.Elements[children.Elements[i].shapeIndex].LocalTransform, ref worldTransform, out transform);
                 children.Elements[i].CollisionInformation.UpdateWorldTransform(ref transform.Position, ref transform.Orientation);
             }
         }

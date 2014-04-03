@@ -4,6 +4,8 @@ using BEPUutilities;
 using BEPUphysics.CollisionShapes;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
 using BEPUphysics.OtherSpaceStages;
+using BEPUutilities.DataStructures;
+using BEPUutilities.ResourceManagement;
 
 namespace BEPUphysics.BroadPhaseEntries
 {
@@ -27,6 +29,10 @@ namespace BEPUphysics.BroadPhaseEntries
             }
         }
 
+        /// <summary>
+        /// The sidedness of triangles in the terrain. Precomputed based on the transform.
+        /// </summary>
+        internal TriangleSidedness sidedness;
 
         internal AffineTransform worldTransform;
         ///<summary>
@@ -41,6 +47,27 @@ namespace BEPUphysics.BroadPhaseEntries
             set
             {
                 worldTransform = value;
+                //Compute the sidedness of triangles in the terrain so that the TerrainContactManifold doesn't have to.
+                //This is a marginally hacky way to determine sidedness: check the sidedness of an arbitrary triangle in the terrain. All other triangles share the same sidedness.
+                Vector3 a, b, c;
+                Shape.GetFirstTriangle(0, 0, ref worldTransform, out a, out b, out c);
+
+                Vector3 AB, AC, normal;
+                Vector3.Subtract(ref b, ref a, out AB);
+                Vector3.Subtract(ref c, ref a, out AC);
+                Vector3.Cross(ref AB, ref AC, out normal);
+
+                Vector3 terrainUp = new Vector3(worldTransform.LinearTransform.M21, worldTransform.LinearTransform.M22, worldTransform.LinearTransform.M23);
+                float dot;
+                Vector3.Dot(ref terrainUp, ref normal, out dot);
+                if (dot > 0)
+                {
+                    sidedness = TriangleSidedness.Clockwise;
+                }
+                else
+                {
+                    sidedness = TriangleSidedness.Counterclockwise;
+                }
             }
         }
 
@@ -144,8 +171,8 @@ namespace BEPUphysics.BroadPhaseEntries
         ///<param name="worldTransform">Transform to use for the terrain.</param>
         public Terrain(TerrainShape shape, AffineTransform worldTransform)
         {
-            this.worldTransform = worldTransform;
             Shape = shape;
+            WorldTransform = worldTransform;
 
             Events = new ContactEventManager<Terrain>();
         }
@@ -209,16 +236,16 @@ namespace BEPUphysics.BroadPhaseEntries
         public override bool ConvexCast(CollisionShapes.ConvexShapes.ConvexShape castShape, ref RigidTransform startingTransform, ref Vector3 sweep, out RayHit hit)
         {
             hit = new RayHit();
-            BoundingBox boundingBox;
-            castShape.GetSweptLocalBoundingBox(ref startingTransform, ref worldTransform, ref sweep, out boundingBox);
+            BoundingBox localSpaceBoundingBox;
+            castShape.GetSweptLocalBoundingBox(ref startingTransform, ref worldTransform, ref sweep, out localSpaceBoundingBox);
             var tri = PhysicsThreadResources.GetTriangle();
-            var hitElements = PhysicsResources.GetTriangleIndicesList();
-            if (Shape.GetOverlaps(boundingBox, hitElements))
+            var hitElements = new QuickList<int>(BufferPools<int>.Thread);
+            if (Shape.GetOverlaps(localSpaceBoundingBox, ref hitElements))
             {
                 hit.T = float.MaxValue;
                 for (int i = 0; i < hitElements.Count; i++)
                 {
-                    Shape.GetTriangle(ref hitElements.Elements[i], ref worldTransform, out tri.vA, out tri.vB, out tri.vC);
+                    Shape.GetTriangle(hitElements.Elements[i], ref worldTransform, out tri.vA, out tri.vB, out tri.vC);
                     Vector3 center;
                     Vector3.Add(ref tri.vA, ref tri.vB, out center);
                     Vector3.Add(ref center, ref tri.vC, out center);
@@ -244,11 +271,11 @@ namespace BEPUphysics.BroadPhaseEntries
                 }
                 tri.MaximumRadius = 0;
                 PhysicsThreadResources.GiveBack(tri);
-                PhysicsResources.GiveBack(hitElements);
+                hitElements.Dispose();
                 return hit.T != float.MaxValue;
             }
             PhysicsThreadResources.GiveBack(tri);
-            PhysicsResources.GiveBack(hitElements);
+            hitElements.Dispose();
             return false;
         }
 

@@ -240,11 +240,11 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         public override void GetBoundingBox(ref RigidTransform shapeTransform, out BoundingBox boundingBox)
         {
             RigidTransform subTransform;
-            RigidTransform.Transform(ref shapes.WrappedList.Elements[0].Transform, ref shapeTransform, out subTransform);
+            RigidTransform.Multiply(ref shapes.WrappedList.Elements[0].Transform, ref shapeTransform, out subTransform);
             shapes.WrappedList.Elements[0].CollisionShape.GetBoundingBox(ref subTransform, out boundingBox);
             for (int i = 1; i < shapes.WrappedList.Count; i++)
             {
-                RigidTransform.Transform(ref shapes.WrappedList.Elements[i].Transform, ref shapeTransform, out subTransform);
+                RigidTransform.Multiply(ref shapes.WrappedList.Elements[i].Transform, ref shapeTransform, out subTransform);
                 BoundingBox toMerge;
                 shapes.WrappedList.Elements[i].CollisionShape.GetBoundingBox(ref subTransform, out toMerge);
                 BoundingBox.CreateMerged(ref boundingBox, ref toMerge, out boundingBox);
