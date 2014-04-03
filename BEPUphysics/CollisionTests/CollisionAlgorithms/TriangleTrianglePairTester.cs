@@ -12,9 +12,9 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
     {
         //TODO: Having a specialized triangle-triangle pair test would be nice.  Even if it didn't use an actual triangle-triangle test, certain assumptions could still make it speedier and more elegant.
         //"Closest points between triangles" + persistent manifolding would probably be the best approach (a lot faster than the triangle-convex general case anyway).
-        public override bool GenerateContactCandidate(out TinyStructList<ContactData> contactList)
+        public override bool GenerateContactCandidates(TriangleShape triangle, out TinyStructList<ContactData> contactList)
         {
-            if (base.GenerateContactCandidate(out contactList))
+            if (base.GenerateContactCandidates(triangle, out contactList))
             {
                 //The triangle-convex pair test has already rejected contacts whose normals would violate the first triangle's sidedness.
                 //However, since it's a vanilla triangle-convex test, it doesn't know about the sidedness of the other triangle!

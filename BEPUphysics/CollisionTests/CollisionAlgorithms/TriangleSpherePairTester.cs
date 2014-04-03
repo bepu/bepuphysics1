@@ -22,7 +22,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
         ///</summary>
         ///<param name="contactList">Contact between the shapes, if any.</param>
         ///<returns>Whether or not the shapes are colliding.</returns>
-        public override bool GenerateContactCandidate(out TinyStructList<ContactData> contactList)
+        public override bool GenerateContactCandidates(TriangleShape triangle, out TinyStructList<ContactData> contactList)
         {
             contactList = new TinyStructList<ContactData>();
 
@@ -100,7 +100,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
 
         }
 
-        public override VoronoiRegion GetRegion(ref ContactData contact)
+        public override VoronoiRegion GetRegion(TriangleShape triangle, ref ContactData contact)
         {
             return lastRegion;
         }
@@ -118,11 +118,9 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
         /// Initializes the pair tester.
         ///</summary>
         ///<param name="convex">Convex shape to use.</param>
-        ///<param name="triangle">Triangle shape to use.</param>
-        public override void Initialize(ConvexShape convex, TriangleShape triangle)
+        public override void Initialize(ConvexShape convex)
         {
             this.sphere = (SphereShape)convex;
-            this.triangle = triangle;
         }
 
         /// <summary>
@@ -130,7 +128,6 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
         /// </summary>
         public override void CleanUp()
         {
-            triangle = null;
             sphere = null;
             Updated = false;
         }
