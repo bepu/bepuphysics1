@@ -60,14 +60,27 @@ namespace BEPUphysics.CollisionTests.Manifolds
             return overlappedTriangles.Count;
         }
 
-        protected override bool ConfigureTriangle(int i, TriangleShape localTriangleShape, out TriangleIndices indices)
+        /// <summary>
+        /// Precomputes the transform to bring triangles from their native local space to the local space of the convex.
+        /// </summary>
+        /// <param name="convexInverseWorldTransform">Inverse of the world transform of the convex shape.</param>
+        /// <param name="fromMeshLocalToConvexLocal">Transform to apply to native local triangles to bring them into the local space of the convex.</param>
+        protected override void PrecomputeTriangleTransform(ref AffineTransform convexInverseWorldTransform, out AffineTransform fromMeshLocalToConvexLocal)
+        {
+            var data = ((TransformableMeshData)mesh.Shape.TriangleMesh.Data);
+            //The mobile mesh has a shape-based transform followed by the instance transform.
+            AffineTransform combinedMobileMeshWorldTransform;
+            AffineTransform.Multiply(ref data.worldTransform, ref mesh.worldTransform, out combinedMobileMeshWorldTransform);
+            AffineTransform.Multiply(ref combinedMobileMeshWorldTransform, ref convexInverseWorldTransform, out fromMeshLocalToConvexLocal);
+        }
+
+        protected override bool ConfigureLocalTriangle(int i, TriangleShape localTriangleShape, out TriangleIndices indices)
         {
             MeshBoundingBoxTreeData data = mesh.Shape.TriangleMesh.Data;
             int triangleIndex = overlappedTriangles.Elements[i];
-            data.GetTriangle(triangleIndex, out localTriangleShape.vA, out localTriangleShape.vB, out localTriangleShape.vC);
-            AffineTransform.Transform(ref localTriangleShape.vA, ref mesh.worldTransform, out localTriangleShape.vA);
-            AffineTransform.Transform(ref localTriangleShape.vB, ref mesh.worldTransform, out localTriangleShape.vB);
-            AffineTransform.Transform(ref localTriangleShape.vC, ref mesh.worldTransform, out localTriangleShape.vC);
+            localTriangleShape.vA = data.vertices[data.indices[triangleIndex]];
+            localTriangleShape.vB = data.vertices[data.indices[triangleIndex + 1]];
+            localTriangleShape.vC = data.vertices[data.indices[triangleIndex + 2]];
             //In instanced meshes, the bounding box we found in local space could collect more triangles than strictly necessary.
             //By doing a second pass, we should be able to prune out quite a few of them.
             BoundingBox triangleAABB;
@@ -82,7 +95,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
 
             localTriangleShape.sidedness = mesh.sidedness;
             localTriangleShape.collisionMargin = 0;
-            indices = new TriangleIndices()
+            indices = new TriangleIndices
             {
                 A = data.indices[triangleIndex],
                 B = data.indices[triangleIndex + 1],

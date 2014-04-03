@@ -311,12 +311,12 @@ namespace BEPUphysics.CollisionShapes
         public override void GetBoundingBox(ref RigidTransform transform, out BoundingBox boundingBox)
         {
             RigidTransform combinedTransform;
-            RigidTransform.Transform(ref shapes.Elements[0].LocalTransform, ref transform, out combinedTransform);
+            RigidTransform.Multiply(ref shapes.Elements[0].LocalTransform, ref transform, out combinedTransform);
             shapes.Elements[0].Shape.GetBoundingBox(ref combinedTransform, out boundingBox);
 
             for (int i = 0; i < shapes.Count; i++)
             {
-                RigidTransform.Transform(ref shapes.Elements[i].LocalTransform, ref transform, out combinedTransform);
+                RigidTransform.Multiply(ref shapes.Elements[i].LocalTransform, ref transform, out combinedTransform);
                 BoundingBox childBoundingBox;
                 shapes.Elements[i].Shape.GetBoundingBox(ref combinedTransform, out childBoundingBox);
                 BoundingBox.CreateMerged(ref boundingBox, ref childBoundingBox, out boundingBox);

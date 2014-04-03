@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using BEPUphysics.CollisionTests.Manifolds;
- 
+
 using BEPUutilities;
 using BEPUutilities.DataStructures;
 
@@ -486,96 +487,14 @@ namespace BEPUphysics.CollisionShapes
             normal.Normalize();
         }
 
-        ///<summary>
-        /// Gets overlapped triangles with the terrain shape with a bounding box in the local space of the shape.
-        ///</summary>
-        ///<param name="localSpaceBoundingBox">Bounding box in the local space of the terrain shape.</param>
-        ///<param name="overlappedTriangles">Triangles whose bounding boxes overlap the input bounding box.</param>
-        public bool GetOverlaps(BoundingBox localSpaceBoundingBox, RawList<TriangleMeshConvexContactManifold.TriangleIndices> overlappedTriangles)
-        {
-            int width = heights.GetLength(0);
-            int minX = Math.Max((int)localSpaceBoundingBox.Min.X, 0);
-            int minY = Math.Max((int)localSpaceBoundingBox.Min.Z, 0);
-            int maxX = Math.Min((int)localSpaceBoundingBox.Max.X, width - 2);
-            int maxY = Math.Min((int)localSpaceBoundingBox.Max.Z, heights.GetLength(1) - 2);
-            for (int i = minX; i <= maxX; i++)
-            {
-                for (int j = minY; j <= maxY; j++)
-                {
-                    //Before adding a triangle to the list, make sure the object isn't too high or low from the quad.
-                    float highest, lowest;
-                    float y1 = heights[i, j];
-                    float y2 = heights[i + 1, j];
-                    float y3 = heights[i, j + 1];
-                    float y4 = heights[i + 1, j + 1];
-
-                    highest = y1;
-                    lowest = y1;
-                    if (y2 > highest)
-                        highest = y2;
-                    else if (y2 < lowest)
-                        lowest = y2;
-                    if (y3 > highest)
-                        highest = y3;
-                    else if (y3 < lowest)
-                        lowest = y3;
-                    if (y4 > highest)
-                        highest = y4;
-                    else if (y4 < lowest)
-                        lowest = y4;
-
-
-                    if (localSpaceBoundingBox.Max.Y < lowest ||
-                        localSpaceBoundingBox.Min.Y > highest)
-                        continue;
-
-                    //Now the local bounding box is very likely intersecting those of the triangles.
-                    //Add the triangles to the list.
-                    var indices = new TriangleMeshConvexContactManifold.TriangleIndices();
-
-                    //v3 v4
-                    //v1 v2
-
-                    if (quadTriangleOrganization == QuadTriangleOrganization.BottomLeftUpperRight)
-                    {
-                        //v1 v2 v3
-                        indices.A = i + j * width;
-                        indices.B = i + 1 + j * width;
-                        indices.C = i + (j + 1) * width;
-                        overlappedTriangles.Add(indices);
-
-                        //v2 v4 v3
-                        indices.A = i + 1 + j * width;
-                        indices.B = i + 1 + (j + 1) * width;
-                        indices.C = i + (j + 1) * width;
-                        overlappedTriangles.Add(indices);
-                    }
-                    else //Bottom right, Upper left
-                    {
-                        //v1 v2 v4
-                        indices.A = i + j * width;
-                        indices.B = i + 1 + j * width;
-                        indices.C = i + 1 + (j + 1) * width;
-                        overlappedTriangles.Add(indices);
-
-                        //v1 v4 v3
-                        indices.A = i + j * width;
-                        indices.B = i + 1 + (j + 1) * width;
-                        indices.C = i + (j + 1) * width;
-                        overlappedTriangles.Add(indices);
-                    }
-
-                }
-            }
-            return overlappedTriangles.Count > 0;
-        }
 
         ///<summary>
         /// Gets overlapped triangles with the terrain shape with a bounding box in the local space of the shape.
         ///</summary>
         ///<param name="localBoundingBox">Bounding box in the local space of the terrain shape.</param>
-        ///<param name="overlappedElements">Indices of elements whose bounding boxes overlap the input bounding box.</param>
-        public bool GetOverlaps(BoundingBox localBoundingBox, RawList<int> overlappedElements)
+        ///<param name="overlappedElements">Indices of triangles whose bounding boxes overlap the input bounding box. Encoded as 2 * (quadRowIndex * terrainWidthInQuads + quadColumnIndex) + isFirstTriangleOfQuad ? 0 : 1, where isFirstTriangleOfQuad refers to which of the two triangles in a quad is being requested. Matches the input of the TerrainShape.GetTriangle function.</param>
+        ///<typeparam name="T">Type of the list to fill with overlaps.</typeparam>
+        public bool GetOverlaps<T>(BoundingBox localBoundingBox, ref T overlappedElements) where T : IList<int> //Designed to work with value type ILists, hence anti-boxing interface constraint and ref.
         {
             int width = heights.GetLength(0);
             int minX = Math.Max((int)localBoundingBox.Min.X, 0);
@@ -615,38 +534,14 @@ namespace BEPUphysics.CollisionShapes
 
                     //Now the local bounding box is very likely intersecting those of the triangles.
                     //Add the triangles to the list.
-                    int quadIndex = (i + j * width) * 2;
+                    int quadIndex = (i + j * width) << 1;
                     overlappedElements.Add(quadIndex);
-                    overlappedElements.Add(quadIndex + 1);
+                    overlappedElements.Add(quadIndex | 1);
 
 
                 }
             }
             return overlappedElements.Count > 0;
-        }
-
-        ///<summary>
-        /// Gets a world space triangle in the terrain at the given indices (as if it were a mesh).
-        ///</summary>
-        ///<param name="indices">Indices of the triangle.</param>
-        ///<param name="transform">Transform to apply to the triangle vertices.</param>
-        ///<param name="a">First vertex of the triangle.</param>
-        ///<param name="b">Second vertex of the triangle.</param>
-        ///<param name="c">Third vertex of the triangle.</param>
-        public void GetTriangle(ref TriangleMeshConvexContactManifold.TriangleIndices indices, ref AffineTransform transform, out Vector3 a, out Vector3 b, out Vector3 c)
-        {
-            //Reverse the encoded index:
-            //index = i + width * j
-            int width = heights.GetLength(0);
-            int rowIndexA = indices.A / width;
-            int columnIndexA = indices.A - rowIndexA * width;
-            int rowIndexB = indices.B / width;
-            int columnIndexB = indices.B - rowIndexB * width;
-            int rowIndexC = indices.C / width;
-            int columnIndexC = indices.C - rowIndexC * width;
-            GetPosition(columnIndexA, rowIndexA, ref transform, out a);
-            GetPosition(columnIndexB, rowIndexB, ref transform, out b);
-            GetPosition(columnIndexC, rowIndexC, ref transform, out c);
         }
 
 
@@ -704,7 +599,7 @@ namespace BEPUphysics.CollisionShapes
         ///<summary>
         /// Gets a world space triangle in the terrain at the given triangle index.
         ///</summary>
-        ///<param name="index">Index of the triangle. Encoded as quadRowIndex * terrainWidthInQuads + quadColumnIndex + isFirstTriangleOfQuad ? 0 : 1, where isFirstTriangleOfQuad refers to which of the two triangles in a quad is being requested.</param>
+        ///<param name="index">Index of the triangle. Encoded as 2 * (quadRowIndex * terrainWidthInQuads + quadColumnIndex) + isFirstTriangleOfQuad ? 0 : 1, where isFirstTriangleOfQuad refers to which of the two triangles in a quad is being requested. Matches the output of the TerrainShape.GetOverlaps function.</param>
         ///<param name="transform">Transform to apply to the triangle vertices.</param>
         ///<param name="a">First vertex of the triangle.</param>
         ///<param name="b">Second vertex of the triangle.</param>
@@ -727,6 +622,44 @@ namespace BEPUphysics.CollisionShapes
         }
 
 
+
+        internal void GetLocalIndices(int i, out TerrainVertexIndices a, out TerrainVertexIndices b, out TerrainVertexIndices c)
+        {
+            int quadIndex = i / 2;
+            //TODO: This division could be avoided if you're willing to get tricky or impose some size requirements.
+            int rowIndex = quadIndex / heights.GetLength(0);
+            int columnIndex = quadIndex - rowIndex * heights.GetLength(0);
+            if ((i & 1) == 0) //Check if this is the first or second triangle.
+            {
+                if (quadTriangleOrganization == QuadTriangleOrganization.BottomLeftUpperRight)
+                {
+                    a = new TerrainVertexIndices { ColumnIndex = columnIndex, RowIndex = rowIndex };
+                    b = new TerrainVertexIndices { ColumnIndex = columnIndex + 1, RowIndex = rowIndex };
+                    c = new TerrainVertexIndices { ColumnIndex = columnIndex, RowIndex = rowIndex + 1 };
+                }
+                else
+                {
+                    a = new TerrainVertexIndices { ColumnIndex = columnIndex, RowIndex = rowIndex };
+                    b = new TerrainVertexIndices { ColumnIndex = columnIndex + 1, RowIndex = rowIndex };
+                    c = new TerrainVertexIndices { ColumnIndex = columnIndex + 1, RowIndex = rowIndex + 1 };
+                }
+            }
+            else
+            {
+                if (quadTriangleOrganization == QuadTriangleOrganization.BottomLeftUpperRight)
+                {
+                    a = new TerrainVertexIndices { ColumnIndex = columnIndex, RowIndex = rowIndex + 1 };
+                    c = new TerrainVertexIndices { ColumnIndex = columnIndex + 1, RowIndex = rowIndex + 1 };
+                    b = new TerrainVertexIndices { ColumnIndex = columnIndex + 1, RowIndex = rowIndex };
+                }
+                else
+                {
+                    a = new TerrainVertexIndices { ColumnIndex = columnIndex, RowIndex = rowIndex };
+                    b = new TerrainVertexIndices { ColumnIndex = columnIndex, RowIndex = rowIndex + 1 };
+                    c = new TerrainVertexIndices { ColumnIndex = columnIndex + 1, RowIndex = rowIndex + 1 };
+                }
+            }
+        }
     }
 
     /// <summary>

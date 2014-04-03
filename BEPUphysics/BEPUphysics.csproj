@@ -213,6 +213,7 @@
     <Compile Include="CollisionTests\Manifolds\TerrainSphereContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\TriangleConvexContactManifold.cs" />
     <Compile Include="CollisionTests\Manifolds\TriangleMeshConvexContactManifold.cs" />
+    <Compile Include="CollisionTests\Manifolds\TerrainVertexIndices.cs" />
     <Compile Include="Constraints\Collision\ContactFrictionConstraint.cs" />
     <Compile Include="Constraints\Collision\ContactManifoldConstraint.cs" />
     <Compile Include="Constraints\Collision\ContactManifoldConstraintGroup.cs" />

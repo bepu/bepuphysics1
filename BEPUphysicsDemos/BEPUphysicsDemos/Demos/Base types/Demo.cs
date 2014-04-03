@@ -30,13 +30,13 @@ namespace BEPUphysicsDemos.Demos
             parallelLooper.AddThread(delegate { Thread.CurrentThread.SetProcessorAffinity(new[] { 5 }); });
 
 #else
-            if (Environment.ProcessorCount > 1)
-            {
-                for (int i = 0; i < Environment.ProcessorCount; i++)
-                {
-                    parallelLooper.AddThread();
-                }
-            }
+            //if (Environment.ProcessorCount > 1)
+            //{
+            //    for (int i = 0; i < Environment.ProcessorCount; i++)
+            //    {
+            //        parallelLooper.AddThread();
+            //    }
+            //}
 #endif
 
             Space = new Space(parallelLooper);

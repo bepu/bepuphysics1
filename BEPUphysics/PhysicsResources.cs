@@ -32,7 +32,6 @@ namespace BEPUphysics
             SubPoolEntityRawList = new LockingResourcePool<RawList<Entity>>(16);
             SubPoolTriangleShape = new LockingResourcePool<TriangleShape>();
             SubPoolTriangleCollidables = new LockingResourcePool<TriangleCollidable>();
-            SubPoolTriangleIndicesList = new LockingResourcePool<RawList<TriangleMeshConvexContactManifold.TriangleIndices>>();
             SimulationIslandConnections = new LockingResourcePool<SimulationIslandConnection>();
         }
 
@@ -43,7 +42,6 @@ namespace BEPUphysics
         static LockingResourcePool<TriangleShape> SubPoolTriangleShape;
         static LockingResourcePool<RawList<CompoundChild>> SubPoolCompoundChildList;
         static LockingResourcePool<TriangleCollidable> SubPoolTriangleCollidables;
-        static LockingResourcePool<RawList<TriangleMeshConvexContactManifold.TriangleIndices>> SubPoolTriangleIndicesList;
         static LockingResourcePool<SimulationIslandConnection> SimulationIslandConnections;
         //#endif
         /// <summary>
@@ -162,25 +160,6 @@ namespace BEPUphysics
         {
             triangle.CleanUp();
             SubPoolTriangleCollidables.GiveBack(triangle);
-        }
-
-        /// <summary>
-        /// Retrieves a TriangleIndices list from the resource pool.
-        /// </summary>
-        /// <returns>TriangleIndices list.</returns>
-        public static RawList<TriangleMeshConvexContactManifold.TriangleIndices> GetTriangleIndicesList()
-        {
-            return SubPoolTriangleIndicesList.Take();
-        }
-
-        /// <summary>
-        /// Returns a resource to the pool.
-        /// </summary>
-        /// <param name="triangleIndices">TriangleIndices list to return.</param>
-        public static void GiveBack(RawList<TriangleMeshConvexContactManifold.TriangleIndices> triangleIndices)
-        {
-            triangleIndices.Clear();
-            SubPoolTriangleIndicesList.GiveBack(triangleIndices);
         }
 
         /// <summary>

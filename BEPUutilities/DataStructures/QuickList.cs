@@ -12,7 +12,7 @@ namespace BEPUutilities.DataStructures
     /// it is a value type and copying it around will break things without extreme care, it cannot be validly default-constructed,
     /// it exposes internal structures to user modification, it rarely checks input for errors, and the enumerator doesn't check for mid-enumeration modification.</remarks>
     /// <typeparam name="T">Type of the elements in the list.</typeparam>
-    public struct QuickList<T> : IDisposable, IEnumerable<T>
+    public struct QuickList<T> : IDisposable, IList<T>
     {
         private int poolIndex;
         private BufferPool<T> pool;
@@ -76,7 +76,7 @@ namespace BEPUutilities.DataStructures
         /// </summary>
         /// <param name="pool">Pool from which to retrieve typed arrays.</param>
         /// <param name="initialPoolIndex">Initial pool index to pull the backing array from. The size of the initial buffer will be 2^initialPoolIndex.</param>
-        public QuickList(BufferPool<T> pool, int initialPoolIndex = 2)
+        public QuickList(BufferPool<T> pool, int initialPoolIndex = 5)
         {
             this.pool = pool;
             poolIndex = initialPoolIndex;
@@ -332,6 +332,88 @@ namespace BEPUutilities.DataStructures
         }
 
         /// <summary>
+        /// Inserts an item to the <see cref="T:System.Collections.Generic.IList`1"/> at the specified index.
+        /// </summary>
+        /// <param name="index">The zero-based index at which <paramref name="element"/> should be inserted.</param>
+        /// <param name="element">The object to insert into the <see cref="T:System.Collections.Generic.IList`1"/>.</param>
+        /// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="index"/> is not a valid index in the <see cref="T:System.Collections.Generic.IList`1"/>.</exception>
+#if FORCEINLINE
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        public void Insert(int index, T element)
+        {
+            Validate();
+            if (Count == Elements.Length)
+                Resize(poolIndex + 1);
+            Array.Copy(Elements, index, Elements, index + 1, count - index);
+            Elements[index] = element;
+            ++Count;
+        }
+
+        /// <summary>
+        /// Inserts an item to the <see cref="T:System.Collections.Generic.IList`1"/> at the specified index.
+        /// </summary>
+        /// <param name="index">The zero-based index at which <paramref name="element"/> should be inserted.</param>
+        /// <param name="element">The object to insert into the <see cref="T:System.Collections.Generic.IList`1"/>.</param>
+        /// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="index"/> is not a valid index in the <see cref="T:System.Collections.Generic.IList`1"/>.</exception>
+#if FORCEINLINE
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        public void Insert(int index, ref T element)
+        {
+            Validate();
+            if (Count == Elements.Length)
+                Resize(poolIndex + 1);
+            Array.Copy(Elements, index, Elements, index + 1, count - index);
+            Elements[index] = element;
+            ++Count;
+        }
+
+
+        /// <summary>
+        /// Determines whether the <see cref="T:System.Collections.Generic.ICollection`1"/> contains a specific value.
+        /// </summary>
+        /// <returns>
+        /// true if <paramref name="element"/> is found in the <see cref="T:System.Collections.Generic.ICollection`1"/>; otherwise, false.
+        /// </returns>
+        /// <param name="element">The object to locate in the <see cref="T:System.Collections.Generic.ICollection`1"/>.</param>
+#if FORCEINLINE
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        public bool Contains(T element)
+        {
+            return IndexOf(element) >= 0;
+        }
+
+        /// <summary>
+        /// Determines whether the <see cref="T:System.Collections.Generic.ICollection`1"/> contains a specific value.
+        /// </summary>
+        /// <returns>
+        /// true if <paramref name="element"/> is found in the <see cref="T:System.Collections.Generic.ICollection`1"/>; otherwise, false.
+        /// </returns>
+        /// <param name="element">The object to locate in the <see cref="T:System.Collections.Generic.ICollection`1"/>.</param>
+#if FORCEINLINE
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        public bool Contains(ref T element)
+        {
+            return IndexOf(ref element) >= 0;
+        }
+
+        /// <summary>
+        /// Copies the elements of the <see cref="T:System.Collections.Generic.ICollection`1"/> to an <see cref="T:System.Array"/>, starting at a particular <see cref="T:System.Array"/> index.
+        /// </summary>
+        /// <param name="array">The one-dimensional <see cref="T:System.Array"/> that is the destination of the elements copied from <see cref="T:System.Collections.Generic.ICollection`1"/>. The <see cref="T:System.Array"/> must have zero-based indexing.</param><param name="arrayIndex">The zero-based index in <paramref name="array"/> at which copying begins.</param><exception cref="T:System.ArgumentNullException"><paramref name="array"/> is null.</exception><exception cref="T:System.ArgumentOutOfRangeException"><paramref name="arrayIndex"/> is less than 0.</exception><exception cref="T:System.ArgumentException">The number of elements in the source <see cref="T:System.Collections.Generic.ICollection`1"/> is greater than the available space from <paramref name="arrayIndex"/> to the end of the destination <paramref name="array"/>.</exception>
+#if FORCEINLINE
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        public void CopyTo(T[] array, int arrayIndex)
+        {
+            Elements.CopyTo(array, arrayIndex);
+        }
+
+
+        /// <summary>
         /// Clears the list by setting the count to zero and explicitly setting all relevant indices in the backing array to default values.
         /// </summary>
 #if FORCEINLINE
@@ -431,6 +513,19 @@ namespace BEPUutilities.DataStructures
             {
                 index = -1;
             }
+        }
+
+
+        
+        /// <summary>
+        /// Gets a value indicating whether the <see cref="T:System.Collections.Generic.ICollection`1"/> is read-only.
+        /// </summary>
+        /// <returns>
+        /// true if the <see cref="T:System.Collections.Generic.ICollection`1"/> is read-only; otherwise, false.
+        /// </returns>
+        bool ICollection<T>.IsReadOnly
+        {
+            get { return false; }
         }
     }
 }
