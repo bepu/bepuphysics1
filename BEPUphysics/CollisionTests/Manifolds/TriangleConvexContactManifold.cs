@@ -98,7 +98,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
             //Now, generate a contact between the two shapes.
             ContactData contact;
             TinyStructList<ContactData> contactList;
-            if (pairTester.GenerateContactCandidate(out contactList))
+            if (pairTester.GenerateContactCandidates(localTriangleShape, out contactList))
             {
                 for (int i = 0; i < contactList.Count; i++)
                 {
@@ -192,7 +192,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     throw new ArgumentException("Inappropriate types used to initialize contact manifold.");
             }
 
-            pairTester.Initialize(convex.Shape, localTriangleShape);
+            pairTester.Initialize(convex.Shape);
         }
 
         public override void CleanUp()

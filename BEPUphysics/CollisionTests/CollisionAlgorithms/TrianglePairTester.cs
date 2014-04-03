@@ -8,8 +8,6 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
     ///</summary>
     public abstract class TrianglePairTester
     {
-        internal TriangleShape triangle;
-
         ///<summary>
         /// Whether or not the pair tester was updated during the last attempt.
         ///</summary>
@@ -20,16 +18,18 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
         ///<summary>
         /// Generates a contact between the triangle and convex.
         ///</summary>
+        /// <param name="triangle">Triangle to test</param>
         ///<param name="contactList">Contact between the shapes, if any.</param>
         ///<returns>Whether or not the shapes are colliding.</returns>
-        public abstract bool GenerateContactCandidate(out TinyStructList<ContactData> contactList);
+        public abstract bool GenerateContactCandidates(TriangleShape triangle, out TinyStructList<ContactData> contactList);
 
         /// <summary>
         /// Gets the triangle region in which the contact resides.
         /// </summary>
+        /// <param name="triangle">Triangle to compare the contact against.</param>
         /// <param name="contact">Contact to check.</param>
         /// <returns>Region in which the contact resides.</returns>
-        public abstract VoronoiRegion GetRegion(ref ContactData contact);
+        public abstract VoronoiRegion GetRegion(TriangleShape triangle, ref ContactData contact);
 
         /// <summary>
         /// Whether or not the last found contact should have its normal corrected.
@@ -40,8 +40,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
         /// Initializes the pair tester.
         ///</summary>
         ///<param name="convex">Convex shape to use.</param>
-        ///<param name="triangle">Triangle shape to use.</param>
-        public abstract void Initialize(ConvexShape convex, TriangleShape triangle);
+        public abstract void Initialize(ConvexShape convex);
 
         /// <summary>
         /// Cleans up the pair tester.

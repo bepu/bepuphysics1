@@ -147,6 +147,7 @@ namespace BEPUphysics.CollisionShapes
             boundingBox.Max.Y = maxYvertex.Y + transform.Translation.Y;
             boundingBox.Max.Z = maxZvertex.Z + transform.Translation.Z;
         }
+
         ///<summary>
         /// Tests a ray against the terrain shape.
         ///</summary>
@@ -407,42 +408,42 @@ namespace BEPUphysics.CollisionShapes
         ///<summary>
         /// Gets the position of a vertex at the given indices in local space.
         ///</summary>
-        ///<param name="i">Index in the first dimension.</param>
-        ///<param name="j">Index in the second dimension.</param>
+        ///<param name="columnIndex">Index in the first dimension.</param>
+        ///<param name="rowIndex">Index in the second dimension.</param>
         ///<param name="v">Local space position at the given vertice.s</param>
-        public void GetLocalPosition(int i, int j, out Vector3 v)
+        public void GetLocalPosition(int columnIndex, int rowIndex, out Vector3 v)
         {
 #if !WINDOWS
             v = new Vector3();
 #endif
-            v.X = i;
-            v.Y = heights[i, j];
-            v.Z = j;
+            v.X = columnIndex;
+            v.Y = heights[columnIndex, rowIndex];
+            v.Z = rowIndex;
         }
 
         /// <summary>
         /// Gets the world space position of a vertex in the terrain at the given indices.
         /// </summary>
-        ///<param name="i">Index in the first dimension.</param>
-        ///<param name="j">Index in the second dimension.</param>
+        ///<param name="columnIndex">Index in the first dimension.</param>
+        ///<param name="rowIndex">Index in the second dimension.</param>
         /// <param name="transform">Transform to apply to the vertex.</param>
         /// <param name="position">Transformed position of the vertex at the given indices.</param>
-        public void GetPosition(int i, int j, ref AffineTransform transform, out Vector3 position)
+        public void GetPosition(int columnIndex, int rowIndex, ref AffineTransform transform, out Vector3 position)
         {
-            if (i <= 0)
-                i = 0;
-            else if (i >= heights.GetLength(0))
-                i = heights.GetLength(0) - 1;
-            if (j <= 0)
-                j = 0;
-            else if (j >= heights.GetLength(1))
-                j = heights.GetLength(1) - 1;
+            if (columnIndex <= 0)
+                columnIndex = 0;
+            else if (columnIndex >= heights.GetLength(0))
+                columnIndex = heights.GetLength(0) - 1;
+            if (rowIndex <= 0)
+                rowIndex = 0;
+            else if (rowIndex >= heights.GetLength(1))
+                rowIndex = heights.GetLength(1) - 1;
 #if !WINDOWS
             position = new Vector3();
 #endif
-            position.X = i;
-            position.Y = heights[i, j];
-            position.Z = j;
+            position.X = columnIndex;
+            position.Y = heights[columnIndex, rowIndex];
+            position.Z = rowIndex;
             AffineTransform.Transform(ref position, ref transform, out position);
 
 
@@ -450,32 +451,32 @@ namespace BEPUphysics.CollisionShapes
 
 
         /// <summary>
-        /// Gets the world space normal at the given indices.
+        /// Gets the world space vertex normal at the given indices.
         /// </summary>
-        ///<param name="i">Index in the first dimension.</param>
-        ///<param name="j">Index in the second dimension.</param>
+        ///<param name="columnIndex">Vertex index in the first dimension.</param>
+        ///<param name="rowIndex">Vertex index in the second dimension.</param>
         /// <param name="transform">Transform to apply to the terrain while computing the normal.</param>
         /// <param name="normal">World space normal at the given indices.</param>
-        public void GetNormal(int i, int j, ref AffineTransform transform, out Vector3 normal)
+        public void GetNormal(int columnIndex, int rowIndex, ref AffineTransform transform, out Vector3 normal)
         {
             Vector3 top;
             Vector3 bottom;
             Vector3 right;
             Vector3 left;
 
-            if (i <= 0)
-                i = 0;
-            else if (i >= heights.GetLength(0))
-                i = heights.GetLength(0) - 1;
-            if (j <= 0)
-                j = 0;
-            else if (j >= heights.GetLength(1))
-                j = heights.GetLength(1) - 1;
+            if (columnIndex <= 0)
+                columnIndex = 0;
+            else if (columnIndex >= heights.GetLength(0))
+                columnIndex = heights.GetLength(0) - 1;
+            if (rowIndex <= 0)
+                rowIndex = 0;
+            else if (rowIndex >= heights.GetLength(1))
+                rowIndex = heights.GetLength(1) - 1;
 
-            GetPosition(i, Math.Min(j + 1, heights.GetLength(1) - 1), ref transform, out top);
-            GetPosition(i, Math.Max(j - 1, 0), ref transform, out bottom);
-            GetPosition(Math.Min(i + 1, heights.GetLength(0) - 1), j, ref transform, out right);
-            GetPosition(Math.Max(i - 1, 0), j, ref transform, out left);
+            GetPosition(columnIndex, Math.Min(rowIndex + 1, heights.GetLength(1) - 1), ref transform, out top);
+            GetPosition(columnIndex, Math.Max(rowIndex - 1, 0), ref transform, out bottom);
+            GetPosition(Math.Min(columnIndex + 1, heights.GetLength(0) - 1), rowIndex, ref transform, out right);
+            GetPosition(Math.Max(columnIndex - 1, 0), rowIndex, ref transform, out left);
 
             Vector3 temp;
             Vector3.Subtract(ref top, ref bottom, out temp);
@@ -637,21 +638,73 @@ namespace BEPUphysics.CollisionShapes
             //Reverse the encoded index:
             //index = i + width * j
             int width = heights.GetLength(0);
-            int columnA = indices.A / width;
-            int rowA = indices.A - columnA * width;
-            int columnB = indices.B / width;
-            int rowB = indices.B - columnB * width;
-            int columnC = indices.C / width;
-            int rowC = indices.C - columnC * width;
-            GetPosition(rowA, columnA, ref transform, out a);
-            GetPosition(rowB, columnB, ref transform, out b);
-            GetPosition(rowC, columnC, ref transform, out c);
+            int rowIndexA = indices.A / width;
+            int columnIndexA = indices.A - rowIndexA * width;
+            int rowIndexB = indices.B / width;
+            int columnIndexB = indices.B - rowIndexB * width;
+            int rowIndexC = indices.C / width;
+            int columnIndexC = indices.C - rowIndexC * width;
+            GetPosition(columnIndexA, rowIndexA, ref transform, out a);
+            GetPosition(columnIndexB, rowIndexB, ref transform, out b);
+            GetPosition(columnIndexC, rowIndexC, ref transform, out c);
         }
+
+
+        ///<summary>
+        /// Gets the first triangle of the quad at the given indices in world space.
+        ///</summary>
+        ///<param name="columnIndex">Index of the triangle's quad in the first dimension.</param>
+        ///<param name="rowIndex">Index of the triangle's quad in the second dimension.</param>
+        ///<param name="transform">Transform to apply to the triangle vertices.</param>
+        ///<param name="a">First vertex of the triangle.</param>
+        ///<param name="b">Second vertex of the triangle.</param>
+        ///<param name="c">Third vertex of the triangle.</param>
+        public void GetFirstTriangle(int columnIndex, int rowIndex, ref AffineTransform transform, out Vector3 a, out Vector3 b, out Vector3 c)
+        {
+            if (quadTriangleOrganization == QuadTriangleOrganization.BottomLeftUpperRight)
+            {
+                GetPosition(columnIndex, rowIndex, ref transform, out a);
+                GetPosition(columnIndex + 1, rowIndex, ref transform, out b);
+                GetPosition(columnIndex, rowIndex + 1, ref transform, out c);
+            }
+            else
+            {
+                GetPosition(columnIndex, rowIndex, ref transform, out a);
+                GetPosition(columnIndex + 1, rowIndex, ref transform, out b);
+                GetPosition(columnIndex + 1, rowIndex + 1, ref transform, out c);
+            }
+        }
+
+        ///<summary>
+        /// Gets the second triangle of the quad at the given indices in world space.
+        ///</summary>
+        ///<param name="columnIndex">Index of the triangle's quad in the first dimension.</param>
+        ///<param name="rowIndex">Index of the triangle's quad in the second dimension.</param>
+        ///<param name="transform">Transform to apply to the triangle vertices.</param>
+        ///<param name="a">First vertex of the triangle.</param>
+        ///<param name="b">Second vertex of the triangle.</param>
+        ///<param name="c">Third vertex of the triangle.</param>
+        public void GetSecondTriangle(int columnIndex, int rowIndex, ref AffineTransform transform, out Vector3 a, out Vector3 b, out Vector3 c)
+        {
+            if (quadTriangleOrganization == QuadTriangleOrganization.BottomLeftUpperRight)
+            {
+                GetPosition(columnIndex, rowIndex + 1, ref transform, out a);
+                GetPosition(columnIndex + 1, rowIndex + 1, ref transform, out b);
+                GetPosition(columnIndex + 1, rowIndex, ref transform, out c);
+            }
+            else
+            {
+                GetPosition(columnIndex, rowIndex, ref transform, out a);
+                GetPosition(columnIndex, rowIndex + 1, ref transform, out b);
+                GetPosition(columnIndex + 1, rowIndex + 1, ref transform, out c);
+            }
+        }
+
 
         ///<summary>
         /// Gets a world space triangle in the terrain at the given triangle index.
         ///</summary>
-        ///<param name="index">Index of the triangle.</param>
+        ///<param name="index">Index of the triangle. Encoded as quadRowIndex * terrainWidthInQuads + quadColumnIndex + isFirstTriangleOfQuad ? 0 : 1, where isFirstTriangleOfQuad refers to which of the two triangles in a quad is being requested.</param>
         ///<param name="transform">Transform to apply to the triangle vertices.</param>
         ///<param name="a">First vertex of the triangle.</param>
         ///<param name="b">Second vertex of the triangle.</param>
@@ -660,41 +713,16 @@ namespace BEPUphysics.CollisionShapes
         {
             //Find the quad.
             int quadIndex = index / 2;
-            bool isFirstTriangle = quadIndex * 2 == index;
-            int column = quadIndex / heights.GetLength(0);
-            int row = quadIndex - column * heights.GetLength(0);
-
-            if (quadTriangleOrganization == CollisionShapes.QuadTriangleOrganization.BottomLeftUpperRight)
+            //TODO: This division could be avoided if you're willing to get tricky or impose some size requirements.
+            int rowIndex = quadIndex / heights.GetLength(0);
+            int columnIndex = quadIndex - rowIndex * heights.GetLength(0);
+            if ((index & 1) == 0) //Check if this is the first or second triangle.
             {
-                if (isFirstTriangle)
-                {
-                    GetPosition(row, column, ref transform, out a);
-                    GetPosition(row + 1, column, ref transform, out b);
-                    GetPosition(row, column + 1, ref transform, out c);
-                }
-                else
-                {
-                    GetPosition(row, column + 1, ref transform, out a);
-                    GetPosition(row + 1, column + 1, ref transform, out b);
-                    GetPosition(row + 1, column, ref transform, out c);
-                }
+                GetFirstTriangle(columnIndex, rowIndex, ref transform, out a, out b, out c);
             }
             else
             {
-                //The quad is BottomRightUpperLeft.
-                if (isFirstTriangle)
-                {
-                    GetPosition(row, column, ref transform, out a);
-                    GetPosition(row + 1, column, ref transform, out b);
-                    GetPosition(row + 1, column + 1, ref transform, out c);
-                }
-                else
-                {
-                    GetPosition(row, column, ref transform, out a);
-                    GetPosition(row, column + 1, ref transform, out b);
-                    GetPosition(row + 1, column + 1, ref transform, out c);
-                }
-
+                GetSecondTriangle(columnIndex, rowIndex, ref transform, out a, out b, out c);
             }
         }
 

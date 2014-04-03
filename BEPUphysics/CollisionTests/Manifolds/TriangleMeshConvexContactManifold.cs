@@ -17,18 +17,11 @@ namespace BEPUphysics.CollisionTests.Manifolds
     {
         protected RawValueList<ContactSupplementData> supplementData = new RawValueList<ContactSupplementData>(4);
         private QuickDictionary<TriangleIndices, TrianglePairTester> activePairTesters;
-        protected TriangleShape localTriangleShape = new TriangleShape();
-
 
 
         protected abstract TrianglePairTester GetTester();
 
         protected abstract void GiveBackTester(TrianglePairTester tester);
-
-        //HashSet<int> blockedVertexRegions = new HashSet<int>();
-        //HashSet<Edge> blockedEdgeRegions = new HashSet<Edge>();
-        //RawValueList<EdgeContact> edgeContacts = new RawValueList<EdgeContact>(8);
-        //RawValueList<VertexContact> vertexContacts = new RawValueList<VertexContact>(8);
 
         private struct BoundarySets
         {
@@ -108,6 +101,9 @@ namespace BEPUphysics.CollisionTests.Manifolds
 
             CleanUpOverlappingTriangles();
             //Get all the overlapped triangle indices.
+            //Note that the collection of triangles is left up to the child implementation.
+            //We're basically treating the child class like an indexable collection.
+            //A little gross to have it organized this way instead of an explicit collection to separate the logic up. Would be nice to improve someday!
             int triangleCount = FindOverlappingTriangles(dt);
 
             //Just use 32 elements for all the lists and sets in this system.
@@ -119,6 +115,9 @@ namespace BEPUphysics.CollisionTests.Manifolds
                 boundarySets = new BoundarySets();
 
             var candidatesToAdd = new QuickList<ContactData>(BufferPools<ContactData>.Thread, bufferPoolSizePower);
+
+            //A single triangle shape will be reused for all operations. It's pulled from a thread local pool to avoid holding a TriangleShape around for every single contact manifold or pair tester.
+            var localTriangleShape = PhysicsThreadResources.GetTriangle();
 
             Matrix3x3 orientation;
             Matrix3x3.CreateFromQuaternion(ref convex.worldTransform.Orientation, out orientation);
@@ -135,7 +134,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     if (!activePairTesters.TryGetValue(indices, out pairTester))
                     {
                         pairTester = GetTester();
-                        pairTester.Initialize(convex.Shape, localTriangleShape);
+                        pairTester.Initialize(convex.Shape);
                         activePairTesters.Add(indices, pairTester);
                     }
                     pairTester.Updated = true;
@@ -150,18 +149,18 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     Matrix3x3.TransformTranspose(ref localTriangleShape.vC, ref orientation, out localTriangleShape.vC);
 
                     //Now, generate a contact between the two shapes.
-                    ContactData contact;
                     TinyStructList<ContactData> contactList;
-                    if (pairTester.GenerateContactCandidate(out contactList))
+                    if (pairTester.GenerateContactCandidates(localTriangleShape, out contactList))
                     {
                         for (int j = 0; j < contactList.Count; j++)
                         {
+                            ContactData contact;
                             contactList.Get(j, out contact);
 
 
                             if (UseImprovedBoundaryHandling)
                             {
-                                if (AnalyzeCandidate(ref indices, pairTester, ref contact, ref boundarySets))
+                                if (AnalyzeCandidate(ref indices, localTriangleShape, pairTester, ref contact, ref boundarySets))
                                 {
                                     //This is let through if there's a face contact. Face contacts cannot be blocked.
                                     guaranteedContacts++;
@@ -351,7 +350,6 @@ namespace BEPUphysics.CollisionTests.Manifolds
                 }
 
 
-
                 boundarySets.Dispose();
 
 
@@ -403,8 +401,8 @@ namespace BEPUphysics.CollisionTests.Manifolds
                 }
             }
 
-
-
+            
+            PhysicsThreadResources.GiveBack(localTriangleShape);
             candidatesToAdd.Dispose();
 
         }
@@ -456,14 +454,14 @@ namespace BEPUphysics.CollisionTests.Manifolds
                 normal = uncorrectedNormal;
         }
 
-        bool AnalyzeCandidate(ref TriangleIndices indices, TrianglePairTester pairTester, ref ContactData contact, ref BoundarySets sets)
+        bool AnalyzeCandidate(ref TriangleIndices indices, TriangleShape triangle, TrianglePairTester pairTester, ref ContactData contact, ref BoundarySets sets)
         {
-            switch (pairTester.GetRegion(ref contact))
+            switch (pairTester.GetRegion(triangle, ref contact))
             {
                 case VoronoiRegion.A:
                     //Add the contact.
                     VertexContact vertexContact;
-                    GetNormal(ref contact.Normal, pairTester.triangle, out vertexContact.CorrectedNormal);
+                    GetNormal(ref contact.Normal, triangle, out vertexContact.CorrectedNormal);
                     vertexContact.ContactData = contact;
                     vertexContact.Vertex = indices.A;
                     vertexContact.ShouldCorrect = pairTester.ShouldCorrectContactNormal;
@@ -479,7 +477,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     break;
                 case VoronoiRegion.B:
                     //Add the contact.
-                    GetNormal(ref contact.Normal, pairTester.triangle, out vertexContact.CorrectedNormal);
+                    GetNormal(ref contact.Normal, triangle, out vertexContact.CorrectedNormal);
                     vertexContact.ContactData = contact;
                     vertexContact.Vertex = indices.B;
                     vertexContact.ShouldCorrect = pairTester.ShouldCorrectContactNormal;
@@ -495,7 +493,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     break;
                 case VoronoiRegion.C:
                     //Add the contact.
-                    GetNormal(ref contact.Normal, pairTester.triangle, out vertexContact.CorrectedNormal);
+                    GetNormal(ref contact.Normal, triangle, out vertexContact.CorrectedNormal);
                     vertexContact.ContactData = contact;
                     vertexContact.Vertex = indices.C;
                     vertexContact.ShouldCorrect = pairTester.ShouldCorrectContactNormal;
@@ -512,7 +510,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                 case VoronoiRegion.AB:
                     //Add the contact.
                     EdgeContact edgeContact;
-                    GetNormal(ref contact.Normal, pairTester.triangle, out edgeContact.CorrectedNormal);
+                    GetNormal(ref contact.Normal, triangle, out edgeContact.CorrectedNormal);
                     edgeContact.Edge = new Edge(indices.A, indices.B);
                     edgeContact.ContactData = contact;
                     edgeContact.ShouldCorrect = pairTester.ShouldCorrectContactNormal;
@@ -527,7 +525,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     break;
                 case VoronoiRegion.AC:
                     //Add the contact.
-                    GetNormal(ref contact.Normal, pairTester.triangle, out edgeContact.CorrectedNormal);
+                    GetNormal(ref contact.Normal, triangle, out edgeContact.CorrectedNormal);
                     edgeContact.Edge = new Edge(indices.A, indices.C);
                     edgeContact.ContactData = contact;
                     edgeContact.ShouldCorrect = pairTester.ShouldCorrectContactNormal;
@@ -542,7 +540,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     break;
                 case VoronoiRegion.BC:
                     //Add the contact.
-                    GetNormal(ref contact.Normal, pairTester.triangle, out edgeContact.CorrectedNormal);
+                    GetNormal(ref contact.Normal, triangle, out edgeContact.CorrectedNormal);
                     edgeContact.Edge = new Edge(indices.B, indices.C);
                     edgeContact.ContactData = contact;
                     edgeContact.ShouldCorrect = pairTester.ShouldCorrectContactNormal;
