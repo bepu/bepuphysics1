@@ -1,10 +1,13 @@
 using System.Collections.Generic;
 using BEPUphysics.BroadPhaseEntries;
-using Microsoft.Xna.Framework;
+using BEPUutilities;
 using Microsoft.Xna.Framework.Graphics;
 using BEPUphysics.CollisionShapes;
 using ConversionHelper;
 using System;
+using Matrix = Microsoft.Xna.Framework.Matrix;
+using Vector2 = Microsoft.Xna.Framework.Vector2;
+using Vector3 = Microsoft.Xna.Framework.Vector3;
 
 namespace BEPUphysicsDrawer.Models
 {
@@ -37,18 +40,11 @@ namespace BEPUphysicsDrawer.Models
 
             //The terrain can be transformed arbitrarily.  However, the collision against the triangles is always oriented such that the transformed local
             //up vector points in the same direction as the collidable surfaces.
-            //To make sure the graphics match the terrain collision, see if a triangle normal faces in the same direction as the local up vector.
-            //If not, construct the graphics with reversed winding.
-            BEPUutilities.Vector3 a, b, c;
-            DisplayedObject.GetPosition(0, 0, out a);
-            DisplayedObject.GetPosition(1, 0, out b);
-            DisplayedObject.GetPosition(0, 1, out c);
-            Vector3 normal = MathConverter.Convert(BEPUutilities.Vector3.Cross(c - a, b - a));
-            Vector3 terrainUp = new Vector3(DisplayedObject.WorldTransform.LinearTransform.M21, DisplayedObject.WorldTransform.LinearTransform.M22, DisplayedObject.WorldTransform.LinearTransform.M23);
-            float dot;
-            Vector3.Dot(ref normal, ref terrainUp, out dot);
-            bool reverseWinding = dot < 0;
+            //To make sure the graphics match the terrain collision, try transforming the local space up direction into world space. Treat it as a normal- it requires an adjugate transpose, not a regular transformation.
 
+            var normalTransform = Matrix3x3.AdjugateTranspose(DisplayedObject.WorldTransform.LinearTransform);
+
+            var reverseWinding = BEPUutilities.Vector3.Dot(normalTransform.Up, DisplayedObject.WorldTransform.LinearTransform.Up) < 0;
 
 
             for (int j = 0; j < numRows; j++)
@@ -58,7 +54,9 @@ namespace BEPUphysicsDrawer.Models
                     VertexPositionNormalTexture v;
                     BEPUutilities.Vector3 position, n;
                     DisplayedObject.GetPosition(i, j, out position);
-                    DisplayedObject.GetNormal(i, j, out n);
+                    shape.GetLocalNormal(i, j, out n);
+                    Matrix3x3.Transform(ref n, ref normalTransform, out n);
+                    n.Normalize();
                     MathConverter.Convert(ref position, out v.Position);
                     MathConverter.Convert(ref n, out v.Normal);
 

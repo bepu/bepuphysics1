@@ -531,6 +531,18 @@ namespace BEPUutilities
         }
 
         /// <summary>
+        /// Inverts the given matix.
+        /// </summary>
+        /// <param name="matrix">Matrix to be inverted.</param>
+        /// <returns>Inverted matrix.</returns>
+        public static Matrix3x3 Invert(Matrix3x3 matrix)
+        {
+            Matrix3x3 toReturn;
+            Invert(ref matrix, out toReturn);
+            return toReturn;
+        }
+
+        /// <summary>
         /// Inverts the largest nonsingular submatrix in the matrix, excluding 2x2's that involve M13 or M31, and excluding 1x1's that include nondiagonal elements.
         /// </summary>
         /// <param name="matrix">Matrix to be inverted.</param>
@@ -652,6 +664,61 @@ namespace BEPUutilities
         }
 
         /// <summary>
+        /// <para>Computes the adjugate transpose of a matrix.</para>
+        /// <para>The adjugate transpose A of matrix M is: det(M) * transpose(invert(M))</para>
+        /// <para>This is necessary when transforming normals (bivectors) with general linear transformations.</para>
+        /// </summary>
+        /// <param name="matrix">Matrix to compute the adjugate transpose of.</param>
+        /// <param name="result">Adjugate transpose of the input matrix.</param>
+        public static void AdjugateTranspose(ref Matrix3x3 matrix, out Matrix3x3 result)
+        {
+            //Despite the relative obscurity of the operation, this is a fairly straightforward operation which is actually faster than a true invert (by virtue of cancellation).
+            //Conceptually, this is implemented as transpose(det(M) * invert(M)), but that's perfectly acceptable:
+            //1) transpose(invert(M)) == invert(transpose(M)), and
+            //2) det(M) == det(transpose(M))
+            //This organization makes it clearer that the invert's usual division by determinant drops out.
+
+            float m11 = (matrix.M22 * matrix.M33 - matrix.M23 * matrix.M32);
+            float m12 = (matrix.M13 * matrix.M32 - matrix.M33 * matrix.M12);
+            float m13 = (matrix.M12 * matrix.M23 - matrix.M22 * matrix.M13);
+
+            float m21 = (matrix.M23 * matrix.M31 - matrix.M21 * matrix.M33);
+            float m22 = (matrix.M11 * matrix.M33 - matrix.M13 * matrix.M31);
+            float m23 = (matrix.M13 * matrix.M21 - matrix.M11 * matrix.M23);
+
+            float m31 = (matrix.M21 * matrix.M32 - matrix.M22 * matrix.M31);
+            float m32 = (matrix.M12 * matrix.M31 - matrix.M11 * matrix.M32);
+            float m33 = (matrix.M11 * matrix.M22 - matrix.M12 * matrix.M21);
+
+            //Note transposition.
+            result.M11 = m11;
+            result.M12 = m21;
+            result.M13 = m31;
+
+            result.M21 = m12;
+            result.M22 = m22;
+            result.M23 = m32;
+
+            result.M31 = m13;
+            result.M32 = m23;
+            result.M33 = m33;
+        }
+
+        /// <summary>
+        /// <para>Computes the adjugate transpose of a matrix.</para>
+        /// <para>The adjugate transpose A of matrix M is: det(M) * transpose(invert(M))</para>
+        /// <para>This is necessary when transforming normals (bivectors) with general linear transformations.</para>
+        /// </summary>
+        /// <param name="matrix">Matrix to compute the adjugate transpose of.</param>
+        /// <returns>Adjugate transpose of the input matrix.</returns>
+        public static Matrix3x3 AdjugateTranspose(Matrix3x3 matrix)
+        {
+            Matrix3x3 toReturn;
+            AdjugateTranspose(ref matrix, out toReturn);
+            return toReturn;
+        }
+
+        /// <summary>
         /// Multiplies the two matrices.
         /// </summary>
         /// <param name="a">First matrix to multiply.</param>
@@ -660,29 +727,7 @@ namespace BEPUutilities
         public static Matrix3x3 operator *(Matrix3x3 a, Matrix3x3 b)
         {
             Matrix3x3 result;
-            float resultM11 = a.M11 * b.M11 + a.M12 * b.M21 + a.M13 * b.M31;
-            float resultM12 = a.M11 * b.M12 + a.M12 * b.M22 + a.M13 * b.M32;
-            float resultM13 = a.M11 * b.M13 + a.M12 * b.M23 + a.M13 * b.M33;
-
-            float resultM21 = a.M21 * b.M11 + a.M22 * b.M21 + a.M23 * b.M31;
-            float resultM22 = a.M21 * b.M12 + a.M22 * b.M22 + a.M23 * b.M32;
-            float resultM23 = a.M21 * b.M13 + a.M22 * b.M23 + a.M23 * b.M33;
-
-            float resultM31 = a.M31 * b.M11 + a.M32 * b.M21 + a.M33 * b.M31;
-            float resultM32 = a.M31 * b.M12 + a.M32 * b.M22 + a.M33 * b.M32;
-            float resultM33 = a.M31 * b.M13 + a.M32 * b.M23 + a.M33 * b.M33;
-
-            result.M11 = resultM11;
-            result.M12 = resultM12;
-            result.M13 = resultM13;
-
-            result.M21 = resultM21;
-            result.M22 = resultM22;
-            result.M23 = resultM23;
-
-            result.M31 = resultM31;
-            result.M32 = resultM32;
-            result.M33 = resultM33;
+            Matrix3x3.Multiply(ref a, ref b, out result);
             return result;
         }        
 

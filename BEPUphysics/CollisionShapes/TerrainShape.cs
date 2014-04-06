@@ -452,39 +452,39 @@ namespace BEPUphysics.CollisionShapes
 
 
         /// <summary>
-        /// Gets the world space vertex normal at the given indices.
+        /// Gets the non-normalized local space vertex normal at the given indices.
         /// </summary>
         ///<param name="columnIndex">Vertex index in the first dimension.</param>
         ///<param name="rowIndex">Vertex index in the second dimension.</param>
-        /// <param name="transform">Transform to apply to the terrain while computing the normal.</param>
-        /// <param name="normal">World space normal at the given indices.</param>
-        public void GetNormal(int columnIndex, int rowIndex, ref AffineTransform transform, out Vector3 normal)
+        /// <param name="normal">Non-normalized local space normal at the given indices.</param>
+        public void GetLocalNormal(int columnIndex, int rowIndex, out Vector3 normal)
         {
-            Vector3 top;
-            Vector3 bottom;
-            Vector3 right;
-            Vector3 left;
 
-            if (columnIndex <= 0)
-                columnIndex = 0;
-            else if (columnIndex >= heights.GetLength(0))
-                columnIndex = heights.GetLength(0) - 1;
-            if (rowIndex <= 0)
-                rowIndex = 0;
-            else if (rowIndex >= heights.GetLength(1))
-                rowIndex = heights.GetLength(1) - 1;
+            float topHeight = heights[columnIndex, Math.Min(rowIndex + 1, heights.GetLength(1) - 1)];
+            float bottomHeight = heights[columnIndex, Math.Max(rowIndex - 1, 0)];
+            float rightHeight = heights[Math.Min(columnIndex + 1, heights.GetLength(0) - 1), rowIndex];
+            float leftHeight = heights[Math.Max(columnIndex - 1, 0), rowIndex];
 
-            GetPosition(columnIndex, Math.Min(rowIndex + 1, heights.GetLength(1) - 1), ref transform, out top);
-            GetPosition(columnIndex, Math.Max(rowIndex - 1, 0), ref transform, out bottom);
-            GetPosition(Math.Min(columnIndex + 1, heights.GetLength(0) - 1), rowIndex, ref transform, out right);
-            GetPosition(Math.Max(columnIndex - 1, 0), rowIndex, ref transform, out left);
+            //Since the horizontal offsets are known to be 1 in local space, we can omit quite a few operations compared to a full Vector3 and cross product.
 
-            Vector3 temp;
-            Vector3.Subtract(ref top, ref bottom, out temp);
-            Vector3.Subtract(ref right, ref left, out normal);
-            Vector3.Cross(ref temp, ref normal, out normal);
+            //The implicit vectors are:
+            //var leftToRight = new Vector3(2, rightHeight - leftHeight, 0);
+            //var bottomToTop = new Vector3(0, topHeight - bottomHeight, 2);
+            //the result is then:
+            //Vector3.Cross(bottomToTop, leftToRight);
+            //Which is:
+            //float resultX = bottomToTop.Y * leftToRight.Z - bottomToTop.Z * leftToRight.Y;
+            //float resultY = bottomToTop.Z * leftToRight.X - bottomToTop.X * leftToRight.Z;
+            //float resultZ = bottomToTop.X * leftToRight.Y - bottomToTop.Y * leftToRight.X;
+            //Which becomes:
+            //float resultX = bottomToTop.Y * 0 - 2 * leftToRight.Y;
+            //float resultY = 2 * 2 - 0 * 0;
+            //float resultZ = 0 * leftToRight.Y - bottomToTop.Y * 2;
+            //Which becomes:
+            normal.X = rightHeight - leftHeight;
+            normal.Y = 2;
+            normal.Z = topHeight - bottomHeight;
 
-            normal.Normalize();
         }
 
 
