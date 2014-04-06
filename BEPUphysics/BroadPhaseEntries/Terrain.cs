@@ -47,20 +47,18 @@ namespace BEPUphysics.BroadPhaseEntries
             set
             {
                 worldTransform = value;
-                //Compute the sidedness of triangles in the terrain so that the TerrainContactManifold doesn't have to.
-                //This is a marginally hacky way to determine sidedness: check the sidedness of an arbitrary triangle in the terrain. All other triangles share the same sidedness.
-                Vector3 a, b, c;
-                Shape.GetFirstTriangle(0, 0, ref worldTransform, out a, out b, out c);
 
-                Vector3 AB, AC, normal;
-                Vector3.Subtract(ref b, ref a, out AB);
-                Vector3.Subtract(ref c, ref a, out AC);
-                Vector3.Cross(ref AB, ref AC, out normal);
+                //Sidedness must be calibrated based on the transform.
+                //To do this, note a few things:
+                //1) All triangles have the same sidedness in the terrain. Winding is consistent. Calibrating for one triangle calibrates for all.
+                //2) Taking a triangle from the terrain into world space and computing the normal there for comparison is unneeded. Picking a fixed valid normal in local space (like {0, 1, 0}) is sufficient.
+                //3) Normals can't be transformed by a direct application of a general affine transform. The adjugate transpose must be used.
 
-                Vector3 terrainUp = new Vector3(worldTransform.LinearTransform.M21, worldTransform.LinearTransform.M22, worldTransform.LinearTransform.M23);
-                float dot;
-                Vector3.Dot(ref terrainUp, ref normal, out dot);
-                if (dot > 0)
+                Matrix3x3 normalTransform;
+                Matrix3x3.AdjugateTranspose(ref worldTransform.LinearTransform, out normalTransform);
+
+                //If the world 'up' doesn't match the normal 'up', some reflection occurred which requires a winding flip.
+                if (Vector3.Dot(normalTransform.Up, worldTransform.LinearTransform.Up) < 0)
                 {
                     sidedness = TriangleSidedness.Clockwise;
                 }
@@ -68,6 +66,8 @@ namespace BEPUphysics.BroadPhaseEntries
                 {
                     sidedness = TriangleSidedness.Counterclockwise;
                 }
+
+
             }
         }
 
@@ -171,8 +171,8 @@ namespace BEPUphysics.BroadPhaseEntries
         ///<param name="worldTransform">Transform to use for the terrain.</param>
         public Terrain(TerrainShape shape, AffineTransform worldTransform)
         {
-            Shape = shape;
             WorldTransform = worldTransform;
+            Shape = shape;
 
             Events = new ContactEventManager<Terrain>();
         }
@@ -277,17 +277,6 @@ namespace BEPUphysics.BroadPhaseEntries
             PhysicsThreadResources.GiveBack(tri);
             hitElements.Dispose();
             return false;
-        }
-
-        ///<summary>
-        /// Gets the normal of a vertex at the given indices.
-        ///</summary>
-        ///<param name="i">First dimension index into the heightmap array.</param>
-        ///<param name="j">Second dimension index into the heightmap array.</param>
-        ///<param name="normal">Normal at the given indices.</param>
-        public void GetNormal(int i, int j, out Vector3 normal)
-        {
-            Shape.GetNormal(i, j, ref worldTransform, out normal);
         }
 
         ///<summary>
