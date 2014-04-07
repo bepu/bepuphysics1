@@ -43,6 +43,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
         /// <param name="fromMeshLocalToConvexLocal">Transform to apply to native local triangles to bring them into the local space of the convex.</param>
         protected override void PrecomputeTriangleTransform(ref AffineTransform convexInverseWorldTransform, out AffineTransform fromMeshLocalToConvexLocal)
         {
+            //StaticMeshes only have transformable mesh data.
             var data = ((TransformableMeshData) mesh.Mesh.Data);
             AffineTransform.Multiply(ref data.worldTransform, ref convexInverseWorldTransform, out fromMeshLocalToConvexLocal);
         }

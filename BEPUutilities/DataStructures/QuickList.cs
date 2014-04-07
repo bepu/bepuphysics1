@@ -23,7 +23,6 @@ namespace BEPUutilities.DataStructures
         /// </summary>
         public readonly T[] Elements;
 
-#if DEBUG
         private int count;
         /// <summary>
         /// Gets or sets the number of pairs in the list.
@@ -37,12 +36,7 @@ namespace BEPUutilities.DataStructures
                 count = value;
             }
         }
-#else
-        /// <summary>
-        /// Gets or sets the number of pairs in the list.
-        /// </summary>
-        public int Count;
-#endif
+
 
         /// <summary>
         /// Gets an element at the given index in the list.
@@ -81,11 +75,8 @@ namespace BEPUutilities.DataStructures
             this.pool = pool;
             poolIndex = initialPoolIndex;
             Elements = pool.TakeFromPoolIndex(poolIndex);
-#if DEBUG
+
             count = 0;
-#else
-            Count = 0;
-#endif
 
         }
 

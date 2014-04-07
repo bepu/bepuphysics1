@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
+using BEPUphysics.Entities.Prefabs;
 using BEPUutilities.ResourceManagement;
 using BEPUphysics.Settings;
 using BEPUphysics.CollisionShapes.ConvexShapes;
@@ -134,6 +135,10 @@ namespace BEPUphysics.CollisionTests.Manifolds
             AffineTransform fromMeshLocalToConvexLocal;
             PrecomputeTriangleTransform(ref convexInverseWorldTransform, out fromMeshLocalToConvexLocal);
 
+            //Grab the convex's local space bounding box up front. This will be used for a secondary pruning step.
+            BoundingBox convexLocalBoundingBox;
+            convex.Shape.GetBoundingBox(ref Toolbox.RigidIdentity, out convexLocalBoundingBox);
+
             Matrix3x3 orientation;
             Matrix3x3.CreateFromQuaternion(ref convex.worldTransform.Orientation, out orientation);
             var guaranteedContacts = 0;
@@ -147,6 +152,16 @@ namespace BEPUphysics.CollisionTests.Manifolds
                     AffineTransform.Transform(ref localTriangleShape.vA, ref fromMeshLocalToConvexLocal, out localTriangleShape.vA);
                     AffineTransform.Transform(ref localTriangleShape.vB, ref fromMeshLocalToConvexLocal, out localTriangleShape.vB);
                     AffineTransform.Transform(ref localTriangleShape.vC, ref fromMeshLocalToConvexLocal, out localTriangleShape.vC);
+
+                    //Do one last AABB test between the convex and triangle in the convex's local space.
+                    //This can prune out a lot of triangles when dealing with larger objects, and it's pretty cheap to do.
+                    BoundingBox triangleBoundingBox;
+                    Toolbox.GetTriangleBoundingBox(ref localTriangleShape.vA, ref localTriangleShape.vB, ref localTriangleShape.vC, out triangleBoundingBox);
+
+                    bool intersecting;
+                    triangleBoundingBox.Intersects(ref convexLocalBoundingBox, out intersecting);
+                    if (!intersecting)
+                        continue;
 
                     //Find a pairtester for the triangle.
                     TrianglePairTester pairTester;
