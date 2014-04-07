@@ -86,6 +86,7 @@ namespace BEPUphysics.CollisionTests.Manifolds
         /// <param name="fromMeshLocalToConvexLocal">Transform to apply to native local triangles to bring them into the local space of the convex.</param>
         protected override void PrecomputeTriangleTransform(ref AffineTransform convexInverseWorldTransform, out AffineTransform fromMeshLocalToConvexLocal)
         {
+            //MobileMeshes only have TransformableMeshData sources.
             var data = ((TransformableMeshData)mesh.Shape.TriangleMesh.Data);
             //The mobile mesh has a shape-based transform followed by the rigid body transform.
             AffineTransform mobileMeshWorldTransform;
@@ -99,20 +100,6 @@ namespace BEPUphysics.CollisionTests.Manifolds
         {
             var data = mesh.Shape.TriangleMesh.Data;
             int triangleIndex = overlappedTriangles.Elements[i];
-            localTriangleShape.vA = data.vertices[data.indices[triangleIndex]];
-            localTriangleShape.vB = data.vertices[data.indices[triangleIndex + 1]];
-            localTriangleShape.vC = data.vertices[data.indices[triangleIndex + 2]];
-            //In instanced meshes, the bounding box we found in local space could collect more triangles than strictly necessary.
-            //By doing a second pass, we should be able to prune out quite a few of them.
-            BoundingBox triangleAABB;
-            Toolbox.GetTriangleBoundingBox(ref localTriangleShape.vA, ref localTriangleShape.vB, ref localTriangleShape.vC, out triangleAABB);
-            bool toReturn;
-            triangleAABB.Intersects(ref convex.boundingBox, out toReturn);
-            if (!toReturn)
-            {
-                indices = new TriangleIndices();
-                return false;
-            }
 
             TriangleSidedness sidedness;
             switch (mesh.Shape.solidity)
@@ -132,12 +119,17 @@ namespace BEPUphysics.CollisionTests.Manifolds
             }
             localTriangleShape.sidedness = sidedness;
             localTriangleShape.collisionMargin = 0;
-            indices = new TriangleIndices()
+            indices = new TriangleIndices
             {
                 A = data.indices[triangleIndex],
                 B = data.indices[triangleIndex + 1],
                 C = data.indices[triangleIndex + 2]
             };
+
+            localTriangleShape.vA = data.vertices[indices.A];
+            localTriangleShape.vB = data.vertices[indices.B];
+            localTriangleShape.vC = data.vertices[indices.C];
+
             return true;
 
         }
