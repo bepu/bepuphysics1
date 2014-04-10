@@ -72,21 +72,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Alternate Movement\Character\QueryManager.cs" />
-    <Compile Include="Alternate Movement\Character\StanceManager.cs" />
-    <Compile Include="Alternate Movement\Character\VerticalMotionConstraint.cs" />
-    <Compile Include="Alternate Movement\Character\HorizontalMotionConstraint.cs" />
-    <Compile Include="Alternate Movement\Character\StepManager.cs" />
-    <Compile Include="Alternate Movement\ICharacterTag.cs" />
-    <Compile Include="Alternate Movement\SphereCharacter\HorizontalMotionConstraint.cs" />
-    <Compile Include="Alternate Movement\SphereCharacter\QueryManager.cs" />
-    <Compile Include="Alternate Movement\SphereCharacter\SphereCharacterController.cs" />
-    <Compile Include="Alternate Movement\SphereCharacter\SphereCharacterControllerInput.cs" />
-    <Compile Include="Alternate Movement\SphereCharacter\SupportFinder.cs" />
-    <Compile Include="Alternate Movement\SphereCharacter\VerticalMotionConstraint.cs" />
-    <Compile Include="Alternate Movement\Character\CharacterControllerInput.cs" />
-    <Compile Include="Alternate Movement\Character\CharacterController.cs" />
-    <Compile Include="Alternate Movement\Character\SupportFinder.cs" />
+    <Compile Include="Alternate Movement\SphereCharacterControllerInput.cs" />
+    <Compile Include="Alternate Movement\CharacterControllerInput.cs" />
     <Compile Include="Alternate Movement\TankInput.cs" />
     <Compile Include="Alternate Movement\VehicleInput.cs" />
     <Compile Include="ChaseCameraControlScheme.cs" />

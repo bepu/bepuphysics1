@@ -15,11 +15,41 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
     {
         internal static float SideContactThreshold = .01f;
 
-        internal RawList<SupportContact> supports = new RawList<SupportContact>();
+        internal RawList<CharacterContact> supportContacts = new RawList<CharacterContact>();
+        internal RawList<CharacterContact> tractionContacts = new RawList<CharacterContact>();
+        internal RawList<CharacterContact> sideContacts = new RawList<CharacterContact>();
+        internal RawList<CharacterContact> headContacts = new RawList<CharacterContact>();
 
-        internal RawList<OtherContact> sideContacts = new RawList<OtherContact>();
+        /// <summary>
+        /// Defines the state of a contact relative to a character's body.
+        /// </summary>
+        [Flags]
+        public enum CharacterContactCategory
+        {
+            /// <summary>
+            /// Head contacts are on top of a character's body, where 'top' means the direction opposing the character's current down direction. They should block attempts at upward motion.
+            /// </summary>
+            Head = 0x1,
+            /// <summary>
+            /// Side contacts represent collisions with objects that the character is running into, as opposed to objects the character is standing on or objects that are sitting on the character.
+            /// A Side contact also be a Support, but Side contacts cannot be Head or Traction contacts.
+            /// </summary>
+            Side = 0x2,
+            /// <summary>
+            /// Support contacts represent collisions with objects on the bottom of the character. Support contacts provide some character control.
+            /// Full control is only provided if the support is also a Traction contact.
+            /// Support contacts can also be Side contacts, and all Traction contacts are Support contacts.
+            /// </summary>
+            Support = 0x4,
+            /// <summary>
+            /// Traction contacts are contacts on the bottom of a character which permit fully controlled movement.
+            /// Traction contacts are also Support contacts.
+            /// </summary>
+            Traction = 0x8
 
-        internal RawList<OtherContact> headContacts = new RawList<OtherContact>();
+        }
+
+       
 
         float bottomHeight;
         /// <summary>
@@ -30,6 +60,24 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             get
             {
                 return bottomHeight;
+            }
+        }
+
+        float maximumAssistedDownStepHeight = 1;
+        /// <summary>
+        /// Gets or sets the maximum distance from the character's center to the support that will be assisted by downstepping.
+        /// If the character walks off a step with height less than this value, the character will retain traction despite
+        /// being temporarily airborne according to its contacts.
+        /// </summary>
+        public float MaximumAssistedDownStepHeight
+        {
+            get
+            {
+                return maximumAssistedDownStepHeight;
+            }
+            set
+            {
+                maximumAssistedDownStepHeight = Math.Max(value, 0);
             }
         }
 
@@ -283,22 +331,22 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         /// <summary>
         /// Gets the contacts on the side of the character.
         /// </summary>
-        public ReadOnlyList<OtherContact> SideContacts
+        public ReadOnlyList<CharacterContact> SideContacts
         {
             get
             {
-                return new ReadOnlyList<OtherContact>(sideContacts);
+                return new ReadOnlyList<CharacterContact>(sideContacts);
             }
         }
 
         /// <summary>
         /// Gets the contacts on the top of the character.
         /// </summary>
-        public ReadOnlyList<OtherContact> HeadContacts
+        public ReadOnlyList<CharacterContact> HeadContacts
         {
             get
             {
-                return new ReadOnlyList<OtherContact>(headContacts);
+                return new ReadOnlyList<CharacterContact>(headContacts);
             }
         }
 
@@ -374,7 +422,12 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 foreach (var c in pair.Contacts)
                 {
                     //It's possible that a subpair has a non-normal collision rule, even if the parent pair is normal.
-                    if (c.Pair.CollisionRule != CollisionRule.Normal)
+                    //Note that only contacts with nonnegative penetration depths are used.
+                    //Negative depth contacts are 'speculative' in nature.
+                    //If we were to use such a speculative contact for support, the character would find supports
+                    //in situations where it should not.
+                    //This can actually be useful in some situations, but keep it disabled by default.
+                    if (c.Pair.CollisionRule != CollisionRule.Normal || c.Contact.PenetrationDepth < 0)
                         continue;
                     //Compute the offset from the position of the character's body to the contact.
                     Vector3 contactOffset;
@@ -425,31 +478,31 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                             HasTraction = true;
                         }
                         else
-                            sideContacts.Add(new OtherContact() { Collidable = supportContact.Support, Contact = supportContact.Contact });  //Considering the side contacts to be supports can help with upstepping.
+                            sideContacts.Add(new CharacterContact() { Collidable = supportContact.Support, Contact = supportContact.Contact });  //Considering the side contacts to be supports can help with upstepping.
 
                         supports.Add(supportContact);
                     }
                     else if (dot < -SideContactThreshold)
                     {
                         //Head contact
-                        OtherContact otherContact;
-                        otherContact.Collidable = pair.BroadPhaseOverlap.EntryA != body.CollisionInformation ? (Collidable)pair.BroadPhaseOverlap.EntryA : (Collidable)pair.BroadPhaseOverlap.EntryB;
-                        otherContact.Contact.Position = c.Contact.Position;
-                        otherContact.Contact.Normal = normal;
-                        otherContact.Contact.PenetrationDepth = c.Contact.PenetrationDepth;
-                        otherContact.Contact.Id = c.Contact.Id;
-                        headContacts.Add(otherContact);
+                        CharacterContact characterContact;
+                        characterContact.Collidable = pair.BroadPhaseOverlap.EntryA != body.CollisionInformation ? (Collidable)pair.BroadPhaseOverlap.EntryA : (Collidable)pair.BroadPhaseOverlap.EntryB;
+                        characterContact.Contact.Position = c.Contact.Position;
+                        characterContact.Contact.Normal = normal;
+                        characterContact.Contact.PenetrationDepth = c.Contact.PenetrationDepth;
+                        characterContact.Contact.Id = c.Contact.Id;
+                        headContacts.Add(characterContact);
                     }
                     else
                     {
                         //Side contact 
-                        OtherContact otherContact;
-                        otherContact.Collidable = pair.BroadPhaseOverlap.EntryA != body.CollisionInformation ? (Collidable)pair.BroadPhaseOverlap.EntryA : (Collidable)pair.BroadPhaseOverlap.EntryB;
-                        otherContact.Contact.Position = c.Contact.Position;
-                        otherContact.Contact.Normal = normal;
-                        otherContact.Contact.PenetrationDepth = c.Contact.PenetrationDepth;
-                        otherContact.Contact.Id = c.Contact.Id;
-                        sideContacts.Add(otherContact);
+                        CharacterContact characterContact;
+                        characterContact.Collidable = pair.BroadPhaseOverlap.EntryA != body.CollisionInformation ? (Collidable)pair.BroadPhaseOverlap.EntryA : (Collidable)pair.BroadPhaseOverlap.EntryB;
+                        characterContact.Contact.Position = c.Contact.Position;
+                        characterContact.Contact.Normal = normal;
+                        characterContact.Contact.PenetrationDepth = c.Contact.PenetrationDepth;
+                        characterContact.Contact.Id = c.Contact.Id;
+                        sideContacts.Add(characterContact);
                     }
                 }
 
@@ -484,7 +537,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             if (!HasTraction && hadTraction && tryingToMove)
             {
                 Ray ray = new Ray(
-                    body.Position + 
+                    body.Position +
                     movementDirection * (character.Body.Radius - character.Body.CollisionInformation.Shape.CollisionMargin) +
                     downDirection * body.Height * .25f, downDirection);
 
@@ -539,7 +592,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     if (TryDownCast(ref ray, length, out hasTraction, out data))
                     {
                         if (SupportRayData == null || data.HitData.T < SupportRayData.Value.HitData.T)
-                        {                            
+                        {
                             //Only replace the previous support ray if we now have traction or we didn't have a support ray at all before,
                             //or this hit is a better (sooner) hit.
                             if (hasTraction)
@@ -755,9 +808,9 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         public bool HasTraction;
     }
     /// <summary>
-    /// Contact associated with the character that isn't a support.
+    /// A contact generated between a character and a stored collidable.
     /// </summary>
-    public struct OtherContact
+    public struct CharacterContact
     {
         /// <summary>
         /// Core information about the contact.

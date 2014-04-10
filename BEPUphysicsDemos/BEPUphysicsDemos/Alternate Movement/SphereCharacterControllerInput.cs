@@ -1,8 +1,10 @@
 using BEPUphysics;
+using BEPUphysics.Character.SphereCharacter;
+using BEPUphysicsDemos.AlternateMovement.SphereCharacter;
 using BEPUutilities;
 using Microsoft.Xna.Framework.Input;
 
-namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
+namespace BEPUphysicsDemos.AlternateMovement
 {
     /// <summary>
     /// Handles input and movement of a character in the game.

@@ -1,6 +1,7 @@
 ﻿using System;
 using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
+using BEPUphysics.Character.SphereCharacter;
 using BEPUphysics.CollisionTests;
 using BEPUutilities;
 using BEPUutilities.DataStructures;

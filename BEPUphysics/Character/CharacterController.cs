@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
+using BEPUphysics.Character;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.UpdateableSystems;
@@ -183,6 +184,142 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     throw new ArgumentException("Value must be nonnegative.");
                 jumpForceFactor = value;
             }
+        }
+
+        float speed = 8f;
+        /// <summary>
+        /// Gets or sets the maximum speed at which the character can move while standing with a support that provides traction.
+        /// Relative velocities with a greater magnitude will be decelerated.
+        /// </summary>
+        public float Speed
+        {
+            get
+            {
+                return speed;
+            }
+            set
+            {
+                if (value < 0)
+                    throw new ArgumentException("Value must be nonnegative.");
+                speed = value;
+            }
+        }
+        float crouchingSpeed = 3f;
+        /// <summary>
+        /// Gets or sets the maximum speed at which the character can move while crouching with a support that provides traction.
+        /// Relative velocities with a greater magnitude will be decelerated.
+        /// </summary>
+        public float CrouchingSpeed
+        {
+            get
+            {
+                return crouchingSpeed;
+            }
+            set
+            {
+                if (value < 0)
+                    throw new ArgumentException("Value must be nonnegative.");
+                crouchingSpeed = value;
+            }
+        }
+        float slidingSpeed = 6;
+        /// <summary>
+        /// Gets or sets the maximum speed at which the character can move while on a support that does not provide traction.
+        /// Relative velocities with a greater magnitude will be decelerated.
+        /// </summary>
+        public float SlidingSpeed
+        {
+            get
+            {
+                return slidingSpeed;
+            }
+            set
+            {
+                if (value < 0)
+                    throw new ArgumentException("Value must be nonnegative.");
+                slidingSpeed = value;
+            }
+        }
+        float airSpeed = 1;
+        /// <summary>
+        /// Gets or sets the maximum speed at which the character can move with no support.
+        /// The character will not be decelerated while airborne.
+        /// </summary>
+        public float AirSpeed
+        {
+            get
+            {
+                return airSpeed;
+            }
+            set
+            {
+                if (value < 0)
+                    throw new ArgumentException("Value must be nonnegative.");
+                airSpeed = value;
+            }
+        }
+        float maximumForce = 1000;
+        /// <summary>
+        /// Gets or sets the maximum force that the character can apply while on a support which provides traction.
+        /// </summary>
+        public float MaximumForce
+        {
+            get
+            {
+                return maximumForce;
+            }
+            set
+            {
+                if (value < 0)
+                    throw new ArgumentException("Value must be nonnegative.");
+                maximumForce = value;
+            }
+        }
+        float maximumSlidingForce = 50;
+        /// <summary>
+        /// Gets or sets the maximum force that the character can apply while on a support which does not provide traction.
+        /// </summary>
+        public float MaximumSlidingForce
+        {
+            get
+            {
+                return maximumSlidingForce;
+            }
+            set
+            {
+                if (value < 0)
+                    throw new ArgumentException("Value must be nonnegative.");
+                maximumSlidingForce = value;
+            }
+        }
+        float maximumAirForce = 250;
+        /// <summary>
+        /// Gets or sets the maximum force that the character can apply with no support.
+        /// </summary>
+        public float MaximumAirForce
+        {
+            get
+            {
+                return maximumAirForce;
+            }
+            set
+            {
+                if (value < 0)
+                    throw new ArgumentException("Value must be nonnegative.");
+                maximumAirForce = value;
+            }
+        }
+
+        private float speedScale = 1;
+        /// <summary>
+        /// Gets or sets a scaling factor to apply to the maximum speed of the character.
+        /// This is useful when a character does not have 0 or MaximumSpeed target speed, but rather
+        /// intermediate values. A common use case is analog controller sticks.
+        /// </summary>
+        public float SpeedScale
+        {
+            get { return speedScale; }
+            set { speedScale = value; }
         }
 
 
@@ -536,11 +673,36 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             SupportFinder.GetTractionInDirection(ref movementDirection, out verticalSupportData);
 
 
- 
+
             HorizontalMotionConstraint.SupportData = supportData;
             VerticalMotionConstraint.SupportData = verticalSupportData;
 
-
+            //Update the 
+            if (supportData.SupportObject != null)
+            {
+                if (supportData.HasTraction)
+                {
+                    HorizontalMotionConstraint.MovementMode = MovementMode.Traction;
+                    if (StanceManager.CurrentStance == Stance.Standing)
+                        HorizontalMotionConstraint.TargetSpeed = speed;
+                    else
+                        HorizontalMotionConstraint.TargetSpeed = crouchingSpeed;
+                    HorizontalMotionConstraint.MaximumForce = maximumForce;
+                }
+                else
+                {
+                    HorizontalMotionConstraint.MovementMode = MovementMode.Sliding;
+                    HorizontalMotionConstraint.TargetSpeed = slidingSpeed;
+                    HorizontalMotionConstraint.MaximumForce = maximumSlidingForce;
+                }
+            }
+            else
+            {
+                HorizontalMotionConstraint.MovementMode = MovementMode.Floating;
+                HorizontalMotionConstraint.TargetSpeed = airSpeed;
+                HorizontalMotionConstraint.MaximumForce = maximumAirForce;
+            }
+            HorizontalMotionConstraint.TargetSpeed *= SpeedScale;
 
 
 

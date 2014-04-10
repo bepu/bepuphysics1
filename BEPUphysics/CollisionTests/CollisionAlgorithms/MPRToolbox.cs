@@ -1380,8 +1380,8 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             }
             //If the sweep direction is found to be negative, the ray can be thought of as pointing away from the shape.
             //Do not sweep backward.
-            bool negativeLength;
-            if (negativeLength = sweepLength < 0)
+            bool negativeLength = sweepLength < 0;
+            if (negativeLength)
                 sweepLength = 0;
 
 
@@ -2310,8 +2310,8 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             }
             //If the sweep direction is found to be negative, the ray can be thought of as pointing away from the shape.
             //Do not sweep backward.
-            bool negativeLength;
-            if (negativeLength = sweepLength < 0)
+            bool negativeLength = sweepLength < 0;
+            if (negativeLength)
                 sweepLength = 0;
 
 
