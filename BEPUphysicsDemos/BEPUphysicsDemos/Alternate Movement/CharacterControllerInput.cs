@@ -1,4 +1,5 @@
 using BEPUphysics;
+using BEPUphysicsDemos.AlternateMovement.Character;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Diagnostics;
@@ -6,7 +7,7 @@ using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using ConversionHelper;
 using BEPUutilities;
 
-namespace BEPUphysicsDemos.AlternateMovement.Character
+namespace BEPUphysicsDemos.AlternateMovement
 {
     /// <summary>
     /// Handles input and movement of a character in the game.

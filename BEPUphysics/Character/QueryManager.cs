@@ -218,6 +218,8 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                         {
                             //Must check per-contact collision rules, just in case
                             //the pair was actually a 'parent pair.'
+                            //Don't have to worry about speculative contacts here yet- no system produces speculative contacts pre-emptively.
+                            //If such a system did exist, this would need to check the contact depth like the support finder does.
                             if (contact.Pair.CollisionRule == CollisionRule.Normal)
                             {
                                 ContactData contactData;

@@ -1,18 +1,19 @@
 ﻿using System;
 using BEPUphysics.Constraints;
 using BEPUphysics.Entities;
+using BEPUphysicsDemos.AlternateMovement.Character;
 using BEPUutilities;
 using BEPUutilities.DataStructures;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 
-namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
+namespace BEPUphysics.Character
 {
     /// <summary>
     /// Manages the horizontal movement of a character.
     /// </summary>
     public class HorizontalMotionConstraint : SolverUpdateable
     {
-        SphereCharacterController character;
+        Entity characterBody;
 
 
         SupportData supportData;
@@ -62,139 +63,39 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
                 float lengthSquared = value.LengthSquared();
                 if (lengthSquared > Toolbox.Epsilon)
                 {
-                    character.Body.ActivityInformation.Activate();
+                    characterBody.Body.ActivityInformation.Activate();
                     Vector2.Divide(ref value, (float)Math.Sqrt(lengthSquared), out movementDirection);
                 }
                 else
                 {
-                    character.Body.ActivityInformation.Activate();
+                    characterBody.Body.ActivityInformation.Activate();
                     movementDirection = new Vector2();
                 }
             }
         }
 
 
-
-        float speed = 8f;
         /// <summary>
-        /// Gets or sets the maximum speed at which the character can move while standing with a support that provides traction.
-        /// Relative velocities with a greater magnitude will be decelerated.
+        /// Gets or sets the target speed of the character in its current state.
         /// </summary>
-        public float Speed
-        {
-            get
-            {
-                return speed;
-            }
-            set
-            {
-                if (value < 0)
-                    throw new ArgumentException("Value must be nonnegative.");
-                speed = value;
-            }
-        }
-        float slidingSpeed = 6;
+        public float TargetSpeed { get; set; }
         /// <summary>
-        /// Gets or sets the maximum speed at which the character can move while on a support that does not provide traction.
-        /// Relative velocities with a greater magnitude will be decelerated.
+        /// Gets or sets the maximum force the character can apply to move horizontally in its current state.
         /// </summary>
-        public float SlidingSpeed
-        {
-            get
-            {
-                return slidingSpeed;
-            }
-            set
-            {
-                if (value < 0)
-                    throw new ArgumentException("Value must be nonnegative.");
-                slidingSpeed = value;
-            }
-        }
-        float airSpeed = 1;
-        /// <summary>
-        /// Gets or sets the maximum speed at which the character can move with no support.
-        /// The character will not be decelerated while airborne.
-        /// </summary>
-        public float AirSpeed
-        {
-            get
-            {
-                return airSpeed;
-            }
-            set
-            {
-                if (value < 0)
-                    throw new ArgumentException("Value must be nonnegative.");
-                airSpeed = value;
-            }
-        }
-        float maximumForce = 1000;
-        /// <summary>
-        /// Gets or sets the maximum force that the character can apply while on a support which provides traction.
-        /// </summary>
-        public float MaximumForce
-        {
-            get
-            {
-                return maximumForce;
-            }
-            set
-            {
-                if (value < 0)
-                    throw new ArgumentException("Value must be nonnegative.");
-                maximumForce = value;
-            }
-        }
-        float maximumSlidingForce = 50;
-        /// <summary>
-        /// Gets or sets the maximum force that the character can apply while on a support which does not provide traction.
-        /// </summary>
-        public float MaximumSlidingForce
-        {
-            get
-            {
-                return maximumSlidingForce;
-            }
-            set
-            {
-                if (value < 0)
-                    throw new ArgumentException("Value must be nonnegative.");
-                maximumSlidingForce = value;
-            }
-        }
-        float maximumAirForce = 250;
-        /// <summary>
-        /// Gets or sets the maximum force that the character can apply with no support.
-        /// </summary>
-        public float MaximumAirForce
-        {
-            get
-            {
-                return maximumAirForce;
-            }
-            set
-            {
-                if (value < 0)
-                    throw new ArgumentException("Value must be nonnegative.");
-                maximumAirForce = value;
-            }
-        }
+        public float MaximumForce { get; set; }
+        float maxForce;
 
         /// <summary>
-        /// Gets or sets a scaling factor to apply to the maximum speed of the character.
-        /// This is useful when a character does not have 0 or MaximumSpeed target speed, but rather
-        /// intermediate values. A common use case is analog controller sticks.
+        /// Gets or sets the current movement style used by the character.
         /// </summary>
-        public float SpeedScale { get; set; }
+        public MovementMode MovementMode { get; set; }
 
         float supportForceFactor = 1;
         /// <summary>
         /// Gets or sets the scaling factor of forces applied to the supporting object if it is a dynamic entity.
         /// Low values (below 1) reduce the amount of motion imparted to the support object; it acts 'heavier' as far as horizontal motion is concerned.
         /// High values (above 1) increase the force applied to support objects, making them appear lighter.
-        /// Be careful when changing this- it can create impossible situations! Imagine the character standing on a compound object.  If the support force
-        /// factor is less than 1, then the character can push the compound around while standing on it!
+        /// Be careful when changing this- it can create impossible situations!
         /// </summary>
         public float SupportForceFactor
         {
@@ -210,13 +111,6 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
             }
         }
 
-        /// <summary>
-        /// Gets the movement mode that the character is currently in.
-        /// </summary>
-        public MovementMode MovementMode { get; private set; }
-
-        float maxSpeed;
-        float maxForce;
 
 
         Matrix2x2 massMatrix;
@@ -242,26 +136,25 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
         /// <summary>
         /// Constructs a new horizontal motion constraint.
         /// </summary>
-        /// <param name="characterController">Character to be governed by this constraint.</param>
-        public HorizontalMotionConstraint(SphereCharacterController characterController)
+        /// <param name="characterBody">Character body to be governed by this constraint.</param>
+        public HorizontalMotionConstraint(Entity characterBody)
         {
-            this.character = characterController;
-            SpeedScale = 1;
+            this.characterBody = characterBody;
             CollectInvolvedEntities();
         }
 
         internal void GetMovementDirectionIn3D(out Vector3 movement3d)
         {
-            movement3d = character.HorizontalViewDirection * movementDirection.Y + character.StrafeDirection * movementDirection.X;
+            movement3d = characterBody.HorizontalViewDirection * movementDirection.Y + characterBody.StrafeDirection * movementDirection.X;
         }
 
 
-        protected override void CollectInvolvedEntities(RawList<Entity> outputInvolvedEntities)
+        protected internal override void CollectInvolvedEntities(RawList<Entity> outputInvolvedEntities)
         {
             var entityCollidable = supportData.SupportObject as EntityCollidable;
             if (entityCollidable != null)
                 outputInvolvedEntities.Add(entityCollidable.Entity);
-            outputInvolvedEntities.Add(character.Body);
+            outputInvolvedEntities.Add(characterBody);
 
         }
 
@@ -271,42 +164,18 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
         /// <param name="dt">Time step duration.</param>
         public override void Update(float dt)
         {
-            //Collect references, pick the mode, and configure the coefficients to be used by the solver.
             Vector3 movementDirectionIn3d;
             GetMovementDirectionIn3D(out movementDirectionIn3d);
             bool isTryingToMove = movementDirectionIn3d.LengthSquared() > 0;
-            if (supportData.SupportObject != null)
-            {
-                if (supportData.HasTraction)
-                {
-                    MovementMode = MovementMode.Traction;
-                    maxSpeed = speed;
-                    maxForce = maximumForce;
-                }
-                else
-                {
-                    MovementMode = MovementMode.Sliding;
-                    maxSpeed = slidingSpeed;
-                    maxForce = maximumSlidingForce;
-                }
-            }
-            else
-            {
-                MovementMode = MovementMode.Floating;
-                maxSpeed = airSpeed;
-                maxForce = maximumAirForce;
-                supportEntity = null;
-            }
             if (!isTryingToMove)
-                maxSpeed = 0;
-
-            maxSpeed *= SpeedScale;
-            maxForce *= dt;
+                TargetSpeed = 0;
+            
+            maxForce = MaximumForce * dt;
 
 
 
             //Compute the jacobians.  This is basically a PointOnLineJoint with motorized degrees of freedom.
-            Vector3 downDirection = character.Down;
+            Vector3 downDirection = characterBody.Down;
 
             if (MovementMode != MovementMode.Floating)
             {
@@ -320,6 +189,7 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
                     //Instead, project along the sweep direction to the plane.
                     //For a 6DOF character controller, the lineStart would be different; it must be perpendicular to the local up.
                     Vector3 lineStart = movementDirectionIn3d;
+
                     Vector3 lineEnd;
                     Vector3.Add(ref lineStart, ref downDirection, out lineEnd);
                     Plane plane = new Plane(supportData.Normal, 0);
@@ -399,14 +269,14 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
             {
                 //If the character is floating, then the jacobians are simply the 3d movement direction and the perpendicular direction on the character's horizontal plane.
                 linearJacobianA1 = movementDirectionIn3d;
-                linearJacobianA2 = Vector3.Cross(linearJacobianA1, character.Down);
+                linearJacobianA2 = Vector3.Cross(linearJacobianA1, characterBody.Down);
 
 
             }
 
 
             //Compute the target velocity (in constraint space) for this frame.  The hard work has already been done.
-            targetVelocity.X = maxSpeed;
+            targetVelocity.X = TargetSpeed;
             targetVelocity.Y = 0;
 
             //Compute the effective mass matrix.
@@ -416,7 +286,7 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
                 float inverseMass;
                 Vector3 intermediate;
 
-                inverseMass = character.Body.InverseMass;
+                inverseMass = characterBody.Body.InverseMass;
                 m11 = inverseMass;
                 m22 = inverseMass;
 
@@ -447,7 +317,7 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
             else
             {
                 //If we're not standing on a dynamic entity, then the mass matrix is defined entirely by the character.
-                Matrix2x2.CreateScale(character.Body.Mass, out massMatrix);
+                Matrix2x2.CreateScale(characterBody.Body.Mass, out massMatrix);
             }
 
             //If we're trying to stand still on an object that's moving, use a position correction term to keep the character
@@ -463,33 +333,33 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
             }
 
             //The state is now up to date.  Compute an error and velocity bias, if needed.
-            if (!isTryingToMove && supportData.HasTraction && supportEntity != null)
+            if (!isTryingToMove && MovementMode == MovementMode.Traction && supportEntity != null)
             {
                 //Compute the time it usually takes for the character to slow down while it has traction.
-                var tractionDecelerationTime = speed / (maximumForce * character.Body.InverseMass);
+                var tractionDecelerationTime = TargetSpeed / (MaximumForce * characterBody.Body.InverseMass);
 
                 if (timeSinceTransition >= 0 && timeSinceTransition < tractionDecelerationTime)
                     timeSinceTransition += dt;
                 if (timeSinceTransition >= tractionDecelerationTime)
                 {
-                    Vector3.Multiply(ref downDirection, character.Body.Radius, out positionLocalOffset);
-                    positionLocalOffset = (positionLocalOffset + character.Body.Position) - supportEntity.Position;
+                    Vector3.Multiply(ref downDirection, characterBody.Body.Height * .5f, out positionLocalOffset);
+                    positionLocalOffset = (positionLocalOffset + characterBody.Body.Position) - supportEntity.Position;
                     positionLocalOffset = Matrix3x3.TransformTranspose(positionLocalOffset, supportEntity.OrientationMatrix);
                     timeSinceTransition = -1; //Negative 1 means that the offset has been computed.
                 }
                 if (timeSinceTransition < 0)
                 {
                     Vector3 targetPosition;
-                    Vector3.Multiply(ref downDirection, character.Body.Radius, out targetPosition);
-                    targetPosition += character.Body.Position;
+                    Vector3.Multiply(ref downDirection, characterBody.Body.Height * .5f, out targetPosition);
+                    targetPosition += characterBody.Body.Position;
                     Vector3 worldSupportLocation = Matrix3x3.Transform(positionLocalOffset, supportEntity.OrientationMatrix) + supportEntity.Position;
                     Vector3 error;
                     Vector3.Subtract(ref targetPosition, ref worldSupportLocation, out error);
                     //If the error is too large, then recompute the offset.  We don't want the character rubber banding around.
                     if (error.LengthSquared() > .15f * .15f)
                     {
-                        Vector3.Multiply(ref downDirection, character.Body.Radius, out positionLocalOffset);
-                        positionLocalOffset = (positionLocalOffset + character.Body.Position) - supportEntity.Position;
+                        Vector3.Multiply(ref downDirection, characterBody.Body.Height * .5f, out positionLocalOffset);
+                        positionLocalOffset = (positionLocalOffset + characterBody.Body.Position) - supportEntity.Position;
                         positionLocalOffset = Matrix3x3.TransformTranspose(positionLocalOffset, supportEntity.OrientationMatrix);
                         positionCorrectionBias = new Vector2();
                     }
@@ -538,7 +408,7 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
             impulse.Y = linearJacobianA1.Y * x + linearJacobianA2.Y * y;
             impulse.Z = linearJacobianA1.Z * x + linearJacobianA2.Z * y;
 
-            character.Body.ApplyLinearImpulse(ref impulse);
+            characterBody.Body.ApplyLinearImpulse(ref impulse);
 
             if (supportEntity != null && supportEntity.IsDynamic)
             {
@@ -612,7 +482,7 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
             impulse.Y = linearJacobianA1.Y * x + linearJacobianA2.Y * y;
             impulse.Z = linearJacobianA1.Z * x + linearJacobianA2.Z * y;
 
-            character.Body.ApplyLinearImpulse(ref impulse);
+            characterBody.Body.ApplyLinearImpulse(ref impulse);
 
             if (supportEntity != null && supportEntity.IsDynamic)
             {
@@ -651,7 +521,7 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
                 Vector2 relativeVelocity;
 #endif
 
-                Vector3 bodyVelocity = character.Body.LinearVelocity;
+                Vector3 bodyVelocity = characterBody.Body.LinearVelocity;
                 Vector3.Dot(ref linearJacobianA1, ref bodyVelocity, out relativeVelocity.X);
                 Vector3.Dot(ref linearJacobianA2, ref bodyVelocity, out relativeVelocity.Y);
 
@@ -672,7 +542,6 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
                     relativeVelocity.Y += y;
 
                 }
-
                 return relativeVelocity;
             }
         }
@@ -684,7 +553,7 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
         {
             get
             {
-                Vector3 bodyVelocity = character.Body.LinearVelocity;
+                Vector3 bodyVelocity = characterBody.Body.LinearVelocity;
                 if (supportEntity != null)
                     return bodyVelocity - Toolbox.GetVelocityOfPoint(supportData.Position, supportEntity.Position, supportEntity.LinearVelocity, supportEntity.AngularVelocity);
                 return bodyVelocity;
@@ -693,13 +562,7 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
 
 
 
+    }
 
 
-    }
-    public enum MovementMode
-    {
-        Traction,
-        Sliding,
-        Floating
-    }
 }

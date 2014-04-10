@@ -5,14 +5,18 @@ using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.UpdateableSystems;
-using BEPUphysics;
+using BEPUphysicsDemos.AlternateMovement;
+using BEPUphysicsDemos.AlternateMovement.Character;
 using BEPUutilities;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
 using BEPUphysics.Materials;
 using BEPUphysics.PositionUpdating;
 using System.Threading;
+using QueryManager = BEPUphysicsDemos.AlternateMovement.SphereCharacter.QueryManager;
+using SupportData = BEPUphysicsDemos.AlternateMovement.SphereCharacter.SupportData;
+using SupportFinder = BEPUphysicsDemos.AlternateMovement.SphereCharacter.SupportFinder;
 
-namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
+namespace BEPUphysics.Character.SphereCharacter
 {
     /// <summary>
     /// Gives a physical object simple and cheap FPS-like control.
@@ -206,8 +210,8 @@ namespace BEPUphysicsDemos.AlternateMovement.SphereCharacter
             Body.CollisionInformation.Events.DetectingInitialCollision += RemoveFriction;
             Body.LinearDamping = 0;
             SupportFinder = new SupportFinder(this);
-            HorizontalMotionConstraint = new HorizontalMotionConstraint(this);
-            VerticalMotionConstraint = new VerticalMotionConstraint(this);
+            HorizontalMotionConstraint = new HorizontalMotionConstraint(Body);
+            VerticalMotionConstraint = new VerticalMotionConstraint(Body);
             QueryManager = new QueryManager(this);
 
             //Enable multithreading for the sphere characters.  

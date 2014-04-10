@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using BEPUphysics.Character.SphereCharacter;
 using BEPUphysics.CollisionTests;
 using BEPUutilities;
 using BEPUutilities.DataStructures;

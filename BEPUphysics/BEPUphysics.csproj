@@ -137,6 +137,16 @@
     <Compile Include="BroadPhaseEntries\Events\IEntryEventTriggerer.cs" />
     <Compile Include="BroadPhaseEntries\MobileCollidables\CompoundHelper.cs" />
     <Compile Include="BroadPhaseEntries\MobileCollidables\MobileMeshCollidable.cs" />
+    <Compile Include="Character\CharacterController.cs" />
+    <Compile Include="Character\CharacterContactCategorizer.cs" />
+    <Compile Include="Character\HorizontalMotionConstraint.cs" />
+    <Compile Include="Character\ICharacterTag.cs" />
+    <Compile Include="Character\MovementMode.cs" />
+    <Compile Include="Character\QueryManager.cs" />
+    <Compile Include="Character\StanceManager.cs" />
+    <Compile Include="Character\StepManager.cs" />
+    <Compile Include="Character\SupportFinder.cs" />
+    <Compile Include="Character\VerticalMotionConstraint.cs" />
     <Compile Include="CollisionRuleManagement\ICollisionRulesOwner.cs" />
     <Compile Include="CollisionShapes\ConvexShapes\ConvexShapeDescription.cs" />
     <Compile Include="CollisionShapes\EntityShapeVolumeDescription.cs" />
@@ -380,6 +390,9 @@
     <Compile Include="BroadPhaseEntries\Events\CollisionEventTypes.cs" />
     <Compile Include="BroadPhaseEntries\DetectorVolume.cs" />
     <Compile Include="PhysicsChecker.cs" />
+    <Compile Include="Character\SphereCharacter\QueryManager.cs" />
+    <Compile Include="Character\SphereCharacter\SphereCharacterController.cs" />
+    <Compile Include="Character\SphereCharacter\SupportFinder.cs" />
     <Compile Include="UpdateableSystems\CombinedUpdateable.cs">
       <SubType>Code</SubType>
     </Compile>
