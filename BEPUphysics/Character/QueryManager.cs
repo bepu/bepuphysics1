@@ -164,7 +164,7 @@ namespace BEPUphysics.Character
                         pairHandler.SuppressEvents = false;
 
                         contactCategorizer.CategorizeContacts(pairHandler, characterBody.CollisionInformation, ref downDirection,
-                                                              tractionContacts, supportContacts, sideContacts, headContacts);
+                                                              ref tractionContacts, ref supportContacts, ref sideContacts, ref headContacts);
                     }
                     //TODO: It would be nice if this was a bit easier.
                     //Having to remember to clean up AND give it back is a bit weird, especially with the property-diving.

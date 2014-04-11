@@ -85,7 +85,7 @@ namespace BEPUphysics.Character
         {
             Vector3 down = characterBody.orientationMatrix.Down;
             Vector3 strafeDirection;
-            Vector3 horizontalForwardDirection = forward - forward * Vector3.Dot(down, forward);
+            Vector3 horizontalForwardDirection = forward - down * Vector3.Dot(down, forward);
             float forwardLengthSquared = horizontalForwardDirection.LengthSquared();
 
             if (forwardLengthSquared < Toolbox.Epsilon)
@@ -97,7 +97,7 @@ namespace BEPUphysics.Character
             else
             {
                 Vector3.Divide(ref horizontalForwardDirection, (float)Math.Sqrt(forwardLengthSquared), out horizontalForwardDirection);
-                Vector3.Cross(ref horizontalForwardDirection, ref down, out strafeDirection);
+                Vector3.Cross(ref down, ref horizontalForwardDirection, out strafeDirection);
                 //Don't need to normalize the strafe direction; it's the cross product of two normalized perpendicular vectors.
             }
 

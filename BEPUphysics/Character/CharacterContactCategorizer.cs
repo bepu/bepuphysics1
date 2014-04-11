@@ -113,7 +113,7 @@ namespace BEPUphysics.Character
         /// <param name="headContacts">List to contain the head contacts found in the input contacts list.</param>
         /// <typeparam name="TOutputContacts">List type used to store the output character contact structs.</typeparam>
         public void CategorizeContacts<TOutputContacts>(CollidablePairHandler pair, EntityCollidable characterCollidable, ref Vector3 downDirection, 
-                                                        TOutputContacts tractionContacts, TOutputContacts supportContacts, TOutputContacts sideContacts, TOutputContacts headContacts)
+                                                        ref TOutputContacts tractionContacts, ref TOutputContacts supportContacts, ref TOutputContacts sideContacts, ref TOutputContacts headContacts)
                                                             where TOutputContacts : IList<CharacterContact>
         {
             var contactCollection = pair.Contacts;
