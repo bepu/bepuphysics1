@@ -57,6 +57,11 @@ namespace BEPUphysics.Character
         public VerticalMotionConstraint VerticalMotionConstraint { get; private set; }
 
         /// <summary>
+        /// Gets or sets the pair locker used by the character controller to avoid interfering with the behavior of other characters.
+        /// </summary>
+        private CharacterPairLocker PairLocker { get; set; }
+
+        /// <summary>
         /// Gets or sets the down direction of the character, defining its orientation.
         /// </summary>
         public Vector3 Down
@@ -367,6 +372,7 @@ namespace BEPUphysics.Character
             VerticalMotionConstraint = new VerticalMotionConstraint(Body, SupportFinder, maximumGlueForce);
             StepManager = new StepManager(Body, ContactCategorizer, SupportFinder, QueryManager, HorizontalMotionConstraint);
             StanceManager = new StanceManager(Body, crouchingHeight, QueryManager, SupportFinder);
+            PairLocker = new CharacterPairLocker(Body);
 
             StandingSpeed = standingSpeed;
             CrouchingSpeed = crouchingSpeed;
@@ -386,61 +392,7 @@ namespace BEPUphysics.Character
         }
 
 
-        List<ICharacterTag> involvedCharacters = new List<ICharacterTag>();
-        public void LockCharacterPairs()
-        {
-            //If this character is colliding with another character, there's a significant danger of the characters
-            //changing the same collision pair handlers.  Rather than infect every character system with micro-locks,
-            //we lock the entirety of a character update.
-
-            foreach (var pair in Body.CollisionInformation.Pairs)
-            {
-                //Is this a pair with another character?
-                var other = pair.BroadPhaseOverlap.EntryA == Body.CollisionInformation ? pair.BroadPhaseOverlap.EntryB : pair.BroadPhaseOverlap.EntryA;
-                var otherCharacter = other.Tag as ICharacterTag;
-                if (otherCharacter != null)
-                {
-                    involvedCharacters.Add(otherCharacter);
-                }
-            }
-            if (involvedCharacters.Count > 0)
-            {
-                //If there were any other characters, we also need to lock ourselves!
-                involvedCharacters.Add((ICharacterTag)Body.CollisionInformation.Tag);
-
-                //However, the characters cannot be locked willy-nilly.  There needs to be some defined order in which pairs are locked to avoid deadlocking.
-                involvedCharacters.Sort(comparer);
-
-                for (int i = 0; i < involvedCharacters.Count; ++i)
-                {
-                    Monitor.Enter(involvedCharacters[i]);
-                }
-            }
-        }
-
-        private static Comparer comparer = new Comparer();
-        class Comparer : IComparer<ICharacterTag>
-        {
-            public int Compare(ICharacterTag x, ICharacterTag y)
-            {
-                if (x.InstanceId < y.InstanceId)
-                    return -1;
-                if (x.InstanceId > y.InstanceId)
-                    return 1;
-                return 0;
-            }
-        }
-
-        public void UnlockCharacterPairs()
-        {
-            //Unlock the pairs, LIFO.
-            for (int i = involvedCharacters.Count - 1; i >= 0; i--)
-            {
-                Monitor.Exit(involvedCharacters[i]);
-            }
-            involvedCharacters.Clear();
-        }
-
+       
 
         void RemoveFriction(EntityCollidable sender, BroadPhaseEntry other, NarrowPhasePair pair)
         {
@@ -523,7 +475,7 @@ namespace BEPUphysics.Character
 
             HorizontalMotionConstraint.UpdateMovementBasis(ref viewDirection);
             //We can't let multiple characters manage the same pairs simultaneously.  Lock it up!
-            LockCharacterPairs();
+            PairLocker.LockCharacterPairs();
             try
             {
                 CorrectContacts();
@@ -613,7 +565,7 @@ namespace BEPUphysics.Character
             }
             finally
             {
-                UnlockCharacterPairs();
+                PairLocker.UnlockCharacterPairs();
             }
 
             //Tell the constraints to get ready to solve.
