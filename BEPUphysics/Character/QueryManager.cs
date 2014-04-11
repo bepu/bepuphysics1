@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
+using BEPUphysics.Character;
 using BEPUphysics.CollisionTests;
+using BEPUphysics.Entities;
 using BEPUutilities;
 using BEPUutilities.DataStructures;
 using BEPUphysics.NarrowPhaseSystems;
@@ -16,53 +19,19 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
     /// </summary>
     public class QueryManager
     {
-        //This QueryManager is not thread safe in any way, but it's only ever used by a single character at a time, so this isn't an issue.
-        RawList<ContactData> contacts = new RawList<ContactData>();
-        RawList<ContactData> supportContacts = new RawList<ContactData>();
-        RawList<ContactData> tractionContacts = new RawList<ContactData>();
-        RawList<ContactData> sideContacts = new RawList<ContactData>();
-        RawList<ContactData> headContacts = new RawList<ContactData>();
+        private Entity characterBody;
+        private CharacterContactCategorizer contactCategorizer;
 
-        public RawList<ContactData> Contacts { get { return contacts; } }
-        public RawList<ContactData> SupportContacts { get { return supportContacts; } }
-        public RawList<ContactData> TractionContacts { get { return tractionContacts; } }
-        public RawList<ContactData> SideContacts { get { return sideContacts; } }
-        public RawList<ContactData> HeadContacts { get { return headContacts; } }
-
-        ConvexCollidable<CylinderShape> standingQueryObject;
-        ConvexCollidable<CylinderShape> crouchingQueryObject;
-        ConvexCollidable<CylinderShape> currentQueryObject;
-        CharacterController character;
 
         /// <summary>
         /// Constructs the query manager for a character.
         /// </summary>
-        /// <param name="character">Character to manage queries for.</param>
-        public QueryManager(CharacterController character)
+        public QueryManager(Entity characterBody, CharacterContactCategorizer contactCategorizer)
         {
-            this.character = character;
-            //We can share the real shape with the 'current' query object.
-            currentQueryObject = new ConvexCollidable<CylinderShape>(character.Body.CollisionInformation.Shape);
-            standingQueryObject = new ConvexCollidable<CylinderShape>(new CylinderShape(character.StanceManager.StandingHeight, character.Body.Radius));
-            crouchingQueryObject = new ConvexCollidable<CylinderShape>(new CylinderShape(character.StanceManager.CrouchingHeight, character.Body.Radius));
-            //Share the collision rules between the main body and its query objects.  That way, the character's queries return valid results.
-            currentQueryObject.CollisionRules = character.Body.CollisionInformation.CollisionRules;
-            standingQueryObject.CollisionRules = character.Body.CollisionInformation.CollisionRules;
-            crouchingQueryObject.CollisionRules = character.Body.CollisionInformation.CollisionRules;
-
+            this.characterBody = characterBody;
+            this.contactCategorizer = contactCategorizer;
 
             SupportRayFilter = SupportRayFilterFunction;
-        }
-
-        /// <summary>
-        /// Updates the query objects to match the character controller's current state.  Called when BodyRadius, StanceManager.StandingHeight, or StanceManager.CrouchingHeight is set.
-        /// </summary>
-        internal void UpdateQueryShapes()
-        {
-            standingQueryObject.Shape.Radius = character.Body.CollisionInformation.Shape.Radius;
-            standingQueryObject.Shape.Height = character.StanceManager.StandingHeight;
-            crouchingQueryObject.Shape.Radius = character.Body.CollisionInformation.Shape.Radius;
-            crouchingQueryObject.Shape.Height = character.StanceManager.CrouchingHeight;
         }
 
 
@@ -70,7 +39,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         bool SupportRayFilterFunction(BroadPhaseEntry entry)
         {
             //Only permit an object to be used as a support if it fully collides with the character.
-            return CollisionRules.CollisionRuleCalculator(entry, character.Body.CollisionInformation) == CollisionRule.Normal;
+            return CollisionRules.CollisionRuleCalculator(entry, characterBody.CollisionInformation) == CollisionRule.Normal;
         }
 
         /// <summary>
@@ -84,7 +53,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         {
             earliestHit = new RayHit();
             earliestHit.T = float.MaxValue;
-            foreach (var collidable in character.Body.CollisionInformation.OverlappedCollidables)
+            foreach (var collidable in characterBody.CollisionInformation.OverlappedCollidables)
             {
                 //Check to see if the collidable is hit by the ray.
                 float? t = ray.Intersects(collidable.BoundingBox);
@@ -117,7 +86,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             earliestHit = new RayHit();
             earliestHit.T = float.MaxValue;
             hitObject = null;
-            foreach (var collidable in character.Body.CollisionInformation.OverlappedCollidables)
+            foreach (var collidable in characterBody.CollisionInformation.OverlappedCollidables)
             {
                 //Check to see if the collidable is hit by the ray.
                 float? t = ray.Intersects(collidable.BoundingBox);
@@ -146,7 +115,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         /// <returns>Whether or not the ray hit anything.</returns>
         public bool RayCastHitAnything(Ray ray, float length)
         {
-            foreach (var collidable in character.Body.CollisionInformation.OverlappedCollidables)
+            foreach (var collidable in characterBody.CollisionInformation.OverlappedCollidables)
             {
                 //Check to see if the collidable is hit by the ray.
                 float? t = ray.Intersects(collidable.BoundingBox);
@@ -163,48 +132,24 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
         }
 
-        private void ClearContacts()
-        {
-            contacts.Clear();
-            supportContacts.Clear();
-            tractionContacts.Clear();
-            sideContacts.Clear();
-            headContacts.Clear();
-        }
+
+
 
         /// <summary>
-        /// Tests a collision object with the same shape as the current character at the given position for contacts.
-        /// Output data is stored in the query manager's supporting lists.
+        /// Finds contacts between the query object and any intersected objects within the character's bounding box.
         /// </summary>
-        /// <param name="position">Position to use for the query.</param>
-        public void QueryContacts(Vector3 position)
+        /// <param name="queryObject">Collidable to query for contacts with.</param>
+        /// <param name="tractionContacts">Output contacts that would provide traction.</param>
+        /// <param name="supportContacts">Output contacts that would provide support.</param>
+        /// <param name="sideContacts">Output contacts on the sides of the query object.</param>
+        /// <param name="headContacts">Output contacts on the head of the query object.</param>
+        public void QueryContacts(EntityCollidable queryObject, RawList<CharacterContact> tractionContacts, RawList<CharacterContact> supportContacts, RawList<CharacterContact> sideContacts, RawList<CharacterContact> headContacts)
         {
-            QueryContacts(position, currentQueryObject);
-        }
+            var downDirection = characterBody.orientationMatrix.Down;
 
-        /// <summary>
-        /// Tests a collision object with the dimensions matching the desired stance shape at the given position for contacts.
-        /// Output data is stored in the query manager's supporting lists.
-        /// </summary>
-        /// <param name="stance">Character stance to use in the query.</param>
-        /// <param name="position">Position to use for the query.</param>
-        public void QueryContacts(Vector3 position, Stance stance)
-        {
-            QueryContacts(position, stance == Stance.Standing ? standingQueryObject : crouchingQueryObject);
-        }
-
-        void QueryContacts(Vector3 position, EntityCollidable queryObject)
-        {
-            ClearContacts();
-
-            //Update the position and orientation of the query object.
-            RigidTransform transform;
-            transform.Position = position;
-            transform.Orientation = character.Body.Orientation;
-            queryObject.UpdateBoundingBoxForTransform(ref transform, 0);
-
-            foreach (var collidable in character.Body.CollisionInformation.OverlappedCollidables)
+            foreach (var collidable in characterBody.CollisionInformation.OverlappedCollidables)
             {
+                //The query object is assumed to have a valid bounding box.
                 if (collidable.BoundingBox.Intersects(queryObject.BoundingBox))
                 {
                     var pair = new CollidablePair(collidable, queryObject);
@@ -214,22 +159,9 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                         pairHandler.SuppressEvents = true;
                         pairHandler.UpdateCollision(0);
                         pairHandler.SuppressEvents = false;
-                        foreach (var contact in pairHandler.Contacts)
-                        {
-                            //Must check per-contact collision rules, just in case
-                            //the pair was actually a 'parent pair.'
-                            //Don't have to worry about speculative contacts here yet- no system produces speculative contacts pre-emptively.
-                            //If such a system did exist, this would need to check the contact depth like the support finder does.
-                            if (contact.Pair.CollisionRule == CollisionRule.Normal)
-                            {
-                                ContactData contactData;
-                                contactData.Position = contact.Contact.Position;
-                                contactData.Normal = contact.Contact.Normal;
-                                contactData.Id = contact.Contact.Id;
-                                contactData.PenetrationDepth = contact.Contact.PenetrationDepth;
-                                contacts.Add(contactData);
-                            }
-                        }
+
+                        contactCategorizer.CategorizeContacts(pairHandler, characterBody.CollisionInformation, ref downDirection,
+                                                              tractionContacts, supportContacts, sideContacts, headContacts);
                     }
                     //TODO: It would be nice if this was a bit easier.
                     //Having to remember to clean up AND give it back is a bit weird, especially with the property-diving.
@@ -240,53 +172,19 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 }
             }
 
-            CategorizeContacts(ref position);
         }
 
-        void CategorizeContacts(ref Vector3 position)
-        {
-            Vector3 downDirection = character.Down;
-            for (int i = 0; i < contacts.Count; i++)
-            {
-                float dot;
-                Vector3 offset;
-                Vector3.Subtract(ref contacts.Elements[i].Position, ref position, out offset);
-                Vector3.Dot(ref contacts.Elements[i].Normal, ref offset, out dot);
-                ContactData processed = contacts.Elements[i];
-                if (dot < 0)
-                {
-                    //The normal should face outward.
-                    dot = -dot;
-                    Vector3.Negate(ref processed.Normal, out processed.Normal);
-                }
-                Vector3.Dot(ref processed.Normal, ref downDirection, out dot);
-                if (dot > SupportFinder.SideContactThreshold)
-                {
-                    //It's a support.
-                    supportContacts.Add(processed);
-                    if (dot > character.SupportFinder.cosMaximumSlope)
-                    {
-                        //It's a traction contact.
-                        tractionContacts.Add(processed);
-                    }
-                    else
-                        sideContacts.Add(processed); //Considering the side contacts to be supports can help with upstepping.
-                }
-                else if (dot < -SupportFinder.SideContactThreshold)
-                {
-                    //It's a head contact.
-                    headContacts.Add(processed);
-                }
-                else
-                {
-                    //It's a side contact.  These could obstruct the stepping.
-                    sideContacts.Add(processed);
-                }
+      
 
-            }
-        }
-
-        internal bool HasSupports(out bool hasTraction, out PositionState state, out ContactData supportContact)
+        /// <summary>
+        /// Analyzes the support state of the character based on the speculative input support and traction contacts.
+        /// </summary>
+        /// <param name="tractionContacts">Contacts providing the character with traction.</param>
+        /// <param name="supportContacts">Contacts providing the character with support.</param>
+        /// <param name="state">State of the contacts relative to the speculative character position.</param>
+        /// <param name="supportContact">Representative contact to use, if any.</param>
+        public void AnalyzeSupportState(RawList<CharacterContact> tractionContacts, RawList<CharacterContact> supportContacts,
+                                        out CharacterContactPositionState state, out CharacterContact supportContact)
         {
             float maxDepth = -float.MaxValue;
             int deepestIndex = -1;
@@ -297,13 +195,12 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 //Find the deepest contact.
                 for (int i = 0; i < tractionContacts.Count; i++)
                 {
-                    if (tractionContacts.Elements[i].PenetrationDepth > maxDepth)
+                    if (tractionContacts.Elements[i].Contact.PenetrationDepth > maxDepth)
                     {
-                        maxDepth = tractionContacts.Elements[i].PenetrationDepth;
+                        maxDepth = tractionContacts.Elements[i].Contact.PenetrationDepth;
                         deepestIndex = i;
                     }
                 }
-                hasTraction = true;
                 supportContact = tractionContacts.Elements[deepestIndex];
             }
             else if (supportContacts.Count > 0)
@@ -314,56 +211,44 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
                 for (int i = 0; i < supportContacts.Count; i++)
                 {
-                    if (supportContacts.Elements[i].PenetrationDepth > maxDepth)
+                    if (supportContacts.Elements[i].Contact.PenetrationDepth > maxDepth)
                     {
-                        maxDepth = supportContacts.Elements[i].PenetrationDepth;
+                        maxDepth = supportContacts.Elements[i].Contact.PenetrationDepth;
                         deepestIndex = i;
                     }
                 }
-                hasTraction = false;
                 supportContact = supportContacts.Elements[deepestIndex];
             }
             else
             {
-                hasTraction = false;
-                state = PositionState.NoHit;
-                supportContact = new ContactData();
-                return false;
+                state = CharacterContactPositionState.NoHit;
+                supportContact = new CharacterContact();
+                return;
             }
             //Check the depth.
             if (maxDepth > CollisionDetectionSettings.AllowedPenetration)
             {
                 //It's too deep.
-                state = PositionState.TooDeep;
+                state = CharacterContactPositionState.TooDeep;
             }
             else if (maxDepth < 0)
             {
                 //The depth is negative, meaning it's separated.  This shouldn't happen with the initial implementation of the character controller,
                 //but this case could conceivably occur in other usages of a system like this (or in a future version of the character),
                 //so go ahead and handle it.
-                state = PositionState.NoHit;
+                state = CharacterContactPositionState.NoHit;
             }
             else
             {
                 //The deepest contact appears to be very nicely aligned with the ground!
                 //It's fully supported.
-                state = PositionState.Accepted;
+                state = CharacterContactPositionState.Accepted;
             }
-            return true;
-
         }
 
     }
 
 
 
-    enum PositionState
-    {
-        Accepted,
-        Rejected,
-        TooDeep,
-        Obstructed,
-        HeadObstructed,
-        NoHit
-    }
+
 }

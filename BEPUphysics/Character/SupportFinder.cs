@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using BEPUphysics.Character;
 using BEPUphysics.CollisionTests;
 using BEPUutilities;
 using BEPUutilities.DataStructures;
@@ -13,43 +14,20 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
     /// </summary>
     public class SupportFinder
     {
-        internal static float SideContactThreshold = .01f;
-
-        internal RawList<CharacterContact> supportContacts = new RawList<CharacterContact>();
-        internal RawList<CharacterContact> tractionContacts = new RawList<CharacterContact>();
-        internal RawList<CharacterContact> sideContacts = new RawList<CharacterContact>();
-        internal RawList<CharacterContact> headContacts = new RawList<CharacterContact>();
+        private RawList<CharacterContact> supportContacts = new RawList<CharacterContact>();
+        private RawList<CharacterContact> tractionContacts = new RawList<CharacterContact>();
+        private RawList<CharacterContact> sideContacts = new RawList<CharacterContact>();
+        private RawList<CharacterContact> headContacts = new RawList<CharacterContact>();
 
         /// <summary>
-        /// Defines the state of a contact relative to a character's body.
+        /// Gets the contact categorizer used by the support finder.
         /// </summary>
-        [Flags]
-        public enum CharacterContactCategory
-        {
-            /// <summary>
-            /// Head contacts are on top of a character's body, where 'top' means the direction opposing the character's current down direction. They should block attempts at upward motion.
-            /// </summary>
-            Head = 0x1,
-            /// <summary>
-            /// Side contacts represent collisions with objects that the character is running into, as opposed to objects the character is standing on or objects that are sitting on the character.
-            /// A Side contact also be a Support, but Side contacts cannot be Head or Traction contacts.
-            /// </summary>
-            Side = 0x2,
-            /// <summary>
-            /// Support contacts represent collisions with objects on the bottom of the character. Support contacts provide some character control.
-            /// Full control is only provided if the support is also a Traction contact.
-            /// Support contacts can also be Side contacts, and all Traction contacts are Support contacts.
-            /// </summary>
-            Support = 0x4,
-            /// <summary>
-            /// Traction contacts are contacts on the bottom of a character which permit fully controlled movement.
-            /// Traction contacts are also Support contacts.
-            /// </summary>
-            Traction = 0x8
+        public CharacterContactCategorizer ContactCategorizer { get; private set; }
 
-        }
-
-       
+        /// <summary>
+        /// Gets the query manager used by the support finder.
+        /// </summary>
+        public QueryManager QueryManager { get; private set; }
 
         float bottomHeight;
         /// <summary>
@@ -320,11 +298,11 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         /// <summary>
         /// Gets the character's supports.
         /// </summary>
-        public ReadOnlyList<SupportContact> Supports
+        public ReadOnlyList<CharacterContact> Supports
         {
             get
             {
-                return new ReadOnlyList<SupportContact>(supports);
+                return new ReadOnlyList<CharacterContact>(supportContacts);
             }
         }
 
@@ -354,41 +332,19 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         /// Gets a collection of the character's supports that provide traction.
         /// Traction means that the surface's slope is flat enough to stand on normally.
         /// </summary>
-        public TractionSupportCollection TractionSupports
+        public ReadOnlyList<CharacterContact> TractionSupports
         {
-            get
-            {
-                return new TractionSupportCollection(supports);
-            }
+            get { return new ReadOnlyList<CharacterContact>(tractionContacts); }
         }
-
-        CharacterController character;
-
-        internal float sinMaximumSlope = (float)Math.Sin(MathHelper.PiOver4 + .01f);
-        internal float cosMaximumSlope = (float)Math.Cos(MathHelper.PiOver4 + .01f);
-        /// <summary>
-        /// Gets or sets the maximum slope on which the character will have traction.
-        /// </summary>
-        public float MaximumSlope
-        {
-            get
-            {
-                return (float)Math.Acos(MathHelper.Clamp(cosMaximumSlope, -1, 1));
-            }
-            set
-            {
-                cosMaximumSlope = (float)Math.Cos(value);
-                sinMaximumSlope = (float)Math.Sin(value);
-            }
-        }
-
+        
         /// <summary>
         /// Constructs a new support finder.
         /// </summary>
-        /// <param name="character">Character to analyze.</param>
-        public SupportFinder(CharacterController character)
+        /// <param name="contactCategorizer">Contact categorizer to use.</param>
+        public SupportFinder(QueryManager queryManager, CharacterContactCategorizer contactCategorizer)
         {
-            this.character = character;
+            QueryManager = queryManager;
+            ContactCategorizer = contactCategorizer;
         }
 
         /// <summary>
@@ -406,7 +362,8 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             Vector3 downDirection = character.Down;
 
 
-            supports.Clear();
+            tractionContacts.Clear();
+            supportContacts.Clear();
             sideContacts.Clear();
             headContacts.Clear();
             //Analyze the cylinder's contacts to see if we're supported.
@@ -419,93 +376,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 //Don't stand on things that aren't really colliding fully.
                 if (pair.CollisionRule != CollisionRule.Normal)
                     continue;
-                foreach (var c in pair.Contacts)
-                {
-                    //It's possible that a subpair has a non-normal collision rule, even if the parent pair is normal.
-                    //Note that only contacts with nonnegative penetration depths are used.
-                    //Negative depth contacts are 'speculative' in nature.
-                    //If we were to use such a speculative contact for support, the character would find supports
-                    //in situations where it should not.
-                    //This can actually be useful in some situations, but keep it disabled by default.
-                    if (c.Pair.CollisionRule != CollisionRule.Normal || c.Contact.PenetrationDepth < 0)
-                        continue;
-                    //Compute the offset from the position of the character's body to the contact.
-                    Vector3 contactOffset;
-                    Vector3.Subtract(ref c.Contact.Position, ref position, out contactOffset);
-
-
-                    //Calibrate the normal of the contact away from the center of the object.
-                    float dot;
-                    Vector3 normal;
-                    Vector3.Dot(ref contactOffset, ref c.Contact.Normal, out dot);
-                    normal = c.Contact.Normal;
-                    if (dot < 0)
-                    {
-                        Vector3.Negate(ref normal, out normal);
-                        dot = -dot;
-                    }
-
-                    //Support contacts are all contacts on the feet of the character- a set that include contacts that support traction and those which do not.
-
-                    Vector3.Dot(ref normal, ref downDirection, out dot);
-                    if (dot > SideContactThreshold)
-                    {
-                        HasSupport = true;
-
-                        //It is a support contact!
-                        //Don't include a reference to the actual contact object.
-                        //It's safer to return copies of a contact data struct.
-                        var supportContact = new SupportContact()
-                            {
-                                Contact = new ContactData()
-                                {
-                                    Position = c.Contact.Position,
-                                    Normal = normal,
-                                    PenetrationDepth = c.Contact.PenetrationDepth,
-                                    Id = c.Contact.Id
-                                },
-                                Support = pair.BroadPhaseOverlap.EntryA != body.CollisionInformation ? (Collidable)pair.BroadPhaseOverlap.EntryA : (Collidable)pair.BroadPhaseOverlap.EntryB
-                            };
-
-                        //But is it a traction contact?
-                        //Traction contacts are contacts where the surface normal is flat enough to stand on.
-                        //We want to check if slope < maxslope so:
-                        //Acos(normal dot down direction) < maxSlope => normal dot down direction > cos(maxSlope)
-                        if (dot > cosMaximumSlope)
-                        {
-                            //The slope is shallow enough that there is traction.
-                            supportContact.HasTraction = true;
-                            HasTraction = true;
-                        }
-                        else
-                            sideContacts.Add(new CharacterContact() { Collidable = supportContact.Support, Contact = supportContact.Contact });  //Considering the side contacts to be supports can help with upstepping.
-
-                        supports.Add(supportContact);
-                    }
-                    else if (dot < -SideContactThreshold)
-                    {
-                        //Head contact
-                        CharacterContact characterContact;
-                        characterContact.Collidable = pair.BroadPhaseOverlap.EntryA != body.CollisionInformation ? (Collidable)pair.BroadPhaseOverlap.EntryA : (Collidable)pair.BroadPhaseOverlap.EntryB;
-                        characterContact.Contact.Position = c.Contact.Position;
-                        characterContact.Contact.Normal = normal;
-                        characterContact.Contact.PenetrationDepth = c.Contact.PenetrationDepth;
-                        characterContact.Contact.Id = c.Contact.Id;
-                        headContacts.Add(characterContact);
-                    }
-                    else
-                    {
-                        //Side contact 
-                        CharacterContact characterContact;
-                        characterContact.Collidable = pair.BroadPhaseOverlap.EntryA != body.CollisionInformation ? (Collidable)pair.BroadPhaseOverlap.EntryA : (Collidable)pair.BroadPhaseOverlap.EntryB;
-                        characterContact.Contact.Position = c.Contact.Position;
-                        characterContact.Contact.Normal = normal;
-                        characterContact.Contact.PenetrationDepth = c.Contact.PenetrationDepth;
-                        characterContact.Contact.Id = c.Contact.Id;
-                        sideContacts.Add(characterContact);
-                    }
-                }
-
+                ContactCategorizer.CategorizeContacts(pair, character.Body.CollisionInformation, ref downDirection, tractionContacts, supportContacts, sideContacts, headContacts);
             }
 
 
@@ -545,7 +416,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 Ray obstructionRay;
                 obstructionRay.Position = body.Position + downDirection * body.Height * .25f;
                 obstructionRay.Direction = ray.Position - obstructionRay.Position;
-                if (!character.QueryManager.RayCastHitAnything(obstructionRay, 1))
+                if (!QueryManager.RayCastHitAnything(obstructionRay, 1))
                 {
                     //The origin isn't obstructed, so now ray cast down.
                     float length = bottomHeight + character.StepManager.MaximumStepHeight;
@@ -583,7 +454,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 Ray obstructionRay;
                 obstructionRay.Position = body.Position + downDirection * body.Height * .25f;
                 obstructionRay.Direction = ray.Position - obstructionRay.Position;
-                if (!character.QueryManager.RayCastHitAnything(obstructionRay, 1))
+                if (!QueryManager.RayCastHitAnything(obstructionRay, 1))
                 {
                     //The origin isn't obstructed, so now ray cast down.
                     float length = bottomHeight + character.StepManager.MaximumStepHeight;
@@ -621,7 +492,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 Ray obstructionRay;
                 obstructionRay.Position = body.Position + downDirection * body.Height * .25f;
                 obstructionRay.Direction = ray.Position - obstructionRay.Position;
-                if (!character.QueryManager.RayCastHitAnything(obstructionRay, 1))
+                if (!QueryManager.RayCastHitAnything(obstructionRay, 1))
                 {
                     //The origin isn't obstructed, so now ray cast down.
                     float length = bottomHeight + character.StepManager.MaximumStepHeight;
@@ -654,7 +525,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             Collidable earliestHitObject;
             supportRayData = new SupportRayData();
             hasTraction = false;
-            if (character.QueryManager.RayCast(ray, length, out earliestHit, out earliestHitObject))
+            if (QueryManager.RayCast(ray, length, out earliestHit, out earliestHitObject))
             {
                 float lengthSquared = earliestHit.Normal.LengthSquared();
                 if (lengthSquared < Toolbox.Epsilon)
@@ -706,107 +577,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
     }
 
-    /// <summary>
-    /// Convenience collection for finding the subset of contacts in a supporting contact list that have traction.
-    /// </summary>
-    public struct TractionSupportCollection : IEnumerable<ContactData>
-    {
-        RawList<SupportContact> supports;
 
-        public TractionSupportCollection(RawList<SupportContact> supports)
-        {
-            this.supports = supports;
-        }
-
-        public Enumerator GetEnumerator()
-        {
-            return new Enumerator(supports);
-        }
-
-        IEnumerator<ContactData> IEnumerable<ContactData>.GetEnumerator()
-        {
-            return new Enumerator(supports);
-        }
-
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-        {
-            return new Enumerator(supports);
-        }
-
-        /// <summary>
-        /// Enumerator type for the TractionSupportCollection.
-        /// </summary>
-        public struct Enumerator : IEnumerator<ContactData>
-        {
-            int currentIndex;
-            RawList<SupportContact> supports;
-
-            /// <summary>
-            /// Constructs the enumerator.
-            /// </summary>
-            /// <param name="supports">Support list to enumerate.</param>
-            public Enumerator(RawList<SupportContact> supports)
-            {
-                currentIndex = -1;
-                this.supports = supports;
-            }
-
-            /// <summary>
-            /// Gets the current contact data.
-            /// </summary>
-            public ContactData Current
-            {
-                get { return supports.Elements[currentIndex].Contact; }
-            }
-
-            public void Dispose()
-            {
-            }
-
-            object System.Collections.IEnumerator.Current
-            {
-                get { return Current; }
-            }
-
-            /// <summary>
-            /// Moves to the next traction contact.  It skips contacts with normals that cannot provide traction.
-            /// </summary>
-            /// <returns></returns>
-            public bool MoveNext()
-            {
-                while (++currentIndex < supports.Count)
-                {
-                    if (supports.Elements[currentIndex].HasTraction)
-                        return true;
-                }
-                return false;
-            }
-
-            public void Reset()
-            {
-                currentIndex = -1;
-            }
-        }
-    }
-
-    /// <summary>
-    /// Contact which acts as a support for the character controller.
-    /// </summary>
-    public struct SupportContact
-    {
-        /// <summary>
-        /// Contact information at the support.
-        /// </summary>
-        public ContactData Contact;
-        /// <summary>
-        /// Object that created this contact with the character.
-        /// </summary>
-        public Collidable Support;
-        /// <summary>
-        /// Whether or not the contact was found to have traction.
-        /// </summary>
-        public bool HasTraction;
-    }
     /// <summary>
     /// A contact generated between a character and a stored collidable.
     /// </summary>

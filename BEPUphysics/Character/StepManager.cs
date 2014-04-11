@@ -240,7 +240,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             PositionState supportState;
             ContactData supportContact;
             bool obstructed = IsDownStepObstructed(character.QueryManager.SideContacts);
-            if (character.QueryManager.HasSupports(out hasTraction, out supportState, out supportContact) && !obstructed)
+            if (character.QueryManager.AnalyzeSupportState(out hasTraction, out supportState, out supportContact) && !obstructed)
             {
                 if (supportState == PositionState.Accepted)
                 {
@@ -618,7 +618,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 return PositionState.HeadObstructed;
             }
             bool obstructed = IsUpStepObstructed(ref sideNormal, character.QueryManager.SideContacts, character.QueryManager.HeadContacts);
-            if (character.QueryManager.HasSupports(out hasTraction, out supportState, out supportContact) && !obstructed)
+            if (character.QueryManager.AnalyzeSupportState(out hasTraction, out supportState, out supportContact) && !obstructed)
             {
                 if (supportState == PositionState.Accepted)
                 {

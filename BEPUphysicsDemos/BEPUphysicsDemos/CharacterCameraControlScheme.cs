@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
+using BEPUphysics.Character;
 using BEPUphysicsDemos.AlternateMovement.Character;
 using BEPUutilities;
 using Microsoft.Xna.Framework.Input;

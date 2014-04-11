@@ -137,6 +137,7 @@
     <Compile Include="BroadPhaseEntries\Events\IEntryEventTriggerer.cs" />
     <Compile Include="BroadPhaseEntries\MobileCollidables\CompoundHelper.cs" />
     <Compile Include="BroadPhaseEntries\MobileCollidables\MobileMeshCollidable.cs" />
+    <Compile Include="Character\CharacterContactPositionState.cs" />
     <Compile Include="Character\CharacterController.cs" />
     <Compile Include="Character\CharacterContactCategorizer.cs" />
     <Compile Include="Character\HorizontalMotionConstraint.cs" />
