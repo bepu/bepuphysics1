@@ -1,15 +1,15 @@
 ﻿using System;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
-using BEPUphysics.Character;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.Entities.Prefabs;
+using BEPUphysicsDemos.AlternateMovement.Character;
 using BEPUutilities;
 using BEPUutilities.DataStructures;
 using BEPUphysics.CollisionTests;
 using BEPUphysics.Settings;
 using BEPUutilities.ResourceManagement;
 
-namespace BEPUphysicsDemos.AlternateMovement.Character
+namespace BEPUphysics.Character
 {
     /// <summary>
     /// Checks to see if a character is capable of stepping up or down onto a new support object.
@@ -129,7 +129,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         {
             //Don't bother trying to step down if we already have a support contact or if the support ray doesn't have traction.
             if (SupportFinder.Supports.Count == 0 && SupportFinder.SupportRayData != null && SupportFinder.SupportRayData.Value.HasTraction &&
-                SupportFinder.SupportRayData.Value.HitData.T - SupportFinder.RayLengthToBottom > minimumDownStepHeight) //Don't do expensive stuff if it's, at most, a super tiny step that gravity will take care of.
+                SupportFinder.SupportRayData.Value.HitData.T - (SupportFinder.MaximumAssistedDownStepHeight + SupportFinder.BottomDistance) > minimumDownStepHeight) //Don't do expensive stuff if it's, at most, a super tiny step that gravity will take care of.
             {
                 //Predict a hit location based on the time of impact and the normal at the intersection.
                 //Take into account the radius of the character (don't forget the collision margin!)
@@ -155,14 +155,14 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 //The words 'highest' and 'lowest' here refer to the position relative to the character's body.
                 //The ray cast points downward relative to the character's body.
                 float highestBound = 0;
-                float lowestBound = characterBody.CollisionInformation.Shape.CollisionMargin + SupportFinder.SupportRayData.Value.HitData.T - SupportFinder.RayLengthToBottom;
+                float lowestBound = characterBody.CollisionInformation.Shape.CollisionMargin + SupportFinder.SupportRayData.Value.HitData.T - SupportFinder.BottomDistance;
                 float currentOffset = lowestBound;
                 float hintOffset;
 
                 var tractionContacts = new QuickList<CharacterContact>(BufferPools<CharacterContact>.Thread);
-                    var supportContacts = new QuickList<CharacterContact>(BufferPools<CharacterContact>.Thread);
-                    var sideContacts = new QuickList<CharacterContact>(BufferPools<CharacterContact>.Thread);
-                    var headContacts = new QuickList<CharacterContact>(BufferPools<CharacterContact>.Thread);
+                var supportContacts = new QuickList<CharacterContact>(BufferPools<CharacterContact>.Thread);
+                var sideContacts = new QuickList<CharacterContact>(BufferPools<CharacterContact>.Thread);
+                var headContacts = new QuickList<CharacterContact>(BufferPools<CharacterContact>.Thread);
                 try
                 {
 

@@ -1,18 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
-using BEPUphysics.Character;
-using BEPUphysics.CollisionTests;
 using BEPUphysics.Entities;
+using BEPUphysicsDemos.AlternateMovement.Character;
 using BEPUutilities;
 using BEPUutilities.DataStructures;
 using BEPUphysics.NarrowPhaseSystems;
 using BEPUphysics.CollisionRuleManagement;
-using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.Settings;
 
-namespace BEPUphysicsDemos.AlternateMovement.Character
+namespace BEPUphysics.Character
 {
     /// <summary>
     /// Helps a character identify supports by finding contacts and ray cast intersections with its immediate surroundings.

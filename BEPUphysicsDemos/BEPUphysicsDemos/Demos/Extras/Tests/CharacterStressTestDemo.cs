@@ -1,6 +1,5 @@
 ﻿using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.Character;
-using BEPUphysics.Character.SphereCharacter;
 using BEPUphysics.CollisionShapes;
 using BEPUphysics.Entities.Prefabs;
 using BEPUutilities;

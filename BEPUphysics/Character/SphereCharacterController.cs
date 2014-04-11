@@ -5,18 +5,14 @@ using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.UpdateableSystems;
-using BEPUphysicsDemos.AlternateMovement;
 using BEPUphysicsDemos.AlternateMovement.Character;
 using BEPUutilities;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
 using BEPUphysics.Materials;
 using BEPUphysics.PositionUpdating;
 using System.Threading;
-using QueryManager = BEPUphysicsDemos.AlternateMovement.SphereCharacter.QueryManager;
-using SupportData = BEPUphysicsDemos.AlternateMovement.SphereCharacter.SupportData;
-using SupportFinder = BEPUphysicsDemos.AlternateMovement.SphereCharacter.SupportFinder;
 
-namespace BEPUphysics.Character.SphereCharacter
+namespace BEPUphysics.Character
 {
     /// <summary>
     /// Gives a physical object simple and cheap FPS-like control.

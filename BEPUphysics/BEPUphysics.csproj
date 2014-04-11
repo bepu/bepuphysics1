@@ -391,9 +391,7 @@
     <Compile Include="BroadPhaseEntries\Events\CollisionEventTypes.cs" />
     <Compile Include="BroadPhaseEntries\DetectorVolume.cs" />
     <Compile Include="PhysicsChecker.cs" />
-    <Compile Include="Character\SphereCharacter\QueryManager.cs" />
-    <Compile Include="Character\SphereCharacter\SphereCharacterController.cs" />
-    <Compile Include="Character\SphereCharacter\SupportFinder.cs" />
+    <Compile Include="Character\SphereCharacterController.cs" />
     <Compile Include="UpdateableSystems\CombinedUpdateable.cs">
       <SubType>Code</SubType>
     </Compile>
