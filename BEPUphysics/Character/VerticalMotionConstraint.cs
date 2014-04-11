@@ -19,8 +19,7 @@ namespace BEPUphysics.Character
 
         SupportData supportData;
 
-
-        float maximumGlueForce = 5000f;
+        private float maximumGlueForce;
         /// <summary>
         /// Gets or sets the maximum force that the constraint will apply in attempting to keep the character stuck to the ground.
         /// </summary>
@@ -84,10 +83,12 @@ namespace BEPUphysics.Character
         /// </summary>
         /// <param name="characterBody">Character body governed by the constraint.</param>
         /// <param name="supportFinder">Support finder used by the character.</param>
-        public VerticalMotionConstraint(Entity characterBody, SupportFinder supportFinder)
+        /// <param name="maximumGlueForce">Maximum force the vertical motion constraint is allowed to apply in an attempt to keep the character on the ground.</param>
+        public VerticalMotionConstraint(Entity characterBody, SupportFinder supportFinder, float maximumGlueForce = 5000)
         {
             this.characterBody = characterBody;
             this.supportFinder = supportFinder;
+            MaximumGlueForce = maximumGlueForce;
         }
 
         /// <summary>

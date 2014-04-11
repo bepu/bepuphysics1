@@ -5,10 +5,8 @@ using BEPUphysics.CollisionShapes;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.Entities.Prefabs;
 using BEPUutilities;
-using BEPUphysicsDemos.AlternateMovement.SphereCharacter;
 using System.Collections.Generic;
 using System;
-using BEPUphysicsDemos.AlternateMovement.Character;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace BEPUphysicsDemos.Demos.Extras.Tests

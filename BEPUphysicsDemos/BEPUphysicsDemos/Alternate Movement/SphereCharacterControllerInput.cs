@@ -1,6 +1,5 @@
 using BEPUphysics;
 using BEPUphysics.Character;
-using BEPUphysicsDemos.AlternateMovement.SphereCharacter;
 using BEPUutilities;
 using Microsoft.Xna.Framework.Input;
 
