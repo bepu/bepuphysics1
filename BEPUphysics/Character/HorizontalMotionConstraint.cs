@@ -63,12 +63,12 @@ namespace BEPUphysics.Character
                 float lengthSquared = value.LengthSquared();
                 if (lengthSquared > Toolbox.Epsilon)
                 {
-                    characterBody.Body.ActivityInformation.Activate();
+                    characterBody.ActivityInformation.Activate();
                     Vector2.Divide(ref value, (float)Math.Sqrt(lengthSquared), out movementDirection);
                 }
                 else
                 {
-                    characterBody.Body.ActivityInformation.Activate();
+                    characterBody.ActivityInformation.Activate();
                     movementDirection = new Vector2();
                 }
             }
@@ -317,7 +317,7 @@ namespace BEPUphysics.Character
             else
             {
                 //If we're not standing on a dynamic entity, then the mass matrix is defined entirely by the character.
-                Matrix2x2.CreateScale(characterBody.Body.Mass, out massMatrix);
+                Matrix2x2.CreateScale(characterBody.Mass, out massMatrix);
             }
 
             //If we're trying to stand still on an object that's moving, use a position correction term to keep the character

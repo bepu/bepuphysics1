@@ -1,4 +1,5 @@
 using BEPUphysics;
+using BEPUphysics.Character;
 using BEPUphysicsDemos.AlternateMovement.Character;
 using Microsoft.Xna.Framework.Input;
 using System;

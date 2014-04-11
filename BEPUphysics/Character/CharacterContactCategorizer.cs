@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using BEPUphysics.BroadPhaseEntries;
+using BEPUphysics.BroadPhaseEntries.MobileCollidables;
+using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.CollisionTests;
+using BEPUphysics.NarrowPhaseSystems.Pairs;
 using BEPUphysicsDemos.AlternateMovement.Character;
 using BEPUutilities;
 
@@ -99,50 +102,40 @@ namespace BEPUphysics.Character
         }
 
         /// <summary>
-        /// Takes all contacts associated with a particular collidable and distributes them into their associated categories according to the categorizer's thresholds.
+        /// Takes a collision pair and distributes its contacts into categories according to the categorizer's thresholds.
         /// </summary>
-        /// <param name="collidable">Collidable that generated the contacts with the character.</param>
+        /// <param name="pair">Source of the contacts to categorize.</param>
+        /// <param name="characterCollidable">Collidable associated with the character.</param>
         /// <param name="downDirection">Down direction of the character.</param>
-        /// <param name="bodyPosition">Position of the character's body to use for calibration.</param>
         /// <param name="tractionContacts">List to contain the traction contacts found in the input contacts list.</param>
         /// <param name="supportContacts">List to contain the support contacts found in the input contacts list.</param>
         /// <param name="sideContacts">List to contain the side contacts found in the input contacts list.</param>
         /// <param name="headContacts">List to contain the head contacts found in the input contacts list.</param>
         /// <typeparam name="TOutputContacts">List type used to store the output character contact structs.</typeparam>
-        public void CategorizeContacts<TOutputContacts>(Collidable collidable, ref Vector3 downDirection, ref Vector3 bodyPosition,
+        public void CategorizeContacts<TOutputContacts>(CollidablePairHandler pair, EntityCollidable characterCollidable, ref Vector3 downDirection, 
                                                         TOutputContacts tractionContacts, TOutputContacts supportContacts, TOutputContacts sideContacts, TOutputContacts headContacts)
                                                             where TOutputContacts : IList<CharacterContact>
         {
-            CategorizeContacts(collidable.conta
-        }
-
-        /// <summary>
-        /// Takes a list of contacts and distributes them into their associated categories according to the categorizer's thresholds.
-        /// </summary>
-        /// <param name="contacts">Contacts to categorize.</param>
-        /// <param name="collidable">Collidable that generated the contacts with the character.</param>
-        /// <param name="downDirection">Down direction of the character.</param>
-        /// <param name="bodyPosition">Position of the character's body to use for calibration.</param>
-        /// <param name="tractionContacts">List to contain the traction contacts found in the input contacts list.</param>
-        /// <param name="supportContacts">List to contain the support contacts found in the input contacts list.</param>
-        /// <param name="sideContacts">List to contain the side contacts found in the input contacts list.</param>
-        /// <param name="headContacts">List to contain the head contacts found in the input contacts list.</param>
-        /// <typeparam name="TInputContacts">List type containing the input contact structs.</typeparam>
-        /// <typeparam name="TOutputContacts">List type used to store the output character contact structs.</typeparam>
-        public void CategorizeContacts<TInputContacts, TOutputContacts>(ref TInputContacts contacts, Collidable collidable, ref Vector3 downDirection, ref Vector3 bodyPosition,
-                                                                        TOutputContacts tractionContacts, TOutputContacts supportContacts, TOutputContacts sideContacts, TOutputContacts headContacts)
-            where TInputContacts : IList<ContactData>
-            where TOutputContacts : IList<CharacterContact>
-        {
-            CharacterContact characterContact;
-            characterContact.Collidable = collidable;
-            for (int i = contacts.Count - 1; i >= 0; --i)
+            var contactCollection = pair.Contacts;
+            for (int i = pair.ContactCount - 1; i >= 0; --i)
             {
-                characterContact.Contact = contacts[i];
+                var contactInfo = contactCollection[i];
+                CharacterContact characterContact;
+                characterContact.Contact = new ContactData(contactInfo.Contact);
+                characterContact.Collidable = pair.CollidableA == characterCollidable ? pair.CollidableB : pair.CollidableA;
+
+                //It's possible that a subpair has a non-normal collision rule, even if the parent pair is normal.
+                //Note that only contacts with nonnegative penetration depths are used.
+                //Negative depth contacts are 'speculative' in nature.
+                //If we were to use such a speculative contact for support, the character would find supports
+                //in situations where it should not.
+                //This can actually be useful in some situations, but keep it disabled by default.
+                if (contactInfo.Pair.CollisionRule != CollisionRule.Normal || characterContact.Contact.PenetrationDepth < 0)
+                    continue;
 
                 float dot;
                 Vector3 offset;
-                Vector3.Subtract(ref characterContact.Contact.Position, ref bodyPosition, out offset);
+                Vector3.Subtract(ref characterContact.Contact.Position, ref characterCollidable.worldTransform.Position, out offset);
                 Vector3.Dot(ref characterContact.Contact.Normal, ref offset, out dot);
                 if (dot < 0)
                 {

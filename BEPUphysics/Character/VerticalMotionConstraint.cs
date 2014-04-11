@@ -171,7 +171,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
             linearJacobianA = supportData.Normal;
             Vector3.Negate(ref linearJacobianA, out linearJacobianB);
-            float inverseEffectiveMass = characterBody.Body.InverseMass;
+            float inverseEffectiveMass = characterBody.InverseMass;
             if (supportEntity != null)
             {
                 Vector3 offsetB = supportData.Position - supportEntity.Position;
@@ -209,7 +209,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 #endif
             Vector3.Multiply(ref linearJacobianA, accumulatedImpulse, out impulse);
 
-            characterBody.Body.ApplyLinearImpulse(ref impulse);
+            characterBody.ApplyLinearImpulse(ref impulse);
 
             if (supportEntity != null && supportEntity.IsDynamic)
             {

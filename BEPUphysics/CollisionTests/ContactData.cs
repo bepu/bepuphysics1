@@ -30,6 +30,18 @@ namespace BEPUphysics.CollisionTests
         public Vector3 Position;
 
         /// <summary>
+        /// Creates a ContactData from an existing Contact.
+        /// </summary>
+        /// <param name="contact">Contact to copy data from.</param>
+        public ContactData(Contact contact)
+        {
+            Id = contact.Id;
+            Normal = contact.Normal;
+            Position = contact.Position;
+            PenetrationDepth = contact.PenetrationDepth;
+        }
+
+        /// <summary>
         /// Returns the fully qualified type name of this instance.
         /// </summary>
         /// <returns>
