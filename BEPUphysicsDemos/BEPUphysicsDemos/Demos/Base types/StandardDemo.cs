@@ -5,12 +5,14 @@ using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysicsDemos.SampleCode;
 using BEPUphysicsDrawer.Lines;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using BEPUphysics.CollisionRuleManagement;
 using System;
 using BEPUphysicsDemos.AlternateMovement;
-using BEPUutilities;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using Ray = BEPUutilities.Ray;
+using Vector2 = BEPUutilities.Vector2;
+using Vector3 = BEPUutilities.Vector3;
 
 namespace BEPUphysicsDemos.Demos
 {
@@ -242,6 +244,11 @@ namespace BEPUphysicsDemos.Demos
             if (Game.MouseInput.RightButton == ButtonState.Pressed)
 #endif
                 Game.UIDrawer.Draw(whitePixel, new Microsoft.Xna.Framework.Rectangle(Game.Graphics.PreferredBackBufferWidth / 2, Game.Graphics.PreferredBackBufferHeight / 2, 3, 3), Microsoft.Xna.Framework.Color.LightBlue);
+            if (character.CharacterController.SupportFinder.HasTraction)
+                Game.TinyTextDrawer.Draw("HAS TRACTION", new Microsoft.Xna.Framework.Vector2(20, 200));
+            else if (character.CharacterController.SupportFinder.HasSupport)
+                Game.TinyTextDrawer.Draw("HAS SUPPORT", new Microsoft.Xna.Framework.Vector2(20, 200));
+
         }
     }
 }

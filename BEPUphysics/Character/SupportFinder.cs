@@ -309,7 +309,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             BottomDistance = -extremePoint.Y + convexShape.collisionMargin;
 
             convexShape.GetLocalExtremePointWithoutMargin(ref Toolbox.RightVector, out extremePoint);
-            float rayCastInnerRadius = Math.Max((extremePoint.X + convexShape.collisionMargin) * 0.9f, extremePoint.X);
+            float rayCastInnerRadius = Math.Max((extremePoint.X + convexShape.collisionMargin) * 0.8f, extremePoint.X);
 
             //Vertically, the rays will start at the same height as the character's center.
             //While they could be started lower on a cylinder, that wouldn't always work for a sphere or capsule: the origin might end up outside of the shape!
@@ -324,11 +324,14 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 //Don't stand on things that aren't really colliding fully.
                 if (pair.CollisionRule != CollisionRule.Normal)
                     continue;
-                ContactCategorizer.CategorizeContacts(pair, characterBody.CollisionInformation, ref downDirection, tractionContacts, supportContacts, sideContacts, headContacts);
+                ContactCategorizer.CategorizeContacts(pair, characterBody.CollisionInformation, ref downDirection, ref tractionContacts, ref supportContacts, ref sideContacts, ref headContacts);
             }
 
+            HasSupport = supportContacts.Count > 0;
+            HasTraction = tractionContacts.Count > 0;
 
-            //Start the ray halfway between the center of the shape and the bottom of the shape.  That extra margin prevents it from getting stuck in the ground and returning t = 0 unhelpfully.
+
+            float supportRayLength = maximumAssistedDownStepHeight + BottomDistance;
             SupportRayData = null;
             //If the contacts aren't available to support the character, raycast down to find the ground.
             if (!HasTraction && hadTraction)
@@ -338,15 +341,13 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
                 bool hasTraction;
                 SupportRayData data;
-                if (TryDownCast(ref ray, maximumAssistedDownStepHeight, out hasTraction, out data))
+                if (TryDownCast(ref ray, supportRayLength, out hasTraction, out data))
                 {
                     SupportRayData = data;
                     HasTraction = data.HasTraction;
                     HasSupport = true;
                 }
             }
-
-            float supportRayLength = maximumAssistedDownStepHeight + BottomDistance;
 
             //If contacts and the center ray cast failed, try a ray offset in the movement direction.
             bool tryingToMove = movementDirection.LengthSquared() > 0;
