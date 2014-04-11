@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
-using BEPUphysics.Character;
-using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.UpdateableSystems;
-using BEPUphysics;
+using BEPUphysicsDemos.AlternateMovement.Character;
 using BEPUutilities;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
 using BEPUphysics.Materials;
@@ -14,7 +12,7 @@ using BEPUphysics.PositionUpdating;
 using System.Diagnostics;
 using System.Threading;
 
-namespace BEPUphysicsDemos.AlternateMovement.Character
+namespace BEPUphysics.Character
 {
     /// <summary>
     /// Gives a physical object FPS-like control, including stepping and jumping.
@@ -26,6 +24,11 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         /// Gets the physical body of the character.  Do not use this reference to modify the character's height and radius.  Instead, use the BodyRadius property and the StanceManager's StandingHeight and CrouchingHeight properties.
         /// </summary>
         public Cylinder Body { get; private set; }
+
+        /// <summary>
+        /// Gets the contact categorizer used by the character to determine how contacts affect the character's movement.
+        /// </summary>
+        public CharacterContactCategorizer ContactCategorizer { get; private set; }
 
         /// <summary>
         /// Gets the manager responsible for finding places for the character to step up and down to.
@@ -351,7 +354,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         /// Constructs a new character controller with the default configuration.
         /// </summary>
         public CharacterController()
-            : this(new Vector3(), 1.7f, 1.7f * .7f, .6f, 10)
+            : this(new Vector3(), 1.7f, 1.7f * .7f, .6f, .1f, 1f, 1.3f, 10)
         {
 
         }
@@ -364,12 +367,23 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         /// <param name="height">Height of the character body while standing.</param>
         /// <param name="crouchingHeight">Height of the character body while crouching.</param>
         /// <param name="radius">Radius of the character body.</param>
+        /// <param name="margin">Radius of 'rounding' applied to the cylindrical body. Higher values make the cylinder's edges more rounded.
+        /// The margin is contained within the cylinder's height and radius, so it must not exceed the radius or height of the cylinder.</param>
+        /// <param name="maximumTractionSlope">Steepest slope, in radians, that the character can maintain traction on.</param>
+        /// <param name="maximumSupportSlope">Steepest slope, in radians, that the character can consider a support.</param>
         /// <param name="mass">Mass of the character body.</param>
-        public CharacterController(Vector3 position, float height, float crouchingHeight, float radius, float mass)
+        public CharacterController(
+            Vector3 position, 
+            float height, float crouchingHeight, float radius, float margin, 
+            float maximumTractionSlope, float maximumSupportSlope, 
+            float mass)
         {
+            if (margin > radius || margin > crouchingHeight || margin > height)
+                throw new ArgumentException("Margin must not be larger than the character's radius or height.");
+
             Body = new Cylinder(position, height, radius, mass);
             Body.IgnoreShapeChanges = true; //Wouldn't want inertia tensor recomputations to occur when crouching and such.
-            Body.CollisionInformation.Shape.CollisionMargin = .1f;
+            Body.CollisionInformation.Shape.CollisionMargin = margin;
             //Making the character a continuous object prevents it from flying through walls which would be pretty jarring from a player's perspective.
             Body.PositionUpdateMode = PositionUpdateMode.Continuous;
             Body.LocalInertiaTensorInverse = new Matrix3x3();
@@ -377,12 +391,13 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             //In a future version where this is changed, change this to conceptually minimally required CreatingPair.
             Body.CollisionInformation.Events.DetectingInitialCollision += RemoveFriction;
             Body.LinearDamping = 0;
-            SupportFinder = new SupportFinder(this);
-            HorizontalMotionConstraint = new HorizontalMotionConstraint(this);
-            VerticalMotionConstraint = new VerticalMotionConstraint(this);
-            StepManager = new StepManager(this);
-            StanceManager = new StanceManager(this, crouchingHeight);
-            QueryManager = new QueryManager(this);
+            ContactCategorizer = new CharacterContactCategorizer(maximumTractionSlope, maximumSupportSlope);
+            QueryManager = new QueryManager(Body, ContactCategorizer);
+            SupportFinder = new SupportFinder(Body, QueryManager, ContactCategorizer);
+            HorizontalMotionConstraint = new HorizontalMotionConstraint(Body, SupportFinder);
+            VerticalMotionConstraint = new VerticalMotionConstraint(Body, SupportFinder);
+            StepManager = new StepManager(Body, ContactCategorizer, SupportFinder, QueryManager, HorizontalMotionConstraint);
+            StanceManager = new StanceManager(Body, crouchingHeight, QueryManager, SupportFinder);
 
             //Enable multithreading for the characters.  
             IsUpdatedSequentially = false;
@@ -518,27 +533,6 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         }
 
 
-        void CollectSupportData()
-        {
-            //Identify supports.
-            SupportFinder.UpdateSupports();
-
-            //Collect the support data from the support, if any.
-            if (SupportFinder.HasSupport)
-            {
-                if (SupportFinder.HasTraction)
-                    supportData = SupportFinder.TractionData.Value;
-                else
-                    supportData = SupportFinder.SupportData.Value;
-            }
-            else
-                supportData = new SupportData();
-
-        }
-
-        SupportData supportData;
-
-
         void IBeforeSolverUpdateable.Update(float dt)
         {
             //Someone may want to use the Body.CollisionInformation.Tag for their own purposes.
@@ -546,6 +540,9 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             //Consider using the making the custom tag implement ICharacterTag, modifying LockCharacterPairs to analyze the different Tag type, or using the Entity.Tag for the custom data instead.
             Debug.Assert(Body.CollisionInformation.Tag is ICharacterTag, "The character.Body.CollisionInformation.Tag must implement ICharacterTag to link the CharacterController and its body together for character-related locking to work in multithreaded simulations.");
 
+            SupportData supportData;
+
+            HorizontalMotionConstraint.UpdateMovementBasis(ref viewDirection);
             //We can't let multiple characters manage the same pairs simultaneously.  Lock it up!
             LockCharacterPairs();
             try
@@ -554,7 +551,8 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
                 bool hadSupport = SupportFinder.HasSupport;
 
-                CollectSupportData();
+                SupportFinder.UpdateSupports(ref HorizontalMotionConstraint.movementDirection3d);
+                supportData = SupportFinder.SupportData;
 
 
                 //Compute the initial velocities relative to the support.
@@ -639,48 +637,14 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 UnlockCharacterPairs();
             }
 
-            //if (SupportFinder.HasTraction && SupportFinder.Supports.Count == 0)
-            //{
-            //There's another way to step down that is a lot cheaper, but less robust.
-            //This modifies the velocity of the character to make it fall faster.
-            //Impacts with the ground will be harder, so it will apply superfluous force to supports.
-            //Additionally, it will not be consistent with instant up-stepping.
-            //However, because it does not do any expensive queries, it is very fast!
+            //Tell the constraints to get ready to solve.
+            HorizontalMotionConstraint.UpdateSupportData();
+            VerticalMotionConstraint.UpdateSupportData();
 
-            ////We are being supported by a ray cast, but we're floating.
-            ////Let's try to get to the ground faster.
-            ////How fast?  Try picking an arbitrary velocity and setting our relative vertical velocity to that value.
-            ////Don't go farther than the maximum distance, though.
-            //float maxVelocity = (SupportFinder.SupportRayData.Value.HitData.T - SupportFinder.RayLengthToBottom);
-            //if (maxVelocity > 0)
-            //{
-            //    maxVelocity = (maxVelocity + .01f) / dt;
-
-            //    float targetVerticalVelocity = -3;
-            //    verticalVelocity = -Vector3.Dot(Down, relativeVelocity);
-            //    float change = MathHelper.Clamp(targetVerticalVelocity - verticalVelocity, -maxVelocity, 0);
-            //    ChangeVelocityUnilaterally(Down * -change, ref relativeVelocity);
-            //}
-            //}
-
-
-
-            //Vertical support data is different because it has the capacity to stop the character from moving unless
-            //contacts are pruned appropriately.
-            SupportData verticalSupportData;
-            Vector3 movementDirection;
-            HorizontalMotionConstraint.GetMovementDirectionIn3D(out movementDirection);
-            SupportFinder.GetTractionInDirection(ref movementDirection, out verticalSupportData);
-
-
-
-            HorizontalMotionConstraint.SupportData = supportData;
-            VerticalMotionConstraint.SupportData = verticalSupportData;
-
-            //Update the 
+            //Update the horizontal motion constraint's state.
             if (supportData.SupportObject != null)
             {
-                if (supportData.HasTraction)
+                if (SupportFinder.HasTraction)
                 {
                     HorizontalMotionConstraint.MovementMode = MovementMode.Traction;
                     if (StanceManager.CurrentStance == Stance.Standing)
@@ -727,7 +691,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             }
             //Also re-collect supports.
             //This will ensure the constraint and other velocity affectors have the most recent information available.
-            CollectSupportData();
+            SupportFinder.UpdateSupports(ref HorizontalMotionConstraint.movementDirection3d);
         }
 
         void CorrectContacts()
@@ -889,25 +853,6 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             Vector3.Add(ref relativeVelocity, ref velocityChange, out relativeVelocity);
 
         }
-
-        /// <summary>
-        /// In some cases, an applied velocity should only modify the character.
-        /// This allows partially non-physical behaviors, like gluing the character to the ground.
-        /// </summary>
-        /// <param name="velocityChange">Change to apply to the character.</param>
-        /// <param name="relativeVelocity">Relative velocity to update.</param>
-        void ChangeVelocityUnilaterally(Vector3 velocityChange, ref Vector3 relativeVelocity)
-        {
-            Body.LinearVelocity += velocityChange;
-            //Update the relative velocity as well.  It's a ref parameter, so this update will be reflected in the calling scope.
-            Vector3.Add(ref relativeVelocity, ref velocityChange, out relativeVelocity);
-
-        }
-
-
-
-
-
 
         bool tryToJump;
         /// <summary>

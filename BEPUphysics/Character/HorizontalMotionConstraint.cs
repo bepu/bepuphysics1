@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics;
+using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.Constraints;
 using BEPUphysics.Entities;
 using BEPUphysicsDemos.AlternateMovement.Character;
@@ -14,39 +16,10 @@ namespace BEPUphysics.Character
     public class HorizontalMotionConstraint : SolverUpdateable
     {
         Entity characterBody;
+        private SupportFinder supportFinder;
 
 
         SupportData supportData;
-        /// <summary>
-        /// Gets or sets the support data used by the constraint.
-        /// </summary>
-        public SupportData SupportData
-        {
-            get
-            {
-                return supportData;
-            }
-            set
-            {
-                //If the support changes, perform the necessary bookkeeping to keep the connections up to date.
-                var oldSupport = supportData.SupportObject;
-                supportData = value;
-                if (oldSupport != supportData.SupportObject)
-                {
-                    OnInvolvedEntitiesChanged();
-                    var supportEntityCollidable = supportData.SupportObject as EntityCollidable;
-                    if (supportEntityCollidable != null)
-                    {
-                        supportEntity = supportEntityCollidable.Entity;
-                    }
-                    else
-                    {
-                        //We aren't on an entity, so clear out the support entity.
-                        supportEntity = null;
-                    }
-                }
-            }
-        }
 
         Vector2 movementDirection;
         /// <summary>
@@ -104,11 +77,11 @@ namespace BEPUphysics.Character
         }
 
         /// <summary>
-        /// Updates the movement basis of the horizontal motion constraint. 
-        /// Should be updated automatically by the character on each time step; other code should not need to modify it.
+        /// Updates the movement basis of the horizontal motion constraint.
+        /// Should be updated automatically by the character on each time step; other code should not need to call this.
         /// </summary>
         /// <param name="forward">Forward facing direction of the character.</param>
-        public void UpdateMovementDirection(ref Vector3 forward)
+        public void UpdateMovementBasis(ref Vector3 forward)
         {
             Vector3 down = characterBody.orientationMatrix.Down;
             Vector3 strafeDirection;
@@ -123,7 +96,7 @@ namespace BEPUphysics.Character
             }
             else
             {
-                Vector3.Divide(ref horizontalForwardDirection, (float) Math.Sqrt(forwardLengthSquared), out horizontalForwardDirection);
+                Vector3.Divide(ref horizontalForwardDirection, (float)Math.Sqrt(forwardLengthSquared), out horizontalForwardDirection);
                 Vector3.Cross(ref horizontalForwardDirection, ref down, out strafeDirection);
                 //Don't need to normalize the strafe direction; it's the cross product of two normalized perpendicular vectors.
             }
@@ -134,6 +107,30 @@ namespace BEPUphysics.Character
             Vector3.Multiply(ref strafeDirection, movementDirection.X, out strafeComponent);
             Vector3.Add(ref strafeComponent, ref movementDirection3d, out movementDirection3d);
 
+        }
+
+        /// <summary>
+        /// Updates the constraint's view of the character's support data.
+        /// </summary>
+        public void UpdateSupportData()
+        {
+            //Check if the support has changed, and perform the necessary bookkeeping to keep the connections up to date.
+            var oldSupport = supportData.SupportObject;
+            supportData = supportFinder.SupportData;
+            if (oldSupport != supportData.SupportObject)
+            {
+                OnInvolvedEntitiesChanged();
+                var supportEntityCollidable = supportData.SupportObject as EntityCollidable;
+                if (supportEntityCollidable != null)
+                {
+                    supportEntity = supportEntityCollidable.Entity;
+                }
+                else
+                {
+                    //We aren't on an entity, so clear out the support entity.
+                    supportEntity = null;
+                }
+            }
         }
 
         float supportForceFactor = 1;
@@ -156,6 +153,8 @@ namespace BEPUphysics.Character
                 supportForceFactor = value;
             }
         }
+
+
 
 
 
@@ -183,9 +182,11 @@ namespace BEPUphysics.Character
         /// Constructs a new horizontal motion constraint.
         /// </summary>
         /// <param name="characterBody">Character body to be governed by this constraint.</param>
-        public HorizontalMotionConstraint(Entity characterBody)
+        /// <param name="supportFinder">Helper used to find supports for the character.</param>
+        public HorizontalMotionConstraint(Entity characterBody, SupportFinder supportFinder)
         {
             this.characterBody = characterBody;
+            this.supportFinder = supportFinder;
             CollectInvolvedEntities();
         }
 
@@ -206,12 +207,10 @@ namespace BEPUphysics.Character
         /// <param name="dt">Time step duration.</param>
         public override void Update(float dt)
         {
-            Vector3 movementDirectionIn3d;
-            GetMovementDirectionIn3D(out movementDirectionIn3d);
-            bool isTryingToMove = movementDirectionIn3d.LengthSquared() > 0;
+            bool isTryingToMove = movementDirection3d.LengthSquared() > 0;
             if (!isTryingToMove)
                 TargetSpeed = 0;
-            
+
             maxForce = MaximumForce * dt;
 
 
@@ -230,7 +229,7 @@ namespace BEPUphysics.Character
                     //This projection is NOT along the support normal to the plane; that would cause the character to veer off course when moving on slopes.
                     //Instead, project along the sweep direction to the plane.
                     //For a 6DOF character controller, the lineStart would be different; it must be perpendicular to the local up.
-                    Vector3 lineStart = movementDirectionIn3d;
+                    Vector3 lineStart = movementDirection3d;
 
                     Vector3 lineEnd;
                     Vector3.Add(ref lineStart, ref downDirection, out lineEnd);
@@ -310,8 +309,8 @@ namespace BEPUphysics.Character
             else
             {
                 //If the character is floating, then the jacobians are simply the 3d movement direction and the perpendicular direction on the character's horizontal plane.
-                linearJacobianA1 = movementDirectionIn3d;
-                linearJacobianA2 = Vector3.Cross(linearJacobianA1, characterBody.Down);
+                linearJacobianA1 = movementDirection3d;
+                linearJacobianA2 = Vector3.Cross(linearJacobianA1, characterBody.orientationMatrix.Down);
 
 
             }
@@ -328,7 +327,7 @@ namespace BEPUphysics.Character
                 float inverseMass;
                 Vector3 intermediate;
 
-                inverseMass = characterBody.Body.InverseMass;
+                inverseMass = characterBody.InverseMass;
                 m11 = inverseMass;
                 m22 = inverseMass;
 
@@ -366,7 +365,7 @@ namespace BEPUphysics.Character
             //from drifting due to accelerations. 
             //First thing to do is to check to see if we're moving into a traction/trying to stand still state from a 
             //non-traction || trying to move state.  Either that, or we've switched supports and need to update the offset.
-            if (supportEntity != null && ((wasTryingToMove && !isTryingToMove) || (!hadTraction && supportData.HasTraction) || supportEntity != previousSupportEntity))
+            if (supportEntity != null && ((wasTryingToMove && !isTryingToMove) || (!hadTraction && supportFinder.HasTraction) || supportEntity != previousSupportEntity))
             {
                 //We're transitioning into a new 'use position correction' state.
                 //Force a recomputation of the local offset.
@@ -378,30 +377,32 @@ namespace BEPUphysics.Character
             if (!isTryingToMove && MovementMode == MovementMode.Traction && supportEntity != null)
             {
                 //Compute the time it usually takes for the character to slow down while it has traction.
-                var tractionDecelerationTime = TargetSpeed / (MaximumForce * characterBody.Body.InverseMass);
+                var tractionDecelerationTime = TargetSpeed / (MaximumForce * characterBody.InverseMass);
+
+                var distanceToBottomOfCharacter = supportFinder.BottomDistance;
 
                 if (timeSinceTransition >= 0 && timeSinceTransition < tractionDecelerationTime)
                     timeSinceTransition += dt;
                 if (timeSinceTransition >= tractionDecelerationTime)
                 {
-                    Vector3.Multiply(ref downDirection, characterBody.Body.Height * .5f, out positionLocalOffset);
-                    positionLocalOffset = (positionLocalOffset + characterBody.Body.Position) - supportEntity.Position;
+                    Vector3.Multiply(ref downDirection, distanceToBottomOfCharacter, out positionLocalOffset);
+                    positionLocalOffset = (positionLocalOffset + characterBody.Position) - supportEntity.Position;
                     positionLocalOffset = Matrix3x3.TransformTranspose(positionLocalOffset, supportEntity.OrientationMatrix);
                     timeSinceTransition = -1; //Negative 1 means that the offset has been computed.
                 }
                 if (timeSinceTransition < 0)
                 {
                     Vector3 targetPosition;
-                    Vector3.Multiply(ref downDirection, characterBody.Body.Height * .5f, out targetPosition);
-                    targetPosition += characterBody.Body.Position;
+                    Vector3.Multiply(ref downDirection, distanceToBottomOfCharacter, out targetPosition);
+                    targetPosition += characterBody.Position;
                     Vector3 worldSupportLocation = Matrix3x3.Transform(positionLocalOffset, supportEntity.OrientationMatrix) + supportEntity.Position;
                     Vector3 error;
                     Vector3.Subtract(ref targetPosition, ref worldSupportLocation, out error);
                     //If the error is too large, then recompute the offset.  We don't want the character rubber banding around.
                     if (error.LengthSquared() > .15f * .15f)
                     {
-                        Vector3.Multiply(ref downDirection, characterBody.Body.Height * .5f, out positionLocalOffset);
-                        positionLocalOffset = (positionLocalOffset + characterBody.Body.Position) - supportEntity.Position;
+                        Vector3.Multiply(ref downDirection, distanceToBottomOfCharacter, out positionLocalOffset);
+                        positionLocalOffset = (positionLocalOffset + characterBody.Position) - supportEntity.Position;
                         positionLocalOffset = Matrix3x3.TransformTranspose(positionLocalOffset, supportEntity.OrientationMatrix);
                         positionCorrectionBias = new Vector2();
                     }
@@ -424,7 +425,7 @@ namespace BEPUphysics.Character
             }
 
             wasTryingToMove = isTryingToMove;
-            hadTraction = supportData.HasTraction;
+            hadTraction = supportFinder.HasTraction;
             previousSupportEntity = supportEntity;
 
         }
@@ -450,7 +451,7 @@ namespace BEPUphysics.Character
             impulse.Y = linearJacobianA1.Y * x + linearJacobianA2.Y * y;
             impulse.Z = linearJacobianA1.Z * x + linearJacobianA2.Z * y;
 
-            characterBody.Body.ApplyLinearImpulse(ref impulse);
+            characterBody.ApplyLinearImpulse(ref impulse);
 
             if (supportEntity != null && supportEntity.IsDynamic)
             {
@@ -524,7 +525,7 @@ namespace BEPUphysics.Character
             impulse.Y = linearJacobianA1.Y * x + linearJacobianA2.Y * y;
             impulse.Z = linearJacobianA1.Z * x + linearJacobianA2.Z * y;
 
-            characterBody.Body.ApplyLinearImpulse(ref impulse);
+            characterBody.ApplyLinearImpulse(ref impulse);
 
             if (supportEntity != null && supportEntity.IsDynamic)
             {
@@ -563,23 +564,18 @@ namespace BEPUphysics.Character
                 Vector2 relativeVelocity;
 #endif
 
-                Vector3 bodyVelocity = characterBody.Body.LinearVelocity;
-                Vector3.Dot(ref linearJacobianA1, ref bodyVelocity, out relativeVelocity.X);
-                Vector3.Dot(ref linearJacobianA2, ref bodyVelocity, out relativeVelocity.Y);
+                Vector3.Dot(ref linearJacobianA1, ref characterBody.linearVelocity, out relativeVelocity.X);
+                Vector3.Dot(ref linearJacobianA2, ref characterBody.linearVelocity, out relativeVelocity.Y);
 
                 float x, y;
                 if (supportEntity != null)
                 {
-                    Vector3 supportLinearVelocity = supportEntity.LinearVelocity;
-                    Vector3 supportAngularVelocity = supportEntity.AngularVelocity;
-
-
-                    Vector3.Dot(ref linearJacobianB1, ref supportLinearVelocity, out x);
-                    Vector3.Dot(ref linearJacobianB2, ref supportLinearVelocity, out y);
+                    Vector3.Dot(ref linearJacobianB1, ref supportEntity.linearVelocity, out x);
+                    Vector3.Dot(ref linearJacobianB2, ref supportEntity.linearVelocity, out y);
                     relativeVelocity.X += x;
                     relativeVelocity.Y += y;
-                    Vector3.Dot(ref angularJacobianB1, ref supportAngularVelocity, out x);
-                    Vector3.Dot(ref angularJacobianB2, ref supportAngularVelocity, out y);
+                    Vector3.Dot(ref angularJacobianB1, ref supportEntity.angularVelocity, out x);
+                    Vector3.Dot(ref angularJacobianB2, ref supportEntity.angularVelocity, out y);
                     relativeVelocity.X += x;
                     relativeVelocity.Y += y;
 
@@ -595,7 +591,7 @@ namespace BEPUphysics.Character
         {
             get
             {
-                Vector3 bodyVelocity = characterBody.Body.LinearVelocity;
+                Vector3 bodyVelocity = characterBody.LinearVelocity;
                 if (supportEntity != null)
                     return bodyVelocity - Toolbox.GetVelocityOfPoint(supportData.Position, supportEntity.Position, supportEntity.LinearVelocity, supportEntity.AngularVelocity);
                 return bodyVelocity;

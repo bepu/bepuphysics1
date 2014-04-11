@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using BEPUphysics.Character;
+using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.CollisionTests;
+using BEPUphysics.Entities;
 using BEPUutilities;
 using BEPUutilities.DataStructures;
 using BEPUphysics.BroadPhaseEntries;
@@ -18,28 +21,6 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         private RawList<CharacterContact> tractionContacts = new RawList<CharacterContact>();
         private RawList<CharacterContact> sideContacts = new RawList<CharacterContact>();
         private RawList<CharacterContact> headContacts = new RawList<CharacterContact>();
-
-        /// <summary>
-        /// Gets the contact categorizer used by the support finder.
-        /// </summary>
-        public CharacterContactCategorizer ContactCategorizer { get; private set; }
-
-        /// <summary>
-        /// Gets the query manager used by the support finder.
-        /// </summary>
-        public QueryManager QueryManager { get; private set; }
-
-        float bottomHeight;
-        /// <summary>
-        /// Gets the length from the ray start to the bottom of the character.
-        /// </summary>
-        public float RayLengthToBottom
-        {
-            get
-            {
-                return bottomHeight;
-            }
-        }
 
         float maximumAssistedDownStepHeight = 1;
         /// <summary>
@@ -60,224 +41,166 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         }
 
         /// <summary>
+        /// Gets the vertical distance from the center of the character to the bottom of the character.
+        /// </summary>
+        public float BottomDistance { get; private set; }
+
+        private SupportData supportData;
+        /// <summary>
         /// Computes a combined support contact from all available supports (contacts or ray).
         /// </summary>
-        public SupportData? SupportData
+        public SupportData SupportData
         {
-            get
-            {
-                if (supports.Count > 0)
-                {
-                    SupportData toReturn = new SupportData()
-                    {
-                        Position = supports.Elements[0].Contact.Position,
-                        Normal = supports.Elements[0].Contact.Normal
-                    };
-                    for (int i = 1; i < supports.Count; i++)
-                    {
-                        Vector3.Add(ref toReturn.Position, ref supports.Elements[i].Contact.Position, out toReturn.Position);
-                        Vector3.Add(ref toReturn.Normal, ref supports.Elements[i].Contact.Normal, out toReturn.Normal);
-                    }
-                    if (supports.Count > 1)
-                    {
-                        Vector3.Multiply(ref toReturn.Position, 1f / supports.Count, out toReturn.Position);
-                        float length = toReturn.Normal.LengthSquared();
-                        if (length < Toolbox.Epsilon)
-                        {
-                            //It's possible that the normals have cancelled each other out- that would be bad!
-                            //Just use an arbitrary support's normal in that case.
-                            toReturn.Normal = supports.Elements[0].Contact.Normal;
-                        }
-                        else
-                        {
-                            Vector3.Multiply(ref toReturn.Normal, 1 / (float)Math.Sqrt(length), out toReturn.Normal);
-                        }
-                    }
-                    //Now that we have the normal, cycle through all the contacts again and find the deepest projected depth.
-                    //Use that object as our support too.
-                    float depth = -float.MaxValue;
-                    Collidable supportObject = null;
-                    for (int i = 0; i < supports.Count; i++)
-                    {
-                        float dot;
-                        Vector3.Dot(ref supports.Elements[i].Contact.Normal, ref toReturn.Normal, out dot);
-                        dot = dot * supports.Elements[i].Contact.PenetrationDepth;
-                        if (dot > depth)
-                        {
-                            depth = dot;
-                            supportObject = supports.Elements[i].Support;
-                        }
-                    }
-                    toReturn.Depth = depth;
-                    toReturn.SupportObject = supportObject;
-                    return toReturn;
-                }
-                else
-                {
-                    //No support contacts; fall back to the raycast result...
-                    if (SupportRayData != null)
-                    {
-                        return new SupportData
-                        {
-                            Position = SupportRayData.Value.HitData.Location,
-                            Normal = SupportRayData.Value.HitData.Normal,
-                            HasTraction = SupportRayData.Value.HasTraction,
-                            Depth = Vector3.Dot(character.Down, SupportRayData.Value.HitData.Normal) * (bottomHeight - SupportRayData.Value.HitData.T),
-                            SupportObject = SupportRayData.Value.HitObject
-                        };
-                    }
-                    else
-                    {
-                        return null;
-                    }
-                }
-            }
+            get { return supportData; }
         }
 
         /// <summary>
-        /// Computes a combined traction contact from all available supports with traction (contacts or ray).
+        /// Computes representative support information based on the character's current traction contacts, support contacts, and ray contacts.
         /// </summary>
-        public SupportData? TractionData
+        /// <param name="down">Down direction of the character.</param>
+        private void UpdateSupportData(ref Vector3 down)
         {
-            get
+            //Choose which set of contacts to use.
+            RawList<CharacterContact> contacts;
+            if (tractionContacts.Count > 0)
             {
-                if (supports.Count > 0)
+                contacts = tractionContacts;
+            }
+            else if (supportContacts.Count > 0)
+            {
+                contacts = supportContacts;
+            }
+            else
+            {
+                //No contacts provide support!
+                //Fall back to the ray cast result.
+                if (SupportRayData != null)
                 {
-                    SupportData toReturn = new SupportData();
-                    int withTraction = 0;
-                    for (int i = 0; i < supports.Count; i++)
-                    {
-                        if (supports.Elements[i].HasTraction)
-                        {
-                            withTraction++;
-                            Vector3.Add(ref toReturn.Position, ref supports.Elements[i].Contact.Position, out toReturn.Position);
-                            Vector3.Add(ref toReturn.Normal, ref supports.Elements[i].Contact.Normal, out toReturn.Normal);
-                        }
-                    }
-                    if (withTraction > 1)
-                    {
-                        Vector3.Multiply(ref toReturn.Position, 1f / withTraction, out toReturn.Position);
-                        float length = toReturn.Normal.LengthSquared();
-                        if (length < Toolbox.BigEpsilon)
-                        {
-                            //It's possible that the normals have cancelled each other out- that would be bad!
-                            //Just use an arbitrary support's normal in that case.
-                            toReturn.Normal = supports.Elements[0].Contact.Normal;
-                        }
-                        else
-                        {
-                            Vector3.Multiply(ref toReturn.Normal, 1 / (float)Math.Sqrt(length), out toReturn.Normal);
-                        }
-                    }
-                    if (withTraction > 0)
-                    {
-                        //Now that we have the normal, cycle through all the contacts again and find the deepest projected depth.
-                        float depth = -float.MaxValue;
-                        Collidable supportObject = null;
-                        for (int i = 0; i < supports.Count; i++)
-                        {
-                            if (supports.Elements[i].HasTraction)
-                            {
-                                float dot;
-                                Vector3.Dot(ref supports.Elements[i].Contact.Normal, ref toReturn.Normal, out dot);
-                                dot = dot * supports.Elements[i].Contact.PenetrationDepth;
-                                if (dot > depth)
-                                {
-                                    depth = dot;
-                                    supportObject = supports.Elements[i].Support;
-                                }
-                            }
-                        }
-                        toReturn.Depth = depth;
-                        toReturn.SupportObject = supportObject;
-                        toReturn.HasTraction = true;
-                        return toReturn;
-                    }
-                }
-                //No support contacts; fall back to the raycast result...
-                if (SupportRayData != null && SupportRayData.Value.HasTraction)
-                {
-                    return new SupportData()
+                    supportData = new SupportData
                     {
                         Position = SupportRayData.Value.HitData.Location,
                         Normal = SupportRayData.Value.HitData.Normal,
-                        HasTraction = true,
-                        Depth = Vector3.Dot(character.Down, SupportRayData.Value.HitData.Normal) * (bottomHeight - SupportRayData.Value.HitData.T),
+                        Depth = Vector3.Dot(down, SupportRayData.Value.HitData.Normal) * (BottomDistance - SupportRayData.Value.HitData.T),
                         SupportObject = SupportRayData.Value.HitObject
                     };
                 }
                 else
                 {
-                    return null;
+                    supportData = new SupportData();
                 }
-
+                return;
             }
+
+            //Compute a representative support from the set of contacts.
+
+            supportData.Position = contacts.Elements[0].Contact.Position;
+            supportData.Normal = contacts.Elements[0].Contact.Normal;
+
+            for (int i = 1; i < contacts.Count; i++)
+            {
+                Vector3.Add(ref supportData.Position, ref contacts.Elements[i].Contact.Position, out supportData.Position);
+                Vector3.Add(ref supportData.Normal, ref contacts.Elements[i].Contact.Normal, out supportData.Normal);
+            }
+            if (contacts.Count > 1)
+            {
+                Vector3.Divide(ref supportData.Position, contacts.Count, out supportData.Position);
+                float length = supportData.Normal.LengthSquared();
+                if (length < Toolbox.Epsilon)
+                {
+                    //It's possible that the normals have cancelled each other out- that would be bad!
+                    //Just use an arbitrary support's normal in that case.
+                    supportData.Normal = contacts.Elements[0].Contact.Normal;
+                }
+                else
+                {
+                    Vector3.Multiply(ref supportData.Normal, 1 / (float)Math.Sqrt(length), out supportData.Normal);
+                }
+            }
+            //Now that we have the normal, cycle through all the contacts again and find the deepest projected depth.
+            //Use that object as our support too.
+            float depth = -float.MaxValue;
+            Collidable supportObject = null;
+            for (int i = 0; i < contacts.Count; i++)
+            {
+                float dot;
+                Vector3.Dot(ref contacts.Elements[i].Contact.Normal, ref supportData.Normal, out dot);
+                dot = dot * contacts.Elements[i].Contact.PenetrationDepth;
+                if (dot > depth)
+                {
+                    depth = dot;
+                    supportObject = contacts.Elements[i].Collidable;
+                }
+            }
+            supportData.Depth = depth;
+            supportData.SupportObject = supportObject;
         }
 
-        public bool GetTractionInDirection(ref Vector3 movementDirection, out SupportData supportData)
+        private SupportData verticalSupportData;
+        /// <summary>
+        /// Gets the support data of the character biased towards the character's movement direction.
+        /// Excludes contacts that might otherwise cause the vertical motion constraint to fight the character's movement.
+        /// </summary>
+        public SupportData VerticalSupportData
         {
+            get { return verticalSupportData; }
+        }
 
+        /// <summary>
+        /// Computes a traction contact using a movement direction. This is helpful for the vertical motion constraint.
+        /// By biasing the search in the movement direction, contacts on the character's butt (which might otherwise hold the character back via the vertical motion constraint) are ignored.
+        /// </summary>
+        /// <param name="down">Down direction of the character.</param>
+        /// <param name="movementDirection">Movement direction of the character.</param>
+        private void UpdateVerticalSupportData(ref Vector3 down, ref Vector3 movementDirection)
+        {
             if (HasTraction)
             {
-                int greatestIndex = -1;
-                float greatestDot = -float.MaxValue;
-                for (int i = 0; i < supports.Count; i++)
+                if (tractionContacts.Count > 0)
                 {
-                    if (supports.Elements[i].HasTraction)
+                    //Find the traction-providing contact which is furthest in the direction of the movement direction.
+                    int greatestIndex = -1;
+                    float greatestDot = -float.MaxValue;
+                    for (int i = 0; i < tractionContacts.Count; i++)
                     {
                         float dot;
-                        Vector3.Dot(ref movementDirection, ref supports.Elements[i].Contact.Normal, out dot);
+                        Vector3.Dot(ref movementDirection, ref tractionContacts.Elements[i].Contact.Normal, out dot);
                         if (dot > greatestDot)
                         {
                             greatestDot = dot;
                             greatestIndex = i;
                         }
                     }
-                }
-                if (greatestIndex != -1)
-                {
-                    supportData.Position = supports.Elements[greatestIndex].Contact.Position;
-                    supportData.Normal = supports.Elements[greatestIndex].Contact.Normal;
-                    supportData.SupportObject = supports.Elements[greatestIndex].Support;
-                    supportData.HasTraction = true;
 
+                    verticalSupportData.Position = tractionContacts.Elements[greatestIndex].Contact.Position;
+                    verticalSupportData.Normal = tractionContacts.Elements[greatestIndex].Contact.Normal;
+                    verticalSupportData.SupportObject = tractionContacts.Elements[greatestIndex].Collidable;
+
+                    //Project all other contact depths onto the chosen normal, keeping the largest one.
+                    //This lets the vertical motion constraint relax when objects are penetrating deeply.
                     float depth = -float.MaxValue;
-                    for (int i = 0; i < supports.Count; i++)
+                    for (int i = 0; i < tractionContacts.Count; i++)
                     {
-                        if (supports.Elements[i].HasTraction)
+                        float dot;
+                        Vector3.Dot(ref tractionContacts.Elements[i].Contact.Normal, ref verticalSupportData.Normal, out dot);
+                        dot = dot * tractionContacts.Elements[i].Contact.PenetrationDepth;
+                        if (dot > depth)
                         {
-                            float dot;
-                            Vector3.Dot(ref supports.Elements[i].Contact.Normal, ref supportData.Normal, out dot);
-                            dot = dot * supports.Elements[i].Contact.PenetrationDepth;
-                            if (dot > depth)
-                            {
-                                depth = dot;
-                            }
+                            depth = dot;
                         }
                     }
-                    supportData.Depth = depth;
+                    verticalSupportData.Depth = depth;
 
-                    return true;
+                    return;
                 }
-                //Okay, try the ray cast result then.
-                if (SupportRayData != null && SupportRayData.Value.HasTraction)
-                {
-                    supportData.Position = SupportRayData.Value.HitData.Location;
-                    supportData.Normal = SupportRayData.Value.HitData.Normal;
-                    supportData.Depth = Vector3.Dot(character.Down, SupportRayData.Value.HitData.Normal) * (bottomHeight - SupportRayData.Value.HitData.T);
-                    supportData.SupportObject = SupportRayData.Value.HitObject;
-                    supportData.HasTraction = true;
-                    return true;
-                }
-                //Well that's strange!
-                supportData = new SupportData();
-                return false;
+                //There were no contacts, so check the support ray.
+                Debug.Assert(SupportRayData != null, "If the character has traction but there are no contacts, there must be a ray cast with traction.");
+                verticalSupportData.Position = SupportRayData.Value.HitData.Location;
+                verticalSupportData.Normal = SupportRayData.Value.HitData.Normal;
+                verticalSupportData.Depth = Vector3.Dot(down, SupportRayData.Value.HitData.Normal) * (BottomDistance - SupportRayData.Value.HitData.T);
+                verticalSupportData.SupportObject = SupportRayData.Value.HitObject;
+                return;
             }
-            else
-            {
-                supportData = new SupportData();
-                return false;
-            }
+            verticalSupportData = new SupportData();
         }
 
         /// <summary>
@@ -336,13 +259,27 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         {
             get { return new ReadOnlyList<CharacterContact>(tractionContacts); }
         }
-        
+
+        private Entity characterBody;
+        /// <summary>
+        /// Gets the contact categorizer used by the support finder.
+        /// </summary>
+        private CharacterContactCategorizer ContactCategorizer { get; set; }
+
+        /// <summary>
+        /// Gets the query manager used by the support finder.
+        /// </summary>
+        private QueryManager QueryManager { get; set; }
+
         /// <summary>
         /// Constructs a new support finder.
         /// </summary>
+        /// <param name="characterBody">Body entity used by the character.</param>
+        /// <param name="queryManager">Query provider used by the character. Used to perform ray cast tests against the character's near environment.</param>
         /// <param name="contactCategorizer">Contact categorizer to use.</param>
-        public SupportFinder(QueryManager queryManager, CharacterContactCategorizer contactCategorizer)
+        public SupportFinder(Entity characterBody, QueryManager queryManager, CharacterContactCategorizer contactCategorizer)
         {
+            this.characterBody = characterBody;
             QueryManager = queryManager;
             ContactCategorizer = contactCategorizer;
         }
@@ -350,7 +287,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         /// <summary>
         /// Updates the collection of supporting contacts.
         /// </summary>
-        public void UpdateSupports()
+        public void UpdateSupports(ref Vector3 movementDirection)
         {
             bool hadTraction = HasTraction;
 
@@ -358,42 +295,50 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             HasTraction = false;
             HasSupport = false;
 
-            var body = character.Body;
-            Vector3 downDirection = character.Down;
+            Vector3 downDirection = characterBody.orientationMatrix.Down;
+            Vector3 bodyPosition = characterBody.position;
 
+            //Compute the character's radius, minus a little margin. We want the rays to originate safely within the character's body.
+            //Assume vertical rotational invariance. Spheres, cylinders, and capsules don't have varying horizontal radii.
+            Vector3 extremePoint;
+            var convexShape = characterBody.CollisionInformation.Shape as ConvexShape;
+            Debug.Assert(convexShape != null, "Character bodies must be convex.");
+
+            //Find the lowest point on the collision shape.
+            convexShape.GetLocalExtremePointWithoutMargin(ref Toolbox.DownVector, out extremePoint);
+            BottomDistance = -extremePoint.Y + convexShape.collisionMargin;
+
+            convexShape.GetLocalExtremePointWithoutMargin(ref Toolbox.RightVector, out extremePoint);
+            float rayCastInnerRadius = Math.Max((extremePoint.X + convexShape.collisionMargin) * 0.9f, extremePoint.X);
+
+            //Vertically, the rays will start at the same height as the character's center.
+            //While they could be started lower on a cylinder, that wouldn't always work for a sphere or capsule: the origin might end up outside of the shape!
 
             tractionContacts.Clear();
             supportContacts.Clear();
             sideContacts.Clear();
             headContacts.Clear();
-            //Analyze the cylinder's contacts to see if we're supported.
-            //Anything that can be a support will have a normal that's off horizontal.
-            //That could be at the top or bottom, so only consider points on the bottom half of the shape.
-            Vector3 position = character.Body.Position;
 
-            foreach (var pair in character.Body.CollisionInformation.Pairs)
+            foreach (var pair in characterBody.CollisionInformation.Pairs)
             {
                 //Don't stand on things that aren't really colliding fully.
                 if (pair.CollisionRule != CollisionRule.Normal)
                     continue;
-                ContactCategorizer.CategorizeContacts(pair, character.Body.CollisionInformation, ref downDirection, tractionContacts, supportContacts, sideContacts, headContacts);
+                ContactCategorizer.CategorizeContacts(pair, characterBody.CollisionInformation, ref downDirection, tractionContacts, supportContacts, sideContacts, headContacts);
             }
 
 
             //Start the ray halfway between the center of the shape and the bottom of the shape.  That extra margin prevents it from getting stuck in the ground and returning t = 0 unhelpfully.
             SupportRayData = null;
-            bottomHeight = body.Height * .25f;
             //If the contacts aren't available to support the character, raycast down to find the ground.
             if (!HasTraction && hadTraction)
             {
-
                 //TODO: could also require that the character has a nonzero movement direction in order to use a ray cast.  Questionable- would complicate the behavior on edges.
-                float length = bottomHeight + character.StepManager.MaximumStepHeight;
-                Ray ray = new Ray(body.Position + downDirection * body.Height * .25f, downDirection);
+                Ray ray = new Ray(bodyPosition, downDirection);
 
                 bool hasTraction;
                 SupportRayData data;
-                if (TryDownCast(ref ray, length, out hasTraction, out data))
+                if (TryDownCast(ref ray, maximumAssistedDownStepHeight, out hasTraction, out data))
                 {
                     SupportRayData = data;
                     HasTraction = data.HasTraction;
@@ -401,28 +346,26 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 }
             }
 
+            float supportRayLength = maximumAssistedDownStepHeight + BottomDistance;
+
             //If contacts and the center ray cast failed, try a ray offset in the movement direction.
-            Vector3 movementDirection;
-            character.HorizontalMotionConstraint.GetMovementDirectionIn3D(out movementDirection);
             bool tryingToMove = movementDirection.LengthSquared() > 0;
             if (!HasTraction && hadTraction && tryingToMove)
             {
                 Ray ray = new Ray(
-                    body.Position +
-                    movementDirection * (character.Body.Radius - character.Body.CollisionInformation.Shape.CollisionMargin) +
-                    downDirection * body.Height * .25f, downDirection);
+                    characterBody.Position +
+                    movementDirection * rayCastInnerRadius, downDirection);
 
                 //Have to test to make sure the ray doesn't get obstructed.  This could happen if the character is deeply embedded in a wall; we wouldn't want it detecting things inside the wall as a support!
                 Ray obstructionRay;
-                obstructionRay.Position = body.Position + downDirection * body.Height * .25f;
+                obstructionRay.Position = characterBody.Position;
                 obstructionRay.Direction = ray.Position - obstructionRay.Position;
                 if (!QueryManager.RayCastHitAnything(obstructionRay, 1))
                 {
                     //The origin isn't obstructed, so now ray cast down.
-                    float length = bottomHeight + character.StepManager.MaximumStepHeight;
                     bool hasTraction;
                     SupportRayData data;
-                    if (TryDownCast(ref ray, length, out hasTraction, out data))
+                    if (TryDownCast(ref ray, supportRayLength, out hasTraction, out data))
                     {
                         if (SupportRayData == null || data.HitData.T < SupportRayData.Value.HitData.T)
                         {
@@ -447,20 +390,19 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 //Compute the horizontal offset direction.  Down direction and the movement direction are normalized and perpendicular, so the result is too.
                 Vector3 horizontalOffset;
                 Vector3.Cross(ref movementDirection, ref downDirection, out horizontalOffset);
-                Vector3.Multiply(ref horizontalOffset, character.Body.Radius - character.Body.CollisionInformation.Shape.CollisionMargin, out horizontalOffset);
-                Ray ray = new Ray(body.Position + horizontalOffset + downDirection * body.Height * .25f, downDirection);
+                Vector3.Multiply(ref horizontalOffset, rayCastInnerRadius, out horizontalOffset);
+                Ray ray = new Ray(bodyPosition + horizontalOffset, downDirection);
 
                 //Have to test to make sure the ray doesn't get obstructed.  This could happen if the character is deeply embedded in a wall; we wouldn't want it detecting things inside the wall as a support!
                 Ray obstructionRay;
-                obstructionRay.Position = body.Position + downDirection * body.Height * .25f;
+                obstructionRay.Position = bodyPosition;
                 obstructionRay.Direction = ray.Position - obstructionRay.Position;
                 if (!QueryManager.RayCastHitAnything(obstructionRay, 1))
                 {
                     //The origin isn't obstructed, so now ray cast down.
-                    float length = bottomHeight + character.StepManager.MaximumStepHeight;
                     bool hasTraction;
                     SupportRayData data;
-                    if (TryDownCast(ref ray, length, out hasTraction, out data))
+                    if (TryDownCast(ref ray, supportRayLength, out hasTraction, out data))
                     {
                         if (SupportRayData == null || data.HitData.T < SupportRayData.Value.HitData.T)
                         {
@@ -485,20 +427,19 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 //Compute the horizontal offset direction.  Down direction and the movement direction are normalized and perpendicular, so the result is too.
                 Vector3 horizontalOffset;
                 Vector3.Cross(ref downDirection, ref movementDirection, out horizontalOffset);
-                Vector3.Multiply(ref horizontalOffset, character.Body.Radius - character.Body.CollisionInformation.Shape.CollisionMargin, out horizontalOffset);
-                Ray ray = new Ray(body.Position + horizontalOffset + downDirection * body.Height * .25f, downDirection);
+                Vector3.Multiply(ref horizontalOffset, rayCastInnerRadius, out horizontalOffset);
+                Ray ray = new Ray(bodyPosition + horizontalOffset, downDirection);
 
                 //Have to test to make sure the ray doesn't get obstructed.  This could happen if the character is deeply embedded in a wall; we wouldn't want it detecting things inside the wall as a support!
                 Ray obstructionRay;
-                obstructionRay.Position = body.Position + downDirection * body.Height * .25f;
+                obstructionRay.Position = bodyPosition;
                 obstructionRay.Direction = ray.Position - obstructionRay.Position;
                 if (!QueryManager.RayCastHitAnything(obstructionRay, 1))
                 {
                     //The origin isn't obstructed, so now ray cast down.
-                    float length = bottomHeight + character.StepManager.MaximumStepHeight;
                     bool hasTraction;
                     SupportRayData data;
-                    if (TryDownCast(ref ray, length, out hasTraction, out data))
+                    if (TryDownCast(ref ray, supportRayLength, out hasTraction, out data))
                     {
                         if (SupportRayData == null || data.HitData.T < SupportRayData.Value.HitData.T)
                         {
@@ -516,6 +457,9 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     }
                 }
             }
+
+            UpdateSupportData(ref downDirection);
+            UpdateVerticalSupportData(ref downDirection, ref movementDirection);
 
         }
 
@@ -546,14 +490,14 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 }
                 //This down cast is only used for finding supports and traction, not for finding side contacts.
                 //If the detected normal is too steep, toss it out.
-                if (dot > cosMaximumSlope)
+                if (dot > ContactCategorizer.TractionThreshold)
                 {
                     //It has traction!
                     hasTraction = true;
-                    supportRayData = new SupportRayData() { HitData = earliestHit, HitObject = earliestHitObject, HasTraction = true };
+                    supportRayData = new SupportRayData { HitData = earliestHit, HitObject = earliestHitObject, HasTraction = true };
                 }
-                else if (dot > SideContactThreshold)
-                    supportRayData = new SupportRayData() { HitData = earliestHit, HitObject = earliestHitObject };
+                else if (dot > ContactCategorizer.SupportThreshold)
+                    supportRayData = new SupportRayData { HitData = earliestHit, HitObject = earliestHitObject };
                 else
                     return false; //Too steep! Toss it out.
                 return true;
@@ -570,10 +514,14 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         {
             HasSupport = false;
             HasTraction = false;
-            supports.Clear();
+            tractionContacts.Clear();
+            supportContacts.Clear();
+            sideContacts.Clear();
+            headContacts.Clear();
             SupportRayData = null;
 
         }
+
 
     }
 
@@ -613,7 +561,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
     }
 
     /// <summary>
-    /// Contact which acts as a support for the character controller.
+    /// Description of a support for a character controller.
     /// </summary>
     public struct SupportData
     {
@@ -625,10 +573,6 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         /// Normal of the support.
         /// </summary>
         public Vector3 Normal;
-        /// <summary>
-        /// Whether or not the contact was found to have traction.
-        /// </summary>
-        public bool HasTraction;
         /// <summary>
         /// Depth of the supporting location.
         /// Can be negative in the case of raycast supports.

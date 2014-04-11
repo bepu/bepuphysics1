@@ -1,12 +1,13 @@
 ﻿using System;
 using BEPUphysics.Constraints;
 using BEPUphysics.Entities;
+using BEPUphysicsDemos.AlternateMovement.Character;
 using BEPUutilities;
 using BEPUutilities.DataStructures;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.Settings;
 
-namespace BEPUphysicsDemos.AlternateMovement.Character
+namespace BEPUphysics.Character
 {
     /// <summary>
     /// Keeps a character glued to the ground, if possible.
@@ -14,29 +15,9 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
     public class VerticalMotionConstraint : SolverUpdateable
     {
         Entity characterBody;
-
+        private SupportFinder supportFinder;
 
         SupportData supportData;
-        /// <summary>
-        /// Gets or sets the support data used by the constraint.
-        /// </summary>
-        public SupportData SupportData
-        {
-            get
-            {
-                return supportData;
-            }
-            set
-            {
-                //If the support changes, perform the necessary bookkeeping to keep the connections up to date.
-                var oldSupport = supportData.SupportObject;
-                supportData = value;
-                if (oldSupport != supportData.SupportObject)
-                {
-                    OnInvolvedEntitiesChanged();
-                }
-            }
-        }
 
 
         float maximumGlueForce = 5000f;
@@ -78,7 +59,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             }
         }
 
-        
+
         /// <summary>
         /// Gets the effective mass felt by the constraint.
         /// </summary>
@@ -102,11 +83,28 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         /// Constructs a new vertical motion constraint.
         /// </summary>
         /// <param name="characterBody">Character body governed by the constraint.</param>
-        public VerticalMotionConstraint(Entity characterBody)
+        /// <param name="supportFinder">Support finder used by the character.</param>
+        public VerticalMotionConstraint(Entity characterBody, SupportFinder supportFinder)
         {
             this.characterBody = characterBody;
+            this.supportFinder = supportFinder;
         }
 
+        /// <summary>
+        /// Updates the movement basis of the horizontal motion constraint and updates the horizontal motion constraint's support data.
+        /// Should be updated automatically by the character on each time step; other code should not need to call this.
+        /// </summary>
+        public void UpdateSupportData()
+        {
+            //Check if the support has changed, and perform the necessary bookkeeping to keep the connections up to date.
+            var oldSupport = supportData.SupportObject;
+            supportData = supportFinder.VerticalSupportData;
+            if (oldSupport != supportData.SupportObject)
+            {
+                OnInvolvedEntitiesChanged();
+            }
+
+        }
 
         protected internal override void CollectInvolvedEntities(RawList<Entity> outputInvolvedEntities)
         {
@@ -117,13 +115,14 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
         }
 
+
         /// <summary>
         /// Updates the activity state of the constraint.
         /// Called automatically by the solver.
         /// </summary>
         public override void UpdateSolverActivity()
         {
-            if (supportData.HasTraction)
+            if (supportFinder.HasTraction)
                 base.UpdateSolverActivity();
             else
                 isActiveInSolver = false;
@@ -251,7 +250,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 #endif
             Vector3.Multiply(ref linearJacobianA, lambda, out impulse);
 
-            characterBody.Body.ApplyLinearImpulse(ref impulse);
+            characterBody.ApplyLinearImpulse(ref impulse);
 
             if (supportEntity != null && supportEntity.IsDynamic)
             {
@@ -276,19 +275,14 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             {
                 float relativeVelocity;
 
-                Vector3 bodyVelocity = characterBody.Body.LinearVelocity;
-                Vector3.Dot(ref linearJacobianA, ref bodyVelocity, out relativeVelocity);
+                Vector3.Dot(ref linearJacobianA, ref characterBody.linearVelocity, out relativeVelocity);
 
                 if (supportEntity != null)
                 {
-                    Vector3 supportLinearVelocity = supportEntity.LinearVelocity;
-                    Vector3 supportAngularVelocity = supportEntity.AngularVelocity;
-
-
                     float supportVelocity;
-                    Vector3.Dot(ref linearJacobianB, ref supportLinearVelocity, out supportVelocity);
+                    Vector3.Dot(ref linearJacobianB, ref supportEntity.linearVelocity, out supportVelocity);
                     relativeVelocity += supportVelocity;
-                    Vector3.Dot(ref angularJacobianB, ref supportAngularVelocity, out supportVelocity);
+                    Vector3.Dot(ref angularJacobianB, ref supportEntity.angularVelocity, out supportVelocity);
                     relativeVelocity += supportVelocity;
 
                 }

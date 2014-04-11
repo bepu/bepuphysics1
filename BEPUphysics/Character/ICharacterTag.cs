@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using BEPUphysics.Entities;
-using BEPUutilities;
+﻿using BEPUphysics.Entities;
 
-namespace BEPUphysicsDemos.AlternateMovement
+namespace BEPUphysics.Character
 {
     /// <summary>
     /// Defines a class which uniquely identifies a character.
