@@ -143,9 +143,15 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         /// <param name="supportContacts">Output contacts that would provide support.</param>
         /// <param name="sideContacts">Output contacts on the sides of the query object.</param>
         /// <param name="headContacts">Output contacts on the head of the query object.</param>
-        public void QueryContacts(EntityCollidable queryObject, RawList<CharacterContact> tractionContacts, RawList<CharacterContact> supportContacts, RawList<CharacterContact> sideContacts, RawList<CharacterContact> headContacts)
+        public void QueryContacts(EntityCollidable queryObject, 
+            ref QuickList<CharacterContact> tractionContacts, ref QuickList<CharacterContact> supportContacts, ref QuickList<CharacterContact> sideContacts, ref QuickList<CharacterContact> headContacts)
         {
             var downDirection = characterBody.orientationMatrix.Down;
+
+            tractionContacts.Clear();
+            supportContacts.Clear();
+            sideContacts.Clear();
+            headContacts.Clear();
 
             foreach (var collidable in characterBody.CollisionInformation.OverlappedCollidables)
             {
@@ -183,7 +189,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         /// <param name="supportContacts">Contacts providing the character with support.</param>
         /// <param name="state">State of the contacts relative to the speculative character position.</param>
         /// <param name="supportContact">Representative contact to use, if any.</param>
-        public void AnalyzeSupportState(RawList<CharacterContact> tractionContacts, RawList<CharacterContact> supportContacts,
+        public void AnalyzeSupportState(ref QuickList<CharacterContact> tractionContacts, ref QuickList<CharacterContact> supportContacts,
                                         out CharacterContactPositionState state, out CharacterContact supportContact)
         {
             float maxDepth = -float.MaxValue;

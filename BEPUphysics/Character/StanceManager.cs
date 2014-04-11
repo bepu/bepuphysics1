@@ -7,6 +7,7 @@ using BEPUutilities;
 using BEPUutilities.DataStructures;
 using BEPUphysics.CollisionTests;
 using BEPUphysics.Settings;
+using BEPUutilities.ResourceManagement;
 
 namespace BEPUphysics.Character
 {
@@ -172,77 +173,91 @@ namespace BEPUphysics.Character
                 }
                 else if (CurrentStance == Stance.Crouching && DesiredStance == Stance.Standing)
                 {
-                    //Attempt to stand.
-                    if (SupportFinder.HasSupport)
+                    var tractionContacts = new QuickList<CharacterContact>(BufferPools<CharacterContact>.Thread);
+                    var supportContacts = new QuickList<CharacterContact>(BufferPools<CharacterContact>.Thread);
+                    var sideContacts = new QuickList<CharacterContact>(BufferPools<CharacterContact>.Thread);
+                    var headContacts = new QuickList<CharacterContact>(BufferPools<CharacterContact>.Thread);
+                    try
                     {
-                        //Standing requires a query to verify that the new state is safe.
-                        //TODO: State queries can be expensive if the character is crouching beneath something really detailed.
-                        //There are some situations where you may want to do an upwards-pointing ray cast first.  If it hits something,
-                        //there's no need to do the full query.
-                        newPosition = currentPosition - down * ((StandingHeight - CrouchingHeight) * .5f);
-                        PrepareQueryObject(standingQueryObject, ref newPosition);
-                        QueryManager.QueryContacts(standingQueryObject, tractionContacts, supportContacts, sideContacts, headContacts);
-                        if (IsObstructed(sideContacts, headContacts))
+                        //Attempt to stand.
+                        if (SupportFinder.HasSupport)
                         {
-                            //Can't stand up if something is in the way!
-                            return false;
-                        }
-                        characterBody.Height = StandingHeight;
-                        CurrentStance = Stance.Standing;
-                        return true;
-                    }
-                    else
-                    {
-                        //This is a complicated case.  We must perform a semi-downstep query.
-                        //It's different than a downstep because the head may be obstructed as well.
-
-                        float highestBound = 0;
-                        float lowestBound = (StandingHeight - CrouchingHeight) * .5f;
-                        float currentOffset = lowestBound;
-                        float maximum = lowestBound;
-
-                        int attempts = 0;
-                        //Don't keep querying indefinitely.  If we fail to reach it in a few informed steps, it's probably not worth continuing.
-                        //The bound size check prevents the system from continuing to search a meaninglessly tiny interval.
-                        while (attempts++ < 5 && lowestBound - highestBound > Toolbox.BigEpsilon)
-                        {
-                            Vector3 candidatePosition = currentPosition + currentOffset * down;
-                            float hintOffset;
-                            switch (TrySupportLocation(ref candidatePosition, out hintOffset))
+                            //Standing requires a query to verify that the new state is safe.
+                            //TODO: State queries can be expensive if the character is crouching beneath something really detailed.
+                            //There are some situations where you may want to do an upwards-pointing ray cast first.  If it hits something,
+                            //there's no need to do the full query.
+                            newPosition = currentPosition - down * ((StandingHeight - CrouchingHeight) * .5f);
+                            PrepareQueryObject(standingQueryObject, ref newPosition);
+                            QueryManager.QueryContacts(standingQueryObject, ref tractionContacts, ref supportContacts, ref sideContacts, ref headContacts);
+                            if (IsObstructed(ref sideContacts, ref headContacts))
                             {
-                                case CharacterContactPositionState.Accepted:
-                                    currentOffset += hintOffset;
-                                    //Only use the new position location if the movement distance was the right size.
-                                    if (currentOffset > 0 && currentOffset < maximum)
-                                    {
-                                        newPosition = currentPosition + currentOffset * down;
-                                        characterBody.Height = StandingHeight;
-                                        CurrentStance = Stance.Standing;
-                                        return true;
-                                    }
-                                    else
-                                    {
-                                        return false;
-                                    }
-                                case CharacterContactPositionState.NoHit:
-                                    highestBound = currentOffset + hintOffset;
-                                    currentOffset = (lowestBound + highestBound) * .5f;
-                                    break;
-                                case CharacterContactPositionState.Obstructed:
-                                    lowestBound = currentOffset;
-                                    currentOffset = (highestBound + lowestBound) * .5f;
-                                    break;
-                                case CharacterContactPositionState.TooDeep:
-                                    currentOffset += hintOffset;
-                                    lowestBound = currentOffset;
-                                    break;
+                                //Can't stand up if something is in the way!
+                                return false;
                             }
+                            characterBody.Height = StandingHeight;
+                            CurrentStance = Stance.Standing;
+                            return true;
                         }
-                        //Couldn't find a hit.  Go ahead and stand!
-                        newPosition = currentPosition;
-                        characterBody.Height = StandingHeight;
-                        CurrentStance = Stance.Standing;
-                        return true;
+                        else
+                        {
+                            //This is a complicated case.  We must perform a semi-downstep query.
+                            //It's different than a downstep because the head may be obstructed as well.
+
+                            float highestBound = 0;
+                            float lowestBound = (StandingHeight - CrouchingHeight) * .5f;
+                            float currentOffset = lowestBound;
+                            float maximum = lowestBound;
+
+                            int attempts = 0;
+                            //Don't keep querying indefinitely.  If we fail to reach it in a few informed steps, it's probably not worth continuing.
+                            //The bound size check prevents the system from continuing to search a meaninglessly tiny interval.
+                            while (attempts++ < 5 && lowestBound - highestBound > Toolbox.BigEpsilon)
+                            {
+                                Vector3 candidatePosition = currentPosition + currentOffset * down;
+                                float hintOffset;
+                                switch (TrySupportLocation(ref candidatePosition, out hintOffset, ref tractionContacts, ref supportContacts, ref sideContacts, ref headContacts))
+                                {
+                                    case CharacterContactPositionState.Accepted:
+                                        currentOffset += hintOffset;
+                                        //Only use the new position location if the movement distance was the right size.
+                                        if (currentOffset > 0 && currentOffset < maximum)
+                                        {
+                                            newPosition = currentPosition + currentOffset * down;
+                                            characterBody.Height = StandingHeight;
+                                            CurrentStance = Stance.Standing;
+                                            return true;
+                                        }
+                                        else
+                                        {
+                                            return false;
+                                        }
+                                    case CharacterContactPositionState.NoHit:
+                                        highestBound = currentOffset + hintOffset;
+                                        currentOffset = (lowestBound + highestBound) * .5f;
+                                        break;
+                                    case CharacterContactPositionState.Obstructed:
+                                        lowestBound = currentOffset;
+                                        currentOffset = (highestBound + lowestBound) * .5f;
+                                        break;
+                                    case CharacterContactPositionState.TooDeep:
+                                        currentOffset += hintOffset;
+                                        lowestBound = currentOffset;
+                                        break;
+                                }
+                            }
+                            //Couldn't find a hit.  Go ahead and stand!
+                            newPosition = currentPosition;
+                            characterBody.Height = StandingHeight;
+                            CurrentStance = Stance.Standing;
+                            return true;
+                        }
+                    }
+                    finally
+                    {
+                        tractionContacts.Dispose();
+                        supportContacts.Dispose();
+                        sideContacts.Dispose();
+                        headContacts.Dispose();
                     }
                 }
             }
@@ -250,7 +265,7 @@ namespace BEPUphysics.Character
             return false;
         }
 
-        bool IsObstructed(RawList<ContactData> sideContacts, RawList<ContactData> headContacts)
+        bool IsObstructed(ref QuickList<CharacterContact> sideContacts, ref QuickList<CharacterContact> headContacts)
         {
             //No head contacts can exist!
             if (headContacts.Count > 0)
@@ -258,7 +273,7 @@ namespace BEPUphysics.Character
             //A contact is considered obstructive if its projected depth is deeper than any existing contact along the existing contacts' normals.
             for (int i = 0; i < sideContacts.Count; i++)
             {
-                if (IsObstructive(ref sideContacts.Elements[i]))
+                if (IsObstructive(ref sideContacts.Elements[i].Contact))
                     return true;
             }
             return false;
@@ -286,13 +301,14 @@ namespace BEPUphysics.Character
             return false;
         }
 
-        CharacterContactPositionState TrySupportLocation(ref Vector3 position, out float hintOffset)
+        CharacterContactPositionState TrySupportLocation(ref Vector3 position, out float hintOffset,
+            ref QuickList<CharacterContact> tractionContacts, ref QuickList<CharacterContact> supportContacts, ref QuickList<CharacterContact> sideContacts, ref QuickList<CharacterContact> headContacts)
         {
             hintOffset = 0;
             PrepareQueryObject(standingQueryObject, ref position);
-            QueryManager.QueryContacts(standingQueryObject, tractionContacts, supportContacts, sideContacts, headContacts);
+            QueryManager.QueryContacts(standingQueryObject, ref tractionContacts, ref supportContacts, ref sideContacts, ref headContacts);
 
-            bool obstructed = IsObstructed(sideContacts, headContacts);
+            bool obstructed = IsObstructed(ref sideContacts, ref headContacts);
             if (obstructed)
             {
                 return CharacterContactPositionState.Obstructed;
@@ -301,7 +317,7 @@ namespace BEPUphysics.Character
             {
                 CharacterContactPositionState supportState;
                 CharacterContact supportContact;
-                QueryManager.AnalyzeSupportState(tractionContacts, supportContacts, out supportState, out supportContact);
+                QueryManager.AnalyzeSupportState(ref tractionContacts, ref supportContacts, out supportState, out supportContact);
                 var down = characterBody.orientationMatrix.Down;
                 //Note that traction is not tested for; it isn't important for the stance manager.
                 if (supportState == CharacterContactPositionState.Accepted)
