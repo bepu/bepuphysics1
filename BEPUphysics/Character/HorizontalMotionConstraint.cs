@@ -90,6 +90,52 @@ namespace BEPUphysics.Character
         /// </summary>
         public MovementMode MovementMode { get; set; }
 
+
+        internal Vector3 movementDirection3d;
+
+        /// <summary>
+        /// Gets the 3d movement direction, as updated in the previous call to UpdateMovementDirection.
+        /// Note that this will not change when MovementDirection is set. It only changes on a call to UpdateMovementDirection.
+        /// So, getting this value externally will get the previous frame's snapshot.
+        /// </summary>
+        public Vector3 MovementDirection3d
+        {
+            get { return movementDirection3d; }
+        }
+
+        /// <summary>
+        /// Updates the movement basis of the horizontal motion constraint. 
+        /// Should be updated automatically by the character on each time step; other code should not need to modify it.
+        /// </summary>
+        /// <param name="forward">Forward facing direction of the character.</param>
+        public void UpdateMovementDirection(ref Vector3 forward)
+        {
+            Vector3 down = characterBody.orientationMatrix.Down;
+            Vector3 strafeDirection;
+            Vector3 horizontalForwardDirection = forward - forward * Vector3.Dot(down, forward);
+            float forwardLengthSquared = horizontalForwardDirection.LengthSquared();
+
+            if (forwardLengthSquared < Toolbox.Epsilon)
+            {
+                //Use an arbitrary direction to complete the basis.
+                horizontalForwardDirection = characterBody.orientationMatrix.Forward;
+                strafeDirection = characterBody.orientationMatrix.Right;
+            }
+            else
+            {
+                Vector3.Divide(ref horizontalForwardDirection, (float) Math.Sqrt(forwardLengthSquared), out horizontalForwardDirection);
+                Vector3.Cross(ref horizontalForwardDirection, ref down, out strafeDirection);
+                //Don't need to normalize the strafe direction; it's the cross product of two normalized perpendicular vectors.
+            }
+
+
+            Vector3.Multiply(ref horizontalForwardDirection, movementDirection.Y, out movementDirection3d);
+            Vector3 strafeComponent;
+            Vector3.Multiply(ref strafeDirection, movementDirection.X, out strafeComponent);
+            Vector3.Add(ref strafeComponent, ref movementDirection3d, out movementDirection3d);
+
+        }
+
         float supportForceFactor = 1;
         /// <summary>
         /// Gets or sets the scaling factor of forces applied to the supporting object if it is a dynamic entity.
@@ -143,10 +189,6 @@ namespace BEPUphysics.Character
             CollectInvolvedEntities();
         }
 
-        internal void GetMovementDirectionIn3D(out Vector3 movement3d)
-        {
-            movement3d = characterBody.HorizontalViewDirection * movementDirection.Y + characterBody.StrafeDirection * movementDirection.X;
-        }
 
 
         protected internal override void CollectInvolvedEntities(RawList<Entity> outputInvolvedEntities)
@@ -175,7 +217,7 @@ namespace BEPUphysics.Character
 
 
             //Compute the jacobians.  This is basically a PointOnLineJoint with motorized degrees of freedom.
-            Vector3 downDirection = characterBody.Down;
+            Vector3 downDirection = characterBody.orientationMatrix.Down;
 
             if (MovementMode != MovementMode.Floating)
             {
