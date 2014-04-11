@@ -140,6 +140,7 @@
     <Compile Include="Character\CharacterContactPositionState.cs" />
     <Compile Include="Character\CharacterController.cs" />
     <Compile Include="Character\CharacterContactCategorizer.cs" />
+    <Compile Include="Character\CharacterPairLocker.cs" />
     <Compile Include="Character\HorizontalMotionConstraint.cs" />
     <Compile Include="Character\ICharacterTag.cs" />
     <Compile Include="Character\MovementMode.cs" />
