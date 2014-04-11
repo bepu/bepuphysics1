@@ -1,22 +1,16 @@
 using BEPUphysics;
 using BEPUphysics.BroadPhaseEntries;
-using BEPUphysics.BroadPhaseSystems;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
-using BEPUphysicsDemos.AlternateMovement.SphereCharacter;
 using BEPUphysicsDemos.SampleCode;
 using BEPUphysicsDrawer.Lines;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using BEPUphysics.CollisionRuleManagement;
 using System;
-using System.Diagnostics;
-using BEPUphysics.Settings;
-using BEPUphysicsDemos.AlternateMovement.Character;
 using BEPUphysicsDemos.AlternateMovement;
 using BEPUutilities;
-using ConversionHelper;
 
 namespace BEPUphysicsDemos.Demos
 {

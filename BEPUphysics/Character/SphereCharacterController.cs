@@ -26,6 +26,11 @@ namespace BEPUphysics.Character
         public Sphere Body { get; private set; }
 
         /// <summary>
+        /// Gets the contact categorizer used by the character to determine how contacts affect the character's movement.
+        /// </summary>
+        public CharacterContactCategorizer ContactCategorizer { get; private set; }
+
+        /// <summary>
         /// Gets the support system which other systems use to perform local ray casts and contact queries.
         /// </summary>
         public QueryManager QueryManager { get; private set; }
@@ -58,34 +63,10 @@ namespace BEPUphysics.Character
                     return; //Silently fail. Assuming here that a dynamic process is setting this property; don't need to make a stink about it.
                 Vector3.Divide(ref value, (float)Math.Sqrt(lengthSquared), out value);
                 down = value;
-                UpdateHorizontalViewDirection();
             }
         }
 
         Vector3 viewDirection = new Vector3(0, 0, -1);
-        Vector3 horizontalViewDirection = new Vector3(0, 0, -1);
-
-        /// <summary>
-        /// Gets the horizontal view direction computed using the Down vector and the ViewDirection.
-        /// </summary>
-        public Vector3 HorizontalViewDirection
-        {
-            get
-            {
-                return horizontalViewDirection;
-            }
-        }
-
-        /// <summary>
-        /// Gets the axis along which the character can strafe.
-        /// </summary>
-        public Vector3 StrafeDirection
-        {
-            get
-            {
-                return Vector3.Cross(Down, horizontalViewDirection);
-            }
-        }
 
         /// <summary>
         /// Gets or sets the view direction associated with the character.
@@ -101,25 +82,10 @@ namespace BEPUphysics.Character
             set
             {
                 viewDirection = value;
-                UpdateHorizontalViewDirection();
             }
         }
 
-        void UpdateHorizontalViewDirection()
-        {
-            float dot = Vector3.Dot(viewDirection, Down);
-            Vector3 toRemove = Down * dot;
-            Vector3.Subtract(ref viewDirection, ref toRemove, out horizontalViewDirection);
-            float length = horizontalViewDirection.LengthSquared();
-            if (length > 0)
-            {
-                Vector3.Divide(ref horizontalViewDirection, (float)Math.Sqrt(length), out horizontalViewDirection);
-            }
-            else
-                horizontalViewDirection = new Vector3();
-        }
-
-        private float jumpSpeed = 4.5f;
+        private float jumpSpeed;
         /// <summary>
         /// Gets or sets the speed at which the character leaves the ground when it jumps.
         /// </summary>
@@ -136,7 +102,7 @@ namespace BEPUphysics.Character
                 jumpSpeed = value;
             }
         }
-        float slidingJumpSpeed = 3;
+        float slidingJumpSpeed;
         /// <summary>
         /// Gets or sets the speed at which the character leaves the ground when it jumps without traction.
         /// </summary>
@@ -171,6 +137,126 @@ namespace BEPUphysics.Character
             }
         }
 
+        float speed;
+        /// <summary>
+        /// Gets or sets the speed at which the character will try to move while standing with a support that provides traction.
+        /// Relative velocities with a greater magnitude will be decelerated.
+        /// </summary>
+        public float Speed
+        {
+            get
+            {
+                return speed;
+            }
+            set
+            {
+                if (value < 0)
+                    throw new ArgumentException("Value must be nonnegative.");
+                speed = value;
+            }
+        }
+        float tractionForce;
+        /// <summary>
+        /// Gets or sets the maximum force that the character can apply while on a support which provides traction.
+        /// </summary>
+        public float TractionForce
+        {
+            get
+            {
+                return tractionForce;
+            }
+            set
+            {
+                if (value < 0)
+                    throw new ArgumentException("Value must be nonnegative.");
+                tractionForce = value;
+            }
+        }
+
+        float slidingSpeed;
+        /// <summary>
+        /// Gets or sets the speed at which the character will try to move while on a support that does not provide traction.
+        /// Relative velocities with a greater magnitude will be decelerated.
+        /// </summary>
+        public float SlidingSpeed
+        {
+            get
+            {
+                return slidingSpeed;
+            }
+            set
+            {
+                if (value < 0)
+                    throw new ArgumentException("Value must be nonnegative.");
+                slidingSpeed = value;
+            }
+        }
+        float slidingForce;
+        /// <summary>
+        /// Gets or sets the maximum force that the character can apply while on a support which does not provide traction.
+        /// </summary>
+        public float SlidingForce
+        {
+            get
+            {
+                return slidingForce;
+            }
+            set
+            {
+                if (value < 0)
+                    throw new ArgumentException("Value must be nonnegative.");
+                slidingForce = value;
+            }
+        }
+
+        float airSpeed;
+        /// <summary>
+        /// Gets or sets the speed at which the character will try to move with no support.
+        /// The character will not be decelerated while airborne.
+        /// </summary>
+        public float AirSpeed
+        {
+            get
+            {
+                return airSpeed;
+            }
+            set
+            {
+                if (value < 0)
+                    throw new ArgumentException("Value must be nonnegative.");
+                airSpeed = value;
+            }
+        }
+        float airForce;
+        /// <summary>
+        /// Gets or sets the maximum force that the character can apply with no support.
+        /// </summary>
+        public float AirForce
+        {
+            get
+            {
+                return airForce;
+            }
+            set
+            {
+                if (value < 0)
+                    throw new ArgumentException("Value must be nonnegative.");
+                airForce = value;
+            }
+        }
+
+        private float speedScale = 1;
+        /// <summary>
+        /// Gets or sets a scaling factor to apply to the maximum speed of the character.
+        /// This is useful when a character does not have 0 or MaximumSpeed target speed, but rather
+        /// intermediate values. A common use case is analog controller sticks.
+        /// </summary>
+        public float SpeedScale
+        {
+            get { return speedScale; }
+            set { speedScale = value; }
+        }
+
 
         /// <summary>
         /// Gets the support finder used by the character.
@@ -179,22 +265,34 @@ namespace BEPUphysics.Character
         public SupportFinder SupportFinder { get; private set; }
 
 
-        /// <summary>
-        /// Constructs a new character controller with the default configuration.
-        /// </summary>
-        public SphereCharacterController()
-            : this(new Vector3(), 1, 10)
-        {
-
-        }
 
         /// <summary>
-        /// Constructs a new character controller with the most common configuration options.
+        /// Constructs a new character controller.
         /// </summary>
         /// <param name="position">Initial position of the character.</param>
         /// <param name="radius">Radius of the character body.</param>
         /// <param name="mass">Mass of the character body.</param>
-        public SphereCharacterController(Vector3 position, float radius, float mass)
+        /// <param name="maximumTractionSlope">Steepest slope, in radians, that the character can maintain traction on.</param>
+        /// <param name="maximumSupportSlope">Steepest slope, in radians, that the character can consider a support.</param>
+        /// <param name="speed">Speed at which the character will try to move while crouching with a support that provides traction.
+        /// Relative velocities with a greater magnitude will be decelerated.</param>
+        /// <param name="tractionForce">Maximum force that the character can apply while on a support which provides traction.</param>
+        /// <param name="slidingSpeed">Speed at which the character will try to move while on a support that does not provide traction.
+        /// Relative velocities with a greater magnitude will be decelerated.</param>
+        /// <param name="slidingForce">Maximum force that the character can apply while on a support which does not provide traction</param>
+        /// <param name="airSpeed">Speed at which the character will try to move with no support.
+        /// The character will not be decelerated while airborne.</param>
+        /// <param name="airForce">Maximum force that the character can apply with no support.</param>
+        /// <param name="jumpSpeed">Speed at which the character leaves the ground when it jumps</param>
+        /// <param name="slidingJumpSpeed">Speed at which the character leaves the ground when it jumps without traction</param>
+        /// <param name="maximumGlueForce">Maximum force the vertical motion constraint is allowed to apply in an attempt to keep the character on the ground.</param>
+        public SphereCharacterController(
+            Vector3 position = new Vector3(), 
+            float radius = 0.6f, float mass = 10f,
+            float maximumTractionSlope = 1f, float maximumSupportSlope = 1.3f, 
+            float speed = 8f, float tractionForce = 1000, float slidingSpeed = 6, float slidingForce = 50, float airSpeed = 1, float airForce = 250,
+            float jumpSpeed = 4.5f, float slidingJumpSpeed = 3, 
+            float maximumGlueForce = 5000)
         {
             Body = new Sphere(position, radius, mass);
             Body.IgnoreShapeChanges = true; //Wouldn't want inertia tensor recomputations to occur if the shape changes.
@@ -205,10 +303,20 @@ namespace BEPUphysics.Character
             //In a future version where this is changed, change this to conceptually minimally required CreatingPair.
             Body.CollisionInformation.Events.DetectingInitialCollision += RemoveFriction;
             Body.LinearDamping = 0;
-            SupportFinder = new SupportFinder(this);
-            HorizontalMotionConstraint = new HorizontalMotionConstraint(Body);
-            VerticalMotionConstraint = new VerticalMotionConstraint(Body);
-            QueryManager = new QueryManager(this);
+            ContactCategorizer = new CharacterContactCategorizer(maximumTractionSlope, maximumSupportSlope);
+            QueryManager = new QueryManager(Body, ContactCategorizer);
+            SupportFinder = new SupportFinder(Body, QueryManager, ContactCategorizer);
+            HorizontalMotionConstraint = new HorizontalMotionConstraint(Body, SupportFinder);
+            VerticalMotionConstraint = new VerticalMotionConstraint(Body, SupportFinder, maximumGlueForce);
+
+            Speed = speed;
+            TractionForce = tractionForce;
+            SlidingSpeed = slidingSpeed;
+            SlidingForce = slidingForce;
+            AirSpeed = airSpeed;
+            AirForce = airForce;
+            JumpSpeed = jumpSpeed;
+            SlidingJumpSpeed = slidingJumpSpeed; 
 
             //Enable multithreading for the sphere characters.  
             //See the bottom of the Update method for more information about using multithreading with this character.
@@ -315,26 +423,6 @@ namespace BEPUphysics.Character
 
         }
 
-
-        void CollectSupportData()
-        {
-            //Identify supports.
-            SupportFinder.UpdateSupports();
-
-            //Collect the support data from the support, if any.
-            if (SupportFinder.HasSupport)
-            {
-                if (SupportFinder.HasTraction)
-                    supportData = SupportFinder.TractionData.Value;
-                else
-                    supportData = SupportFinder.SupportData.Value;
-            }
-            else
-                supportData = new SupportData();
-        }
-
-        SupportData supportData;
-
         void IBeforeSolverUpdateable.Update(float dt)
         {
             //Someone may want to use the Body.CollisionInformation.Tag for their own purposes.
@@ -342,13 +430,17 @@ namespace BEPUphysics.Character
             //Consider using the making the custom tag implement ICharacterTag, modifying LockCharacterPairs to analyze the different Tag type, or using the Entity.Tag for the custom data instead.
             Debug.Assert(Body.CollisionInformation.Tag is ICharacterTag, "The character.Body.CollisionInformation.Tag must implement ICharacterTag to link the SphereCharacterController and its body together for character-related locking to work in multithreaded simulations.");
 
+            SupportData supportData;
+
+            HorizontalMotionConstraint.UpdateMovementBasis(ref viewDirection);
             //We can't let multiple characters manage the same pairs simultaneously.  Lock it up!
             LockCharacterPairs();
             try
             {
                 bool hadSupport = SupportFinder.HasSupport;
 
-                CollectSupportData();
+                SupportFinder.UpdateSupports(ref HorizontalMotionConstraint.movementDirection3d);
+                supportData = SupportFinder.SupportData;
 
                 //Compute the initial velocities relative to the support.
                 Vector3 relativeVelocity;
@@ -411,72 +503,38 @@ namespace BEPUphysics.Character
             }
 
 
-            //if (SupportFinder.HasTraction && SupportFinder.Supports.Count == 0)
-            //{
-            //    //There's another way to step down that is a lot cheaper, but less robust.
-            //    //This modifies the velocity of the character to make it fall faster.
-            //    //Impacts with the ground will be harder, so it will apply superfluous force to supports.
-            //    //Additionally, it will not be consistent with instant up-stepping.
-            //    //However, because it does not do any expensive queries, it is very fast!
-
-            //    //We are being supported by a ray cast, but we're floating.
-            //    //Let's try to get to the ground faster.
-            //    //How fast?  Try picking an arbitrary velocity and setting our relative vertical velocity to that value.
-            //    //Don't go farther than the maximum distance, though.
-            //    float maxVelocity = (SupportFinder.SupportRayData.Value.HitData.T - SupportFinder.RayLengthToBottom);
-            //    if (maxVelocity > 0)
-            //    {
-            //        maxVelocity = (maxVelocity + .01f) / dt;
-
-            //        float targetVerticalVelocity = -3;
-            //        verticalVelocity = Vector3.Dot(Body.OrientationMatrix.Up, relativeVelocity);
-            //        float change = MathHelper.Clamp(targetVerticalVelocity - verticalVelocity, -maxVelocity, 0);
-            //        ChangeVelocityUnilaterally(Body.OrientationMatrix.Up * change, ref relativeVelocity);
-            //    }
-            //}
+            //Tell the constraints to get ready to solve.
+            HorizontalMotionConstraint.UpdateSupportData();
+            VerticalMotionConstraint.UpdateSupportData();
 
 
 
-
-
-            //Vertical support data is different because it has the capacity to stop the character from moving unless
-            //contacts are pruned appropriately.
-            SupportData verticalSupportData;
-            Vector3 movement3d;
-            HorizontalMotionConstraint.GetMovementDirectionIn3D(out movement3d);
-            SupportFinder.GetTractionInDirection(ref movement3d, out verticalSupportData);
-
-
-
-            HorizontalMotionConstraint.SupportData = supportData;
-            VerticalMotionConstraint.SupportData = verticalSupportData;
-
-
-
-
-
-
-
-        }
-
-
-        void TeleportToPosition(Vector3 newPosition, float dt)
-        {
-            Body.Position = newPosition;
-            var orientation = Body.Orientation;
-            //The re-do of contacts won't do anything unless we update the collidable's world transform.
-            Body.CollisionInformation.UpdateWorldTransform(ref newPosition, ref orientation);
-            //Refresh all the narrow phase collisions.
-            foreach (var pair in Body.CollisionInformation.Pairs)
+            //Update the horizontal motion constraint's state.
+            if (supportData.SupportObject != null)
             {
-                //Clear out the old contacts.  This prevents contacts in persistent manifolds from surviving the step
-                //Such old contacts might still have old normals which blocked the character's forward motion.
-                pair.ClearContacts();
-                pair.UpdateCollision(dt);
+                if (SupportFinder.HasTraction)
+                {
+                    HorizontalMotionConstraint.MovementMode = MovementMode.Traction;
+                    HorizontalMotionConstraint.TargetSpeed = speed;
+                    HorizontalMotionConstraint.MaximumForce = tractionForce;
+                }
+                else
+                {
+                    HorizontalMotionConstraint.MovementMode = MovementMode.Sliding;
+                    HorizontalMotionConstraint.TargetSpeed = slidingSpeed;
+                    HorizontalMotionConstraint.MaximumForce = slidingForce;
+                }
             }
-            //Also re-collect supports.
-            //This will ensure the constraint and other velocity affectors have the most recent information available.
-            CollectSupportData();
+            else
+            {
+                HorizontalMotionConstraint.MovementMode = MovementMode.Floating;
+                HorizontalMotionConstraint.TargetSpeed = airSpeed;
+                HorizontalMotionConstraint.MaximumForce = airForce;
+            }
+            HorizontalMotionConstraint.TargetSpeed *= SpeedScale;
+
+
+
         }
 
         void ComputeRelativeVelocity(ref SupportData supportData, out Vector3 relativeVelocity)
@@ -545,23 +603,6 @@ namespace BEPUphysics.Character
             Vector3.Add(ref relativeVelocity, ref velocityChange, out relativeVelocity);
 
         }
-
-        /// <summary>
-        /// In some cases, an applied velocity should only modify the character.
-        /// This allows partially non-physical behaviors, like gluing the character to the ground.
-        /// </summary>
-        /// <param name="velocityChange">Change to apply to the character.</param>
-        /// <param name="relativeVelocity">Relative velocity to update.</param>
-        void ChangeVelocityUnilaterally(Vector3 velocityChange, ref Vector3 relativeVelocity)
-        {
-            Body.LinearVelocity += velocityChange;
-            //Update the relative velocity as well.  It's a ref parameter, so this update will be reflected in the calling scope.
-            Vector3.Add(ref relativeVelocity, ref velocityChange, out relativeVelocity);
-
-        }
-
-
-
 
 
 

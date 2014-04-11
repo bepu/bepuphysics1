@@ -28,7 +28,7 @@ namespace BEPUphysics.Character
         /// <summary>
         /// Updates the query objects to match the character controller's current state.  Called when BodyRadius, StanceManager.StandingHeight, or StanceManager.CrouchingHeight is set.
         /// </summary>
-        void UpdateQueryShapes()
+        public void UpdateQueryShapes()
         {
             standingQueryObject.Shape.Radius = characterBody.Radius;
             standingQueryObject.Shape.Height = StandingHeight;
