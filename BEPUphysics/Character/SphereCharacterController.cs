@@ -5,7 +5,6 @@ using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.UpdateableSystems;
-using BEPUphysicsDemos.AlternateMovement.Character;
 using BEPUutilities;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
 using BEPUphysics.Materials;
@@ -294,7 +293,7 @@ namespace BEPUphysics.Character
         public SphereCharacterController(
             Vector3 position = new Vector3(),
             float radius = 0.6f, float mass = 10f,
-            float maximumTractionSlope = 1f, float maximumSupportSlope = 1.3f,
+            float maximumTractionSlope = 0.8f, float maximumSupportSlope = 1.3f,
             float speed = 8f, float tractionForce = 1000, float slidingSpeed = 6, float slidingForce = 50, float airSpeed = 1, float airForce = 250,
             float jumpSpeed = 4.5f, float slidingJumpSpeed = 3,
             float maximumGlueForce = 5000)

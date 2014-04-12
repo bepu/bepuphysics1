@@ -3,7 +3,6 @@ using System.Diagnostics;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.Constraints;
 using BEPUphysics.Entities;
-using BEPUphysicsDemos.AlternateMovement.Character;
 using BEPUutilities;
 using BEPUutilities.DataStructures;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;

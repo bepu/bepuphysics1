@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using BEPUphysics.Character;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.CollisionTests;
 using BEPUphysics.Entities;
@@ -10,7 +8,7 @@ using BEPUutilities.DataStructures;
 using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.CollisionRuleManagement;
 
-namespace BEPUphysicsDemos.AlternateMovement.Character
+namespace BEPUphysics.Character
 {
     /// <summary>
     /// Analyzes the contacts on the character's body to find supports.
@@ -192,7 +190,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
                     return;
                 }
-                //There were no contacts, so check the support ray.
+                //There were no traction providing contacts, so check the support ray.
                 Debug.Assert(SupportRayData != null, "If the character has traction but there are no contacts, there must be a ray cast with traction.");
                 verticalSupportData.Position = SupportRayData.Value.HitData.Location;
                 verticalSupportData.Normal = SupportRayData.Value.HitData.Normal;
@@ -330,130 +328,140 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             HasSupport = supportContacts.Count > 0;
             HasTraction = tractionContacts.Count > 0;
 
-
-            float supportRayLength = maximumAssistedDownStepHeight + BottomDistance;
-            SupportRayData = null;
-            //If the contacts aren't available to support the character, raycast down to find the ground.
-            if (!HasTraction && hadTraction)
+            //Only perform ray casts if the character has fully left the surface, and only if the previous frame had traction.
+            //(If ray casts are allowed when support contacts still exist, the door is opened for climbing surfaces which should not be climbable.
+            //Consider a steep slope. If the character runs at it, the character will likely be wedged off of the ground, making it lose traction while still having a support contact with the slope.
+            //If ray tests are allowed when support contacts exist, the character will maintain traction despite climbing the wall.
+            //The VerticalMotionConstraint can stop the character from climbing in many cases, but it's nice not to have to rely on it.
+            //Disallowing ray tests when supports exist does have a cost, though. For example, consider rounded steps.
+            //If the character walks off a step such that it is still in contact with the step but is far enough down that the slope is too steep for traction, 
+            //the ray test won't recover traction. This situation just isn't very common.)
+            if (!HasSupport && hadTraction)
             {
-                //TODO: could also require that the character has a nonzero movement direction in order to use a ray cast.  Questionable- would complicate the behavior on edges.
-                Ray ray = new Ray(bodyPosition, downDirection);
-
-                bool hasTraction;
-                SupportRayData data;
-                if (TryDownCast(ref ray, supportRayLength, out hasTraction, out data))
+                float supportRayLength = maximumAssistedDownStepHeight + BottomDistance;
+                SupportRayData = null;
+                //If the contacts aren't available to support the character, raycast down to find the ground.
+                if (!HasTraction)
                 {
-                    SupportRayData = data;
-                    HasTraction = data.HasTraction;
-                    HasSupport = true;
-                }
-            }
+                    //TODO: could also require that the character has a nonzero movement direction in order to use a ray cast.  Questionable- would complicate the behavior on edges.
+                    Ray ray = new Ray(bodyPosition, downDirection);
 
-            //If contacts and the center ray cast failed, try a ray offset in the movement direction.
-            bool tryingToMove = movementDirection.LengthSquared() > 0;
-            if (!HasTraction && hadTraction && tryingToMove)
-            {
-                Ray ray = new Ray(
-                    characterBody.Position +
-                    movementDirection * rayCastInnerRadius, downDirection);
-
-                //Have to test to make sure the ray doesn't get obstructed.  This could happen if the character is deeply embedded in a wall; we wouldn't want it detecting things inside the wall as a support!
-                Ray obstructionRay;
-                obstructionRay.Position = characterBody.Position;
-                obstructionRay.Direction = ray.Position - obstructionRay.Position;
-                if (!QueryManager.RayCastHitAnything(obstructionRay, 1))
-                {
-                    //The origin isn't obstructed, so now ray cast down.
                     bool hasTraction;
                     SupportRayData data;
                     if (TryDownCast(ref ray, supportRayLength, out hasTraction, out data))
                     {
-                        if (SupportRayData == null || data.HitData.T < SupportRayData.Value.HitData.T)
+                        SupportRayData = data;
+                        HasTraction = data.HasTraction;
+                        HasSupport = true;
+                    }
+                }
+
+                //If contacts and the center ray cast failed, try a ray offset in the movement direction.
+                bool tryingToMove = movementDirection.LengthSquared() > 0;
+                if (!HasTraction && tryingToMove)
+                {
+                    Ray ray = new Ray(
+                        characterBody.Position +
+                        movementDirection * rayCastInnerRadius, downDirection);
+
+                    //Have to test to make sure the ray doesn't get obstructed.  This could happen if the character is deeply embedded in a wall; we wouldn't want it detecting things inside the wall as a support!
+                    Ray obstructionRay;
+                    obstructionRay.Position = characterBody.Position;
+                    obstructionRay.Direction = ray.Position - obstructionRay.Position;
+                    if (!QueryManager.RayCastHitAnything(obstructionRay, 1))
+                    {
+                        //The origin isn't obstructed, so now ray cast down.
+                        bool hasTraction;
+                        SupportRayData data;
+                        if (TryDownCast(ref ray, supportRayLength, out hasTraction, out data))
                         {
-                            //Only replace the previous support ray if we now have traction or we didn't have a support ray at all before,
-                            //or this hit is a better (sooner) hit.
-                            if (hasTraction)
+                            if (SupportRayData == null || data.HitData.T < SupportRayData.Value.HitData.T)
                             {
-                                SupportRayData = data;
-                                HasTraction = true;
+                                //Only replace the previous support ray if we now have traction or we didn't have a support ray at all before,
+                                //or this hit is a better (sooner) hit.
+                                if (hasTraction)
+                                {
+                                    SupportRayData = data;
+                                    HasTraction = true;
+                                }
+                                else if (SupportRayData == null)
+                                    SupportRayData = data;
+                                HasSupport = true;
                             }
-                            else if (SupportRayData == null)
-                                SupportRayData = data;
-                            HasSupport = true;
                         }
                     }
                 }
-            }
 
-            //If contacts, center ray, AND forward ray failed to find traction, try a side ray created from down x forward.
-            if (!HasTraction && hadTraction && tryingToMove)
-            {
-                //Compute the horizontal offset direction.  Down direction and the movement direction are normalized and perpendicular, so the result is too.
-                Vector3 horizontalOffset;
-                Vector3.Cross(ref movementDirection, ref downDirection, out horizontalOffset);
-                Vector3.Multiply(ref horizontalOffset, rayCastInnerRadius, out horizontalOffset);
-                Ray ray = new Ray(bodyPosition + horizontalOffset, downDirection);
-
-                //Have to test to make sure the ray doesn't get obstructed.  This could happen if the character is deeply embedded in a wall; we wouldn't want it detecting things inside the wall as a support!
-                Ray obstructionRay;
-                obstructionRay.Position = bodyPosition;
-                obstructionRay.Direction = ray.Position - obstructionRay.Position;
-                if (!QueryManager.RayCastHitAnything(obstructionRay, 1))
+                //If contacts, center ray, AND forward ray failed to find traction, try a side ray created from down x forward.
+                if (!HasTraction && tryingToMove)
                 {
-                    //The origin isn't obstructed, so now ray cast down.
-                    bool hasTraction;
-                    SupportRayData data;
-                    if (TryDownCast(ref ray, supportRayLength, out hasTraction, out data))
+                    //Compute the horizontal offset direction.  Down direction and the movement direction are normalized and perpendicular, so the result is too.
+                    Vector3 horizontalOffset;
+                    Vector3.Cross(ref movementDirection, ref downDirection, out horizontalOffset);
+                    Vector3.Multiply(ref horizontalOffset, rayCastInnerRadius, out horizontalOffset);
+                    Ray ray = new Ray(bodyPosition + horizontalOffset, downDirection);
+
+                    //Have to test to make sure the ray doesn't get obstructed.  This could happen if the character is deeply embedded in a wall; we wouldn't want it detecting things inside the wall as a support!
+                    Ray obstructionRay;
+                    obstructionRay.Position = bodyPosition;
+                    obstructionRay.Direction = ray.Position - obstructionRay.Position;
+                    if (!QueryManager.RayCastHitAnything(obstructionRay, 1))
                     {
-                        if (SupportRayData == null || data.HitData.T < SupportRayData.Value.HitData.T)
+                        //The origin isn't obstructed, so now ray cast down.
+                        bool hasTraction;
+                        SupportRayData data;
+                        if (TryDownCast(ref ray, supportRayLength, out hasTraction, out data))
                         {
-                            //Only replace the previous support ray if we now have traction or we didn't have a support ray at all before,
-                            //or this hit is a better (sooner) hit.
-                            if (hasTraction)
+                            if (SupportRayData == null || data.HitData.T < SupportRayData.Value.HitData.T)
                             {
-                                SupportRayData = data;
-                                HasTraction = true;
+                                //Only replace the previous support ray if we now have traction or we didn't have a support ray at all before,
+                                //or this hit is a better (sooner) hit.
+                                if (hasTraction)
+                                {
+                                    SupportRayData = data;
+                                    HasTraction = true;
+                                }
+                                else if (SupportRayData == null)
+                                    SupportRayData = data;
+                                HasSupport = true;
                             }
-                            else if (SupportRayData == null)
-                                SupportRayData = data;
-                            HasSupport = true;
                         }
                     }
                 }
-            }
 
-            //If contacts, center ray, forward ray, AND the first side ray failed to find traction, try a side ray created from forward x down.
-            if (!HasTraction && hadTraction && tryingToMove)
-            {
-                //Compute the horizontal offset direction.  Down direction and the movement direction are normalized and perpendicular, so the result is too.
-                Vector3 horizontalOffset;
-                Vector3.Cross(ref downDirection, ref movementDirection, out horizontalOffset);
-                Vector3.Multiply(ref horizontalOffset, rayCastInnerRadius, out horizontalOffset);
-                Ray ray = new Ray(bodyPosition + horizontalOffset, downDirection);
-
-                //Have to test to make sure the ray doesn't get obstructed.  This could happen if the character is deeply embedded in a wall; we wouldn't want it detecting things inside the wall as a support!
-                Ray obstructionRay;
-                obstructionRay.Position = bodyPosition;
-                obstructionRay.Direction = ray.Position - obstructionRay.Position;
-                if (!QueryManager.RayCastHitAnything(obstructionRay, 1))
+                //If contacts, center ray, forward ray, AND the first side ray failed to find traction, try a side ray created from forward x down.
+                if (!HasTraction && tryingToMove)
                 {
-                    //The origin isn't obstructed, so now ray cast down.
-                    bool hasTraction;
-                    SupportRayData data;
-                    if (TryDownCast(ref ray, supportRayLength, out hasTraction, out data))
+                    //Compute the horizontal offset direction.  Down direction and the movement direction are normalized and perpendicular, so the result is too.
+                    Vector3 horizontalOffset;
+                    Vector3.Cross(ref downDirection, ref movementDirection, out horizontalOffset);
+                    Vector3.Multiply(ref horizontalOffset, rayCastInnerRadius, out horizontalOffset);
+                    Ray ray = new Ray(bodyPosition + horizontalOffset, downDirection);
+
+                    //Have to test to make sure the ray doesn't get obstructed.  This could happen if the character is deeply embedded in a wall; we wouldn't want it detecting things inside the wall as a support!
+                    Ray obstructionRay;
+                    obstructionRay.Position = bodyPosition;
+                    obstructionRay.Direction = ray.Position - obstructionRay.Position;
+                    if (!QueryManager.RayCastHitAnything(obstructionRay, 1))
                     {
-                        if (SupportRayData == null || data.HitData.T < SupportRayData.Value.HitData.T)
+                        //The origin isn't obstructed, so now ray cast down.
+                        bool hasTraction;
+                        SupportRayData data;
+                        if (TryDownCast(ref ray, supportRayLength, out hasTraction, out data))
                         {
-                            //Only replace the previous support ray if we now have traction or we didn't have a support ray at all before,
-                            //or this hit is a better (sooner) hit.
-                            if (hasTraction)
+                            if (SupportRayData == null || data.HitData.T < SupportRayData.Value.HitData.T)
                             {
-                                SupportRayData = data;
-                                HasTraction = true;
+                                //Only replace the previous support ray if we now have traction or we didn't have a support ray at all before,
+                                //or this hit is a better (sooner) hit.
+                                if (hasTraction)
+                                {
+                                    SupportRayData = data;
+                                    HasTraction = true;
+                                }
+                                else if (SupportRayData == null)
+                                    SupportRayData = data;
+                                HasSupport = true;
                             }
-                            else if (SupportRayData == null)
-                                SupportRayData = data;
-                            HasSupport = true;
                         }
                     }
                 }

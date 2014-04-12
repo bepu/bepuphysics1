@@ -6,7 +6,6 @@ using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.CollisionTests;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
-using BEPUphysicsDemos.AlternateMovement.Character;
 using BEPUutilities;
 
 namespace BEPUphysics.Character

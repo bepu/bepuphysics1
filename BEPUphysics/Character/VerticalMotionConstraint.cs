@@ -1,7 +1,6 @@
 ﻿using System;
 using BEPUphysics.Constraints;
 using BEPUphysics.Entities;
-using BEPUphysicsDemos.AlternateMovement.Character;
 using BEPUutilities;
 using BEPUutilities.DataStructures;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
