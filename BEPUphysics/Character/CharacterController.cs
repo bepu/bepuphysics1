@@ -345,8 +345,8 @@ namespace BEPUphysics.Character
         public CharacterController(
             Vector3 position = new Vector3(), 
             float height = 1.7f, float crouchingHeight = 1.7f * .7f, float radius = 0.6f, float margin = 0.1f, float mass = 10f,
-            float maximumTractionSlope = 0.01f, float maximumSupportSlope = 1.3f, 
-            float standingSpeed = 4f, float crouchingSpeed = 3f, float tractionForce = 1000, float slidingSpeed = 6, float slidingForce = 50, float airSpeed = 1, float airForce = 250,
+            float maximumTractionSlope = 0.8f, float maximumSupportSlope = 1.3f, 
+            float standingSpeed = 8f, float crouchingSpeed = 3f, float tractionForce = 1000, float slidingSpeed = 6, float slidingForce = 50, float airSpeed = 1, float airForce = 250,
             float jumpSpeed = 4.5f, float slidingJumpSpeed = 3, 
             float maximumGlueForce = 5000
             )
@@ -551,12 +551,11 @@ namespace BEPUphysics.Character
                 //You can also avoid doing upstepping by fattening up the character's margin, turning it into more of a capsule.
                 //Instead of teleporting up steps, it would slide up.
                 //Without teleportation-based upstepping, steps usually need to be quite a bit smaller (i.e. fairly normal sized, instead of 2 feet tall).
-                //if (StepManager.TryToStepDown(out newPosition) ||
-                //    StepManager.TryToStepUp(out newPosition))
-                //{
-                //    supportData = TeleportToPosition(newPosition, dt);
-                //}
-                VerticalMotionConstraint.IsActive = false;
+                if (StepManager.TryToStepDown(out newPosition) ||
+                    StepManager.TryToStepUp(out newPosition))
+                {
+                    supportData = TeleportToPosition(newPosition, dt);
+                }
 
                 if (StanceManager.UpdateStance(out newPosition))
                 {
@@ -606,7 +605,6 @@ namespace BEPUphysics.Character
                 HorizontalMotionConstraint.MaximumForce = airForce;
             }
             HorizontalMotionConstraint.TargetSpeed *= SpeedScale;
-
 
 
         }

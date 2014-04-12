@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using BEPUphysics.Constraints;
 using BEPUphysics.Entities;
 using BEPUutilities;
@@ -74,6 +75,7 @@ namespace BEPUphysics.Character
         Vector3 linearJacobianB;
         Vector3 angularJacobianB;
 
+   
         float accumulatedImpulse;
         float permittedVelocity;
 
@@ -159,12 +161,10 @@ namespace BEPUphysics.Character
             maximumForce = maximumGlueForce * dt;
 
             //If we don't allow the character to get out of the ground, it could apply some significant forces to a dynamic support object.
-            //Technically, there exists a better estimate of the necessary speed, but choosing the maximum position correction speed is a nice catch-all.
-            //If you change that correction speed, watch out!!! It could significantly change the way the character behaves when trying to glue to surfaces.
-            if (supportData.Depth > 0)
-                permittedVelocity = CollisionResponseSettings.MaximumPenetrationRecoverySpeed;
-            else
-                permittedVelocity = 0;
+            //Let the character escape penetration in a controlled manner. This mirrors the regular penetration recovery speed.
+            //Since the vertical motion constraint works in the opposite direction of the contact penetration constraint,
+            //this actually eliminates the 'bounce' that can occur with non-character objects in deep penetration.
+            permittedVelocity = Math.Min(Math.Max(supportData.Depth * CollisionResponseSettings.PenetrationRecoveryStiffness / dt, 0), CollisionResponseSettings.MaximumPenetrationRecoverySpeed);
 
             //Compute the jacobians and effective mass matrix.  This constraint works along a single degree of freedom, so the mass matrix boils down to a scalar.
 
@@ -229,6 +229,7 @@ namespace BEPUphysics.Character
             //The relative velocity's x component is in the movement direction.
             //y is the perpendicular direction.
 
+            //Note that positive velocity is penetrating velocity.
             float relativeVelocity = RelativeVelocity + permittedVelocity;
 
 
