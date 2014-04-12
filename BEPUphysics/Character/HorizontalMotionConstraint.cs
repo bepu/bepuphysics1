@@ -57,6 +57,23 @@ namespace BEPUphysics.Character
         public float MaximumForce { get; set; }
         float maxForce;
 
+        private float timeUntilStableFooting = .2f;
+
+        /// <summary>
+        /// <para>Gets or sets the time it takes for the character to achieve stable footing after trying to stop moving.
+        /// When a character has stable footing, it will resist position drift relative to its support. For example,
+        /// if the player was on a rotating platform, integrating the velocity repeatedly would otherwise make the character gradually shift
+        /// relative to the support.</para>
+        /// <para>This time should be longer than the time it takes the player to decelerate from normal movement while it has traction. Otherwise, the character 
+        /// will seem to 'rubber band' back to a previous location after the character tries to stop.</para>
+        /// </summary>
+        public float TimeUntilStableFooting
+        {
+            get { return timeUntilStableFooting; }
+            set { timeUntilStableFooting = value; }
+        }
+
+
         /// <summary>
         /// Gets or sets the current movement style used by the character.
         /// </summary>
@@ -200,18 +217,19 @@ namespace BEPUphysics.Character
 
         }
 
+
         /// <summary>
         /// Computes per-frame information necessary for the constraint.
         /// </summary>
         /// <param name="dt">Time step duration.</param>
         public override void Update(float dt)
         {
+
             bool isTryingToMove = movementDirection3d.LengthSquared() > 0;
             if (!isTryingToMove)
                 TargetSpeed = 0;
 
             maxForce = MaximumForce * dt;
-
 
 
             //Compute the jacobians.  This is basically a PointOnLineJoint with motorized degrees of freedom.
@@ -375,14 +393,12 @@ namespace BEPUphysics.Character
             //The state is now up to date.  Compute an error and velocity bias, if needed.
             if (!isTryingToMove && MovementMode == MovementMode.Traction && supportEntity != null)
             {
-                //Compute the time it usually takes for the character to slow down while it has traction.
-                var tractionDecelerationTime = TargetSpeed / (MaximumForce * characterBody.InverseMass);
 
                 var distanceToBottomOfCharacter = supportFinder.BottomDistance;
 
-                if (timeSinceTransition >= 0 && timeSinceTransition < tractionDecelerationTime)
+                if (timeSinceTransition >= 0 && timeSinceTransition < timeUntilStableFooting)
                     timeSinceTransition += dt;
-                if (timeSinceTransition >= tractionDecelerationTime)
+                if (timeSinceTransition >= timeUntilStableFooting)
                 {
                     Vector3.Multiply(ref downDirection, distanceToBottomOfCharacter, out positionLocalOffset);
                     positionLocalOffset = (positionLocalOffset + characterBody.Position) - supportEntity.Position;
