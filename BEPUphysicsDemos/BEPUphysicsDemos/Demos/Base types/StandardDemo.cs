@@ -1,6 +1,7 @@
 using BEPUphysics;
 using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
+using BEPUphysics.Character;
 using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysicsDemos.SampleCode;
@@ -248,6 +249,10 @@ namespace BEPUphysicsDemos.Demos
                 Game.TinyTextDrawer.Draw("HAS TRACTION", new Microsoft.Xna.Framework.Vector2(20, 200));
             else if (character.CharacterController.SupportFinder.HasSupport)
                 Game.TinyTextDrawer.Draw("HAS SUPPORT", new Microsoft.Xna.Framework.Vector2(20, 200));
+            if (Keyboard.GetState().IsKeyDown(Keys.NumPad6))
+            {
+                CharacterController.DEBUGBREAK = true;
+            }
 
         }
     }

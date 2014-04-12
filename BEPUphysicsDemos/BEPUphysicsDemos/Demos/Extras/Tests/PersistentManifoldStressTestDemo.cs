@@ -6,7 +6,6 @@ using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.Materials;
 using BEPUphysics.NarrowPhaseSystems;
 using BEPUphysics.Settings;
-using BEPUphysicsDemos.AlternateMovement.Character;
 using BEPUutilities;
 using Microsoft.Xna.Framework.Input;
 

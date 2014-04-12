@@ -2,7 +2,6 @@
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.Entities.Prefabs;
-using BEPUphysicsDemos.AlternateMovement.Character;
 using BEPUutilities;
 using BEPUutilities.DataStructures;
 using BEPUphysics.CollisionTests;
@@ -128,145 +127,147 @@ namespace BEPUphysics.Character
         public bool TryToStepDown(out Vector3 newPosition)
         {
             //Don't bother trying to step down if we already have a support contact or if the support ray doesn't have traction.
-            if (SupportFinder.Supports.Count == 0 && SupportFinder.SupportRayData != null && SupportFinder.SupportRayData.Value.HasTraction &&
-                SupportFinder.SupportRayData.Value.HitData.T - (SupportFinder.MaximumAssistedDownStepHeight + SupportFinder.BottomDistance) > minimumDownStepHeight) //Don't do expensive stuff if it's, at most, a super tiny step that gravity will take care of.
-            {
-                //Predict a hit location based on the time of impact and the normal at the intersection.
-                //Take into account the radius of the character (don't forget the collision margin!)
-                Vector3 normal = SupportFinder.SupportRayData.Value.HitData.Normal;
-
-                Vector3 down = characterBody.orientationMatrix.Down;
-
-                RigidTransform transform = characterBody.CollisionInformation.WorldTransform;
-
-                //We know that the closest point to the plane will be the extreme point in the plane's direction.
-                //Use it as the ray origin.
-                Ray ray;
-                characterBody.CollisionInformation.Shape.GetExtremePoint(normal, ref transform, out ray.Position);
-                ray.Direction = down;
-
-                //Intersect the ray against the plane defined by the support hit.
-                Vector3 intersection;
-                Plane plane = new Plane(normal, Vector3.Dot(SupportFinder.SupportRayData.Value.HitData.Location, normal));
-                Vector3 candidatePosition;
-
-                //Define the interval bounds to be used later.
-
-                //The words 'highest' and 'lowest' here refer to the position relative to the character's body.
-                //The ray cast points downward relative to the character's body.
-                float highestBound = 0;
-                float lowestBound = characterBody.CollisionInformation.Shape.CollisionMargin + SupportFinder.SupportRayData.Value.HitData.T - SupportFinder.BottomDistance;
-                float currentOffset = lowestBound;
-                float hintOffset;
-
-                var tractionContacts = new QuickList<CharacterContact>(BufferPools<CharacterContact>.Thread);
-                var supportContacts = new QuickList<CharacterContact>(BufferPools<CharacterContact>.Thread);
-                var sideContacts = new QuickList<CharacterContact>(BufferPools<CharacterContact>.Thread);
-                var headContacts = new QuickList<CharacterContact>(BufferPools<CharacterContact>.Thread);
-                try
-                {
-
-                    //This guess may either win immediately, or at least give us a better idea of where to search.
-                    float hitT;
-                    if (Toolbox.GetRayPlaneIntersection(ref ray, ref plane, out hitT, out intersection))
-                    {
-                        currentOffset = hitT + CollisionDetectionSettings.AllowedPenetration;
-                        candidatePosition = characterBody.Position + down * currentOffset;
-                        switch (TryDownStepPosition(ref candidatePosition, ref down,
-                                                    ref tractionContacts, ref supportContacts, ref sideContacts, ref headContacts,
-                                                    out hintOffset))
-                        {
-                            case CharacterContactPositionState.Accepted:
-                                currentOffset += hintOffset;
-                                //Only use the new position location if the movement distance was the right size.
-                                if (currentOffset > minimumDownStepHeight && currentOffset < maximumStepHeight)
-                                {
-                                    newPosition = characterBody.Position + currentOffset * down;
-                                    return true;
-                                }
-                                else
-                                {
-                                    newPosition = new Vector3();
-                                    return false;
-                                }
-                            case CharacterContactPositionState.NoHit:
-                                highestBound = currentOffset + hintOffset;
-                                currentOffset = (lowestBound + currentOffset) * .5f;
-                                break;
-                            case CharacterContactPositionState.Obstructed:
-                                lowestBound = currentOffset;
-                                currentOffset = (highestBound + currentOffset) * .5f;
-                                break;
-                            case CharacterContactPositionState.TooDeep:
-                                currentOffset += hintOffset;
-                                lowestBound = currentOffset;
-                                break;
-                        }
-
-                    }
-
-                    //Our guesses failed.
-                    //Begin the regular process.  Start at the time of impact of the ray itself.
-                    //How about trying the time of impact of the ray itself?
-
-                    //Since we wouldn't be here unless there were no contacts at the body's current position,
-                    //testing the ray cast location gives us the second bound we need to do an informed binary search.
-
-
-
-                    int attempts = 0;
-                    //Don't keep querying indefinitely.  If we fail to reach it in a few informed steps, it's probably not worth continuing.
-                    //The bound size check prevents the system from continuing to search a meaninglessly tiny interval.
-                    while (attempts++ < 5 && lowestBound - highestBound > Toolbox.BigEpsilon)
-                    {
-                        candidatePosition = characterBody.Position + currentOffset * down;
-                        switch (TryDownStepPosition(ref candidatePosition, ref down, ref tractionContacts, ref supportContacts, ref sideContacts, ref headContacts, out hintOffset))
-                        {
-                            case CharacterContactPositionState.Accepted:
-                                currentOffset += hintOffset;
-                                //Only use the new position location if the movement distance was the right size.
-                                if (currentOffset > minimumDownStepHeight && currentOffset < maximumStepHeight)
-                                {
-                                    newPosition = characterBody.Position + currentOffset * down;
-                                    return true;
-                                }
-                                else
-                                {
-                                    newPosition = new Vector3();
-                                    return false;
-                                }
-                            case CharacterContactPositionState.NoHit:
-                                highestBound = currentOffset + hintOffset;
-                                currentOffset = (lowestBound + highestBound) * .5f;
-                                break;
-                            case CharacterContactPositionState.Obstructed:
-                                lowestBound = currentOffset;
-                                currentOffset = (highestBound + lowestBound) * .5f;
-                                break;
-                            case CharacterContactPositionState.TooDeep:
-                                currentOffset += hintOffset;
-                                lowestBound = currentOffset;
-                                break;
-                        }
-                    }
-                    //Couldn't find a candidate.
-                    newPosition = new Vector3();
-                    return false;
-                }
-                finally
-                {
-                    tractionContacts.Dispose();
-                    supportContacts.Dispose();
-                    sideContacts.Dispose();
-                    headContacts.Dispose();
-                }
-
-            }
-            else
+            if (!(SupportFinder.Supports.Count == 0 && SupportFinder.SupportRayData != null && SupportFinder.SupportRayData.Value.HasTraction))
             {
                 newPosition = new Vector3();
                 return false;
             }
+            if (!(SupportFinder.SupportRayData.Value.HitData.T - SupportFinder.BottomDistance > minimumDownStepHeight)) //Don't do expensive stuff if it's, at most, a super tiny step that gravity will take care of.
+            {
+                newPosition = new Vector3();
+                return false;
+            }
+            //Predict a hit location based on the time of impact and the normal at the intersection.
+            //Take into account the radius of the character (don't forget the collision margin!)
+            Vector3 normal = SupportFinder.SupportRayData.Value.HitData.Normal;
+
+            Vector3 down = characterBody.orientationMatrix.Down;
+
+            RigidTransform transform = characterBody.CollisionInformation.WorldTransform;
+
+            //We know that the closest point to the plane will be the extreme point in the plane's direction.
+            //Use it as the ray origin.
+            Ray ray;
+            characterBody.CollisionInformation.Shape.GetExtremePoint(normal, ref transform, out ray.Position);
+            ray.Direction = down;
+
+            //Intersect the ray against the plane defined by the support hit.
+            Vector3 intersection;
+            Plane plane = new Plane(normal, Vector3.Dot(SupportFinder.SupportRayData.Value.HitData.Location, normal));
+            Vector3 candidatePosition;
+
+            //Define the interval bounds to be used later.
+
+            //The words 'highest' and 'lowest' here refer to the position relative to the character's body.
+            //The ray cast points downward relative to the character's body.
+            float highestBound = 0;
+            float lowestBound = characterBody.CollisionInformation.Shape.CollisionMargin + SupportFinder.SupportRayData.Value.HitData.T - SupportFinder.BottomDistance;
+            float currentOffset = lowestBound;
+            float hintOffset;
+
+            var tractionContacts = new QuickList<CharacterContact>(BufferPools<CharacterContact>.Thread);
+            var supportContacts = new QuickList<CharacterContact>(BufferPools<CharacterContact>.Thread);
+            var sideContacts = new QuickList<CharacterContact>(BufferPools<CharacterContact>.Thread);
+            var headContacts = new QuickList<CharacterContact>(BufferPools<CharacterContact>.Thread);
+            try
+            {
+
+                //This guess may either win immediately, or at least give us a better idea of where to search.
+                float hitT;
+                if (Toolbox.GetRayPlaneIntersection(ref ray, ref plane, out hitT, out intersection))
+                {
+                    currentOffset = hitT + CollisionDetectionSettings.AllowedPenetration;
+                    candidatePosition = characterBody.Position + down * currentOffset;
+                    switch (TryDownStepPosition(ref candidatePosition, ref down,
+                                                ref tractionContacts, ref supportContacts, ref sideContacts, ref headContacts,
+                                                out hintOffset))
+                    {
+                        case CharacterContactPositionState.Accepted:
+                            currentOffset += hintOffset;
+                            //Only use the new position location if the movement distance was the right size.
+                            if (currentOffset > minimumDownStepHeight && currentOffset < maximumStepHeight)
+                            {
+                                newPosition = characterBody.Position + currentOffset * down;
+                                return true;
+                            }
+                            else
+                            {
+                                newPosition = new Vector3();
+                                return false;
+                            }
+                        case CharacterContactPositionState.NoHit:
+                            highestBound = currentOffset + hintOffset;
+                            currentOffset = (lowestBound + currentOffset) * .5f;
+                            break;
+                        case CharacterContactPositionState.Obstructed:
+                            lowestBound = currentOffset;
+                            currentOffset = (highestBound + currentOffset) * .5f;
+                            break;
+                        case CharacterContactPositionState.TooDeep:
+                            currentOffset += hintOffset;
+                            lowestBound = currentOffset;
+                            break;
+                    }
+
+                }
+
+                //Our guesses failed.
+                //Begin the regular process.  Start at the time of impact of the ray itself.
+                //How about trying the time of impact of the ray itself?
+
+                //Since we wouldn't be here unless there were no contacts at the body's current position,
+                //testing the ray cast location gives us the second bound we need to do an informed binary search.
+
+
+
+                int attempts = 0;
+                //Don't keep querying indefinitely.  If we fail to reach it in a few informed steps, it's probably not worth continuing.
+                //The bound size check prevents the system from continuing to search a meaninglessly tiny interval.
+                while (attempts++ < 5 && lowestBound - highestBound > Toolbox.BigEpsilon)
+                {
+                    candidatePosition = characterBody.Position + currentOffset * down;
+                    switch (TryDownStepPosition(ref candidatePosition, ref down, ref tractionContacts, ref supportContacts, ref sideContacts, ref headContacts, out hintOffset))
+                    {
+                        case CharacterContactPositionState.Accepted:
+                            currentOffset += hintOffset;
+                            //Only use the new position location if the movement distance was the right size.
+                            if (currentOffset > minimumDownStepHeight && currentOffset < maximumStepHeight)
+                            {
+                                newPosition = characterBody.Position + currentOffset * down;
+                                return true;
+                            }
+                            else
+                            {
+                                newPosition = new Vector3();
+                                return false;
+                            }
+                        case CharacterContactPositionState.NoHit:
+                            highestBound = currentOffset + hintOffset;
+                            currentOffset = (lowestBound + highestBound) * .5f;
+                            break;
+                        case CharacterContactPositionState.Obstructed:
+                            lowestBound = currentOffset;
+                            currentOffset = (highestBound + lowestBound) * .5f;
+                            break;
+                        case CharacterContactPositionState.TooDeep:
+                            currentOffset += hintOffset;
+                            lowestBound = currentOffset;
+                            break;
+                    }
+                }
+                //Couldn't find a candidate.
+                newPosition = new Vector3();
+                return false;
+            }
+            finally
+            {
+                tractionContacts.Dispose();
+                supportContacts.Dispose();
+                sideContacts.Dispose();
+                headContacts.Dispose();
+            }
+
+
         }
 
         CharacterContactPositionState TryDownStepPosition(ref Vector3 position, ref Vector3 down,
