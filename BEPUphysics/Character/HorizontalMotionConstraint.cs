@@ -32,16 +32,19 @@ namespace BEPUphysics.Character
             get { return movementDirection; }
             set
             {
-                float lengthSquared = value.LengthSquared();
-                if (lengthSquared > Toolbox.Epsilon)
+                if (movementDirection.X != value.X || movementDirection.Y != value.Y) //Floating point comparison is perfectly fine here. Any bitwise variation should go through.
                 {
                     characterBody.ActivityInformation.Activate();
-                    Vector2.Divide(ref value, (float)Math.Sqrt(lengthSquared), out movementDirection);
-                }
-                else
-                {
-                    characterBody.ActivityInformation.Activate();
-                    movementDirection = new Vector2();
+
+                    float lengthSquared = value.LengthSquared();
+                    if (lengthSquared > Toolbox.Epsilon)
+                    {
+                        Vector2.Divide(ref value, (float) Math.Sqrt(lengthSquared), out movementDirection);
+                    }
+                    else
+                    {
+                        movementDirection = new Vector2();
+                    }
                 }
             }
         }

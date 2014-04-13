@@ -343,11 +343,11 @@ namespace BEPUphysics.Character
         /// <param name="slidingJumpSpeed">Speed at which the character leaves the ground when it jumps without traction</param>
         /// <param name="maximumGlueForce">Maximum force the vertical motion constraint is allowed to apply in an attempt to keep the character on the ground.</param>
         public CharacterController(
-            Vector3 position = new Vector3(), 
+            Vector3 position = new Vector3(),
             float height = 1.7f, float crouchingHeight = 1.7f * .7f, float radius = 0.6f, float margin = 0.1f, float mass = 10f,
-            float maximumTractionSlope = 0.8f, float maximumSupportSlope = 1.3f, 
+            float maximumTractionSlope = 0.8f, float maximumSupportSlope = 1.3f,
             float standingSpeed = 8f, float crouchingSpeed = 3f, float tractionForce = 1000, float slidingSpeed = 6, float slidingForce = 50, float airSpeed = 1, float airForce = 250,
-            float jumpSpeed = 4.5f, float slidingJumpSpeed = 3, 
+            float jumpSpeed = 4.5f, float slidingJumpSpeed = 3,
             float maximumGlueForce = 5000
             )
         {
@@ -381,7 +381,7 @@ namespace BEPUphysics.Character
             AirSpeed = airSpeed;
             AirForce = airForce;
             JumpSpeed = jumpSpeed;
-            SlidingJumpSpeed = slidingJumpSpeed; 
+            SlidingJumpSpeed = slidingJumpSpeed;
 
             //Enable multithreading for the characters.  
             IsUpdatedSequentially = false;
@@ -391,7 +391,7 @@ namespace BEPUphysics.Character
         }
 
 
-       
+
 
         void RemoveFriction(EntityCollidable sender, BroadPhaseEntry other, NarrowPhasePair pair)
         {
@@ -577,10 +577,7 @@ namespace BEPUphysics.Character
                 if (SupportFinder.HasTraction)
                 {
                     HorizontalMotionConstraint.MovementMode = MovementMode.Traction;
-                    if (StanceManager.CurrentStance == Stance.Standing)
-                        HorizontalMotionConstraint.TargetSpeed = standingSpeed;
-                    else
-                        HorizontalMotionConstraint.TargetSpeed = crouchingSpeed;
+                    HorizontalMotionConstraint.TargetSpeed = StanceManager.CurrentStance == Stance.Standing ? standingSpeed : crouchingSpeed;
                     HorizontalMotionConstraint.MaximumForce = tractionForce;
                 }
                 else
@@ -632,10 +629,8 @@ namespace BEPUphysics.Character
             return SupportFinder.SupportData;
         }
 
-        public static bool DEBUGBREAK;
         void CorrectContacts()
         {
-            Debug.Assert(!DEBUGBREAK);
             //Go through the contacts associated with the character.
             //If the contact is at the bottom of the character, regardless of its normal, take a closer look.
             //If the direction from the closest point on the inner cylinder to the contact position has traction
@@ -657,14 +652,6 @@ namespace BEPUphysics.Character
                 {
                     var contact = contactData.Contact;
                     float dot;
-                    //Vector3.Dot(ref contact.Normal, ref downDirection, out dot);
-                    //if (Math.Abs(dot) > SupportFinder.cosMaximumSlope)
-                    //{
-                    //    //This contact will already be considered to have traction.
-                    //    //Don't bother doing the somewhat expensive correction process on it.
-                    //    //TODO: Test this; see how much benefit there is.
-                    //    continue;
-                    //}
                     //Check to see if the contact position is at the bottom of the character.
                     Vector3 offset = contact.Position - Body.Position;
                     Vector3.Dot(ref offset, ref downDirection, out dot);
@@ -706,7 +693,7 @@ namespace BEPUphysics.Character
                         Vector3.Dot(ref offsetDirection, ref downDirection, out dot);
                         float dotOriginal;
                         Vector3.Dot(ref contact.Normal, ref downDirection, out dotOriginal);
-                        if (Math.Abs(dot) > Math.Abs(dotOriginal)) //if the new offsetDirection normal is less steep than the original slope...
+                        if (dot > Math.Abs(dotOriginal)) //if the new offsetDirection normal is less steep than the original slope...
                         {
                             //Then use it!
                             Vector3.Dot(ref offsetDirection, ref contact.Normal, out dot);
