@@ -161,6 +161,9 @@ namespace BEPUphysics.Character
             //The words 'highest' and 'lowest' here refer to the position relative to the character's body.
             //The ray cast points downward relative to the character's body.
             float highestBound = 0;
+            //The lowest possible distance is the ray distance plus the collision margin because the ray could theoretically be on the outskirts of the collision margin
+            //where the shape would actually have to move more than the bottom distance difference would imply.
+            //(Could compute the true lowest bound analytically based on the horizontal position of the ray...)
             float lowestBound = characterBody.CollisionInformation.Shape.CollisionMargin + SupportFinder.SupportRayData.Value.HitData.T - SupportFinder.BottomDistance;
             float currentOffset = lowestBound;
             float hintOffset;
@@ -176,7 +179,7 @@ namespace BEPUphysics.Character
                 float hitT;
                 if (Toolbox.GetRayPlaneIntersection(ref ray, ref plane, out hitT, out intersection))
                 {
-                    currentOffset = hitT + CollisionDetectionSettings.AllowedPenetration;
+                    currentOffset = hitT + CollisionDetectionSettings.AllowedPenetration * 0.5f;
                     candidatePosition = characterBody.Position + down * currentOffset;
                     switch (TryDownStepPosition(ref candidatePosition, ref down,
                                                 ref tractionContacts, ref supportContacts, ref sideContacts, ref headContacts,
