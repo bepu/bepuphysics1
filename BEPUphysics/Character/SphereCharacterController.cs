@@ -292,7 +292,7 @@ namespace BEPUphysics.Character
         /// <param name="maximumGlueForce">Maximum force the vertical motion constraint is allowed to apply in an attempt to keep the character on the ground.</param>
         public SphereCharacterController(
             Vector3 position = new Vector3(),
-            float radius = 0.6f, float mass = 10f,
+            float radius = .85f, float mass = 10f,
             float maximumTractionSlope = 0.8f, float maximumSupportSlope = 1.3f,
             float speed = 8f, float tractionForce = 1000, float slidingSpeed = 6, float slidingForce = 50, float airSpeed = 1, float airForce = 250,
             float jumpSpeed = 4.5f, float slidingJumpSpeed = 3,
