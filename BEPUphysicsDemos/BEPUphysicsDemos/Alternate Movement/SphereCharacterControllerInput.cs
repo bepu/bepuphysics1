@@ -47,10 +47,10 @@ namespace BEPUphysicsDemos.AlternateMovement
         public SphereCharacterControllerInput(Space owningSpace, Camera camera, DemosGame game)
         {
             CharacterController = new SphereCharacterController();
+            Camera = camera;
             CameraControlScheme = new FixedOffsetCameraControlScheme(CharacterController.Body, camera, game);
 
             Space = owningSpace;
-            Space.Add(CharacterController);
 
         }
 
