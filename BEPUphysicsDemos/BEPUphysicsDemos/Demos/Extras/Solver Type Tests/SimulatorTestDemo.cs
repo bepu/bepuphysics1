@@ -53,7 +53,7 @@ namespace BEPUphysicsDemos.Demos.Extras.SolverTypeTests
         {
             //Create a lattice of dynamic objects.
             int width = 30;
-            int height = 5;
+            int height = 10;
             int length = 30;
             float spacing = 3;
             var dynamics = new LinearDynamic[width, height, length];

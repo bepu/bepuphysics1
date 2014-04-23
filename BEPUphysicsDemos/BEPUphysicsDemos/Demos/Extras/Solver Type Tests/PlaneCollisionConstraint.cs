@@ -40,6 +40,7 @@ namespace BEPUphysicsDemos.Demos.Extras.SolverTypeTests
         public PlaneCollisionConstraint(LinearDynamic dynamic, Plane plane)
         {
             Dynamic = dynamic;
+            ++dynamic.ConstraintCount;
             this.plane = plane;
         }
 
@@ -49,7 +50,7 @@ namespace BEPUphysicsDemos.Demos.Extras.SolverTypeTests
             float d;
             Vector3.Dot(ref plane.Normal, ref Dynamic.Position, out d);
 
-            effectiveMass = 1 / (Dynamic.InverseMass + Softness);
+            effectiveMass = 1 / (Dynamic.ConstraintCount * Dynamic.InverseMass + Softness);
 
             float error = d + plane.D;
             if (error > 0)
