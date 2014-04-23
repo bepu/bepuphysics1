@@ -28,6 +28,8 @@ namespace BEPUphysicsDemos.Demos.Extras.SolverTypeTests
             get { return inverseMass; }
         }
 
+        internal int ConstraintCount;
+
         public Vector3 Velocity;
 
         public Vector3 Position;

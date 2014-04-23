@@ -28,6 +28,8 @@ namespace BEPUphysicsDemos.Demos.Extras.SolverTypeTests
         {
             A = a;
             B = b;
+            ++a.ConstraintCount;
+            ++b.ConstraintCount;
 
             distance = (a.Position - b.Position).Length();
         }
@@ -46,8 +48,8 @@ namespace BEPUphysicsDemos.Demos.Extras.SolverTypeTests
                 currentDistance = 0;
                 jacobian = Toolbox.UpVector;
             }
-
-            effectiveMass = 1 / (A.InverseMass + B.InverseMass + Softness);
+            
+            effectiveMass = 1 / (A.ConstraintCount * A.InverseMass + B.ConstraintCount * B.InverseMass + Softness);
 
             accumulatedImpulse = 0;
             biasVelocity = (distance - currentDistance) * BiasFactor * inverseDt;
