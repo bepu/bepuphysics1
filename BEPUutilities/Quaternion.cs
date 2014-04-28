@@ -675,23 +675,28 @@ namespace BEPUutilities
         /// <param name="q">Quaternion representing the yaw, pitch, and roll.</param>
         public static void CreateFromYawPitchRoll(float yaw, float pitch, float roll, out Quaternion q)
         {
-            double cosYaw = Math.Cos(yaw * .5f);
-            double cosPitch = Math.Cos(pitch * .5f);
-            double cosRoll = Math.Cos(roll * .5f);
+            double halfRoll = roll * 0.5;
+            double halfPitch = pitch * 0.5;
+            double halfYaw = yaw * 0.5;
 
-            double sinYaw = Math.Sin(yaw * .5f);
-            double sinPitch = Math.Sin(pitch * .5f);
-            double sinRoll = Math.Sin(roll * .5f);
+            double sinRoll = Math.Sin(halfRoll);
+            double sinPitch = Math.Sin(halfPitch);
+            double sinYaw = Math.Sin(halfYaw);
+
+            double cosRoll = Math.Cos(halfRoll);
+            double cosPitch = Math.Cos(halfPitch);
+            double cosYaw = Math.Cos(halfYaw);
 
             double cosYawCosPitch = cosYaw * cosPitch;
             double cosYawSinPitch = cosYaw * sinPitch;
             double sinYawCosPitch = sinYaw * cosPitch;
             double sinYawSinPitch = sinYaw * sinPitch;
 
-            q.W = (float)(cosYawCosPitch * cosRoll + sinYawSinPitch * sinRoll);
-            q.X = (float)(sinYawCosPitch * cosRoll - cosYawSinPitch * sinRoll);
-            q.Y = (float)(cosYawSinPitch * cosRoll + sinYawCosPitch * sinRoll);
+            q.X = (float)(cosYawSinPitch * cosRoll + sinYawCosPitch * sinRoll);
+            q.Y = (float)(sinYawCosPitch * cosRoll - cosYawSinPitch * sinRoll);
             q.Z = (float)(cosYawCosPitch * sinRoll - sinYawSinPitch * cosRoll);
+            q.W = (float)(cosYawCosPitch * cosRoll + sinYawSinPitch * sinRoll);
+
         }
 
         /// <summary>
