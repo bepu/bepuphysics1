@@ -815,5 +815,14 @@ namespace BEPUutilities
             Conjugate(ref targetBasis, out basisInverse);
             Concatenate(ref rotation, ref basisInverse, out localRotation);
         }
+
+        /// <summary>
+        /// Gets a string representation of the quaternion.
+        /// </summary>
+        /// <returns>String representing the quaternion.</returns>
+        public override string ToString()
+        {
+            return "{ X: " + X + ", Y: " + Y + ", Z: " + Z + ", W: " + W + "}";
+        }
     }
 }

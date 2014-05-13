@@ -368,6 +368,7 @@ namespace BEPUphysics.Character
             QueryManager = new QueryManager(Body, ContactCategorizer);
             SupportFinder = new SupportFinder(Body, QueryManager, ContactCategorizer);
             HorizontalMotionConstraint = new HorizontalMotionConstraint(Body, SupportFinder);
+            HorizontalMotionConstraint.PositionAnchorDistanceThreshold = radius * 0.25f;
             VerticalMotionConstraint = new VerticalMotionConstraint(Body, SupportFinder, maximumGlueForce);
             StepManager = new StepManager(Body, ContactCategorizer, SupportFinder, QueryManager, HorizontalMotionConstraint);
             StanceManager = new StanceManager(Body, crouchingHeight, QueryManager, SupportFinder);

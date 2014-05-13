@@ -89,7 +89,9 @@
     <Compile Include="IKDistanceLimit.cs" />
     <Compile Include="IKJoint.cs" />
     <Compile Include="IKLimit.cs" />
-    <Compile Include="IKLinearAxisLimit.cs" />
+    <Compile Include="IKLinearAxisLimit.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="IKPointOnLineJoint.cs" />
     <Compile Include="IKPointOnPlaneJoint.cs" />
     <Compile Include="IKRevoluteJoint.cs" />

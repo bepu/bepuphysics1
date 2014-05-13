@@ -60,7 +60,7 @@ namespace BEPUphysics.Character
         public float MaximumForce { get; set; }
         float maxForce;
 
-        private float timeUntilStableFooting = .2f;
+        private float timeUntilPositionAnchor = .2f;
 
         /// <summary>
         /// <para>Gets or sets the time it takes for the character to achieve stable footing after trying to stop moving.
@@ -70,10 +70,38 @@ namespace BEPUphysics.Character
         /// <para>This time should be longer than the time it takes the player to decelerate from normal movement while it has traction. Otherwise, the character 
         /// will seem to 'rubber band' back to a previous location after the character tries to stop.</para>
         /// </summary>
-        public float TimeUntilStableFooting
+        public float TimeUntilPositionAnchor
         {
-            get { return timeUntilStableFooting; }
-            set { timeUntilStableFooting = value; }
+            get { return timeUntilPositionAnchor; }
+            set { timeUntilPositionAnchor = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the distance beyond which the character will reset its goal position.
+        /// When a character is standing still (as defined by TimeUntilStableFooting), a shove smaller than this threshold will result in an attempt to return to the previous anchor.
+        /// A shove which pushes the character more than this threshold will cause a new anchor to be created.
+        /// </summary>
+        public float PositionAnchorDistanceThreshold { get; set; }
+
+        /// <summary>
+        /// <para>Gets whether the character currently has stable footing. If true, the character will resist position drift relative to its support. For example,
+        /// if the character was on a rotating platform while trying to stand still relative to the platform, integrating the velocity repeatedly would make the character gradually shift
+        /// relative to the platform. The anchoring effect of stable footing keeps the character near the same relative location.</para>
+        /// <para>Can only occur when the character has traction and is not trying to move while standing on an entity.</para>
+        /// </summary>
+        public bool HasPositionAnchor
+        {
+            get { return timeSinceTransition < 0; }
+        }
+
+        /// <summary>
+        /// Forces a recomputation of the position anchor during the next update if a position anchor is currently active.
+        /// The new position anchor will be dropped at the character's location as of the next update.
+        /// </summary>
+        public void ResetPositionAnchor()
+        {
+            if (HasPositionAnchor)
+                timeSinceTransition = timeUntilPositionAnchor;
         }
 
 
@@ -399,9 +427,9 @@ namespace BEPUphysics.Character
 
                 var distanceToBottomOfCharacter = supportFinder.BottomDistance;
 
-                if (timeSinceTransition >= 0 && timeSinceTransition < timeUntilStableFooting)
+                if (timeSinceTransition >= 0 && timeSinceTransition < timeUntilPositionAnchor)
                     timeSinceTransition += dt;
-                if (timeSinceTransition >= timeUntilStableFooting)
+                if (timeSinceTransition >= timeUntilPositionAnchor)
                 {
                     Vector3.Multiply(ref downDirection, distanceToBottomOfCharacter, out positionLocalOffset);
                     positionLocalOffset = (positionLocalOffset + characterBody.Position) - supportEntity.Position;
@@ -417,7 +445,7 @@ namespace BEPUphysics.Character
                     Vector3 error;
                     Vector3.Subtract(ref targetPosition, ref worldSupportLocation, out error);
                     //If the error is too large, then recompute the offset.  We don't want the character rubber banding around.
-                    if (error.LengthSquared() > .15f * .15f)
+                    if (error.LengthSquared() > PositionAnchorDistanceThreshold * PositionAnchorDistanceThreshold)
                     {
                         Vector3.Multiply(ref downDirection, distanceToBottomOfCharacter, out positionLocalOffset);
                         positionLocalOffset = (positionLocalOffset + characterBody.Position) - supportEntity.Position;

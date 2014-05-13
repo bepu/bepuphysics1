@@ -312,6 +312,7 @@ namespace BEPUutilities
             return X.GetHashCode() + Y.GetHashCode() + Z.GetHashCode();
         }
 
+        
         /// <summary>
         /// Computes the squared distance between two vectors.
         /// </summary>
@@ -327,6 +328,21 @@ namespace BEPUutilities
         }
 
         /// <summary>
+        /// Computes the squared distance between two vectors.
+        /// </summary>
+        /// <param name="a">First vector.</param>
+        /// <param name="b">Second vector.</param>
+        /// <returns>Squared distance between the two vectors.</returns>
+        public static float DistanceSquared(Vector3 a, Vector3 b)
+        {
+            float x = a.X - b.X;
+            float y = a.Y - b.Y;
+            float z = a.Z - b.Z;
+            return x * x + y * y + z * z;
+        }
+
+
+        /// <summary>
         /// Computes the distance between two two vectors.
         /// </summary>
         /// <param name="a">First vector.</param>
@@ -337,7 +353,7 @@ namespace BEPUutilities
             float x = a.X - b.X;
             float y = a.Y - b.Y;
             float z = a.Z - b.Z;
-            distance = (float)System.Math.Sqrt(x * x + y * y + z * z);
+            distance = (float)Math.Sqrt(x * x + y * y + z * z);
         }
         /// <summary>
         /// Computes the distance between two two vectors.
