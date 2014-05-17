@@ -152,10 +152,10 @@ namespace BEPUutilities.DataStructures
         }
 
         /// <summary>
-        /// Gets the index of the key in the list if it exists.
+        /// Gets the index of the key in the dictionary values list if it exists.
         /// </summary>
         /// <param name="key">Key to get the index of.</param>
-        /// <returns>The index of the key if the key exists in the list, -1 otherwise.</returns>
+        /// <returns>The index of the key if the key exists in the dictionary, -1 otherwise.</returns>
         public int IndexOf(TKey key)
         {
             Validate();
