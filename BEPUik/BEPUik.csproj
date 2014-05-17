@@ -81,6 +81,10 @@
     <Compile Include="ActiveSet.cs" />
     <Compile Include="Bone.cs" />
     <Compile Include="Control.cs" />
+    <Compile Include="AngularPlaneControl.cs" />
+    <Compile Include="SingleBoneAngularPlaneConstraint.cs" />
+    <Compile Include="RevoluteControl.cs" />
+    <Compile Include="SingleBoneRevoluteConstraint.cs" />
     <Compile Include="DragControl.cs" />
     <Compile Include="IKAngularJoint.cs" />
     <Compile Include="IKBallSocketJoint.cs" />

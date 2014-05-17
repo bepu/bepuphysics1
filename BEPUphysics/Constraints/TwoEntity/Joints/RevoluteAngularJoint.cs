@@ -109,6 +109,18 @@ namespace BEPUphysics.Constraints.TwoEntity.Joints
             }
         }
 
+        private void UpdateRestrictedAxes()
+        {
+            localConstrainedAxis1 = Vector3.Cross(Vector3.Up, localAxisA);
+            if (localConstrainedAxis1.LengthSquared() < .001f)
+            {
+                localConstrainedAxis1 = Vector3.Cross(Vector3.Right, localAxisA);
+            }
+            localConstrainedAxis2 = Vector3.Cross(localAxisA, localConstrainedAxis1);
+            localConstrainedAxis1.Normalize();
+            localConstrainedAxis2.Normalize();
+        }
+
         #region I2DImpulseConstraintWithError Members
 
         /// <summary>
@@ -207,53 +219,6 @@ namespace BEPUphysics.Constraints.TwoEntity.Joints
 
         #endregion
 
-        /// <summary>
-        /// Computes one iteration of the constraint to meet the solver updateable's goal.
-        /// </summary>
-        /// <returns>The rough applied impulse magnitude.</returns>
-        public override float SolveIteration()
-        {
-            // lambda = -mc * (Jv + b)
-            // P = JT * lambda
-            Vector3 velocity;
-            Vector3.Subtract(ref connectionA.angularVelocity, ref connectionB.angularVelocity, out velocity);
-
-#if !WINDOWS
-            Vector2 lambda = new Vector2();
-#else
-            Vector2 lambda;
-#endif
-            Vector3.Dot(ref worldConstrainedAxis1, ref velocity, out lambda.X);
-            Vector3.Dot(ref worldConstrainedAxis2, ref velocity, out lambda.Y);
-            Vector2.Add(ref lambda, ref biasVelocity, out lambda);
-            Vector2 softnessImpulse;
-            Vector2.Multiply(ref accumulatedImpulse, softness, out softnessImpulse);
-            Vector2.Add(ref lambda, ref softnessImpulse, out lambda);
-            Matrix2x2.Transform(ref lambda, ref effectiveMassMatrix, out lambda);
-            Vector2.Add(ref accumulatedImpulse, ref lambda, out accumulatedImpulse);
-
-
-#if !WINDOWS
-            Vector3 impulse = new Vector3();
-#else
-            Vector3 impulse;
-#endif
-            impulse.X = worldConstrainedAxis1.X * lambda.X + worldConstrainedAxis2.X * lambda.Y;
-            impulse.Y = worldConstrainedAxis1.Y * lambda.X + worldConstrainedAxis2.Y * lambda.Y;
-            impulse.Z = worldConstrainedAxis1.Z * lambda.X + worldConstrainedAxis2.Z * lambda.Y;
-            if (connectionA.isDynamic)
-            {
-                connectionA.ApplyAngularImpulse(ref impulse);
-            }
-            if (connectionB.isDynamic)
-            {
-                Vector3.Negate(ref impulse, out impulse);
-                connectionB.ApplyAngularImpulse(ref impulse);
-            }
-
-            return (Math.Abs(lambda.X) + Math.Abs(lambda.Y));
-        }
-
         ///<summary>
         /// Performs the frame's configuration step.
         ///</summary>
@@ -351,16 +316,54 @@ namespace BEPUphysics.Constraints.TwoEntity.Joints
             }
         }
 
-        private void UpdateRestrictedAxes()
+
+        /// <summary>
+        /// Computes one iteration of the constraint to meet the solver updateable's goal.
+        /// </summary>
+        /// <returns>The rough applied impulse magnitude.</returns>
+        public override float SolveIteration()
         {
-            localConstrainedAxis1 = Vector3.Cross(Vector3.Up, localAxisA);
-            if (localConstrainedAxis1.LengthSquared() < .001f)
+            // lambda = -mc * (Jv + b)
+            // P = JT * lambda
+            Vector3 velocity;
+            Vector3.Subtract(ref connectionA.angularVelocity, ref connectionB.angularVelocity, out velocity);
+
+#if !WINDOWS
+            Vector2 lambda = new Vector2();
+#else
+            Vector2 lambda;
+#endif
+            Vector3.Dot(ref worldConstrainedAxis1, ref velocity, out lambda.X);
+            Vector3.Dot(ref worldConstrainedAxis2, ref velocity, out lambda.Y);
+            Vector2.Add(ref lambda, ref biasVelocity, out lambda);
+            Vector2 softnessImpulse;
+            Vector2.Multiply(ref accumulatedImpulse, softness, out softnessImpulse);
+            Vector2.Add(ref lambda, ref softnessImpulse, out lambda);
+            Matrix2x2.Transform(ref lambda, ref effectiveMassMatrix, out lambda);
+            Vector2.Add(ref accumulatedImpulse, ref lambda, out accumulatedImpulse);
+
+
+#if !WINDOWS
+            Vector3 impulse = new Vector3();
+#else
+            Vector3 impulse;
+#endif
+            impulse.X = worldConstrainedAxis1.X * lambda.X + worldConstrainedAxis2.X * lambda.Y;
+            impulse.Y = worldConstrainedAxis1.Y * lambda.X + worldConstrainedAxis2.Y * lambda.Y;
+            impulse.Z = worldConstrainedAxis1.Z * lambda.X + worldConstrainedAxis2.Z * lambda.Y;
+            if (connectionA.isDynamic)
             {
-                localConstrainedAxis1 = Vector3.Cross(Vector3.Right, localAxisA);
+                connectionA.ApplyAngularImpulse(ref impulse);
             }
-            localConstrainedAxis2 = Vector3.Cross(localAxisA, localConstrainedAxis1);
-            localConstrainedAxis1.Normalize();
-            localConstrainedAxis2.Normalize();
+            if (connectionB.isDynamic)
+            {
+                Vector3.Negate(ref impulse, out impulse);
+                connectionB.ApplyAngularImpulse(ref impulse);
+            }
+
+            return (Math.Abs(lambda.X) + Math.Abs(lambda.Y));
         }
+
+
     }
 }
