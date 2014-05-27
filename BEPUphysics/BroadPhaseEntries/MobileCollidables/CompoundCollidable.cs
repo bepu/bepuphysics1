@@ -73,8 +73,6 @@ namespace BEPUphysics.BroadPhaseEntries.MobileCollidables
             for (int i = 0; i < children.Count; i++)
             {
                 children.Elements[i].CollisionInformation.Entity = entity;
-                if (children.Elements[i].Material == null)
-                    children.Elements[i].Material = entity.material;
             }
             base.OnEntityChanged();
         }

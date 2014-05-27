@@ -20,11 +20,11 @@ namespace BEPUutilities
         /// Constructs a new rigid transform.
         ///</summary>
         ///<param name="position">Translation component of the transform.</param>
-        ///<param name="orienation">Rotation component of the transform.</param>
-        public RigidTransform(Vector3 position, Quaternion orienation)
+        ///<param name="orientation">Rotation component of the transform.</param>
+        public RigidTransform(Vector3 position, Quaternion orientation)
         {
             Position = position;
-            Orientation = orienation;
+            Orientation = orientation;
         }
 
         ///<summary>

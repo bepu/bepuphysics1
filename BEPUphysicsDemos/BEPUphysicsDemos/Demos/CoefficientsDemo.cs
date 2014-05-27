@@ -58,6 +58,7 @@ namespace BEPUphysicsDemos.Demos
             toAdd.LinearVelocity = new Vector3(-5, 0, 0);
             Space.Add(toAdd);
             game.Camera.Position = new Vector3(0, 2, 30);
+
         }
 
         /// <summary>
