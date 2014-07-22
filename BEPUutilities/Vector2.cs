@@ -178,6 +178,86 @@ namespace BEPUutilities
         }
 
         /// <summary>
+        /// Computes the absolute value of the input vector.
+        /// </summary>
+        /// <param name="v">Vector to take the absolute value of.</param>
+        /// <param name="result">Vector with nonnegative elements.</param>
+        public static void Abs(ref Vector2 v, out Vector2 result)
+        {
+            if (v.X < 0)
+                result.X = -v.X;
+            else
+                result.X = v.X;
+            if (v.Y < 0)
+                result.Y = -v.Y;
+            else
+                result.Y = v.Y;
+        }
+
+        /// <summary>
+        /// Computes the absolute value of the input vector.
+        /// </summary>
+        /// <param name="v">Vector to take the absolute value of.</param>
+        /// <returns>Vector with nonnegative elements.</returns>
+        public static Vector2 Abs(Vector2 v)
+        {
+            Vector2 result;
+            Abs(ref v, out result);
+            return result;
+        }
+
+        /// <summary>
+        /// Creates a vector from the lesser values in each vector.
+        /// </summary>
+        /// <param name="a">First input vector to compare values from.</param>
+        /// <param name="b">Second input vector to compare values from.</param>
+        /// <param name="min">Vector containing the lesser values of each vector.</param>
+        public static void Min(ref Vector2 a, ref Vector2 b, out Vector2 min)
+        {
+            min.X = a.X < b.X ? a.X : b.X;
+            min.Y = a.Y < b.Y ? a.Y : b.Y;
+        }
+
+        /// <summary>
+        /// Creates a vector from the lesser values in each vector.
+        /// </summary>
+        /// <param name="a">First input vector to compare values from.</param>
+        /// <param name="b">Second input vector to compare values from.</param>
+        /// <returns>Vector containing the lesser values of each vector.</returns>
+        public static Vector2 Min(Vector2 a, Vector2 b)
+        {
+            Vector2 result;
+            Min(ref a, ref b, out result);
+            return result;
+        }
+
+
+        /// <summary>
+        /// Creates a vector from the greater values in each vector.
+        /// </summary>
+        /// <param name="a">First input vector to compare values from.</param>
+        /// <param name="b">Second input vector to compare values from.</param>
+        /// <param name="max">Vector containing the greater values of each vector.</param>
+        public static void Max(ref Vector2 a, ref Vector2 b, out Vector2 max)
+        {
+            max.X = a.X > b.X ? a.X : b.X;
+            max.Y = a.Y > b.Y ? a.Y : b.Y;
+        }
+
+        /// <summary>
+        /// Creates a vector from the greater values in each vector.
+        /// </summary>
+        /// <param name="a">First input vector to compare values from.</param>
+        /// <param name="b">Second input vector to compare values from.</param>
+        /// <returns>Vector containing the greater values of each vector.</returns>
+        public static Vector2 Max(Vector2 a, Vector2 b)
+        {
+            Vector2 result;
+            Max(ref a, ref b, out result);
+            return result;
+        }
+
+        /// <summary>
         /// Normalizes the vector.
         /// </summary>
         public void Normalize()
@@ -313,7 +393,7 @@ namespace BEPUutilities
         {
             if (obj is Vector2)
             {
-                return Equals((Vector2) obj);
+                return Equals((Vector2)obj);
             }
             return false;
         }
@@ -330,6 +410,6 @@ namespace BEPUutilities
             return X.GetHashCode() + Y.GetHashCode();
         }
 
-       
+
     }
 }

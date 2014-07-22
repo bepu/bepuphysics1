@@ -1056,6 +1056,43 @@ namespace BEPUutilities
         }
 
         /// <summary>
+        /// Creates a right handed orthographic projection.
+        /// </summary>
+        /// <param name="left">Leftmost coordinate of the projected area.</param>
+        /// <param name="right">Rightmost coordinate of the projected area.</param>
+        /// <param name="bottom">Bottom coordinate of the projected area.</param>
+        /// <param name="top">Top coordinate of the projected area.</param>
+        /// <param name="zNear">Near plane of the projection.</param>
+        /// <param name="zFar">Far plane of the projection.</param>
+        /// <param name="projection">The resulting orthographic projection matrix.</param>
+        public static void CreateOrthographicRH(float left, float right, float bottom, float top, float zNear, float zFar, out Matrix projection)
+        {
+            float width = right - left;
+            float height = top - bottom;
+            float depth = zFar - zNear;
+            projection.M11 = 2f / width;
+            projection.M12 = 0;
+            projection.M13 = 0;
+            projection.M14 = 0;
+
+            projection.M21 = 0;
+            projection.M22 = 2f / height;
+            projection.M23 = 0;
+            projection.M24 = 0;
+
+            projection.M31 = 0;
+            projection.M32 = 0;
+            projection.M33 = -1f / depth;
+            projection.M34 = 0;
+
+            projection.M41 = (left + right) / -width;
+            projection.M42 = (top + bottom) / -height;
+            projection.M43 = zNear / -depth;
+            projection.M44 = 1f;
+
+        }
+
+        /// <summary>
         /// Creates a right-handed perspective matrix.
         /// </summary>
         /// <param name="fieldOfView">Field of view of the perspective in radians.</param>
@@ -1336,5 +1373,7 @@ namespace BEPUutilities
             CreateScale(x, y, z, out scaleMatrix);
             return scaleMatrix;
         }
+
+
     }
 }

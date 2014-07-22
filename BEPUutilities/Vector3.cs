@@ -564,30 +564,90 @@ namespace BEPUutilities
             negated.Z = -v.Z;
         }
 
+        /// <summary>
+        /// Computes the absolute value of the input vector.
+        /// </summary>
+        /// <param name="v">Vector to take the absolute value of.</param>
+        /// <param name="result">Vector with nonnegative elements.</param>
+        public static void Abs(ref Vector3 v, out Vector3 result)
+        {
+            if (v.X < 0)
+                result.X = -v.X;
+            else
+                result.X = v.X;
+            if (v.Y < 0)
+                result.Y = -v.Y;
+            else
+                result.Y = v.Y;
+            if (v.Z < 0)
+                result.Z = -v.Z;
+            else
+                result.Z = v.Z;
+        }
 
         /// <summary>
-        /// Computes a vector with the minimum components of the given vectors.
+        /// Computes the absolute value of the input vector.
         /// </summary>
-        /// <param name="a">First vector.</param>
-        /// <param name="b">Second vector.</param>
-        /// <param name="result">Vector with the smaller components of each input vector.</param>
-        public static void Min(ref Vector3 a, ref Vector3 b, out Vector3 result)
+        /// <param name="v">Vector to take the absolute value of.</param>
+        /// <returns>Vector with nonnegative elements.</returns>
+        public static Vector3 Abs(Vector3 v)
         {
-            result.X = a.X < b.X ? a.X : b.X;
-            result.Y = a.Y < b.Y ? a.Y : b.Y;
-            result.Z = a.Z < b.Z ? a.Z : b.Z;
+            Vector3 result;
+            Abs(ref v, out result);
+            return result;
         }
+
         /// <summary>
-        /// Computes a vector with the maximum components of the given vectors.
+        /// Creates a vector from the lesser values in each vector.
         /// </summary>
-        /// <param name="a">First vector.</param>
-        /// <param name="b">Second vector.</param>
-        /// <param name="result">Vector with the larger components of each input vector.</param>
-        public static void Max(ref Vector3 a, ref Vector3 b, out Vector3 result)
+        /// <param name="a">First input vector to compare values from.</param>
+        /// <param name="b">Second input vector to compare values from.</param>
+        /// <param name="min">Vector containing the lesser values of each vector.</param>
+        public static void Min(ref Vector3 a, ref Vector3 b, out Vector3 min)
         {
-            result.X = a.X > b.X ? a.X : b.X;
-            result.Y = a.Y > b.Y ? a.Y : b.Y;
-            result.Z = a.Z > b.Z ? a.Z : b.Z;
+            min.X = a.X < b.X ? a.X : b.X;
+            min.Y = a.Y < b.Y ? a.Y : b.Y;
+            min.Z = a.Z < b.Z ? a.Z : b.Z;
+        }
+
+        /// <summary>
+        /// Creates a vector from the lesser values in each vector.
+        /// </summary>
+        /// <param name="a">First input vector to compare values from.</param>
+        /// <param name="b">Second input vector to compare values from.</param>
+        /// <returns>Vector containing the lesser values of each vector.</returns>
+        public static Vector3 Min(Vector3 a, Vector3 b)
+        {
+            Vector3 result;
+            Min(ref a, ref b, out result);
+            return result;
+        }
+
+
+        /// <summary>
+        /// Creates a vector from the greater values in each vector.
+        /// </summary>
+        /// <param name="a">First input vector to compare values from.</param>
+        /// <param name="b">Second input vector to compare values from.</param>
+        /// <param name="max">Vector containing the greater values of each vector.</param>
+        public static void Max(ref Vector3 a, ref Vector3 b, out Vector3 max)
+        {
+            max.X = a.X > b.X ? a.X : b.X;
+            max.Y = a.Y > b.Y ? a.Y : b.Y;
+            max.Z = a.Z > b.Z ? a.Z : b.Z;
+        }
+
+        /// <summary>
+        /// Creates a vector from the greater values in each vector.
+        /// </summary>
+        /// <param name="a">First input vector to compare values from.</param>
+        /// <param name="b">Second input vector to compare values from.</param>
+        /// <returns>Vector containing the greater values of each vector.</returns>
+        public static Vector3 Max(Vector3 a, Vector3 b)
+        {
+            Vector3 result;
+            Max(ref a, ref b, out result);
+            return result;
         }
 
         /// <summary>
