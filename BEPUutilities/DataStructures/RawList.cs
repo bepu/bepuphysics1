@@ -93,6 +93,7 @@ namespace BEPUutilities.DataStructures
 
         ///<summary>
         /// Gets or sets the current size allocated for the list.
+        /// If the new capacity is less than the current Count, the excess elements are truncated.
         ///</summary>
         public int Capacity
         {
@@ -103,7 +104,7 @@ namespace BEPUutilities.DataStructures
             set
             {
                 T[] newArray = new T[value];
-                Array.Copy(Elements, newArray, Count);
+                Array.Copy(Elements, newArray, Math.Min(value, Count));
                 Elements = newArray;
             }
         }
