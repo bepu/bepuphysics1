@@ -115,6 +115,17 @@ namespace BEPUutilities
         }
 
         /// <summary>
+        /// Computes the dot product of the two vectors.
+        /// </summary>
+        /// <param name="a">First vector of the dot product.</param>
+        /// <param name="b">Second vector of the dot product.</param>
+        /// <returns>Dot product of the two vectors.</returns>
+        public static float Dot(Vector2 a, Vector2 b)
+        {
+            return a.X * b.X + a.Y * b.Y;
+        }
+
+        /// <summary>
         /// Gets the zero vector.
         /// </summary>
         public static Vector2 Zero
