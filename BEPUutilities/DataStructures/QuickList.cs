@@ -16,6 +16,10 @@ namespace BEPUutilities.DataStructures
     {
         private int poolIndex;
         private BufferPool<T> pool;
+        /// <summary>
+        /// Gets the pool used by the quick list.
+        /// </summary>
+        public BufferPool<T> Pool { get { return pool; } }
 
         /// <summary>
         /// Gets the backing array containing the elements of the list.
@@ -25,7 +29,7 @@ namespace BEPUutilities.DataStructures
 
         private int count;
         /// <summary>
-        /// Gets or sets the number of pairs in the list.
+        /// Gets or sets the number of elements in the list.
         /// </summary>
         public int Count
         {
@@ -78,6 +82,18 @@ namespace BEPUutilities.DataStructures
 
             count = 0;
 
+        }
+
+        /// <summary>
+        /// Ensures that the quick list has enough room to hold the specified number of elements.
+        /// </summary>
+        /// <param name="count">Number of elements to hold.</param>
+        public void EnsureCapacity(int count)
+        {
+            if (count > (1 << poolIndex))
+            {
+                Resize(BufferPool<T>.GetPoolIndex(count));
+            }
         }
 
         private void Resize(int newPoolIndex)
@@ -507,7 +523,7 @@ namespace BEPUutilities.DataStructures
         }
 
 
-        
+
         /// <summary>
         /// Gets a value indicating whether the <see cref="T:System.Collections.Generic.ICollection`1"/> is read-only.
         /// </summary>

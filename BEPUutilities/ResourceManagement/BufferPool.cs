@@ -110,9 +110,9 @@ namespace BEPUutilities.ResourceManagement
         /// <param name="poolIndex">Pool index associated with the buffer.</param>
         public virtual void GiveBack(T[] buffer, int poolIndex)
         {
-#if DEBUG          
+#if DEBUG
             Debug.Assert(outstandingResources.Remove(buffer), "The buffer being returned must come from this pool, and buffers should only be returned once.");
-            if (!suppressCleanBufferAsserts)
+            if (!SuppressCleanBufferAsserts)
             {
                 for (int i = 0; i < buffer.Length; ++i)
                 {
@@ -154,20 +154,12 @@ namespace BEPUutilities.ResourceManagement
             }
         }
 
-        /// <summary>
-        /// Sets whether to suppress the GiveBack function's checks for buffer clearing.
-        /// </summary>
-        /// <param name="shouldSuppress">True if the cleanliness asserts should be suppressed, false otherwise.</param>
-        [Conditional("DEBUG")]
-        public void SetSuppressCleanBufferAsserts(bool shouldSuppress)
-        {
-#if DEBUG
-            suppressCleanBufferAsserts = shouldSuppress;
-#endif
-        }
 
 #if DEBUG
-        private bool suppressCleanBufferAsserts;
+        /// <summary>
+        /// Gets or sets whether to check buffers for cleanliness when they are returned when compiled in debug mode. A clean buffer is defined as one that contains all default values.
+        /// </summary>
+        public bool SuppressCleanBufferAsserts { get; set; }
 #endif
     }
 }
