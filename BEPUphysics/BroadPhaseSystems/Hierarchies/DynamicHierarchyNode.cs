@@ -118,12 +118,10 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
 
         internal override void GetOverlaps(ref Ray ray, float maximumLength, IList<BroadPhaseEntry> outputOverlappedElements)
         {
-            float? result;
-            ray.Intersects(ref childA.BoundingBox, out result);
-            if (result != null && result < maximumLength)
+            float result;
+            if (ray.Intersects(ref childA.BoundingBox, out result) && result < maximumLength)
                 childA.GetOverlaps(ref ray, maximumLength, outputOverlappedElements);
-            ray.Intersects(ref childB.BoundingBox, out result);
-            if (result != null && result < maximumLength)
+            if (ray.Intersects(ref childB.BoundingBox, out result) && result < maximumLength)
                 childB.GetOverlaps(ref ray, maximumLength, outputOverlappedElements);
         }
 

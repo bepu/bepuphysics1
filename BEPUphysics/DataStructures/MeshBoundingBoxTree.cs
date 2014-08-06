@@ -3,7 +3,7 @@ using System.Globalization;
 using BEPUutilities;
 
 namespace BEPUphysics.DataStructures
-{    
+{
     ///<summary>
     /// Acceleration structure of triangles surrounded by axis aligned bounding boxes, supporting various speedy queries.
     ///</summary>
@@ -21,7 +21,7 @@ namespace BEPUphysics.DataStructures
             {
                 if (root != null)
                     return root.BoundingBox;
-                else 
+                else
                     return new BoundingBox();
             }
         }
@@ -185,9 +185,8 @@ namespace BEPUphysics.DataStructures
         {
             if (root != null)
             {
-                float? result;
-                ray.Intersects(ref root.BoundingBox, out result);
-                if (result != null)
+                float result;
+                if (ray.Intersects(ref root.BoundingBox, out result))
                     root.GetOverlaps(ref ray, float.MaxValue, outputOverlappedElements);
             }
             return outputOverlappedElements.Count > 0;
@@ -203,9 +202,8 @@ namespace BEPUphysics.DataStructures
         {
             if (root != null)
             {
-                float? result;
-                ray.Intersects(ref root.BoundingBox, out result);
-                if (result != null)
+                float result;
+                if (ray.Intersects(ref root.BoundingBox, out result))
                     root.GetOverlaps(ref ray, maximumLength, outputOverlappedElements);
             }
             return outputOverlappedElements.Count > 0;
@@ -280,12 +278,10 @@ namespace BEPUphysics.DataStructures
 
             internal override void GetOverlaps(ref Ray ray, float maximumLength, IList<int> outputOverlappedElements)
             {
-                float? result;
-                ray.Intersects(ref ChildA.BoundingBox, out result);
-                if (result != null && result < maximumLength)
+                float result;
+                if (ray.Intersects(ref ChildA.BoundingBox, out result) && result < maximumLength)
                     ChildA.GetOverlaps(ref ray, maximumLength, outputOverlappedElements);
-                ray.Intersects(ref ChildB.BoundingBox, out result);
-                if (result != null && result < maximumLength)
+                if (ray.Intersects(ref ChildB.BoundingBox, out result) && result < maximumLength)
                     ChildB.GetOverlaps(ref ray, maximumLength, outputOverlappedElements);
             }
 
