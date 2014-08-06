@@ -52,8 +52,8 @@ namespace BEPUphysics.Character
             foreach (var collidable in characterBody.CollisionInformation.OverlappedCollidables)
             {
                 //Check to see if the collidable is hit by the ray.
-                float? t = ray.Intersects(collidable.BoundingBox);
-                if (t != null && t < length)
+                float t;
+                if (ray.Intersects(ref collidable.boundingBox, out t) && t < length)
                 {
                     //Is it an earlier hit than the current earliest?
                     RayHit hit;
@@ -85,8 +85,8 @@ namespace BEPUphysics.Character
             foreach (var collidable in characterBody.CollisionInformation.OverlappedCollidables)
             {
                 //Check to see if the collidable is hit by the ray.
-                float? t = ray.Intersects(collidable.BoundingBox);
-                if (t != null && t < length)
+                float t;
+                if (ray.Intersects(ref collidable.boundingBox, out t) && t < length)
                 {
                     //Is it an earlier hit than the current earliest?
                     RayHit hit;
@@ -114,8 +114,8 @@ namespace BEPUphysics.Character
             foreach (var collidable in characterBody.CollisionInformation.OverlappedCollidables)
             {
                 //Check to see if the collidable is hit by the ray.
-                float? t = ray.Intersects(collidable.BoundingBox);
-                if (t != null && t < length)
+                float t;
+                if (ray.Intersects(ref collidable.boundingBox, out t) && t < length)
                 {
                     RayHit hit;
                     if (collidable.RayCast(ray, length, SupportRayFilter, out hit))
@@ -139,7 +139,7 @@ namespace BEPUphysics.Character
         /// <param name="supportContacts">Output contacts that would provide support.</param>
         /// <param name="sideContacts">Output contacts on the sides of the query object.</param>
         /// <param name="headContacts">Output contacts on the head of the query object.</param>
-        public void QueryContacts(EntityCollidable queryObject, 
+        public void QueryContacts(EntityCollidable queryObject,
             ref QuickList<CharacterContact> tractionContacts, ref QuickList<CharacterContact> supportContacts, ref QuickList<CharacterContact> sideContacts, ref QuickList<CharacterContact> headContacts)
         {
             var downDirection = characterBody.orientationMatrix.Down;
@@ -176,7 +176,7 @@ namespace BEPUphysics.Character
 
         }
 
-      
+
 
         /// <summary>
         /// Analyzes the support state of the character based on the speculative input support and traction contacts.

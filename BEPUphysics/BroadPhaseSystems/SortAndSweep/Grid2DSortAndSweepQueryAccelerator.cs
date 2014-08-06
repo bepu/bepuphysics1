@@ -87,10 +87,9 @@ namespace BEPUphysics.BroadPhaseSystems.SortAndSweep
                     for (int i = 0; i < cell.entries.Count 
                         && cell.entries.Elements[i].item.boundingBox.Min.X <= endingX; i++) //TODO: Try additional x axis pruning?
                     {
-                        float? intersects;
                         var item = cell.entries.Elements[i].item;
-                        ray.Intersects(ref item.boundingBox, out intersects);
-                        if (intersects != null && intersects < maximumLength && !outputIntersections.Contains(item))
+                        float t;
+                        if (ray.Intersects(ref item.boundingBox, out t) && t < maximumLength && !outputIntersections.Contains(item))
                         {
                             outputIntersections.Add(item);
                         }

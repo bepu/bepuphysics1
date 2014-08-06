@@ -171,9 +171,8 @@ namespace BEPUphysics.DataStructures
         {
             if (root != null)
             {
-                float? result;
-                ray.Intersects(ref root.BoundingBox, out result);
-                if (result != null)
+                float result;
+                if (ray.Intersects(ref root.BoundingBox, out result))
                     root.GetOverlaps(ref ray, float.MaxValue, outputOverlappedElements);
             }
             return outputOverlappedElements.Count > 0;
@@ -189,9 +188,8 @@ namespace BEPUphysics.DataStructures
         {
             if (root != null)
             {
-                float? result;
-                ray.Intersects(ref root.BoundingBox, out result);
-                if (result != null)
+                float result;
+                if (ray.Intersects(ref root.BoundingBox, out result))
                     root.GetOverlaps(ref ray, maximumLength, outputOverlappedElements);
             }
             return outputOverlappedElements.Count > 0;
@@ -311,12 +309,10 @@ namespace BEPUphysics.DataStructures
 
             internal override void GetOverlaps(ref Ray ray, float maximumLength, IList<T> outputOverlappedElements)
             {
-                float? result;
-                ray.Intersects(ref childA.BoundingBox, out result);
-                if (result != null && result < maximumLength)
+                float result;
+                if (ray.Intersects(ref childA.BoundingBox, out result) && result < maximumLength)
                     childA.GetOverlaps(ref ray, maximumLength, outputOverlappedElements);
-                ray.Intersects(ref childB.BoundingBox, out result);
-                if (result != null && result < maximumLength)
+                if (ray.Intersects(ref childB.BoundingBox, out result) && result < maximumLength)
                     childB.GetOverlaps(ref ray, maximumLength, outputOverlappedElements);
             }
 
@@ -329,10 +325,10 @@ namespace BEPUphysics.DataStructures
                     //If it's a leaf, go deeper in our hierarchy, but not the opposition.
                     childA.BoundingBox.Intersects(ref opposingNode.BoundingBox, out intersects);
                     if (intersects)
-                        childA.GetOverlaps<TElement>(opposingNode, outputOverlappedElements);
+                        childA.GetOverlaps(opposingNode, outputOverlappedElements);
                     childB.BoundingBox.Intersects(ref opposingNode.BoundingBox, out intersects);
                     if (intersects)
-                        childB.GetOverlaps<TElement>(opposingNode, outputOverlappedElements);
+                        childB.GetOverlaps(opposingNode, outputOverlappedElements);
                 }
                 else
                 {
@@ -341,16 +337,16 @@ namespace BEPUphysics.DataStructures
                     //If it's not a leaf, try to go deeper in both hierarchies.
                     childA.BoundingBox.Intersects(ref opposingChildA.BoundingBox, out intersects);
                     if (intersects)
-                        childA.GetOverlaps<TElement>(opposingChildA, outputOverlappedElements);
+                        childA.GetOverlaps(opposingChildA, outputOverlappedElements);
                     childA.BoundingBox.Intersects(ref opposingChildB.BoundingBox, out intersects);
                     if (intersects)
-                        childA.GetOverlaps<TElement>(opposingChildB, outputOverlappedElements);
+                        childA.GetOverlaps(opposingChildB, outputOverlappedElements);
                     childB.BoundingBox.Intersects(ref opposingChildA.BoundingBox, out intersects);
                     if (intersects)
-                        childB.GetOverlaps<TElement>(opposingChildA, outputOverlappedElements);
+                        childB.GetOverlaps(opposingChildA, outputOverlappedElements);
                     childB.BoundingBox.Intersects(ref opposingChildB.BoundingBox, out intersects);
                     if (intersects)
-                        childB.GetOverlaps<TElement>(opposingChildB, outputOverlappedElements);
+                        childB.GetOverlaps(opposingChildB, outputOverlappedElements);
 
 
                 }
