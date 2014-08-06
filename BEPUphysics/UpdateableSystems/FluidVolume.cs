@@ -325,9 +325,10 @@ namespace BEPUphysics.UpdateableSystems
                 GetBuoyancyInformation(entityCollidable, out submergedVolume, out submergedCenter);
 
                 if (submergedVolume > 0)
-                {              
+                {
 
-                    float fractionSubmerged = submergedVolume / entityCollidable.entity.CollisionInformation.Shape.Volume;
+                    //The approximation can sometimes output a volume greater than the shape itself. Don't let that error seep into usage.
+                    float fractionSubmerged = Math.Min(1, submergedVolume / entityCollidable.entity.CollisionInformation.Shape.Volume);
 
                     //Divide the volume by the density multiplier if present.
                     float densityMultiplier;
@@ -337,7 +338,7 @@ namespace BEPUphysics.UpdateableSystems
                     }
                     Vector3 force;
                     Vector3.Multiply(ref upVector, -gravity * Density * dt * submergedVolume, out force);
-                    entityCollidable.entity.ApplyImpulse(ref submergedCenter, ref force);
+                    entityCollidable.entity.ApplyImpulseWithoutActivating(ref submergedCenter, ref force);
 
                     //Flow
                     if (FlowForce != 0)
