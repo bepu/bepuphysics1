@@ -623,7 +623,7 @@ namespace BEPUphysics.Entities
         protected internal void Initialize(EntityCollidable collisionInformation, float mass, Matrix3x3 inertiaTensor)
         {
             CollisionInformation = collisionInformation;
-            
+
             if (mass > 0)
                 BecomeDynamic(mass, inertiaTensor);
             else
@@ -689,23 +689,34 @@ namespace BEPUphysics.Entities
         {
             if (isDynamic)
             {
-                ApplyLinearImpulse(ref impulse);
-#if WINDOWS
-                Vector3 positionDifference;
-#else
-                Vector3 positionDifference = new Vector3();
-#endif
-                positionDifference.X = location.X - position.X;
-                positionDifference.Y = location.Y - position.Y;
-                positionDifference.Z = location.Z - position.Z;
-
-                Vector3 cross;
-                Vector3.Cross(ref positionDifference, ref impulse, out cross);
-                ApplyAngularImpulse(ref cross);
-
+                ApplyImpulseWithoutActivating(ref location, ref impulse);
                 activityInformation.Activate();
             }
         }
+
+        ///<summary>
+        /// Applies an impulse to the entity without activating the entity.
+        ///</summary>
+        ///<param name="location">Location to apply the impulse.</param>
+        ///<param name="impulse">Impulse to apply.</param>
+        public void ApplyImpulseWithoutActivating(ref Vector3 location, ref Vector3 impulse)
+        {
+            ApplyLinearImpulse(ref impulse);
+#if WINDOWS
+            Vector3 positionDifference;
+#else
+            Vector3 positionDifference = new Vector3();
+#endif
+            positionDifference.X = location.X - position.X;
+            positionDifference.Y = location.Y - position.Y;
+            positionDifference.Z = location.Z - position.Z;
+
+            Vector3 cross;
+            Vector3.Cross(ref positionDifference, ref impulse, out cross);
+            ApplyAngularImpulse(ref cross);
+
+        }
+
 
         //These methods are very direct and quick.  They don't activate the object or anything.
         /// <summary>
@@ -899,7 +910,7 @@ namespace BEPUphysics.Entities
 
             linearDampingBoost = 0;
             angularDampingBoost = 0;
-            
+
             //Update world inertia tensors.
             Matrix3x3 multiplied;
             Matrix3x3.MultiplyTransposed(ref orientationMatrix, ref localInertiaTensorInverse, out multiplied);
