@@ -72,7 +72,7 @@ namespace BEPUutilities
         /// <returns>Length of the vector.</returns>
         public float Length()
         {
-            return (float)System.Math.Sqrt(X * X + Y * Y + Z * Z);
+            return (float)Math.Sqrt(X * X + Y * Y + Z * Z);
         }
 
         /// <summary>
@@ -80,7 +80,7 @@ namespace BEPUutilities
         /// </summary>
         public void Normalize()
         {
-            float inverse = (float)(1 / System.Math.Sqrt(X * X + Y * Y + Z * Z));
+            float inverse = (float)(1 / Math.Sqrt(X * X + Y * Y + Z * Z));
             X *= inverse;
             Y *= inverse;
             Z *= inverse;
@@ -152,6 +152,20 @@ namespace BEPUutilities
             result.Y = v.Y * scale;
             result.Z = v.Z * scale;
         }
+
+        /// <summary>
+        /// Multiplies two vectors on a per-component basis.
+        /// </summary>
+        /// <param name="a">First vector to multiply.</param>
+        /// <param name="b">Second vector to multiply.</param>
+        /// <param name="result">Result of the componentwise multiplication.</param>
+        public static void Multiply(ref Vector3 a, ref Vector3 b, out Vector3 result)
+        {
+            result.X = a.X * b.X;
+            result.Y = a.Y * b.Y;
+            result.Z = a.Z * b.Z;
+        }
+
         /// <summary>
         /// Divides a vector's components by some amount.
         /// </summary>
@@ -179,6 +193,7 @@ namespace BEPUutilities
             toReturn.Z = v.Z * f;
             return toReturn;
         }
+
         /// <summary>
         /// Scales a vector.
         /// </summary>
@@ -192,6 +207,19 @@ namespace BEPUutilities
             toReturn.Y = v.Y * f;
             toReturn.Z = v.Z * f;
             return toReturn;
+        }
+
+        /// <summary>
+        /// Multiplies two vectors on a per-component basis.
+        /// </summary>
+        /// <param name="a">First vector to multiply.</param>
+        /// <param name="b">Second vector to multiply.</param>
+        /// <returns>Result of the componentwise multiplication.</returns>
+        public static Vector3 operator *(Vector3 a, Vector3 b)
+        {
+            Vector3 result;
+            Multiply(ref a, ref b, out result);
+            return result;
         }
 
         /// <summary>

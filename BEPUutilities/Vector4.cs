@@ -221,6 +221,23 @@ namespace BEPUutilities
             result.Z = v.Z * scale;
             result.W = v.W * scale;
         }
+
+
+        /// <summary>
+        /// Multiplies two vectors on a per-component basis.
+        /// </summary>
+        /// <param name="a">First vector to multiply.</param>
+        /// <param name="b">Second vector to multiply.</param>
+        /// <param name="result">Result of the componentwise multiplication.</param>
+        public static void Multiply(ref Vector4 a, ref Vector4 b, out Vector4 result)
+        {
+            result.X = a.X * b.X;
+            result.Y = a.Y * b.Y;
+            result.Z = a.Z * b.Z;
+            result.W = a.W * b.W;
+        }
+
+
         /// <summary>
         /// Divides a vector's components by some amount.
         /// </summary>
@@ -265,6 +282,21 @@ namespace BEPUutilities
             toReturn.W = v.W * f;
             return toReturn;
         }
+
+
+        /// <summary>
+        /// Multiplies two vectors on a per-component basis.
+        /// </summary>
+        /// <param name="a">First vector to multiply.</param>
+        /// <param name="b">Second vector to multiply.</param>
+        /// <returns>Result of the componentwise multiplication.</returns>
+        public static Vector4 operator *(Vector4 a, Vector4 b)
+        {
+            Vector4 result;
+            Multiply(ref a, ref b, out result);
+            return result;
+        }
+
 
         /// <summary>
         /// Divides a vector's components by some amount.
