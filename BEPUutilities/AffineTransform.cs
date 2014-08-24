@@ -1,4 +1,4 @@
-﻿ 
+﻿
 
 namespace BEPUutilities
 {
@@ -20,9 +20,29 @@ namespace BEPUutilities
         /// Constructs a new affine transform.
         ///</summary>
         ///<param name="translation">Translation to use in the transform.</param>
-        public AffineTransform(Vector3 translation)
+        public AffineTransform(ref Vector3 translation)
         {
             LinearTransform = Matrix3x3.Identity;
+            Translation = translation;
+        }
+
+        ///<summary>
+        /// Constructs a new affine transform.
+        ///</summary>
+        ///<param name="translation">Translation to use in the transform.</param>
+        public AffineTransform(Vector3 translation)
+            : this(ref translation)
+        {
+        }
+
+        ///<summary>
+        /// Constructs a new affine tranform.
+        ///</summary>
+        ///<param name="orientation">Orientation to use as the linear transform.</param>
+        ///<param name="translation">Translation to use in the transform.</param>
+        public AffineTransform(ref Quaternion orientation, ref Vector3 translation)
+        {
+            Matrix3x3.CreateFromQuaternion(ref orientation, out LinearTransform);
             Translation = translation;
         }
 
@@ -32,9 +52,8 @@ namespace BEPUutilities
         ///<param name="orientation">Orientation to use as the linear transform.</param>
         ///<param name="translation">Translation to use in the transform.</param>
         public AffineTransform(Quaternion orientation, Vector3 translation)
+            : this(ref orientation, ref translation)
         {
-            Matrix3x3.CreateFromQuaternion(ref orientation, out LinearTransform);
-            Translation = translation;
         }
 
         ///<summary>
@@ -43,7 +62,7 @@ namespace BEPUutilities
         ///<param name="scaling">Scaling to apply in the linear transform.</param>
         ///<param name="orientation">Orientation to apply in the linear transform.</param>
         ///<param name="translation">Translation to apply.</param>
-        public AffineTransform(Vector3 scaling, Quaternion orientation, Vector3 translation)
+        public AffineTransform(ref Vector3 scaling, ref Quaternion orientation, ref Vector3 translation)
         {
             //Create an SRT transform.
             Matrix3x3.CreateScale(ref scaling, out LinearTransform);
@@ -56,13 +75,34 @@ namespace BEPUutilities
         ///<summary>
         /// Constructs a new affine transform.
         ///</summary>
+        ///<param name="scaling">Scaling to apply in the linear transform.</param>
+        ///<param name="orientation">Orientation to apply in the linear transform.</param>
+        ///<param name="translation">Translation to apply.</param>
+        public AffineTransform(Vector3 scaling, Quaternion orientation, Vector3 translation)
+            : this(ref scaling, ref orientation, ref translation)
+        {
+        }
+
+        ///<summary>
+        /// Constructs a new affine transform.
+        ///</summary>
         ///<param name="linearTransform">The linear transform component.</param>
         ///<param name="translation">Translation component of the transform.</param>
-        public AffineTransform(Matrix3x3 linearTransform, Vector3 translation)
+        public AffineTransform(ref Matrix3x3 linearTransform, ref Vector3 translation)
         {
             LinearTransform = linearTransform;
             Translation = translation;
 
+        }
+
+        ///<summary>
+        /// Constructs a new affine transform.
+        ///</summary>
+        ///<param name="linearTransform">The linear transform component.</param>
+        ///<param name="translation">Translation component of the transform.</param>
+        public AffineTransform(Matrix3x3 linearTransform, Vector3 translation)
+            : this(ref linearTransform, ref translation)
+        {
         }
 
         ///<summary>

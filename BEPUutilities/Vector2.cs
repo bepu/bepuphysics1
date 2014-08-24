@@ -91,6 +91,18 @@ namespace BEPUutilities
         }
 
         /// <summary>
+        /// Multiplies two vectors on a per-component basis.
+        /// </summary>
+        /// <param name="a">First vector to multiply.</param>
+        /// <param name="b">Second vector to multiply.</param>
+        /// <param name="result">Result of the componentwise multiplication.</param>
+        public static void Multiply(ref Vector2 a, ref Vector2 b, out Vector2 result)
+        {
+            result.X = a.X * b.X;
+            result.Y = a.Y * b.Y;
+        }
+
+        /// <summary>
         /// Divides a vector's components by some amount.
         /// </summary>
         /// <param name="v">Vector to divide.</param>
@@ -303,6 +315,19 @@ namespace BEPUutilities
             toReturn.X = v.X * f;
             toReturn.Y = v.Y * f;
             return toReturn;
+        }
+
+        /// <summary>
+        /// Multiplies two vectors on a per-component basis.
+        /// </summary>
+        /// <param name="a">First vector to multiply.</param>
+        /// <param name="b">Second vector to multiply.</param>
+        /// <returns>Result of the componentwise multiplication.</returns>
+        public static Vector2 operator *(Vector2 a, Vector2 b)
+        {
+            Vector2 result;
+            Multiply(ref a, ref b, out result);
+            return result;
         }
 
         /// <summary>
