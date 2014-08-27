@@ -213,7 +213,7 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
         /// <summary>
         /// Adds an entry to the hierarchy.
         /// </summary>
-        /// <param name="entry">Entry to remove.</param>
+        /// <param name="entry">Entry to add.</param>
         public override void Add(BroadPhaseEntry entry)
         {
             base.Add(entry);
