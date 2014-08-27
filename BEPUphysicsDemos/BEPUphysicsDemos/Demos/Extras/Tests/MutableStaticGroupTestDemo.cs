@@ -1,6 +1,7 @@
 ﻿using BEPUphysics.Entities.Prefabs;
 using BEPUutilities;
 using BEPUphysics.CollisionShapes;
+using BEPUutilities.DataStructures;
 using Microsoft.Xna.Framework.Graphics;
 using BEPUphysics.BroadPhaseEntries;
 using System;
@@ -8,18 +9,18 @@ using BEPUphysics.CollisionShapes.ConvexShapes;
 using System.Collections.Generic;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 
-namespace BEPUphysicsDemos.Demos
+namespace BEPUphysicsDemos.Demos.Extras.Tests
 {
     /// <summary>
-    /// Demo showing a whole bunch of efficient static geometry.
+    /// Demo showing a whole bunch of efficient static geometry that gets shuffled in and out of the StaticGroup at load time.
     /// </summary>
-    public class StaticGroupDemo : StandardDemo
+    public class MutableStaticGroupTestDemo : StandardDemo
     {
         /// <summary>
         /// Constructs a new demo.
         /// </summary>
         /// <param name="game">Game owning this demo.</param>
-        public StaticGroupDemo(DemosGame game)
+        public MutableStaticGroupTestDemo(DemosGame game)
             : base(game)
         {
 
@@ -114,9 +115,35 @@ namespace BEPUphysicsDemos.Demos
             collidables.Add(ground);
 
             var group = new StaticGroup(collidables);
-            for (int i = 0; i < collidables.Count; ++i)
+            var removed = new RawList<Collidable>();
+            var contained = new RawList<Collidable>();
+            group.Shape.CollidableTree.CollectLeaves(contained);
+            for (int i = 0; i < 100000; ++i)
             {
-                game.ModelDrawer.Add(collidables[i]);
+                for (int collidableIndex = contained.Count - 1; collidableIndex >= 0; --collidableIndex)
+                {
+                    if (random.NextDouble() < 0.6)
+                    {
+                        group.Shape.Remove(contained[collidableIndex]);
+                        removed.Add(contained[collidableIndex]);
+                        contained.FastRemoveAt(collidableIndex);
+                    }
+                }
+
+                for (int collidableIndex = removed.Count - 1; collidableIndex >= 0; --collidableIndex)
+                {
+                    if (random.NextDouble() < 0.4)
+                    {
+                        group.Shape.Add(removed[collidableIndex]);
+                        contained.Add(removed[collidableIndex]);
+                        removed.FastRemoveAt(collidableIndex);
+                    }
+                }
+            }
+
+            for (int i = 0; i < contained.Count; ++i)
+            {
+                game.ModelDrawer.Add(contained[i]);
             }
             Space.Add(group);
 

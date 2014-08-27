@@ -50,6 +50,24 @@ namespace BEPUphysics.CollisionShapes
             //Rather than hooking up a bunch of ShapeChanged events here that don't capture the full capacity of change
             //in our child collidables, we will rely on the user telling the collidable tree to reformat itself directly.
         }
+        
+        /// <summary>
+        /// Adds a new collidable to the group.
+        /// </summary>
+        /// <param name="collidable">Collidable to remove.</param>
+        public void Add(Collidable collidable)
+        {
+            CollidableTree.Add(collidable);
+        }
+
+        /// <summary>
+        /// Removes a collidable from the group.
+        /// </summary>
+        /// <param name="collidable">Collidable to remove.</param>
+        public void Remove(Collidable collidable)
+        {
+            CollidableTree.Remove(collidable);
+        }
 
 
         /// <summary>

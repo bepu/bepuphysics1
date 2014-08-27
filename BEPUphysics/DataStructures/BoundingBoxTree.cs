@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using BEPUphysics.BroadPhaseSystems;
 using BEPUutilities;
 
@@ -23,7 +24,7 @@ namespace BEPUphysics.DataStructures
             }
         }
 
-        Node root;
+        private Node root;
 
 
         /// <summary>
@@ -35,10 +36,10 @@ namespace BEPUphysics.DataStructures
             Reconstruct(elements);
         }
 
-
         /// <summary>
-        /// Reconstructs the tree based on the current data.
+        /// Reconstructs the tree using the given elements.
         /// </summary>
+        /// <param name="elements">Elements to fill the tree with.</param>
         public void Reconstruct(IList<T> elements)
         {
             root = null;
@@ -62,7 +63,7 @@ namespace BEPUphysics.DataStructures
                 root.Refit();
         }
 
-        void Analyze(out List<int> depths, out int minDepth, out int maxDepth, out int nodeCount)
+        private void Analyze(out List<int> depths, out int minDepth, out int maxDepth, out int nodeCount)
         {
             depths = new List<int>();
             nodeCount = 0;
@@ -104,9 +105,22 @@ namespace BEPUphysics.DataStructures
                     //The caller is responsible for the merge.
                     BoundingBox.CreateMerged(ref node.BoundingBox, ref root.BoundingBox, out root.BoundingBox);
                     Node treeNode = root;
-                    while (!treeNode.TryToInsert(node, out treeNode)) ;//TryToInsert returns the next node, if any, and updates node bounding box.
+                    while (!treeNode.TryToInsert(node, out treeNode)) ; //TryToInsert returns the next node, if any, and updates node bounding box.
                 }
             }
+        }
+
+        /// <summary>
+        /// Removes an element from the tree.
+        /// </summary>
+        /// <param name="element">Element to remove.</param>
+        public void Remove(T element)
+        {
+            if (root == null || (!root.Remove(element, out root) && !root.RemoveBrute(element, out root)))
+            {
+                throw new ArgumentException("Element is not present in the tree.");
+            }
+
         }
 
         /// <summary>
@@ -214,6 +228,17 @@ namespace BEPUphysics.DataStructures
             return outputOverlappedElements.Count > 0;
         }
 
+
+        /// <summary>
+        /// Adds all leaves in the tree to the given list.
+        /// </summary>
+        /// <param name="outputCollidables">List to hold the leaves of the tree.</param>
+        public void CollectLeaves(IList<T> outputCollidables)
+        {
+            if (root != null)
+                root.CollectLeaves(outputCollidables);
+        }
+
         internal abstract class Node
         {
             internal BoundingBox BoundingBox;
@@ -236,6 +261,12 @@ namespace BEPUphysics.DataStructures
             internal abstract void Analyze(List<int> depths, int depth, ref int nodeCount);
 
             internal abstract void Refit();
+
+            internal abstract bool Remove(T element, out Node replacementNode);
+
+            internal abstract bool RemoveBrute(T toRemove, out Node replacementNode);
+
+            internal abstract void CollectLeaves(IList<T> outputLeaves);
         }
 
         internal sealed class InternalNode : Node
@@ -462,6 +493,85 @@ namespace BEPUphysics.DataStructures
                 childB.Refit();
                 BoundingBox.CreateMerged(ref childA.BoundingBox, ref childB.BoundingBox, out BoundingBox);
             }
+
+
+            internal override bool RemoveBrute(T entry, out Node replacementNode)
+            {
+                if (childA.RemoveBrute(entry, out replacementNode))
+                {
+                    if (childA.IsLeaf)
+                        replacementNode = childB;
+                    else
+                    {
+                        //It was not a leaf node, but a child found the leaf.
+                        //Change the child to the replacement node.
+                        childA = replacementNode;
+                        replacementNode = this; //We don't need to be replaced!
+                    }
+                    return true;
+
+                }
+                if (childB.RemoveBrute(entry, out replacementNode))
+                {
+                    if (childB.IsLeaf)
+                        replacementNode = childA;
+                    else
+                    {
+                        //It was not a leaf node, but a child found the leaf.
+                        //Change the child to the replacement node.
+                        childB = replacementNode;
+                        replacementNode = this; //We don't need to be replaced!
+                    }
+                    return true;
+                }
+                replacementNode = this;
+                return false;
+            }
+
+            internal override bool Remove(T entry, out Node replacementNode)
+            {
+                var boundingBox = entry.BoundingBox;
+                //Only bother checking deeper in the path if the entry and child have overlapping bounding boxes.
+                bool intersects;
+                childA.BoundingBox.Intersects(ref boundingBox, out intersects);
+                if (intersects && childA.Remove(entry, out replacementNode))
+                {
+                    if (childA.IsLeaf)
+                        replacementNode = childB;
+                    else
+                    {
+                        //It was not a leaf node, but a child found the leaf.
+                        //Change the child to the replacement node.
+                        childA = replacementNode;
+                        replacementNode = this; //We don't need to be replaced!
+                    }
+                    return true;
+
+                }
+                childB.BoundingBox.Intersects(ref boundingBox, out intersects);
+                if (intersects && childB.Remove(entry, out replacementNode))
+                {
+                    if (childB.IsLeaf)
+                        replacementNode = childA;
+                    else
+                    {
+                        //It was not a leaf node, but a child found the leaf.
+                        //Change the child to the replacement node.
+                        childB = replacementNode;
+                        replacementNode = this; //We don't need to be replaced!
+                    }
+                    return true;
+                }
+                replacementNode = this;
+                return false;
+            }
+
+            internal override void CollectLeaves(IList<T> outputLeaves)
+            {
+                childA.CollectLeaves(outputLeaves);
+                childB.CollectLeaves(outputLeaves);
+            }
+
         }
 
         /// <summary>
@@ -588,6 +698,25 @@ namespace BEPUphysics.DataStructures
                 BoundingBox.Min.X -= LeafMargin;
                 BoundingBox.Min.Y -= LeafMargin;
                 BoundingBox.Min.Z -= LeafMargin;
+            }
+
+            internal override bool RemoveBrute(T entry, out Node replacementNode)
+            {
+                return Remove(entry, out replacementNode);
+            }
+            internal override bool Remove(T entry, out Node replacementNode)
+            {
+                replacementNode = null;
+                if (EqualityComparer<T>.Default.Equals(element, entry))
+                {
+                    return true;
+                }
+                return false;
+            }
+
+            internal override void CollectLeaves(IList<T> outputLeaves)
+            {
+                outputLeaves.Add(element);
             }
         }
 
