@@ -723,29 +723,31 @@ namespace BEPUutilities
 #if !WINDOWS
             axis = new Vector3();
 #endif
-            float qx = q.X;
-            float qy = q.Y;
-            float qz = q.Z;
             float qw = q.W;
-            if (qw < 0)
+            if (qw > 0)
             {
-                qx = -qx;
-                qy = -qy;
-                qz = -qz;
-                qw = -qw;
-            }
-            if (qw > 1 - 1e-6)
-            {
-                axis = Toolbox.UpVector;
-                angle = 0;
+                axis.X = q.X;
+                axis.Y = q.Y;
+                axis.Z = q.Z;
             }
             else
             {
-                angle = 2 * (float)Math.Acos(qw);
-                float denominator = 1 / (float)Math.Sqrt(1 - qw * qw);
-                axis.X = qx * denominator;
-                axis.Y = qy * denominator;
-                axis.Z = qz * denominator;
+                axis.X = -q.X;
+                axis.Y = -q.Y;
+                axis.Z = -q.Z;
+                qw = -qw;
+            }
+
+            float lengthSquared = axis.LengthSquared();
+            if (lengthSquared > 1e-14f)
+            {
+                Vector3.Divide(ref axis, (float)Math.Sqrt(lengthSquared), out axis);
+                angle = 2 * (float)Math.Acos(MathHelper.Clamp(qw, -1, 1));
+            }
+            else
+            {
+                axis = Toolbox.UpVector;
+                angle = 0;
             }
         }
 

@@ -45,12 +45,15 @@ namespace BEPUphysicsDemos.Demos.Extras.SolverTypeTests
         }
 
 
-        public override void Preupdate(float inverseDt)
+        public override void Preupdate(float inverseDt, bool useConstraintCounts)
         {
             float d;
             Vector3.Dot(ref plane.Normal, ref Dynamic.Position, out d);
 
-            effectiveMass = 1 / (Dynamic.ConstraintCount * Dynamic.InverseMass + Softness);
+            if (useConstraintCounts)
+                effectiveMass = 1 / (Dynamic.ConstraintCount * Dynamic.InverseMass + Softness);
+            else
+                effectiveMass = 1 / (Dynamic.InverseMass + Softness);
 
             float error = d + plane.D;
             if (error > 0)

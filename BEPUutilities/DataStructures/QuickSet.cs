@@ -79,7 +79,7 @@ namespace BEPUutilities.DataStructures
         /// <param name="elementPool">Pool from which to retrieve typed arrays.</param>
         /// <param name="initialElementPoolIndex">Initial pool index to pull the object buffer from. The size of the initial buffer will be 2^initialElementPoolIndex.</param>
         /// <param name="tableSizePower">Initial pool index to pull the object buffer from. The size of the initial table buffer will be 2^(initialElementPoolIndex + tableSizePower).</param>
-        public QuickSet(BufferPool<T> elementPool, BufferPool<int> tablePool, int initialElementPoolIndex = 2, int tableSizePower = 5)
+        public QuickSet(BufferPool<T> elementPool, BufferPool<int> tablePool, int initialElementPoolIndex = 2, int tableSizePower = 3)
         {
             if (tableSizePower <= 0)
                 throw new ArgumentException("The hash table must be larger than the element array.", "tableSizePower");

@@ -9,7 +9,7 @@ namespace BEPUphysicsDemos.Demos.Extras.SolverTypeTests
 
         private void Preupdate(int i)
         {
-            constraints.Elements[i].Preupdate(inverseDt);
+            constraints.Elements[i].Preupdate(inverseDt, true);
         }
 
         private void ApplyAccumulatedImpulses(int i)
@@ -62,7 +62,7 @@ namespace BEPUphysicsDemos.Demos.Extras.SolverTypeTests
             var solverStartTime = Stopwatch.GetTimestamp();
             foreach (var constraint in constraints)
             {
-                constraint.Preupdate(inverseDt);
+                constraint.Preupdate(inverseDt, true);
             }
             for (int i = 0; i < dynamics.Count; ++i)
             {

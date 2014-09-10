@@ -12,7 +12,7 @@ namespace BEPUphysicsDemos.Demos.Extras.SolverTypeTests
         public float Softness = 0f;
         public float BiasFactor = 0.2f;
 
-        public abstract void Preupdate(float inverseDt);
+        public abstract void Preupdate(float inverseDt, bool useConstraintCounts);
 
         public abstract void SolveIteration();
 
