@@ -9,7 +9,7 @@ namespace BEPUphysicsDemos.Demos.Extras.SolverTypeTests
 
         private void Preupdate(int i)
         {
-            constraints.Elements[i].Preupdate(inverseDt);
+            constraints.Elements[i].Preupdate(inverseDt, false);
         }
 
         private void ApplyAccumulatedImpulses(int i)

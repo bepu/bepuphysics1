@@ -34,7 +34,7 @@ namespace BEPUphysicsDemos.Demos.Extras.SolverTypeTests
             distance = (a.Position - b.Position).Length();
         }
 
-        public override void Preupdate(float inverseDt)
+        public override void Preupdate(float inverseDt, bool useConstraintCounts)
         {
             Vector3.Subtract(ref B.Position, ref A.Position, out jacobian);
             float currentDistance = jacobian.LengthSquared();
@@ -48,9 +48,11 @@ namespace BEPUphysicsDemos.Demos.Extras.SolverTypeTests
                 currentDistance = 0;
                 jacobian = Toolbox.UpVector;
             }
-            
-            effectiveMass = 1 / (A.ConstraintCount * A.InverseMass + B.ConstraintCount * B.InverseMass + Softness);
 
+            if (useConstraintCounts)
+                effectiveMass = 1f / (A.ConstraintCount * A.InverseMass + B.ConstraintCount * B.InverseMass + Softness);
+            else
+                effectiveMass = 1f / (A.InverseMass + B.InverseMass + Softness);
             accumulatedImpulse = 0;
             biasVelocity = (distance - currentDistance) * BiasFactor * inverseDt;
 
