@@ -22,7 +22,7 @@ namespace BEPUutilities.ResourceManagement
 #endif
 
         /// <summary>
-        /// Constructs a new resource buffer pool and checks the pool type to ensure that it is unmanaged.
+        /// Constructs a new resource buffer pool.
         /// </summary>
         public BufferPool()
         {
