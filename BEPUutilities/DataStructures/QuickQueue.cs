@@ -113,7 +113,7 @@ namespace BEPUutilities.DataStructures
             this = new QuickQueue<T>(pool, newPoolIndex);
             count = oldList.Count;
             //Copy the old first-end to the first part of the new array.
-            Array.Copy(oldList.Elements, oldList.firstIndex, Elements, 0, oldList.Elements.Length - firstIndex);
+            Array.Copy(oldList.Elements, oldList.firstIndex, Elements, 0, oldList.Elements.Length - oldList.firstIndex);
             //Copy the old begin-first to the second part of the new array.
             Array.Copy(oldList.Elements, 0, Elements, oldList.Elements.Length - firstIndex, firstIndex);
 
