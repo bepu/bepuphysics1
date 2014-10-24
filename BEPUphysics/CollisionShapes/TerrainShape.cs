@@ -655,8 +655,8 @@ namespace BEPUphysics.CollisionShapes
                 else
                 {
                     a = new TerrainVertexIndices { ColumnIndex = columnIndex, RowIndex = rowIndex };
-                    b = new TerrainVertexIndices { ColumnIndex = columnIndex, RowIndex = rowIndex + 1 };
-                    c = new TerrainVertexIndices { ColumnIndex = columnIndex + 1, RowIndex = rowIndex + 1 };
+                    b = new TerrainVertexIndices { ColumnIndex = columnIndex + 1, RowIndex = rowIndex + 1 };
+                    c = new TerrainVertexIndices { ColumnIndex = columnIndex, RowIndex = rowIndex + 1 };
                 }
             }
         }

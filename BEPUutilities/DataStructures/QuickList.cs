@@ -416,7 +416,7 @@ namespace BEPUutilities.DataStructures
 #endif
         public void CopyTo(T[] array, int arrayIndex)
         {
-            Elements.CopyTo(array, arrayIndex);
+            Array.Copy(Elements, 0, array, arrayIndex, Count);
         }
 
 

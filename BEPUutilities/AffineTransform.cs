@@ -247,5 +247,6 @@ namespace BEPUutilities
             Matrix3x3.CreateFromQuaternion(ref rigid.Orientation, out toReturn.LinearTransform);
             return toReturn;
         }
+
     }
 }
