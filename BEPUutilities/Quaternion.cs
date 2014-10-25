@@ -308,7 +308,7 @@ namespace BEPUutilities
                 cosHalfTheta = -cosHalfTheta;
             }
             // If the orientations are similar enough, then just pick one of the inputs.
-            if (cosHalfTheta > .999999)
+            if (cosHalfTheta > (1.0 - 1e-12f))
             {
                 result.W = start.W;
                 result.X = start.X;
@@ -626,12 +626,12 @@ namespace BEPUutilities
         /// <returns>Quaternion representing the axis and angle rotation.</returns>
         public static Quaternion CreateFromAxisAngle(Vector3 axis, float angle)
         {
-            float halfAngle = angle * .5f;
-            float s = (float)Math.Sin(halfAngle);
+            double halfAngle = angle * 0.5;
+            double s = Math.Sin(halfAngle);
             Quaternion q;
-            q.X = axis.X * s;
-            q.Y = axis.Y * s;
-            q.Z = axis.Z * s;
+            q.X = (float)(axis.X * s);
+            q.Y = (float)(axis.Y * s);
+            q.Z = (float)(axis.Z * s);
             q.W = (float)Math.Cos(halfAngle);
             return q;
         }
@@ -644,11 +644,11 @@ namespace BEPUutilities
         /// <param name="q">Quaternion representing the axis and angle rotation.</param>
         public static void CreateFromAxisAngle(ref Vector3 axis, float angle, out Quaternion q)
         {
-            float halfAngle = angle * .5f;
-            float s = (float)Math.Sin(halfAngle);
-            q.X = axis.X * s;
-            q.Y = axis.Y * s;
-            q.Z = axis.Z * s;
+            double halfAngle = angle * 0.5;
+            double s = Math.Sin(halfAngle);
+            q.X = (float)(axis.X * s);
+            q.Y = (float)(axis.Y * s);
+            q.Z = (float)(axis.Z * s);
             q.W = (float)Math.Cos(halfAngle);
         }
 
