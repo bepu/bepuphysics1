@@ -645,6 +645,21 @@ namespace BEPUphysics.Character
         }
 
 
+        /// <summary>
+        /// Gets the accumulated impulse in world space applied to the character.
+        /// </summary>
+        public Vector3 CharacterAccumulatedImpulse
+        {
+            get
+            {
+
+                Vector3 impulse;
+                impulse.X = accumulatedImpulse.X * linearJacobianA1.X + accumulatedImpulse.Y * linearJacobianA2.X;
+                impulse.Y = accumulatedImpulse.X * linearJacobianA1.Y + accumulatedImpulse.Y * linearJacobianA2.Y;
+                impulse.Z = accumulatedImpulse.X * linearJacobianA1.Z + accumulatedImpulse.Y * linearJacobianA2.Z;
+                return impulse;
+            }
+        }
 
     }
 
