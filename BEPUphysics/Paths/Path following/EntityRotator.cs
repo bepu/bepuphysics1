@@ -9,7 +9,7 @@ using BEPUutilities;
 namespace BEPUphysics.Paths.PathFollowing
 {
     /// <summary>
-    /// Pushes an entity around according to goal positions and orientations.
+    /// Changes the angular velocity of an entity to reach goal orientations.
     /// </summary>
     public class EntityRotator : Updateable, IDuringForcesUpdateable
     {
