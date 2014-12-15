@@ -68,7 +68,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
 
         /// <summary>
         /// Gets the basis attached to entity B.
-        /// The primary axis represents the twist axis attached to entity A.
+        /// The primary axis represents the twist axis attached to entity B.
         /// The x axis is projected onto the plane defined by localTransformA's x and y axes
         /// to get the twist angle.
         /// </summary>

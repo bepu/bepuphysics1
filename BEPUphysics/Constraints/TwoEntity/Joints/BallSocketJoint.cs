@@ -338,7 +338,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Joints
             //Turn the velocity into an impulse.
             Matrix3x3.Transform(ref lambda, ref massMatrix, out lambda);
 
-            //ACcumulate the impulse
+            //Accumulate the impulse
             Vector3.Add(ref accumulatedImpulse, ref lambda, out accumulatedImpulse);
 
             //Apply the impulse

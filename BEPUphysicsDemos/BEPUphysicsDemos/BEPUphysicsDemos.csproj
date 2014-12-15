@@ -82,6 +82,7 @@
     <Compile Include="CameraControlScheme.cs" />
     <Compile Include="CharacterCameraControlScheme.cs" />
     <Compile Include="Demos\Extras\Tests\MutableStaticGroupTestDemo.cs" />
+    <Compile Include="Demos\Extras\Tests\TwistTestDemo.cs" />
     <Compile Include="Demos\RagdollDemo.cs" />
     <Compile Include="Demos\Extras\Solver Type Tests\Constraint.cs" />
     <Compile Include="Demos\Extras\Solver Type Tests\SimulatorTestDemo.cs" />

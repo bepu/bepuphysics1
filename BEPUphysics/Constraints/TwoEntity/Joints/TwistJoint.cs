@@ -103,7 +103,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Joints
             {
                 worldAxisB = Vector3.Normalize(value);
                 Quaternion conjugate;
-                Quaternion.Conjugate(ref connectionA.orientation, out conjugate);
+                Quaternion.Conjugate(ref connectionB.orientation, out conjugate);
                 Quaternion.Transform(ref worldAxisB, ref conjugate, out localAxisB);
                 Initialize();
             }
@@ -330,7 +330,11 @@ namespace BEPUphysics.Constraints.TwoEntity.Joints
             }
         }
 
-        private void Initialize()
+        /// <summary>
+        /// Computes the internal bases and target relative state based on the current axes and entity states.
+        /// Called automatically when setting any of the axis properties.
+        /// </summary>
+        public void Initialize()
         {
             //Compute a vector which is perpendicular to the axis.  It'll be added in local space to both connections.
             Vector3 yAxis;
