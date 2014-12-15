@@ -5,6 +5,7 @@ using BEPUphysics.Constraints.SingleEntity;
 using BEPUphysics.Constraints.SolverGroups;
 using BEPUphysics.Constraints.TwoEntity.JointLimits;
 using BEPUphysics.Constraints.TwoEntity.Joints;
+using BEPUphysics.Constraints.TwoEntity.Motors;
 using ConversionHelper;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -38,17 +39,18 @@ namespace BEPUphysicsDrawer.Lines
             lineDrawer = new BasicEffect(game.GraphicsDevice);
 
             //Set up the default type mapping.   
-            myDisplayTypes.Add(typeof (PointOnPlaneJoint), typeof (DisplayPointOnPlaneJoint));
-            myDisplayTypes.Add(typeof (SwivelHingeAngularJoint), typeof (DisplaySwivelHingeAngularJoint));
-            myDisplayTypes.Add(typeof (PointOnLineJoint), typeof (DisplayPointOnLineJoint));
-            myDisplayTypes.Add(typeof (BallSocketJoint), typeof (DisplayBallSocketJoint));
-            myDisplayTypes.Add(typeof (TwistJoint), typeof (DisplayTwistJoint));
-            myDisplayTypes.Add(typeof (DistanceLimit), typeof (DisplayDistanceLimit));
-            myDisplayTypes.Add(typeof (DistanceJoint), typeof (DisplayDistanceJoint));
-            myDisplayTypes.Add(typeof (LinearAxisLimit), typeof (DisplayLinearAxisLimit));
-            myDisplayTypes.Add(typeof (EllipseSwingLimit), typeof (DisplayEllipseSwingLimit));
-            myDisplayTypes.Add(typeof (SingleEntityLinearMotor), typeof (DisplaySingleEntityLinearMotor));
-            myDisplayTypes.Add(typeof (RevoluteLimit), typeof (DisplayRevoluteLimit));
+            myDisplayTypes.Add(typeof(PointOnPlaneJoint), typeof(DisplayPointOnPlaneJoint));
+            myDisplayTypes.Add(typeof(SwivelHingeAngularJoint), typeof(DisplaySwivelHingeAngularJoint));
+            myDisplayTypes.Add(typeof(PointOnLineJoint), typeof(DisplayPointOnLineJoint));
+            myDisplayTypes.Add(typeof(BallSocketJoint), typeof(DisplayBallSocketJoint));
+            myDisplayTypes.Add(typeof(TwistJoint), typeof(DisplayTwistJoint));
+            myDisplayTypes.Add(typeof(TwistMotor), typeof(DisplayTwistMotor));
+            myDisplayTypes.Add(typeof(DistanceLimit), typeof(DisplayDistanceLimit));
+            myDisplayTypes.Add(typeof(DistanceJoint), typeof(DisplayDistanceJoint));
+            myDisplayTypes.Add(typeof(LinearAxisLimit), typeof(DisplayLinearAxisLimit));
+            myDisplayTypes.Add(typeof(EllipseSwingLimit), typeof(DisplayEllipseSwingLimit));
+            myDisplayTypes.Add(typeof(SingleEntityLinearMotor), typeof(DisplaySingleEntityLinearMotor));
+            myDisplayTypes.Add(typeof(RevoluteLimit), typeof(DisplayRevoluteLimit));
 
             blendState = new BlendState();
             blendState.ColorSourceBlend = Blend.SourceAlpha;
@@ -184,7 +186,7 @@ namespace BEPUphysicsDrawer.Lines
                                                     new Type[] { o.GetType(), typeof(LineDrawer) })
                                                     .Invoke(new object[] { o, this });
 #else
-                var objectAdded = (LineDisplayObjectBase) Activator.CreateInstance(displayType, new[] {o, this});
+                var objectAdded = (LineDisplayObjectBase)Activator.CreateInstance(displayType, new[] { o, this });
 #endif
                 displayObjects.Add(objectAdded);
                 return objectAdded;

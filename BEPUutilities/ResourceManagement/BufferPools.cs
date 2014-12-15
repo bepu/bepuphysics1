@@ -9,7 +9,7 @@ namespace BEPUutilities.ResourceManagement
     /// Contains locking and thread static buffer pools for the specified type.
     /// </summary>
     /// <typeparam name="T">Type of element in the buffers stored in the pools.</typeparam>
-    public class BufferPools<T>
+    public static class BufferPools<T>
     {
         /// <summary>
         /// Gets a buffer pool for this type which provides thread safe resource acquisition and return.</summary>
