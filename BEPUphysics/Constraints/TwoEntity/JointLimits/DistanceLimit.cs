@@ -305,7 +305,7 @@ namespace BEPUphysics.Constraints.TwoEntity.JointLimits
             Vector3 separation;
             Vector3.Subtract(ref anchorB, ref anchorA, out separation);
             float distance = separation.Length();
-            if (distance < maximumLength && distance > minimumLength)
+            if (distance <= maximumLength && distance >= minimumLength)
             {
                 isActiveInSolver = false;
                 accumulatedImpulse = 0;

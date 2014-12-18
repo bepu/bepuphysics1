@@ -82,6 +82,9 @@
     <Compile Include="Bone.cs" />
     <Compile Include="Control.cs" />
     <Compile Include="AngularPlaneControl.cs" />
+    <Compile Include="IKTwistJoint.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="SingleBoneAngularPlaneConstraint.cs" />
     <Compile Include="RevoluteControl.cs" />
     <Compile Include="SingleBoneRevoluteConstraint.cs" />
@@ -102,7 +105,6 @@
     <Compile Include="IKSolver.cs" />
     <Compile Include="IKSwingLimit.cs" />
     <Compile Include="IKSwivelHingeJoint.cs" />
-    <Compile Include="IKTwistJoint.cs" />
     <Compile Include="IKTwistLimit.cs" />
     <Compile Include="SingleBoneAngularMotor.cs" />
     <Compile Include="SingleBoneConstraint.cs">
