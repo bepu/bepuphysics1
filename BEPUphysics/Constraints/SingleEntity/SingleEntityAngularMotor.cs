@@ -29,7 +29,7 @@ namespace BEPUphysics.Constraints.SingleEntity
         private float usedSoftness;
 
         /// <summary>
-        /// Constructs a new constraint which attempts to restrict the relative angular velocity of two entities to some value.
+        /// Constructs a new constraint which attempts to restrict the angular velocity or orientation to a goal.
         /// </summary>
         /// <param name="entity">Affected entity.</param>
         public SingleEntityAngularMotor(Entity entity)
@@ -43,7 +43,7 @@ namespace BEPUphysics.Constraints.SingleEntity
         }
 
         /// <summary>
-        /// Constructs a new constraint which attempts to restrict the relative angular velocity of two entities to some value.
+        /// Constructs a new constraint which attempts to restrict the angular velocity or orientation to a goal.
         /// This constructor will make the angular motor start with isActive set to false.
         /// </summary>
         public SingleEntityAngularMotor()

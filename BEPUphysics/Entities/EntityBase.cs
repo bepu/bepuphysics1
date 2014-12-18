@@ -29,7 +29,8 @@ namespace BEPUphysics.Entities
         IForceUpdateable,
         ISpaceObject,
         IMaterialOwner,
-        ICollisionRulesOwner
+        ICollisionRulesOwner, 
+        IEquatable<Entity>
     {
         internal Vector3 position;
         internal Quaternion orientation = Quaternion.Identity;
@@ -1238,5 +1239,15 @@ namespace BEPUphysics.Entities
             return hashCode;
         }
 
+
+        public bool Equals(Entity other)
+        {
+            return other == this;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return Equals((Entity)obj);
+        }
     }
 }
