@@ -247,6 +247,6 @@ namespace BEPUphysics.BroadPhaseEntries
             return false;
         }
 
-    
+
     }
 }

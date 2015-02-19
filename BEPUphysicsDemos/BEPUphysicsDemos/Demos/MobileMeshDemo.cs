@@ -18,7 +18,6 @@ namespace BEPUphysicsDemos.Demos
             : base(game)
         {
 
-
             Vector3[] vertices;
             int[] indices;
 

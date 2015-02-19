@@ -39,7 +39,7 @@ namespace BEPUphysics.Character
                     float lengthSquared = value.LengthSquared();
                     if (lengthSquared > Toolbox.Epsilon)
                     {
-                        Vector2.Divide(ref value, (float) Math.Sqrt(lengthSquared), out movementDirection);
+                        Vector2.Divide(ref value, (float)Math.Sqrt(lengthSquared), out movementDirection);
                     }
                     else
                     {
@@ -114,13 +114,37 @@ namespace BEPUphysics.Character
         internal Vector3 movementDirection3d;
 
         /// <summary>
-        /// Gets the 3d movement direction, as updated in the previous call to UpdateMovementDirection.
-        /// Note that this will not change when MovementDirection is set. It only changes on a call to UpdateMovementDirection.
+        /// Gets the 3d movement direction, as updated in the previous call to UpdateMovementBasis.
+        /// Note that this will not change when MovementDirection is set. It only changes on a call to UpdateMovementBasis.
         /// So, getting this value externally will get the previous frame's snapshot.
         /// </summary>
         public Vector3 MovementDirection3d
         {
             get { return movementDirection3d; }
+        }
+
+        Vector3 strafeDirection;
+        /// <summary>
+        /// Gets the strafe direction as updated in the previous call to UpdateMovementBasis.
+        /// </summary>
+        public Vector3 StrafeDirection
+        {
+            get
+            {
+                return strafeDirection;
+            }
+        }
+
+        Vector3 horizontalForwardDirection;
+        /// <summary>
+        /// Gets the horizontal forward direction as updated in the previous call to UpdateMovementBasis.
+        /// </summary>
+        public Vector3 ForwardDirection
+        {
+            get
+            {
+                return horizontalForwardDirection;
+            }
         }
 
         /// <summary>
@@ -131,8 +155,7 @@ namespace BEPUphysics.Character
         public void UpdateMovementBasis(ref Vector3 forward)
         {
             Vector3 down = characterBody.orientationMatrix.Down;
-            Vector3 strafeDirection;
-            Vector3 horizontalForwardDirection = forward - down * Vector3.Dot(down, forward);
+            horizontalForwardDirection = forward - down * Vector3.Dot(down, forward);
             float forwardLengthSquared = horizontalForwardDirection.LengthSquared();
 
             if (forwardLengthSquared < Toolbox.Epsilon)

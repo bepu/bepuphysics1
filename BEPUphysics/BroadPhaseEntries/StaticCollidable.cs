@@ -71,7 +71,7 @@ namespace BEPUphysics.BroadPhaseEntries
             get { return false; }
         }
 
-        
+
 
         Space space;
         Space ISpaceObject.Space
@@ -121,5 +121,6 @@ namespace BEPUphysics.BroadPhaseEntries
         {
             get;
         }
+
     }
 }

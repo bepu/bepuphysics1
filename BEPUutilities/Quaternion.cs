@@ -426,6 +426,49 @@ namespace BEPUutilities
         }
 
         /// <summary>
+        /// Negates the components of a quaternion.
+        /// </summary>
+        /// <param name="a">Quaternion to negate.</param>
+        /// <param name="b">Negated result.</param>
+        public static void Negate(ref Quaternion a, out Quaternion b)
+        {
+            b.X = -a.X;
+            b.Y = -a.Y;
+            b.Z = -a.Z;
+            b.W = -a.W;
+        }      
+        
+        /// <summary>
+        /// Negates the components of a quaternion.
+        /// </summary>
+        /// <param name="q">Quaternion to negate.</param>
+        /// <returns>Negated result.</returns>
+        public static Quaternion Negate(Quaternion q)
+        {
+            Quaternion toReturn;
+            toReturn.X = q.X;
+            toReturn.Y = q.Y;
+            toReturn.Z = q.Z;
+            toReturn.W = q.W;
+            return toReturn;
+        }
+
+        /// <summary>
+        /// Negates the components of a quaternion.
+        /// </summary>
+        /// <param name="q">Quaternion to negate.</param>
+        /// <returns>Negated result.</returns>
+        public static Quaternion operator -(Quaternion q)
+        {
+            Quaternion toReturn;
+            toReturn.X = q.X;
+            toReturn.Y = q.Y;
+            toReturn.Z = q.Z;
+            toReturn.W = q.W;
+            return toReturn;
+        }
+
+        /// <summary>
         /// Indicates whether the current object is equal to another object of the same type.
         /// </summary>
         /// <returns>
@@ -805,6 +848,7 @@ namespace BEPUutilities
             Concatenate(ref startInverse, ref end, out relative);
         }
 
+        
         /// <summary>
         /// Transforms the rotation into the local space of the target basis such that rotation = Quaternion.Concatenate(localRotation, targetBasis)
         /// </summary>

@@ -1,7 +1,7 @@
 ﻿using System;
 using BEPUphysics.Entities;
 using BEPUutilities;
- 
+
 
 namespace BEPUphysics.Constraints.TwoEntity.Motors
 {
@@ -190,7 +190,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
             if (sumLengthSquared > maxForceDtSquared)
             {
                 //max / impulse gives some value 0 < x < 1.  Basically, normalize the vector (divide by the length) and scale by the maximum.
-                float multiplier = maxForceDt / (float) Math.Sqrt(sumLengthSquared);
+                float multiplier = maxForceDt / (float)Math.Sqrt(sumLengthSquared);
                 accumulatedImpulse.X *= multiplier;
                 accumulatedImpulse.Y *= multiplier;
                 accumulatedImpulse.Z *= multiplier;
@@ -225,6 +225,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
             basis.rotationMatrix = connectionA.orientationMatrix;
             basis.ComputeWorldSpaceAxes();
 
+            float inverseDt = 1 / dt;
             if (settings.mode == MotorMode.Servomechanism) //Only need to do the bulk of this work if it's a servo.
             {
 
@@ -246,10 +247,10 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
 
                 Quaternion error;
                 Quaternion.Concatenate(ref bTargetConjugate, ref connectionB.orientation, out error);
-                
+
 
                 float errorReduction;
-                settings.servo.springSettings.ComputeErrorReductionAndSoftness(dt, 1 / dt, out errorReduction, out usedSoftness);
+                settings.servo.springSettings.ComputeErrorReductionAndSoftness(dt, inverseDt, out errorReduction, out usedSoftness);
 
                 //Turn this into an axis-angle representation.
                 Quaternion.GetAxisAngleFromQuaternion(ref error, out axis, out angle);
@@ -257,7 +258,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
                 //Scale the axis by the desired velocity if the angle is sufficiently large (epsilon).
                 if (angle > Toolbox.BigEpsilon)
                 {
-                    float velocity = -(MathHelper.Min(settings.servo.baseCorrectiveSpeed, angle / dt) + angle * errorReduction);
+                    float velocity = -(MathHelper.Min(settings.servo.baseCorrectiveSpeed, angle * inverseDt) + angle * errorReduction);
 
                     biasVelocity.X = axis.X * velocity;
                     biasVelocity.Y = axis.Y * velocity;
@@ -268,7 +269,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
                     float length = biasVelocity.LengthSquared();
                     if (length > settings.servo.maxCorrectiveVelocitySquared)
                     {
-                        float multiplier = settings.servo.maxCorrectiveVelocity / (float) Math.Sqrt(length);
+                        float multiplier = settings.servo.maxCorrectiveVelocity / (float)Math.Sqrt(length);
                         biasVelocity.X *= multiplier;
                         biasVelocity.Y *= multiplier;
                         biasVelocity.Z *= multiplier;
@@ -283,7 +284,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
             }
             else
             {
-                usedSoftness = settings.velocityMotor.softness / dt;
+                usedSoftness = settings.velocityMotor.softness * inverseDt;
                 angle = 0; //Zero out the error;
                 Matrix3x3 transform = basis.WorldTransform;
                 Matrix3x3.Transform(ref settings.velocityMotor.goalVelocity, ref transform, out biasVelocity);
@@ -300,7 +301,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
             ComputeMaxForces(settings.maximumForce, dt);
 
 
-           
+
         }
 
         /// <summary>

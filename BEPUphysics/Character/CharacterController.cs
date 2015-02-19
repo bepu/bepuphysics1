@@ -98,7 +98,25 @@ namespace BEPUphysics.Character
             }
             set
             {
-                viewDirection = value;
+                float lengthSquared = value.LengthSquared();
+                if (lengthSquared > 1e-7f)
+                {
+                    Vector3.Divide(ref value, (float)Math.Sqrt(lengthSquared), out viewDirection);
+                }
+                else
+                {
+                    value = Vector3.Cross(Down, Toolbox.UpVector);
+                    lengthSquared = value.LengthSquared();
+                    if (lengthSquared > 1e-7f)
+                    {
+                        Vector3.Divide(ref value, (float)Math.Sqrt(lengthSquared), out viewDirection);
+                    }
+                    else
+                    {
+                        value = Vector3.Cross(Down, Toolbox.ForwardVector);
+                        Vector3.Normalize(ref value, out viewDirection);
+                    }
+                }
             }
         }
 

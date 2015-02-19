@@ -34,7 +34,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
         internal float maximumForce = float.MaxValue;
         internal MotorMode mode = MotorMode.VelocityMotor;
 
-        internal MotorSettings(SolverUpdateable motor)
+        protected MotorSettings(SolverUpdateable motor)
         {
             this.motor = motor;
         }
@@ -93,7 +93,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
         internal ServoSettings1D servo;
         internal VelocityMotorSettings1D velocityMotor;
 
-        internal MotorSettings1D(Motor motor)
+        public MotorSettings1D(Motor motor)
             : base(motor)
         {
             servo = new ServoSettings1D(this);
@@ -125,7 +125,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
         internal ServoSettings3D servo;
         internal VelocityMotorSettings3D velocityMotor;
 
-        internal MotorSettings3D(SolverUpdateable motor)
+        public MotorSettings3D(SolverUpdateable motor)
             : base(motor)
         {
             servo = new ServoSettings3D(this);
@@ -157,7 +157,7 @@ namespace BEPUphysics.Constraints.TwoEntity.Motors
         internal ServoSettingsOrientation servo;
         internal VelocityMotorSettings3D velocityMotor;
 
-        internal MotorSettingsOrientation(SolverUpdateable motor)
+        public MotorSettingsOrientation(SolverUpdateable motor)
             : base(motor)
         {
             servo = new ServoSettingsOrientation(this);
