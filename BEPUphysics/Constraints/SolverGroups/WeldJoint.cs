@@ -43,16 +43,8 @@ namespace BEPUphysics.Constraints.SolverGroups
         /// <param name="connectionA">First entity of the constraint pair.</param>
         /// <param name="connectionB">Second entity of the constraint pair.</param>
         public WeldJoint(Entity connectionA, Entity connectionB)
-            :this(connectionA, connectionB, GetAnchorGuess(connectionA, connectionB))
+            : this(connectionA, connectionB, GetAnchorGuess(connectionA, connectionB))
         {
-            if (connectionA == null)
-                connectionA = TwoEntityConstraint.WorldEntity;
-            if (connectionB == null)
-                connectionB = TwoEntityConstraint.WorldEntity;
-            BallSocketJoint = new BallSocketJoint(connectionA, connectionB, (connectionA.position + connectionB.position) * .5f);
-            NoRotationJoint = new NoRotationJoint(connectionA, connectionB);
-            Add(BallSocketJoint);
-            Add(NoRotationJoint);
         }
 
         /// <summary>
