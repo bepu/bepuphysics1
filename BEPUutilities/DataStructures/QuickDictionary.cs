@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using BEPUutilities.ResourceManagement;
+#if FORCEINLINE
+using System.Runtime.CompilerServices;
+#endif
 
 namespace BEPUutilities.DataStructures
 {
@@ -11,8 +14,9 @@ namespace BEPUutilities.DataStructures
     /// </summary>
     /// <remarks><para>Be very careful when using this type. It has sacrificed a lot upon the altar of performance; a few notable issues include:
     /// it is a value type and copying it around will break things without extreme care, it cannot be validly default-constructed,
-    /// it exposes internal structures to user modification, it rarely checks input for errors, and the enumerator doesn't check for mid-enumeration modification.</para>
-    /// <para>Note that the implementation is a extremely simple. It uses single-step linear probing under the assumption of very low collision rates.
+    /// it exposes internal structures to user modification, it is particularly vulnerable to bad hash functions, 
+    /// it rarely checks input for errors, and the enumerator doesn't check for mid-enumeration modification.</para>
+    /// <para>Note that the implementation is extremely simple. It uses single-step linear probing under the assumption of very low collision rates.
     /// A generous table capacity is recommended; this trades some memory for simplicity and runtime performance.</para></remarks>
     /// <typeparam name="TKey">Type of key held by the container.</typeparam>
     /// <typeparam name="TValue">Type of value held by the container.</typeparam>
@@ -105,6 +109,7 @@ namespace BEPUutilities.DataStructures
             table = tablePool.TakeFromPoolIndex(tablePoolIndex);
             count = 0;
             tableMask = table.Length - 1;
+
 
         }
 
