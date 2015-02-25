@@ -8,7 +8,7 @@ using BEPUphysics.CollisionTests.Manifolds;
 using BEPUphysics.Constraints.Collision;
 using BEPUphysics.PositionUpdating;
 using BEPUphysics.Settings;
- 
+
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUutilities;
 
@@ -19,15 +19,8 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
     ///</summary>
     public abstract class ConvexConstraintPairHandler : ConvexPairHandler
     {
+        private ConvexContactManifoldConstraint contactConstraint;
 
-        ConvexContactManifoldConstraint contactConstraint = new ConvexContactManifoldConstraint();
-
-        //public override void Initialize(BroadPhaseEntry entryA, BroadPhaseEntry entryB)
-        //{
-        //    contactConstraint = new ConvexContactManifoldConstraint();
-
-        //    base.Initialize(entryA, entryB);
-        //}
 
         /// <summary>
         /// Gets the contact constraint used by the pair handler.
@@ -37,6 +30,10 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             get { return contactConstraint; }
         }
 
+        protected ConvexConstraintPairHandler()
+        {
+            contactConstraint = new ConvexContactManifoldConstraint(this);
+        }
 
         protected internal override void GetContactInformation(int index, out ContactInformation info)
         {

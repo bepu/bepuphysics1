@@ -21,7 +21,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         InstancedMesh instancedMesh;
         ConvexCollidable convex;
 
-        NonConvexContactManifoldConstraint contactConstraint = new NonConvexContactManifoldConstraint();
+        private NonConvexContactManifoldConstraint contactConstraint;
 
         public override Collidable CollidableA
         {
@@ -54,6 +54,11 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             get { return MeshManifold; }
         }
         protected abstract InstancedMeshContactManifold MeshManifold { get; }
+
+        protected InstancedMeshPairHandler()
+        {
+            contactConstraint = new NonConvexContactManifoldConstraint(this);
+        }
 
         ///<summary>
         /// Initializes the pair handler.

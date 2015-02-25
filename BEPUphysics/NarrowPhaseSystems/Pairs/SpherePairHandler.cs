@@ -7,7 +7,7 @@ using BEPUphysics.CollisionTests.CollisionAlgorithms.GJK;
 using BEPUphysics.Constraints.Collision;
 using BEPUphysics.PositionUpdating;
 using BEPUphysics.Settings;
- 
+
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.CollisionTests.Manifolds;
@@ -25,7 +25,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
 
         //Using a non-convex one since they have slightly lower overhead than their Convex friends when dealing with a single contact point.
         SphereContactManifold contactManifold = new SphereContactManifold();
-        NonConvexContactManifoldConstraint contactConstraint = new NonConvexContactManifoldConstraint();
+        private NonConvexContactManifoldConstraint contactConstraint;
 
         public override Collidable CollidableA
         {
@@ -60,6 +60,12 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         {
             get { return contactManifold; }
         }
+
+        public SpherePairHandler()
+        {
+            contactConstraint = new NonConvexContactManifoldConstraint(this);
+        }
+
         ///<summary>
         /// Initializes the pair handler.
         ///</summary>

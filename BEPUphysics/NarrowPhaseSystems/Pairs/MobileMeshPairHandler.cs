@@ -20,7 +20,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         MobileMeshCollidable mobileMesh;
         ConvexCollidable convex;
 
-        NonConvexContactManifoldConstraint contactConstraint = new NonConvexContactManifoldConstraint();
+        private NonConvexContactManifoldConstraint contactConstraint;
 
 
         public override Collidable CollidableA
@@ -55,6 +55,11 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         }
 
         protected internal abstract MobileMeshContactManifold MeshManifold { get; }
+
+        protected MobileMeshPairHandler()
+        {
+            contactConstraint = new NonConvexContactManifoldConstraint(this);
+        }
 
         ///<summary>
         /// Initializes the pair handler.

@@ -1,5 +1,6 @@
 ﻿using BEPUphysics.CollisionTests;
 using System.Collections.Generic;
+using BEPUphysics.NarrowPhaseSystems.Pairs;
 using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.Constraints.Collision
@@ -60,7 +61,8 @@ namespace BEPUphysics.Constraints.Collision
         ///<summary>
         /// Constructs a new convex contact manifold constraint.
         ///</summary>
-        public ConvexContactManifoldConstraint()
+        public ConvexContactManifoldConstraint(CollidablePairHandler pairHandler)
+            :base(pairHandler)
         {
             //All of the constraints are always in the solver group.  Some of them are just deactivated sometimes.
             //This reduces some bookkeeping complications.
@@ -89,6 +91,7 @@ namespace BEPUphysics.Constraints.Collision
         ///</summary>
         public override void CleanUp()
         {
+            base.CleanUp();
             //Deactivate any remaining constraints.
             for (int i = penetrationConstraints.Count - 1; i >= 0; i--)
             {
