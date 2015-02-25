@@ -103,6 +103,8 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             subPairs.Clear();
             //don't need to remove constraints directly from our group, since cleaning up our children should get rid of them.
 
+            manifoldConstraintGroup.CleanUp();
+
 
             base.CleanUp();
 

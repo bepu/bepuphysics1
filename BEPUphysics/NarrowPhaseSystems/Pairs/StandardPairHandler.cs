@@ -57,7 +57,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             //Child initialization is responsible for setting up the entries.
 
             ContactManifold.Initialize(CollidableA, CollidableB);
-            ContactConstraint.Initialize(EntityA, EntityB, this);
+            ContactConstraint.Initialize(EntityA, EntityB);
 
             base.Initialize(entryA, entryB);
 
@@ -101,7 +101,6 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             //If the constraint is still in the solver, then request to have it removed.
             if (ContactConstraint.solver != null)
             {
-                ContactConstraint.pair = null; //Setting the pair to null tells the constraint that it's going to be orphaned.  It will be cleaned up on removal.
                 if (Parent != null)
                     Parent.RemoveSolverUpdateable(ContactConstraint);
                 else if (NarrowPhase != null)
@@ -109,12 +108,11 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             }
             else
             {
-                ContactConstraint.CleanUpReferences();//The constraint isn't in the solver, so we can safely clean it up directly.
                 //Even though it's not in the solver, we still may need to notify the parent to remove it.
                 if (Parent != null && ContactConstraint.SolverGroup != null)
                     Parent.RemoveSolverUpdateable(ContactConstraint);
             }
-
+            //Contact constraint cleanup changes the involved entities, which is acceptable because it's no longer in the solver.
             ContactConstraint.CleanUp();
 
 

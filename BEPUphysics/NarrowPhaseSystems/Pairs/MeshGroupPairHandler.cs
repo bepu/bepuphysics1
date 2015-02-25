@@ -138,8 +138,12 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         {
 
             //The pair handler cleanup will get rid of contacts.
-            foreach (CollidablePairHandler pairHandler in subPairs.Values)
+            foreach (var pairHandler in subPairs.Values)
             {
+                //The contained pairs list pulled TriangleCollidables from a pool to create the opposing collidables.
+                //Clean those up now.
+                //CollidableA is used without checking, because MobileMeshPairHandlers always put the convex in slot A.
+                CleanUpCollidable((TriangleCollidable)pairHandler.CollidableA);
                 pairHandler.CleanUp();             
                 //Don't forget to give the pair back to the factory!
                 //There'd be a lot of leaks otherwise.
@@ -148,6 +152,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             subPairs.Clear();
             //don't need to remove constraints directly from our group, since cleaning up our children should get rid of them.
 
+            manifoldConstraintGroup.CleanUp();
 
             base.CleanUp();
 
@@ -217,6 +222,10 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             {
                 var toReturn = subPairs[pairsToRemove.Elements[i]];
                 subPairs.Remove(pairsToRemove.Elements[i]);
+                //The contained pairs list pulled TriangleCollidables from a pool to create the opposing collidables.
+                //Clean those up now.
+                //CollidableA is used without checking, because MobileMeshPairHandlers always put the convex in slot A.
+                CleanUpCollidable((TriangleCollidable)toReturn.CollidableA);
                 toReturn.CleanUp();
                 toReturn.Factory.GiveBack(toReturn);
 

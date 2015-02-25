@@ -236,6 +236,30 @@ namespace BEPUphysics.Constraints.SolverGroups
         }
 
         ///<summary>
+        /// Called when the updateable is added to a solver.
+        ///</summary>
+        ///<param name="newSolver">Solver to which the updateable was added.</param>
+        public override void OnAdditionToSolver(Solver newSolver)
+        {
+            for (int i = 0; i < solverUpdateables.Count; i++)
+            {
+                solverUpdateables[i].OnAdditionToSolver(newSolver);
+            }
+        }
+
+        /// <summary>
+        /// Called when the updateable is removed from its solver.
+        /// </summary>
+        /// <param name="oldSolver">Solver from which the updateable was removed.</param>
+        public override void OnRemovalFromSolver(Solver oldSolver)
+        {
+            for (int i = 0; i < solverUpdateables.Count; i++)
+            {
+                solverUpdateables[i].OnRemovalFromSolver(oldSolver);
+            }
+        }
+
+        ///<summary>
         /// Gets the solver to which the solver updateable belongs.
         ///</summary>
         public override Solver Solver

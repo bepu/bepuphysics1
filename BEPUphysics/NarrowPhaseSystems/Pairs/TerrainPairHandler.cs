@@ -18,7 +18,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         Terrain terrain;
         ConvexCollidable convex;
 
-        NonConvexContactManifoldConstraint contactConstraint = new NonConvexContactManifoldConstraint();
+        private NonConvexContactManifoldConstraint contactConstraint;
 
 
         public override Collidable CollidableA
@@ -57,6 +57,10 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             get;
         }
 
+        protected TerrainPairHandler()
+        {
+            contactConstraint = new NonConvexContactManifoldConstraint(this);
+        }
 
         ///<summary>
         /// Initializes the pair handler.

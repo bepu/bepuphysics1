@@ -1,4 +1,5 @@
-﻿using BEPUphysics.Constraints.SolverGroups;
+﻿using System;
+using BEPUphysics.Constraints.SolverGroups;
 using BEPUutilities.DataStructures;
 using BEPUphysics.Entities;
 using BEPUphysics.CollisionTests;
@@ -55,6 +56,12 @@ namespace BEPUphysics.Constraints.Collision
 
         }
 
+        protected ContactManifoldConstraint(CollidablePairHandler pairHandler)
+        {
+            this.pair = pairHandler;
+        }
+
+
         protected internal override void OnInvolvedEntitiesChanged()
         {
             //The default implementation of this method is pretty complicated.
@@ -92,22 +99,18 @@ namespace BEPUphysics.Constraints.Collision
         ///</summary>
         ///<param name="a">First entity of the pair.</param>
         ///<param name="b">Second entity of the pair.</param>
-        ///<param name="newPair">Pair owning this constraint.</param>
-        public virtual void Initialize(Entity a, Entity b, CollidablePairHandler newPair)
+        public virtual void Initialize(Entity a, Entity b)
         {
             //This should only be called before the constraint has been added to the solver.
             entityA = a;
             entityB = b;
-            pair = newPair;
             OnInvolvedEntitiesChanged();
         }
 
         ///<summary>
         /// Cleans up the constraint.
         ///</summary>
-        public abstract void CleanUp();
-
-        protected internal void CleanUpReferences()
+        public virtual void CleanUp()
         {
             entityA = null;
             entityB = null;
@@ -116,18 +119,6 @@ namespace BEPUphysics.Constraints.Collision
         }
 
 
-        /// <summary>
-        /// Called when the updateable is removed from its solver.
-        /// </summary>
-        /// <param name="oldSolver">Solver from which the updateable was removed.</param>
-        public override void OnRemovalFromSolver(Solver oldSolver)
-        {
-            //This should only be called after the constraint has been removed from the solver.
-            if (pair == null)
-            {
-                CleanUpReferences();
-            }
-        }
 
         /// <summary>
         /// Sets the activity state of the constraint based on the activity state of its connections.
@@ -149,7 +140,7 @@ namespace BEPUphysics.Constraints.Collision
             }
             else
                 isActiveInSolver = false;
-            
+
 
         }
 

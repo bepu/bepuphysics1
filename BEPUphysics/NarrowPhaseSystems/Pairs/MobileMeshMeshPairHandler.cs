@@ -9,7 +9,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
     ///</summary>
     public abstract class MobileMeshMeshPairHandler : MeshGroupPairHandler
     {
-        public MobileMeshCollidable mobileMesh;
+        protected MobileMeshCollidable mobileMesh;
 
         public override Collidable CollidableA
         {

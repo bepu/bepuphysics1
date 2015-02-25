@@ -15,7 +15,6 @@ namespace BEPUphysics.Character
 {
     /// <summary>
     /// Gives a physical object FPS-like control, including stepping and jumping.
-    /// This is more robust/expensive than the SimpleCharacterController.
     /// </summary>
     public class CharacterController : Updateable, IBeforeSolverUpdateable
     {

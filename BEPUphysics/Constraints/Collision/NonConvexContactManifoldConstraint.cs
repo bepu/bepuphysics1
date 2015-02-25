@@ -1,5 +1,6 @@
 ﻿using BEPUphysics.CollisionTests;
 using System.Collections.Generic;
+using BEPUphysics.NarrowPhaseSystems.Pairs;
 using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.Constraints.Collision
@@ -51,7 +52,8 @@ namespace BEPUphysics.Constraints.Collision
         ///<summary>
         /// Constructs a new nonconvex manifold constraint.
         ///</summary>
-        public NonConvexContactManifoldConstraint()
+        public NonConvexContactManifoldConstraint(CollidablePairHandler pairHandler)
+            : base(pairHandler)
         {
             //All of the constraints are always in the solver group.  Some of them are just deactivated sometimes.
             //This reduces some bookkeeping complications.
@@ -69,7 +71,7 @@ namespace BEPUphysics.Constraints.Collision
                 frictionConstraintPool.Push(frictionConstraint);
                 Add(frictionConstraint);
             }
-            
+
         }
 
 
@@ -78,6 +80,7 @@ namespace BEPUphysics.Constraints.Collision
         ///</summary>
         public override void CleanUp()
         {
+            base.CleanUp();
             //Deactivate any remaining constraints.
             for (int i = penetrationConstraints.Count - 1; i >= 0; i--)
             {
@@ -99,7 +102,7 @@ namespace BEPUphysics.Constraints.Collision
         }
 
 
- 
+
 
 
 

@@ -7,7 +7,7 @@ using BEPUphysics.CollisionTests.CollisionAlgorithms.GJK;
 using BEPUphysics.Constraints.Collision;
 using BEPUphysics.PositionUpdating;
 using BEPUphysics.Settings;
- 
+
 using BEPUphysics.CollisionTests.CollisionAlgorithms;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.CollisionTests.Manifolds;
@@ -25,7 +25,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
 
         //Using a non-convex one since they have slightly lower overhead than their Convex friends when dealing with a single contact point.
         BoxSphereContactManifold contactManifold = new BoxSphereContactManifold();
-        NonConvexContactManifoldConstraint contactConstraint = new NonConvexContactManifoldConstraint();
+        private NonConvexContactManifoldConstraint contactConstraint;
 
         public override Collidable CollidableA
         {
@@ -64,7 +64,12 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
         {
             get { return sphere.entity; }
         }
-        
+
+        public BoxSpherePairHandler()
+        {
+            contactConstraint = new NonConvexContactManifoldConstraint(this);
+        }
+
         ///<summary>
         /// Initializes the pair handler.
         ///</summary>
@@ -90,7 +95,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             //Reorder the entries so that the guarantee that the normal points from A to B is satisfied.
             broadPhaseOverlap.entryA = box;
             broadPhaseOverlap.entryB = sphere;
-            
+
             base.Initialize(entryA, entryB);
 
 
@@ -127,7 +132,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             }
             //Compute relative velocity
             Vector3 velocity;
-            
+
             if (EntityA != null)
             {
                 Vector3.Subtract(ref info.Contact.Position, ref EntityA.position, out velocity);
