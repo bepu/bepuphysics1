@@ -29,7 +29,7 @@ namespace BEPUphysics.Entities
         IForceUpdateable,
         ISpaceObject,
         IMaterialOwner,
-        ICollisionRulesOwner, 
+        ICollisionRulesOwner,
         IEquatable<Entity>
     {
         internal Vector3 position;
@@ -250,19 +250,43 @@ namespace BEPUphysics.Entities
 
 
 
-        bool isAffectedByGravity = true;
+        bool hasPersonalGravity;
+        private Vector3 personalGravity;
         ///<summary>
-        /// Gets or sets whether or not the entity can be affected by gravity applied by the ForceUpdater.
+        /// Gets or sets the entity's personal gravity. If null, the ForceUpdater's gravity is used instead. Defaults to null.
         ///</summary>
-        public bool IsAffectedByGravity
+        public Vector3? Gravity
         {
             get
             {
-                return isAffectedByGravity;
+                if (hasPersonalGravity)
+                {
+                    return personalGravity;
+                }
+                return null;
             }
             set
             {
-                isAffectedByGravity = value;
+                if (value != null)
+                {
+                    if (!hasPersonalGravity || personalGravity != value.Value)
+                    {
+                        //Personal gravity either turned on or changed; wake up to handle it.
+                        activityInformation.Activate();
+                    }
+                    hasPersonalGravity = true;
+                    personalGravity = value.Value;
+                }
+                else
+                {
+                    if (hasPersonalGravity)
+                    {
+                        //Personal gravity turned off; wake up to handle it.
+                        activityInformation.Activate();
+                    }
+                    hasPersonalGravity = false;
+                    personalGravity = new Vector3();
+                }
             }
         }
 
@@ -872,9 +896,14 @@ namespace BEPUphysics.Entities
         void IForceUpdateable.UpdateForForces(float dt)
         {
 
-
-            //Linear velocity
-            if (IsAffectedByGravity)
+            //Apply gravity.
+            if (hasPersonalGravity)
+            {
+                Vector3 gravityDt;
+                Vector3.Multiply(ref personalGravity, dt, out gravityDt);
+                Vector3.Add(ref gravityDt, ref linearVelocity, out linearVelocity);
+            }
+            else
             {
                 Vector3.Add(ref forceUpdater.gravityDt, ref linearVelocity, out linearVelocity);
             }

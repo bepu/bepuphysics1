@@ -15,7 +15,7 @@ using BEPUutilities;
 namespace BEPUphysics.NarrowPhaseSystems.Pairs
 {
     ///<summary>
-    /// Pair handler that manages a pair of two boxes.
+    /// Pair handler that manages a pair of two convex shapes.
     ///</summary>
     public abstract class ConvexPairHandler : StandardPairHandler
     {

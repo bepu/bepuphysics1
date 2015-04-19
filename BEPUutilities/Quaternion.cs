@@ -308,7 +308,7 @@ namespace BEPUutilities
                 cosHalfTheta = -cosHalfTheta;
             }
             // If the orientations are similar enough, then just pick one of the inputs.
-            if (cosHalfTheta > (1.0 - 1e-12f))
+            if (cosHalfTheta > (1.0 - 1e-12))
             {
                 result.W = start.W;
                 result.X = start.X;

@@ -207,7 +207,7 @@ namespace BEPUphysicsDemos.Demos
             //************************
             //Sometimes, it's nice to be able to change how subshapes behave.
             //This example will use a prefab CompoundBody type, but note that there exists a CompoundCollidable that can be constructed independently as well.
-            //Just like a list of CompoundShapeEntry objects can be ued to construct a compound object, a list of CompoundChildData objects can too.
+            //Just like a list of CompoundShapeEntry objects can be used to construct a compound object, a list of CompoundChildData objects can too.
             //CompoundChildData objects contain CompoundShapeEntry objects as well as other data to be used by a Collidable instance.
             //That extra data includes material, events, and collision rules.
 

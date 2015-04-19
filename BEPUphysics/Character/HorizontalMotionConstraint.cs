@@ -684,6 +684,19 @@ namespace BEPUphysics.Character
             }
         }
 
+        /// <summary>
+        /// Gets the accumulated impulse in constraint space.
+        /// The X component corresponds to impulse along the movement direction.
+        /// The Y component corresponds to impulse perpendicular to the movement direction and support normal.
+        /// </summary>
+        public Vector2 AccumulatedImpulse
+        {
+            get
+            {
+                return accumulatedImpulse;
+            }
+        }
+
     }
 
 
