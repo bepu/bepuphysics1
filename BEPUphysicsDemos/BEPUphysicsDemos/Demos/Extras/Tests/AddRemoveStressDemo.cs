@@ -69,7 +69,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             for (int i = 0; i < addedEntities.Count; ++i)
             {
                 var entity = addedEntities[i];
-                entity.IsAffectedByGravity = false;
+                entity.Gravity = new Vector3();
                 entity.Position = GetRandomPosition(random);
                 entity.LinearVelocity = 3 * Vector3.Normalize(entity.Position);
                 Space.Add(entity);
