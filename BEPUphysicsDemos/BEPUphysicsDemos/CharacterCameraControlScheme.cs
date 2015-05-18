@@ -25,6 +25,11 @@ namespace BEPUphysicsDemos
         public float CrouchingCameraOffset { get; set; }
 
         /// <summary>
+        /// Gets or sets the Offset from the position of the character to the 'eyes' while the character is prone.
+        /// </summary>
+        public float ProneCameraOffset { get; set; }
+
+        /// <summary>
         /// Gets the character associated with the control scheme.
         /// </summary>
         public CharacterController Character { get; private set; }
@@ -42,6 +47,7 @@ namespace BEPUphysicsDemos
             UseCameraSmoothing = true;
             StandingCameraOffset = 0.7f;
             CrouchingCameraOffset = 0.4f;
+            ProneCameraOffset = 0.1f;
         }
 
         public override void Update(float dt)
@@ -64,6 +70,19 @@ namespace BEPUphysicsDemos
             //    }
             //}
 
+            float cameraOffset;
+            switch (Character.StanceManager.CurrentStance)
+            {
+                case Stance.Prone:
+                    cameraOffset = ProneCameraOffset;
+                    break;
+                case Stance.Crouching:
+                    cameraOffset = CrouchingCameraOffset;
+                    break;
+                default:
+                    cameraOffset = StandingCameraOffset;
+                    break;
+            }
             if (UseCameraSmoothing)
             {
                 //First, find where the camera is expected to be based on the last position and the current velocity.
@@ -77,7 +96,8 @@ namespace BEPUphysicsDemos
                 //Now compute where it should be according the physical body of the character.
                 Vector3 up = Character.Body.OrientationMatrix.Up;
                 Vector3 bodyPosition = Character.Body.BufferedStates.InterpolatedStates.Position;
-                Vector3 goalPosition = bodyPosition + up * (Character.StanceManager.CurrentStance == Stance.Standing ? StandingCameraOffset : CrouchingCameraOffset);
+
+                Vector3 goalPosition = bodyPosition + up * cameraOffset;
 
                 //Usually, the camera position and the goal will be very close, if not matching completely.
                 //However, if the character steps or has its position otherwise modified, then they will not match.
@@ -128,7 +148,7 @@ namespace BEPUphysicsDemos
             }
             else
             {
-                Camera.Position = Character.Body.Position + (Character.StanceManager.CurrentStance == Stance.Standing ? StandingCameraOffset : CrouchingCameraOffset) * Character.Body.OrientationMatrix.Up;
+                Camera.Position = Character.Body.Position + cameraOffset * Character.Body.OrientationMatrix.Up;
             }
         }
     }

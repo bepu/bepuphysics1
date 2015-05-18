@@ -141,7 +141,12 @@ namespace BEPUphysicsDemos.AlternateMovement
                     CharacterController.HorizontalMotionConstraint.MovementDirection = Vector2.Normalize(totalMovement);
 
 
-                CharacterController.StanceManager.DesiredStance = keyboardInput.IsKeyDown(Keys.Z) ? Stance.Crouching : Stance.Standing;
+                if (keyboardInput.IsKeyDown(Keys.X))
+                    CharacterController.StanceManager.DesiredStance = Stance.Prone;
+                else if (keyboardInput.IsKeyDown(Keys.Z))
+                    CharacterController.StanceManager.DesiredStance = Stance.Crouching;
+                else
+                    CharacterController.StanceManager.DesiredStance = Stance.Standing;
 
                 //Jumping
                 if (previousKeyboardInput.IsKeyUp(Keys.A) && keyboardInput.IsKeyDown(Keys.A))
