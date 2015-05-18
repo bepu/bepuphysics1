@@ -207,6 +207,24 @@ namespace BEPUphysics.Character
                 crouchingSpeed = value;
             }
         }
+        float proneSpeed;
+        /// <summary>
+        /// Gets or sets the speed at which the character will try to move while prone with a support that provides traction.
+        /// Relative velocities with a greater magnitude will be decelerated.
+        /// </summary>
+        public float ProneSpeed
+        {
+            get
+            {
+                return proneSpeed;
+            }
+            set
+            {
+                if (value < 0)
+                    throw new ArgumentException("Value must be nonnegative.");
+                proneSpeed = value;
+            }
+        }
         float tractionForce;
         /// <summary>
         /// Gets or sets the maximum force that the character can apply while on a support which provides traction.
@@ -327,6 +345,22 @@ namespace BEPUphysics.Character
         }
 
         /// <summary>
+        /// Gets or sets the collision margin of the body cylinder. Also updates the StanceManager's query shapes to match.
+        /// </summary>
+        public float CollisionMargin
+        {
+            get { return Body.CollisionInformation.Shape.CollisionMargin; }
+            set
+            {
+                if (value <= 0)
+                    throw new ArgumentException("Radius must be positive.");
+                Body.CollisionInformation.Shape.CollisionMargin = value;
+                //Tell the query manager to update its representation.
+                StanceManager.UpdateQueryShapes();
+            }
+        }
+
+        /// <summary>
         /// Gets the support finder used by the character.
         /// The support finder analyzes the character's contacts to see if any of them provide support and/or traction.
         /// </summary>
@@ -339,15 +373,19 @@ namespace BEPUphysics.Character
         /// <param name="position">Initial position of the character.</param>
         /// <param name="height">Height of the character body while standing.</param>
         /// <param name="crouchingHeight">Height of the character body while crouching.</param>
+        /// <param name="proneHeight">Height of the character body while prone.</param>
         /// <param name="radius">Radius of the character body.</param>
         /// <param name="margin">Radius of 'rounding' applied to the cylindrical body. Higher values make the cylinder's edges more rounded.
-        /// The margin is contained within the cylinder's height and radius, so it must not exceed the radius or height of the cylinder.</param>
+        /// The margin is contained within the cylinder's height and radius, so it must not exceed the radius or height of the cylinder.
+        /// To change the collision margin later, use the CharacterController.CollisionMargin property.</param>
         /// <param name="mass">Mass of the character body.</param>
         /// <param name="maximumTractionSlope">Steepest slope, in radians, that the character can maintain traction on.</param>
         /// <param name="maximumSupportSlope">Steepest slope, in radians, that the character can consider a support.</param>
         /// <param name="standingSpeed">Speed at which the character will try to move while crouching with a support that provides traction.
         /// Relative velocities with a greater magnitude will be decelerated.</param>
         /// <param name="crouchingSpeed">Speed at which the character will try to move while crouching with a support that provides traction.
+        /// Relative velocities with a greater magnitude will be decelerated.</param>
+        /// <param name="proneSpeed">Speed at which the character will try to move while prone with a support that provides traction.
         /// Relative velocities with a greater magnitude will be decelerated.</param>
         /// <param name="tractionForce">Maximum force that the character can apply while on a support which provides traction.</param>
         /// <param name="slidingSpeed">Speed at which the character will try to move while on a support that does not provide traction.
@@ -361,9 +399,9 @@ namespace BEPUphysics.Character
         /// <param name="maximumGlueForce">Maximum force the vertical motion constraint is allowed to apply in an attempt to keep the character on the ground.</param>
         public CharacterController(
             Vector3 position = new Vector3(),
-            float height = 1.7f, float crouchingHeight = 1.7f * .7f, float radius = 0.6f, float margin = 0.1f, float mass = 10f,
+            float height = 1.7f, float crouchingHeight = 1.7f * .7f, float proneHeight = 1.7f * 0.3f, float radius = 0.6f, float margin = 0.1f, float mass = 10f,
             float maximumTractionSlope = 0.8f, float maximumSupportSlope = 1.3f,
-            float standingSpeed = 8f, float crouchingSpeed = 3f, float tractionForce = 1000, float slidingSpeed = 6, float slidingForce = 50, float airSpeed = 1, float airForce = 250,
+            float standingSpeed = 8f, float crouchingSpeed = 3f, float proneSpeed = 1.5f, float tractionForce = 1000, float slidingSpeed = 6, float slidingForce = 50, float airSpeed = 1, float airForce = 250,
             float jumpSpeed = 4.5f, float slidingJumpSpeed = 3,
             float maximumGlueForce = 5000
             )
@@ -388,11 +426,12 @@ namespace BEPUphysics.Character
             HorizontalMotionConstraint.PositionAnchorDistanceThreshold = radius * 0.25f;
             VerticalMotionConstraint = new VerticalMotionConstraint(Body, SupportFinder, maximumGlueForce);
             StepManager = new StepManager(Body, ContactCategorizer, SupportFinder, QueryManager, HorizontalMotionConstraint);
-            StanceManager = new StanceManager(Body, crouchingHeight, QueryManager, SupportFinder);
+            StanceManager = new StanceManager(Body, crouchingHeight, proneHeight, QueryManager, SupportFinder);
             PairLocker = new CharacterPairLocker(Body);
 
             StandingSpeed = standingSpeed;
             CrouchingSpeed = crouchingSpeed;
+            ProneSpeed = proneSpeed;
             TractionForce = tractionForce;
             SlidingSpeed = slidingSpeed;
             SlidingForce = slidingForce;
@@ -518,7 +557,7 @@ namespace BEPUphysics.Character
 
 
                 //Attempt to jump.
-                if (tryToJump && StanceManager.CurrentStance != Stance.Crouching) //Jumping while crouching would be a bit silly.
+                if (tryToJump)
                 {
                     //In the following, note that the jumping velocity changes are computed such that the separating velocity is specifically achieved,
                     //rather than just adding some speed along an arbitrary direction.  This avoids some cases where the character could otherwise increase
@@ -592,25 +631,30 @@ namespace BEPUphysics.Character
             //Update the horizontal motion constraint's state.
             if (supportData.SupportObject != null)
             {
+                float speed;
+                switch (StanceManager.CurrentStance)
+                {
+                    case Stance.Prone:
+                        speed = proneSpeed;
+                        break;
+                    case Stance.Crouching:
+                        speed = crouchingSpeed;
+                        break;
+                    default:
+                        speed = standingSpeed;
+                        break;
+                }
                 if (SupportFinder.HasTraction)
                 {
                     HorizontalMotionConstraint.MovementMode = MovementMode.Traction;
-                    HorizontalMotionConstraint.TargetSpeed = StanceManager.CurrentStance == Stance.Standing ? standingSpeed : crouchingSpeed;
+                    HorizontalMotionConstraint.TargetSpeed = speed;
                     HorizontalMotionConstraint.MaximumForce = tractionForce;
                 }
                 else
                 {
                     HorizontalMotionConstraint.MovementMode = MovementMode.Sliding;
-                    if (StanceManager.CurrentStance == Stance.Standing)
-                    {
-                        HorizontalMotionConstraint.TargetSpeed = Math.Min(standingSpeed, slidingSpeed);
-                        HorizontalMotionConstraint.MaximumForce = Math.Min(tractionForce, slidingForce);
-                    }
-                    else
-                    {
-                        HorizontalMotionConstraint.TargetSpeed = Math.Min(crouchingSpeed, slidingSpeed);
-                        HorizontalMotionConstraint.MaximumForce = Math.Min(tractionForce, slidingForce);
-                    }
+                    HorizontalMotionConstraint.TargetSpeed = Math.Min(speed, slidingSpeed);
+                    HorizontalMotionConstraint.MaximumForce = Math.Min(tractionForce, slidingForce);
                 }
             }
             else
