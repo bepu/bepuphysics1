@@ -576,16 +576,16 @@ namespace BEPUphysics.Character
             }
             else
             {
-                
+
                 Vector2.Add(ref lambda, ref accumulatedImpulse, out accumulatedImpulse);
-                if(isTryingToMove && accumulatedImpulse.X > maxAccelerationForceDt)
-                {
-                    accumulatedImpulse.X = maxAccelerationForceDt;
-                }
                 float length = accumulatedImpulse.LengthSquared();
                 if (length > maxForceDt * maxForceDt)
                 {
                     Vector2.Multiply(ref accumulatedImpulse, maxForceDt / (float)Math.Sqrt(length), out accumulatedImpulse);
+                }
+                if (isTryingToMove && accumulatedImpulse.X > maxAccelerationForceDt)
+                {
+                    accumulatedImpulse.X = maxAccelerationForceDt;
                 }
             }
             Vector2.Subtract(ref accumulatedImpulse, ref previousAccumulatedImpulse, out lambda);
