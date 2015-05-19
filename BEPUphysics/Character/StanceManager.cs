@@ -448,16 +448,16 @@ namespace BEPUphysics.Character
     public enum Stance
     {
         /// <summary>
-        /// The shortest stance; the character is essentially on the ground. Note that the width and length of the character do not change while prone.
+        /// Tallest stance.
         /// </summary>
-        Prone,
+        Standing,
         /// <summary>
         /// Middle-height stance; must be taller than prone and shorter than standing.
         /// </summary>
         Crouching,
         /// <summary>
-        /// Tallest stance.
+        /// The shortest stance; the character is essentially on the ground. Note that the width and length of the character do not change while prone.
         /// </summary>
-        Standing
+        Prone
     }
 }
