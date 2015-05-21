@@ -765,7 +765,7 @@ namespace BEPUutilities
         public static Vector3 TransformNormal(Vector3 v, Matrix matrix)
         {
             Vector3 toReturn;
-            Transform(ref v, ref matrix, out toReturn);
+            TransformNormal(ref v, ref matrix, out toReturn);
             return toReturn;
         }
 
@@ -794,7 +794,7 @@ namespace BEPUutilities
         public static Vector3 TransformNormalTranspose(Vector3 v, Matrix matrix)
         {
             Vector3 toReturn;
-            TransformTranspose(ref v, ref matrix, out toReturn);
+            TransformNormalTranspose(ref v, ref matrix, out toReturn);
             return toReturn;
         }
 
