@@ -490,6 +490,8 @@ namespace BEPUphysics.BroadPhaseEntries.MobileCollidables
         {
             hit = new RayHit();
             hitChild = null;
+            if (!filter(this))
+                return false;
             BoundingBox boundingBox;
             castShape.GetSweptBoundingBox(ref startingTransform, ref sweep, out boundingBox);
             var hitElements = PhysicsResources.GetCompoundChildList();
