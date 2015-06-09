@@ -6,6 +6,7 @@ using BEPUphysics.Constraints.Collision;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.CollisionTests;
 using BEPUphysics.Materials;
+using BEPUphysics.Settings;
 using BEPUutilities.DataStructures;
 
 namespace BEPUphysics.NarrowPhaseSystems.Pairs
@@ -242,12 +243,15 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             {
                 //The system uses the identity of the requester to determine if it needs to do handle the TOI calculation.
                 //Use the child pair's own entries as a proxy.
-                if (BroadPhaseOverlap.entryA == requester)
-                    pair.UpdateTimeOfImpact((Collidable)pair.BroadPhaseOverlap.entryA, dt);
-                else
-                    pair.UpdateTimeOfImpact((Collidable)pair.BroadPhaseOverlap.entryB, dt);
-                if (pair.timeOfImpact < timeOfImpact)
-                    timeOfImpact = pair.timeOfImpact;
+                if (MotionSettings.CCDFilter(pair))
+                {
+                    if (BroadPhaseOverlap.entryA == requester)
+                        pair.UpdateTimeOfImpact((Collidable) pair.BroadPhaseOverlap.entryA, dt);
+                    else
+                        pair.UpdateTimeOfImpact((Collidable) pair.BroadPhaseOverlap.entryB, dt);
+                    if (pair.timeOfImpact < timeOfImpact)
+                        timeOfImpact = pair.timeOfImpact;
+                }
             }
         }
 

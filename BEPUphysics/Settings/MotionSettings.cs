@@ -57,13 +57,8 @@ namespace BEPUphysics.Settings
         /// </summary>
         public static CCDFilter CCDFilter;
 
-        internal static bool PairAllowsCCD(Entity entity, CollidablePairHandler pair)
-        {
-            var other = (pair.broadPhaseOverlap.entryA == entity.CollisionInformation ? pair.broadPhaseOverlap.entryB : pair.broadPhaseOverlap.entryA) as Collidable;
-            return CCDFilter(entity, other, pair);
-        }
-
-        static bool DefaultCCDFilter(Entity entity, Collidable other, CollidablePairHandler pair)
+       
+        static bool DefaultCCDFilter(CollidablePairHandler pair)
         {
             return pair.broadPhaseOverlap.collisionRule < CollisionRule.NoSolver;
         }
@@ -79,5 +74,5 @@ namespace BEPUphysics.Settings
     /// Delegate which determines if a given pair should be allowed to run continuous collision detection.
     /// This is only called for entities which are continuous and colliding with other objects.
     /// </summary>
-    public delegate bool CCDFilter(Entity entity, Collidable other, CollidablePairHandler pair);
+    public delegate bool CCDFilter(CollidablePairHandler pair);
 }
