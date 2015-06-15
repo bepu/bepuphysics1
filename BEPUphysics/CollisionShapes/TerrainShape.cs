@@ -356,7 +356,7 @@ namespace BEPUphysics.CollisionShapes
                 float timeToX;
                 if (localRay.Direction.X < 0)
                     timeToX = -(progressingOrigin.X - xCell) / localRay.Direction.X;
-                else if (ray.Direction.X > 0)
+                else if (localRay.Direction.X > 0)
                     timeToX = (xCell + 1 - progressingOrigin.X) / localRay.Direction.X;
                 else
                     timeToX = float.MaxValue;
