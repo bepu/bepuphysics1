@@ -55,7 +55,7 @@ namespace BEPUutilities.DataStructures
 
         private int count;
         /// <summary>
-        /// Gets the number of pairs in the list.
+        /// Gets the number of elements in the queue.
         /// </summary>
         public int Count
         {
@@ -65,11 +65,11 @@ namespace BEPUutilities.DataStructures
 
 
         /// <summary>
-        /// Gets an element at the given index in the list.
+        /// Gets an element at the given index in the queue.
         /// 0 gets the element at the FirstIndex. Count-1 would get the element at LastIndex.
         /// </summary>
         /// <param name="index">Index to grab an element from.</param>
-        /// <returns>Element at the given index in the list.</returns>
+        /// <returns>Element at the given index in the queue.</returns>
         public T this[int index]
         {
             //You would think that such a trivial accessor would inline without any external suggestion.
@@ -111,19 +111,19 @@ namespace BEPUutilities.DataStructures
 
         private void Resize(int newPoolIndex)
         {
-            Debug.Assert(count <= (1 << newPoolIndex), "New pool index must contain all elements in the list.");
-            var oldList = this;
+            Debug.Assert(count <= (1 << newPoolIndex), "New pool index must contain all elements in the queue.");
+            var oldQueue = this;
             this = new QuickQueue<T>(pool, newPoolIndex);
-            count = oldList.Count;
+            count = oldQueue.Count;
             //Copy the old first-end to the first part of the new array.
-            Array.Copy(oldList.Elements, oldList.firstIndex, Elements, 0, oldList.Elements.Length - oldList.firstIndex);
+            Array.Copy(oldQueue.Elements, oldQueue.firstIndex, Elements, 0, oldQueue.Elements.Length - oldQueue.firstIndex);
             //Copy the old begin-first to the second part of the new array.
-            Array.Copy(oldList.Elements, 0, Elements, oldList.Elements.Length - oldList.firstIndex, oldList.firstIndex);
+            Array.Copy(oldQueue.Elements, 0, Elements, oldQueue.Elements.Length - oldQueue.firstIndex, oldQueue.firstIndex);
 
             firstIndex = 0;
             lastIndex = count - 1;
 
-            oldList.Dispose();
+            oldQueue.Dispose();
         }
 
         /// <summary>
@@ -279,7 +279,22 @@ namespace BEPUutilities.DataStructures
         }
 
         /// <summary>
-        /// Clears the list by setting the count to zero and explicitly setting all relevant indices in the backing array to default values.
+        /// Copies the elements of the <see cref="T:System.Collections.Generic.ICollection`1"/> to an <see cref="T:System.Array"/>, starting at a particular <see cref="T:System.Array"/> index.
+        /// </summary>
+        /// <param name="array">The one-dimensional <see cref="T:System.Array"/> that is the destination of the elements copied from <see cref="T:System.Collections.Generic.ICollection`1"/>. The <see cref="T:System.Array"/> must have zero-based indexing.</param><param name="arrayIndex">The zero-based index in <paramref name="array"/> at which copying begins.</param><exception cref="T:System.ArgumentNullException"><paramref name="array"/> is null.</exception><exception cref="T:System.ArgumentOutOfRangeException"><paramref name="arrayIndex"/> is less than 0.</exception><exception cref="T:System.ArgumentException">The number of elements in the source <see cref="T:System.Collections.Generic.ICollection`1"/> is greater than the available space from <paramref name="arrayIndex"/> to the end of the destination <paramref name="array"/>.</exception>
+#if FORCEINLINE
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        public void CopyTo(T[] array, int arrayIndex)
+        {
+            //Copy the old first-end to the first part of the new array.
+            Array.Copy(Elements, firstIndex, array, arrayIndex, Elements.Length - firstIndex);
+            //Copy the old begin-first to the second part of the new array.
+            Array.Copy(Elements, 0, array, arrayIndex + Elements.Length - firstIndex, firstIndex);
+        }
+
+        /// <summary>
+        /// Clears the queue by setting the count to zero and explicitly setting all relevant indices in the backing array to default values.
         /// </summary>
 #if FORCEINLINE
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -302,7 +317,7 @@ namespace BEPUutilities.DataStructures
         }
 
         /// <summary>
-        /// Compacts the internal buffer to the minimum size required for the number of elements in the list.
+        /// Compacts the internal buffer to the minimum size required for the number of elements in the queue.
         /// </summary>
         public void Compact()
         {
@@ -313,7 +328,7 @@ namespace BEPUutilities.DataStructures
         }
 
         /// <summary>
-        /// Clears and returns the list's buffers.
+        /// Clears and returns the queue's buffers.
         /// </summary>
         public void Dispose()
         {
@@ -327,14 +342,14 @@ namespace BEPUutilities.DataStructures
         [Conditional("DEBUG")]
         void ValidateIndex(int index)
         {
-            Debug.Assert(index >= 0 && index < Count, "Index must be nonnegative and less than the number of elements in the list.");
+            Debug.Assert(index >= 0 && index < Count, "Index must be nonnegative and less than the number of elements in the queue.");
         }
 
 
         [Conditional("DEBUG")]
         private void Validate()
         {
-            Debug.Assert(pool != null, "Should not use a default-constructed or disposed QuickList.");
+            Debug.Assert(pool != null, "Should not use a default-constructed or disposed QuickQueue.");
         }
 
         public Enumerator GetEnumerator()
