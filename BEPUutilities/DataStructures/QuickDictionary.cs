@@ -130,7 +130,7 @@ namespace BEPUutilities.DataStructures
         /// </summary>
         /// <param name="element">Element to look up.</param>
         /// <param name="tableIndex">Index of the element in the redirect table, or if it is not present, the index of where it would be added.</param>
-        /// <param name="elementIndex">The index of the element in the list, if it exists; -1 otherwise.</param>
+        /// <param name="elementIndex">The index of the element in the element arrays, if it exists; -1 otherwise.</param>
         /// <returns>True if the element is present in the set, false if it is not.</returns>
 #if FORCEINLINE
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
