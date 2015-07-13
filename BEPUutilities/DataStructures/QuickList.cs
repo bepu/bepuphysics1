@@ -93,7 +93,7 @@ namespace BEPUutilities.DataStructures
         /// <param name="count">Number of elements to hold.</param>
         public void EnsureCapacity(int count)
         {
-            if (count > (1 << poolIndex))
+            if (count > Elements.Length)
             {
                 Resize(BufferPool<T>.GetPoolIndex(count));
             }

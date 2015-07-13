@@ -16,7 +16,6 @@ namespace BEPUphysics.BroadPhaseEntries.Events
     public class CompoundEventManager : ContactEventManager<EntityCollidable>
     {
 
-        //TODO: This class can be generalized if there is ever another collidable which has similar requirements to the compound body.
         protected override void DispatchEvents()
         {
             //Go through all children and dispatch events.
@@ -38,4 +37,5 @@ namespace BEPUphysics.BroadPhaseEntries.Events
             base.DispatchEvents();
         }
     }
+
 }

@@ -35,7 +35,6 @@ namespace BEPUphysicsDemos.Demos
                     Space.Add(toAdd);
                 }
             }
-            
 
             Box ground = new Box(new Vector3(0, -.5f, 0), 50, 1, 50);
             Space.Add(ground);
