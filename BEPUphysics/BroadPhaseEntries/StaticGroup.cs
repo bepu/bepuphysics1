@@ -25,7 +25,7 @@ namespace BEPUphysics.BroadPhaseEntries
         ///<param name="collidables">List of collidables in the static group.</param>
         public StaticGroup(IList<Collidable> collidables)
         {
-            shape = new StaticGroupShape(collidables, this);
+            base.Shape = new StaticGroupShape(collidables, this);
             Events = new ContactEventManager<StaticGroup>();
 
         }

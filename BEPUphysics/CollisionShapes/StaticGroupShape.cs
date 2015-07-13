@@ -58,6 +58,7 @@ namespace BEPUphysics.CollisionShapes
         public void Add(Collidable collidable)
         {
             CollidableTree.Add(collidable);
+            OnShapeChanged();
         }
 
         /// <summary>
@@ -67,6 +68,7 @@ namespace BEPUphysics.CollisionShapes
         public void Remove(Collidable collidable)
         {
             CollidableTree.Remove(collidable);
+            OnShapeChanged();
         }
 
 
