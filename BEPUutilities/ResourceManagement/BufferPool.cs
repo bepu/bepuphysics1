@@ -112,7 +112,7 @@ namespace BEPUutilities.ResourceManagement
         {
 #if DEBUG
             Debug.Assert(outstandingResources.Remove(buffer), "The buffer being returned must come from this pool, and buffers should only be returned once.");
-            if (!SuppressCleanBufferAsserts)
+            if (CheckIfReturnedBuffersAreClean)
             {
                 for (int i = 0; i < buffer.Length; ++i)
                 {
@@ -124,7 +124,7 @@ namespace BEPUutilities.ResourceManagement
         }
 
         /// <summary>
-        /// Gives a buffer back to the pool without clearing it out. The caller should clear the buffer.
+        /// Gives a buffer back to the pool without clearing it out.
         /// </summary>
         /// <param name="buffer">Buffer to return to the pool.</param>
         public void GiveBack(T[] buffer)
@@ -159,7 +159,7 @@ namespace BEPUutilities.ResourceManagement
         /// <summary>
         /// Gets or sets whether to check buffers for cleanliness when they are returned when compiled in debug mode. A clean buffer is defined as one that contains all default values.
         /// </summary>
-        public bool SuppressCleanBufferAsserts { get; set; }
+        public bool CheckIfReturnedBuffersAreClean { get; set; }
 #endif
     }
 }
