@@ -317,6 +317,19 @@ namespace BEPUutilities.DataStructures
         }
 
         /// <summary>
+        /// Clears the queue without changing any of the values in the backing array. Be careful about using this if the queue contains reference types.
+        /// </summary>
+#if FORCEINLINE
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        public void FastClear()
+        {
+            count = 0;
+            firstIndex = 0;
+            lastIndex = capacityMask;
+        }
+
+        /// <summary>
         /// Compacts the internal buffer to the minimum size required for the number of elements in the queue.
         /// </summary>
         public void Compact()

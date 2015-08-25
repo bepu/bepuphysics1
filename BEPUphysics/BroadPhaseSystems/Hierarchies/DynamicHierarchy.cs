@@ -175,12 +175,12 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
 
         #endregion
 
-        private void SingleThreadedRefitPhase()
+        public void SingleThreadedRefitPhase()
         {
             root.Refit();
         }
 
-        private void SingleThreadedOverlapPhase()
+        public void SingleThreadedOverlapPhase()
         {
             if (!root.IsLeaf) //If the root is a leaf, it's alone- nothing to collide against! This test is required by the assumptions of the leaf-leaf test.
                 root.GetOverlaps(root, this);
@@ -305,6 +305,26 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
         internal void ForceRevalidation()
         {
             ((InternalNode)root).Revalidate();
+        }
+
+
+        /// <summary>
+        /// Measures the cost of the tree, based on the volume of the tree's nodes.
+        /// Approximates the expected cost of volume-based queries against the tree. 
+        /// Useful for comparing against other trees.
+        /// </summary>
+        /// <returns>Cost of the tree.</returns>
+        public float MeasureCostMetric()
+        {
+            if (root != null)
+            {
+                var offset = root.BoundingBox.Max - root.BoundingBox.Min;
+                var volume = offset.X * offset.Y * offset.Z;
+                if (volume < 1e-9f)
+                    return 0;
+                return root.MeasureSubtreeCost() / volume;
+            }
+            return 0;
         }
         #endregion
     }

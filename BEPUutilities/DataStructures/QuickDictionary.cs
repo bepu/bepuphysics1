@@ -107,6 +107,8 @@ namespace BEPUutilities.DataStructures
             Keys = keyPool.TakeFromPoolIndex(pairPoolIndex);
             Values = valuePool.TakeFromPoolIndex(pairPoolIndex);
             table = tablePool.TakeFromPoolIndex(tablePoolIndex);
+            //Pooled buffers are not guaranteed to be cleared. The dictionary and set require clean tables, 0 means untaken.
+            Array.Clear(table, 0, table.Length);
             count = 0;
             tableMask = table.Length - 1;
 
@@ -353,7 +355,7 @@ namespace BEPUutilities.DataStructures
         }
 
         /// <summary>
-        /// Removes all elements from the set.
+        /// Removes all elements from the dictionary.
         /// </summary>
         public void Clear()
         {
@@ -362,6 +364,15 @@ namespace BEPUutilities.DataStructures
             Array.Clear(table, 0, table.Length);
             Array.Clear(Keys, 0, count);
             Array.Clear(Values, 0, count);
+            count = 0;
+        }
+
+        /// <summary>
+        /// Removes all elements from the dictionary without modifying the contents of the keys or values arrays. Be careful about using this with reference types.
+        /// </summary>
+        public void FastClear()
+        {
+            Array.Clear(table, 0, table.Length);
             count = 0;
         }
 
@@ -433,9 +444,13 @@ namespace BEPUutilities.DataStructures
         /// </summary>
         public void Dispose()
         {
-            //We must clean out the table before returning it to the pool.
-
-            Clear();
+            //We must clean out the table before returning it to the pool in case the array contains reference types which would otherwise leak.
+            //The user may have already manually cleared it. To avoid doing redundant work, check the count first.
+            //The user may have chosen to leave reference types in the list if they did a fast clear, but that's not for us to worry about.
+            if (count > 0)
+            {
+                Clear();
+            }
 
             tablePool.GiveBack(table, tablePoolIndex);
             keyPool.GiveBack(Keys, pairPoolIndex);
