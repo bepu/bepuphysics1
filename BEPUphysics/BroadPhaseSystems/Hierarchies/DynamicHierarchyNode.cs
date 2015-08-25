@@ -40,6 +40,8 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
 
         internal abstract bool Remove(BroadPhaseEntry entry, out LeafNode leafNode, out Node replacementNode);
         internal abstract bool RemoveFast(BroadPhaseEntry entry, out LeafNode leafNode, out Node replacementNode);
+
+        internal abstract float MeasureSubtreeCost();
     }
 
     internal sealed class InternalNode : Node
@@ -611,6 +613,13 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
             return false;
         }
 
+        internal override float MeasureSubtreeCost()
+        {
+            Vector3 offset;
+            Vector3.Subtract(ref BoundingBox.Max, ref BoundingBox.Min, out offset);
+            return offset.X * offset.Y * offset.Z + ChildA.MeasureSubtreeCost() + childB.MeasureSubtreeCost();
+        }
+
 
         static XComparer xComparer = new XComparer();
         static YComparer yComparer = new YComparer();
@@ -835,6 +844,14 @@ namespace BEPUphysics.BroadPhaseSystems.Hierarchies
             }
             leafNode = null;
             return false;
+        }
+
+        internal override float MeasureSubtreeCost()
+        {
+            //Not much value in attempting to assign variable cost to leaves vs internal nodes for this diagnostic.
+            Vector3 offset;
+            Vector3.Subtract(ref BoundingBox.Max, ref BoundingBox.Min, out offset);
+            return offset.X * offset.Y * offset.Z;
         }
     }
 }
