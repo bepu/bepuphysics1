@@ -287,10 +287,20 @@ namespace BEPUutilities.DataStructures
 #endif
         public void CopyTo(T[] array, int arrayIndex)
         {
-            //Copy the old first-end to the first part of the new array.
-            Array.Copy(Elements, firstIndex, array, arrayIndex, Elements.Length - firstIndex);
-            //Copy the old begin-first to the second part of the new array.
-            Array.Copy(Elements, 0, array, arrayIndex + Elements.Length - firstIndex, firstIndex);
+            if (count > 0)
+            {
+                if (firstIndex <= lastIndex)
+                {
+                    Array.Copy(Elements, firstIndex, array, arrayIndex, count);
+                }
+                else
+                {
+                    //Copy the old first-end to the first part of the new array.
+                    Array.Copy(Elements, firstIndex, array, arrayIndex, Elements.Length - firstIndex);
+                    //Copy the old begin-last to the second part of the new array.
+                    Array.Copy(Elements, 0, array, arrayIndex + Elements.Length - firstIndex, lastIndex + 1);
+                }
+            }
         }
 
         /// <summary>
