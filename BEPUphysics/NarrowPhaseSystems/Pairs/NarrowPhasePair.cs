@@ -37,7 +37,7 @@ namespace BEPUphysics.NarrowPhaseSystems.Pairs
             }
         }
 
-        internal BroadPhaseOverlap broadPhaseOverlap;
+        protected internal BroadPhaseOverlap broadPhaseOverlap;
         ///<summary>
         /// Gets the overlap used to create the pair.
         ///</summary>

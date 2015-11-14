@@ -12,6 +12,15 @@ namespace BEPUphysics.BroadPhaseEntries.Events
     ///<typeparam name="T">Some Collidable subclass.</typeparam>
     public class ContactEventManager<T> : EntryEventManager<T>, IContactEventTriggerer where T : Collidable
     {
+        /// <summary>
+        /// Creates a new contact event manager with the given owner.
+        /// </summary>
+        /// <param name="owner">New owner of the contact event manager.</param>
+        public ContactEventManager(T owner = null)
+        {
+            Owner = owner;
+        }
+
 
         #region Events
 

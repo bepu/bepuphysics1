@@ -20,7 +20,7 @@ namespace BEPUphysics.BroadPhaseEntries
 
 
 
-        internal CollisionShape shape; //Having this non-private allows for some very special-casey stuff; see TriangleShape initialization.
+        protected internal CollisionShape shape; //Having this non-private allows for some very special-casey stuff; see TriangleShape initialization.
         ///<summary>
         /// Gets the shape used by the collidable.
         ///</summary>
