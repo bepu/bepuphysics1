@@ -113,7 +113,7 @@ namespace BEPUphysics.BroadPhaseEntries
         }
 
 
-        
+
         /// <summary>
         /// Fires when an entity comes into contact with the volume.
         /// </summary>
@@ -135,7 +135,7 @@ namespace BEPUphysics.BroadPhaseEntries
         public event VolumeStopsContainingEntityEventHandler VolumeStoppedContainingEntity;
 
 
-        
+
 
         private Space space;
         Space ISpaceObject.Space
@@ -224,7 +224,10 @@ namespace BEPUphysics.BroadPhaseEntries
 
         }
 
-        protected internal override bool IsActive
+        /// <summary>
+        /// Gets whether this collidable is associated with an active entity. True if it is, false if it's not.
+        /// </summary>
+        public override bool IsActive
         {
             get { return false; }
         }
