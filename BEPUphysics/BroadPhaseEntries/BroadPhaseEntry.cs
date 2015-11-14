@@ -55,7 +55,10 @@ namespace BEPUphysics.BroadPhaseEntries
             }
         }
 
-        protected internal abstract bool IsActive { get; }
+        /// <summary>
+        /// Gets whether this collidable is associated with an active entity. True if it is, false if it's not.
+        /// </summary>
+        public abstract bool IsActive { get; }
 
         internal CollisionRules collisionRules;
         /// <summary>

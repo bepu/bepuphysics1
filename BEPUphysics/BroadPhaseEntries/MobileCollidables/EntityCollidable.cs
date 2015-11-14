@@ -90,7 +90,10 @@ namespace BEPUphysics.BroadPhaseEntries.MobileCollidables
             }
         }
 
-        protected internal override bool IsActive
+        /// <summary>
+        /// Gets whether this collidable is associated with an active entity. True if it is, false if it's not.
+        /// </summary>
+        public override bool IsActive
         {
             get
             {

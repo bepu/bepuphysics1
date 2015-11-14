@@ -66,7 +66,10 @@ namespace BEPUphysics.BroadPhaseEntries
             }
         }
 
-        protected internal override bool IsActive
+        /// <summary>
+        /// Gets whether this collidable is associated with an active entity. Returns false for all static collidables.
+        /// </summary>
+        public override bool IsActive
         {
             get { return false; }
         }
