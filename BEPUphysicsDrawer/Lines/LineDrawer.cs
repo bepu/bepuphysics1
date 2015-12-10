@@ -6,6 +6,7 @@ using BEPUphysics.Constraints.SolverGroups;
 using BEPUphysics.Constraints.TwoEntity.JointLimits;
 using BEPUphysics.Constraints.TwoEntity.Joints;
 using BEPUphysics.Constraints.TwoEntity.Motors;
+using BEPUutilities.DataStructures;
 using ConversionHelper;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -20,12 +21,20 @@ namespace BEPUphysicsDrawer.Lines
         private readonly Queue<int> availableIndices = new Queue<int>();
         private readonly BlendState blendState;
 
-        private readonly List<LineDisplayObjectBase> displayObjects = new List<LineDisplayObjectBase>();
+        private Dictionary<object, LineDisplayObjectBase> displayMapping = new Dictionary<object, LineDisplayObjectBase>();
         private readonly Game game;
         private readonly BasicEffect lineDrawer;
 
+        /// <summary>
+        /// Gets the mapping between added objects and their display representations.
+        /// </summary>
+        public ReadOnlyDictionary<object, LineDisplayObjectBase> DisplayMapping
+        {
+            get { return new ReadOnlyDictionary<object, LineDisplayObjectBase>(displayMapping); }
+        }
 
-        private readonly Dictionary<Type, Type> myDisplayTypes = new Dictionary<Type, Type>();
+
+        private readonly Dictionary<Type, Type> displayTypes = new Dictionary<Type, Type>();
         private int firstOpenIndex;
 
         /// <summary>
@@ -39,18 +48,18 @@ namespace BEPUphysicsDrawer.Lines
             lineDrawer = new BasicEffect(game.GraphicsDevice);
 
             //Set up the default type mapping.   
-            myDisplayTypes.Add(typeof(PointOnPlaneJoint), typeof(DisplayPointOnPlaneJoint));
-            myDisplayTypes.Add(typeof(SwivelHingeAngularJoint), typeof(DisplaySwivelHingeAngularJoint));
-            myDisplayTypes.Add(typeof(PointOnLineJoint), typeof(DisplayPointOnLineJoint));
-            myDisplayTypes.Add(typeof(BallSocketJoint), typeof(DisplayBallSocketJoint));
-            myDisplayTypes.Add(typeof(TwistJoint), typeof(DisplayTwistJoint));
-            myDisplayTypes.Add(typeof(TwistMotor), typeof(DisplayTwistMotor));
-            myDisplayTypes.Add(typeof(DistanceLimit), typeof(DisplayDistanceLimit));
-            myDisplayTypes.Add(typeof(DistanceJoint), typeof(DisplayDistanceJoint));
-            myDisplayTypes.Add(typeof(LinearAxisLimit), typeof(DisplayLinearAxisLimit));
-            myDisplayTypes.Add(typeof(EllipseSwingLimit), typeof(DisplayEllipseSwingLimit));
-            myDisplayTypes.Add(typeof(SingleEntityLinearMotor), typeof(DisplaySingleEntityLinearMotor));
-            myDisplayTypes.Add(typeof(RevoluteLimit), typeof(DisplayRevoluteLimit));
+            displayTypes.Add(typeof(PointOnPlaneJoint), typeof(DisplayPointOnPlaneJoint));
+            displayTypes.Add(typeof(SwivelHingeAngularJoint), typeof(DisplaySwivelHingeAngularJoint));
+            displayTypes.Add(typeof(PointOnLineJoint), typeof(DisplayPointOnLineJoint));
+            displayTypes.Add(typeof(BallSocketJoint), typeof(DisplayBallSocketJoint));
+            displayTypes.Add(typeof(TwistJoint), typeof(DisplayTwistJoint));
+            displayTypes.Add(typeof(TwistMotor), typeof(DisplayTwistMotor));
+            displayTypes.Add(typeof(DistanceLimit), typeof(DisplayDistanceLimit));
+            displayTypes.Add(typeof(DistanceJoint), typeof(DisplayDistanceJoint));
+            displayTypes.Add(typeof(LinearAxisLimit), typeof(DisplayLinearAxisLimit));
+            displayTypes.Add(typeof(EllipseSwingLimit), typeof(DisplayEllipseSwingLimit));
+            displayTypes.Add(typeof(SingleEntityLinearMotor), typeof(DisplaySingleEntityLinearMotor));
+            displayTypes.Add(typeof(RevoluteLimit), typeof(DisplayRevoluteLimit));
 
             blendState = new BlendState();
             blendState.ColorSourceBlend = Blend.SourceAlpha;
@@ -64,7 +73,7 @@ namespace BEPUphysicsDrawer.Lines
         /// </summary>
         public Dictionary<Type, Type> DisplayTypes
         {
-            get { return myDisplayTypes; }
+            get { return displayTypes; }
         }
 
         /// <summary>
@@ -130,10 +139,10 @@ namespace BEPUphysicsDrawer.Lines
         public void Update()
         {
             //Update vertex positions and data.
-            foreach (LineDisplayObjectBase c in displayObjects)
+            foreach (var displayObject in displayMapping.Values)
             {
-                if (c.IsDrawing && c.IsActive)
-                    c.Update();
+                if (displayObject.IsDrawing && displayObject.IsActive)
+                    displayObject.Update();
             }
         }
 
@@ -169,7 +178,6 @@ namespace BEPUphysicsDrawer.Lines
             }
         }
 
-
         /// <summary>
         /// Adds the object to the rendering system.
         /// </summary>
@@ -179,7 +187,7 @@ namespace BEPUphysicsDrawer.Lines
         {
             //Create the correct kind of display object for this line drawer.
             Type displayType;
-            if (myDisplayTypes.TryGetValue(o.GetType(), out displayType))
+            if (displayTypes.TryGetValue(o.GetType(), out displayType))
             {
 #if !WINDOWS
                 LineDisplayObjectBase objectAdded = (LineDisplayObjectBase)displayType.GetConstructor(
@@ -188,7 +196,7 @@ namespace BEPUphysicsDrawer.Lines
 #else
                 var objectAdded = (LineDisplayObjectBase)Activator.CreateInstance(displayType, new[] { o, this });
 #endif
-                displayObjects.Add(objectAdded);
+                displayMapping.Add(o, objectAdded);
                 return objectAdded;
             }
             if (o is SolverGroup)
@@ -210,20 +218,31 @@ namespace BEPUphysicsDrawer.Lines
         /// Removes the object from the rendering system.
         /// </summary>
         /// <param name="o">Object to remove.</param>
-        /// <returns>Display object created from the object that was just removed.  Null if not found.</returns>
-        public LineDisplayObjectBase Remove<T>(T o)
+        /// <returns>True if the object was fully removed. False if the object was not found in the drawer, or if it was a solver group that could only be partially removed.</returns>
+        public bool Remove(object o)
         {
-            for (int i = 0; i < displayObjects.Count; i++)
+            LineDisplayObjectBase displayObject;
+            if (displayMapping.TryGetValue(o, out displayObject))
             {
-                var lineDisplayObject = displayObjects[i] as LineDisplayObject<T>;
-                if (lineDisplayObject != null && lineDisplayObject.LineObject.Equals(o))
-                {
-                    lineDisplayObject.RemoveLines();
-                    displayObjects.RemoveAt(i);
-                    return lineDisplayObject;
-                }
+                displayObject.RemoveLines();
+                displayMapping.Remove(o);
+                return true;
             }
-            return null;
+            if (o is SolverGroup)
+            {
+                //Solver groups are special.  If no special type-specific display object 
+                //has been registered for a solver group, remove every child individually.
+                bool removed = true;
+                foreach (var item in (o as SolverGroup).SolverUpdateables)
+                {
+                    //Only try to remove types which the line drawer could have recognized.
+                    Type displayType;
+                    if (displayTypes.TryGetValue(item.GetType(), out displayType) && !Remove(item))
+                        removed = false;
+                }
+                return removed;
+            }
+            return false;
         }
 
 
@@ -234,7 +253,7 @@ namespace BEPUphysicsDrawer.Lines
         {
             firstOpenIndex = 0;
             availableIndices.Clear();
-            displayObjects.Clear();
+            displayMapping.Clear();
         }
     }
 }
