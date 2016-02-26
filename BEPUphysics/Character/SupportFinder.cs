@@ -517,9 +517,9 @@ namespace BEPUphysics.Character
 
 
         /// <summary>
-        /// Cleans up the support finder.
+        /// Clears out the support finder's cache, removing all support from the character.
         /// </summary>
-        internal void ClearSupportData()
+        public void ClearSupportData()
         {
             HasSupport = false;
             HasTraction = false;
