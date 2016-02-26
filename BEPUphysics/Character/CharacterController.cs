@@ -557,7 +557,7 @@ namespace BEPUphysics.Character
 
 
                 //Attempt to jump.
-                if (tryToJump)
+                if (TryToJump)
                 {
                     //In the following, note that the jumping velocity changes are computed such that the separating velocity is specifically achieved,
                     //rather than just adding some speed along an arbitrary direction.  This avoids some cases where the character could otherwise increase
@@ -592,7 +592,7 @@ namespace BEPUphysics.Character
                         supportData = new SupportData();
                     }
                 }
-                tryToJump = false;
+                TryToJump = false;
 
 
                 //Try to step!
@@ -843,16 +843,27 @@ namespace BEPUphysics.Character
 
         }
 
-        bool tryToJump;
         /// <summary>
-        /// Jumps the character off of whatever it's currently standing on.  If it has traction, it will go straight up.
-        /// If it doesn't have traction, but is still supported by something, it will jump in the direction of the surface normal.
+        /// <para>Gets or sets whether the character should attempt to jump during the next update. During each update, this flag will be set to false.
+        /// If it has traction, it will go straight up. If it doesn't have traction, but is still supported by something, it will jump in the direction of the surface normal.</para>
+        /// <para>Setting this to true has the same effect as calling Jump. This property is primarily useful for fully resetting the physical state to avoid desynchronization, e.g. in networking.</para>
+        /// </summary>
+        public bool TryToJump
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// <para>Jumps the character off of whatever it's currently standing on during the next update.  If it has traction, it will go straight up.
+        /// If it doesn't have traction, but is still supported by something, it will jump in the direction of the surface normal.</para>
+        /// <para>The same effect can be achieved by setting TryToJump to true.</para>
         /// </summary>
         public void Jump()
         {
             //The actual jump velocities are applied next frame.  This ensures that gravity doesn't pre-emptively slow the jump, and uses more
             //up-to-date support data.
-            tryToJump = true;
+            TryToJump = true;
         }
 
         public override void OnAdditionToSpace(Space newSpace)
