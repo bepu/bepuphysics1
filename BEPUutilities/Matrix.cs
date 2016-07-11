@@ -1173,7 +1173,7 @@ namespace BEPUutilities
 
 
         /// <summary>
-        /// Creates a view matrix pointing looking in a direction with a given up vector.
+        /// Creates a view matrix pointing in a direction with a given up vector.
         /// </summary>
         /// <param name="position">Position of the camera.</param>
         /// <param name="forward">Forward direction of the camera.</param>

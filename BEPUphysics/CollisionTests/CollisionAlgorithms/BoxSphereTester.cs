@@ -74,7 +74,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 else
                 {
                     contact.Normal = localClosestPoint.Z > 0 ? Toolbox.BackVector : Toolbox.ForwardVector; 
-                    contact.PenetrationDepth = penetrationDepths.X;
+                    contact.PenetrationDepth = penetrationDepths.Z;
                 }
                 contact.PenetrationDepth += sphere.collisionMargin;
                 Quaternion.Transform(ref contact.Normal, ref boxTransform.Orientation, out contact.Normal);

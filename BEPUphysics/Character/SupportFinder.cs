@@ -528,7 +528,6 @@ namespace BEPUphysics.Character
             sideContacts.Clear();
             headContacts.Clear();
             SupportRayData = null;
-
         }
 
 
