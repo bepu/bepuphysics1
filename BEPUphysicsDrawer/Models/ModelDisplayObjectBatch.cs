@@ -29,7 +29,7 @@ namespace BEPUphysicsDrawer.Models
         /// <summary>
         /// List of textures associated with display objects in the batch.
         /// </summary>
-        private readonly int[] textureIndices = new int[MaximumObjectsPerBatch];
+        private readonly float[] textureIndices = new float[MaximumObjectsPerBatch];
 
         //These lists are used to collect temporary data from display objects.
         private readonly List<VertexPositionNormalTexture> vertexList = new List<VertexPositionNormalTexture>();
@@ -113,7 +113,7 @@ namespace BEPUphysicsDrawer.Models
             vertexBuffer.SetData(vertices);
             instancingBuffer = new VertexBuffer(graphicsDevice, InstancedVertex.VertexDeclaration, instancedVertices.Length, BufferUsage.WriteOnly);
             instancingBuffer.SetData(instancedVertices);
-            bindings = new VertexBufferBinding[] { vertexBuffer, instancingBuffer };
+            bindings = new[] { new VertexBufferBinding(vertexBuffer), new VertexBufferBinding(instancingBuffer) };
             indexBuffer = new IndexBuffer(graphicsDevice, IndexElementSize.SixteenBits, indices.Length, BufferUsage.WriteOnly);
             indexBuffer.SetData(indices);
 
@@ -192,7 +192,7 @@ namespace BEPUphysicsDrawer.Models
                 indexBuffer = new IndexBuffer(graphicsDevice, IndexElementSize.SixteenBits, indices.Length, BufferUsage.WriteOnly);
                 indexBuffer.SetData(indices);
 
-                bindings = new VertexBufferBinding[] { vertexBuffer, instancingBuffer };
+                bindings = new[] { new VertexBufferBinding(vertexBuffer), new VertexBufferBinding(instancingBuffer) };
             }
         }
 
