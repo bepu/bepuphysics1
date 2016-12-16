@@ -30,14 +30,8 @@ namespace BEPUphysicsDrawer.Models
         public InstancedModelDrawer(Game game)
             : base(game)
         {
-            var resourceContentManager = new ResourceContentManager(game.Services, DrawerResource.ResourceManager);
-#if WINDOWS
-            instancingEffect = resourceContentManager.Load<Effect>("InstancedEffect");
-#else
-            instancingEffect = resourceContentManager.Load<Effect>("InstancedEffectXbox");
-#endif
-            //instancingEffect = game.Content.Load<Effect>("InstancedEffect");
-
+            instancingEffect = game.Content.Load<Effect>("InstancedEffect");
+            
             worldTransformsParameter = instancingEffect.Parameters["WorldTransforms"];
             textureIndicesParameter = instancingEffect.Parameters["TextureIndices"];
             viewParameter = instancingEffect.Parameters["View"];

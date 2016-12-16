@@ -52,19 +52,18 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
     int index = (int)round(input.Index);
     float3 worldPosition = mul(input.Position, WorldTransforms[index]);
     output.Position = mul(mul(float4(worldPosition, 1), View), Projection);
-    output.Normal = mul(input.Normal, WorldTransforms[index]);
+    output.Normal = mul(float4(input.Normal, 0), WorldTransforms[index]);
 	output.TextureIndex = input.TextureIndex;
 
     return output;
 }
 
-float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
+float3 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 {
-    float4 surfaceColor;
 
 	float halfPixel = .5f / NUM_TEXTURES;
     
-	surfaceColor = tex2D(ColorSampler, float2(halfPixel + halfPixel * 2 * input.TextureIndex, halfPixel));
+	float3 surfaceColor = tex2D(ColorSampler, float2(halfPixel + halfPixel * 2 * input.TextureIndex, halfPixel)).xyz;
 
 		
 	float3 normal = normalize(input.Normal);
@@ -72,7 +71,7 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
     float diffuseAmount2 = saturate(-dot(normal, LightDirection2));
   
     
-	surfaceColor =  float4(AmbientAmount * surfaceColor + surfaceColor * (diffuseAmount1 * DiffuseColor1 + diffuseAmount2 * DiffuseColor2), 1);
+	surfaceColor =  AmbientAmount * surfaceColor + surfaceColor * (diffuseAmount1 * DiffuseColor1 + diffuseAmount2 * DiffuseColor2);
     return surfaceColor;
 }
 
@@ -80,7 +79,7 @@ technique Technique1
 {
     pass Pass1
     {
-        VertexShader = compile vs_2_0 VertexShaderFunction();
-        PixelShader = compile ps_2_0 PixelShaderFunction();
+        VertexShader = compile vs_4_0 VertexShaderFunction();
+        PixelShader = compile ps_4_0 PixelShaderFunction();
     }
 }

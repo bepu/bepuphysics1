@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyProduct("BEPUphysics")]
 [assembly: AssemblyDescription("Real time physics simulation library")]
 [assembly: AssemblyCompany("Bepu Entertainment LLC")]
-[assembly: AssemblyCopyright("Copyright © 2014, Bepu Entertainment LLC")]
+[assembly: AssemblyCopyright("Copyright © 2016, Bepu Entertainment LLC")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
