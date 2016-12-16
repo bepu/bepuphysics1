@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Bepu Entertainment LLC")]
 [assembly: AssemblyProduct("BEPUutilities")]
-[assembly: AssemblyCopyright("Copyright © 2014, Bepu Entertainment LLC")]
+[assembly: AssemblyCopyright("Copyright © 2016, Bepu Entertainment LLC")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

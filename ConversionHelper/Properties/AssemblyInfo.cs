@@ -6,23 +6,21 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("ConversionHelper")]
+[assembly: AssemblyDescription("Helps convert types between BEPUutilities and MonoGame.")]
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyCompany("Bepu Entertainment LLC")]
 [assembly: AssemblyProduct("ConversionHelper")]
-[assembly: AssemblyDescription("Simple math conversion helpers")]
-[assembly: AssemblyCompany("Bepu Entertainment, LLC")]
-[assembly: AssemblyCopyright("Copyright © 2014, Bepu Entertainment LLC")]
+[assembly: AssemblyCopyright("Copyright © 2016, Bepu Entertainment LLC")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
-// COM, set the ComVisible attribute to true on that type. Only Windows
-// assemblies support COM.
+// COM, set the ComVisible attribute to true on that type.
 [assembly: ComVisible(false)]
 
-// On Windows, the following GUID is for the ID of the typelib if this
-// project is exposed to COM. On other platforms, it unique identifies the
-// title storage container when deploying this assembly to the device.
-[assembly: Guid("647024ce-597e-439d-8954-206aaa5f6d31")]
+// The following GUID is for the ID of the typelib if this project is exposed to COM
+[assembly: Guid("aa264458-f33c-4b6b-90c1-b3209470893b")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -31,4 +29,8 @@ using System.Runtime.InteropServices;
 //      Build Number
 //      Revision
 //
-[assembly: AssemblyVersion("1.4.0.0")]
+// You can specify all the values or you can default the Build and Revision Numbers 
+// by using the '*' as shown below:
+// [assembly: AssemblyVersion("1.0.*")]
+[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyFileVersion("0")]

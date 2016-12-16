@@ -1,30 +1,26 @@
 ﻿using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-
 [assembly: AssemblyTitle("BEPUphysicsDrawer")]
-[assembly: AssemblyProduct("BEPUphysicsDrawer")]
-[assembly: AssemblyDescription("Debug visualizer for BEPUphysics")]
+[assembly: AssemblyDescription("Very old and not great basic debug renderer for the BEPUphysicsDemos.")]
+[assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Bepu Entertainment LLC")]
-[assembly: AssemblyCopyright("Copyright © 2014, Bepu Entertainment LLC")]
+[assembly: AssemblyProduct("BEPUphysicsDrawer")]
+[assembly: AssemblyCopyright("Copyright © 2016, Bepu Entertainment LLC")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
-// COM, set the ComVisible attribute to true on that type. Only Windows
-// assemblies support COM.
-
+// COM, set the ComVisible attribute to true on that type.
 [assembly: ComVisible(false)]
 
-// On Windows, the following GUID is for the ID of the typelib if this
-// project is exposed to COM. On other platforms, it unique identifies the
-// title storage container when deploying this assembly to the device.
-
-[assembly: Guid("6db0e2d0-5900-4151-9c4b-62a12293ddb9")]
+// The following GUID is for the ID of the typelib if this project is exposed to COM
+[assembly: Guid("6c947788-8eaa-40e6-ae71-d18a11dd2f4e")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -33,6 +29,8 @@ using System.Runtime.InteropServices;
 //      Build Number
 //      Revision
 //
-
+// You can specify all the values or you can default the Build and Revision Numbers 
+// by using the '*' as shown below:
+// [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.4.0.0")]
-[assembly: AssemblyFileVersionAttribute("0")]
+[assembly: AssemblyFileVersion("0")]
