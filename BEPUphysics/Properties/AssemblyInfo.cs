@@ -31,7 +31,7 @@ using System.Runtime.InteropServices;
 //      Build Number
 //      Revision
 //
-[assembly: AssemblyVersion("1.4.0.0")]
+[assembly: AssemblyVersion("1.5.0.0")]
 #if WINDOWS_PHONE
 [assembly: CodeGeneration(CodeGenerationFlags.EnableFPIntrinsicsUsingSIMD)]
 #endif
