@@ -1,0 +1,977 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>BEPUphysicsDrawer</name>
+    </assembly>
+    <members>
+        <member name="T:BEPUphysicsDrawer.Font.TextDrawer">
+            <summary>
+            Simple text-drawing helper class.
+            </summary>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Font.TextDrawer.#ctor(Microsoft.Xna.Framework.Graphics.SpriteBatch,Microsoft.Xna.Framework.Graphics.SpriteFont,Microsoft.Xna.Framework.Color)">
+            <summary>
+            Constructs a new text drawer.
+            </summary>
+            <param name="spriteBatch">Sprite batch to use.</param>
+            <param name="font">Font to use.</param>
+            <param name="color">Color to use.</param>
+        </member>
+        <member name="P:BEPUphysicsDrawer.Font.TextDrawer.SpriteBatch">
+            <summary>
+            Gets the sprite batch used by the drawer.
+            </summary>
+        </member>
+        <member name="P:BEPUphysicsDrawer.Font.TextDrawer.Font">
+            <summary>
+            Gets or sets the font used by the drawer.
+            </summary>
+        </member>
+        <member name="P:BEPUphysicsDrawer.Font.TextDrawer.Color">
+            <summary>
+            Gets or sets the color used by the drawer.
+            </summary>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Font.TextDrawer.Draw(System.String,Microsoft.Xna.Framework.Vector2)">
+            <summary>
+            Draws the text at a position.
+            </summary>
+            <param name="text">Text to draw.</param>
+            <param name="position">Position to draw the text at.</param>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Font.TextDrawer.Draw(System.String,System.Int32,Microsoft.Xna.Framework.Vector2)">
+            <summary>
+            Draws text followed by an integer.
+            </summary>
+            <param name="text">Text to draw.</param>
+            <param name="value">Value to draw.</param>
+            <param name="position">Position to draw the text at.</param>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Font.TextDrawer.Draw(System.String,System.Double,Microsoft.Xna.Framework.Vector2)">
+            <summary>
+            Draws text followed by a double.
+            </summary>
+            <param name="text">Text to draw.</param>
+            <param name="value">Number to draw.</param>
+            <param name="position">Position to draw the text at.</param>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Font.TextDrawer.Draw(System.String,System.Double,System.Int32,Microsoft.Xna.Framework.Vector2)">
+            <summary>
+            Draws text followed by a double.
+            </summary>
+            <param name="text">Text to draw.</param>
+            <param name="value">Number to draw.</param>
+            <param name="numPlaces">Number of digits to include after the decimal.</param>
+            <param name="position">Position to draw the text at.</param>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Font.TextDrawer.Draw(System.Int32,Microsoft.Xna.Framework.Vector2)">
+            <summary>  
+            Draws an integer.
+            </summary>  
+            <param name="value">The integer value to draw.</param>  
+            <param name="position">The screen position specifying where to draw the value.</param>  
+            <returns>The next position on the line to draw text. This value uses position.Y and position.X plus the equivalent of calling spriteFont.MeasureString on value.ToString(CultureInfo.InvariantCulture).</returns>  
+        </member>
+        <member name="M:BEPUphysicsDrawer.Font.TextDrawer.Draw(System.Double,Microsoft.Xna.Framework.Vector2)">
+            <summary>  
+            Draws a double.
+            </summary>  
+            <param name="value">The double value to draw.</param>  
+            <param name="position">The screen position specifying where to draw the value.</param>  
+            <returns>The next position on the line to draw text. This value uses position.Y and position.X plus the equivalent of calling spriteFont.MeasureString on value.ToString(CultureInfo.InvariantCulture).</returns>  
+        </member>
+        <member name="M:BEPUphysicsDrawer.Font.TextDrawer.Draw(System.Double,System.Int32,Microsoft.Xna.Framework.Vector2)">
+            <summary>  
+            Draws a double.
+            </summary>  
+            <param name="value">The double value to draw.</param>  
+            <param name="numPlaces">Maximum number of digits to include after the decimal.</param>
+            <param name="position">The screen position specifying where to draw the value.</param>  
+            <returns>The next position on the line to draw text. This value uses position.Y and position.X plus the equivalent of calling spriteFont.MeasureString on value.ToString(CultureInfo.InvariantCulture).</returns>  
+        </member>
+        <member name="T:BEPUphysicsDrawer.Lines.BoundingBoxDrawer">
+            <summary>
+            Renders bounding boxes of entities.
+            </summary>
+        </member>
+        <member name="T:BEPUphysicsDrawer.Lines.ContactDrawer">
+            <summary>
+            Renders contact points.
+            </summary>
+        </member>
+        <member name="T:BEPUphysicsDrawer.Lines.DisplayBallSocketJoint">
+            <summary>
+            Graphical representation of a ball socket joint.
+            </summary>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Lines.DisplayBallSocketJoint.Update">
+            <summary>
+            Moves the constraint lines to the proper location relative to the entities involved.
+            </summary>
+        </member>
+        <member name="T:BEPUphysicsDrawer.Lines.DisplayDistanceJoint">
+            <summary>
+            Graphical representation of a PointOnPlaneConstraint
+            </summary>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Lines.DisplayDistanceJoint.Update">
+            <summary>
+            Moves the constraint lines to the proper location relative to the entities involved.
+            </summary>
+        </member>
+        <member name="T:BEPUphysicsDrawer.Lines.DisplayDistanceLimit">
+            <summary>
+            Graphical representation of a PointOnPlaneConstraint
+            </summary>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Lines.DisplayDistanceLimit.Update">
+            <summary>
+            Moves the constraint lines to the proper location relative to the entities involved.
+            </summary>
+        </member>
+        <member name="T:BEPUphysicsDrawer.Lines.DisplayEllipseSwingLimit">
+            <summary>
+            Graphical representation of a twist joint
+            </summary>
+        </member>
+        <member name="F:BEPUphysicsDrawer.Lines.DisplayEllipseSwingLimit.limitFacetCount">
+            <summary>
+            Number of facets to use when representing the swing limit boundary.
+            </summary>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Lines.DisplayEllipseSwingLimit.Update">
+            <summary>
+            Moves the constraint lines to the proper location relative to the entities involved.
+            </summary>
+        </member>
+        <member name="T:BEPUphysicsDrawer.Lines.DisplayLinearAxisLimit">
+            <summary>
+            Graphical representation of a LinearLimit.
+            </summary>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Lines.DisplayLinearAxisLimit.Update">
+            <summary>
+            Moves the constraint lines to the proper location relative to the entities involved.
+            </summary>
+        </member>
+        <member name="T:BEPUphysicsDrawer.Lines.DisplayPointOnLineJoint">
+            <summary>
+            Graphical representation of a PointOnPlaneConstraint
+            </summary>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Lines.DisplayPointOnLineJoint.Update">
+            <summary>
+            Moves the constraint lines to the proper location relative to the entities involved.
+            </summary>
+        </member>
+        <member name="T:BEPUphysicsDrawer.Lines.DisplayPointOnPlaneJoint">
+            <summary>
+            Graphical representation of a PointOnPlaneConstraint
+            </summary>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Lines.DisplayPointOnPlaneJoint.Update">
+            <summary>
+            Moves the constraint lines to the proper location relative to the entities involved.
+            </summary>
+        </member>
+        <member name="T:BEPUphysicsDrawer.Lines.DisplayRevoluteLimit">
+            <summary>
+            Graphical representation of a ball socket joint.
+            </summary>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Lines.DisplayRevoluteLimit.Update">
+            <summary>
+            Moves the constraint lines to the proper location relative to the entities involved.
+            </summary>
+        </member>
+        <member name="T:BEPUphysicsDrawer.Lines.DisplaySingleEntityLinearMotor">
+            <summary>
+            Graphical representation of a single entity linear motor.
+            </summary>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Lines.DisplaySingleEntityLinearMotor.Update">
+            <summary>
+            Moves the constraint lines to the proper location relative to the entities involved.
+            </summary>
+        </member>
+        <member name="T:BEPUphysicsDrawer.Lines.DisplaySwivelHingeAngularJoint">
+            <summary>
+            Graphical representation of a SwivelHinge.
+            </summary>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Lines.DisplaySwivelHingeAngularJoint.Update">
+            <summary>
+            Moves the constraint lines to the proper location relative to the entities involved.
+            </summary>
+        </member>
+        <member name="T:BEPUphysicsDrawer.Lines.DisplayTwistJoint">
+            <summary>
+            Graphical representation of a twist joint
+            </summary>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Lines.DisplayTwistJoint.Update">
+            <summary>
+            Moves the constraint lines to the proper location relative to the entities involved.
+            </summary>
+        </member>
+        <member name="T:BEPUphysicsDrawer.Lines.DisplayTwistMotor">
+            <summary>
+            Graphical representation of a twist joint
+            </summary>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Lines.DisplayTwistMotor.Update">
+            <summary>
+            Moves the constraint lines to the proper location relative to the entities involved.
+            </summary>
+        </member>
+        <member name="T:BEPUphysicsDrawer.Lines.Line">
+            <summary>
+            Represents a graphical line in the ConstraintDrawer.
+            </summary>
+        </member>
+        <member name="F:BEPUphysicsDrawer.Lines.Line.IndexA">
+            <summary>
+            First index of the line in the constraint drawer vertex list.
+            </summary>
+        </member>
+        <member name="F:BEPUphysicsDrawer.Lines.Line.IndexB">
+            <summary>
+            Second index of the line in the constraint drawer vertex list.
+            </summary>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Lines.Line.#ctor(Microsoft.Xna.Framework.Vector3,Microsoft.Xna.Framework.Vector3,Microsoft.Xna.Framework.Color,Microsoft.Xna.Framework.Color,BEPUphysicsDrawer.Lines.LineDrawer)">
+            <summary>
+            Constructs a new line.
+            </summary>
+            <param name="positionA">Initial position of the first vertex of the line.</param>
+            <param name="positionB">Initial position of the second vertex of the line.</param>
+            <param name="colorA">Initial color of the first vertex of the line.</param>
+            <param name="colorB">Initial color of the second vertex of the line.</param>
+            <param name="drawer">System responsible for drawing this line.</param>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Lines.Line.#ctor(Microsoft.Xna.Framework.Color,Microsoft.Xna.Framework.Color,BEPUphysicsDrawer.Lines.LineDrawer)">
+            <summary>
+            Constructs a new line.
+            </summary>
+            <param name="colorA">Initial color of the first vertex of the line.</param>
+            <param name="colorB">Initial color of the second vertex of the line.</param>
+            <param name="drawer">System responsible for drawing this line.</param>
+        </member>
+        <member name="P:BEPUphysicsDrawer.Lines.Line.PositionA">
+            <summary>
+            Gets and sets the position of the first vertex of the line.
+            </summary>
+        </member>
+        <member name="P:BEPUphysicsDrawer.Lines.Line.PositionB">
+            <summary>
+            Gets and sets the position of the second vertex of the line.
+            </summary>
+        </member>
+        <member name="P:BEPUphysicsDrawer.Lines.Line.ColorA">
+            <summary>
+            Gets and sets the color of the first vertex of the line.
+            </summary>
+        </member>
+        <member name="P:BEPUphysicsDrawer.Lines.Line.ColorB">
+            <summary>
+            Gets and sets the color of the second vertex of the line.
+            </summary>
+        </member>
+        <member name="T:BEPUphysicsDrawer.Lines.LineDisplayObject`1">
+            <summary>
+            Line-based graphical representation of an object.
+            </summary>
+            <typeparam name="T">Type of the object to be displayed.</typeparam>
+        </member>
+        <member name="P:BEPUphysicsDrawer.Lines.LineDisplayObject`1.LineObject">
+            <summary>
+            Gets the object to represent with lines.
+            </summary>
+        </member>
+        <member name="T:BEPUphysicsDrawer.Lines.LineDisplayObjectBase">
+            <summary>
+            Base class of LineDisplayObjects.
+            </summary>
+        </member>
+        <member name="P:BEPUphysicsDrawer.Lines.LineDisplayObjectBase.Drawer">
+            <summary>
+            Gets the drawer that this display object belongs to.
+            </summary>
+        </member>
+        <member name="P:BEPUphysicsDrawer.Lines.LineDisplayObjectBase.IsDrawing">
+            <summary>
+            Gets or sets whether or not this display object is active.
+            </summary>
+        </member>
+        <member name="P:BEPUphysicsDrawer.Lines.LineDisplayObjectBase.Lines">
+            <summary>
+            Gets the list of lines used by this display object.
+            </summary>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Lines.LineDisplayObjectBase.Update">
+            <summary>
+            Moves the constraint lines to the proper location relative to the entities involved.
+            </summary>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Lines.LineDisplayObjectBase.RemoveLines">
+            <summary>
+            Removes the lines used by the display constraint from its line drawer.
+            </summary>
+        </member>
+        <member name="T:BEPUphysicsDrawer.Lines.LineDrawer">
+            <summary>
+            Manages the graphical representation of joints and constraints.
+            </summary>
+        </member>
+        <member name="P:BEPUphysicsDrawer.Lines.LineDrawer.DisplayMapping">
+            <summary>
+            Gets the mapping between added objects and their display representations.
+            </summary>
+        </member>
+        <member name="F:BEPUphysicsDrawer.Lines.LineDrawer.vertices">
+            <summary>
+            Line vertices buffer used by the constraint graphics.
+            </summary>
+        </member>
+        <member name="P:BEPUphysicsDrawer.Lines.LineDrawer.DisplayTypes">
+            <summary>
+            Gets the map from object types to display object types.
+            </summary>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Lines.LineDrawer.GetNewLineIndex(System.Int32@)">
+            <summary>
+            Finds a place for a new line in the vertex list.
+            </summary>
+            <param name="index">Index for the new line.</param>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Lines.LineDrawer.Deactivate(BEPUphysicsDrawer.Lines.Line)">
+            <summary>
+            Makes a line invisible.
+            </summary>
+            <param name="line">Line to make invisible.</param>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Lines.LineDrawer.Activate(BEPUphysicsDrawer.Lines.Line)">
+            <summary>
+            Makes a line visible.
+            </summary>
+            <param name="line">Line to make visible.</param>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Lines.LineDrawer.RemoveLine(BEPUphysicsDrawer.Lines.Line)">
+            <summary>
+            Makes the line's index available to use for other lines.
+            </summary>
+            <param name="line">Line to remove.</param>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Lines.LineDrawer.Update">
+            <summary>
+            Updates the component.
+            </summary>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Lines.LineDrawer.Draw(BEPUutilities.Matrix,BEPUutilities.Matrix)">
+            <summary>
+            Draws the component.
+            </summary>
+            <param name="viewMatrix">View matrix to use when rendering the lines.</param>
+            <param name="projectionMatrix">Projection matrix to use when rendering the lines.</param>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Lines.LineDrawer.Add(System.Object)">
+            <summary>
+            Adds the object to the rendering system.
+            </summary>
+            <param name="o">Object to add.</param>
+            <returns>Display object created from the object.</returns>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Lines.LineDrawer.Remove(System.Object)">
+            <summary>
+            Removes the object from the rendering system.
+            </summary>
+            <param name="o">Object to remove.</param>
+            <returns>True if the object was fully removed. False if the object was not found in the drawer, or if it was a solver group that could only be partially removed.</returns>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Lines.LineDrawer.Clear">
+            <summary>
+            Clears out pre-existing data in the line drawer.
+            </summary>
+        </member>
+        <member name="T:BEPUphysicsDrawer.Lines.SimulationIslandDrawer">
+            <summary>
+            Renders bounding boxes of simulation islands.
+            </summary>
+        </member>
+        <member name="T:BEPUphysicsDrawer.Lines.SolverDisplayObject`1">
+            <summary>
+            Line-based graphical representation of an object.
+            </summary>
+            <typeparam name="T">Type of the object to be displayed.</typeparam>
+        </member>
+        <member name="T:BEPUphysicsDrawer.Models.BatchInformation">
+            <summary>
+            Contains some information about a ModelDisplayObject's batch.
+            </summary>
+        </member>
+        <member name="F:BEPUphysicsDrawer.Models.BatchInformation.BaseIndexBufferIndex">
+            <summary>
+            Index in the batch's index buffer where this display object's vertices start.
+            </summary>
+        </member>
+        <member name="F:BEPUphysicsDrawer.Models.BatchInformation.BaseVertexBufferIndex">
+            <summary>
+            Index in the batch's vertex buffer where this display object's vertices start.
+            </summary>
+        </member>
+        <member name="F:BEPUphysicsDrawer.Models.BatchInformation.Batch">
+            <summary>
+            Batch that a display object belongs to.
+            </summary>
+        </member>
+        <member name="F:BEPUphysicsDrawer.Models.BatchInformation.BatchListIndex">
+            <summary>
+            Index in the batch's display object list where this display object will be inserted.
+            </summary>
+        </member>
+        <member name="F:BEPUphysicsDrawer.Models.BatchInformation.IndexCount">
+            <summary>
+            Number of indices in the display object.
+            </summary>
+        </member>
+        <member name="F:BEPUphysicsDrawer.Models.BatchInformation.VertexCount">
+            <summary>
+            Number of vertices in the display object.
+            </summary>
+        </member>
+        <member name="T:BEPUphysicsDrawer.Models.DisplayEntityModel">
+            <summary>
+            Display object of a model that follows an entity.
+            </summary>
+        </member>
+        <member name="F:BEPUphysicsDrawer.Models.DisplayEntityModel.transforms">
+            <summary>
+            Bone transformations of meshes in the model.
+            </summary>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Models.DisplayEntityModel.#ctor(BEPUphysics.Entities.Entity,Microsoft.Xna.Framework.Graphics.Model,BEPUphysicsDrawer.Models.ModelDrawer)">
+            <summary>
+            Constructs a new display model.
+            </summary>
+            <param name="entity">Entity to follow.</param>
+            <param name="model">Model to draw on the entity.</param>
+            <param name="modelDrawer">Model drawer to use.</param>
+        </member>
+        <member name="P:BEPUphysicsDrawer.Models.DisplayEntityModel.Entity">
+            <summary>
+            Gets or sets the entity to base the model's world matrix on.
+            </summary>
+        </member>
+        <member name="P:BEPUphysicsDrawer.Models.DisplayEntityModel.Model">
+            <summary>
+            Gets or sets the model to display.
+            </summary>
+        </member>
+        <member name="P:BEPUphysicsDrawer.Models.DisplayEntityModel.Texture">
+            <summary>
+            Gets or sets the texture drawn on this model.
+            </summary>
+        </member>
+        <member name="P:BEPUphysicsDrawer.Models.DisplayEntityModel.LocalTransform">
+            <summary>
+            Gets and sets the local transform to apply to the model prior to transforming it by the entity's world matrix.
+            </summary>
+        </member>
+        <member name="P:BEPUphysicsDrawer.Models.DisplayEntityModel.WorldTransform">
+            <summary>
+            Gets the world transformation applied to the model.
+            </summary>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Models.DisplayEntityModel.Update">
+            <summary>
+            Updates the display object.
+            </summary>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Models.DisplayEntityModel.Draw(BEPUutilities.Matrix,BEPUutilities.Matrix)">
+            <summary>
+            Draws the display object.
+            </summary>
+            <param name="viewMatrix">Current view matrix.</param>
+            <param name="projectionMatrix">Current projection matrix.</param>
+        </member>
+        <member name="T:BEPUphysicsDrawer.Models.DisplayFluid">
+            <summary>
+            Simple display object for triangles.
+            </summary>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Models.DisplayFluid.#ctor(BEPUphysicsDrawer.Models.ModelDrawer,BEPUphysics.UpdateableSystems.FluidVolume)">
+            <summary>
+            Creates the display object for the entity.
+            </summary>
+            <param name="drawer">Drawer managing this display object.</param>
+            <param name="displayedObject">Entity to draw.</param>
+        </member>
+        <member name="T:BEPUphysicsDrawer.Models.DisplayInstancedMesh">
+            <summary>
+            Simple display object for triangles.
+            </summary>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Models.DisplayInstancedMesh.#ctor(BEPUphysicsDrawer.Models.ModelDrawer,BEPUphysics.BroadPhaseEntries.InstancedMesh)">
+            <summary>
+            Creates the display object for the entity.
+            </summary>
+            <param name="drawer">Drawer managing this display object.</param>
+            <param name="displayedObject">Entity to draw.</param>
+        </member>
+        <member name="T:BEPUphysicsDrawer.Models.DisplayModel">
+            <summary>
+            Model which just sits in space.
+            </summary>
+        </member>
+        <member name="F:BEPUphysicsDrawer.Models.DisplayModel.transforms">
+            <summary>
+            Bone transformations of meshes in the model.
+            </summary>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Models.DisplayModel.#ctor(Microsoft.Xna.Framework.Graphics.Model,BEPUphysicsDrawer.Models.ModelDrawer)">
+            <summary>
+            Constructs a new display model.
+            </summary>
+            <param name="model">Model to draw on the entity.</param>
+            <param name="modelDrawer">Model drawer to use.</param>
+        </member>
+        <member name="P:BEPUphysicsDrawer.Models.DisplayModel.Model">
+            <summary>
+            Gets or sets the model to display.
+            </summary>
+        </member>
+        <member name="P:BEPUphysicsDrawer.Models.DisplayModel.Texture">
+            <summary>
+            Gets or sets the texture drawn on this model.
+            </summary>
+        </member>
+        <member name="P:BEPUphysicsDrawer.Models.DisplayModel.WorldTransform">
+            <summary>
+            Gets or sets the world transformation applied to the model.
+            </summary>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Models.DisplayModel.Update">
+            <summary>
+            Updates the display object.
+            </summary>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Models.DisplayModel.Draw(BEPUutilities.Matrix,BEPUutilities.Matrix)">
+            <summary>
+            Draws the display object.
+            </summary>
+            <param name="viewMatrix">Current view matrix.</param>
+            <param name="projectionMatrix">Current projection matrix.</param>
+        </member>
+        <member name="T:BEPUphysicsDrawer.Models.DisplayStaticMesh">
+            <summary>
+            Simple display object for triangles.
+            </summary>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Models.DisplayStaticMesh.#ctor(BEPUphysicsDrawer.Models.ModelDrawer,BEPUphysics.BroadPhaseEntries.StaticMesh)">
+            <summary>
+            Creates the display object for the object.
+            </summary>
+            <param name="drawer">Drawer managing this display object.</param>
+            <param name="displayedObject">Object to draw.</param>
+        </member>
+        <member name="T:BEPUphysicsDrawer.Models.DisplayTerrain">
+            <summary>
+            Simple display object for triangles.
+            </summary>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Models.DisplayTerrain.#ctor(BEPUphysicsDrawer.Models.ModelDrawer,BEPUphysics.BroadPhaseEntries.Terrain)">
+            <summary>
+            Creates the display object for the entity.
+            </summary>
+            <param name="drawer">Drawer managing this display object.</param>
+            <param name="displayedObject">Entity to draw.</param>
+        </member>
+        <member name="T:BEPUphysicsDrawer.Models.DisplayTriangleMesh">
+            <summary>
+            Simple display object for triangles.
+            </summary>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Models.DisplayTriangleMesh.#ctor(BEPUphysicsDrawer.Models.ModelDrawer,BEPUphysics.DataStructures.TriangleMesh)">
+            <summary>
+            Creates the display object for the entity.
+            </summary>
+            <param name="drawer">Drawer managing this display object.</param>
+            <param name="displayedObject">Entity to draw.</param>
+        </member>
+        <member name="T:BEPUphysicsDrawer.Models.DisplayBox">
+            <summary>
+            Helper class that can create shape mesh data.
+            </summary>
+        </member>
+        <member name="T:BEPUphysicsDrawer.Models.DisplayCapsule">
+            <summary>
+            Helper class that can create shape mesh data.
+            </summary>
+        </member>
+        <member name="F:BEPUphysicsDrawer.Models.DisplayCapsule.NumSides">
+            <summary>
+            Number of sides to build geometry with.
+            </summary>
+        </member>
+        <member name="T:BEPUphysicsDrawer.Models.DisplayCompoundBody">
+            <summary>
+            Helper class that can create shape mesh data.
+            </summary>
+        </member>
+        <member name="T:BEPUphysicsDrawer.Models.DisplayCone">
+            <summary>
+            Helper class that can create shape mesh data.
+            </summary>
+        </member>
+        <member name="F:BEPUphysicsDrawer.Models.DisplayCone.NumSides">
+            <summary>
+            Number of sides to build geometry with.
+            </summary>
+        </member>
+        <member name="T:BEPUphysicsDrawer.Models.DisplayConvex">
+            <summary>
+            Helper class that can create shape mesh data.
+            </summary>
+        </member>
+        <member name="T:BEPUphysicsDrawer.Models.DisplayConvexHull">
+            <summary>
+            Helper class that can create shape mesh data.
+            </summary>
+        </member>
+        <member name="T:BEPUphysicsDrawer.Models.DisplayCylinder">
+            <summary>
+            Helper class that can create shape mesh data.
+            </summary>
+        </member>
+        <member name="F:BEPUphysicsDrawer.Models.DisplayCylinder.NumSides">
+            <summary>
+            Number of sides to build geometry with.
+            </summary>
+        </member>
+        <member name="T:BEPUphysicsDrawer.Models.DisplayEntityCollidable">
+            <summary>
+            Superclass of display objects that follow entity collidables.
+            </summary>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Models.DisplayEntityCollidable.#ctor(BEPUphysicsDrawer.Models.ModelDrawer,BEPUphysics.BroadPhaseEntries.MobileCollidables.EntityCollidable)">
+            <summary>
+            Constructs a new display entity.
+            </summary>
+            <param name="drawer">Drawer to use.</param>
+            <param name="entityCollidable">EntityCollidable to draw.</param>
+        </member>
+        <member name="T:BEPUphysicsDrawer.Models.DisplayMobileMesh">
+            <summary>
+            Simple display object for triangles.
+            </summary>
+        </member>
+        <member name="T:BEPUphysicsDrawer.Models.DisplaySphere">
+            <summary>
+            Helper class that can create shape mesh data.
+            </summary>
+        </member>
+        <member name="F:BEPUphysicsDrawer.Models.DisplaySphere.NumSides">
+            <summary>
+            Number of sides to build geometry with.
+            </summary>
+        </member>
+        <member name="T:BEPUphysicsDrawer.Models.DisplayTriangle">
+            <summary>
+            Helper class that can create shape mesh data.
+            </summary>
+        </member>
+        <member name="T:BEPUphysicsDrawer.Models.ModelDisplayObject`1">
+            <summary>
+            Model-based graphical representation of an object.
+            </summary>
+            <typeparam name="T">Type of the object to be displayed.</typeparam>
+        </member>
+        <member name="P:BEPUphysicsDrawer.Models.ModelDisplayObject`1.DisplayedObject">
+            <summary>
+            Gets the object to represent with a model.
+            </summary>
+        </member>
+        <member name="T:BEPUphysicsDrawer.Models.ModelDisplayObject">
+            <summary>
+            Base class of ModelDisplayObjects.
+            </summary>
+        </member>
+        <member name="P:BEPUphysicsDrawer.Models.ModelDisplayObject.WorldTransform">
+            <summary>
+            Gets or sets the world transform of the display object.
+            </summary>
+        </member>
+        <member name="P:BEPUphysicsDrawer.Models.ModelDisplayObject.BatchInformation">
+            <summary>
+            Gets the batch information associated with this display object if it belongs to a batch.
+            </summary>
+        </member>
+        <member name="P:BEPUphysicsDrawer.Models.ModelDisplayObject.Drawer">
+            <summary>
+            Gets the drawer that this display object belongs to.
+            </summary>
+        </member>
+        <member name="P:BEPUphysicsDrawer.Models.ModelDisplayObject.TextureIndex">
+            <summary>
+            Gets or sets the texture index used for this display object.
+            </summary>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Models.ModelDisplayObject.ClearBatchReferences">
+            <summary>
+            When a ModelDisplayObject is removed from a batch, the batch information is cleaned up.
+            </summary>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Models.ModelDisplayObject.GetVertexData(System.Collections.Generic.List{Microsoft.Xna.Framework.Graphics.VertexPositionNormalTexture},System.Collections.Generic.List{System.UInt16},BEPUphysicsDrawer.Models.ModelDisplayObjectBatch,System.UInt16,System.Int32,System.Int32)">
+            <summary>
+            Collects the local space vertex data of the model.
+            </summary>
+            <param name="vertices">List of vertices to be filled with the model vertices.</param>
+            <param name="indices">List of indices to be filled with the model indices.</param>
+            <param name="batch">Batch that the display object is being added to.</param>
+            <param name="baseVertexBufferIndex">Index in the batch's vertex buffer where this display object's vertices start.</param>
+            <param name="baseIndexBufferIndex">Index in the batch's index buffer where this display object's vertices start.</param>
+            <param name="batchListIndex">Index in the batch's display object list where this display object will be inserted.</param>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Models.ModelDisplayObject.GetTriangleCountEstimate">
+            <summary>
+            Gets the approximate number of triangles that will be used by the display object if added.
+            </summary>
+            <returns>Approximate number of triangles that the display object will use if added.</returns>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Models.ModelDisplayObject.GetMeshData(System.Collections.Generic.List{Microsoft.Xna.Framework.Graphics.VertexPositionNormalTexture},System.Collections.Generic.List{System.UInt16})">
+            <summary>
+            Collects the local space vertex data of the model.
+            </summary>
+            <param name="vertices">List of vertices to be filled with the model vertices.</param>
+            <param name="indices">List of indices to be filled with the model indices.</param>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Models.ModelDisplayObject.Update">
+            <summary>
+            Updates the display object and reports the world transform.
+            </summary>
+        </member>
+        <member name="T:BEPUphysicsDrawer.Models.SelfDrawingModelDisplayObject">
+            <summary>
+            Superclass of display types that can draw themselves.
+            These types do not use any instancing techniques.
+            </summary>
+        </member>
+        <member name="P:BEPUphysicsDrawer.Models.SelfDrawingModelDisplayObject.ModelDrawer">
+            <summary>
+            Gets the drawer that manages this display object.
+            </summary>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Models.SelfDrawingModelDisplayObject.Update">
+            <summary>
+            Updates the display object.
+            </summary>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Models.SelfDrawingModelDisplayObject.Draw(BEPUutilities.Matrix,BEPUutilities.Matrix)">
+            <summary>
+            Draws the display object.
+            </summary>
+            <param name="viewMatrix">Current view matrix.</param>
+            <param name="projectionMatrix">Current projection matrix.</param>
+        </member>
+        <member name="T:BEPUphysicsDrawer.Models.InstancedModelDrawer">
+            <summary>
+            Manages and draws instanced models.
+            </summary>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Models.InstancedModelDrawer.DrawManagedModels(BEPUutilities.Matrix,BEPUutilities.Matrix)">
+            <summary>
+            Draws the models managed by the drawer.
+            </summary>
+            <param name="viewMatrix">View matrix to use to draw the objects.</param>
+            <param name="projectionMatrix">Projection matrix to use to draw the objects.</param>
+        </member>
+        <member name="T:BEPUphysicsDrawer.Models.ModelDisplayObjectBatch">
+            <summary>
+            Manages batching of display models and their drawing.
+            </summary>
+        </member>
+        <member name="F:BEPUphysicsDrawer.Models.ModelDisplayObjectBatch.MaximumObjectsPerBatch">
+            <summary>
+            Maximum number of display objects that can be lumped into a single display batch.
+            </summary>
+        </member>
+        <member name="F:BEPUphysicsDrawer.Models.ModelDisplayObjectBatch.MaximumPrimitiveCountPerBatch">
+            <summary>
+            Maximum number of primitives that can be batched together in a single draw call.
+            </summary>
+        </member>
+        <member name="F:BEPUphysicsDrawer.Models.ModelDisplayObjectBatch.textureIndices">
+            <summary>
+            List of textures associated with display objects in the batch.
+            </summary>
+        </member>
+        <member name="F:BEPUphysicsDrawer.Models.ModelDisplayObjectBatch.worldTransforms">
+            <summary>
+            List of all world transforms associated with display objects in the batch.
+            </summary>
+        </member>
+        <member name="F:BEPUphysicsDrawer.Models.ModelDisplayObjectBatch.instancingBuffer">
+            <summary>
+            Contains instancing data to be fed into the second stream.
+            </summary>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Models.ModelDisplayObjectBatch.#ctor(Microsoft.Xna.Framework.Graphics.GraphicsDevice)">
+            <summary>
+            Constructs a new batch.
+            </summary>
+            <param name="graphicsDevice">Device to use when drawing.</param>
+        </member>
+        <member name="P:BEPUphysicsDrawer.Models.ModelDisplayObjectBatch.DisplayObjects">
+            <summary>
+            Gets the display objects in this batch.
+            </summary>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Models.ModelDisplayObjectBatch.Add(BEPUphysicsDrawer.Models.ModelDisplayObject,BEPUphysicsDrawer.Models.InstancedModelDrawer)">
+            <summary>
+            Adds a display object to the batch.
+            </summary>
+            <param name="displayObject">Display object to add.</param>
+            <param name="drawer">Drawer of the batch.</param>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Models.ModelDisplayObjectBatch.Remove(BEPUphysicsDrawer.Models.ModelDisplayObject,BEPUphysicsDrawer.Models.InstancedModelDrawer)">
+            <summary>
+            Removes a display object from the batch.
+            </summary>
+            <param name="displayObject">Display object to remove.</param>
+            <param name="drawer">Instanced model drawer doing the removal.</param>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Models.ModelDisplayObjectBatch.Update">
+            <summary>
+            Updates the display objects within the batch and collects transforms.
+            </summary>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Models.ModelDisplayObjectBatch.Draw(Microsoft.Xna.Framework.Graphics.Effect,Microsoft.Xna.Framework.Graphics.EffectParameter,Microsoft.Xna.Framework.Graphics.EffectParameter,Microsoft.Xna.Framework.Graphics.EffectPass)">
+            <summary>
+            Draws the models managed by the batch.
+            </summary>
+        </member>
+        <member name="F:BEPUphysicsDrawer.Models.ModelDisplayObjectBatch.InstancedVertex.InstanceIndex">
+            <summary>
+            Index of the instance to which this vertex belongs.
+            </summary>
+        </member>
+        <member name="F:BEPUphysicsDrawer.Models.ModelDisplayObjectBatch.InstancedVertex.TextureIndex">
+            <summary>
+            Index of the texture used by the vertex.
+            </summary>
+        </member>
+        <member name="T:BEPUphysicsDrawer.Models.ModelDrawer">
+            <summary>
+            Manages and draws models.
+            </summary>
+        </member>
+        <member name="P:BEPUphysicsDrawer.Models.ModelDrawer.DisplayTypes">
+            <summary>
+            Gets the map from object types to display object types.
+            </summary>
+        </member>
+        <member name="P:BEPUphysicsDrawer.Models.ModelDrawer.ShapeMeshGetters">
+            <summary>
+            Gets the map from shape object types to methods which can be used to construct the data.
+            </summary>
+        </member>
+        <member name="P:BEPUphysicsDrawer.Models.ModelDrawer.Game">
+            <summary>
+            Gets the game using this ModelDrawer.
+            </summary>
+        </member>
+        <member name="P:BEPUphysicsDrawer.Models.ModelDrawer.IsWireframe">
+            <summary>
+            Gets or sets whether or not the model drawer is drawing wireframes.
+            </summary>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Models.ModelDrawer.GetDisplayObject(System.Object)">
+            <summary>
+            Constructs a new display object for an object.
+            </summary>
+            <param name="objectToDisplay">Object to create a display object for.</param>
+            <returns>Display object for an object.</returns>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Models.ModelDrawer.Add(System.Object)">
+            <summary>
+            Attempts to add an object to the ModelDrawer.
+            </summary>
+            <param name="objectToDisplay">Object to be added to the model drawer.</param>
+            <returns>ModelDisplayObject created for the object.  Null if it couldn't be added.</returns>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Models.ModelDrawer.Add(BEPUphysicsDrawer.Models.SelfDrawingModelDisplayObject)">
+            <summary>
+            Adds the display object to the drawer.
+            </summary>
+            <param name="displayObject">Display object to add.</param>
+            <returns>Whether or not the display object was added.</returns>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Models.ModelDrawer.Add(BEPUphysicsDrawer.Models.ModelDisplayObject)">
+            <summary>
+            Adds a display object directly to the drawer without being linked to a source.
+            </summary>
+            <param name="displayObject">Display object to add.</param>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Models.ModelDrawer.Remove(System.Object)">
+            <summary>
+            Removes an object from the drawer.
+            </summary>
+            <param name="objectToRemove">Object to remove.</param>
+            <returns>Whether or not the object was present.</returns>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Models.ModelDrawer.Remove(BEPUphysicsDrawer.Models.SelfDrawingModelDisplayObject)">
+            <summary>
+            Removes an object from the drawer.
+            </summary>
+            <param name="displayObject">Display object to remove.</param>
+            <returns>Whether or not the object was present.</returns>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Models.ModelDrawer.Remove(BEPUphysicsDrawer.Models.ModelDisplayObject)">
+            <summary>
+            Removes a display object from the drawer.  Only use this if display object was added directly.
+            </summary>
+            <param name="displayObject">Object to remove.</param>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Models.ModelDrawer.Clear">
+            <summary>
+            Cleans out the model drawer of any existing display objects.
+            </summary>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Models.ModelDrawer.ClearManagedModels">
+            <summary>
+            Cleans out any data contained by derived drawers.
+            </summary>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Models.ModelDrawer.Contains(System.Object)">
+            <summary>
+            Determines if the object has an associated display object in this drawer.
+            </summary>
+            <param name="displayedObject">Object to check for in the drawer.</param>
+            <returns>Whether or not the object has an associated display object in this drawer.</returns>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Models.ModelDrawer.Update">
+            <summary>
+            Updates the drawer and its components.
+            </summary>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Models.ModelDrawer.UpdateManagedModels">
+            <summary>
+            Updates the drawer's technique.
+            </summary>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Models.ModelDrawer.Draw(BEPUutilities.Matrix,BEPUutilities.Matrix)">
+            <summary>
+            Draws the drawer's models.
+            </summary>
+            <param name="viewMatrix">View matrix to use to draw the objects.</param>
+            <param name="projectionMatrix">Projection matrix to use to draw the objects.</param>
+        </member>
+        <member name="M:BEPUphysicsDrawer.Models.ModelDrawer.DrawManagedModels(BEPUutilities.Matrix,BEPUutilities.Matrix)">
+            <summary>
+            Draws the models managed by the drawer using the appropriate technique.
+            </summary>
+            <param name="viewMatrix">View matrix to use to draw the objects.</param>
+            <param name="projectionMatrix">Projection matrix to use to draw the objects.</param>
+        </member>
+    </members>
+</doc>

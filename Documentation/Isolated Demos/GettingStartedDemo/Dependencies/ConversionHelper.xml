@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ConversionHelper</name>
+    </assembly>
+    <members>
+        <member name="T:ConversionHelper.MathConverter">
+            <summary>
+            Helps convert between XNA math types and the BEPUphysics replacement math types.
+            A version of this converter could be created for other platforms to ease the integration of the engine.
+            </summary>
+        </member>
+    </members>
+</doc>
