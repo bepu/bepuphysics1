@@ -6,7 +6,7 @@ In physics engines and simulation, the term _constraint_ is commonly used to mea
 
 A joint is a type of constraint. In BEPUphysics, joints can bind entities together in many different ways, such as door hinges and wheel axes.
 
-The set of constraints in a simulation can be thought of as equations that need to be satisfied to figure out how entities can move. BEPUphysics uses a _solver _to compute the result. That's where the name SolverUpdateable comes from. SolverUpdateable provides the interface the solver needs to function.
+The set of constraints in a simulation can be thought of as equations that need to be satisfied to figure out how entities can move. BEPUphysics uses a _solver_ to compute the result. That's where the name SolverUpdateable comes from. SolverUpdateable provides the interface the solver needs to function.
 
 Due to its generality, SolverUpdateables can take on many different forms, from the standard two body joint to customizable groups of multiple other SolverUpdateables. The following goes in depth on the variety of joints available.
 
