@@ -18,11 +18,12 @@ The result would look something like:
 effect.World = localOffsetTransform * entity.WorldTransform;
 
 Here is a visual showing the problem and the applied solution:
-![offsetexplanation.jpg](Documentation/images/recentering/offsetexplanation.jpg)
+![offsetexplanation.jpg](images/recentering/offsetexplanation.jpg)
 
 The [GraphicMatchingDemo](../BEPUphysicsDemos/Demos/Extras/GraphicMatchingDemo.cs) can be found in the BEPUphysicsDemos that shows these concepts applied to a convex hull.
 
 Here are some links to forum posts with similar explanations:
+
 [http://www.bepu-games.com/forum/viewtopic.php?f=4&t=1511](http://www.bepu-games.com/forum/viewtopic.php?f=4&t=1511)
 [http://www.bepu-games.com/forum/viewtopic.php?f=4&t=1516](http://www.bepu-games.com/forum/viewtopic.php?f=4&t=1516)
 [http://www.bepu-games.com/forum/viewtopic.php?f=4&t=1513](http://www.bepu-games.com/forum/viewtopic.php?f=4&t=1513)

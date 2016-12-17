@@ -6,7 +6,7 @@ A basic tutorial on setting up a simulation. The following assumes that you have
 
 A periodically packaged binary form of the libraries can be downloaded on [github](https://github.com/RossNordby/bepuphysics1/releases). There's also a [nuget package](https://www.nuget.org/packages/BEPUphysics/).
 
-Be advised, historical evidence suggests I'll be pretty lazy about setting up packaged releases. There may be significantly newer versions available in the [source](../../).
+Be advised, historical evidence suggests I'll be pretty lazy about setting up packaged releases. There may be significantly newer versions available in the [source](../../../).
 
 The following will use monogame for simple visualization, but the details of the graphical setup are not covered. Check out the [GettingStartedDemo](Isolated Demos/GettingStartedDemo) for the end result of this walkthrough, and the [BasicSetupDemo](Isolated Demos/BasicSetupDemo) for a super-barebones simulation to fiddle with.
 
@@ -127,4 +127,4 @@ For more detailed information about events, check the Collision Events documenta
 
 ## 6 | Going Further
 
-To learn more about BEPUphysics, check out the other demos and documentation available in the [repository](../../). Try changing various settings and creating your own simulations. If you ever need help, please feel free to post on the [forums](http://www.bepu-games.com/forum/). Asking questions is a great way to learn and helps make BEPUphysics better too!
+To learn more about BEPUphysics, check out the other demos and documentation available in the [repository](../../../). Try changing various settings and creating your own simulations. If you ever need help, please feel free to post on the [forums](http://www.bepu-games.com/forum/). Asking questions is a great way to learn and helps make BEPUphysics better too!

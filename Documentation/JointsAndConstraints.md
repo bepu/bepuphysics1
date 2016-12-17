@@ -1,7 +1,7 @@
 # **Joints and Constraints**
 Make fancy contraptions, ragdolls, and more.
 
-## **1 | What are Joints and Constraints? **
+## **1 | What are Joints and Constraints?**
 In physics engines and simulation, the term _constraint_ is commonly used to mean a physical limitation that enforces some requirement on one or more objects. Constraints can limit the range of allowed movement and change the way dynamic objects act.
 
 A joint is a type of constraint. In BEPUphysics, joints can bind entities together in many different ways, such as door hinges and wheel axes.
@@ -165,7 +165,7 @@ The joint also provides control over the free degrees of freedom through its Rev
 ![image](images/joints and constraints/swivelhinge.png)
 
 ### 5.F | UniversalJoint
-The UniversalJoint allows two angular degrees of freedom between two entities. It is comprised of a BallSocketJoint and a TwistJoint. It’s useful for transferring twist motion around angles, such as in vehicle drive shafts. The UniversalJoint also provides a TwistLimit and TwistMotor which are initially inactive. These are not complementary to the TwistJoint; the TwistJoint should be inactive if either the limit or motor is active.
+The UniversalJoint allows two angular degrees of freedom between two entities. It is comprised of a BallSocketJoint and a TwistJoint. It's useful for transferring twist motion around angles, such as in vehicle drive shafts. The UniversalJoint also provides a TwistLimit and TwistMotor which are initially inactive. These are not complementary to the TwistJoint; the TwistJoint should be inactive if either the limit or motor is active.
 
 ![image](images/joints and constraints/universal.png)
 
@@ -224,7 +224,7 @@ Velocity motors do not have an error correction factor because there is no posit
 SolverUpdateables are subject to the solver's iteration count. The solver iteration count is shared with the collision solver and can be changed by setting the Space.Solver.IterationLimit property. 
  Care should be taken when selecting an iteration count. The default value of 10 is usually sufficient for most simulations, but it can also be more than necessary for some simulations. If more speed is needed, try decreasing the iteration count and seeing if constraint and collision behavior is still satisfactory.
 
-Iteration limits can also be defined on a per-SolverUpdateable basis using their SolverSettings property. The solver will only do up to its own IterationLimit, but a SolverUpdateable’s SolverSettings can specify a lower number. In addition, it allows a minimum iteration count to be set. This defaults to 1 for all SolverUpdateables, but can be set to other values depending on the need. Increasing it will prevent the system from early-outing due to tiny impulses as quickly, increasing robustness while decreasing performance. Setting it to 0 will increase speed somewhat due to more early-outs, but can harm simulation quality a little.
+Iteration limits can also be defined on a per-SolverUpdateable basis using their SolverSettings property. The solver will only do up to its own IterationLimit, but a SolverUpdateable's SolverSettings can specify a lower number. In addition, it allows a minimum iteration count to be set. This defaults to 1 for all SolverUpdateables, but can be set to other values depending on the need. Increasing it will prevent the system from early-outing due to tiny impulses as quickly, increasing robustness while decreasing performance. Setting it to 0 will increase speed somewhat due to more early-outs, but can harm simulation quality a little.
 
 #### 7.B.c | Impulse Limits
 Constraints with position goals like Joints, JointLimits, and Motors in servo mode can only correct the position error as fast as their MaxCorrectiveVelocity property permits. This can be used to prevent objects from getting too much speed when trying to correct position error without dealing with the spring settings. By default, the maximum velocity is infinite. 

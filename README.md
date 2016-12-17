@@ -3,6 +3,7 @@
 BEPUphysics is a pure C# 3D physics library by [BEPU](http://bepuphysics.com). It's fast and has a bunch of cool features like constraints, terrain, static and instanced meshes, continuous collision detection, custom collision rules, vehicles, easy multithreading, yadda yadda yadda.
 
 Stuff you'll find in this repository:
+
 1. [BEPUphysics](BEPUphysics), the physics simulation library
 2. [BEPUik](BEPUik), the simulation-based inverse kinematics solver library
 3. [BEPUphysicsDemos](BEPUphysicsDemos), the demonstration and test application for the above, along with its [debug renderer](BEPUphysicsDrawer).
@@ -22,6 +23,6 @@ If you're looking for more BEPU-related stuff, head to the [main BEPU website](h
 
 If you're feeling angelic, you can throw money at us:
 
-![](Documentation/images/readme/angelduck.png.gif)
+![](Documentation/images/readme/angelduck.png)
 
 [![](Documentation/images/readme/throw money.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=contact%40bepuentertainment%2ecom&lc=US&item_name=BEPUphysics&no_note=0¤cy_code=USD&bn=PP%2dDonationsBF%3abtn_donate_LG%2egif%3aNonHostedGuest)

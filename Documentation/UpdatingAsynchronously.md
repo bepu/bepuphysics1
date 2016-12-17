@@ -2,7 +2,7 @@
 
 Managing BEPUphysics running on a separate thread.
 
-[Updating Asynchronously Demo](Isolated Demos/UpdatingAsynchronouslyDemo)
+[Updating Asynchronously Demo](Isolated Demos/AsynchronousUpdateDemo)
 
 ## **1 | Getting Started**
 BEPUphysics can be run in a separate thread while your game and rendering run in others. The process to get started is simple: call update from another thread, passing the elapsed time between updates into the Space.Update method.
