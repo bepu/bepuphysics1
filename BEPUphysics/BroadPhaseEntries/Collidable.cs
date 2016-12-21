@@ -32,14 +32,41 @@ namespace BEPUphysics.BroadPhaseEntries
             }
             protected set
             {
-                if (shape != null)
+                if (shape != null && shapeChangedHooked)
                     shape.ShapeChanged -= shapeChangedDelegate;
                 shape = value;
-                if (shape != null)
+                if (shape != null && shapeChangedHooked)
                     shape.ShapeChanged += shapeChangedDelegate;
                 OnShapeChanged(shape);
+            }
+        }
 
-                //TODO: Watch out for unwanted references in the delegate lists.
+        bool shapeChangedHooked = true;
+        /// <summary>
+        /// Gets or sets whether the shape changed event is hooked. Setting this modifies the event delegate list on the associated shape, if any shape exists.
+        /// If no shape exists, getting this property returns whether the event would be hooked if a shape was present.
+        /// </summary>
+        /// <remarks>Yes, this is a hack.</remarks>
+        public bool ShapeChangedHooked
+        {
+            get
+            {
+                return shapeChangedHooked;
+            }
+            set
+            {
+                if (shape != null)
+                {
+                    if (shapeChangedHooked && !value)
+                    {
+                        shape.ShapeChanged -= shapeChangedDelegate;
+                    }
+                    else if (!shapeChangedHooked && value)
+                    {
+                        shape.ShapeChanged += shapeChangedDelegate;
+                    }
+                }
+                shapeChangedHooked = value;
             }
         }
 
@@ -49,6 +76,7 @@ namespace BEPUphysics.BroadPhaseEntries
 
         /// <summary>
         /// Gets or sets whether or not to ignore shape changes.  When true, changing the collision shape will not force the collidable to perform any updates.
+        /// Does not modify the shape changed event delegate list.
         /// </summary>
         public bool IgnoreShapeChanges { get; set; }
 
