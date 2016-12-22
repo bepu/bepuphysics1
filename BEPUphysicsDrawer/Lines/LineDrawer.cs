@@ -16,7 +16,7 @@ namespace BEPUphysicsDrawer.Lines
     /// <summary>
     /// Manages the graphical representation of joints and constraints.
     /// </summary>
-    public class LineDrawer
+    public class LineDrawer : IDisposable
     {
         private readonly Queue<int> availableIndices = new Queue<int>();
         private readonly BlendState blendState;
@@ -254,6 +254,17 @@ namespace BEPUphysicsDrawer.Lines
             firstOpenIndex = 0;
             availableIndices.Clear();
             displayMapping.Clear();
+        }
+
+        bool disposed;
+        public void Dispose()
+        {
+            if (!disposed)
+            { 
+                disposed = true;
+                blendState.Dispose();
+                lineDrawer.Dispose();
+            }
         }
     }
 }

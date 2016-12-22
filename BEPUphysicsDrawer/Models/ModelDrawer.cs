@@ -15,7 +15,7 @@ namespace BEPUphysicsDrawer.Models
     /// <summary>
     /// Manages and draws models.
     /// </summary>
-    public abstract class ModelDrawer
+    public abstract class ModelDrawer : IDisposable
     {
         private readonly Dictionary<object, ModelDisplayObject> displayObjects = new Dictionary<object, ModelDisplayObject>();
         private readonly RasterizerState fillState;
@@ -55,7 +55,6 @@ namespace BEPUphysicsDrawer.Models
             displayTypes.Add(typeof(StaticMesh), typeof(DisplayStaticMesh));
             displayTypes.Add(typeof(InstancedMesh), typeof(DisplayInstancedMesh));
 
-
             //Entity types are handled through a special case that uses an Entity's Shape to look up one of the ShapeMeshGetters.
             shapeMeshGetters.Add(typeof(ConvexCollidable<BoxShape>), DisplayBox.GetShapeMeshData);
             shapeMeshGetters.Add(typeof(ConvexCollidable<SphereShape>), DisplaySphere.GetShapeMeshData);
@@ -77,8 +76,8 @@ namespace BEPUphysicsDrawer.Models
             Game = game;
 
             colors = new Texture2D(game.GraphicsDevice, 8, 1);
-            colors.SetData(new[] 
-            { 
+            colors.SetData(new[]
+            {
                 new Color(255, 216, 0),
                 new Color(79, 200, 255),
                 new Color(255, 0, 0),
@@ -279,6 +278,25 @@ namespace BEPUphysicsDrawer.Models
         /// <param name="projectionMatrix">Projection matrix to use to draw the objects.</param>
         protected abstract void DrawManagedModels(Matrix viewMatrix, Matrix projectionMatrix);
 
+
         public delegate void ShapeMeshGetter(EntityCollidable collidable, List<VertexPositionNormalTexture> vertices, List<ushort> indices);
+
+        protected virtual void OnDisposed()
+        {
+
+        }
+
+        bool disposed;
+        public void Dispose()
+        {
+            if (!disposed)
+            {
+                OnDisposed();
+                colors.Dispose();
+                fillState.Dispose();
+                wireframeState.Dispose();
+                disposed = true;
+            }
+        }
     }
 }

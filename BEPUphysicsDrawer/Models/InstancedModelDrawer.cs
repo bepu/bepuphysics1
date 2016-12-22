@@ -30,7 +30,7 @@ namespace BEPUphysicsDrawer.Models
             : base(game)
         {
             instancingEffect = game.Content.Load<Effect>("InstancedEffect");
-            
+
             worldTransformsParameter = instancingEffect.Parameters["WorldTransforms"];
             textureIndicesParameter = instancingEffect.Parameters["TextureIndices"];
             viewParameter = instancingEffect.Parameters["View"];
@@ -73,14 +73,14 @@ namespace BEPUphysicsDrawer.Models
         {
             ModelDisplayObjectBatch batch = displayObject.BatchInformation.Batch;
             batch.Remove(displayObject, this);
-            //If it's an empty batch, just throw it away.
-            if (batch.DisplayObjects.Count == 0)
-                batches.Remove(batch);
         }
 
         protected override void ClearManagedModels()
         {
-            batches.Clear();
+            foreach (var batch in batches)
+            {
+                batch.Clear();
+            }
         }
 
         //This drawer isn't really optimized for the frequent addition and removal of objects.
@@ -115,6 +115,15 @@ namespace BEPUphysicsDrawer.Models
                     batch.Draw(instancingEffect, worldTransformsParameter, textureIndicesParameter, instancingEffect.CurrentTechnique.Passes[i]);
                 }
             }
+        }
+
+        protected override void OnDisposed()
+        {
+            foreach (var batch in batches)
+            {
+                batch.Dispose();
+            }
+            instancingEffect.Dispose();
         }
     }
 }

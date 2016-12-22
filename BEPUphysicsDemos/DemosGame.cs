@@ -15,9 +15,6 @@ using Microsoft.Xna.Framework.Input;
 
 namespace BEPUphysicsDemos
 {
-    /// <summary>
-    /// This is the main type for your game
-    /// </summary>
     public class DemosGame : Game
     {
         public Camera Camera;
@@ -128,6 +125,11 @@ namespace BEPUphysicsDemos
         private void DemosGameExiting(object sender, EventArgs e)
         {
             currentSimulation.CleanUp();
+            ModelDrawer.Dispose();
+            LineDrawer.Dispose();
+            ConstraintDrawer.Dispose();
+            UIDrawer.Dispose();
+            controlsMenu.Dispose();
         }
 
 
@@ -176,6 +178,24 @@ namespace BEPUphysicsDemos
 #endif
             #region DisplayObject creation
 
+            foreach (Entity e in currentSimulation.Space.Entities)
+            {
+                if ((string)e.Tag != "noDisplayObject")
+                {
+                    ModelDrawer.Add(e);
+                }
+                //else //Remove the now unnecessary tag.
+                //    e.Tag = null;
+            }
+            foreach (Entity e in currentSimulation.Space.Entities)
+            {
+                if ((string)e.Tag != "noDisplayObject")
+                {
+                    ModelDrawer.Remove(e);
+                }
+                //else //Remove the now unnecessary tag.
+                //    e.Tag = null;
+            }
             foreach (Entity e in currentSimulation.Space.Entities)
             {
                 if ((string)e.Tag != "noDisplayObject")
