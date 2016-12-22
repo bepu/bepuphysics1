@@ -177,25 +177,6 @@ namespace BEPUphysicsDemos
             currentSimulation = (Demo)Activator.CreateInstance(demoType, new object[] { this });
 #endif
             #region DisplayObject creation
-
-            foreach (Entity e in currentSimulation.Space.Entities)
-            {
-                if ((string)e.Tag != "noDisplayObject")
-                {
-                    ModelDrawer.Add(e);
-                }
-                //else //Remove the now unnecessary tag.
-                //    e.Tag = null;
-            }
-            foreach (Entity e in currentSimulation.Space.Entities)
-            {
-                if ((string)e.Tag != "noDisplayObject")
-                {
-                    ModelDrawer.Remove(e);
-                }
-                //else //Remove the now unnecessary tag.
-                //    e.Tag = null;
-            }
             foreach (Entity e in currentSimulation.Space.Entities)
             {
                 if ((string)e.Tag != "noDisplayObject")
