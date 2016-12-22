@@ -85,6 +85,9 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="Alternate Movement\CharacterControllerInput.cs" />
     <Compile Include="Alternate Movement\SphereCharacterControllerInput.cs" />
