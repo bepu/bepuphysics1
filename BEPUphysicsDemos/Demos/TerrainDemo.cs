@@ -41,9 +41,9 @@ namespace BEPUphysicsDemos.Demos
             }
             //Create the terrain.
             var terrain = new Terrain(heights, new AffineTransform(
-                    new Vector3(-xSpacing, 1, -zSpacing),
+                    new Vector3(xSpacing, 1, zSpacing),
                     Quaternion.Identity,
-                    new Vector3(xLength * xSpacing / 2, 0, zLength * zSpacing / 2)));
+                    new Vector3(-xLength * xSpacing / 2, 0, -zLength * zSpacing / 2)));
             terrain.Shape.QuadTriangleOrganization = BEPUphysics.CollisionShapes.QuadTriangleOrganization.BottomRightUpperLeft;
 
             //terrain.Thickness = 5; //Uncomment this and shoot some things at the bottom of the terrain! They'll be sucked up through the ground.

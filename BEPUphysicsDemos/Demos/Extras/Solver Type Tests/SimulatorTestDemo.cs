@@ -16,9 +16,6 @@ using Vector3 = BEPUutilities.Vector3;
 
 namespace BEPUphysicsDemos.Demos.Extras.SolverTypeTests
 {
-    /// <summary>
-    /// Demo showing a tower of blocks being smashed by a sphere.
-    /// </summary>
     public class SimulatorTestDemo : StandardDemo
     {
         private struct DynamicVisualizer
