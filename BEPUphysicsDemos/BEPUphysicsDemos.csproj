@@ -7,7 +7,7 @@
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{D1CB3D50-699C-4A1E-BF09-E5E689E6B853}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>BEPUphysicsDemos</RootNamespace>
     <AssemblyName>BEPUphysicsDemos</AssemblyName>

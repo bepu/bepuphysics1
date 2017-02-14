@@ -17,7 +17,7 @@ The library uses its own math libraries for cross platform development. The demo
 
 This repository contains the v1.X.X implementation of BEPUphysics that used to be hosted on [codeplex](https://bepuphysics.codeplex.com/). In the future, there will be another repository for the new v2.X.X implementation, which is pretty much a complete rewrite. Check out the [scratchpad repository](https://github.com/RossNordby/scratchpad) for some early bits and pieces.
 
-For discussions about BEPUphysics, please head to the [BEPUphysics forums](http://www.bepu-games.com/forum).
+For discussions about BEPUphysics, please head to the [BEPUphysics forums](https://forum.bepuentertainment.com).
 
 If you're looking for more BEPU-related stuff, head to the [main BEPU website](http://bepuphysics.com).
 

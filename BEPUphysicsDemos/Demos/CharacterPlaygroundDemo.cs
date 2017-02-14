@@ -72,8 +72,6 @@ namespace BEPUphysicsDemos.Demos
             {
                 position = startPosition + offset * i;
                 Box link = new Box(position, 3, .3f, 1.5f, 50);
-                link.LinearDamping = .1f;
-                link.AngularDamping = .1f;
                 Space.Add(link);
                 Space.Add(new RevoluteJoint(previousLink, link, position - offset * .5f, Vector3.Right));
 
