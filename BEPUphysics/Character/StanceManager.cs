@@ -264,7 +264,7 @@ namespace BEPUphysics.Character
                         newPosition = currentPosition - down * ((targetHeight - currentHeight) * .5f);
                         PrepareQueryObject(queryObject, ref newPosition);
                         QueryManager.QueryContacts(queryObject, ref tractionContacts, ref supportContacts, ref sideContacts, ref headContacts);
-                        if (IsObstructed(ref sideContacts, ref headContacts))
+                        if (IsObstructed(ref supportContacts, ref sideContacts, ref headContacts))
                         {
                             //Can't stand up if something is in the way!
                             return false;
@@ -275,26 +275,29 @@ namespace BEPUphysics.Character
                     else
                     {
                         //This is a complicated case.  We must perform a semi-downstep query.
-                        //It's different than a downstep because the head may be obstructed as well.
-
-                        float highestBound = 0;
-                        float lowestBound = (targetHeight - currentHeight) * .5f;
-                        float currentOffset = lowestBound;
-                        float maximum = lowestBound;
+                        //It's different than a downstep because the head may be obstructed as well. Also, in downstepping, the character always goes *down*.
+                        //In this, while the bottom of the character is extending downward, the character position actually either stays the same or goes up. 
+                        //(We arbitrarily ignore the case where the character could push off a ceiling.)
+                        //The goal is to put the feet of the character on any support that can be found, and then verify that the rest of its body fits in that location.
+                        float lowestBound = 0;
+                        float originalHighestBound = (targetHeight - currentHeight) * -.5f;
+                        float highestBound = originalHighestBound;
+                        float currentOffset = 0;
 
                         int attempts = 0;
                         //Don't keep querying indefinitely.  If we fail to reach it in a few informed steps, it's probably not worth continuing.
                         //The bound size check prevents the system from continuing to search a meaninglessly tiny interval.
+                        var lastState = CharacterContactPositionState.Accepted;
                         while (attempts++ < 5 && lowestBound - highestBound > Toolbox.BigEpsilon)
                         {
                             Vector3 candidatePosition = currentPosition + currentOffset * down;
                             float hintOffset;
-                            switch (TrySupportLocation(queryObject, ref candidatePosition, out hintOffset, ref tractionContacts, ref supportContacts, ref sideContacts, ref headContacts))
+                            switch (lastState = TrySupportLocation(queryObject, ref candidatePosition, out hintOffset, ref tractionContacts, ref supportContacts, ref sideContacts, ref headContacts))
                             {
                                 case CharacterContactPositionState.Accepted:
                                     currentOffset += hintOffset;
                                     //Only use the new position location if the movement distance was the right size.
-                                    if (currentOffset > 0 && currentOffset < maximum)
+                                    if (currentOffset <= 0 && currentOffset >= originalHighestBound)
                                     {
                                         newPosition = currentPosition + currentOffset * down;
                                         newHeight = targetHeight;
@@ -318,10 +321,16 @@ namespace BEPUphysics.Character
                                     break;
                             }
                         }
-                        //Couldn't find a hit.  Go ahead and get bigger!
-                        newPosition = currentPosition;
-                        newHeight = targetHeight;
-                        return true;
+                        //If it terminated in a safe state, it can increase in size.
+                        //TODO: You could handle this more efficiently by early terminating the above loop once obstruction is clearly unavoidable.
+                        //(Not messing with it right now because this is likely going to change completely.)
+                        if (lastState == CharacterContactPositionState.Accepted || lastState == CharacterContactPositionState.NoHit)
+                        {
+                            newPosition = currentPosition;
+                            newHeight = targetHeight;
+                            return true;
+                        }
+                        return false;
                     }
                 }
                 finally
@@ -352,6 +361,38 @@ namespace BEPUphysics.Character
             return false;
         }
 
+        bool IsObstructed(ref QuickList<CharacterContact> supportContacts, ref QuickList<CharacterContact> sideContacts, ref QuickList<CharacterContact> headContacts)
+        {
+            if (IsObstructed(ref sideContacts, ref headContacts))
+                return true;
+
+            for (int i = 0; i < supportContacts.Count; ++i)
+            {
+                if (IsSupportContactObstructive(ref supportContacts.Elements[i].Contact))
+                    return true;
+            }
+            return false;
+        }
+
+        bool IsSupportContactObstructive(ref ContactData contact)
+        {
+            //If the contact has less than the allowed penetration depth, allow it.
+            if (contact.PenetrationDepth <= CollisionDetectionSettings.AllowedPenetration)
+            {
+                return false;
+            }
+            //If there is already a contact that is deeper than the new contact, then allow it. It won't make things worse.
+            foreach (var c in SupportFinder.Supports)
+            {
+                //An existing contact is considered 'deeper' if its normal-adjusted depth is greater than the new contact.
+                float dot = Vector3.Dot(contact.Normal, c.Contact.Normal);
+                float depth = dot * c.Contact.PenetrationDepth + Toolbox.BigEpsilon;
+                if (depth >= contact.PenetrationDepth)
+                    return false;
+            }
+            return true;
+        }
+
         bool IsObstructed(ref QuickList<CharacterContact> sideContacts, ref QuickList<CharacterContact> headContacts)
         {
             //No head contacts can exist!
@@ -360,32 +401,32 @@ namespace BEPUphysics.Character
             //A contact is considered obstructive if its projected depth is deeper than any existing contact along the existing contacts' normals.
             for (int i = 0; i < sideContacts.Count; i++)
             {
-                if (IsObstructive(ref sideContacts.Elements[i].Contact))
+                if (IsSideContactObstructive(ref sideContacts.Elements[i].Contact))
                     return true;
             }
             return false;
         }
 
-        bool IsObstructive(ref ContactData contact)
+        bool IsSideContactObstructive(ref ContactData contact)
         {
             //Can't stand up if there are new side contacts that are too deep.
-            if (SupportFinder.SideContacts.Count == 0 && contact.PenetrationDepth > CollisionDetectionSettings.AllowedPenetration)
+            //If the contact has less than the allowed penetration depth, allow it.
+            if (contact.PenetrationDepth <= CollisionDetectionSettings.AllowedPenetration)
             {
-                return true;
+                return false;
             }
-
-            //Go through side-facing contact and check to see if the new contact is deeper than any existing contact in the direction of the existing contact.
-            //This is equivalent to considering the existing contacts to define planes and then comparing the new contact against those planes.
-            //Since we already have the penetration depths, we don't need to use the positions of the contacts.
+            //If there is already a contact that is deeper than the new contact, then allow it. It won't make things worse.
+            //Adding this extra permission avoids situations where the character can't stand up because it's just slightly pushed up against a wall.
             foreach (var c in SupportFinder.SideContacts)
             {
+                //An existing contact is considered 'deeper' if its normal-adjusted depth is greater than the new contact.
                 float dot = Vector3.Dot(contact.Normal, c.Contact.Normal);
-                float depth = dot * c.Contact.PenetrationDepth;
-                if (depth > Math.Max(c.Contact.PenetrationDepth, CollisionDetectionSettings.AllowedPenetration))
-                    return true;
+                float depth = dot * c.Contact.PenetrationDepth + Toolbox.BigEpsilon;
+                if (depth >= contact.PenetrationDepth)
+                    return false;
 
             }
-            return false;
+            return true;
         }
 
         CharacterContactPositionState TrySupportLocation(ConvexCollidable<CylinderShape> queryObject, ref Vector3 position, out float hintOffset,
