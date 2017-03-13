@@ -401,33 +401,12 @@ namespace BEPUphysics.Character
             //A contact is considered obstructive if its projected depth is deeper than any existing contact along the existing contacts' normals.
             for (int i = 0; i < sideContacts.Count; i++)
             {
-                if (IsSideContactObstructive(ref sideContacts.Elements[i].Contact))
+                if (SupportFinder.IsSideContactObstructive(ref sideContacts.Elements[i].Contact))
                     return true;
             }
             return false;
         }
 
-        bool IsSideContactObstructive(ref ContactData contact)
-        {
-            //Can't stand up if there are new side contacts that are too deep.
-            //If the contact has less than the allowed penetration depth, allow it.
-            if (contact.PenetrationDepth <= CollisionDetectionSettings.AllowedPenetration)
-            {
-                return false;
-            }
-            //If there is already a contact that is deeper than the new contact, then allow it. It won't make things worse.
-            //Adding this extra permission avoids situations where the character can't stand up because it's just slightly pushed up against a wall.
-            foreach (var c in SupportFinder.SideContacts)
-            {
-                //An existing contact is considered 'deeper' if its normal-adjusted depth is greater than the new contact.
-                float dot = Vector3.Dot(contact.Normal, c.Contact.Normal);
-                float depth = dot * c.Contact.PenetrationDepth + Toolbox.BigEpsilon;
-                if (depth >= contact.PenetrationDepth)
-                    return false;
-
-            }
-            return true;
-        }
 
         CharacterContactPositionState TrySupportLocation(ConvexCollidable<CylinderShape> queryObject, ref Vector3 position, out float hintOffset,
             ref QuickList<CharacterContact> tractionContacts, ref QuickList<CharacterContact> supportContacts, ref QuickList<CharacterContact> sideContacts, ref QuickList<CharacterContact> headContacts)

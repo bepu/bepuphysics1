@@ -7,6 +7,7 @@ using BEPUutilities;
 using BEPUutilities.DataStructures;
 using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.CollisionRuleManagement;
+using BEPUphysics.Settings;
 
 namespace BEPUphysics.Character
 {
@@ -512,6 +513,30 @@ namespace BEPUphysics.Character
                 return true;
             }
             return false;
+        }
+
+
+        internal bool IsSideContactObstructive(ref ContactData contact)
+        {
+            //Can't stand up or step down if there are new side contacts that are too deep.
+            //If the contact has less than the allowed penetration depth, allow it.
+            if (contact.PenetrationDepth <= CollisionDetectionSettings.AllowedPenetration)
+            {
+                return false;
+            }
+            //If there is already a contact that is deeper than the new contact, then allow it. It won't make things worse.
+            //Adding this extra permission avoids situations where the character can't stand up because it's just slightly pushed up against a wall.
+            foreach (var c in SideContacts)
+            {
+                //An existing contact is considered 'deeper' if its normal-adjusted depth is greater than the new contact.
+                float dot = Vector3.Dot(contact.Normal, c.Contact.Normal);
+                float depth = dot * c.Contact.PenetrationDepth + Toolbox.BigEpsilon;
+                if (depth >= contact.PenetrationDepth)
+                    return false;
+
+            }
+            return true;
+
         }
 
 

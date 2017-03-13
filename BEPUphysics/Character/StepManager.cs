@@ -88,33 +88,12 @@ namespace BEPUphysics.Character
             //A contact is considered obstructive if its projected depth is deeper than any existing contact along the existing contacts' normals.
             for (int i = 0; i < sideContacts.Count; i++)
             {
-                if (IsObstructiveToDownStepping(ref sideContacts.Elements[i].Contact))
+                if (SupportFinder.IsSideContactObstructive(ref sideContacts.Elements[i].Contact))
                     return true;
             }
             return false;
         }
-
-        bool IsObstructiveToDownStepping(ref ContactData contact)
-        {
-            //If there weren't any contacts before, and the new contact is too deep, then it's obstructive.
-            //If it is barely touching then it's not really an issue.
-            if (SupportFinder.SideContacts.Count == 0 && contact.PenetrationDepth > CollisionDetectionSettings.AllowedPenetration)
-            {
-                return true;
-            }
-            //Go through side-facing contact and check to see if the new contact is deeper than any existing contact in the direction of the existing contact.
-            //This is equivalent to considering the existing contacts to define planes and then comparing the new contact against those planes.
-            //Since we already have the penetration depths, we don't need to use the positions of the contacts.
-            foreach (var c in SupportFinder.SideContacts)
-            {
-                float dot = Vector3.Dot(contact.Normal, c.Contact.Normal);
-                float depth = dot * c.Contact.PenetrationDepth;
-                if (depth > c.Contact.PenetrationDepth)
-                    return true;
-
-            }
-            return false;
-        }
+        
 
 
         RawList<ContactData> stepContacts = new RawList<ContactData>();
