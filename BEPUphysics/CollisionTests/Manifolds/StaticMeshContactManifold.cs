@@ -55,7 +55,8 @@ namespace BEPUphysics.CollisionTests.Manifolds
             localTriangleShape.vA = data.vertices[data.indices[triangleIndex]];
             localTriangleShape.vB = data.vertices[data.indices[triangleIndex + 1]];
             localTriangleShape.vC = data.vertices[data.indices[triangleIndex + 2]];
-            localTriangleShape.sidedness = mesh.sidedness;
+            //TODO: Note the IsQuery hack to avoid missing contacts. Avoid doing this in v2.
+            localTriangleShape.sidedness = IsQuery ? TriangleSidedness.DoubleSided : mesh.sidedness;
             localTriangleShape.collisionMargin = 0;
             indices = new TriangleIndices
                           {

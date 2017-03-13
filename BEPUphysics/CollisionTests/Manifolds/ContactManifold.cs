@@ -10,9 +10,19 @@ namespace BEPUphysics.CollisionTests.Manifolds
     ///</summary>
     public abstract class ContactManifold
     {
+        /// <summary>
+        /// Gets or sets whether this pair handler should avoid doing any prefiltering on contacts that might destroy information for the user.
+        /// Some pairs, like the convex-mesh types, will operate a little differently when used as a query. This is a hack that should be addressed later.
+        /// </summary>
+        /// <remarks>
+        /// Very few manifolds actually make use of this. It exists solely as a hack to compensate for other design limitations surrounding collision detection APIs
+        /// and specifically one sided mesh contact generation breaking character controller stance queries.
+        /// </remarks>
+        public bool IsQuery { get; set; }
 
         protected RawList<int> contactIndicesToRemove;
         protected internal RawList<Contact> contacts;
+
 
         ///<summary>
         /// Gets the contacts in the manifold.

@@ -7,6 +7,7 @@ using BEPUutilities.DataStructures;
 using BEPUphysics.NarrowPhaseSystems;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.Settings;
+using BEPUphysics.NarrowPhaseSystems.Pairs;
 
 namespace BEPUphysics.Character
 {
@@ -139,8 +140,10 @@ namespace BEPUphysics.Character
         /// <param name="supportContacts">Output contacts that would provide support.</param>
         /// <param name="sideContacts">Output contacts on the sides of the query object.</param>
         /// <param name="headContacts">Output contacts on the head of the query object.</param>
+        /// <param name="forceStandardPairsToBeQueries">An extremely hacky control parameter that makes any mesh-cylinder pair treat the mesh as double sided. Useful for not going through the ceiling when changing stances.</param>
         public void QueryContacts(EntityCollidable queryObject,
-            ref QuickList<CharacterContact> tractionContacts, ref QuickList<CharacterContact> supportContacts, ref QuickList<CharacterContact> sideContacts, ref QuickList<CharacterContact> headContacts)
+            ref QuickList<CharacterContact> tractionContacts, ref QuickList<CharacterContact> supportContacts, ref QuickList<CharacterContact> sideContacts, ref QuickList<CharacterContact> headContacts,
+            bool forceStandardPairsToBeQueries = false)
         {
             var downDirection = characterBody.orientationMatrix.Down;
 
@@ -158,9 +161,28 @@ namespace BEPUphysics.Character
                     var pairHandler = NarrowPhaseHelper.GetPairHandler(ref pair);
                     if (pairHandler.CollisionRule == CollisionRule.Normal)
                     {
+                        if (forceStandardPairsToBeQueries)
+                        {
+                            //TODO: This is a massive hack that assumes a fixed set of collidable types. This won't work in the long run.
+                            //The only reason it's here is that it was the easiest solution, combined with the fact that the character has to be rewritten for v2 anyway.
+                            //Hopefully no one gets bit by this before the replacement is available.
+                            //The core reason it exists is that one sided meshes don't generate contacts on their backside. That means a query shape can end up above a ceiling
+                            //and it won't detect the ceiling. A better solution would be to let the caller choose whether or not to filter the contacts, and then use a 
+                            //direct test rather than stateful pair to perform the query here. Still some type-related annoyance to deal with, but a bit better.
+                            var standardPair = pairHandler as StandardPairHandler;
+                            if (standardPair != null)
+                                standardPair.ContactManifold.IsQuery = true;
+                        }
                         pairHandler.SuppressEvents = true;
                         pairHandler.UpdateCollision(0);
                         pairHandler.SuppressEvents = false;
+                        if (forceStandardPairsToBeQueries)
+                        {
+                            //TODO: Again, superhack! Avoid this in v2.
+                            var standardPair = pairHandler as StandardPairHandler;
+                            if (standardPair != null)
+                                standardPair.ContactManifold.IsQuery = false;
+                        }
 
                         contactCategorizer.CategorizeContacts(pairHandler, characterBody.CollisionInformation, ref downDirection,
                                                               ref tractionContacts, ref supportContacts, ref sideContacts, ref headContacts);

@@ -102,20 +102,26 @@ namespace BEPUphysics.CollisionTests.Manifolds
             int triangleIndex = overlappedTriangles.Elements[i];
 
             TriangleSidedness sidedness;
-            switch (mesh.Shape.solidity)
+            //TODO: Note superhack; don't do this in v2.
+            if (IsQuery)
+                sidedness = TriangleSidedness.DoubleSided;
+            else
             {
-                case MobileMeshSolidity.Clockwise:
-                    sidedness = TriangleSidedness.Clockwise;
-                    break;
-                case MobileMeshSolidity.Counterclockwise:
-                    sidedness = TriangleSidedness.Counterclockwise;
-                    break;
-                case MobileMeshSolidity.DoubleSided:
-                    sidedness = TriangleSidedness.DoubleSided;
-                    break;
-                default:
-                    sidedness = mesh.Shape.SidednessWhenSolid;
-                    break;
+                switch (mesh.Shape.solidity)
+                {
+                    case MobileMeshSolidity.Clockwise:
+                        sidedness = TriangleSidedness.Clockwise;
+                        break;
+                    case MobileMeshSolidity.Counterclockwise:
+                        sidedness = TriangleSidedness.Counterclockwise;
+                        break;
+                    case MobileMeshSolidity.DoubleSided:
+                        sidedness = TriangleSidedness.DoubleSided;
+                        break;
+                    default:
+                        sidedness = mesh.Shape.SidednessWhenSolid;
+                        break;
+                }
             }
             localTriangleShape.sidedness = sidedness;
             localTriangleShape.collisionMargin = 0;

@@ -263,7 +263,7 @@ namespace BEPUphysics.Character
                         //there's no need to do the full query.
                         newPosition = currentPosition - down * ((targetHeight - currentHeight) * .5f);
                         PrepareQueryObject(queryObject, ref newPosition);
-                        QueryManager.QueryContacts(queryObject, ref tractionContacts, ref supportContacts, ref sideContacts, ref headContacts);
+                        QueryManager.QueryContacts(queryObject, ref tractionContacts, ref supportContacts, ref sideContacts, ref headContacts, true);
                         if (IsObstructed(ref supportContacts, ref sideContacts, ref headContacts))
                         {
                             //Can't stand up if something is in the way!
@@ -434,7 +434,7 @@ namespace BEPUphysics.Character
         {
             hintOffset = 0;
             PrepareQueryObject(queryObject, ref position);
-            QueryManager.QueryContacts(queryObject, ref tractionContacts, ref supportContacts, ref sideContacts, ref headContacts);
+            QueryManager.QueryContacts(queryObject, ref tractionContacts, ref supportContacts, ref sideContacts, ref headContacts, true);
 
             bool obstructed = IsObstructed(ref sideContacts, ref headContacts);
             if (obstructed)

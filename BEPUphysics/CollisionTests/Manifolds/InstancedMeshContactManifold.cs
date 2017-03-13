@@ -75,7 +75,8 @@ namespace BEPUphysics.CollisionTests.Manifolds
         {
             MeshBoundingBoxTreeData data = mesh.Shape.TriangleMesh.Data;
             int triangleIndex = overlappedTriangles.Elements[i];
-            localTriangleShape.sidedness = mesh.sidedness;
+            //TODO: Note the IsQuery hack to avoid missing contacts. Avoid doing this in v2.
+            localTriangleShape.sidedness = IsQuery ? TriangleSidedness.DoubleSided : mesh.sidedness;
             localTriangleShape.collisionMargin = 0;
             indices = new TriangleIndices
             {
