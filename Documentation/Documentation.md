@@ -15,8 +15,8 @@ Looking for samples? In addition to the projects found in the individual section
 
 [Updating Asynchronously](UpdatingAsynchronously.md)
 
-[Collision Behavior Tuning Tips](http://www.bepu-games.com/forum/viewtopic.php?f=4&t=2362&p=13386)
+[Collision Behavior Tuning Tips](https://forum.bepuentertainment.com/viewtopic.php?f=4&t=2362&p=13386)
 
-[Constraint Stability Tuning Tips](http://www.bepu-games.com/forum/viewtopic.php?f=4&t=2364)
+[Constraint Stability Tuning Tips](https://forum.bepuentertainment.com/viewtopic.php?f=4&t=2364)
 
-[Some Math and Geometry Resources, Tools, and Tricks](http://www.bepu-games.com/forum/viewtopic.php?f=4&t=1442)
+[Some Math and Geometry Resources, Tools, and Tricks](https://forum.bepuentertainment.com/viewtopic.php?f=4&t=1442)

@@ -17,24 +17,24 @@ The Joint class in BEPUphysics connects two entities together. All Joints restri
 The BallSocketJoint restricts all three linear degrees of freedom. Each entity has a point attached and the constraint attempts to keep the two points at the same location.
 
 BallSocketJoints are very common and act as the linear component of many constraint configurations. For example, in a ragdoll, every joint has a BallSocketJoint to keep the body together (along with other constraints to handle angular motion). 
-![image](images/joints and constraints/ballsocket.png)
+![image](images/joints%20and%20constraints/ballsocket.png)
 
 ### 2.B | DistanceJoint
 The DistanceJoint removes a single linear degree of freedom. Each entity has a point attached and the constraint attempts to keep them at the same distance.
 
 A target distance of zero will be difficult to maintain since the constraint only works on a single degree of freedom instead of three. If zero distance is desired between the anchor points, consider using a BallSocketJoint.
 
-![image](images/joints and constraints/distance.png)
+![image](images/joints%20and%20constraints/distance.png)
 
 ### 2.C | PointOnLineJoint
 The PointOnLineJoint restricts two linear degrees of freedom. An infinite line is attached to entity A and a point is attached to entity B. The constraint attempts to keep the point on the line.
 
-![image](images/joints and constraints/pointonline.png)
+![image](images/joints%20and%20constraints/pointonline.png)
 
 ### 2.D | PointOnPlaneJoint
 The PointOnPlaneJoint restricts one linear degree of freedom. An infinite plane is attached to entity A and a point is attached to entity B. The constraint attempts to keep the point on the plane.
 
-![image](images/joints and constraints/pointonplane.png)
+![image](images/joints%20and%20constraints/pointonplane.png)
 
 ### 2.E | TwistJoint
 The TwistJoint restricts one angular degree of freedom. Each entity has an axis attached and the constraint attempts to prevent any relative twisting motion around the axes.
@@ -66,28 +66,28 @@ The DistanceLimit restricts one linear degree of freedom. Each entity has a poin
 
 In the following picture, the outer gray shell represents the maximum distance that the blue point can move away from the inner red point. The inner yellow shell represents the minimum distance that must be maintained between the red and blue points.
 
-![image](images/joints and constraints/distancelimit.png)
+![image](images/joints%20and%20constraints/distancelimit.png)
 
 ### 3.B | EllipseSwingLimit
 The EllipseSwingLimit restricts one angular degree of freedom. Each entity has an axis attached. The constraint attempts to keep the axes at an angle no greater than the angle limit defined by an ellipse.
 
 EllipseSwingLimits are commonly used in shoulder-like joints with complicated allowed motion.
 
-![image](images/joints and constraints/ellipseswinglimit.png)
+![image](images/joints%20and%20constraints/ellipseswinglimit.png)
 
 ### 3.C | LinearAxisLimit
 The LinearAxisLimit restricts one linear degree of freedom. A point and axis are attached to entity A and a point is attached to entity B. The constraint attempts to keep entity B's point from moving beyond the minimum or maximum distance along the axis from entity A's point.
 
 One common application of the LinearAxisLimit is to keep entities attached with a PointOnLineJoint from sliding away from each other.
 
-![image](images/joints and constraints/linearaxislimit.png)
+![image](images/joints%20and%20constraints/linearaxislimit.png)
 
 ### 3.D | RevoluteLimit
 The RevoluteLimit restricts one angular degree of freedom, complementing the RevoluteAngularJoint. An axis is attached to entity A and another axis is attached to entity B. The constraint measures the angle of entity B's axis relative to entity A's axis around the swing axis and attempts to keep it within the allowed limits.
 
 Examples of RevoluteLimits can be found in elbow joints, knees, and door hinges. In the following example of a modified RevoluteJoint, the tab on the hinge simulates the limit by preventing the green box from rotating any further.
 
-![image](images/joints and constraints/revolutelimit.png)
+![image](images/joints%20and%20constraints/revolutelimit.png)
 
 ### 3.E | SwingLimit
 The SwingLimit restricts one angular degree of freedom and acts like a special case of the EllipseSwingLimit, where the ellipse is a circle. Using this constraint where appropriate can help performance.
@@ -134,7 +134,7 @@ The LineSliderJoint is created from a PointOnLineJoint and a RevoluteAngularJoin
 
 The LineSliderJoint also provides a LinearAxisLimit and a LinearAxisMotor, which are inactive by default.
 
-![image](images/joints and constraints/lineslider.png)
+![image](images/joints%20and%20constraints/lineslider.png)
 
 ### 5.B | PlaneSliderJoint
 The PlaneSliderJoint restricts a single linear degree of freedom. It is created from a PointOnPlaneJoint and a LinearAxisLimit and LinearAxisMotor for each of two axes on the plane. The limits and motors are inactive by default.
@@ -146,7 +146,7 @@ The PrismaticJoint allows a single sliding linear degree of freedom and zero ang
 
 The joint also provides a LinearAxisLimit and a LinearAxisMotor which are initially inactive.
 
-![image](images/joints and constraints/prismatic.png)
+![image](images/joints%20and%20constraints/prismatic.png)
 
 ### 5.D | RevoluteJoint
 The RevoluteJoint allows one angular degree of freedom between two entities. It is composed of a BallSocketJoint and RevoluteAngularJoint.
@@ -155,19 +155,19 @@ RevoluteJoints are commonly used for door hinges, elbows, and axis joints.
 
 The joint also provides a RevoluteLimit and a RevoluteMotor which are initially inactive.
 
-![image](images/joints and constraints/revolute.png)
+![image](images/joints%20and%20constraints/revolute.png)
 
 ### 5.E | SwivelHingeJoint
 The SwivelHingeJoint allows two angular degrees of freedom between two entities. It is comprised of a BallSocketJoint and a SwivelHingeAngularJoint.
 
 The joint also provides control over the free degrees of freedom through its RevoluteLimit, RevoluteMotor, TwistLimit, and TwistMotor which are initially inactive.
 
-![image](images/joints and constraints/swivelhinge.png)
+![image](images/joints%20and%20constraints/swivelhinge.png)
 
 ### 5.F | UniversalJoint
 The UniversalJoint allows two angular degrees of freedom between two entities. It is comprised of a BallSocketJoint and a TwistJoint. It's useful for transferring twist motion around angles, such as in vehicle drive shafts. The UniversalJoint also provides a TwistLimit and TwistMotor which are initially inactive. These are not complementary to the TwistJoint; the TwistJoint should be inactive if either the limit or motor is active.
 
-![image](images/joints and constraints/universal.png)
+![image](images/joints%20and%20constraints/universal.png)
 
 ### 5.G | WeldJoint
 The WeldJoint removes all degrees of freedom between two entities. It is composed of a BallSocketJoint and a NoRotationJoint.

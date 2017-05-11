@@ -25,4 +25,4 @@ If you're feeling angelic, you can throw money at us:
 
 ![](Documentation/images/readme/angelduck.png)
 
-[![](Documentation/images/readme/throw money.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=contact%40bepuentertainment%2ecom&lc=US&item_name=BEPUphysics&no_note=0¤cy_code=USD&bn=PP%2dDonationsBF%3abtn_donate_LG%2egif%3aNonHostedGuest)
+[![](Documentation/images/readme/throw%20money.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=contact%40bepuentertainment%2ecom&lc=US&item_name=BEPUphysics&no_note=0¤cy_code=USD&bn=PP%2dDonationsBF%3abtn_donate_LG%2egif%3aNonHostedGuest)

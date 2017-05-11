@@ -9,7 +9,7 @@ To understand exactly how this system works, it helps to first understand how th
 ### 1.A | BroadPhase: Creating a Collision Pair
 The first stage in the pipeline, known as “broad phase” collision detection, determines which collidable objects are in danger of colliding. Each collidable object has its own axis-aligned bounding box which fully contains the collision shape of the collidable object. A bounding box overlap signifies a potential collision pair, such as in the image below.
 
-![image](images/collision rules/overlap.png)
+![image](images/collision%20rules/overlap.png)
 
 The BroadPhases of BEPUphysics identify these pairs using various acceleration structures. The current recommended BroadPhase, DynamicHierarchy, uses incrementally updated hierarchical bounding volumes that can be traversed for quick pair finding.
 
@@ -61,7 +61,7 @@ To use custom collision groups, simply create a new CollisionGroup instance. You
 ### 2.C | Combining Collision Rules
 Since there are three different settings for each collidable object in a pair, some computation must be done to determine what CollisionRule to use for the collision pair. This is done through prioritizing more specific rules over more general relationships. The Specific rules are considered the most specific, the personal rules are in the middle, and the collision groups are the most general.
 
-![image](images/collision rules/rulepriority.png)
+![image](images/collision%20rules/rulepriority.png)
 
 The Specific rule, if defined, overrides the personal rule which, if defined, overrides the group rule. If after going through all stages no CollisionRule has been defined, the CollisionRules.DefaultCollisionRule is returned.
 

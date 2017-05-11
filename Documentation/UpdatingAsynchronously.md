@@ -28,7 +28,7 @@ Buffered properties read from a buffer that flips after each space update comple
 
 Buffered properties are thread safe, allowing multiple threads to read from and write to them simultaneously. None of the interactions with buffered properties will interfere with the updating of the engine. The following example shows how the main thread's reads and writes interact with the space update thread's buffering systems.
 
-![image](images/updating asynchronously/buffering.png)
+![image](images/updating%20asynchronously/buffering.png)
 
 Writes to buffered properties accumulate in the write buffer until the space update hits the “Apply Writes” stage. Buffered reads check the current visible buffer while the other buffer is internally updated with more current information. The “Flip Read Buffers” stage acquires a lock (see the next section) and switches the positions of the read buffers.
 
@@ -48,7 +48,7 @@ The BufferedStatesManager’s interpolated states (also accessible from the Entity
 
 Interpolation fills in the gaps between frames. Frequently, when the physics thread's loop calls the space's update method, not enough time has elapsed since the previous time step to warrant another time step. Rather than do nothing and give the other systems jerky states, the last two time steps' results are blended together to form an intermediate state.
 
-![image](images/updating asynchronously/interpolation.png)
+![image](images/updating%20asynchronously/interpolation.png)
 
 The amount of the previous and current states to use is defined by the amount of time that has built up since the last time step. For example:
 
@@ -65,7 +65,7 @@ These amounts are used in simple linear interpolation to blend the position, whi
 ## **3 | Thread Interaction**
 While on Windows the thread scheduler will generally be able to resolve the placement and scheduling of threads, the Xbox360 will need a more hands-on approach. The engine should not be running on the same core as other intensive tasks to avoid stalling the physics. For example, here is one possible configuration:
 
-![image](images/updating asynchronously/xboxthreadallocation.png)
+![image](images/updating%20asynchronously/xboxthreadallocation.png)
 
 To define where the physics loop executes, Thread.CurrentThread.SetProcessorAffinity can be called from the beginning of the physics loop method.
 

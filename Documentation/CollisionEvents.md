@@ -84,6 +84,6 @@ Every CompoundBody has a tree of collidables. Compound bodies can have collidabl
 
 In a CompoundBody, it may be inconvenient to attach an event handler to every non-compound child entity. To avoid having to do this, compound bodies collect the events of their children. Attaching an event to a CompoundBody will trigger on the events of its children.
 
-![image](images/collision events/compoundevents.png)
+![image](images/collision%20events/compoundevents.png)
 
 Any CompoundBody in the tree above a event-causing child will receive events from that child. This allows the root body to fire all events and the sub-compound bodies to fire events only from particular entities in the tree.
