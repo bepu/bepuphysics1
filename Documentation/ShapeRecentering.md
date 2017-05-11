@@ -24,10 +24,10 @@ The [GraphicMatchingDemo](../BEPUphysicsDemos/Demos/Extras/GraphicMatchingDemo.c
 
 Here are some links to forum posts with similar explanations:
 
-[http://www.bepu-games.com/forum/viewtopic.php?f=4&t=1511](http://www.bepu-games.com/forum/viewtopic.php?f=4&t=1511)
-[http://www.bepu-games.com/forum/viewtopic.php?f=4&t=1516](http://www.bepu-games.com/forum/viewtopic.php?f=4&t=1516)
-[http://www.bepu-games.com/forum/viewtopic.php?f=4&t=1513](http://www.bepu-games.com/forum/viewtopic.php?f=4&t=1513)
-[http://www.bepu-games.com/forum/viewtopic.php?f=4&t=1517](http://www.bepu-games.com/forum/viewtopic.php?f=4&t=1517)
+[https://forum.bepuentertainment.com/viewtopic.php?f=4&t=1511](https://forum.bepuentertainment.com/viewtopic.php?f=4&t=1511)
+[https://forum.bepuentertainment.com/viewtopic.php?f=4&t=1516](https://forum.bepuentertainment.com/viewtopic.php?f=4&t=1516)
+[https://forum.bepuentertainment.com/viewtopic.php?f=4&t=1513](https://forum.bepuentertainment.com/viewtopic.php?f=4&t=1513)
+[https://forum.bepuentertainment.com/viewtopic.php?f=4&t=1517](https://forum.bepuentertainment.com/viewtopic.php?f=4&t=1517)
 
 If the origin of the graphic is desired as the origin of rotation for the entity, the entity.CollisionInformation.LocalPosition can be used to offset the collision shape. The graphic and collision shape will once again match and the center of rotation will be wherever the origin was in the model editor. A post about this can be found here:
-[http://www.bepu-games.com/forum/viewtopic.php?f=4&t=1494](http://www.bepu-games.com/forum/viewtopic.php?f=4&t=1494)
+[https://forum.bepuentertainment.com/viewtopic.php?f=4&t=1494](https://forum.bepuentertainment.com/viewtopic.php?f=4&t=1494)
