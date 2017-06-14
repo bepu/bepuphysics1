@@ -119,7 +119,7 @@ namespace BEPUphysicsDemos.Demos.Extras.Tests
             testSpace0.Update();
             testSpace1.Update();
 
-            for (int i = 0; i < Space.Entities.Count; ++i)
+            for (int i = 0; i < testSpace0.Entities.Count; ++i)
             {
                 if(!testSpace0.Entities[i].MotionState.Equals(testSpace1.Entities[i].MotionState))
                 {
