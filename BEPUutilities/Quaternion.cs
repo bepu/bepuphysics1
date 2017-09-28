@@ -445,12 +445,8 @@ namespace BEPUutilities
         /// <returns>Negated result.</returns>
         public static Quaternion Negate(Quaternion q)
         {
-            Quaternion toReturn;
-            toReturn.X = q.X;
-            toReturn.Y = q.Y;
-            toReturn.Z = q.Z;
-            toReturn.W = q.W;
-            return toReturn;
+            Negate(ref q, out var result);
+            return result;
         }
 
         /// <summary>
@@ -460,12 +456,8 @@ namespace BEPUutilities
         /// <returns>Negated result.</returns>
         public static Quaternion operator -(Quaternion q)
         {
-            Quaternion toReturn;
-            toReturn.X = q.X;
-            toReturn.Y = q.Y;
-            toReturn.Z = q.Z;
-            toReturn.W = q.W;
-            return toReturn;
+            Negate(ref q, out var result);
+            return result;
         }
 
         /// <summary>
