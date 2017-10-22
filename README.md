@@ -1,4 +1,6 @@
-# BEPUphysics
+# BEPUphysics v1
+
+*Looking for the newer bepuphysics v2? Head over to its [repository](https://github.com/bepu/bepuphysics2).*
 
 BEPUphysics is a pure C# 3D physics library by [BEPU](http://bepuphysics.com). It's fast and has a bunch of cool features like constraints, terrain, static and instanced meshes, continuous collision detection, custom collision rules, vehicles, easy multithreading, yadda yadda yadda.
 
@@ -15,7 +17,7 @@ Check the [documentation page](Documentation/Documentation.md) for some deeper d
 
 The library uses its own math libraries for cross platform development. The demo applications rely on [monogame](http://www.monogame.net/).
 
-This repository contains the v1.X.X implementation of BEPUphysics that used to be hosted on [codeplex](https://bepuphysics.codeplex.com/). In the future, there will be another repository for the new v2.X.X implementation, which is pretty much a complete rewrite. Check out the [scratchpad repository](https://github.com/RossNordby/scratchpad) for some early bits and pieces.
+This repository contains the v1.X.X implementation of BEPUphysics that used to be hosted on [codeplex](https://bepuphysics.codeplex.com/). If you want some new fanciness, check out the [bepuphysics v2 repository](https://github.com/bepu/bepuphysics2).
 
 For discussions about BEPUphysics, please head to the [BEPUphysics forums](https://forum.bepuentertainment.com).
 
