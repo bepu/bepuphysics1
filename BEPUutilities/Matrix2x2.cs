@@ -50,7 +50,7 @@ namespace BEPUutilities
         /// </summary>
         public static Matrix2x2 Identity
         {
-            get { return new Matrix2x2(1, 0, 1, 0); }
+            get { return new Matrix2x2(1, 0, 0, 1); }
         }
 
         /// <summary>
