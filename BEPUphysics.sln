@@ -1,13 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27428.2015
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BEPUutilities", "BEPUutilities\BEPUutilities.csproj", "{34853DEA-43A6-4F2F-A379-D1EE04D256D2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BEPUutilities", "BEPUutilities\BEPUutilities.csproj", "{34853DEA-43A6-4F2F-A379-D1EE04D256D2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BEPUphysics", "BEPUphysics\BEPUphysics.csproj", "{C0D52C9F-14B8-4008-8DDC-109C27561A5C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BEPUphysics", "BEPUphysics\BEPUphysics.csproj", "{C0D52C9F-14B8-4008-8DDC-109C27561A5C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BEPUik", "BEPUik\BEPUik.csproj", "{2D5A0344-623A-4BFA-AAB6-8AC64E2A4129}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BEPUik", "BEPUik\BEPUik.csproj", "{2D5A0344-623A-4BFA-AAB6-8AC64E2A4129}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -58,5 +58,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B8626FEB-BD01-4331-96D0-DB0FB96F2BC1}
 	EndGlobalSection
 EndGlobal
