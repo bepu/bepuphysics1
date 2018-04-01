@@ -23,7 +23,6 @@ namespace BEPUphysicsDemos.Demos
             //Springs: Create a lattice of springs to hold the boxes together.
             var platform = new Box(new Vector3(0, 4, 0), 18, 1, 18, 400);
             platform.Material.KineticFriction = .8f;
-
             Space.Add(platform);
 
             //Create a big mess of DistanceJoints representing springs.

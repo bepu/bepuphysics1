@@ -23,8 +23,6 @@ For discussions about BEPUphysics, please head to the [BEPUphysics forums](https
 
 If you're looking for more BEPU-related stuff, head to the [main BEPU website](http://bepuphysics.com).
 
-If you're feeling angelic, you can throw money at us:
+If you're feeling angelic, you can throw money at us on [patreon](https://www.patreon.com/bepu).
 
-![](Documentation/images/readme/angelduck.png)
-
-[![](Documentation/images/readme/throw%20money.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=contact%40bepuentertainment%2ecom&lc=US&item_name=BEPUphysics&no_note=0¤cy_code=USD&bn=PP%2dDonationsBF%3abtn_donate_LG%2egif%3aNonHostedGuest)
+![](https://raw.githubusercontent.com/bepu/bepuphysics1/master/Documentation/images/readme/angelduck.png)
