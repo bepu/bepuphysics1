@@ -4,7 +4,7 @@ using BEPUutilities;
 namespace BEPUik
 {
     /// <summary>
-    /// Keeps the anchor points on two bones at the same distance.
+    /// Keeps a point on one body on top of a line attached to the other body.
     /// </summary>
     public class IKPointOnLineJoint : IKJoint
     {
