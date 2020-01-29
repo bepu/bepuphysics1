@@ -197,83 +197,84 @@ namespace BEPUphysics.CollisionShapes.ConvexShapes
         /// <returns>Whether or not the ray hit the target.</returns>
         public override bool RayTest(ref Ray ray, ref RigidTransform transform, float maximumLength, out RayHit hit)
         {
-            hit = new RayHit();
+            Vector3.Subtract(ref ray.Position, ref transform.Position, out var offset);
+            Matrix3x3.CreateFromQuaternion(ref transform.Orientation, out var orientation);
+            Matrix3x3.TransformTranspose(ref offset, ref orientation, out var localOffset);
+            Matrix3x3.TransformTranspose(ref ray.Direction, ref orientation, out var localDirection);
+            //Note that this division has two odd properties:
+            //1) If the local direction has a near zero component, it is clamped to a nonzero but extremely small value. This is a hack, but it works reasonably well.
+            //The idea is that any interval computed using such an inverse would be enormous. Those values will not be exactly accurate, but they will never appear as a result
+            //because a parallel ray will never actually intersect the surface. The resulting intervals are practical approximations of the 'true' infinite intervals.
+            //2) To compensate for the clamp and abs, we reintroduce the sign in the numerator. Note that it has the reverse sign since it will be applied to the offset to get the T value.
+            var offsetToTScale = new Vector3(
+                (localDirection.X < 0 ? 1 : -1) / Math.Max(1e-15f, Math.Abs(localDirection.X)),
+                (localDirection.Y < 0 ? 1 : -1) / Math.Max(1e-15f, Math.Abs(localDirection.Y)),
+                (localDirection.Z < 0 ? 1 : -1) / Math.Max(1e-15f, Math.Abs(localDirection.Z)));
 
-            Quaternion conjugate;
-            Quaternion.Conjugate(ref transform.Orientation, out conjugate);
-            Vector3 localOrigin;
-            Vector3.Subtract(ref ray.Position, ref transform.Position, out localOrigin);
-            Quaternion.Transform(ref localOrigin, ref conjugate, out localOrigin);
-            Vector3 localDirection;
-            Quaternion.Transform(ref ray.Direction, ref conjugate, out localDirection);
-            Vector3 normal = Toolbox.ZeroVector;
-            float temp, tmin = 0, tmax = maximumLength;
+            //Compute impact times for each pair of planes in local space.
+            var halfExtent = new Vector3(HalfWidth, HalfHeight, HalfLength);
+            Vector3.Subtract(ref localOffset, ref halfExtent, out var negativeTNumerator);
+            Vector3.Add(ref localOffset, ref halfExtent, out var positiveTNumerator);
+            Vector3.Multiply(ref negativeTNumerator, ref offsetToTScale, out var negativeT);
+            Vector3.Multiply(ref positiveTNumerator, ref offsetToTScale, out var positiveT);
+            Vector3.Min(ref negativeT, ref positiveT, out var entryT);
+            Vector3.Max(ref negativeT, ref positiveT, out var exitT);
 
-            if (Math.Abs(localDirection.X) < Toolbox.Epsilon && (localOrigin.X < -halfWidth || localOrigin.X > halfWidth))
-                return false;
-            float inverseDirection = 1 / localDirection.X;
-            float t1 = (-halfWidth - localOrigin.X) * inverseDirection;
-            float t2 = (halfWidth - localOrigin.X) * inverseDirection;
-            var tempNormal = new Vector3(-1, 0, 0);
-            if (t1 > t2)
+            //In order for an impact to occur, the ray must enter all three slabs formed by the axis planes before exiting any of them.
+            //In other words, the first exit must occur after the last entry.
+            var earliestExit = exitT.X < exitT.Y ? exitT.X : exitT.Y;
+            if (exitT.Z < earliestExit)
+                earliestExit = exitT.Z;
+            if (earliestExit > maximumLength)
+                earliestExit = maximumLength;
+            //The interval of ray-box intersection goes from latestEntry to earliestExit. If earliestExit is negative, then the ray is pointing away from the box.
+            if (earliestExit < 0)
             {
-                temp = t1;
-                t1 = t2;
-                t2 = temp;
-                tempNormal *= -1;
+                hit = default;
+                return false;
             }
-            temp = tmin;
-            tmin = Math.Max(tmin, t1);
-            if (temp != tmin)
-                normal = tempNormal;
-            tmax = Math.Min(tmax, t2);
-            if (tmin > tmax)
-                return false;
-            if (Math.Abs(localDirection.Y) < Toolbox.Epsilon && (localOrigin.Y < -halfHeight || localOrigin.Y > halfHeight))
-                return false;
-            inverseDirection = 1 / localDirection.Y;
-            t1 = (-halfHeight - localOrigin.Y) * inverseDirection;
-            t2 = (halfHeight - localOrigin.Y) * inverseDirection;
-            tempNormal = new Vector3(0, -1, 0);
-            if (t1 > t2)
+            float latestEntry;
+            if (entryT.X > entryT.Y)
             {
-                temp = t1;
-                t1 = t2;
-                t2 = temp;
-                tempNormal *= -1;
+                if (entryT.X > entryT.Z)
+                {
+                    latestEntry = entryT.X;
+                    hit.Normal = new Vector3(orientation.M11, orientation.M12, orientation.M13);
+                }
+                else
+                {
+                    latestEntry = entryT.Z;
+                    hit.Normal = new Vector3(orientation.M31, orientation.M32, orientation.M33);
+                }
             }
-            temp = tmin;
-            tmin = Math.Max(tmin, t1);
-            if (temp != tmin)
-                normal = tempNormal;
-            tmax = Math.Min(tmax, t2);
-            if (tmin > tmax)
-                return false;
-            if (Math.Abs(localDirection.Z) < Toolbox.Epsilon && (localOrigin.Z < -halfLength || localOrigin.Z > halfLength))
-                return false;
-            inverseDirection = 1 / localDirection.Z;
-            t1 = (-halfLength - localOrigin.Z) * inverseDirection;
-            t2 = (halfLength - localOrigin.Z) * inverseDirection;
-            tempNormal = new Vector3(0, 0, -1);
-            if (t1 > t2)
+            else
             {
-                temp = t1;
-                t1 = t2;
-                t2 = temp;
-                tempNormal *= -1;
+                if (entryT.Y > entryT.Z)
+                {
+                    latestEntry = entryT.Y;
+                    hit.Normal = new Vector3(orientation.M21, orientation.M22, orientation.M23);
+                }
+                else
+                {
+                    latestEntry = entryT.Z;
+                    hit.Normal = new Vector3(orientation.M31, orientation.M32, orientation.M33);
+                }
             }
-            temp = tmin;
-            tmin = Math.Max(tmin, t1);
-            if (temp != tmin)
-                normal = tempNormal;
-            tmax = Math.Min(tmax, t2);
-            if (tmin > tmax)
+
+            if (earliestExit < latestEntry)
+            {
+                //At no point is the ray in all three slabs at once.
+                hit = default;
                 return false;
-            hit.T = tmin;
-            Vector3.Multiply(ref ray.Direction, tmin, out hit.Location);
-            Vector3.Add(ref hit.Location, ref ray.Position, out hit.Location);
-            Quaternion.Transform(ref normal, ref transform.Orientation, out normal);
-            hit.Normal = normal;
+            }
+            hit.T = latestEntry < 0 ? 0 : latestEntry;
+            //The normal should point away from the center of the box.
+            if (Vector3.Dot(hit.Normal, offset) < 0)
+            {
+                Vector3.Negate(ref hit.Normal, out hit.Normal);
+            }
+            Vector3.Multiply(ref ray.Direction, hit.T, out var offsetFromOrigin);
+            Vector3.Add(ref ray.Position, ref offsetFromOrigin, out hit.Location);
             return true;
         }
 
