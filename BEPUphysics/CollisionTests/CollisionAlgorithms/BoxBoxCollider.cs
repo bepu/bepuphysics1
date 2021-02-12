@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using BEPUutilities.DataStructures;
 using BEPUutilities;
- 
+
 using BEPUphysics.CollisionShapes.ConvexShapes;
 
 namespace BEPUphysics.CollisionTests.CollisionAlgorithms
@@ -122,10 +122,10 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             bR.M12 = aO.M11 * bO.M21 + aO.M12 * bO.M22 + aO.M13 * bO.M23;
             bR.M13 = aO.M11 * bO.M31 + aO.M12 * bO.M32 + aO.M13 * bO.M33;
             Matrix3x3 absBR;
-
-            absBR.M11 = Math.Abs(bR.M11);
-            absBR.M12 = Math.Abs(bR.M12);
-            absBR.M13 = Math.Abs(bR.M13);
+            //Epsilons are added to deal with near-parallel edges.
+            absBR.M11 = Math.Abs(bR.M11) + Toolbox.Epsilon;
+            absBR.M12 = Math.Abs(bR.M12) + Toolbox.Epsilon;
+            absBR.M13 = Math.Abs(bR.M13) + Toolbox.Epsilon;
             float tX = t.X;
             t.X = t.X * aO.M11 + t.Y * aO.M12 + t.Z * aO.M13;
 
@@ -137,9 +137,9 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             bR.M21 = aO.M21 * bO.M11 + aO.M22 * bO.M12 + aO.M23 * bO.M13;
             bR.M22 = aO.M21 * bO.M21 + aO.M22 * bO.M22 + aO.M23 * bO.M23;
             bR.M23 = aO.M21 * bO.M31 + aO.M22 * bO.M32 + aO.M23 * bO.M33;
-            absBR.M21 = Math.Abs(bR.M21);
-            absBR.M22 = Math.Abs(bR.M22);
-            absBR.M23 = Math.Abs(bR.M23);
+            absBR.M21 = Math.Abs(bR.M21) + Toolbox.Epsilon;
+            absBR.M22 = Math.Abs(bR.M22) + Toolbox.Epsilon;
+            absBR.M23 = Math.Abs(bR.M23) + Toolbox.Epsilon;
             float tY = t.Y;
             t.Y = tX * aO.M21 + t.Y * aO.M22 + t.Z * aO.M23;
 
@@ -151,9 +151,9 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             bR.M31 = aO.M31 * bO.M11 + aO.M32 * bO.M12 + aO.M33 * bO.M13;
             bR.M32 = aO.M31 * bO.M21 + aO.M32 * bO.M22 + aO.M33 * bO.M23;
             bR.M33 = aO.M31 * bO.M31 + aO.M32 * bO.M32 + aO.M33 * bO.M33;
-            absBR.M31 = Math.Abs(bR.M31);
-            absBR.M32 = Math.Abs(bR.M32);
-            absBR.M33 = Math.Abs(bR.M33);
+            absBR.M31 = Math.Abs(bR.M31) + Toolbox.Epsilon;
+            absBR.M32 = Math.Abs(bR.M32) + Toolbox.Epsilon;
+            absBR.M33 = Math.Abs(bR.M33) + Toolbox.Epsilon;
             t.Z = tX * aO.M31 + tY * aO.M32 + t.Z * aO.M33;
 
             //A.Z
@@ -181,56 +181,56 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             //A.X x B.X
             ra = aY * absBR.M31 + aZ * absBR.M21;
             rb = bY * absBR.M13 + bZ * absBR.M12;
-            if(absBR.M11 < 1-Toolbox.Epsilon && Math.Abs(t.Z * bR.M21 - t.Y * bR.M31) > ra + rb)
+            if (absBR.M11 < 1 && Math.Abs(t.Z * bR.M21 - t.Y * bR.M31) > ra + rb)
                 return false;
 
             //A.X x B.Y
             ra = aY * absBR.M32 + aZ * absBR.M22;
             rb = bX * absBR.M13 + bZ * absBR.M11;
-            if (absBR.M21 < 1 - Toolbox.Epsilon && Math.Abs(t.Z * bR.M22 - t.Y * bR.M32) > ra + rb)
+            if (absBR.M21 < 1 && Math.Abs(t.Z * bR.M22 - t.Y * bR.M32) > ra + rb)
                 return false;
 
             //A.X x B.Z
             ra = aY * absBR.M33 + aZ * absBR.M23;
             rb = bX * absBR.M12 + bY * absBR.M11;
-            if (absBR.M31 < 1 - Toolbox.Epsilon && Math.Abs(t.Z * bR.M23 - t.Y * bR.M33) > ra + rb)
+            if (absBR.M31 < 1 && Math.Abs(t.Z * bR.M23 - t.Y * bR.M33) > ra + rb)
                 return false;
 
 
             //A.Y x B.X
             ra = aX * absBR.M31 + aZ * absBR.M11;
             rb = bY * absBR.M23 + bZ * absBR.M22;
-            if (absBR.M12 < 1 - Toolbox.Epsilon && Math.Abs(t.X * bR.M31 - t.Z * bR.M11) > ra + rb)
+            if (absBR.M12 < 1 && Math.Abs(t.X * bR.M31 - t.Z * bR.M11) > ra + rb)
                 return false;
 
             //A.Y x B.Y
             ra = aX * absBR.M32 + aZ * absBR.M12;
             rb = bX * absBR.M23 + bZ * absBR.M21;
-            if (absBR.M22 < 1 - Toolbox.Epsilon && Math.Abs(t.X * bR.M32 - t.Z * bR.M12) > ra + rb)
+            if (absBR.M22 < 1 && Math.Abs(t.X * bR.M32 - t.Z * bR.M12) > ra + rb)
                 return false;
 
             //A.Y x B.Z
             ra = aX * absBR.M33 + aZ * absBR.M13;
             rb = bX * absBR.M22 + bY * absBR.M21;
-            if (absBR.M32 < 1 - Toolbox.Epsilon && Math.Abs(t.X * bR.M33 - t.Z * bR.M13) > ra + rb)
+            if (absBR.M32 < 1 && Math.Abs(t.X * bR.M33 - t.Z * bR.M13) > ra + rb)
                 return false;
 
             //A.Z x B.X
             ra = aX * absBR.M21 + aY * absBR.M11;
             rb = bY * absBR.M33 + bZ * absBR.M32;
-            if (absBR.M13 < 1 - Toolbox.Epsilon && Math.Abs(t.Y * bR.M11 - t.X * bR.M21) > ra + rb)
+            if (absBR.M13 < 1 && Math.Abs(t.Y * bR.M11 - t.X * bR.M21) > ra + rb)
                 return false;
 
             //A.Z x B.Y
             ra = aX * absBR.M22 + aY * absBR.M12;
             rb = bX * absBR.M33 + bZ * absBR.M31;
-            if (absBR.M23 < 1 - Toolbox.Epsilon && Math.Abs(t.Y * bR.M12 - t.X * bR.M22) > ra + rb)
+            if (absBR.M23 < 1 && Math.Abs(t.Y * bR.M12 - t.X * bR.M22) > ra + rb)
                 return false;
 
             //A.Z x B.Z
             ra = aX * absBR.M23 + aY * absBR.M13;
             rb = bX * absBR.M32 + bY * absBR.M31;
-            if (absBR.M33 < 1 - Toolbox.Epsilon && Math.Abs(t.Y * bR.M13 - t.X * bR.M23) > ra + rb)
+            if (absBR.M33 < 1 && Math.Abs(t.Y * bR.M13 - t.X * bR.M23) > ra + rb)
                 return false;
 
             return true;
@@ -274,10 +274,10 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             bR.M12 = aO.M11 * bO.M21 + aO.M12 * bO.M22 + aO.M13 * bO.M23;
             bR.M13 = aO.M11 * bO.M31 + aO.M12 * bO.M32 + aO.M13 * bO.M33;
             Matrix3x3 absBR;
-
-            absBR.M11 = Math.Abs(bR.M11);
-            absBR.M12 = Math.Abs(bR.M12);
-            absBR.M13 = Math.Abs(bR.M13);
+            //Epsilons are added to deal with near-parallel edges.
+            absBR.M11 = Math.Abs(bR.M11) + Toolbox.Epsilon;
+            absBR.M12 = Math.Abs(bR.M12) + Toolbox.Epsilon;
+            absBR.M13 = Math.Abs(bR.M13) + Toolbox.Epsilon;
             float tX = t.X;
             t.X = t.X * aO.M11 + t.Y * aO.M12 + t.Z * aO.M13;
 
@@ -301,9 +301,9 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             bR.M21 = aO.M21 * bO.M11 + aO.M22 * bO.M12 + aO.M23 * bO.M13;
             bR.M22 = aO.M21 * bO.M21 + aO.M22 * bO.M22 + aO.M23 * bO.M23;
             bR.M23 = aO.M21 * bO.M31 + aO.M22 * bO.M32 + aO.M23 * bO.M33;
-            absBR.M21 = Math.Abs(bR.M21);
-            absBR.M22 = Math.Abs(bR.M22);
-            absBR.M23 = Math.Abs(bR.M23);
+            absBR.M21 = Math.Abs(bR.M21) + Toolbox.Epsilon;
+            absBR.M22 = Math.Abs(bR.M22) + Toolbox.Epsilon;
+            absBR.M23 = Math.Abs(bR.M23) + Toolbox.Epsilon;
             float tY = t.Y;
             t.Y = tX * aO.M21 + t.Y * aO.M22 + t.Z * aO.M23;
 
@@ -325,9 +325,9 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             bR.M31 = aO.M31 * bO.M11 + aO.M32 * bO.M12 + aO.M33 * bO.M13;
             bR.M32 = aO.M31 * bO.M21 + aO.M32 * bO.M22 + aO.M33 * bO.M23;
             bR.M33 = aO.M31 * bO.M31 + aO.M32 * bO.M32 + aO.M33 * bO.M33;
-            absBR.M31 = Math.Abs(bR.M31);
-            absBR.M32 = Math.Abs(bR.M32);
-            absBR.M33 = Math.Abs(bR.M33);
+            absBR.M31 = Math.Abs(bR.M31) + Toolbox.Epsilon;
+            absBR.M32 = Math.Abs(bR.M32) + Toolbox.Epsilon;
+            absBR.M33 = Math.Abs(bR.M33) + Toolbox.Epsilon;
             t.Z = tX * aO.M31 + tY * aO.M32 + t.Z * aO.M33;
 
             //A.Z
@@ -408,7 +408,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             rarb = aY * absBR.M31 + aZ * absBR.M21 +
                    bY * absBR.M13 + bZ * absBR.M12;
             tl = t.Z * bR.M21 - t.Y * bR.M31;
-            if (absBR.M11 < 1 - Toolbox.Epsilon)
+            if (absBR.M11 < 1)
             {
                 if (tl > rarb)
                 {
@@ -432,7 +432,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             rarb = aY * absBR.M32 + aZ * absBR.M22 +
                    bX * absBR.M13 + bZ * absBR.M11;
             tl = t.Z * bR.M22 - t.Y * bR.M32;
-            if (absBR.M21 < 1 - Toolbox.Epsilon)
+            if (absBR.M21 < 1)
             {
                 if (tl > rarb)
                 {
@@ -456,7 +456,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             rarb = aY * absBR.M33 + aZ * absBR.M23 +
                    bX * absBR.M12 + bY * absBR.M11;
             tl = t.Z * bR.M23 - t.Y * bR.M33;
-            if (absBR.M31 < 1 - Toolbox.Epsilon)
+            if (absBR.M31 < 1)
             {
                 if (tl > rarb)
                 {
@@ -484,7 +484,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             rarb = aX * absBR.M31 + aZ * absBR.M11 +
                    bY * absBR.M23 + bZ * absBR.M22;
             tl = t.X * bR.M31 - t.Z * bR.M11;
-            if (absBR.M12 < 1 - Toolbox.Epsilon)
+            if (absBR.M12 < 1)
             {
                 if (tl > rarb)
                 {
@@ -508,7 +508,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             rarb = aX * absBR.M32 + aZ * absBR.M12 +
                    bX * absBR.M23 + bZ * absBR.M21;
             tl = t.X * bR.M32 - t.Z * bR.M12;
-            if (absBR.M22 < 1 - Toolbox.Epsilon)
+            if (absBR.M22 < 1)
             {
                 if (tl > rarb)
                 {
@@ -532,7 +532,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             rarb = aX * absBR.M33 + aZ * absBR.M13 +
                    bX * absBR.M22 + bY * absBR.M21;
             tl = t.X * bR.M33 - t.Z * bR.M13;
-            if (absBR.M32 < 1 - Toolbox.Epsilon)
+            if (absBR.M32 < 1)
             {
                 if (tl > rarb)
                 {
@@ -560,7 +560,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             rarb = aX * absBR.M21 + aY * absBR.M11 +
                    bY * absBR.M33 + bZ * absBR.M32;
             tl = t.Y * bR.M11 - t.X * bR.M21;
-            if (absBR.M13 < 1 - Toolbox.Epsilon)
+            if (absBR.M13 < 1)
             {
                 if (tl > rarb)
                 {
@@ -584,7 +584,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             rarb = aX * absBR.M22 + aY * absBR.M12 +
                    bX * absBR.M33 + bZ * absBR.M31;
             tl = t.Y * bR.M12 - t.X * bR.M22;
-            if (absBR.M23 < 1 - Toolbox.Epsilon)
+            if (absBR.M23 < 1)
             {
                 if (tl > rarb)
                 {
@@ -608,7 +608,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             rarb = aX * absBR.M23 + aY * absBR.M13 +
                    bX * absBR.M32 + bY * absBR.M31;
             tl = t.Y * bR.M13 - t.X * bR.M23;
-            if (absBR.M33 < 1 - Toolbox.Epsilon)
+            if (absBR.M33 < 1)
             {
                 if (tl > rarb)
                 {
@@ -677,10 +677,10 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             bR.M12 = aO.M11 * bO.M21 + aO.M12 * bO.M22 + aO.M13 * bO.M23;
             bR.M13 = aO.M11 * bO.M31 + aO.M12 * bO.M32 + aO.M13 * bO.M33;
             Matrix3x3 absBR;
-
-            absBR.M11 = Math.Abs(bR.M11);
-            absBR.M12 = Math.Abs(bR.M12);
-            absBR.M13 = Math.Abs(bR.M13);
+            //Epsilons are added to deal with near-parallel edges.
+            absBR.M11 = Math.Abs(bR.M11) + Toolbox.Epsilon;
+            absBR.M12 = Math.Abs(bR.M12) + Toolbox.Epsilon;
+            absBR.M13 = Math.Abs(bR.M13) + Toolbox.Epsilon;
             float tX = t.X;
             t.X = t.X * aO.M11 + t.Y * aO.M12 + t.Z * aO.M13;
 
@@ -723,9 +723,9 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             bR.M21 = aO.M21 * bO.M11 + aO.M22 * bO.M12 + aO.M23 * bO.M13;
             bR.M22 = aO.M21 * bO.M21 + aO.M22 * bO.M22 + aO.M23 * bO.M23;
             bR.M23 = aO.M21 * bO.M31 + aO.M22 * bO.M32 + aO.M23 * bO.M33;
-            absBR.M21 = Math.Abs(bR.M21);
-            absBR.M22 = Math.Abs(bR.M22);
-            absBR.M23 = Math.Abs(bR.M23);
+            absBR.M21 = Math.Abs(bR.M21) + Toolbox.Epsilon;
+            absBR.M22 = Math.Abs(bR.M22) + Toolbox.Epsilon;
+            absBR.M23 = Math.Abs(bR.M23) + Toolbox.Epsilon;
             float tY = t.Y;
             t.Y = tX * aO.M21 + t.Y * aO.M22 + t.Z * aO.M23;
 
@@ -766,9 +766,9 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             bR.M31 = aO.M31 * bO.M11 + aO.M32 * bO.M12 + aO.M33 * bO.M13;
             bR.M32 = aO.M31 * bO.M21 + aO.M32 * bO.M22 + aO.M33 * bO.M23;
             bR.M33 = aO.M31 * bO.M31 + aO.M32 * bO.M32 + aO.M33 * bO.M33;
-            absBR.M31 = Math.Abs(bR.M31);
-            absBR.M32 = Math.Abs(bR.M32);
-            absBR.M33 = Math.Abs(bR.M33);
+            absBR.M31 = Math.Abs(bR.M31) + Toolbox.Epsilon;
+            absBR.M32 = Math.Abs(bR.M32) + Toolbox.Epsilon;
+            absBR.M33 = Math.Abs(bR.M33) + Toolbox.Epsilon;
             t.Z = tX * aO.M31 + tY * aO.M32 + t.Z * aO.M33;
 
             //A.Z
@@ -927,7 +927,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             rarb = aY * absBR.M31 + aZ * absBR.M21 +
                    bY * absBR.M13 + bZ * absBR.M12;
             tl = t.Z * bR.M21 - t.Y * bR.M31;
-            if (absBR.M11 < 1 - Toolbox.Epsilon)
+            if (absBR.M11 < 1)
             {
                 if (tl > rarb)
                 {
@@ -984,7 +984,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             rarb = aY * absBR.M32 + aZ * absBR.M22 +
                    bX * absBR.M13 + bZ * absBR.M11;
             tl = t.Z * bR.M22 - t.Y * bR.M32;
-            if (absBR.M21 < 1 - Toolbox.Epsilon)
+            if (absBR.M21 < 1)
             {
                 if (tl > rarb)
                 {
@@ -1041,7 +1041,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             rarb = aY * absBR.M33 + aZ * absBR.M23 +
                    bX * absBR.M12 + bY * absBR.M11;
             tl = t.Z * bR.M23 - t.Y * bR.M33;
-            if (absBR.M31 < 1 - Toolbox.Epsilon)
+            if (absBR.M31 < 1)
             {
                 if (tl > rarb)
                 {
@@ -1102,7 +1102,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             rarb = aX * absBR.M31 + aZ * absBR.M11 +
                    bY * absBR.M23 + bZ * absBR.M22;
             tl = t.X * bR.M31 - t.Z * bR.M11;
-            if (absBR.M12 < 1 - Toolbox.Epsilon)
+            if (absBR.M12 < 1)
             {
                 if (tl > rarb)
                 {
@@ -1159,7 +1159,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             rarb = aX * absBR.M32 + aZ * absBR.M12 +
                    bX * absBR.M23 + bZ * absBR.M21;
             tl = t.X * bR.M32 - t.Z * bR.M12;
-            if (absBR.M22 < 1 - Toolbox.Epsilon)
+            if (absBR.M22 < 1)
             {
                 if (tl > rarb)
                 {
@@ -1216,7 +1216,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             rarb = aX * absBR.M33 + aZ * absBR.M13 +
                    bX * absBR.M22 + bY * absBR.M21;
             tl = t.X * bR.M33 - t.Z * bR.M13;
-            if (absBR.M32 < 1 - Toolbox.Epsilon)
+            if (absBR.M32 < 1)
             {
                 if (tl > rarb)
                 {
@@ -1277,7 +1277,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             rarb = aX * absBR.M21 + aY * absBR.M11 +
                    bY * absBR.M33 + bZ * absBR.M32;
             tl = t.Y * bR.M11 - t.X * bR.M21;
-            if (absBR.M13 < 1 - Toolbox.Epsilon)
+            if (absBR.M13 < 1)
             {
                 if (tl > rarb)
                 {
@@ -1334,7 +1334,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             rarb = aX * absBR.M22 + aY * absBR.M12 +
                    bX * absBR.M33 + bZ * absBR.M31;
             tl = t.Y * bR.M12 - t.X * bR.M22;
-            if (absBR.M23 < 1 - Toolbox.Epsilon)
+            if (absBR.M23 < 1)
             {
                 if (tl > rarb)
                 {
@@ -1391,7 +1391,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             rarb = aX * absBR.M23 + aY * absBR.M13 +
                    bX * absBR.M32 + bY * absBR.M31;
             tl = t.Y * bR.M13 - t.X * bR.M23;
-            if (absBR.M33 < 1 - Toolbox.Epsilon)
+            if (absBR.M33 < 1)
             {
                 if (tl > rarb)
                 {
@@ -1530,10 +1530,10 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             bR.M12 = aO.M11 * bO.M21 + aO.M12 * bO.M22 + aO.M13 * bO.M23;
             bR.M13 = aO.M11 * bO.M31 + aO.M12 * bO.M32 + aO.M13 * bO.M33;
             Matrix3x3 absBR;
-
-            absBR.M11 = Math.Abs(bR.M11);
-            absBR.M12 = Math.Abs(bR.M12);
-            absBR.M13 = Math.Abs(bR.M13);
+            //Epsilons are added to deal with near-parallel edges.
+            absBR.M11 = Math.Abs(bR.M11) + Toolbox.Epsilon;
+            absBR.M12 = Math.Abs(bR.M12) + Toolbox.Epsilon;
+            absBR.M13 = Math.Abs(bR.M13) + Toolbox.Epsilon;
             float tX = t.X;
             t.X = t.X * aO.M11 + t.Y * aO.M12 + t.Z * aO.M13;
 
@@ -1578,9 +1578,9 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             bR.M21 = aO.M21 * bO.M11 + aO.M22 * bO.M12 + aO.M23 * bO.M13;
             bR.M22 = aO.M21 * bO.M21 + aO.M22 * bO.M22 + aO.M23 * bO.M23;
             bR.M23 = aO.M21 * bO.M31 + aO.M22 * bO.M32 + aO.M23 * bO.M33;
-            absBR.M21 = Math.Abs(bR.M21);
-            absBR.M22 = Math.Abs(bR.M22);
-            absBR.M23 = Math.Abs(bR.M23);
+            absBR.M21 = Math.Abs(bR.M21) + Toolbox.Epsilon;
+            absBR.M22 = Math.Abs(bR.M22) + Toolbox.Epsilon;
+            absBR.M23 = Math.Abs(bR.M23) + Toolbox.Epsilon;
             float tY = t.Y;
             t.Y = tX * aO.M21 + t.Y * aO.M22 + t.Z * aO.M23;
 
@@ -1623,9 +1623,9 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             bR.M31 = aO.M31 * bO.M11 + aO.M32 * bO.M12 + aO.M33 * bO.M13;
             bR.M32 = aO.M31 * bO.M21 + aO.M32 * bO.M22 + aO.M33 * bO.M23;
             bR.M33 = aO.M31 * bO.M31 + aO.M32 * bO.M32 + aO.M33 * bO.M33;
-            absBR.M31 = Math.Abs(bR.M31);
-            absBR.M32 = Math.Abs(bR.M32);
-            absBR.M33 = Math.Abs(bR.M33);
+            absBR.M31 = Math.Abs(bR.M31) + Toolbox.Epsilon;
+            absBR.M32 = Math.Abs(bR.M32) + Toolbox.Epsilon;
+            absBR.M33 = Math.Abs(bR.M33) + Toolbox.Epsilon;
             t.Z = tX * aO.M31 + tY * aO.M32 + t.Z * aO.M33;
 
             //A.Z
@@ -1800,7 +1800,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             rarb = aY * absBR.M31 + aZ * absBR.M21 +
                    bY * absBR.M13 + bZ * absBR.M12;
             tl = t.Z * bR.M21 - t.Y * bR.M31;
-            if (absBR.M11 < 1 - Toolbox.Epsilon)
+            if (absBR.M11 < 1)
             {
                 if (tl > rarb)
                 {
@@ -1860,7 +1860,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             rarb = aY * absBR.M32 + aZ * absBR.M22 +
                    bX * absBR.M13 + bZ * absBR.M11;
             tl = t.Z * bR.M22 - t.Y * bR.M32;
-            if (absBR.M21 < 1 - Toolbox.Epsilon)
+            if (absBR.M21 < 1)
             {
                 if (tl > rarb)
                 {
@@ -1921,7 +1921,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             rarb = aY * absBR.M33 + aZ * absBR.M23 +
                    bX * absBR.M12 + bY * absBR.M11;
             tl = t.Z * bR.M23 - t.Y * bR.M33;
-            if (absBR.M31 < 1 - Toolbox.Epsilon)
+            if (absBR.M31 < 1)
             {
                 if (tl > rarb)
                 {
@@ -1986,7 +1986,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             rarb = aX * absBR.M31 + aZ * absBR.M11 +
                    bY * absBR.M23 + bZ * absBR.M22;
             tl = t.X * bR.M31 - t.Z * bR.M11;
-            if (absBR.M12 < 1 - Toolbox.Epsilon)
+            if (absBR.M12 < 1)
             {
                 if (tl > rarb)
                 {
@@ -2047,7 +2047,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             rarb = aX * absBR.M32 + aZ * absBR.M12 +
                    bX * absBR.M23 + bZ * absBR.M21;
             tl = t.X * bR.M32 - t.Z * bR.M12;
-            if (absBR.M22 < 1 - Toolbox.Epsilon)
+            if (absBR.M22 < 1)
             {
                 if (tl > rarb)
                 {
@@ -2108,7 +2108,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             rarb = aX * absBR.M33 + aZ * absBR.M13 +
                    bX * absBR.M22 + bY * absBR.M21;
             tl = t.X * bR.M33 - t.Z * bR.M13;
-            if (absBR.M32 < 1 - Toolbox.Epsilon)
+            if (absBR.M32 < 1)
             {
                 if (tl > rarb)
                 {
@@ -2173,7 +2173,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             rarb = aX * absBR.M21 + aY * absBR.M11 +
                    bY * absBR.M33 + bZ * absBR.M32;
             tl = t.Y * bR.M11 - t.X * bR.M21;
-            if (absBR.M13 < 1 - Toolbox.Epsilon)
+            if (absBR.M13 < 1)
             {
                 if (tl > rarb)
                 {
@@ -2233,7 +2233,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             rarb = aX * absBR.M22 + aY * absBR.M12 +
                    bX * absBR.M33 + bZ * absBR.M31;
             tl = t.Y * bR.M12 - t.X * bR.M22;
-            if (absBR.M23 < 1 - Toolbox.Epsilon)
+            if (absBR.M23 < 1)
             {
                 if (tl > rarb)
                 {
@@ -2293,7 +2293,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
             rarb = aX * absBR.M23 + aY * absBR.M13 +
                    bX * absBR.M32 + bY * absBR.M31;
             tl = t.Y * bR.M13 - t.X * bR.M23;
-            if (absBR.M33 < 1 - Toolbox.Epsilon)
+            if (absBR.M33 < 1)
             {
                 if (tl > rarb)
                 {
@@ -3919,7 +3919,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 contactData.Count++;
             }
 
-            #endregion
+        #endregion
 
             //Compute depths.
             tempData = contactData;
@@ -3993,7 +3993,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 contactData.Count++;
             }
 
-            #endregion
+        #endregion
 
             //Compute depths.
             tempData = contactData;
@@ -4143,7 +4143,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 }
             }
 
-            #endregion
+        #endregion
 
         #region CLIP EDGE: v2 v3
 
@@ -4265,7 +4265,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 }
             }
 
-            #endregion
+        #endregion
 
         #region CLIP EDGE: v3 v4
 
@@ -4379,7 +4379,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 }
             }
 
-            #endregion
+        #endregion
 
         #region CLIP EDGE: v4 v1
 
@@ -4493,7 +4493,7 @@ namespace BEPUphysics.CollisionTests.CollisionAlgorithms
                 }
             }
 
-            #endregion
+        #endregion
 
             //Compute depths.
             tempData = contactData;
