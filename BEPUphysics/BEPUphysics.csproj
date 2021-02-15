@@ -9,7 +9,7 @@
     <RepositoryUrl>https://github.com/bepu/bepuphysics1.git</RepositoryUrl>
     <PackageTags>physics;3d;rigid body;real time;simulation</PackageTags>
     <Description>Real time physics simulation library.</Description>
-    <Version>1.5.1</Version>
+    <Version>1.5.2</Version>
     <Authors>Ross Nordby</Authors>
     <Company>Bepu Entertainment LLC</Company>
     <Copyright>© Bepu Entertainment LLC</Copyright>
