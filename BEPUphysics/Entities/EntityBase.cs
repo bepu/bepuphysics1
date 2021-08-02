@@ -787,10 +787,25 @@ namespace BEPUphysics.Entities
             MathChecker.Validate(angularVelocity);
         }
 
+        bool ignoreShapeChanges;
         /// <summary>
         /// Gets or sets whether or not to ignore shape changes.  When true, changing the entity's collision shape will not update the volume, density, or inertia tensor. 
         /// </summary>
-        public bool IgnoreShapeChanges { get; set; }
+        public bool IgnoreShapeChanges
+        {
+            get
+            {
+                return ignoreShapeChanges;
+            }
+            set
+            {
+                if (ignoreShapeChanges && !value)
+                    collisionInformation.Shape.ShapeChanged += shapeChangedDelegate;
+                if (!ignoreShapeChanges && value)
+                    collisionInformation.Shape.ShapeChanged -= shapeChangedDelegate;
+                ignoreShapeChanges = value;
+            }
+        }
 
         Action<CollisionShape> shapeChangedDelegate;
         protected void OnShapeChanged(CollisionShape shape)
