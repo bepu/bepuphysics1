@@ -96,8 +96,8 @@ namespace BEPUik
 
             axisX = Vector3.Normalize(axisX);
             axisY = Vector3.Normalize(axisY);
-            Quaternion.Transform(axisX, Quaternion.Inverse(ConnectionA.Orientation));
-            Quaternion.Transform(axisY, Quaternion.Inverse(ConnectionA.Orientation));
+            axisX = Quaternion.Transform(axisX, Quaternion.Inverse(ConnectionA.Orientation));
+            axisY = Quaternion.Transform(axisY, Quaternion.Inverse(ConnectionA.Orientation));
         }
 
         protected internal override void UpdateJacobiansAndVelocityBias()
